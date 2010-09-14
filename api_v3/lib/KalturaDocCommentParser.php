@@ -191,7 +191,14 @@ class KalturaDocCommentParser
 	            $apiErrorsReflected = new ReflectionClass($errorClass);
 	            $apiErrors = $apiErrorsReflected->getConstants();
             
-                $error_array[] = array ( $error , $apiErrors[$error]);
+	            if(isset($apiErrors[$error]))
+	            {
+                	$error_array[] = array ( $error , $apiErrors[$error]);
+	            }
+	            else
+	            {
+	            	KalturaLog::err("Constant [$error] not found in class [$errorClass]");
+	            }
             }
         }
         $this->errors = $error_array;        
