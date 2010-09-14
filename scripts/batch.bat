@@ -1,1 +1,0 @@
-php C:\opt\kaltura\app\batch\KGenericBatchMgr.class.php php C:\opt\kaltura\app\batch\config\pa-win1_config.ini
