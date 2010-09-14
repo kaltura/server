@@ -22,6 +22,5 @@ $application = new Zend_Application(
     APPLICATION_ENV,
     APPLICATION_PATH . '/configs/application.ini'
 );
-ActKeyUtils::checkCurrent();
 $application->bootstrap()
             ->run();
