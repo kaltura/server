@@ -70,5 +70,20 @@ class kCurrentContext
 	 */
 	public static $user_ip;
 	
+	public static function getEntryPoint()
+	{
+		if(self::$service && self::$action)
+			return self::$service . '::' . self::$action;
+			
+		if(isset($_SERVER['SCRIPT_NAME']))
+			return $_SERVER['SCRIPT_NAME'];
+			
+		if(isset($_SERVER['PHP_SELF']))
+			return $_SERVER['PHP_SELF'];
+			
+		if(isset($_SERVER['SCRIPT_FILENAME']))
+			return $_SERVER['SCRIPT_FILENAME'];
+			
+		return '';
+	}
 }
-?>
