@@ -1,5 +1,4 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
 
 class MetadataFilter extends baseObjectFilter
 {
