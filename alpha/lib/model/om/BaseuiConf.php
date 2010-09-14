@@ -1266,6 +1266,17 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
     	
 		return parent::preSave($con);
 	}
+
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null) 
+	{
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
+	}
 	
 	/**
 	 * Code to be run before inserting to database

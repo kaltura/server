@@ -694,6 +694,15 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	{
 		return parent::preSave($con);
 	}
+
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null) 
+	{
+		$this->oldColumnsValues = array(); 
+	}
 	
 	/**
 	 * Code to be run before inserting to database
