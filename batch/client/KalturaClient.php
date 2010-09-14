@@ -5638,13 +5638,6 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd = null;
 
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $freeText = null;
-
 
 }
 
