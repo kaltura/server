@@ -1,0 +1,142 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+tags =  tags - separated by ',' to make it easy to search 
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+------------------------------------------------------------------------------------------------
+name						|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
+------------------------------------------------------------------------------------------------
+addbulkupload				|			|2		|1	|0		|2		|1		|rw |		|	|	|kmc
+addconversionprofile		|			|2		|1	|0		|0		|1		|rw |		|	|	|kmc
+adddataentry				|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+adddownload					|			|1		|1	|0		|0		|1		|rw	|		|	|   |
+adddvdentry					|			|1		|1	|1		|2		|1		|rw	|		|	|   |kdvc
+adddvdjob					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+addentry					|			|1		|1	|1		|2		|1		|rw	|		|	|   |kcw
+addkshow					|			|1		|1	|1		|1		|1		|r	|		|	|   |
+addmoderation				|			|2		|1	|1		|1		|1		|	|		|	|   |
+addpartnerentry				|			|2		|1	|1		|2		|1		|	|		|	|   |
+addplaylist					|			|2		|1	|1		|2		|1		|rw	|		|	|   |
+addroughcutentry			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+adduiconf					|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
+addsearchresult				|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+adduser						|			|2		|1	|0		|0		|1		|	|		|	|   |
+addwidget					|			|1		|1	|0		|0		|1		|	|		|	|   |
+adminlogin					|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
+appendentrytoroughcut		|			|1		|1	|1		|2		|1		|	|		|	|   |
+checknotifications			|			|1		|1	|0		|0		|1		|	|		|	|   |
+clonekshow					|			|2		|1	|1		|1		|1		|rw	|		|	|   |
+cloneroughcut				|			|2		|1	|1		|1		|1		|rw	|		|	|   |
+cloneuiconf					|			|2		|1	|0		|0		|1		|rw	|		|1	|   |app-studio
+collectstats				|			|1		|1	|0		|0		|1		|	|		|	|   |
+contactsalesforce			|			|0		|1	|0		|0		|1		|r	|		|	|	|kmc
+deletedataentry				|			|2		|1	|1		|0		|1		|	|		|	|   |
+deleteentry					|			|2		|1	|1		|0		|1		|	|		|	|   |
+deletekshow					|			|2		|1	|1		|0		|1		|	|		|	|   |
+deleteuser					|			|2		|1	|1		|0		|1		|	|		|	|   |
+deleteplaylist				|			|2		|1	|1		|0		|1		|	|		|	|   |
+deleteuiconf				|			|2		|1	|1		|0		|1		|	|		|	|   |app-studio
+executeplaylist				|			|0		|0	|0		|0		|1		|	|		|1	|   |kpl
+executeplaylistfromcontent	|			|2		|0	|0		|0		|1		|	|		|1	|   |kmc
+generatewidget				|			|0		|1	|1		|1		|1		|	|		|	|   |
+getadmintags				|			|2		|1	|0		|0		|1		|	|		|	|   |
+getallentries				|			|1		|1	|0		|0		|1		|	|		|1	|   |kdp
+getdefaultwidget			|			|2		|1	|0		|0		|1		|rw	|		|	|   |
+getdataentry				|			|1		|1	|0		|0		|1		|	|		|	|   |
+getdvdentry					|			|1		|1	|0		|0		|1		|	|		|	|   |kdvc
+getentries					|			|1		|1	|0		|0		|1		|	|		|1	|   |
+getentry					|			|1		|1	|0		|0		|1		|	|		|1	|   |kdp
+getentryroughcuts			|			|1		|1	|0		|0		|1		|	|		|1	|   |kmc
+getfilehash					|			|1		|1	|0		|0		|1		|	|		|	|   |
+getkshow					|			|1		|1	|0		|0		|1		|r	|		|1	|   |kdp
+getlastversionsinfo			|			|1		|1	|0		|0		|1		|	|		|	|   |
+getmetadata					|			|1		|1	|0		|0		|1		|	|		|1	|   |kdp
+getpartner					|			|0		|1	|0		|0		|1		|	|		|	|   |
+getpartnerinfo				|			|2		|1	|0		|0		|1		|	|		|	|   |kmc
+getpartnerusage				|			|2		|1	|0		|0		|1		|r	|		|	|	|kmc
+getplaylist					|			|1,2	|1	|0		|0		|1		|	|		|	|   |kpl
+getplayliststatsfromcontent	|			|2		|1	|0		|0		|1		|	|		|1	|   |kmc
+getroughcut					|			|1		|1	|0		|0		|1		|	|		|1	|   |
+getthumbnail				|			|1		|1	|0		|0		|1		|	|		|1	|   |
+getuiconf					|			|0		|1	|0		|0		|1		|	|		|1	|   |kdp,kcw,kse
+getuser						|			|2		|1	|0		|0		|1		|	|		|	|   |
+getwidget					|			|0		|1	|0		|0		|1		|	|		|	|   |kdp
+handlemoderation			|			|2		|1	|0		|0		|1		|	|		|	|   |
+listbulkuploads				|			|2		|1	|0		|0		|1		|rw |		|	|	|kmc
+listconversionprofiles		|			|2		|1	|0		|0		|1		|rw |		|	|	|kmc
+listdownloads				|			|2		|1	|0		|0		|1		|rw |		|	|	|kmc
+listdataentries				|			|1		|1	|0		|0		|1		|	|		|	|   |
+listdvdentries				|			|1		|1	|0		|0		|1		|	|		|	|   |
+listentries					|			|2		|1	|0		|0		|1		|	|		|	|   |
+listkshows					|			|2		|1	|2		|0		|1		|	|		|	|   |
+listmoderations				|			|2		|1	|0		|0		|1		|	|		|	|   |
+listmydvdentries			|			|1		|1	|1		|0		|1		|	|		|	|   |
+listmyentries				|			|1		|1	|1		|0		|1		|	|		|	|   |
+listmykshows				|			|1		|1	|2		|0		|1		|	|		|	|   |
+listnotifications			|			|2		|1	|0		|0		|1		|	|		|	|   |
+listpartnerentries			|			|1		|1	|1		|0		|1		|	|		|	|   |
+listpartnerpackages			|			|0		|0	|0		|0		|1		|r	|		|	|	|kmc
+listplaylists				|			|2		|1	|0		|0		|1		|	|		|	|   |
+listuiconfs					|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
+listusers					|			|2		|1	|0		|0		|1		|r  |		|	|	|
+mrss						|			|0		|0	|0		|0		|1		|	|		|	|   |
+myMultiRequest				|			|0		|0	|0		|0		|1		|	|		|1	|   |
+objdetails					|			|0		|1	|0		|0		|1		|	|		|	|   |
+ping						|			|0		|0	|0		|0		|1		|	|		|	|	|						
+purchasepackage				|			|2		|1	|0		|0		|1		|r	|		|	|	|kmc
+queuependingbatchjob		|			|1		|1	|1		|0		|1		|	|		|	|   |
+rankkshow					|			|1		|1	|1		|0		|1		|	|		|	|   |kdp
+registerpartner				|			|0		|0	|0		|0		|1		|	|		|	|   |
+reportentry					|			|1		|1	|1		|1		|1		|	|		|	|   |kdp
+reporterror					|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+reportkshow					|			|1		|1	|1		|1		|1		|	|		|	|   |
+reportuser					|			|1		|1	|1		|1		|1		|	|		|	|   |kmc
+resetadminpassword			|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
+rollbackkshow				|			|1		|1	|1		|0		|1		|	|		|	|   |
+search						|			|0		|1	|0		|0		|1		|	|		|	|   |
+searchauthdata				|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+searchfromurl				|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+searchmediainfo				|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+searchmediaproviders		|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+setmetadata					|			|1		|1	|1		|2		|1		|	|		|	|   |kdp
+startsession				|			|0		|1	|0		|0		|1		|	|		|	|   |
+startwidgetsession			|			|0		|0	|0		|0		|1		|	|		|	|   |kdp
+testnotification			|			|1		|1	|0		|0		|1		|	|		|	|	|
+transcode					|			|2		|1	|1		|2		|1		|rw	|		|	|   |saysme-project
+updateadminpassword			|			|2		|1	|0		|0		|0		|	|		|	|   |kmc
+updatebatchjob				|			|1		|1	|1		|0		|1		|	|		|	|   |
+updatedataentry				|			|1		|1	|1		|1		|1		|	|		|	|   |
+updatedvdentry				|			|1		|1	|1		|1		|1		|	|		|	|   |kdvc
+updateentriesthumbnails		|			|2		|1	|2		|1		|1		|	|		|	|   |
+updateentry					|			|1		|1	|1		|1		|1		|	|		|	|   |kdvc
+updateentrymoderation		|			|2		|1	|0		|0		|1		|	|		|	|   |
+updateentrythumbnail		|			|1		|1	|2		|1		|1		|	|		|	|   |
+updateentrythumbnailjpeg	|			|1		|1	|2		|1		|1		|	|		|	|   |
+updatekshow					|			|1		|1	|1		|1		|1		|	|		|	|   |
+updatekshowowner			|			|2		|1	|1		|1		|1		|	|		|	|   |
+updatenotification			|			|2		|1	|0		|0		|1		|	|		|	|   |
+updatepartner				|			|2		|1	|0		|0		|1		|rw	|		|	|   |
+updateplaylist				|			|2		|1	|1		|1		|1		|	|		|	|   |
+updateuser					|			|2		|1	|2		|1		|1		|	|		|	|   |
+updateuserid				|			|2		|1	|0		|0		|1		|	|		|	|   |
+updateuiconf				|			|2		|1	|0		|0		|1		|	|		|	|   |app-studio
+upload						|			|1		|1	|0		|0		|1		|	|		|	|   |
+uploadjpeg					|			|1		|1	|0		|0		|1		|	|		|	|   |kse?
+viewwidget					|			|1		|1	|1		|1		|1		|	|		|	|   |
+webcamdummy					|			|1		|1	|0		|0		|1		|	|		|	|   |
+---------------------------------------------------------------------------------------------------
+                                                 	 
