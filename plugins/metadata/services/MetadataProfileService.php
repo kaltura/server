@@ -111,7 +111,7 @@ class MetadataProfileService extends KalturaBaseService
 	 * @param file $xsdFile XSD metadata definition
 	 * @param file $viewsFile UI views definition
 	 * @return KalturaMetadataProfile
-	 * @throws KalturaErrors::METADATA_FILE_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 */
 	function addFromFileAction(KalturaMetadataProfile $metadataProfile, $xsdFile, $viewsFile = null)
 	{
