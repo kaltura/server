@@ -83,7 +83,6 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	
 	public function save(PropelPDO $con = null, $isClone = false)
 	{
-		$this->setCustomDataObj();
 		$this->validateConfFilesExistance();
 		
 		$res = parent::save( $con );
@@ -126,7 +125,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		if($this->isColumnModified(uiConfPeer::STATUS) && $this->getStatus() == self::UI_CONF_STATUS_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 	
 	private function validateConfFilesExistance()

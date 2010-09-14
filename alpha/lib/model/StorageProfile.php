@@ -29,14 +29,6 @@ class StorageProfile extends BaseStorageProfile
 	
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
-
-	public function save(PropelPDO $con = null)
-	{
-		// if the custom_data obj has change - serialize it
-		$this->setCustomDataObj();
-		
-		return parent::save ( $con ) ;		
-	}
 	
 	/**
 	 * @return kPathManager

@@ -239,9 +239,6 @@ class kshow extends Basekshow
 		myPartnerUtils::setPartnerIdForObj( $this );
 
 		mySearchUtils::setDisplayInSearch( $this );
-
-		// if the custom_data obj has change - serialize it
-		$this->setCustomDataObj();
 		
 		$res =  parent::save( $con );
 		if ($is_new)

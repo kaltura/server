@@ -58,8 +58,6 @@ class Partner extends BasePartner
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
-		// if the custom_data obj has change - serialize it
-		$this->setCustomDataObj();
 		
 		return parent::save ( $con ) ;		
 	}
