@@ -1,2 +1,0 @@
-<?php
-$sphinxServer = 'ny-sphinx';
