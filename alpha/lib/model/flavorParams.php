@@ -120,12 +120,5 @@ class flavorParams extends BaseflavorParams
 				$finalTags[] = $tag;
 				
 		$this->setTags(implode(',', $finalTags));
-	}
-	
-	public function save(PropelPDO $con = null)
-	{
-		$this->setCustomDataObj();
-		parent::save($con);
-	}
-	
+	}	
 }

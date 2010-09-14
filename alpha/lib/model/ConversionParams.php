@@ -13,12 +13,6 @@ class ConversionParams extends BaseConversionParams
 	const CONVERSION_PARAMS_CREATION_MODE_KMC = 2;
 	const CONVERSION_PARAMS_CREATION_MODE_AUTOMATIC = 3;
 	
-	
-	public function save(PropelPDO $con = null)
-	{
-		$this->setCustomDataObj();
-		return parent::save ( $con ) ;		
-	}
 /*
  * 	public $video = true; 		// should attempt to convert with video
 	public $audio = true; 		// should attempt to convert with audio

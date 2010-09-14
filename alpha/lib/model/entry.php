@@ -194,7 +194,6 @@ class entry extends Baseentry implements ISyncableFile
 	
 	public function justSave($con = null)
 	{
-		$this->setCustomDataObj();
 		return parent::save( $con );
 	}
 	
@@ -278,9 +277,6 @@ class entry extends Baseentry implements ISyncableFile
 		
 		// same for puserId ... 
 		$this->getPuserId( true );
-		
-		// if the custom_data obj has change - serialize it
-		$this->setCustomDataObj();
 
 		// make sure this entry is saved before calling updateAllMetadataVersionsRelevantForEntry, since fixMetadata retrieves the entry from the DB
 		// and checks its data path which was modified above.
@@ -312,7 +308,6 @@ class entry extends Baseentry implements ISyncableFile
 				try{
 					myMetadataUtils::updateAllMetadataVersionsRelevantForEntry ( $this , $version_to_update );
 					$this->resetUpdateWhenReady();
-					$this->setCustomDataObj();
 					$res = parent::save( $con );
 				}
 				catch(Exception $e)
@@ -2404,7 +2399,7 @@ class entry extends Baseentry implements ISyncableFile
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == self::ENTRY_STATUS_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 	
 	/*************** Bulk download functions - start ******************/

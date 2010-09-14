@@ -12,14 +12,6 @@ class EmailIngestionProfile extends BaseEmailIngestionProfile
 	const EMAIL_INGESTION_PROFILE_STATUS_INACTIVE = 0;
 	const EMAIL_INGESTION_PROFILE_STATUS_ACTIVE = 1;
 	
-	public function save(PropelPDO $con = null)
-	{
-		// if the custom_data obj has change - serialize it
-		$this->setCustomDataObj();
-		
-		return parent::save ( $con ) ;		
-	}
-	
 	public function getDefaultCategory() { return $this->getFromCustomData("defaultCategory", null); }
 	public function setDefaultCategory( $v ) { $this->putInCustomData("defaultCategory", $v); } 
 
