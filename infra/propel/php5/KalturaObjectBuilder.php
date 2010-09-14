@@ -12,7 +12,50 @@ require_once 'propel/engine/builder/om/php5/PHP5ObjectBuilder.php';
  */
 class KalturaObjectBuilder extends PHP5ObjectBuilder 
 {
+	const KALTURA_COLUMN_CREATED_AT = 'created_at';
+	const KALTURA_COLUMN_UPDATED_AT = 'updated_at';
+	const KALTURA_COLUMN_CUSTOM_DATA = 'custom_data';
+	
+	protected static $systemColumns = array(
+		self::KALTURA_COLUMN_CREATED_AT,
+		self::KALTURA_COLUMN_UPDATED_AT,
+		self::KALTURA_COLUMN_CUSTOM_DATA,
+	);
+	
+	/**
+	 * Adds class attributes.
+	 * @param      string &$script The script will be modified in this method.
+	 */
+	protected function addAttributes(&$script)
+	{
+		parent::addAttributes($script);
+		
+		$this->addTraceAttributes($script);
+	}
 
+	/**
+	 * Adds the $alreadyInValidation attribute, which prevents attempting to re-validate the same object.
+	 * @param      string &$script The script will be modified in this method.
+	 */
+	protected function addTraceAttributes(&$script)
+	{
+		$script .= "
+	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected \$oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return \$this->oldColumnsValues;
+	}
+";
+	}
+	
 	/**
 	 * Adds the methods related to refreshing, saving and deleting the object.
 	 * @param      string &$script The script will be modified in this method.
@@ -31,10 +74,28 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 	protected function addSaveHooks(&$script)
 	{
 		$table = $this->getTable();
-		$createdAtColumn = $table->getColumn('created_at');
-		$updatedAtColumn = $table->getColumn('updated_at');
+		$createdAtColumn = $table->getColumn(self::KALTURA_COLUMN_CREATED_AT);
+		$updatedAtColumn = $table->getColumn(self::KALTURA_COLUMN_UPDATED_AT);
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		
 		$script .= "
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO \$con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO \$con = null)
+	{";
+		
+		if($customDataColumn)
+		$script .= "
+		\$this->setCustomDataObj();
+    	";
+		
+		$script .= "
+		return parent::preSave(\$con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO \$con
@@ -157,9 +218,113 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		parent::addClassBody($script);
 		
 		$table = $this->getTable();
-		$customDataColumn = $table->getColumn('custom_data');
+		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		if($customDataColumn)
 			$this->addCustomDataMethods($script);
+	}
+
+	/**
+	 * Adds the mutator open body part
+	 * @param      string &$script The script will be modified in this method.
+	 * @param      Column $col The current column.
+	 * @see        addMutatorOpen()
+	 **/
+	protected function addMutatorOpenBody(&$script, Column $col) 
+	{
+		parent::addMutatorOpenBody($script, $col);
+		
+		$clo = strtolower($col->getName());
+		if(in_array($clo, self::$systemColumns))
+			return;
+			
+		$fullColumnName = $this->getColumnConstant($col);
+		$cfc = $col->getPhpName();
+		$script .= "
+		if(!isset(\$this->oldColumnsValues[$fullColumnName]))
+			\$this->oldColumnsValues[$fullColumnName] = \$this->get$cfc();
+";
+	}
+	
+
+	/**
+	 * Adds a setter method for date/time/timestamp columns.
+	 * @param      string &$script The script will be modified in this method.
+	 * @param      Column $col The current column.
+	 * @see        parent::addColumnMutators()
+	 */
+	protected function addTemporalMutator(&$script, Column $col)
+	{
+		$cfc = $col->getPhpName();
+		$clo = strtolower($col->getName());
+		$visibility = $col->getMutatorVisibility();
+
+		$dateTimeClass = $this->getBuildProperty('dateTimeClass');
+		if (!$dateTimeClass) {
+			$dateTimeClass = 'DateTime';
+		}
+
+		$script .= "
+	/**
+	 * Sets the value of [$clo] column to a normalized version of the date/time value specified.
+	 * ".$col->getDescription()."
+	 * @param      mixed \$v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     ".$this->getObjectClassname()." The current object (for fluent API support)
+	 */
+	".$visibility." function set$cfc(\$v)
+	{";
+		
+		$this->addMutatorOpenBody($script, $col);
+
+		$fmt = var_export($this->getTemporalFormatter($col), true);
+
+		$script .= "
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if (\$v === null || \$v === '') {
+			\$dt = null;
+		} elseif (\$v instanceof DateTime) {
+			\$dt = \$v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric(\$v)) { // if it's a unix timestamp
+					\$dt = new $dateTimeClass('@'.\$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					\$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					\$dt = new $dateTimeClass(\$v);
+				}
+			} catch (Exception \$x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export(\$v, true), \$x);
+			}
+		}
+
+		if ( \$this->$clo !== null || \$dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			\$currNorm = (\$this->$clo !== null && \$tmpDt = new $dateTimeClass(\$this->$clo)) ? \$tmpDt->format($fmt) : null;
+			\$newNorm = (\$dt !== null) ? \$dt->format($fmt) : null;
+
+			if ( (\$currNorm !== \$newNorm) // normalized values don't match ";
+
+		if (($def = $col->getDefaultValue()) !== null && !$def->isExpression()) {
+			$defaultValue = $this->getDefaultValueString($col);
+			$script .= "
+					|| (\$dt->format($fmt) === $defaultValue) // or the entered value matches the default";
+		}
+
+		$script .= "
+					)
+			{
+				\$this->$clo = (\$dt ? \$dt->format($fmt) : null);
+				\$this->modifiedColumns[] = ".$this->getColumnConstant($col).";
+			}
+		} // if either are not null
+";
+		$this->addMutatorClose($script, $col);
 	}
 	
 	
@@ -172,15 +337,55 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		$table = $this->getTable();
 
 		$script .= "
-/* ---------------------- CustomData functions ------------------------- */
-	private \$m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected \$m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected \$oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return \$this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string \$name
+	 * @param string \$value
+	 * @param string \$namespace
+	 * @return string
+	 */
 	public function putInCustomData ( \$name , \$value , \$namespace = null )
 	{
 		\$customData = \$this->getCustomDataObj( );
+		
+		\$currentNamespace = '';
+		if(\$namespace)
+			\$currentNamespace = \$namespace;
+			
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace]))
+			\$this->oldCustomDataValues[\$currentNamespace] = array();
+		if(!isset(\$this->oldCustomDataValues[\$currentNamespace][\$name]))
+			\$this->oldCustomDataValues[\$currentNamespace][\$name] = \$customData->get(\$name, \$namespace);
+		
 		\$customData->put ( \$name , \$value , \$namespace );
 	}
 
+	/**
+	 * @param string \$name
+	 * @param string \$namespace
+	 * @param string \$defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( \$name , \$namespace = null , \$defaultValue = null )
 	{
 		\$customData = \$this->getCustomDataObj( );
@@ -189,6 +394,10 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		return \$res;
 	}
 
+	/**
+	 * @param string \$name
+	 * @param string \$namespace
+	 */
 	public function removeFromCustomData ( \$name , \$namespace = null)
 	{
 
@@ -196,18 +405,33 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		return \$customData->remove ( \$name , \$namespace );
 	}
 
+	/**
+	 * @param string \$name
+	 * @param int \$delta
+	 * @param string \$namespace
+	 * @return string
+	 */
 	public function incInCustomData ( \$name , \$delta = 1, \$namespace = null)
 	{
 		\$customData = \$this->getCustomDataObj( );
 		return \$customData->inc ( \$name , \$delta , \$namespace  );
 	}
 
+	/**
+	 * @param string \$name
+	 * @param int \$delta
+	 * @param string \$namespace
+	 * @return string
+	 */
 	public function decInCustomData ( \$name , \$delta = 1, \$namespace = null)
 	{
 		\$customData = \$this->getCustomDataObj(  );
 		return \$customData->dec ( \$name , \$delta , \$namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! \$this->m_custom_data )
@@ -217,6 +441,9 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		return \$this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( \$this->m_custom_data != null )
@@ -224,7 +451,8 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 			\$this->setCustomData( \$this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	";
 		
 	} // addCustomDataMethods()
