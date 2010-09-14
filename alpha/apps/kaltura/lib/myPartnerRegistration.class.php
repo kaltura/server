@@ -208,13 +208,11 @@ class myPartnerRegistration
 		
 		$fromPartner = PartnerPeer::retrieveByPK(kConf::get("template_partner_id"));
 	 	if (!$fromPartner)
-	 		kLog::log("Template content partner was not found!");
+	 		KalturaLog::log("Template content partner was not found!");
  		else
 	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner);
 		
 		$newPartner->setKmcVersion('3');
-		$newPartner->setEnableSilverLight('1');
-		$newPartner->setLiveStreamEnabled('1');
 		$newPartner->save();
 		
 		return $newPartner;
@@ -257,11 +255,6 @@ class myPartnerRegistration
 		$adminKuser->save();
 
 		$adminKuserId = $adminKuser->getId();
-		// add to the new created admin_kuser all the available priviliges
-		$partnerAdminPerms = new adminPermission();
-		$partnerAdminPerms->setAdminKuserId($adminKuserId);
-		$partnerAdminPerms->setGroups(AdminSecurity::GROUP_ALL);
-		$partnerAdminPerms->save();
 
 		return $password;
 	}
