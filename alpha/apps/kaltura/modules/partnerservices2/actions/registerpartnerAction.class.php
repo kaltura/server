@@ -54,14 +54,22 @@ class registerpartnerAction extends defPartnerservices2Action
 			try
 			{
 				$cms_password = $this->getP ( "cms_password" );
+				
+				if ($cmsPassword) {
+					if (!adminKuserPeer::isPasswordStructureValid($cmsPassword)) {
+						$this->addError( APIErrors::PASSWORD_STRUCTURE_INVALID);
+						return;
+					}
+				}
+				
 				$partner_registration = new myPartnerRegistration ();
-				list($pid, $subpid, $pass) = $partner_registration->initNewPartner( $partner->getName() , $partner->getAdminName() , $partner->getAdminEmail() , $partner->getCommercialUse() ,
+				list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $partner->getName() , $partner->getAdminName() , $partner->getAdminEmail() , $partner->getCommercialUse() ,
 					"yes" , $partner->getDescription() , $partner->getUrl1() , $cms_password , $partner );
 
 				$partner_from_db = PartnerPeer::retrieveByPK( $pid );
 
 				// send a confirmation email as well as the result of the service
-				$partner_registration->sendRegistrationInformationForPartner( $partner_from_db , $subpid , $pass );
+				$partner_registration->sendRegistrationInformationForPartner( $partner_from_db , $subpid , $pass, false, $hashKey);
 
 			}
 			catch ( SignupException $se )

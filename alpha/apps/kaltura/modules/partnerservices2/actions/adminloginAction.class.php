@@ -48,10 +48,33 @@ class adminloginAction extends defPartnerservices2Action
 			return;
 		}
 
-		if ( ! $admin->isPasswordValid ( $password ))
-		{
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
-			return;			
+		try {
+			$canLogin = adminKuserPeer::adminLogin($email, $password);
+		}
+		catch (kAdminKuserException $e) {
+			$code = $e->getCode();
+			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
+				$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				return null;
+			}
+			else if ($code == kAdminKuserException::LOGIN_RETRIES_EXCEEDED) {
+				$this->addError  ( APIErrors::LOGIN_RETRIES_EXCEEDED );
+				return null;
+			}
+			else if ($code == kAdminKuserException::LOGIN_BLOCKED) {
+				$this->addError  ( APIErrors::LOGIN_BLOCKED );
+				return null;
+			}
+			else if ($code == kAdminKuserException::PASSWORD_EXPIRED) {
+				$this->addError  ( APIErrors::PASSWORD_EXPIRED );
+				return null;
+			}
+			$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
+			return null;
+		}
+		if (!$canLogin) {
+			$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+			return null;
 		}
 		
 		$partner = PartnerPeer::retrieveByPK( $admin->getPartnerId() );

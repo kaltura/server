@@ -229,5 +229,21 @@
 		const INVALID_FILE_SYNC_ID = "INVALID_FILE_SYNC_ID, Invalid file sync id [%s]";
 		
 		const INVALID_SEARCH_TEXT = "INVALID_SEARCH_TEXT, Invalid search text [%s]";
+		
+		// admin kuser password related errors
+		
+		const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID,The password you entered has an invalid structure";
+		
+		const PASSWORD_ALREADY_USED = "PASSWORD_ALREADY_USED,Chosen password has already been used";
+		
+		const PASSWORD_EXPIRED = "PASSWORD_EXPIRED,Current password has expired";
+		
+		const LOGIN_BLOCKED = "LOGIN_BLOCKED,You account is locked";
+		
+		const LOGIN_RETRIES_EXCEEDED = "LOGIN_RETRIES_EXCEEDED,Your account has been locked and will not be available for 24 hours";
+		
+		const NEW_PASSWORD_HASH_KEY_INVALID = "NEW_PASSWORD_HASH_KEY_INVALID,Given hash key is invalid";
+		
+		const NEW_PASSWORD_HASH_KEY_EXPIRED = "NEW_PASSWORD_HASH_KEY_EXPIRED,Given has key has expired";
 	}
 ?>

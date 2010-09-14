@@ -103,6 +103,16 @@ var kmc = {};
 	// attempt to login without params - see if there are cookies - the remMe is true so the expiry will continue 
 	if ( !loginF ( null , null , null , null , true ) ) {
 		var flashVars = {
+			<?php
+				if ($this->setPassHashKey) {
+					echo 'hashCode: "'.$this->setPassHashKey.'",';
+				}
+			?>
+			<?php
+				if ($this->hashKeyErrorCode) {
+					echo 'errorCode: "'.$this->hashKeyErrorCode.'",';
+				}
+			?>
 			loginF: "loginF" ,
 			closeF: "closeLoginF" ,
 			host: "<?php echo $host ?>",

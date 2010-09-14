@@ -46,15 +46,30 @@ class updateadminpasswordAction extends defPartnerservices2Action
 				$this->addException( APIErrors::INVALID_FIELD_VALUE, $f_name );
 			}
 		}
-
-		$akp = new adminKuserPeer(); // TODO - why not static ?
-		list( $new_password , $new_email ) = $akp->resetUserPassword ( $email , $password , $old_password , $new_email );
-
-		if ( ! $new_password )
-		{
-			$this->addException( APIErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD );
-			//$this->addException( APIErrors::ADMIN_KUSER_NOT_FOUND );
+		try {	
+			$akp = new adminKuserPeer(); // TODO - why not static ?
+			list( $new_password , $new_email) = $akp->resetUserPassword ( $email , $password , $old_password , $new_email );
 		}
+		catch (kAdminKuserException $e) {
+			$code = $e->getCode();
+			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
+				$this->addException( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				return null;
+			}
+			if ($code == kAdminKuserException::ADMIN_KUSER_WRONG_OLD_PASSWORD) {
+				$this->addException( APIErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD );
+				return null;
+			}
+			if ($code == kAdminKuserException::PASSWORD_STRUCTURE_INVALID) {
+				$this->addException( APIErrors::PASSWORD_STRUCTURE_INVALID );
+				return null;
+			}
+			if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
+				$this->addException( APIErrors::PASSWORD_ALREADY_USED );
+				return null;
+			}
+		}	
+
 		if ( $new_email )
 		{
 			$this->addMsg ( "new_email" , $new_email ) ;

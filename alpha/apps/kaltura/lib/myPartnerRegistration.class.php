@@ -37,7 +37,7 @@ class myPartnerRegistration
 
 	const KALTURAS_CMS_REGISTRATION_CONFIRMATION = 50;
 	const KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION = 54;
-	public function sendRegistrationInformationForPartner ($partner  , $subp_id , $cms_password , $skip_emails = false )
+	public function sendRegistrationInformationForPartner ($partner  , $subp_id , $cms_password , $skip_emails = false, $hashKey )
 	{
 		// email the client with this info
 		$this->sendRegistrationInformation($partner->getAdminName(),
@@ -46,7 +46,7 @@ class myPartnerRegistration
 											$partner->getAdminSecret(),
 											$partner->getSecret(),
 											$partner->getAdminEmail(),
-											$cms_password,
+											adminKuserPeer::getPassResetLink($hashKey),
 											null,
 											$partner->getType());
 											
@@ -59,7 +59,7 @@ class myPartnerRegistration
 												$partner->getAdminSecret(),
 												$partner->getSecret(),
 												$partner->getAdminEmail(),
-												$cms_password,
+												adminKuserPeer::getPassResetLink($hashKey),
 												self::KALTURA_SUPPORT );
 
 			// if need to hook into SalesForce - this is the place
@@ -78,7 +78,7 @@ class myPartnerRegistration
 	
 
 
-	private  function sendRegistrationInformation($admin_name, $pid, $subpid, $admin_secret, $secret, $cms_email, $cms_password , $recipient_email = null , $partner_type = 1 )
+	private  function sendRegistrationInformation($admin_name, $pid, $subpid, $admin_secret, $secret, $cms_email, $passResetLink , $recipient_email = null , $partner_type = 1 )
 	{
 		$mailType = null;
 		$bodyParams = array();
@@ -86,7 +86,7 @@ class myPartnerRegistration
 	 	if(kConf::get('kaltura_installation_type') == 'CE')
 		{
 			$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-			$bodyParams = array($admin_name, $pid, $subpid, $cms_email, $cms_password, $admin_secret, $secret, $cms_email, $cms_password);
+			$bodyParams = array($admin_name, $pid, $subpid, $cms_email, $passResetLink, $admin_secret, $secret, $cms_email, $passResetLink);
 		}
 		else
 		{
@@ -94,11 +94,11 @@ class myPartnerRegistration
 			{
 				case 1: // KMC signup
 					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$cms_email,$cms_password,$pid);
+				 	$bodyParams = array($admin_name,$cms_email,$passResetLink,$pid);
 					break;
 				default: // all others
 				 	$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$cms_email,$cms_password,$pid, $subpid, $cms_email, $cms_password, $admin_secret, $secret );
+				 	$bodyParams = array($admin_name,$cms_email,$passResetLink,$pid, $subpid, $cms_email, $hashKey, $admin_secret, $secret );
 			}
 		}
 		if ( $recipient_email == null ) $recipient_email = $cms_email;
@@ -245,18 +245,22 @@ class myPartnerRegistration
 		}
 		else
 		{
-			$password = $this->str_makerand(8,8,true,false,true);
+			$password = adminKuserPeer::generateNewPassword();
 		}
 //		$passHash = sha1($adminKuser->getSalt().$password);
 //		$adminKuser->setSha1Password($passHash);
 		$adminKuser->setPassword( $password );
-
+		$adminKuser->setLoginAttempts(0);
+		$adminKuser->setLoginBlockedUntil(null);
+		$adminKuser->resetPreviousPasswords();
 		$adminKuser->setPartnerId($newPartner->getId());
+		$hashKey = $adminKuser->newPassHashKey();
+		$adminKuser->setPasswordHashKey($hashKey);	
 		$adminKuser->save();
 
 		$adminKuserId = $adminKuser->getId();
 
-		return $password;
+		return array($password, $hashKey);
 	}
 
 	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
@@ -298,9 +302,9 @@ class myPartnerRegistration
 
 			// create a new admin_kuser for the user,
 			// so he will be able to login to the system (including permissions)
-			$newAdminKuserPassword = $this->createNewAdminKuser($newPartner , $password );
+			list($newAdminKuserPassword, $newPassHashKey) = $this->createNewAdminKuser($newPartner , $password );
 
-			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword);
+			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
 		}
 		catch (Exception $e) {
 			//TODO: revert all changes, depending where and why we failed

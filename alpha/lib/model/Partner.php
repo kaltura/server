@@ -550,4 +550,66 @@ class Partner extends BasePartner
 		return $priorityGroup->getPriority();
 	}
 	
+	
+	public function getMaxLoginAttempts()
+	{
+		$maxAttempts = $this->getFromCustomData('max_login_attempts', null, null);
+		if (!$maxAttempts) {
+			$maxAttempts = kConf::get('admin_kuser_max_login_attempts');
+		}
+		return $maxAttempts;
+	}
+	
+	public function setMaxLoginAttempts($maxAttempts)
+	{
+		$this->putInCustomData('max_login_attempts', $maxAttempts, null);
+	}
+	
+	
+	
+	public function getLoginBlockPeriod()
+	{
+		$blockPeriod = $this->getFromCustomData('login_blocked_period', null, null);
+		if (!$blockPeriod) {
+			$blockPeriod = kConf::get('admin_kuser_login_block_period');
+		}
+		return $blockPeriod;
+	}
+	
+	public function setLoginBlockPeriod($blockPeriod)
+	{
+		$this->putInCustomData('login_blocked_period', $blockPeriod, null);
+	}
+	
+	
+	public function getNumPrevPassToKeep()
+	{
+		$prevPass = $this->getFromCustomData('num_prev_passwords_to_keep', null, null);
+		if (!$prevPass) {
+			$prevPass = kConf::get('admin_kuser_num_prev_passwords_to_keep');
+		}
+		return $prevPass;
+	}
+	
+	public function setNumPrevPassToKeep($numToKeep)
+	{
+		$this->putInCustomData('num_prev_passwords_to_keep', $numToKeep, null);
+	}
+
+	
+	
+	public function getPassReplaceFreq()
+	{
+		$replaceFreq = $this->getFromCustomData('password_replace_freq', null, null);
+		if (!$replaceFreq) {
+			$replaceFreq = kConf::get('admin_kuser_password_replace_freq');
+		}
+		return $replaceFreq;
+	}
+	
+	public function setPassReplaceFreq($replaceFreq)
+	{
+		$this->putInCustomData('password_replace_freq', $replaceFreq, null);
+	}
+	
 }

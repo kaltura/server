@@ -38,7 +38,15 @@ class PartnerService extends KalturaBaseService
 		
 		try
 		{
-			if ( $cmsPassword == "" ) $cmsPassword = null;
+			if ( $cmsPassword == "" ) {
+				$cmsPassword = null;
+			}
+			
+			if ($cmsPassword) {
+				if (!adminKuserPeer::isPasswordStructureValid($cmsPassword)) {
+					throw new KalturaAPIException (KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				}
+			}
 			
 			$parentPartnerId = null;
 			if ( $this->getKs() && $this->getKs()->isAdmin() )
@@ -56,13 +64,13 @@ class PartnerService extends KalturaBaseService
 			
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
-			list($pid, $subpid, $pass) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
+			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
 				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner );
 
 			$dbPartner = PartnerPeer::retrieveByPK( $pid );
 
 			// send a confirmation email as well as the result of the service
-			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , $subpid , $pass );
+			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , $subpid , $pass, false, $hashKey );
 
 		}
 		catch ( SignupException $se )

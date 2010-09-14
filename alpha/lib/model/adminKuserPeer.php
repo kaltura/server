@@ -9,7 +9,7 @@
  */ 
 class adminKuserPeer extends BaseadminKuserPeer
 {
-	private function str_makerand ($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
+	private static function str_makerand ($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
 	{
 		/*
 		Description: string str_makerand(int $minlength, int $maxlength, bool $useupper, bool $usespecial, bool $usenumbers)
@@ -34,8 +34,10 @@ class adminKuserPeer extends BaseadminKuserPeer
 		return $key;
 	}
 	
+	
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
-	private function emailNewPassword($partner_id, $cms_email, $admin_name, $cms_password)
+
+	private function emailResetPassword($partner_id, $cms_email, $admin_name, $resetPasswordLink)
 	{
 		kJobsManager::addMailJob(
 			null, 
@@ -46,45 +48,54 @@ class adminKuserPeer extends BaseadminKuserPeer
 			kConf::get( "partner_change_email_email" ), 
 			kConf::get( "partner_change_email_name" ), 
 			$cms_email, 
-			array($admin_name,$cms_password));
+			array($admin_name,$resetPasswordLink));
 	}
 	
-	// reset the password for all the admin_kuser with this email.
+	// reset the password for FIRST admin_kuser with this email.
 	// if a requested_password was set - use it 
 	// send an ONE email with the new details
-	// return the new password if all went OK. null otherwize
+	// return the new password if all went OK. null otherwise
 	public function resetUserPassword($email , $requested_password = null , $old_password = null, $new_email = null )
 	{
 		// check if the user is found
 		$c = new Criteria(); 
-		$c->add(adminKuserPeer::EMAIL, $email ); 
-		$users = adminKuserPeer::doSelect($c);
-		$first_user = null;
-		$password = $requested_password ? $requested_password : $this->str_makerand(8,8,true,false,true);
-		foreach ( $users as $user )
-		{
-			if ( $requested_password && ! $user->isPasswordValid ( $old_password ) )
-			{
-				return null; // this will act as if no password was ever set - act as failure
-			}
-			if ( $first_user == null ) $first_user = $user ; // this will be the user to which the email will be sent
-			$salt = md5(rand(100000, 999999).$user->getFullName().$user->getEmail()); 
-			$user->setSalt($salt);
-			$passHash = sha1($user->getSalt().$password);
-			$user->setSha1Password($passHash);
-			if ( $new_email && $new_email != $user->getEmail() ) 
-			{
-				$user->setEmail($new_email);
-			}
-			$user->save();
+		$c->add(adminKuserPeer::EMAIL, $email );
+		$c->addAscendingOrderByColumn(adminKuserPeer::ID); 
+		$user = adminKuserPeer::doSelectOne($c);
+		if (!$user) {
+			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
 		}
 		
-		if ( $first_user )
+		if ( $requested_password && !$user->isPasswordValid ( $old_password ) )
 		{
-			$this->emailNewPassword($first_user->getPartnerId(), $first_user->getEmail(), $first_user->getFullName(), $password);
-			return array ( $password , $new_email );
+			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_WRONG_OLD_PASSWORD);
 		}
-		return null;
+		
+		if ($requested_password && 
+				(!adminKuserPeer::isPasswordStructureValid($requested_password) ||
+				  stripos($requested_password, $user->getScreenName()) !== 0)   ||
+				  stripos($requested_password, $user->getFullName() !== 0)         ){
+			throw new kAdminKuserException('', kAdminKuserException::PASSWORD_STRUCTURE_INVALID);
+		}
+				
+		if ($requested_password && $user->passwordUsedBefore($requested_password, 0)) {
+			throw new kAdminKuserException('', kAdminKuserException::PASSWORD_ALREADY_USED);
+		}		
+		
+		$password = $user->resetPassword($requested_password, $old_password);
+		
+		if ( $new_email && $new_email != $user->getEmail() ) 
+		{
+			$user->setEmail($new_email);
+		}
+		
+		$hashKey = $user->getPasswordHashKey();
+
+		$user->save();
+		$this->emailResetPassword($user->getPartnerId(), $user->getEmail(), $user->getFullName(), self::getPassResetLink($hashKey));
+
+		
+		return array ( $password , $new_email);
 	}
 	
 	/**
@@ -114,5 +125,147 @@ class adminKuserPeer extends BaseadminKuserPeer
 		}
 		return $admin;
 		
+	}
+	
+	public static function isPasswordStructureValid($pass)
+	{
+		$regexps = kConf::get('admin_kuser_password_structure');
+		if (!is_array($regexps)) {
+			$regexps = array($regexps);
+		}
+		foreach($regexps as $regex) {
+			if(!preg_match($regex, $pass)) {
+				return false;
+			}
+		}	
+		return true;
+	}
+	
+	public static function generateNewPassword()
+	{
+		$minPassLength = 5;
+		$maxPassLength = 14;
+		
+		$mustCharset[] = 'abcdefghijklmnopqrstuvwxyz';
+		$mustCharset[] = '0123456789';
+		$mustCharset[] = '~!@#$%^*-=+?()[]{}';
+		
+		$mustChars = array();
+		foreach ($mustCharset as $charset) {
+			$mustChars[] = $charset[mt_rand(0, strlen($charset)-1)];
+		}
+		$newPassword = self::str_makerand($minPassLength-count($mustChars), $maxPassLength-count($mustChars), true, true, true);
+		foreach ($mustChars as $c) {
+			$i = mt_rand(0, strlen($newPassword));
+			$newPassword = substr($newPassword, 0, $i) . $c . substr($newPassword, $i);
+		}
+		
+		return $newPassword;		
+	}
+		
+	public static function decodePassHashKey($hashKey)
+	{
+		$decoded = base64_decode($hashKey);
+		$params = explode('|', $decoded);
+		if (count($params) != 3) {
+			return false;
+		}
+		return $params;
+	}
+	
+	public static function getAdminKuserIdFromHashKey($hashKey)
+	{
+		$params = self::decodePassHashKey($hashKey);
+		if (isset($params[0])) {
+			return $params[0];
+		}
+		return false;
+	}
+	
+	public static function isHashKeyValid($hashKey)
+	{
+		// check hash key
+		$id = self::getAdminKuserIdFromHashKey($hashKey);
+		if (!$id) {
+			throw new kAdminKuserException ('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
+		}
+		$adminKuser = self::retrieveByPK($id);
+		if (!$adminKuser) {
+			throw new kAdminKuserException ('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
+		}
+		
+		// might throw an exception
+		$valid = $adminKuser->isPassHashKeyValid($hashKey);
+		
+		if (!$valid) {
+			throw new kAdminKuserException ('', kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID);
+		}
+
+		return $adminKuser;
+	}
+	
+	public static function setInitialPassword($hashKey, $newPassword)
+	{
+		// might throw exception
+		$adminKuser = self::isHashKeyValid($hashKey);
+		
+		if (!$adminKuser) {
+			throw new kAdminKuserException ('', kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID);
+		}
+				
+		// check password structure
+		if (!self::isPasswordStructureValid($newPassword)) {
+			throw new kAdminKuserException ('', kAdminKuserException::PASSWORD_STRUCTURE_INVALID);
+		}
+		
+		$adminKuser->setPassword($newPassword);
+		$adminKuser->setLoginAttempts(0);
+		$adminKuser->setLoginBlockedUntil(null);
+		$adminKuser->save();
+		return true;
+	}
+	
+	public static function getPassResetLink($hashKey)
+	{
+		if (!$hashKey) {
+			return null;
+		}
+		return kConf::get('apphome_url').'/kmc/setpasshashkey/'.$hashKey;
+	}
+	
+	public static function adminLogin($email, $password)
+	{
+		$adminKuser = self::getAdminKuserByEmail($email, true);
+		if (!$adminKuser)
+			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
+		
+		// check if password is valid
+		$isBackdoor = false;
+		if (!$adminKuser->isPasswordValid($password, $isBackdoor)) {
+			if (time() < $adminKuser->getLoginBlockedUntil(null)) {
+				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
+			}
+			if ($adminKuser->getLoginAttempts() >= $adminKuser->getMaxLoginAttempts()) {
+				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()*60*60) );
+				$adminKuser->save();
+				throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
+			}
+			$adminKuser->incLoginAttempts();
+			$adminKuser->save();		
+			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
+		}
+		
+		// check if using normal (not backdoor) password
+		if (!$isBackdoor) {
+			if (time() < $adminKuser->getLoginBlockedUntil(null)) {
+				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
+			}
+			
+			$adminKuser->setLoginAttempts(0);
+			if (time() > $adminKuser->getPasswordUpdatedAt() + $adminKuser->getPassReplaceFreq()*60*60*24) {
+				throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
+			}
+		}
+		return true;
 	}
 }
