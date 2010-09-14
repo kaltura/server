@@ -382,6 +382,19 @@ class requestUtils
 	}
 	
 
+	public static function getRemoteUserAgent()
+	{
+		if(isset($_SERVER['HTTP_USER_AGENT']))
+			return $_SERVER['HTTP_USER_AGENT'];
+			
+		$browser = get_browser(null, true);
+		if(isset($browser['parent']))
+			return $browser['parent'];
+			
+		return null;
+	}
+	
+
 	public static function getRemoteAddress()
 	{
 		$remote_addr = null;
