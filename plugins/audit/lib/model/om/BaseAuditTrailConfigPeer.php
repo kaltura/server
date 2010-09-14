@@ -25,7 +25,7 @@ abstract class BaseAuditTrailConfigPeer {
 	const TM_CLASS = 'AuditTrailConfigTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 5;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -45,9 +45,6 @@ abstract class BaseAuditTrailConfigPeer {
 	/** the column name for the ACTIONS field */
 	const ACTIONS = 'audit_trail_config.ACTIONS';
 
-	/** the column name for the PARSERS field */
-	const PARSERS = 'audit_trail_config.PARSERS';
-
 	/**
 	 * An identiy map to hold any loaded instances of AuditTrailConfig objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -64,11 +61,11 @@ abstract class BaseAuditTrailConfigPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ObjectType', 'Descriptors', 'Actions', 'Parsers', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'objectType', 'descriptors', 'actions', 'parsers', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::OBJECT_TYPE, self::DESCRIPTORS, self::ACTIONS, self::PARSERS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'object_type', 'descriptors', 'actions', 'parsers', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'ObjectType', 'Descriptors', 'Actions', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'objectType', 'descriptors', 'actions', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::OBJECT_TYPE, self::DESCRIPTORS, self::ACTIONS, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'object_type', 'descriptors', 'actions', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -78,11 +75,11 @@ abstract class BaseAuditTrailConfigPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ObjectType' => 2, 'Descriptors' => 3, 'Actions' => 4, 'Parsers' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'objectType' => 2, 'descriptors' => 3, 'actions' => 4, 'parsers' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::OBJECT_TYPE => 2, self::DESCRIPTORS => 3, self::ACTIONS => 4, self::PARSERS => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'object_type' => 2, 'descriptors' => 3, 'actions' => 4, 'parsers' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'ObjectType' => 2, 'Descriptors' => 3, 'Actions' => 4, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'objectType' => 2, 'descriptors' => 3, 'actions' => 4, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::OBJECT_TYPE => 2, self::DESCRIPTORS => 3, self::ACTIONS => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'object_type' => 2, 'descriptors' => 3, 'actions' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -157,7 +154,6 @@ abstract class BaseAuditTrailConfigPeer {
 		$criteria->addSelectColumn(AuditTrailConfigPeer::OBJECT_TYPE);
 		$criteria->addSelectColumn(AuditTrailConfigPeer::DESCRIPTORS);
 		$criteria->addSelectColumn(AuditTrailConfigPeer::ACTIONS);
-		$criteria->addSelectColumn(AuditTrailConfigPeer::PARSERS);
 	}
 
 	/**

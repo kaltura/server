@@ -49,12 +49,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	protected $actions;
 
 	/**
-	 * The value for the parsers field.
-	 * @var        string
-	 */
-	protected $parsers;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -130,16 +124,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function getActions()
 	{
 		return $this->actions;
-	}
-
-	/**
-	 * Get the [parsers] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getParsers()
-	{
-		return $this->parsers;
 	}
 
 	/**
@@ -258,29 +242,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	} // setActions()
 
 	/**
-	 * Set the value of [parsers] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     AuditTrailConfig The current object (for fluent API support)
-	 */
-	public function setParsers($v)
-	{
-		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::PARSERS]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::PARSERS] = $this->getParsers();
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->parsers !== $v) {
-			$this->parsers = $v;
-			$this->modifiedColumns[] = AuditTrailConfigPeer::PARSERS;
-		}
-
-		return $this;
-	} // setParsers()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -317,7 +278,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 			$this->object_type = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->descriptors = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->actions = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->parsers = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -327,7 +287,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 6; // 6 = AuditTrailConfigPeer::NUM_COLUMNS - AuditTrailConfigPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 5; // 5 = AuditTrailConfigPeer::NUM_COLUMNS - AuditTrailConfigPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating AuditTrailConfig object", $e);
@@ -534,6 +494,15 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	{
 		return parent::preSave($con);
 	}
+
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null) 
+	{
+		$this->oldColumnsValues = array(); 
+	}
 	
 	/**
 	 * Code to be run before inserting to database
@@ -688,9 +657,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 			case 4:
 				return $this->getActions();
 				break;
-			case 5:
-				return $this->getParsers();
-				break;
 			default:
 				return null;
 				break;
@@ -717,7 +683,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 			$keys[2] => $this->getObjectType(),
 			$keys[3] => $this->getDescriptors(),
 			$keys[4] => $this->getActions(),
-			$keys[5] => $this->getParsers(),
 		);
 		return $result;
 	}
@@ -736,7 +701,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AuditTrailConfigPeer::OBJECT_TYPE)) $criteria->add(AuditTrailConfigPeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(AuditTrailConfigPeer::DESCRIPTORS)) $criteria->add(AuditTrailConfigPeer::DESCRIPTORS, $this->descriptors);
 		if ($this->isColumnModified(AuditTrailConfigPeer::ACTIONS)) $criteria->add(AuditTrailConfigPeer::ACTIONS, $this->actions);
-		if ($this->isColumnModified(AuditTrailConfigPeer::PARSERS)) $criteria->add(AuditTrailConfigPeer::PARSERS, $this->parsers);
 
 		return $criteria;
 	}
@@ -798,8 +762,6 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 		$copyObj->setDescriptors($this->descriptors);
 
 		$copyObj->setActions($this->actions);
-
-		$copyObj->setParsers($this->parsers);
 
 
 		$copyObj->setNew(true);

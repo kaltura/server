@@ -29,5 +29,22 @@ class AuditTrailConfigPeer extends BaseAuditTrailConfigPeer {
 		$criteria->add(AuditTrailConfigPeer::PARTNER_ID, $partnerId);
 		return AuditTrailConfigPeer::doSelect($criteria, $con);
 	}
-	
+
+	/**
+	 * Retrieve multiple objects by partner id.
+	 *
+	 * @param      string $objectType
+	 * @param      int $partnerId
+	 * @param      PropelPDO $con the connection to use
+	 * @return AuditTrailConfig
+	 */
+	public static function retrieveByObjectType($objectType, $partnerId = null, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(AuditTrailConfigPeer::OBJECT_TYPE, $objectType);
+		if(!is_null($partnerId))
+			$criteria->add(AuditTrailConfigPeer::PARTNER_ID, $partnerId);
+			
+		return AuditTrailConfigPeer::doSelectOne($criteria, $con);
+	}
 } // AuditTrailConfigPeer

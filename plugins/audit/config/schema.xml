@@ -67,7 +67,6 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="varchar" size="31" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="descriptors" type="varchar" size="1023" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="actions" type="varchar" size="1023" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="parsers" type="varchar" size="1023" />
 		<index name="partner_object_index">
 			<index-column name="partner_id" />
 			<index-column name="object_type" />

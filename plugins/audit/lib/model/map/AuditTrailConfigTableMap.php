@@ -41,7 +41,6 @@ class AuditTrailConfigTableMap extends TableMap {
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'VARCHAR', false, 31, null);
 		$this->addColumn('DESCRIPTORS', 'Descriptors', 'VARCHAR', false, 1023, null);
 		$this->addColumn('ACTIONS', 'Actions', 'VARCHAR', false, 1023, null);
-		$this->addColumn('PARSERS', 'Parsers', 'VARCHAR', false, 1023, null);
 		// validators
 	} // initialize()
 

@@ -81,7 +81,6 @@ CREATE TABLE `audit_trail_config`
 	`object_type` VARCHAR(31),
 	`descriptors` VARCHAR(1023),
 	`actions` VARCHAR(1023),
-	`parsers` VARCHAR(1023),
 	PRIMARY KEY (`id`),
 	KEY `partner_object_index`(`partner_id`, `object_type`)
 )Type=MyISAM;

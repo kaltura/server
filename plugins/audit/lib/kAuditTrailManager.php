@@ -23,7 +23,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(is_null($auditTrail))
 			return true;
 			
-		$auditTrailConfig = $this->getAuditTrailConfig($partnerId, $auditTrail->getObjectType());
+		$auditTrailConfig = self::getAuditTrailConfig($partnerId, $auditTrail->getObjectType());
 		if(is_null($auditTrailConfig))
 			return false;
 			
@@ -35,7 +35,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 * @param string $objectType
 	 * @return AuditTrailConfig
 	 */
-	protected function getAuditTrailConfig($partnerId, $objectType) 
+	protected static function getAuditTrailConfig($partnerId, $objectType) 
 	{
 		$config = null;
 		if(isset(self::$cachedPartnerConfig[$partnerId]))
@@ -44,7 +44,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		else
 		{
-			$cachePath = realpath( dirname(__FILE__) . '/../audit') . "/$partnerId.cfg";
+			$cachePath = realpath( dirname(__FILE__) . '/../cache') . "/$partnerId.cfg";
+			KalturaLog::debug("Audit trail config cache path [$cachePath]");
 			if(file_exists($cachePath))
 			{
 				$config = unserialize(file_get_contents($cachePath));
@@ -117,19 +118,22 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return null;
 			
 		$peer = $object->getPeer();
+		$objectType = $peer->getOMClass(false);
+		
+		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");
 		
 		try
 		{
 			$auditTrail = new AuditTrail();
 			$auditTrail->setPartnerId($partnerId);
-			$auditTrail->setObjectType($peer->OM_CLASS);
+			$auditTrail->setObjectType($objectType);
 			$auditTrail->setStatus(KalturaAuditTrailStatus::READY);
 			$auditTrail->setObjectId($object->getId());
 			$auditTrail->setEntryId($this->getEntryId($object));
 		}
 		catch(kAuditTrailException $e)
 		{
-			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[" . $peer->OM_CLASS . "] " . $e->getMessage());
+			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
 			$auditTrail = null;
 		}
 		
@@ -195,9 +199,22 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(method_exists($object, 'getCustomDataOldValues'))
 			$customDataOldValues = $object->getCustomDataOldValues();
 		
+		$auditTrailConfig = self::getAuditTrailConfig($auditTrail->getPartnerId(), $auditTrail->getObjectType());
+		if(!$auditTrailConfig)
+			return;
+			
+		$supportedDescriptors = explode(',', $auditTrailConfig->getDescriptors());
+		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
+		
 		$changedItems = new KalturaAuditTrailChangeItemArray();
 		foreach($columnsOldValues as $column => $oldValue)
 		{
+			if(!in_array($column, $supportedDescriptors))
+			{
+				KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
+				continue;
+			}
+				
 			$changedItem = new KalturaAuditTrailChangeItem();
 			$changedItem->descriptor = $column;
 			$changedItem->oldValue = $oldValue;
@@ -216,13 +233,22 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					
 			foreach($oldValues as $name => $oldValue)
 			{
+				$descriptor = $prefix . $name;
+				if(!in_array($descriptor, $supportedDescriptors))
+				{
+					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] descriptor[$descriptor] not supported");
+					continue;
+				}
+					
 				$changedItem = new KalturaAuditTrailChangeItem();
-				$changedItem->descriptor = $prefix . $name;
+				$changedItem->descriptor = $descriptor;
 				$changedItem->oldValue = $oldValue;
 				$changedItem->newValue = $object->getFromCustomData($name, $namespace);
 				$changedItems[] = $changedItem;
 			}
 		}
+		if(!$changedItems->count)
+			return;
 			
 		$data = new KalturaAuditTrailChangeInfo();
 		$data->changedItems = $changedItems;
