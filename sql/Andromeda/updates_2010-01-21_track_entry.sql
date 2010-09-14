@@ -1,1 +1,0 @@
-ALTER TABLE track_entry ADD COLUMN user_ip VARCHAR(20);

@@ -1,1 +1,0 @@
-ALTER TABLE media_info CHANGE flavor_asset_id flavor_asset_id VARCHAR( 20 ) NULL DEFAULT NULL; 

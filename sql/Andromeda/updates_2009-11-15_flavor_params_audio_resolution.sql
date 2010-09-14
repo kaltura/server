@@ -1,1 +1,0 @@
-ALTER TABLE flavor_params ADD `audio_resolution` INTEGER default 0 AFTER `audio_sample_rate`;

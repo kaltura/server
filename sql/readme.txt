@@ -1,2 +1,0 @@
- * all sql updates should be saved in next_update folder
- * on server update day, create a new folder with the day date and move the relevant scripts from next_update folder to the newly created folder

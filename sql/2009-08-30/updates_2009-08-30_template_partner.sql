@@ -1,5 +1,0 @@
-INSERT INTO `partner` VALUES (99,'Template Partner',NULL,NULL,'94e4533084528b3ffadcb6d3f5eefdb3','37e368cfa63e37eaad96c0fd02e0bd8d',-1,2,0,NULL,now(),now(),'97385113302981a3c601ef230faab181',NULL,86400,1,'17','Template Partner','template@kaltura.com','Template partner is used to load the default content, players & playlists for a new partner',1,0,0,'a:1:{s:24:\"defConversionProfileType\";s:3:\"med\";}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1);
-INSERT INTO `widget` (id, source_widget_id, root_widget_id, partner_id, subp_id, kshow_id, entry_id, ui_conf_id, custom_data, security_type, security_policy, created_at, updated_at, partner_data) 
-VALUES('_99', NULL, NULL, '99', '9900', NULL, NULL, '200', NULL, NULL, NULL, now(), now(), NULL);
-
-insert into  admin_kuser (screen_name, full_name, email, sha1_password, salt, picture, icon, created_at, updated_at, partner_id) value('Template Partner', 'Template Partner', 'template@kaltura.com', '1ce3d92783a8c623ee3b0bef161d787d7c465633', '1e4040a591f081f2fa0f8418a3d763be', null, null, now(), now(), 99);

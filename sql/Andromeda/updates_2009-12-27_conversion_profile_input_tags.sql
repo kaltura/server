@@ -1,1 +1,0 @@
-UPDATE conversion_profile_2 SET input_tags_map = 'web' WHERE input_tags_map IS NULL;

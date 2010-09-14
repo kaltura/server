@@ -1,1 +1,0 @@
-alter table kshow modify episode_id varchar(10);

@@ -1,1 +1,0 @@
-ALTER TABLE `flavor_asset` ADD `is_original` INT NOT NULL DEFAULT '0' AFTER `size`;

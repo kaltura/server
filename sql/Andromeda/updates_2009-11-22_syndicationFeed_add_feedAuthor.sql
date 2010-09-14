@@ -1,1 +1,0 @@
-alter table syndication_feed add column `feed_author` VARCHAR(50) after feed_image_url;

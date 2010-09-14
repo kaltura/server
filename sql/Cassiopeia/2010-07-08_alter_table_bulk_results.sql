@@ -1,1 +1,0 @@
-ALTER TABLE  `bulk_upload_result` ADD  `plugins_data` VARCHAR( 9182 ) NOT NULL AFTER  `error_description`;

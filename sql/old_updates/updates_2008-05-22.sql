@@ -1,1 +1,0 @@
-alter table roughcut_entry modify roughcut_id varchar(10);

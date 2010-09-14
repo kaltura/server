@@ -1,1 +1,0 @@
-ALTER TABLE conversion_profile ADD bypass_by_extension VARCHAR(32);

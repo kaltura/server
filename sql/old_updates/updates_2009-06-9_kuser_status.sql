@@ -1,1 +1,0 @@
-update kuser set status = 1;
