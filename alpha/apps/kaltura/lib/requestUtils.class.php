@@ -387,10 +387,6 @@ class requestUtils
 		if(isset($_SERVER['HTTP_USER_AGENT']))
 			return $_SERVER['HTTP_USER_AGENT'];
 			
-		$browser = get_browser(null, true);
-		if(isset($browser['parent']))
-			return $browser['parent'];
-			
 		return null;
 	}
 	
