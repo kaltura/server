@@ -1,0 +1,1 @@
+ALTER TABLE `media_info` CHANGE `raw_data` `raw_data` TEXT;

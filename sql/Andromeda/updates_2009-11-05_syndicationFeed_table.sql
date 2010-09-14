@@ -1,0 +1,27 @@
+CREATE TABLE `syndication_feed`
+(
+	`id` VARCHAR(20)  NOT NULL,
+	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`partner_id` INTEGER  NOT NULL,
+	`playlist_id` VARCHAR(20),
+	`name` VARCHAR(128) default '' NOT NULL,
+	`status` TINYINT,
+	`type` TINYINT,
+	`landing_page` VARCHAR(512) default '' NOT NULL,
+	`flavor_param_id` INTEGER,
+	`player_uiconf_id` INTEGER,
+	`allow_embed` INTEGER default 1,
+	`adult_content` VARCHAR(10),
+	`transcode_existing_content` INTEGER default 0,
+	`add_to_default_conversion_profile` INTEGER default 0,
+	`categories` VARCHAR(1024),
+	`feed_description` VARCHAR(1024),
+	`language` VARCHAR(5),
+	`feed_landing_page` VARCHAR(512),
+	`owner_name` VARCHAR(50),
+	`owner_email` VARCHAR(128),
+	`feed_image_url` VARCHAR(512),
+	`created_at` DATETIME,
+	PRIMARY KEY (`id`),
+	KEY `int_id_index`(`int_id`)
+)Type=MyISAM;

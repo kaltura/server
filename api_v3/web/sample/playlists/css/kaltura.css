@@ -1,0 +1,92 @@
+html, body{ height: 100%; overflow: hidden; }
+
+body{
+	color: #333;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height:1.3;
+	background: #fff;
+}
+
+body.wrapperbody { background:url('../images/wrapper_bg.jpg') no-repeat top left; height:1310px; }
+body.wrapperbody iframe#kaltura_featured_videos_box { margin-top:573px; margin-left:238px; }
+/*--------------------------------
+	customize & global reset
+---------------------------------*/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, 
+abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, 
+strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, 
+table, caption, tbody, tfoot, thead, tr, th, td { margin: 0; padding: 0; }
+
+a{ color:#003399; text-decoration:none; cursor:pointer; }
+a:hover{ color:#57a125; }
+
+	.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }	/* Controlsthe BR tag, which makes the WRAPPER float stretch for GECKO */
+	.clearfix {display: inline-block; }
+	/* Hides from IE-mac \*/
+		* html .clearfix { height: 1%; }
+		.clearfix { display: block; }
+	/* End hide from IE-mac */
+
+:focus { -moz-outline-style: none; outline:none; }
+*::-moz-selection { background:#2b5459; color:#f0f6f8; }
+
+#overlay{ position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background: url(../images/kaltura/trans-bg.png) repeat; cursor: default; }
+*:first-child+html #overlay{ background:none; background-color:#000; }
+* html #overlay{ position: absolute; background:none; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
+
+/*--------------------------------
+	Content
+---------------------------------*/
+#kaltura{ width:780px; margin:0 auto; border:1px solid #dedede; border-top:none; margin-top:2px; }
+/* main menu */
+	#videoBoxMenu{ list-style:none; margin-bottom:-1px; }
+		#videoBoxMenu li{ padding-bottom:2px; margin-right:2px; float:left; width:154px; line-height:2.2em; text-align:center; background:#e9e9e9 url('../images/kaltura/video_icon.gif') no-repeat 97% center; }
+		#videoBoxMenu li.last{ margin-right:0px; }
+		#videoBoxMenu li.active{ border:1px solid #dedede; width:154px; border-bottom:none; }
+			#videoBoxMenu li a{ font-weight:bold; width: 154px; display: block; }
+			#videoBoxMenu li.active a{  color:#fff;}
+			
+   a#tab1 { color:#a6e5ec; }
+   a#tab2 { color:#ec8131; }
+   a#tab3 { color:#4386bd; }
+   a#tab4 { color:#f93839; }
+   a#tab5 { color:#7fab3a; }
+
+/* videoboxContent */
+	#videoboxContent{ padding:4px; }
+		#kplayer{ float:right; margin-left:5px; width:389px; height:350px; }
+		#kaltura_wrapper { background:#f1f1f1; } 
+		.byKaltura  { text-align: right; font-size: 10px; padding-top: 1px; color: #666666; }
+		.byKaltura a { color: #666666; }
+		.byKaltura a:hover { color: #003399; }
+		.mediaContent{ float:left; width:374px; }
+			/* rows */	
+			.mediaContent .row{ margin-bottom:5px; padding:5px; background-color:#f1f1f1; }
+				.mediaContent .row .videoBoxTitle{ display:block; height:20px; color:#666; font-size:1.2em; font-weight:bold; padding:0 20px 2px; overflow:hidden; }
+				/* left right arrows */	
+				.mediaContent .row a.prev, .mediaContent .row a.next{ width:16px; height:83px; -moz-border-radius:3px; background:#cacaca url(../images/kaltura/arrows.gif) -3px center no-repeat; }
+				.mediaContent .row a.prev:hover, .mediaContent .row a.next:hover{ background-color:#b8b8b8; }
+				.mediaContent .row a.prev:active, .mediaContent .row a.next:active{ background-color:#a8a8a8; }
+				.mediaContent .row a.prev{ float:left; }
+				.mediaContent .row a.next{ float:right; background-position:-25px; }
+				/* scrollable list */
+				.mediaContent .row .scrollable{ float:left; width:322px; height:129px; margin:0 5px; position:relative; overflow:hidden; }
+					.mediaContent .row ul{ position:absolute; width:10000em; }
+						.mediaContent .row ul li{ list-style:none; float:left; width:104px; margin-right:5px; color:#666; font-size:11px; line-height:1.2em; }
+						.mediaContent .row ul li.hover{ color:#003399; }	
+							.mediaContent .row ul li div{ position:relative; width:104px; height:83px; margin-bottom:4px; overflow:hidden; background-color:#ddd; cursor:pointer; }
+								.mediaContent .row ul li div b{ position:absolute; top:50%; left:50%; margin:-17px 0 0 -17px; width:34px; height:34px; background:url(../images/kaltura/play_icon.png) 0 0 no-repeat; }
+								* html .mediaContent .row ul li div b{ { background:none; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="images/kaltura/play_icon.png", crop); } }
+							.mediaContent .row ul li strong{ display:block; height:1.25em; overflow-x:hidden; overflow-y:hidden; width:100%; }
+							.mediaContent .row ul li span{ display:block; }
+			
+			.mediaContent .search{ background:url('../images/search_bg.jpg') no-repeat top left; width:292px; height:24px; }
+				.mediaContent .search input.inputSearch{ display:none; float:left; width:160px; margin-top:2px; padding:3px 2px; border:1px solid #bbb; }
+				.mediaContent .search div.opts{ visibility:hidden; float:left; margin-left:5px; }
+					.mediaContent .search div.opts label{ visibility:hidden; float:left; clear:left; color:#555; line-height:1.2em; font-size:11px; cursor:pointer; }
+						.mediaContent .search div.opts label input{ visibility:hidden; float:left; margin:1px 5px 0; }
+			
+			
+#kaltura_playlist_horizontal_wrap { width: 724px; margin: 40px auto; }
+#kaltura_playlist_vertical_wrap { width: 400px; margin: 40px auto; }

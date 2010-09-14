@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configdata>
+	<accounts>
+		<label>Publishers</label>
+		<controller>partner</controller>
+		<action>list</action>
+		<pages>
+			<accounts-management>
+				<label>Publisher Management</label>
+				<controller>partner</controller>
+				<action>list</action>
+			</accounts-management>
+			<account-new>
+				<label>Add New Publisher</label>
+				<controller>partner</controller>
+				<action>create</action>
+			</account-new>
+			<account-usage>
+				<label>Publishers' Usage</label>
+				<controller>partner-usage</controller>
+				<action>index</action>
+			</account-usage>
+			<external-storages>
+				<label>Publishers’ Remote Storage</label>
+				<controller>partner</controller>
+				<action>external-storages</action>
+			</external-storages>
+		</pages>
+	</accounts>
+	<users>
+		<label>Users</label>
+		<controller>user</controller>
+		<action>index</action>
+		<pages>
+			<users-management>
+				<label>User Management</label>
+				<controller>user</controller>
+				<action>index</action>
+			</users-management>
+			<create-new-user>
+				<label>Add User</label>
+				<controller>user</controller>
+				<action>create</action>
+			</create-new-user>
+			<change-my-settings>
+				<label>Change My Settings</label>
+				<controller>user</controller>
+				<action>settings</action>
+			</change-my-settings>
+		</pages>
+	</users>
+	<batch-proccess-control>
+		<label>Batch Process Control</label>
+		<controller>batch</controller>
+		<action>in-progress-tasks</action>
+		<pages>
+			<in-progress-tasks>
+				<label>In-Progress Tasks</label>
+				<controller>batch</controller>
+				<action>in-progress-tasks</action>
+			</in-progress-tasks>
+			<failed-tasks>
+				<label>Failed Tasks</label>
+				<controller>batch</controller>
+				<action>failed-tasks</action>
+			</failed-tasks>
+			<setup>
+				<label>Setup</label>
+				<controller>batch</controller>
+				<action>setup</action>
+			</setup>
+			<entry-lifecycle>
+				<label>Entry Lifecycle</label>
+				<controller>batch</controller>
+				<action>entry-lifecycle</action>
+			</entry-lifecycle>
+			<entry-investigation>
+				<label>Entry Investigation</label>
+				<controller>batch</controller>
+				<action>entry-investigation</action>
+			</entry-investigation>
+		</pages>
+	</batch-proccess-control>
+	<monitoring>
+		<label>Monitoring</label>
+		<controller>monitoring</controller>
+		<action>xymon</action>
+		<pages>
+			<xymon>
+				<label>Status</label>
+				<controller>monitoring</controller>
+				<action>xymon</action>
+			</xymon>
+			<ack-alerts>
+				<label>Acknowledge Alerts</label>
+				<controller>monitoring</controller>
+				<action>ack-alerts</action>
+			</ack-alerts>
+		</pages>
+	</monitoring>
+	<developer>
+		<label>Developer</label>
+		<controller>index</controller>
+		<action>testme</action>
+	</developer>
+</configdata>

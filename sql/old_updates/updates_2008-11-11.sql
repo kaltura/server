@@ -1,0 +1,1 @@
+alter table widget add index partner_id_index (partner_id);

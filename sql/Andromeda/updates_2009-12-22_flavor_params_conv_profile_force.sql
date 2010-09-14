@@ -1,0 +1,1 @@
+ALTER TABLE  `flavor_params_conversion_profile` CHANGE  `force`  `force_none_complied` INT( 11 ) NULL DEFAULT  '0';

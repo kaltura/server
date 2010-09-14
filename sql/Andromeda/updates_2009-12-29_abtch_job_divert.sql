@@ -1,0 +1,1 @@
+ALTER TABLE  `batch_job` ADD  `on_stress_divert_to` INT NOT NULL DEFAULT  '0' AFTER  `err_number`;

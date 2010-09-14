@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editmodel:ActivityDiagramEditModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:editmodel="editmodel.xmi" xmlns:options="options.xmi" name="BulkUpload" id="{UMLID=__Sm0gL5VEd6M19kKXhY_WA,JavaID=.}" metadata="uml2-1.0" initialized="true" scrolledX="-5" tag="10" key="3230303730363239206261746368">
+  <children xsi:type="editmodel:ActivityActivityEditModel" name="Bulk Upload Lifecycle" size="673,575" fontInfo="Omondo_Font_Default-8-1" id="{UMLID=_RvXqwL5WEd6M19kKXhY_WA}" itemName="Bulk Upload Lifecycle" numberOfThread="1">
+    <children xsi:type="editmodel:CompartmentEditModel" size="632,510">
+      <children xsi:type="editmodel:StartEditModel" name="Upload CSV" location="275,28" size="16,16" itemName="Upload CSV">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.0" target="//@children.0/@children.0/@children.2" targetEnd="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="7,16" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="58,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="Upload CSV" location="292,24" size="67,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.0"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.0/@sourceConnections.0" name="addBulkUpload" backgroundRGB="192,192,192" location="224,73" size="123,60" fontInfo="Omondo_Font_Default-8-0" itemName="addBulkUpload">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.2" target="//@children.0/@children.0/@children.3" targetEnd="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="60,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="61,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.2/@sourceConnections.0" name="Bulk Upload" backgroundRGB="251,251,251" location="223,171" size="122,60" stereotype="task" itemName="Bulk Upload">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" source="//@children.0/@children.0/@children.3" target="//@children.0/@children.0/@children.4" targetEnd="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="122,31" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="102,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.3" target="//@children.0/@children.0/@children.5" targetEnd="//@children.0/@children.0/@children.3/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.3/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.3/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="62,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.3/@sourceConnections.0" name="addEntry - for each url" backgroundRGB="192,192,192" location="436,314" size="196,60" fontInfo="Omondo_Font_Default-8-0" links="{Entry=UML Test\Entry.uad}" itemName="addEntry - for each url"/>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.3/@sourceConnections.1 //@children.0/@children.0/@children.7/@sourceConnections.0" name="bulk upload status" backgroundRGB="251,251,251" location="271,345" size="30,30" itemName="bulk upload status">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Almost-Done" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.5" target="//@children.0/@children.0/@children.7" targetEnd="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="Almost-Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="0,14" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="141,18"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Almost-Done" location="198,379" size="62,14" fontInfo="Arial-8-0" automaticRelocationAllowed="false" locationOnWireFromSource="NaN" distanceFromWire="NaN" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Done" foregroundRGB="128,255,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.5" target="//@children.0/@children.0/@children.8" targetEnd="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="62,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Done" size="25,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="bulk upload status" location="298,339" size="101,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.5"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.5/@sourceConnections.0" name="Close Bulk Upload" backgroundRGB="251,251,251" location="40,341" size="141,60" itemName="Close Bulk Upload">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" source="//@children.0/@children.0/@children.7" target="//@children.0/@children.0/@children.5" targetEnd="//@children.0/@children.0/@children.7/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.7/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.7/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="0,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="5,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:FlowFinalEditModel" targetConnections="//@children.0/@children.0/@children.5/@sourceConnections.1" name="Bulk Upload Succeed" backgroundRGB="128,255,0" location="223,475" size="122,35" fontInfo="Omondo_Font_Default-8-0" itemName="Bulk Upload Succeed"/>
+    </children>
+  </children>
+  <diagramOptions xsi:type="options:ActivityDiagramOptions" level="0" autoName="false"/>
+  <boardSetting snapToGeometry="true" gridEnabled="true" gridSpacing="14,14" gridOrigin="574,294" rulerUnit="cm" gridShow="true">
+    <leftRuler/>
+    <topRuler/>
+  </boardSetting>
+</editmodel:ActivityDiagramEditModel>

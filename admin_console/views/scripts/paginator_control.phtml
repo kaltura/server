@@ -1,0 +1,57 @@
+<?php // See http://developer.yahoo.com/ypatterns/pattern.php?pattern=searchpagination ?>
+
+<?php if ($this->pageCount): ?>
+	<div class="paginator">
+		<!-- Previous page link -->
+		<?php if (isset($this->previous)): ?>
+			<span class="enabled" onclick="gotoPage(<?php echo $this->index . ',' . $this->previous; ?>)">&lt; Previous</span> |
+		<?php else: ?>
+			<span class="disabled">&lt; Previous</span> |
+		<?php endif; ?>
+		
+		<!-- Numbered page links -->
+		<?php foreach ($this->pagesInRange as $page): ?>
+			<?php if ($page != $this->current): ?>
+				<span class="enabled" onclick="gotoPage(<?php echo $this->index . ',' . $page; ?>)"><?php echo $page; ?></span> |
+			<?php else: ?>
+				<span class="currnet"><?php echo $page; ?></span> |
+			<?php endif; ?>
+		<?php endforeach; ?>
+		
+		<!-- Next page link -->
+		<?php if (isset($this->next)): ?>
+			<span class="enabled" onclick="gotoPage(<?php echo $this->index . ',' . $this->next; ?>)">Next &gt; </span>
+		<?php else: ?>
+			<span class="disabled">Next &gt;</span>
+		<?php endif; ?>
+		<form method="post" id="frmPaginator<?php echo $this->index; ?>" action="<?php echo $this->action; ?>" style="display: inline; ">
+			<select id="pageSize" name="pageSize" onchange="gotoPage(<?php echo $this->index; ?>, 1);">
+				<option <?php echo ($this->itemCountPerPage == 10) ? 'selected="selected"' : ''; ?>>10</option>
+				<option <?php echo ($this->itemCountPerPage == 25) ? 'selected="selected"' : ''; ?>>25</option>
+				<option <?php echo ($this->itemCountPerPage == 50) ? 'selected="selected"' : ''; ?>>50</option>
+				<option <?php echo ($this->itemCountPerPage == 100) ? 'selected="selected"' : ''; ?>>100</option>
+			</select>
+			<?php $params = ($this->request) ? $this->request->getParams() : array(); ?>
+			<?php if (count($params)): ?>
+				<?php $ignore = array('submit', 'pageSize'); ?>
+				<?php foreach ($params as $field => $value): ?>
+					<?php if ($field != $this->pageFieldName && !in_array($field, $ignore)): ?>
+						<input type="hidden" name="<?php echo $field; ?>" value="<?php echo $value; ?>"/>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			<?php endif; ?>
+			<input type="hidden" id="page" name="<?php echo $this->pageFieldName; ?>" value="<?php echo $this->current; ?>"/>
+		</form>
+	</div>
+<?php endif; ?>
+	
+<?php if ($this->index == 1): ?>
+	<script type="text/javascript">
+	function gotoPage(index, page)
+	{
+		var frm = document.getElementById("frmPaginator" + index);
+		frm.page.value = page;
+		frm.submit();
+	}
+	</script>
+<?php endif; ?>

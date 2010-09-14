@@ -1,0 +1,1 @@
+ALTER TABLE `control_panel_command` ADD `batch_index` INT NULL DEFAULT NULL AFTER `worker_name`;

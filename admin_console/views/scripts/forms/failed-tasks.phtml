@@ -1,0 +1,233 @@
+
+	<strong title="<?php echo $this->translate('jobs failed filter created tooltip from'); ?>">Created between:</strong>
+	<div>
+		<?php echo $this->createdAtFrom; ?> -&nbsp; <?php echo $this->createdAtTo; ?>
+		<p id="clear_dates"><a id="clearDates" class="secondary"><?php echo $this->translate('Clear Dates'); ?></a></p>
+	</div>
+	<hr noshade="noshade" size="1" />
+
+	<label title="<?php echo $this->translate('jobs failed filter entry tooltip') ?>"><?php echo $this->translate('jobs failed filter entry label'); ?><?php echo $this->entryId; ?></label>
+	<label title="<?php echo $this->translate('jobs failed filter partner tooltip') ?>"><?php echo $this->translate('jobs failed filter partner label'); ?><?php echo $this->partnerId; ?></label>
+
+	<hr noshade="noshade" size="1" />
+
+	<?php echo $this->allReasons . ' ' . $this->translate('jobs failed filter all errors'); ?><!--label></label-->
+
+	<ul id="reasons_list">
+
+	<?php 
+		foreach($this->failStatuses as $status => $errorTypes)
+		{
+	        $fieldName = "status_$status";
+	        $label = $this->enumTranslate('KalturaBatchJobStatus', $status);
+        	?>
+			<li><label><?php echo $this->$fieldName . ' ' . $label . ' (' . $status . ')'; ?></label>
+			
+        	<?php
+        	
+        	if(is_array($errorTypes))
+        	{
+			?>
+				<ul>
+			<?php
+	        	foreach($errorTypes as $errorType)
+	        	{
+			        $fieldName = "status_{$status}_{$errorType}";
+			        $label = $this->enumTranslate('KalturaBatchJobErrorTypes', $errorType);
+		        	?>
+						<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
+					
+		        	<?php
+	        	}
+				?>
+				</ul>
+			<?php
+        	}
+			?>
+			</li>
+			<?php
+		}
+	?>
+	</ul>
+
+	<br />
+	<?php echo $this->allJobs . ' ' . $this->translate('jobs failed filter all jobs'); ?>
+
+	<ul id="tasks_list">
+
+	<?php 
+        $fieldName = '';
+        $label = '';
+        
+		foreach($this->jobTypes as $jobType => $jobSubTypes)
+		{
+        	if(is_array($jobSubTypes))
+        	{
+	        	foreach($jobSubTypes as $jobSubType => $checked)
+	        	{
+	        		$fieldName = "job_{$jobType}_{$jobSubType}";
+	        		$label = $this->jobTypeTranslate($jobType, $jobSubType);
+		        	?>
+							<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
+					
+		        	<?php
+	        	}
+        	}
+        	else
+        	{
+	        	$fieldName = "job_{$jobType}";
+	        	$label = $this->jobTypeTranslate($jobType);
+				
+	        	?>
+						<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
+				
+	        	<?php
+        	}
+		}
+	?>
+
+	</ul>
+
+	<?php echo $this->search; ?>
+
+<?php 
+	echo $this->page; 
+	echo $this->pageSize;
+	echo $this->submitAction; 
+	echo $this->actionJobs; 
+?>
+
+<script type="text/javascript">
+
+	$(function(){
+		$("#allJobs").click(function(){
+			window.check_all_flag = window.check_all_flag || false;
+		//	alert("window.check_all_flag="+window.check_all_flag);
+			var $lis = $("#tasks_list input");
+			if(!window.check_all_flag) {
+				$.each($lis,function(){$(this).attr("checked","checked");});
+				window.check_all_flag = true;
+			}
+			else {
+				$.each($lis,function(){$(this).removeAttr("checked");});
+				window.check_all_flag = false;
+			}
+		});
+
+		$("#tasks_list input").click(function(){
+			$("#allJobs").removeAttr("checked");
+			window.check_all_flag = false;
+		});
+
+		$("#allReasons").click(function(){
+			window.check_all_reasons_flag = window.check_all_reasons_flag || false;
+			var $lis = $("#reasons_list input");
+			if(!window.check_all_reasons_flag) {
+				$.each($lis,function(){$(this).attr("checked","checked");});
+				window.check_all_reasons_flag = true;
+			}
+			else {
+				$.each($lis,function(){$(this).removeAttr("checked");});
+				window.check_all_reasons_flag = false;
+				window.check_all_failed_flag = false;
+			}
+		});
+
+		$("#reasons_list input").click(function(){
+			$("#allReasons").removeAttr("checked");
+			window.check_all_reasons_flag = false;
+		});
+
+		$("#status_6").click(function(){
+			window.check_all_failed_flag = window.check_all_failed_flag || false;
+			var $lis = $("#reasons_list li ul input");
+			if(!window.check_all_failed_flag) {
+				$.each($lis,function(){$(this).attr("checked","checked");});
+				window.check_all_failed_flag = true;
+			}
+			else {
+				$.each($lis,function(){$(this).removeAttr("checked");});
+				window.check_all_failed_flag = false;
+			}
+		});
+
+		$("#reasons_list li ul input").click(function(){
+			$("#status_6").removeAttr("checked");
+			window.check_all_reasons_flag = false;
+		});
+
+		jQuery('#createdAtFrom, #createdAtTo').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+
+		jQuery('#clearDates').click(function() {
+			jQuery('#createdAtFrom').val("");
+			jQuery('#createdAtTo').val("");
+		});
+	});
+
+
+/*
+function toggleForm(show, clazz) {
+	if (show)
+		jQuery('.' + clazz).show();
+	else
+		jQuery('.' + clazz).hide();
+}
+
+<?php 
+	foreach($this->failStatuses as $status => $errorTypes) {
+    	if(!is_array($errorTypes))
+    		continue;
+    	
+        $fieldName = "status_$status";
+        ?>
+        	jQuery('#<?php echo $fieldName; ?>').click(function() {
+        		toggleForm (!this.checked, 'xxx<?php echo $status; ?>');
+        	});
+        <?php
+	}
+?>
+
+jQuery('#createdAt').click(function() {
+	toggleForm (this.checked, 'trCreatedAt');
+});
+
+jQuery('#entry').click(function() {
+	toggleForm (this.checked, 'trEntry');
+});
+
+jQuery('#partner').click(function() {
+	toggleForm (this.checked, 'trPartner');
+});
+
+jQuery('#allReasons').click(function() {
+	toggleForm (!this.checked, 'trErrors');
+});
+
+jQuery('#allJobs').click(function() {
+	toggleForm (!this.checked, 'trJobs');
+});
+
+function toggleByJQuery($obj, clazz, hideWhenChecked)
+{
+	var field = $obj.get(0);
+	var checked = field.checked;
+
+	if(hideWhenChecked)
+		checked = !checked;
+
+	toggleForm(checked, clazz);
+}
+
+jQuery(function(){
+	jQuery('#createdAtFrom, #createdAtTo').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?><br />', buttonImageOnly: true});
+
+	toggleByJQuery(jQuery("#createdAt[type=checkbox]"), 'trCreatedAt');
+	toggleByJQuery(jQuery("#entry[type=checkbox]"), 'trEntry');
+	toggleByJQuery(jQuery("#partner[type=checkbox]"), 'trPartner');
+	toggleByJQuery(jQuery("#allReasons[type=checkbox]"), 'trErrors', true);
+	toggleByJQuery(jQuery("#allJobs[type=checkbox]"), 'trJobs', true);
+
+	jQuery('#createdAtFrom, #createdAtTo').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?><br />', buttonImageOnly: true});
+});
+*/
+</script>

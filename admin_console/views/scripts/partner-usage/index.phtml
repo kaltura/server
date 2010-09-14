@@ -1,0 +1,104 @@
+
+<p><?php echo $this->translate('partner-usage intro text'); ?></p>
+<ul>
+ <li><?php echo $this->translate('partner-usage intro text2'); ?></li>
+ <li><?php echo $this->translate('partner-usage intro text3'); ?></li>
+</ul>
+<?php echo $this->form; ?>
+<div id="results" class="clear">
+	<h2>Results <span>(<?php echo $this->paginator->getItemsCount(); ?> publishers | <a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th title="<?php echo $this->translate('partner-usage table partnerStatus tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerStatus'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table partnerName tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerName'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table partnerId tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerId'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table partnerCreatedAt tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerCreatedAt'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table partnerPackage tooltip'); ?>"><?php echo $this->translate('partner-usage table partnerPackage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table views tooltip'); ?>"><?php echo $this->translate('partner-usage table views'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table plays tooltip'); ?>"><?php echo $this->translate('partner-usage table plays'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table entriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table entriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table totalEntriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table totalEntriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table videoEntriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table videoEntriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table imagesEntriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table imagesEntriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table audioEntriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table audioEntriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table mixEntriesCount tooltip'); ?>"><?php echo $this->translate('partner-usage table mixEntriesCount'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table bandwidth tooltip'); ?>"><?php echo $this->translate('partner-usage table bandwidth'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table totalStorage tooltip'); ?>"><?php echo $this->translate('partner-usage table totalStorage'); ?></th>
+				<th title="<?php echo $this->translate('partner-usage table storage tooltip'); ?>"><?php echo $this->translate('partner-usage table storage'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $item): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaPartnerStatus', $item->partnerStatus); ?></td>
+				<td><?php echo $item->partnerName; ?></td>
+				<td><?php echo $item->partnerId; ?></td>
+				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td><?php echo $this->translate($this->packageNameById($item->partnerPackage)); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->views); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->plays); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->entriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->totalEntriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->videoEntriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->imageEntriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->audioEntriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->mixEntriesCount); ?></td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->bandwidth); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->totalStorage); ?> MB</td>
+				<td><?php echo Zend_Locale_Format::toNumber((int)$item->storage); ?> MB</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	<a class="exportCsv"><?php echo $this->translate('Export to CSV'); ?></a>
+</div>
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+
+jQuery('#filter_type').change();
+
+jQuery('#clear_dates').click(function() {
+	jQuery('#from_date').val('');
+	jQuery('#to_date').val('');
+});
+
+
+jQuery('.exportCsv').click(function() {
+	// change the form action to the csv handler
+	jQuery('form:first')
+		.attr('action', '<?php echo $this->url(array('controller' => 'partner-usage', 'action' => 'export-csv')); ?>')
+		.attr('target', '_blank')
+		.find('#do_filter')
+		.click();
+	
+	// restore
+	jQuery('form:first')
+		.attr('action', null)
+		.attr('target', null);
+});
+
+jQuery(function(){
+	jQuery('#from_date, #to_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+});
+
+</script>

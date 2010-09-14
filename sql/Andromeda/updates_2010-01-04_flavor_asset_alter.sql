@@ -1,0 +1,2 @@
+ALTER TABLE  `flavor_asset` ADD  `container_format` VARCHAR(127) NULL DEFAULT  NULL AFTER  `file_ext`;
+ALTER TABLE  `flavor_asset` ADD  `video_codec_id` VARCHAR(127) NULL DEFAULT  NULL AFTER  `container_format`;

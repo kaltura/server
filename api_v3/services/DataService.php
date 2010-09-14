@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * Data service lets you manage data content (textual content)
+ *
+ * @service data
+ * @package api
+ * @subpackage services
+ */
+class DataService extends KalturaEntryService
+{
+	/**
+	 * Adds a new data entry
+	 * 
+	 * @action add
+	 * @param KalturaDataEntry $dataEntry Data entry
+	 * @return KalturaDataEntry The new data entry
+	 */
+	function addAction(KalturaDataEntry $dataEntry)
+	{
+		$dbEntry = $dataEntry->toObject(new entry());
+		
+		$this->checkAndSetValidUser($dataEntry, $dbEntry);
+		$this->checkAdminOnlyInsertProperties($dataEntry);
+		$this->validateAccessControlId($dataEntry);
+		$this->validateEntryScheduleDates($dataEntry);
+		
+		$dbEntry->setPartnerId($this->getPartnerId());
+		$dbEntry->setSubpId($this->getPartnerId() * 100);
+		$dbEntry->setStatus(KalturaEntryStatus::READY);
+		$dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC); 
+		$dbEntry->save();
+		
+		$dataEntry->fromObject($dbEntry);
+		
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
+		
+		return $dataEntry;
+	}
+	
+	/**
+	 * Get data entry by ID.
+	 * 
+	 * @action get
+	 * @param string $entryId Data entry id
+	 * @param int $version Desired version of the data
+	 * @return KalturaDataEntry The requested data entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function getAction($entryId, $version = -1)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DATA)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if ($version !== -1)
+			$dbEntry->setDesiredVersion($version);
+			
+		$dataEntry = new KalturaDataEntry();
+		$dataEntry->fromObject($dbEntry);
+
+		return $dataEntry;
+	}
+	
+	/**
+	 * Update data entry. Only the properties that were set will be updated.
+	 * 
+	 * @action update
+	 * @param string $entryId Data entry id to update
+	 * @param KalturaDataEntry $documentEntry Data entry metadata to update
+	 * @return KalturaDataEntry The updated data entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function updateAction($entryId, KalturaDataEntry $documentEntry)
+	{
+		return $this->updateEntry($entryId, $documentEntry, KalturaEntryType::DATA);
+	}
+	
+	/**
+	 * Delete a data entry.
+	 *
+	 * @action delete
+	 * @param string $entryId Data entry id to delete
+	 * 
+ 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function deleteAction($entryId)
+	{
+		$this->deleteEntry($entryId, KalturaEntryType::DATA);
+	}
+	
+	/**
+	 * List data entries by filter with paging support.
+	 * 
+	 * @action list
+     * @param KalturaDataEntryFilter $filter Document entry filter
+	 * @param KalturaFilterPager $pager Pager
+	 * @return KalturaDataListResponse Wrapper for array of document entries and total count
+	 */
+	function listAction(KalturaDataEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+	    if (!$filter)
+			$filter = new KalturaDataEntryFilter();
+			
+	    $filter->typeEqual = KalturaEntryType::DATA;
+	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
+	    
+	    $newList = KalturaDataEntryArray::fromEntryArray($list);
+		$response = new KalturaDataListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
+}

@@ -1,0 +1,354 @@
+
+<p><?php echo $this->translate('batch setup into'); ?> - <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'learn-more')); ?>"><?php echo $this->translate('batch setup learn link'); ?></a></p>
+
+
+<h2>&nbsp;</h2>
+<ul id="summary">
+	<li>Auto Refresh <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
+		onclick="toggleRefresh();return false;"><?php echo $this->translate('jobs in-progress refresh pause label'); ?></a> &nbsp;|&nbsp;
+		<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('jobs in-progress refresh now label'); ?></a></li>
+</ul>
+
+<?php if(count($this->errors)): ?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php endif; ?>
+		
+<?php
+	if($this->actionDescription)
+		echo '<div class="message">' . $this->translate($this->actionDescription) . '</div>';
+		
+	$schedulers = array();
+	$workers = array();
+	
+	$isRunning = array(
+		0 => $this->translate('batch setup worker status stopped'),
+		1 => $this->translate('batch setup worker status started'),
+	);
+	$isEnabled = array(
+		0 => array(
+			0 => $this->translate('batch setup worker enabled disabled'),
+			1 => $this->translate('batch setup worker enabled disabled'),
+		),
+		1 => array(
+			0 => $this->translate('batch setup worker enabled manual'),
+			1 => $this->translate('batch setup worker enabled auto'),
+		),
+	);	
+?>
+<br/><br/>
+<h2><?php echo $this->translate('batch setup schedulers title'); ?></h2>
+<!--<p><?php echo $this->translate('batch setup schedulers intro'); ?></p>-->
+
+<table>
+	<thead>
+		<tr>
+			<th title="<?php echo $this->translate('batch setup schedulers name tooltip'); ?>"><?php echo $this->translate('batch setup schedulers name th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup schedulers host tooltip'); ?>"><?php echo $this->translate('batch setup schedulers host th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup schedulers id tooltip'); ?>"><?php echo $this->translate('batch setup schedulers id th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup schedulers created tooltip'); ?>"><?php echo $this->translate('batch setup schedulers created th'); ?></th>
+			<th><?php echo $this->translate('batch setup schedulers status time th'); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($this->schedulers as $scheduler): ?>
+		<?php 
+			$schedulers[$scheduler->id] = $scheduler->name;
+		?>
+		<tr class="<?php echo $this->cycle(array('odd', 'even'), 'sched')->next(); ?>">
+			<td><?php echo $scheduler->name; ?></td>
+			<td><?php echo $scheduler->host; ?></td>
+			<td><?php echo $scheduler->configuredId; ?></td>
+			<td><?php echo date($this->translate('date format'), $scheduler->createdAt); ?></td>
+			<td><?php echo date($this->translate('date format'), $scheduler->lastStatus); ?></td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+	
+<br/><br/>
+	
+<h2><?php echo $this->translate('batch setup workers title'); ?></h2>
+<!--<p><?php echo $this->translate('batch setup workers intro'); ?></p>-->
+
+<table>
+	<thead>
+		<tr>
+			<th title="<?php echo $this->translate('batch setup workers name tooltip'); ?>"><?php echo $this->translate('batch setup workers name th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers worker name tooltip'); ?>"><?php echo $this->translate('batch setup workers worker name th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers jobs type tooltip'); ?>"><?php echo $this->translate('batch setup workers jobs type th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers scheduler tooltip'); ?>"><?php echo $this->translate('batch setup workers scheduler th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers status tooltip'); ?>"><?php echo $this->translate('batch setup workers status th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers enabled tooltip'); ?>"><?php echo $this->translate('batch setup workers enabled th'); ?></th>
+			<th title="<?php echo $this->translate('batch setup workers max instances tooltip'); ?>"><?php echo $this->translate('batch setup workers max instances th'); ?></th>
+			<th><?php echo $this->translate('batch setup workers action th'); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($this->workers as $worker): ?>
+		<?php 
+			$running = false;
+			$runningStr = '';
+			if(is_array($worker->statuses))
+			{
+				foreach($worker->statuses as $status)
+				{
+					if(intval($status->type) == KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING)
+					{
+						$running = $status->value;
+						$runningStr = $isRunning[$status->value];
+					}
+				}
+			}
+			
+			$friendlyName = $worker->name;
+			$enabledStr = '';
+			$enable = false;
+			$autoStart = false;
+			$maxInstances = false;
+			if(is_array($worker->configs))
+			{
+				foreach($worker->configs as $config)
+				{
+					switch($config->variable)
+					{
+						case 'friendlyName':
+							if(strlen(trim($config->value)))
+								$friendlyName = $config->value;
+							break;
+						
+						case 'enable':
+							$enable = $config->value;
+							break;
+							
+						case 'autoStart':
+							$autoStart = $config->value;
+							break;
+							
+						case 'maxInstances':
+							$maxInstances = $config->value;
+							break;
+							
+						default:
+							break;
+					}
+				}
+			}
+			$workers[$worker->id] = $friendlyName;
+			$enabledStr = $isEnabled[$enable][$autoStart];
+			
+			$actions = array();
+			
+			$enableStopStart = true;
+			if(isset($this->disabledWorkers[$worker->id]))
+				$enableStopStart = false;
+			
+			if($running && $enableStopStart)
+			{
+				$actions['stop'] = $this->translate('batch setup worker action stop');
+			}
+			
+			if($enable)
+			{
+				if(!$running && $enableStopStart)
+				{
+					$actions['start'] = $this->translate('batch setup worker action start');
+				}
+				
+				$actions['disable'] = $this->translate('batch setup worker action disable');
+				if($autoStart)
+				{
+					$actions['start-manual'] = $this->translate('batch setup worker action start manual');					
+				}
+				else
+				{
+					$actions['start-auto'] = $this->translate('batch setup worker action start auto');					
+				}
+			}
+			else
+			{
+				$actions['enable'] = $this->translate('batch setup worker action enable');
+//				$actions['start-auto'] = $this->translate('batch setup worker action start auto');
+//				$actions['start-manual'] = $this->translate('batch setup worker action start manual');
+			}
+			
+		?>
+		<tr class="<?php echo $this->cycle(array('odd', 'even'), 'work')->next(); ?>">
+			<td class="link" onclick="toggleView('tr_worker_data_<?php echo $worker->id; ?>')"><?php echo $friendlyName; ?></td>
+			<td><?php echo $worker->name; ?></td>
+			<td><?php echo $this->jobTypeTranslate($worker->type); ?></td>
+			<td><?php echo $schedulers[$worker->schedulerId]; ?></td>
+			<td><?php echo $runningStr; ?></td>
+			<td><?php echo $enabledStr; ?></td>
+			<td><?php echo $maxInstances; ?></td>
+			<td>
+				<?php $disabled = (!Kaltura_AclHelper::isAllowed('batch', 'stop-start')) ? ' disabled="disabled"' : ''; ?>
+				<select onchange="callAction(<?php echo $worker->id; ?>, this.value)"<?php echo $disabled;?>>
+					<option><?php echo $this->translate('batch setup worker action select'); ?></option>
+					<?php foreach($actions as $action => $text): ?>
+						<option value="<?php echo $action; ?>"><?php echo $text; ?></option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr class="additionalData" id="tr_worker_data_<?php echo $worker->id; ?>" style="display: none">
+			<td colspan="15"><textarea rows="20" cols="100"><?php
+				foreach($worker->configs as $config)
+				{
+					$var = $config->variable;
+					if(strlen($config->variablePart))
+						$var .= '.' . $config->variablePart;
+						
+					echo str_pad($var, 30) . '= ' . $config->value . "\n";
+				}
+			?>
+			</textarea> </td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<?php 
+
+	if($this->commands && count($this->commands))
+	{
+		?>
+		
+			<br/><br/>	
+			<h2><?php echo $this->translate('batch setup commands title'); ?></h2>
+			<br/>
+					
+			<table>
+				<thead>
+					<tr>
+						<th><?php echo $this->translate('batch setup commands id th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands worker th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands scheduler th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands created th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands type th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands status th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands cause th'); ?></th>
+						<th><?php echo $this->translate('batch setup commands err desc th'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach($this->commands as $command): ?>
+					<tr class="<?php echo $this->cycle(array('odd', 'even'), 'cmd')->next(); ?>">
+						<td><?php echo $command->id; ?></td>
+						<td><?php echo $workers[$command->workerId]; ?></td>
+						<td><?php echo $schedulers[$command->schedulerId]; ?></td>
+						<td><?php echo date($this->translate('date format'), $command->createdAt); ?></td>
+						<td><?php echo $this->enumTranslate('KalturaControlPanelCommandType', $command->type); ?></td>
+						<td><?php echo $this->enumTranslate('KalturaControlPanelCommandStatus', $command->status); ?></td>
+						<td><?php echo $command->cause; ?></td>
+						<td><?php echo $command->errorDescription; ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+				
+		<?php
+	}
+
+?>
+
+<form id="frmAction" method="post">
+	<input type="hidden" id="hdnAction" name="hdnAction"/>
+	<input type="hidden" id="hdnWorkerId" name="hdnWorkerId"/>
+	<input type="hidden" id="hdnCause" name="hdnCause"/>
+</form>
+
+
+<script type="text/javascript">
+
+	function toggleView(entityId)
+	{
+		$("#" + entityId).toggle();
+	}
+
+</script>
+
+<script type="text/javascript">
+
+	function callAction(workerId, action) {
+		var confirmText = "";
+		
+		switch(action) {
+			case "stop":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm stop'); ?>";
+				break;
+				
+			case "start":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm start'); ?>";
+				break;
+				
+			case "disable":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm disable'); ?>";
+				break;
+				
+			case "enable":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm enable'); ?>";
+				break;
+				
+			case "start-manual":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm start manual'); ?>";
+				break;
+				
+			case "start-auto":
+				confirmText = "<?php echo $this->translate('batch setup worker confirm start auto'); ?>";
+				break;
+				
+			default:
+				return;
+		}
+		var reason = prompt(confirmText, "");
+		if(reason == null)
+			return;
+
+		var frm = document.getElementById("frmAction");
+		frm.hdnAction.value = action;
+		frm.hdnWorkerId.value = workerId;
+		frm.hdnCause.value = reason;
+		frm.submit();
+	}
+	
+</script>
+
+<script type="text/javascript">
+
+	var intervalPointer = null;
+	
+	function refreshPage() {
+		pauseRefresh();
+		
+		document.location = document.location;
+	}
+	
+	function setRefreshTimer() {
+		intervalPointer = setTimeout(refreshPage, <?php echo $this->getConfigValue('refreshIntervalSec'); ?> * 1000);
+	}
+
+	function pauseRefresh()	{
+		clearTimeout(intervalPointer);
+		intervalPointer = null;
+	}
+
+	function toggleRefresh() {
+		if(intervalPointer == null) {
+			setRefreshTimer();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs in-progress refresh pause label'); ?>";
+		}
+		else {
+			pauseRefresh();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs in-progress refresh resume label'); ?>";
+		}
+	}
+
+	setRefreshTimer();
+	
+</script>

@@ -1,0 +1,274 @@
+
+<p><?php echo $this->translate('jobs in-progress intro text'); ?> - <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'learn-more')); ?>"><?php echo $this->translate('entry-history help link'); ?></a></p>
+
+<?php if(count($this->errors)): ?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php endif; ?>
+
+	<br class="clear" />
+
+	<div id="filters" class="clear">
+		<h2><?php echo $this->translate('jobs in-progress filter title'); ?></h2>
+		<?php echo $this->tasksInProgressForm; ?>
+	</div>
+
+	<div id="results">
+		<h2><?php echo $this->translate('jobs in-progress summary'); ?> <span>(filtered, <?php echo date($this->translate('date format')); ?>)</span></h2>
+		<ul id="summary">
+			<li><?php echo $this->translate('jobs in-progress status'); ?>:&nbsp; <a href="#in_queue"><?php echo $this->inQueuePaginator->getItemsCount() . $this->translate('jobs in-progress sum in-queue'); ?></a>
+				&nbsp;|&nbsp; <a href="#in_progress"><?php echo $this->inProgressPaginator->getItemsCount() . $this->translate('jobs in-progress sum in-progress'); ?></a>
+				&nbsp; | &nbsp;<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'failed-tasks')); ?>"><?php echo $this->translate('jobs in-progress links failed label'); ?></a></li>
+			<li><?php echo $this->translate('jobs failed auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
+				onclick="toggleRefresh();return false;"><?php echo $this->translate('jobs in-progress refresh pause label'); ?></a> &nbsp;|&nbsp;
+				<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('jobs in-progress refresh now label'); ?></a></li>
+		</ul>
+				
+		<a name="a_in_queue"></a>
+		<h2><?php echo $this->translate('jobs in-progress in-queue title'); ?> <span>(<?php echo $this->inQueuePaginator->getItemsCount() . $this->translate('jobs in-progress in-queue sum'); ?>)</span></h2>
+		<table>
+			<thead>
+				<tr>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid job th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid entry name th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid entry id th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid partner id th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid info th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid created th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid num of exe th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid actions th'); ?></th>
+				</tr>
+			</thead>
+			<tfoot>
+			<tr>
+				<td colspan="8">
+				<?php echo $this->inQueuePaginator; ?>
+				</td>
+			</tr>
+			</tfoot>
+			<tbody>
+				<?php 
+					$itemsFound = false;
+					foreach($this->inQueuePaginator as $job)
+					{
+						$itemsFound = true;
+						?>
+							<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+								<td class="nowrap">
+									<a title="<?php echo $this->translate('batch in-progress more-info tooltip'); ?>" class="taskinfo" href="#" onclick="toggleView('tr_job_data_<?php echo $job->id; ?>'); return false;">
+									<?php
+										echo $this->jobTypeTranslate($job->jobType, $job->jobSubType);
+										echo "&nbsp;($job->id)";
+									?>
+									</a>
+									   
+								</td>
+								<td><a title="<?php echo $this->translate('batch in-progress lifecycle tooltip'); ?>" class="lifecycle" href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $job->entryId)); ?>"><?php echo $job->entryName; ?></a></td>
+								<td><?php echo $job->entryId; ?></td>
+								<td>
+									<A href="<?php echo $this->url(array('controller' => 'partner', 'action' => 'list', 'filter_input' => $job->partnerId, 'filter_type' => 'byid' )); ?>">
+									<?php echo $job->partnerId; ?></A></td>
+								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
+								<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
+								<td><?php echo $job->executionAttempts; ?></td>
+								<td>
+									<?php if (Kaltura_AclHelper::isAllowed('batch', 'abort-tasks')): ?>
+									<button onclick="cancelJob(<?php echo $job->id . ',' . $job->jobType; ?>)"><?php echo $this->translate('jobs in-progress action cancel'); ?></button>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr class="additionalData" id="tr_job_data_<?php echo $job->id; ?>" style="display: none">
+								<td colspan="8"><?php echo $this->printKalturaObject($job->data); ?></td>
+							</tr>
+						<?php
+					}
+					if(!$itemsFound)
+					{
+						?>
+							<tr class="odd">
+								<td colspan="8"><?php echo $this->translate('no results'); ?></td>
+							</tr>
+						<?php
+					}
+				?>
+			</tbody>
+		</table>
+		
+		
+
+		<br />
+		<a name="a_in_progress"></a>
+		<h2><?php echo $this->translate('jobs in-progress in-progress title'); ?> <span>(<?php echo $this->inProgressPaginator->getItemsCount() . " " . $this->translate('jobs in-progress in-progress sum'); ?>)</span></h2>
+		<table>
+			<thead>
+				<tr>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid job th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid entry name th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid entry id th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid partner id th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid info th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid created th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid started th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid num of exe th'); ?></th>
+					<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs in-progress grid actions th'); ?></th>
+				</tr>
+			</thead>
+			<tfoot>
+			<tr>
+				<td colspan="9">
+				<?php echo $this->inProgressPaginator; ?>
+				</td>
+			</tr>
+			</tfoot>
+			<tbody>
+				<?php 
+					$itemsFound = false;
+					foreach($this->inProgressPaginator as $job)
+					{
+						$itemsFound = true;
+						?>
+							<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+								<td>
+									<a href="#" class="taskinfo" onclick="toggleView('tr_job_data_<?php echo $job->id; ?>'); return false;">
+									<?php
+										echo $this->jobTypeTranslate($job->jobType, $job->jobSubType);
+										echo " ($job->id)";
+									?>
+									</a>
+								</td>
+								<td><a class="lifecycle" href="<?php echo $this->url(array('controller' => 'batch', 'action' => $this->getConfigValue('inProgressEntryAction', 'entry-lifecycle'), 'entryId' => $job->entryId)); ?>"><?php echo $job->entryName; ?></a></td>
+								<td><?php echo $job->entryId; ?></td>
+								<td><?php echo $job->partnerId; ?></td>
+								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
+								<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
+								<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
+								<td><?php echo $job->executionAttempts; ?></td>
+								<td>
+									<?php if (Kaltura_AclHelper::isAllowed('batch', 'abort-tasks')): ?>
+									<button onclick="abortJob(<?php echo $job->id . ',' . $job->jobType; ?>)"><?php echo $this->translate('jobs in-progress action abort'); ?></button>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr class="additionalData" id="tr_job_data_<?php echo $job->id; ?>" style="display: none">
+								<td colspan="9"><?php echo $this->printKalturaObject($job->data); ?></td>
+							</tr>
+						<?php 
+					}
+					if(!$itemsFound)
+					{
+						?>
+							<tr class="odd">
+								<td colspan="9"><?php echo $this->translate('no results'); ?></td>
+							</tr>
+						<?php
+					}
+				?>
+			</tbody>
+		</table>
+		<br /><br />
+	</div> <!-- results -->
+		
+
+<script type="text/javascript">
+
+	function toggleView(entityId)
+	{
+		$("#" + entityId).toggle();
+	}
+
+</script>
+
+<script type="text/javascript">
+
+	var intervalPointer = null;
+	
+	function doAbort(jobId, type)
+	{
+		var frm = document.getElementById("frmTasksInProgress");
+		frm.reset();
+
+		frm.action = "<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks'), null, true); ?>/abort/" + jobId + "/abortType/" + type;
+		frm.submit();
+	}
+	
+	function abortJob(jobId, type)
+	{
+		var shoudRefresh = (intervalPointer != null);
+		pauseRefresh();
+
+		var confirmed = confirm("<?php echo $this->translate('jobs in-progress confirm abort'); ?>");
+		if(!confirmed)
+		{
+			if(shoudRefresh)
+				setRefreshTimer();
+			
+			return;
+		}
+		doAbort(jobId, type);
+	}
+	
+	function cancelJob(jobId, type)
+	{
+		var shoudRefresh = (intervalPointer != null);
+		pauseRefresh();
+
+		var confirmed = confirm("<?php echo $this->translate('jobs in-progress confirm cancel'); ?>");
+		if(!confirmed)
+		{
+			if(shoudRefresh)
+				setRefreshTimer();
+			
+			return;
+		}
+		doAbort(jobId, type);
+	}
+	
+	function refreshPage()
+	{
+		pauseRefresh();
+		
+		var frm = document.getElementById("frmTasksInProgress");
+		frm.reset();
+		frm.submit();
+	}
+	
+	function setRefreshTimer()
+	{
+		intervalPointer = setTimeout(refreshPage, <?php echo $this->getConfigValue('refreshIntervalSec'); ?> * 1000);
+	}
+
+	function pauseRefresh()
+	{
+		clearTimeout(intervalPointer);
+		intervalPointer = null;
+	}
+
+	function toggleRefresh()
+	{
+		if(intervalPointer == null)
+		{
+			setRefreshTimer();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs in-progress refresh pause label'); ?>";
+		}
+		else
+		{
+			pauseRefresh();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs in-progress refresh resume label'); ?>";
+		}
+	}
+
+	setRefreshTimer();
+
+	$("#wrapper").css("width", 3333 + "px");
+	var extra = $.browser.safari ? 42 : 30;
+	$(window).load(function(){
+		var width = $("#filters").width() + $("#results").width();
+		$("#wrapper").css("width", ( width + extra ) + "px");
+	});
+	
+</script>

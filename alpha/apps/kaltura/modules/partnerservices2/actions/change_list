@@ -1,0 +1,3 @@
+2008-07-05
+added mediaId to entry.php as read-write property
+addentry allows media<i>_id or entry<i>.mediaId 

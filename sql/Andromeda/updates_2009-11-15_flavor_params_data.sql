@@ -1,0 +1,6 @@
+insert into flavor_params (partner_id, name, tags, description, ready_behavior, created_at, updated_at, deleted_at, is_default, format, video_codec, video_bitrate, audio_codec, audio_bitrate, audio_channels, audio_sample_rate, width, height, frame_rate, gop_size, conversion_engines, conversion_engines_extra_params, custom_data) VALUES
+('0', 'HD', 'hd,web', 'High definition description goes here.', '0', now(), now(), NULL, '1', 'mp4', 'h264', '4000', 'mp3', '192', '2', '44000', '1920', '1080', '25', '50', '1,2,3', NULL, NULL), 
+('0', 'HQ', 'web', 'High quality description goes here.', '0', now(), now(), NULL, '1', 'mp4', 'h264', '2500', 'mp3', '128', '2', '44000', '1280', '720', '25', '50', '1,2,3', NULL, NULL), 
+('0', 'Normal - big', 'web', 'Normal quality big screen description goes here.', '0', now(), now(), NULL, '1', 'mp4', 'h264', '1350', 'mp3', '96', '2', '44000', '1280', '720', '25', '50', '1,2,3', NULL, NULL), 
+('0', 'Normal - small', 'web', 'Normal quality small screen description goes here.', '0', now(), now(), NULL, '1', 'mp4', 'h264', '750', 'mp3', '96', '2', '44000', '512', '288', '25', '50', '1,2,3', NULL, NULL), 
+('0', 'Low - small', 'web', 'Low quality description goes here.', '0', now(), now(), NULL, '1', 'mp4', 'h264', '400', 'mp3', '96', '2', '44000', '512', '288', '25', '50', '1,2,3', NULL, NULL)

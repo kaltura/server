@@ -1,0 +1,197 @@
+
+<p><?php echo $this->translate('jobs failed intro text'); ?> - <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'learn-more')); ?>"><?php echo $this->translate('entry-history help link'); ?></a></p>
+<br />
+<?php if(count($this->errors)): ?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php endif; ?>
+		
+	<div id="filters" class="clear">
+		<h2><?php echo $this->translate('jobs failed filter title'); ?></h2>
+		<?php echo $this->tasksFailedForm; ?>
+	</div>
+
+ <div id="results">
+	<h2>&nbsp;</h2>
+	<ul id="summary">
+		<li><?php echo $this->translate('jobs failed auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
+			onclick="toggleRefresh();return false;"><?php echo $this->translate('jobs in-progress refresh pause label'); ?></a> &nbsp;|&nbsp;
+			<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('jobs in-progress refresh now label'); ?></a></li>
+		<li><?php echo $this->translate('jobs failed also see'); ?>:&nbsp; <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_queue"><?php echo $this->translate('jobs failed links in-queue label'); ?></a>
+			&nbsp; | &nbsp;<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_progress"><?php echo $this->translate('jobs failed links in-progress label'); ?></a></li>
+	</ul>
+			
+	<h2><?php echo $this->translate('jobs failed grid title'); ?> <span>(<?php echo $this->paginator->getItemsCount() . $this->translate('jobs failed grid sum'); ?>)</span></h2>
+
+	<table>
+		<thead>
+			<tr>
+				<th><input type="checkbox" onclick="checkAll(this.checked)"/></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid job th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid entry name th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid entry id th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid partner id th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid info th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid created th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid started th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid end th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid reason th'); ?></th>
+				<th title="<?php echo $this->translate(''); ?>"><?php echo $this->translate('jobs failed grid num of exe th'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="11">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php 
+				$recordsFound = false;
+				foreach($this->paginator as $job)
+				{
+					$recordsFound = true;
+					?>
+						<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+							<td><input type="checkbox" class="jobAction" value="<?php echo $job->id . ',' . $job->jobType; ?>"/></td>
+							<td>
+								<a title="<?php echo $this->translate('batch in-progress more-info tooltip'); ?>" class="taskinfo" href="#" onclick="toggleView('tr_job_data_<?php echo $job->id; ?>'); return false;">
+								<?php 
+									echo $this->jobTypeTranslate($job->jobType, $job->jobSubType);
+									echo "&nbsp;($job->id)";
+								?>
+								</a>
+							</td>
+							<td><a title="<?php echo $this->translate('batch in-progress investigate tooltip'); ?>" class="investigate" href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $job->entryId)); ?>"><?php echo $job->entryName; ?></a></td>
+							<td><?php echo $job->entryId; ?></td>
+							<td><?php echo $job->partnerId; ?></td>
+							<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
+							<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
+							<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
+							<td><?php echo date($this->translate('date format'), $job->finishTime); ?></td>
+							<td><?php echo $this->failReasonTranslate($job->status, $job->errType, $job->errNumber, $job->message); ?></td>
+							<td><?php echo $job->executionAttempts; ?></td>
+						</tr>
+						<tr class="additionalData <?php echo $this->cycle(array('odd', 'even'))->current(); ?>" id="tr_job_data_<?php echo $job->id; ?>" style="display: none">
+							<td colspan="11"><?php echo $this->printKalturaObject($job->data); ?></td>
+						</tr>
+					<?php
+				}
+				if(!$recordsFound)
+				{
+					?>
+						<tr class="odd">
+							<td colspan="11"><?php echo $this->translate('no results'); ?></td>
+						</tr>
+					<?php
+				} 
+			?>
+		</tbody>
+	</table>
+	<div id="buttons">
+		<button name="retry" onclick="doAction(this.name);"><span><?php echo $this->translate('jobs failed action retry'); ?></span></button>
+		<button name="delete" onclick="doAction(this.name)"><span><?php echo $this->translate('jobs failed action delete'); ?></span></button>
+	</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+	function toggleView(entityId) {
+		$("#" + entityId).toggle();
+	}
+
+</script>
+
+<script type="text/javascript">
+
+	function checkAll(check) {
+		var $chk = $('.jobAction');
+		var values = new Array();
+		$chk.each(function(){
+			var chk = $(this).get(0);
+			chk.checked = check;
+		});
+	}
+	
+	function doAction(actionType) {
+		switch(actionType) {
+			case "retry" :
+					alert("<?php echo $this->translate('jobs failed action retry alert'); ?>");
+					break;
+			case "delete" :
+//					return false;
+					var do_delete = confirm("<?php echo $this->translate('jobs failed action delete confirm'); ?>");
+					if(!do_delete) {
+						return false;
+					}
+					break;
+			default :
+					break;
+		}
+		var $chk = $('.jobAction');
+		var values = new Array();
+		$chk.each(function(){
+			var chk = $(this).get(0);
+			if(chk.checked)
+				values.push($(this).val());
+		});
+
+		if(!values.length)
+			return;
+
+		var frm = document.getElementById("frmTasksFailed");
+		frm.reset();
+		
+		$('#actionJobs').val(values.join(';'));
+		$('#submitAction').val(actionType);
+
+		frm.submit();
+	}
+
+	var intervalPointer = null;
+	
+	function refreshPage() {
+		pauseRefresh();
+		
+		var frm = document.getElementById("frmTasksFailed");
+		frm.reset();
+		frm.submit();
+	}
+	
+	function setRefreshTimer() {
+		intervalPointer = setTimeout(refreshPage, <?php echo $this->getConfigValue('refreshIntervalSec'); ?> * 1000);
+	}
+
+	function pauseRefresh()	{
+		clearTimeout(intervalPointer);
+		intervalPointer = null;
+	}
+
+	function toggleRefresh() {
+		if(intervalPointer == null) {
+			setRefreshTimer();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs failed refresh pause label'); ?>";
+		}
+		else {
+			pauseRefresh();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('jobs failed refresh resume label'); ?>";
+		}
+	}
+
+	setRefreshTimer();
+
+	$("#wrapper").css("width", 3333 + "px");
+	$(window).load(function(){
+		var extra = $.browser.safari ? 51 : 30;
+		var width = $("#filters").width() + $("#results").width();
+		$("#wrapper").css("width", ( width + extra ) + "px");
+	});
+</script>

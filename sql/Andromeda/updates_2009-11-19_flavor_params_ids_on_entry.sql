@@ -1,0 +1,1 @@
+ALTER TABLE `entry` ADD `flavor_params_ids` VARCHAR(512) AFTER `search_text_discrete`;

@@ -1,0 +1,1 @@
+ALTER TABLE flavor_asset ADD KEY partner_id_entry_id (partner_id, entry_id);

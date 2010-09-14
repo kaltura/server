@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+ <log>
+  <ident>kaltura</ident>
+  <level>7</level>
+ </log>
+ <propel>
+  <datasources default="kaltura">
+   <datasource id="kaltura">
+    <adapter>mysql</adapter>
+    <connection>
+     <phptype>mysql</phptype>
+     <database>kaltura</database>
+     <hostspec>localhost</hostspec>
+     <username>root</username>
+     <password>root</password>
+    </connection>
+   </datasource>
+  </datasources>
+ </propel>
+</config>

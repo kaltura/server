@@ -1,0 +1,2 @@
+<?php
+$sphinxServer = 'pa-sphinx';

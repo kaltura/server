@@ -1,0 +1,1 @@
+ALTER TABLE media_info ADD multi_stream_info VARCHAR( 1023 ) NULL DEFAULT NULL; 

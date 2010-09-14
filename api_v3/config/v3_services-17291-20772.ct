@@ -1,0 +1,121 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+------------------------------------------------------------------------------------------------
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
+------------------------------------------------------------------------------------------------
+session.start						|			|0		|1	|0		|0		|1		|r	|17291,20772,25912,25913|	|	|
+session.startWidgetSession			|			|0		|1	|0		|0		|1		|r	|17291,20772,25912,25913|	|	|
+
+uiconf.add							|			|2		|1	|0		|0		|1		|rw |17291,20772,25912,25913|	|	|app-studio
+uiconf.update						|			|2		|1	|0		|0		|1		|rw |17291,20772,25912,25913|	|	|app-studio
+uiconf.get							|			|0		|1	|0		|0		|1		|r 	|17291,20772,25912,25913|1	|	|app-studio,kdp,kcw,kse
+uiconf.delete						|			|2		|1	|0		|0		|1		|r 	|17291,20772,25912,25913|	|	|app-studio
+uiconf.clone						|			|2		|1	|0		|0		|1		|r 	|17291,20772,25912,25913|1	|	|app-studio
+uiconf.list							|			|1,2		|1	|0		|0		|1		|r 	|       |1	|	|app-studio
+
+user.add							|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+user.get							|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+user.update							|			|2		|1	|2		|1		|1		|	|17291,20772,25912,25913|	|   |
+user.delete							|			|2		|1	|1		|0		|1		|	|17291,20772,25912,25913|	|   |
+user.updateid						|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+user.list							|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+
+widget.add							|			|1		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+widget.clone						|			|1		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+widget.get							|			|0		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kdp
+widget.update						|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+widget.list							|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+
+partner.register					|			|0		|0	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+partner.update						|			|2		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |
+partner.getsecrets					|			|0		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+partner.getinfo						|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kmc
+partner.getusage					|			|2		|1	|0		|0		|1		|r	|17291,20772,25912,25913|	|	|kmc
+
+adminuser.updatepasswd				|			|2		|1	|0		|0		|0		|	|17291,20772,25912,25913|	|   |kmc
+adminuser.resetpasswd				|			|0		|0	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kmc
+adminuser.login						|			|0		|0	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kmc
+
+search.search						|			|0		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kcw
+search.getmediainfo					|			|0		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kcw
+search.searchurl					|			|0		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kcw
+
+playlist.add						|			|2		|1	|1		|2		|1		|rw	|17291,20772,25912,25913|	|   |
+playlist.update						|			|2		|1	|1		|1		|1		|	|17291,20772,25912,25913|	|   |
+playlist.get						|			|1,2	|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |kpl
+playlist.delete						|			|2		|1	|1		|0		|1		|	|17291,20772,25912,25913|	|   |
+playlist.list						|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+playlist.execute					|			|0		|0	|0		|0		|1		|	|17291,20772,25912,25913|1	|   |kpl
+playlist.executefromcontent			|			|2		|0	|0		|0		|1		|	|17291,20772,25912,25913|1	|   |kmc
+playlist.getstatsfromcontent		|			|2		|1	|0		|0		|1		|	|17291,20772,25912,25913|1	|   |kmc
+
+media.addfromurl					|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.addfromsearchresult			|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.addfromuploadedfile			|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.addfromrecordedwebcam			|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.get							|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.update						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.upload						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.delete						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.list							|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.updatethumbnail				|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.updatethumbnailjpeg			|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.requestconversion				|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.flag					|			|0		|0	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.reject				|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.approve				|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+media.listflags				|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+
+
+mixing.add							|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.get							|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.update						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.delete						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.list							|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.clone						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.appendmediaentry				|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.requestflattening			|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+mixing.getmixesbymediaid	|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+
+
+baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+baseentry.list						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+baseentry.get						|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+baseentry.delete					|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+
+bulkupload.add					|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+bulkupload.get					|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+bulkupload.delete				|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+bulkupload.list					|			|2		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+
+batch.getexclusiveimportjobs		|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+batch.updateexclusiveimportjob		|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+batch.freeexclusiveimportjob		|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+batch.getexclusivenotificationjobs	|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+batch.updateexclusivenotificationjob|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+batch.freeexclusivenotificationjob	|			|N		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |batch
+
+report.getgraph						|			|2		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |reports
+report.gettotal						|			|2		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |reports
+report.gettable						|			|2		|1	|0		|0		|1		|rw	|17291,20772,25912,25913|	|   |reports
+
+system.ping							|			|0		|0	|0		|0		|1		|	|17291,20772,25912,25913|	|   |
+
+notification.getclientnotification	|			|1		|1	|1		|2		|1		|	|17291,20772,25912,25913|	|   |
+---------------------------------------------------------------------------------------------------

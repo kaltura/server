@@ -1,0 +1,117 @@
+
+<p><?php echo $this->translate('entry-history intro text'); ?> - <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'learn-more')); ?>"><?php echo $this->translate('entry-history help link'); ?></a></p>
+<br />
+
+<?php if($this->entry): ?>
+	<p><?php echo $this->translate('entry-history history links desc'); ?>
+		<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks', 'entryId' => $this->entry->id, 'entry' => true)); ?>#a_in_queue"><?php echo $this->translate('entry-history history in-queue link'); ?></a>&nbsp; | &nbsp;
+		<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks', 'entryId' => $this->entry->id, 'entry' => true)); ?>#a_in_progress"><?php echo $this->translate('entry-history history in-process link'); ?></a>&nbsp; | &nbsp;
+		<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'failed-tasks', 'entryId' => $this->entry->id, 'entry' => true)); ?>"><?php echo $this->translate('entry-history history failed link'); ?></a>
+	</p>
+<?php endif; ?>
+
+<?php if(count($this->errors)): ?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php endif; ?>
+
+<?php echo $this->searchEntryForm; ?>
+
+<br class="clear" />
+
+<?php 
+	if($this->entry)
+	{
+		?>
+		
+			<h2><?php echo $this->translate('entry-history info title'); ?></h2>
+			<ul class="details">
+				<li><label><?php echo $this->translate('entry-history info entry id label'); ?></label> <?php echo $this->entry->id; ?></li>
+				<li><label><?php echo $this->translate('entry-history info entry name label'); ?></label> <a title="<?php echo $this->translate('entry-history info entry name tooltip'); ?>" href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $this->entry->id)); ?>"><?php echo $this->entry->name; ?></a></li>
+				<li><label><?php echo $this->translate('entry-history info account label'); ?></label> <a title="<?php echo $this->translate('entry-history info account tooltip'); ?>" href="<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => $this->partner->id)); ?>"><?php echo $this->partner->name; ?></a></li>
+			</ul>
+			<br />
+			<h2><?php echo $this->translate('entry-history history title'); ?> <span>(<?php echo $this->translate('entry-history history update label'); ?> <?php echo date($this->translate('date format')); ?>)</span></h2>
+			<table>
+				<thead>
+					<tr>
+						<th title="<?php echo $this->translate('entry-history history batch tooltip'); ?>"><?php echo $this->translate('entry-history history batch th'); ?></th>
+						<th><?php echo $this->translate('entry-history history info th'); ?></th>
+						<th title="<?php echo $this->translate('entry-history history create time tooltip'); ?>"><?php echo $this->translate('entry-history history create time th'); ?></th>
+						<th title="<?php echo $this->translate('entry-history history start time tooltip'); ?>"><?php echo $this->translate('entry-history history start time th'); ?></th>
+						<th title="<?php echo $this->translate('entry-history history end time tooltip'); ?>"><?php echo $this->translate('entry-history history end time th'); ?></th>
+						<th title="<?php echo $this->translate('entry-history history status tooltip'); ?>"><?php echo $this->translate('entry-history history status th'); ?></th>
+						<th title="<?php echo $this->translate('entry-history history attempts tooltip'); ?>"><?php echo $this->translate('entry-history history attempts th'); ?></th>
+					</tr>
+				</thead>
+				<tfoot>
+				<tr>
+					<td colspan="7">
+					<?php echo $this->paginator; ?>
+					</td>
+				</tr>
+				</tfoot>
+				<tbody>
+					<?php foreach($this->paginator as $job): ?>
+					<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+						<td>
+							<?php 
+							
+								echo $this->jobTypeTranslate($job->jobType, $job->jobSubType);
+								echo " ($job->id)";
+							?>
+						</td>
+						<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
+						<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
+						<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
+						<td><?php echo date($this->translate('date format'), $job->finishTime); ?></td>
+						<td>
+							<?php 
+								$color = 'black';
+								switch($job->status)
+								{
+									case KalturaBatchJobStatus::FINISHED:
+									case KalturaBatchJobStatus::DONT_PROCESS:
+										$color = 'green';
+										break;
+										
+									case KalturaBatchJobStatus::ABORTED:
+									case KalturaBatchJobStatus::FAILED:										
+									case KalturaBatchJobStatus::FATAL:
+										$color = 'red';
+										break;
+								}
+								
+								$status = $this->enumTranslate('KalturaBatchJobStatus', $job->status);
+								echo "<font color=\"$color\">$status</font>";
+								
+								if($job->deletedAt)
+									echo ' (<font color="red">' . $this->translate('DELETED') . '</font>)';
+							?>
+						</td>
+						<td><?php echo $job->executionAttempts; ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		<?php
+	}
+?>
+
+
+ <script>
+	$(function(){
+		 $("form.simple").submit(function(){
+			var $my_input = $("form.simple input")
+			if($my_input.val() == "") {
+				$my_input.focus().css({"outline":"solid 2px red"});
+				return false;
+			}
+		})
+	});
+ </script>

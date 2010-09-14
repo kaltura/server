@@ -1,0 +1,20 @@
+<fieldset>
+	<label for="entryId" class="required"><?php echo $this->translate('entry-history search label'); ?>:</label> 
+	<?php echo $this->entryId; ?>
+	
+	<?php if(Kaltura_Support::isAdminEnabled()): ?> 
+		<dt id="entryFile-label"><label for="entryFile" class="optional"><?php echo $this->translate('entry-investigate entry upload support'); ?>:</label></dt> 
+		<dd> 
+			<?php echo $this->entryFile; ?>
+		</dd>
+	<?php endif; ?> 
+	 
+	<?php 
+		echo $this->search; 
+		
+		echo $this->submitAction;
+		echo $this->actionFlavorAssetId;
+		echo $this->actionJobId;
+		echo $this->actionJobType;
+	?>
+</fieldset>

@@ -1,0 +1,245 @@
+
+<p><?php echo $this->translate('partner-list intro text'); ?></p>
+
+<?php echo $this->form; ?>
+<div id="results" class="clear">
+	<h2>Results <span>(<?php echo $this->paginator->getItemsCount(); ?> publishers)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Publisher Name'); ?></th>
+				<th><?php echo $this->translate('Website URL'); ?></th>
+				<th><?php echo $this->translate('Admin Name'); ?></th>
+				<th><?php echo $this->translate('Admin Email'); ?></th>
+				<th><?php echo $this->translate('Admin Phone'); ?></th>
+				<th><?php echo $this->translate('Account Creation Date'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* KalturaPartner */ $partner): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaPartnerStatus', $partner->status); ?></td>
+				<td><?php echo $partner->id; ?></td>
+				<td><?php echo $partner->name; ?></td>
+				<td><?php echo $partner->website; ?></td>
+				<td><?php echo $partner->adminName; ?></td>
+				<td><?php echo $partner->adminEmail; ?></td>
+				<td><?php echo $partner->phone; ?></td>
+				<td><?php $d = (new Zend_Date($partner->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
+						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
+							<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+							<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+							<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
+								<option value="block"><?php echo $this->translate('Block'); ?></option>
+							<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
+								<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+							<?php endif; ?>
+							<option value="remove"><?php echo $this->translate('Remove'); ?></option>
+						<?php endif; ?>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
+
+jQuery('#filter_type').change();
+
+function doAction(action, partnerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function manage(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => '')); ?>' + partnerId;
+	window.open(url);
+}
+
+function remoteStorage(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'external-storages')); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	document.location = url;
+}
+function configure(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure', 'partner_id' => '')); ?>' + partnerId;
+	
+	jQuery('#partner-configure-dialog').remove();
+	var dialogDiv = jQuery('<div id="partner-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 400,
+		height: 600,
+		title: '<?php echo $this->translate('Account Specific Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+
+		jQuery(this).find('form').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			
+		}	
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(function() { 
+				dialogDiv.dialog('close');
+			}); 
+		}
+	);
+}
+
+function block(partnerId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure block partner?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+			partnerId, 
+			<?php echo KalturaPartnerStatus::BLOCKED; ?>, 
+			function() {
+				alert('<?php echo $this->translate('partner was blocked');?>');
+			}
+		);
+	}
+}
+
+function unblock(partnerId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure unblock partner?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+			partnerId, 
+			<?php echo KalturaPartnerStatus::ACTIVE; ?>, 
+			function() {
+				alert('<?php echo $this->translate('partner was unblocked');?>');
+			}
+		);
+	}
+}
+
+function remove(partnerId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure remove partner?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+			partnerId, 
+			<?php echo KalturaPartnerStatus::FULL_BLOCK; ?>, 
+			function() {
+				alert('<?php echo $this->translate('partner was removed');?>');
+			}
+		);
+	}
+}
+
+function changeStatus(partnerId, status, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-status', 'partner_id' => 'PARTNERID', 'status' => 'STATUS')); ?>';
+	url = url.replace('STATUS', status);
+	url = url.replace('PARTNERID', partnerId);
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+				this.error();
+			
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this);
+			}
+
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('an error occured'); ?>');
+		}
+	});
+}
+
+jQuery(function() {
+	$("#configure-dialog").dialog({
+		bgiframe: true,
+		autoOpen: false,
+		height: 300,
+		modal: true,
+		buttons: {
+			'Create an account': function() {
+				var bValid = true;
+				allFields.removeClass('ui-state-error');
+	
+				bValid = bValid && checkLength(name,"username",3,16);
+				bValid = bValid && checkLength(email,"email",6,80);
+				bValid = bValid && checkLength(password,"password",5,16);
+	
+				bValid = bValid && checkRegexp(name,/^[a-z]([0-9a-z_])+$/i,"Username may consist of a-z, 0-9, underscores, begin with a letter.");
+				// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
+				bValid = bValid && checkRegexp(email,/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,"eg. ui@jquery.com");
+				bValid = bValid && checkRegexp(password,/^([0-9a-zA-Z])+$/,"Password field only allow : a-z 0-9");
+				
+				if (bValid) {
+					$('#users tbody').append('<tr>' +
+						'<td>' + name.val() + '</td>' + 
+						'<td>' + email.val() + '</td>' + 
+						'<td>' + password.val() + '</td>' +
+						'</tr>'); 
+					$(this).dialog('close');
+				}
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+			}
+		},
+		close: function() {
+			allFields.val('').removeClass('ui-state-error');
+		}	
+	});
+});
+
+</script>

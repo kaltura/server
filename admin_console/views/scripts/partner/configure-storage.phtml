@@ -1,0 +1,85 @@
+<!-- <?php //$this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'configure-storage'))); ?>
+<?php// echo $this->form; ?> -->
+
+<form
+	action="<?php echo $this->url ( array ('controller' => 'partner', 'action' => 'configure-storage' )); ?>"
+	method="post" enctype="application/x-www-form-urlencoded"
+	id="frmStorageConfig" class="<?php echo ($this->formValid) ? 'valid' : 'invalid'; ?>">
+<div class="clear"></div>
+<div class="newStorageDiv">
+	<div class="rightcolumn">
+	<p align="right"> <font size="-2"> *Mandatory Fields </font></p>
+	</div>
+<div><b>General</b></div>
+		<div class="leftcolumn">
+		<dl>
+		<?php echo $this->form->partnerId;?>
+		<?php echo $this->form->name;?>
+		</dl>
+		</div>
+		<div class="rightcolumn">
+		<dl>		
+		<?php echo $this->form->desciption;?>
+		</dl>
+		</div>
+		<div class="clear"></div>		
+</div>
+<hr></hr>
+<div class="newStorageDiv">
+	<div class="leftBottomColumn">
+		<div>
+		<div><b>Exported Details</b></div>
+		<?php echo $this->form->storageUrl;?>	
+		<?php echo $this->form->storageBaseDir;?>
+		
+		<?php echo $this->form->pathManagerClass;?>
+		<?php echo $this->form->protocol;?>
+		<?php echo $this->form->storageFtpPassiveMode;?>
+		<dt id="s"> &nbsp;</dt>
+		<?php echo $this->form->storageUsername;?>
+		<?php echo $this->form->storagePassword;?>
+		</div>
+		<hr id="crossLine"></hr>
+		<div>
+		<div><b>Delivery Details</b></div>
+		<?php echo $this->form->deliveryHttpBaseUrl;?>
+		<?php echo $this->form->deliveryRmpBaseUrl;?>
+		<?php echo $this->form->deliveryIisBaseUrl;?>
+		<?php echo $this->form->urlManagerClass;?>
+		
+	
+		</div>
+	</div>
+	<div class="rightcolumn">
+	<div><b>Exported Policy</b></div>
+		<?php echo $this->form->minFileSize;?>
+		<?php echo $this->form->maxFileSize;?>
+		<?php echo $this->form->trigger;?>
+		
+		<hr></hr>
+		<div><a id="toggleLink" onclick="jQuery('[class=commentForm]').toggle();"><b>Advanced >> </b></a></div>
+		<div class="commentForm">
+		Check/Uncheck transcoding flavors for selective export:
+		<div class="commentFormObjects">
+		<?php 		
+		foreach($this->form as $name => $obj)
+		{
+			if(isset($obj->indicator)) 
+			{
+				echo '<div>'.$obj.'</div>';	
+			}
+		} 
+		?>
+		</div>
+		</div>
+	</div>
+			
+</div>
+
+
+<script type="text/javascript">
+jQuery('[class=commentForm]').toggle();
+</script>
+</form>
+
+

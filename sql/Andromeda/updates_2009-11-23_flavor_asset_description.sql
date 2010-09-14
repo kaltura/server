@@ -1,0 +1,1 @@
+ALTER TABLE `flavor_asset` ADD `description` VARCHAR( 255 ) NOT NULL AFTER `version`;

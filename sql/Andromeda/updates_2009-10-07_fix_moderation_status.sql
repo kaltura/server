@@ -1,0 +1,1 @@
+update entry set moderation_status = 1, status = 2 where status = 5;

@@ -1,0 +1,266 @@
+	
+<p><?php echo $this->translate('external-storages intro text'); ?></p>
+
+<?php 
+	$triggersNames = array(
+		1 => 'Convert Finished',
+		2 => 'Moderation Approved',
+		3 => 'Flavor Ready',
+	);
+	
+	$pathManagersNames = array(
+		'default' => 'Kaltura Path',
+		'kPathManager' => 'Kaltura Path',
+		'kExternalPathManager' => 'External Path',
+	);
+	
+	$urlManagersNames = array(
+		'default' => 'Kaltura WWW',
+		'kLocalPathUrlManager' => 'QA FMS Server',
+		'kLimeLightUrlManager' => 'Lime Light CDN',
+		'kAkamaiUrlManager' => 'Akamai CDN',
+		'kLevel3UrlManager' => 'Level 3 CDN',
+	);
+?>
+
+   <?php echo $this->form; ?>
+   <?php echo $this->newForm; ?>
+
+<div id="results" class="clear">
+	<h2><?php echo $this->translate('external-storages results count', $this->paginator->getItemsCount()); ?></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Protocol'); ?></th>
+				<th><?php echo $this->translate('URL'); ?></th>
+				<th><?php echo $this->translate('Publisher ID'); ?></th>
+				<th><?php echo $this->translate('Path Manager'); ?></th>
+				<th><?php echo $this->translate('URL Manager'); ?></th>
+				<th><?php echo $this->translate('Trigger'); ?></th>
+				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* KalturaStorageProfile */ $storage): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaStorageProfileStatus', $storage->status); ?></td>
+				<td><?php echo $storage->id; ?></td>
+				<td><?php echo $storage->name; ?></td>
+				<td><?php echo $this->enumTranslate('KalturaStorageProfileProtocol', $storage->protocol); ?></td>
+				<td><?php echo $storage->storageUrl; ?></td>
+				<td><?php echo $storage->partnerId; ?></td>
+				<td><?php echo (isset($pathManagersNames[$storage->pathManagerClass]) ? $pathManagersNames[$storage->pathManagerClass] : $pathManagersNames['default']); ?></td>
+				<td><?php echo (isset($urlManagersNames[$storage->urlManagerClass]) ? $urlManagersNames[$storage->urlManagerClass] : $urlManagersNames['default']); ?></td>
+				<td><?php echo $triggersNames[$storage->trigger]; ?></td>
+				<td><?php $d = (new Zend_Date($storage->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $storage->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+						<?php if ($storage->status == KalturaStorageProfileStatus::DISABLED): ?>
+							<option value="setManual"><?php echo $this->translate('Enable'); ?></option>
+							<option value="setAutomatic"><?php echo $this->translate('Export Automatically'); ?></option>
+						<?php elseif ($storage->status == KalturaStorageProfileStatus::MANUAL): ?>
+							<option value="disable"><?php echo $this->translate('Disable'); ?></option>
+							<option value="setAutomatic"><?php echo $this->translate('Export Automatically'); ?></option>
+						<?php elseif ($storage->status == KalturaStorageProfileStatus::AUTOMATIC): ?>
+							<option value="disable"><?php echo $this->translate('Disable'); ?></option>
+							<option value="setManual"><?php echo $this->translate('Manual only'); ?></option>
+						<?php endif; ?>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+
+jQuery('#filter_type').change();
+
+function doAction(action, storageId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+var dialogDiv;
+function newStorage(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage')); ?>';
+	
+	jQuery('#partner-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 880,
+		height: 650,
+		title: '<?php echo $this->translate('Storage Specific Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmStorageConfig').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {	
+		}	
+	});	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmStorageConfig').ajaxForm(newStorageSuccess); 
+		}
+	);
+}
+
+function newStorageSuccess(html) {
+	if (jQuery(html).parent().find('form').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+	}
+	else
+	{
+		jQuery('#frmStorageConfig').replaceWith(html);
+		jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
+	}
+}
+function configure(storageId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'storageId' => '')); ?>' + storageId;
+	
+	jQuery('#partner-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 880,
+		height: 650,
+		title: '<?php echo $this->translate('Storage Specific Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmStorageConfig').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			
+		}	
+	});
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmStorageConfig').ajaxForm(newStorageSuccess);
+		}
+	);
+}
+
+function setManual(storageId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure manual storage?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+				storageId, 
+			<?php echo KalturaStorageProfileStatus::MANUAL; ?>, 
+			function() {
+				alert('<?php echo $this->translate('storage was manualed');?>');
+			}
+		);
+	}
+}
+
+function setAutomatic(storageId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure auto storage?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+				storageId, 
+			<?php echo KalturaStorageProfileStatus::AUTOMATIC; ?>, 
+			function() {
+				alert('<?php echo $this->translate('storage was autoed');?>');
+			}
+		);
+	}
+}
+
+function disable(storageId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure disable storage?'); ?>');
+	if (ok)
+	{
+		changeStatus(
+				storageId, 
+			<?php echo KalturaStorageProfileStatus::DISABLED; ?>, 
+			function() {
+				alert('<?php echo $this->translate('storage was disabled');?>');
+			}
+		);
+	}
+}
+
+function changeStatus(storageId, status, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'update-storage-status', 'storageId' => 'STORAGE_ID', 'status' => 'STATUS')); ?>';
+	url = url.replace('STATUS', status);
+	url = url.replace('STORAGE_ID', storageId);
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+				this.error();
+			
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this);
+			}
+
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('an error occured'); ?>');
+		}
+	});
+}
+
+</script>

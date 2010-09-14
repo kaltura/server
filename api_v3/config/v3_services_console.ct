@@ -1,0 +1,59 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+
+!!!! will override the ticket and pg columns !!!!
+------------------------------------------------------------------------------------------------
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
+------------------------------------------------------------------------------------------------
+
+jobs.addmailjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.listbatchjobs					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletejob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.addconvertprofilejob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+
+batchcontrol.setscheduleconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.setworkerconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.stopschedule			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.stopworker				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.startworker			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.kill					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.getcommand				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.setcommandresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.getfullstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.listschedulers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+
+system.adduser						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+system.getuserbyemail				|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+system.getuser						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+system.updateuser					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+system.deleteuser					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+system.listusers					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+
+#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+
+entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+
+---------------------------------------------------------------------------------------------------

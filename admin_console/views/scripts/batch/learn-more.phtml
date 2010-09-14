@@ -1,0 +1,253 @@
+<h2><a name="Introduction">Introduction</a></h2>
+<p>The new generation of the Kaltura batch management module implements  a modular and distributed architecture, designed to answer the growing business  and operational needs for site elasticity and smart distribution of system  resources.&nbsp; The purpose of this document is to describe the architecture of the Kaltura  batch management module with special emphasis on understanding the batch tasks  and services that play a part in the Kaltura content ingestion flow.&nbsp; </p>
+<h2><a name="What_is">What is Batch processing?</a></h2>
+<p>(From <a href="http://en.wikipedia.org/wiki/Batch_processing" target="_blank">Wikipedia</a>)<br />
+  Batch processing&nbsp;is the execution of a  series of&nbsp;<a href="http://en.wikipedia.org/wiki/Computer_program" target="_blank">programs</a> (&quot;<a href="http://en.wikipedia.org/wiki/Job_(software)" target="_blank">jobs</a>&quot;) on a <a href="http://en.wikipedia.org/wiki/Computer" target="_blank">computer</a> without manual intervention.&nbsp; Batch jobs are set up so they can be run to completion without manual intervention, so all input data is preselected through <a href="http://en.wikipedia.org/wiki/Script_(computer_programming)" target="_blank">scripts</a> or <a href="http://en.wikipedia.org/wiki/Command-line_parameter" target="_blank">command-line parameters</a>.&nbsp; This is in contrast to &quot;online&quot; or <a href="http://en.wikipedia.org/wiki/Interactive_computing" target="_blank">interactive programs</a> which  prompt the user for such input.&nbsp; A program takes a set of data files as input, process the data, and produces a set of output data files.&nbsp; This operating  environment is termed as &quot;batch processing&quot; because the input data  are collected into <a href="http://en.wikipedia.org/wiki/At_(Unix)" target="_blank">batches</a> on files and are processed in batches by the program.&nbsp; </p>
+<h2><a name="Kaltura_Batch_Task">Kaltura Batch Task</a></h2>
+<p>A Kaltura Batch Task is a stand-alone task  which is designed to be executed within the Kaltura Platform by a batch  process.&nbsp; Kaltura batch tasks are initiated by a Kaltura API call that is  triggered either by a specific end-user workflow or by an internal batch  processing flow management entity.&nbsp; </p>
+<p>When created, each  batch task is stored within a dedicated data base record holding all  information related to its specific type, its executing state, its  priority and other operational information.&nbsp; For more information on batch tasks type classification, please refer to  the Kaltura Batch Tasks Type Classification section.&nbsp; </p>
+<h2><a name="Kaltura_Batch_Service">Kaltura Batch Service</a></h2>
+<p>A Kaltura Batch Service is a configurable  set of parameters defining a specific service that handles a batch task of a  specific type in a specific way.&nbsp; A batch  service is defined by parameters such as service name, the type of batch tasks  it should handle, the name of the process that  should be executed to operate the service, the maximum number of instances each  service can operate at a given time, the execution schedule of the service and  other operable parameters.&nbsp; There are 3 main types of batch services:</p>
+<ul>
+ <li>
+  <h3><a name="Batch_Execution_Service">Batch Execution Service</a></h3>
+  <p>A batch service that executes a full operation  on a specific type of batch tasks.&nbsp; </p>
+ </li>
+ <li>
+  <h3><a name="Batch_Closure_Service">Batch Closure Service</a></h3>
+  <p>A batch service that only handles the finalization of a previous operation on a specific type of batch tasks.&nbsp; </p>
+  </li>
+  <li>
+   <h3><a name="Batch_Periodic_Service">Batch Periodic Service</a></h3>
+   <p>A batch service that is mainly used for  system maintenance operations, and does not handle batch tasks.&nbsp; </p>
+  </li>
+</ul>
+&nbsp;
+<p>For more information on the Kaltura batch services, please refer to the <a href="#Kaltura_Default_Batch">Kaltura Default Batch Services</a> section.&nbsp; </p>
+<h2><a name="Kaltura_Batch_Process">Kaltura Batch Process</a></h2>
+<p>A Kaltura Batch Process is one instance of a  specific Kaltura batch service, executing the specific actions and logic needed  for handling a specific type of batch tasks.&nbsp; Upon execution, each batch process checks for the next relevant pending batch task to be handled and operates on it.&nbsp; </p>
+<h2><a name="Kaltura_Batch_Jobs_API">Kaltura Batch Jobs API</a></h2>
+<p>A set of specific APIs used for implementing  the internal and external flows related to the Kaltura batch processing  implementation.&nbsp; </p>
+<h2><a name="Kaltura_Batch_Scheduler">Kaltura Batch Scheduler</a></h2>
+<p>The Kaltura Batch Scheduler is a continual process, responsible for the scheduling of the batch services assigned to it.&nbsp; It schedules the execution of batch processes according to the load of pending  batch tasks in the system and according to the scheduling rules defined in its  configuration for the different batch services.&nbsp; The Kaltura batch scheduler is  assisted by a special batch periodic service, named Scheduler Helper, providing  the batch scheduler with relevant information on the current state of batch  processes and batch tasks.&nbsp; </p>
+<p>A Kaltura Batch Scheduler can run as a  single scheduler within the platform deployment or run as one of many  schedulers in a scaled-up platform configuration.&nbsp; The defined set of batch  services controlled by each batch scheduler can be extended, reduced or  adjusted in run-time according to system functional and scalability needs.&nbsp; </p>
+<h2><a name="Internal_Batch_Processing">Internal Batch Processing of a Single Batch Task</a></h2>
+<p>The following diagram illustrates the internal processing flow of a single batch task (import)<br />
+  <img border="0" width="617" height="298" src="../../images/learn_more_img2.jpg" alt="internal processing flow of a single batch task (import)" /></p>
+<ol>
+  <li>A new import task is added via Kaltura API as the first step of a content ingestion flow for a new rich-media file, following an end-user  import action.</li>
+  <li>The Batch Scheduler executes a new batch process for executing the import job service.</li>
+  <li>The Import batch process asks for the next pending import task via Kaltura API.</li>
+  <li>The Import batch process updates the import batch task state to "Started".</li>
+  <li>The Import batch process transfers the rich-media file from its original location to the Kaltura platform.</li>
+  <li>The Import batch process updates the import batch task state to "Done".</li>
+  <li>The Import batch process releases the import batch task and ends.</li>
+</ol>
+
+<h2><a name="Batch_Processing_Flow">Batch Processing Flow of a Successful Entry  Ingestion</a></h2>
+<p>The following diagram describes the internal  batch processing flow for full ingestion of rich-media files by the Kaltura  online video platform - from import (detailed above) to full transcoding into  various 'transcoding flavors' for playback.&nbsp; This is a simplified flow of a successful ingestion process.&nbsp; </p>
+<img src="../../images/learn_more_img3.gif" alt="internal  batch processing flow for full ingestion of rich-media files" width="345" height="653" style="float:left" />
+<ol style="margin: 20px 380px 0;">
+  <li>The <strong>Import batch process</strong> transfers the new video file from its original location to the Kaltura platform</li>
+  <li>A<strong> convert profile batch task</strong> is created as a parent task to all the batch tasks related to the transcoding of the video file.&nbsp; An<strong> extract media batch task</strong> is created as well.&nbsp; </li>
+  <li>The <strong>extract media batch process</strong> extracts media related parameters from the headers of the video file that is about to be transcoded into web quality formats (flavors).&nbsp; This information is then passed over to the Kaltura <strong>transcoding decision layer</strong> for deciding on the optimal quality flavors and transcoding options to be used.&nbsp; Based on these decisions a suitable <strong>convert batch task</strong> is created for each one of the transcoding flavors to be generated.&nbsp; </li>
+  <li>Each <strong>convert batch process</strong> (4a, 4b, 4c) handles transcoding of the original media file into a specific transcoding flavor.&nbsp; In this example: 2 <strong>convert batch tasks</strong> are processed by <strong>convert batch processes</strong> that utilize the FFmpeg transcoding engine and one <strong>convert batch task</strong> is processed by a <strong>convert batch process</strong> that utilizes the On2 transcoding engine.&nbsp; Upon success, <strong>post convert batch tasks </strong>are created</li>
+  <li>Each <strong>post-convert batch process</strong> (5a, 5b, 5c) processes the relevant <strong>post convert batch task</strong> for creating a thumbnail image and for extracting and storing media info about the created flavor for later use.&nbsp; </li>
+  <li>When all previously described<strong> post convert batch    tasks</strong> have completed successfully, the new entry is available for web    publishing in all of the required web quality flavors.&nbsp; </li>
+</ol>
+
+<h2 style="clear:both; padding-top:22px;"><a name="Kaltura_Batch_Tasks_Type">Kaltura Batch Tasks Type Classification</a></h2>
+<p>The  following table lists the different types of batch tasks currently handled by  the batch processing module.&nbsp; </p>
+<table border="1" cellspacing="0" cellpadding="0" width="650">
+  <tr>
+    <th width="50%">Batch Task Type Classification (Internal Type ID)</th>
+    <th width="49%">Batch Sub Types Classification (Internal Sub Type ID)</th>
+  </tr>
+  <tr>
+    <td width="50%" rowspan="5">Convert (0)</td>
+    <td width="49%">On2 (1)</td>
+  </tr>
+  <tr>
+    <td width="49%">FFmpeg (2)</p></td>
+  </tr>
+  <tr>
+    <td width="49%">Mencoder (3)</p></td>
+  </tr>
+  <tr>
+    <td width="49%">Encoding.com (4)</p></td>
+  </tr>
+  <tr>
+    <td width="49%">FFmpeg-Aux (5)</p></td>
+  </tr>
+  <tr>
+    <td width="50%">Import (1)</td>
+    <td width="49%">N/A</td>
+  </tr>
+  <tr>
+    <td width="50%">Flatten (3)</td>
+    <td width="49%">N/A</td>
+  </tr>
+  <tr>
+    <td width="50%">Bulk Upload (4)</td>
+    <td width="49%">N/A</td>
+  </tr>
+  <tr>
+    <td width="50%"><p>Download    (6)</p></td>
+    <td width="49%"><p>N/A</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><p>Convert Profile (10)</p></td>
+    <td width="49%"><p>N/A</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><p>Post Convert (11)</p></td>
+    <td width="49%"><p>N/A</p></td>
+  </tr>
+  <tr>
+    <td width="50%" rowspan="2"><p>Extract Media (14)</p></td>
+    <td width="49%"><p>Entry Input (0) </p></td>
+  </tr>
+  <tr>
+    <td width="49%"><p>Flavor Input (1)</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><p>Send Email (15)</p></td>
+    <td width="49%"><p>Per email type</p></td>
+  </tr>
+  <tr>
+    <td width="50%"><p>Send Notification (16)</p></td>
+    <td width="49%"><p>Per server notification type</p></td>
+  </tr>
+</table>
+
+<h2><a name="Kaltura_Default_Batch">Kaltura Default Batch Services</a></h2>
+<p>The Kaltura online video platform includes a set of default batch services that are required for system operation.&nbsp; The following table describes these services:</p>
+<table border="1" cellspacing="0" cellpadding="0" width="960">
+  <tr>
+    <th width="154">Service Name</th>
+    <th width="163">Service System Name</th>
+    <th width="174">Service Classification</th>
+    <th width="114">Batch Tasks Handled By This Service</th>
+    <th width="636">Description</th>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Import Service</td>
+    <td width="163" valign="top">KAsyncImport</td>
+    <td width="174" valign="top"><a href="#">Batch Execution Service</a></td>
+    <td width="114" valign="top">Import</td>
+    <td width="636" valign="top">Handles the physical transferring of rich-media files imported by content managers and/or by end-users from their original location to the Kaltura platform</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Bulk Upload Service</td>
+    <td width="163" valign="top">KAsyncBulkUpload</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top"><a href="#">Bulk Upload</a></td>
+    <td width="636" valign="top">Handles the processing of a bulk upload operation.&nbsp; Analyzes bulk upload csv and creates multiple import batch tasks to be processed separately </td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Bulk Upload Closer Service</td>
+    <td width="163" valign="top">KAsyncBulkUploadCloser</td>
+    <td width="174" valign="top">Batch Closure Service</td>
+    <td width="114" valign="top">Bulk Upload</td>
+    <td width="636" valign="top">Finalize bulk upload operation based on the completion status of all batch tasks related to the ingestion process of the uploaded files</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Extract Media Service</td>
+    <td width="163" valign="top">KAsyncExtractMedia</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top"><a href="#">Extract Media</a></td>
+    <td width="636" valign="top">Extract media related information from media files to serve as an input for optimal transcoding operation</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Convert Service</td>
+    <td width="163" valign="top">KAsyncConvert</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top">Convert</td>
+    <td width="636" valign="top">Handles the actual transcoding of one video file from one format to a specific quality flavor.&nbsp; Based on the transcoding requirements and system load, the convert service can operate transcoding action by utilizing one of the transcoding engines that are configured in the system.&nbsp; </td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Divert Conversion Service</td>
+    <td width="163" valign="top">KAsyncDivertConvert</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top">Convert</td>
+    <td width="636" valign="top">Handles real-time diversion of a convert task from one transcoding engine to another (specifically divert convert tasks to encoding.com if operable within the specific deployment and when needed for balancing system transcoding load)</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Convert Closer Service</td>
+    <td width="163" valign="top">KAsyncConvertCloser</td>
+    <td width="174" valign="top">Batch Closure Service</td>
+    <td width="114" valign="top">Convert </td>
+    <td width="636" valign="top">Handles the finalization of a specific convert task (specifically handles the finalization of convert being handled by encoding .com or by a distributed scheduler)</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Post Convert Service</td>
+    <td width="163" valign="top">KAsyncPostConvert</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top">Post Convert</td>
+    <td width="636" valign="top">Handles the last steps of a specific convert task including thumbnail creation and extracting media info from created flavors.&nbsp; </td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Convert Profile Closer Service</td>
+    <td width="163" valign="top">KAsyncConvertProfileCloser</td>
+    <td width="174" valign="top">Batch Closure Service</td>
+    <td width="114" valign="top">Convert Profile </td>
+    <td width="636" valign="top">Handles the finalization of in-progress convert tasks related to one entry when not all tasks were finalized before a defined timeout</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Download Closer Service</td>
+    <td width="163" valign="top">KAsyncBulkDownloadCloser</td>
+    <td width="174" valign="top">Batch Closure Service</td>
+    <td width="114" valign="top">Download</td>
+    <td width="636" valign="top">Handles the completion of entry download flow, specifically responsible for triggering an email to the end-user with the download location </td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Mailer Service</td>
+    <td width="163" valign="top">KAsyncMailer</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top">Send Email </td>
+    <td width="636" valign="top">Handles all system generated emails sent by the Kaltura platform upon different events.&nbsp; </td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Notification Service</td>
+    <td width="163" valign="top">KAsyncNotifier</td>
+    <td width="174" valign="top">Batch Execution Service</td>
+    <td width="114" valign="top">Send Notification </td>
+    <td width="636" valign="top">Handles all server notifications sent by the Kaltura platform to web components (server/client) that are integrated with The Kaltura notification system</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Shared Imports Cleanup Service</td>
+    <td width="163" valign="top">DirectoryCleanupLocalImport</td>
+    <td width="174" valign="top"><a href="#">Periodic Batch Service</a></td>
+    <td width="114" valign="top"><a href="#">N/A</a></td>
+    <td width="636" valign="top"><a href="#">This is a scheduled maintenance service that cleans up the 'byproducts' of an import task</a></td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Shared Thumbnails Cleanup Service</td>
+    <td width="163" valign="top">DirectoryCleanupLocalThumb</td>
+    <td width="174" valign="top">Periodic Batch Service</td>
+    <td width="114" valign="top">N/A</td>
+    <td width="636" valign="top">This is a scheduled maintenance service that cleans up the 'byproducts' of a thumbnail creation process</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Shared Converts Cleanup Service</td>
+    <td width="163" valign="top">DirectoryCleanupLocalConvert</td>
+    <td width="174" valign="top">Periodic Batch Service</td>
+    <td width="114" valign="top">N/A</td>
+    <td width="636" valign="top">This is a scheduled maintenance service that cleans up the 'byproducts' of a convert task</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Database Cleanup Service</td>
+    <td width="163" valign="top">KAsyncDbCleanup</td>
+    <td width="174" valign="top">Periodic Batch Service</td>
+    <td width="114" valign="top">N/A</td>
+    <td width="636" valign="top">This is a scheduled maintenance that handles database cleanup</td>
+  </tr>
+  <tr>
+    <td width="154" valign="top">Scheduler Helper Service</td>
+    <td width="163" valign="top">KScheduleHelper</td>
+    <td width="174" valign="top">Periodic Batch Service</td>
+    <td width="114" valign="top">N/A</td>
+    <td width="636" valign="top">Handles all communication between the Batch Schedulers deployed in the Kaltura platform and the Kaltura API/DB</td>
+  </tr>
+</table>
+<p>&nbsp;</p>

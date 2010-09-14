@@ -1,0 +1,1 @@
+ALTER TABLE `batch_job` ADD `duplication_key` VARCHAR( 41 ) NOT NULL AFTER `data`;

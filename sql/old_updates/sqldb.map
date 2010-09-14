@@ -1,0 +1,2 @@
+# Sqlfile -> Database map
+lib.model.schema.sql=propel

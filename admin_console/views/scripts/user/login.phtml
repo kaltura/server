@@ -1,0 +1,46 @@
+<?php 
+	$this->headScript()	->appendFile($this->baseUrl('js/excanvas.compiled.js'))
+						->appendFile($this->baseUrl('js/jquery.corner.js')); 
+?>
+<div class="box">
+	<div class="header">
+		<h1>Login</h1>
+	</div>
+	<div class="main">
+		<?php echo $this->loginForm->setAction($this->url(array('controller' => 'user', 'action' => 'login')));?>
+		<div class="reset-wrapper">
+			<hr />
+			<div class="reset-txt"><?php echo $this->translate('login forget password'); ?></div>
+			<p>
+				<?php echo $this->translate('login forget password text'); ?>
+			</p>
+			<?php echo $this->resetForm->setAction($this->url(array('controller' => 'user', 'action' => 'reset-password'))); ?>
+		</div>
+	</div>
+	<div class="footer">
+		<a class="reset-link" onclick="showResetForm();"><?php echo $this->translate('Reset Password'); ?></a>
+	</div>
+</div>
+<script>
+	function showResetForm() {
+		var $reset_wrapper = jQuery('div.reset-wrapper')
+		$reset_wrapper.slideToggle("normal",function(){
+			if($reset_wrapper.hasClass("display")) {
+				$reset_wrapper.removeClass("display");
+			}
+			else {
+				$reset_wrapper.css("display","table").addClass("display");
+			}
+		});
+	}
+	jQuery(function() {
+		if($.browser.msie) {
+			jQuery("div.box").corner("8px");
+//			jQuery("input[type='text']").corner("8px")
+			if($.browser.version < 7 ) {
+				jQuery("input[type='text']").addClass("text");
+			}
+		}		
+		$("input[type='password']").addClass("text");
+	});
+</script>

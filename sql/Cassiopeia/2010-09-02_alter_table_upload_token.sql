@@ -1,0 +1,1 @@
+ALTER TABLE  `upload_token` ADD  `dc` INT NULL;

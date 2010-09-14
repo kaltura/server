@@ -1,0 +1,164 @@
+
+<p><?php echo $this->translate('users intro text'); ?></p>
+<div id="list_admins_panel" class="panel">
+	<table>
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('Admin ID'); ?></th>
+				<th><?php echo $this->translate('Email Address'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="5">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $user): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaSystemUserStatus', $user->status); ?></td>
+				<td><?php echo $user->id; ?></td>
+				<td><?php echo $user->email; ?></td>
+				<td>
+					<?php echo $user->firstName; ?> <?php echo $user->lastName; ?>
+					<?php $titles = array(); ?>
+					<?php if ($user->email == $this->myEmail) { $titles[] = $this->translate('you'); }; ?>
+					<?php if ($user->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
+					<?php if (count($titles)): ?>
+						(<?php echo implode($titles, ', '); ?>)
+					<?php endif; ?>
+				</td>
+				<td>
+					<?php $disabled = (($user->email == $this->myEmail) || $user->isPrimary) ? ' disabled="disabled"' : ''; ?>
+					<select class="options" onchange="doAction(this.value, <?php echo $user->id; ?>)"<?php echo $disabled; ?>>
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<?php if ($user->email != $this->myEmail): ?>
+							<?php if ($user->status === KalturaSystemUserStatus::ACTIVE): ?>
+							<option value="block" ><?php echo $this->translate('Block'); ?></option>
+							<?php elseif ($user->status === KalturaSystemUserStatus::BLOCKED): ?>
+							<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+							<?php endif; ?>
+							<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
+
+						<?php endif; ?>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+function doAction(action, userId) {
+	switch(action) {
+		case 'block':
+			block(userId);
+			break;
+		case 'unblock':
+			unblock(userId);
+			break;
+		case 'remove':
+			remove(userId);
+			break;
+	}
+}
+function block(userId) {
+	changeStatus(userId, 'block');
+}
+
+function unblock(userId) {
+	changeStatus(userId, 'unblock');
+}
+
+function changeStatus(userId, status) {
+	resetOptions();
+	var ok = false;
+	if (status == 'block')
+		ok = confirm('<?php echo $this->translate('are you sure block user?'); ?>');
+	else if (status == 'unblock')
+		ok = confirm('<?php echo $this->translate('are you sure unblock user?'); ?>');
+	
+	if (ok) {
+		var url = '';
+		if (status == 'block')
+			url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'block', 'userId' => ''), null, true); ?>' + userId;
+		else if (status == 'unblock')
+			url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'unblock', 'userId' => ''), null, true); ?>' + userId;
+			
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+					this.error();
+
+				if (status == 'block')
+					alert('<?php echo $this->translate('user was blocked');?>');
+				else if (status == 'unblock')
+					alert('<?php echo $this->translate('user was unblocked');?>');
+				
+				window.location = '<?php echo $this->url(array('controller' => 'user', 'action' => 'index'), null, true); ?>';
+			},
+			error: function() {
+				if (status == 'block')
+					alert('<?php echo $this->translate('user was not blocked');?>');
+				else if (status == 'unblock')
+					alert('<?php echo $this->translate('user was not unblocked');?>');
+			}
+		});
+	}
+}
+
+function remove(userId) {
+	var ok = confirm('<?php echo $this->translate('are you sure remove user?'); ?>');
+
+	resetOptions();
+	if (ok) {
+		var url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'remove', 'userId' => '')); ?>' + userId;
+
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+					this.error();
+				alert('<?php echo $this->translate('user was removed');?>');
+				window.location = '<?php echo $this->url(array('controller' => 'user', 'action' => 'index'), null, true); ?>';
+			},
+			error: function() {
+				alert('<?php echo $this->translate('user was not removed');?>');
+			}
+		});
+	}
+}
+
+function resetOptions() {
+	jQuery('table select.options').val('');
+}
+
+$(function(){
+	$("ul.tabz").click(
+		function(e) {
+			$("ul.tabz li").removeClass("selected");
+			$(e.target).addClass("selected");
+			$("div.panel").hide();
+			$("div#"+e.target.id+"_panel").show();
+		});
+
+	<?php if ($this->type == "add"): ?>
+	$("ul.tabz #new_admin").click();
+	<?php elseif ($this->type == "update"): ?>
+	$("ul.tabz #my_info").click();
+	<?php else: ?>
+	$("ul.tabz #list_admins").click();
+	<?php endif; ?>
+
+	<?php // reset the paginator form action, when trying to update or add new user the url will be wrong ?>
+	$("form#frmPaginator1").attr('action', '<?php echo $this->url(array('controller' => 'user', 'action' => 'index'), null, true); ?>');
+});
+</script>

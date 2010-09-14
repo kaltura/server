@@ -1,0 +1,73 @@
+
+#modalbox{ position: fixed; left: 50%; top:50%; margin:-180px 0 0 -340px; background:transparent; /*border:3px solid #666;*/ width: 680px; z-index: 200; }
+#overlay{ position: fixed; top: 0; left: 0; z-index: 199; width: 100%; height: 100%; background:url(../images/transBG.png) 0 0 repeat; cursor: pointer; }
+#modalbox.white_bg { background:#ffffff; }
+/* Fixed posistioning emulation for IE6, currently no need because its being set via the JQM js to offset the wizard in the middle */
+
+* html #overlay{ position: absolute; background:#000; filter: alpha(opacity=40); top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
+
+* html #modalbox{ position: absolute; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round((document.documentElement.offsetHeight || document.body.clientHeight) / 2) + 'px'); }
+
+#modalbox iframe{ overflow:hidden; }
+#modalbox iframe.remove_overflow { overflow:auto; }
+
+body, html { margin:0; padding:0; height: 100%; overflow: hidden; }
+pre { background-color:#F9F9F9; border:1px dashed #4F81BD; color:black; line-height:1.1em; padding:1em; }
+body { margin: 6px 15px; background: #f7f7f7 url(../images/bg.png) repeat-x; font: normal 12px arial,sans-serif; }
+body div#wrap {float:left; width:100%;}
+.left { float:left; width: 280px; overflow-y: scroll; overflow-x:hidden; height: 100%; }
+.left .left-content { padding: 10px; }
+.left-content h2 { padding:0px; margin:0px; }
+
+.right { margin-left:280px;  overflow-y: scroll; overflow-x:hidden; height: 100%; border: 0; }
+.right  h2 { padding:0px; margin:0px; }
+#doc { padding: 10px; }
+.left #general {}
+
+.left #services {}
+.left #services li.service { list-style-image:url(../images/collapsed.gif); }
+.left #services li.service.expended { list-style-image:url(../images/expended.gif); }
+.left #services li.service ul.actions { display: none; }
+.left #services li.service.expended ul { display: block; }
+
+.left #services li.action, .left #services li.action.expended  { list-style-image:none; }
+.left #services a { }
+
+table { width:100%; }
+table th,
+table td { text-align:left; padding:4px; }
+
+table th.service_action_title { background-color:#D3DFEE; color:#000; border-bottom:3px solid #7BA0CD;}
+
+table .title { vertical-align:top; background-color:#4F81BD; color:#fff; font-weight:bold;}
+table th.subtitle  { background-color:#EFEFEF; }
+table#serviceInfo td.title { width:150px;}
+
+
+table td { background-color:#F7F7F7; padding:8px;}
+table tr.odd td { background-color:#EFEFEF;}
+
+div.bluebox { background-color:#D3DFEE; border:2px solid #7BA0CD; margin-bottom:20px; margin-top:10px;}
+div.bluebox h3 { background-color:#4F81BD; border-bottom:2px solid #7BA0CD; color:#FFFFFF; margin:0; padding:5px;}
+
+table#general_errors th,
+table#notifications_table { width: 900px; }
+table#notifications_table th { background-color:#4F81BD; color:#FFFFFF; text-align:left;}
+table#notifications_table th.center { text-align:center;}
+table#notifications_table td,
+table#notifications_table th,
+table#general_errors td,
+table#general_errors th { border:1px solid #4F81BD; padding:2px 3px; vertical-align:top; }
+
+table#notifications_table td { background-color: #F9F9F9; }
+table#notifications_table td.property_yes { background: #F9F9F9 url(../images/checked.gif) no-repeat center; }
+
+td.example_hit div { overflow:scroll; white-space:nowrap; width:640px; }
+div.post_fields { line-height:1.5em; }
+
+#kmcSubMenu { margin: 1px 0 27px; display:table; zoom:1;}
+ #kmcSubMenu li { float:left; display:inline; list-style: none inside none; padding-left:9px; height:19px;}
+  #kmcSubMenu li a, #kmcSubMenu li a:active, #kmcSubMenu li a:visited { height:19px; padding: 1px 12px 0 4px; display:block; font: bold 12px arial,sans-serif; color:#666; text-decoration:none;}
+  #kmcSubMenu li a:hover { color:#000;}
+#kmcSubMenu li.active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
+#kmcSubMenu li.active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}

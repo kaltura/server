@@ -1,0 +1,109 @@
+# set caching for static files such as crossdomain.xml
+<FilesMatch "\.(xml|flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav)$">
+ExpiresActive On
+ExpiresDefault "access plus 3 month"
+Header append Cache-Control "public"
+SetEnv force-no-vary
+Header unset ETag
+FileETag None
+</FilesMatch>
+
+# IE8 download compatiblity
+Header set X-UA-Compatible "IE=EmulateIE7"
+DirectoryIndex index.php
+RedirectMatch permanent ^/index.php/searchmusicians$ /index.php/search?mode=KSHOW\&keywords=music+bands+song+fan+scrapbook\&category=2\&or=t\&promotion=1
+RedirectMatch permanent ^/index.php/index.php/(.+?)$ /index.php/$1
+RedirectMatch permanent ^/index.php/index/s/UT/I/(.+?)$ /index.php?s=UT\&I=$1
+RedirectMatch permanent ^/show/(.+?)/?$ /index.php/login/register?invite=1\&goto=/index.php\&s=UT\&I=$1
+RedirectMatch permanent ^/show/?$ /index.php/login/register?invite=1\&goto=/index.php
+RedirectMatch permanent ^/id/(.+?)/?$ /index.php/browse?kshow_id=$1
+RewriteEngine on
+
+# redirect kmc.kaltura.com to kaltura's kmc
+RewriteCond %{HTTP_HOST} kmc.kaltura.com
+RewriteRule .*  http://www.kaltura.com/index.php/kmc
+
+# will redirect kaltura.com/kmc to www.kaltura.com/index.php/kmc
+RewriteCond %{HTTP_HOST} ^kaltura.com$
+RewriteRule .*  http://www.kaltura.com/index.php/kmc [L]
+
+# redirect flash file with swfparams parameters to the bare flash file
+RewriteRule ^(.*)/swfparams/(.*) /$1
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
+RewriteRule ^p/[0-9]+/thumbnail/(.*)$ /index.php/extwidget/thumbnail/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
+RewriteRule ^p/[0-9]+/raw/(.*)$ /index.php/extwidget/raw/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
+RewriteRule ^p/[0-9]+/download/(.*)$ index.php/extwidget/download/$1 [L]
+
+RewriteRule ^index.php/downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
+RewriteRule ^downloadUrl(.*)$ /index.php/extwidget/downloadUrl/$1 [L]
+RewriteRule ^entryPage(.*)$ /index.php/extwidget/entryPage/$1 [L]
+RewriteRule ^userPage(.*)$ /index.php/extwidget/userPage/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+RewriteRule ^p/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+RewriteRule ^flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+
+RewriteRule ^s/p/[0-9]+/sp/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+RewriteRule ^s/p/[0-9]+/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+RewriteRule ^s/flvclipper/(.*)$ /index.php/keditorservices/flvclipper/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
+RewriteRule ^p/[0-9]+/flv/(.*)$ /index.php/flv/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
+RewriteRule ^p/[0-9]+/kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
+RewriteRule ^kpreloader/(.*)$ /index.php/extwidget/kpreloader/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/swf/(.*)$ /swf/$1 [L]
+RewriteRule ^p/[0-9]+/swf/(.*)$ /swf/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/demos/(.*)$ /demos/$1 [L]
+RewriteRule ^p/[0-9]+/demos/(.*)$ /demos/$1 [L]
+
+RewriteRule ^p/[0-9]+/sp/[0-9]+/flash/(.*)$ /flash/$1 [L]
+RewriteRule ^p/[0-9]+/flash/(.*)$ /flash/$1 [L]
+
+RewriteRule ^kwidget/(.*)$ /index.php/extwidget/kwidget/$1 [L]
+RewriteRule ^kcw/(.*)$ /index.php/extwidget/kcw/$1 [L]
+RewriteRule ^kse/(.*)$ /index.php/extwidget/kse/$1 [L]
+RewriteRule ^kae/(.*)$ /index.php/extwidget/kae/$1 [L]
+RewriteRule ^kupload/(.*)$ /index.php/extwidget/kupload/$1 [L]
+RewriteRule ^krecord/(.*)$ /index.php/extwidget/krecord/$1 [L]
+RewriteRule ^kgeneric/(.*)$ /index.php/extwidget/kgeneric/$1 [L]
+
+RewriteRule ^api/(.*)$ /index.php/partnerservices2/$1 [L]
+
+RewriteRule ^p/[0-9]+/content/(.*)$ /content/$1 [L]
+RewriteRule ^p/[0-9]+/sp/[0-9]+/content/(.*)$ /content/$1 [L]
+
+RewriteRule ^extservices/(.*)$ /index.php/extservices/$1 [L]
+
+# redirect collectstats to alive.html
+RewriteRule ^(.*)/collectstats /alive.html [L]
+
+RewriteRule ^tracker$ /tracker.php [L]
+
+# rewrite rule for an errornous url from myspace - fetch a 1-pixel.gif
+RewriteRule ^(.*)entry/widget/(.*) /images/blank_one_pixel.gif [L]
+
+# rewrite rules for old links
+RewriteRule ^swf/(.*)$ OLD_PATHS/web/swf/$1 [L]
+RewriteRule ^simpleswf/(.*)$ OLD_PATHS/web/simpleswf/$1 [L]
+RewriteRule ^images/(.*)$ OLD_PATHS/web/images/$1 [L]
+RewriteRule ^js/(.*)$ OLD_PATHS/web/js/$1 [L]
+RewriteRule ^css/(.*)$ OLD_PATHS/web/css/$1 [L]
+RewriteRule ^projects/(.*)$ OLD_PATHS/web/projects/$1 [L]
+RewriteRule ^groupalbum(.*)$ OLD_PATHS/web/groupalbum/index.php [L]
+RewriteRule ^fb_greetings(.*)$ OLD_PATHS/web/fb_greetings/index.php [L]
+RewriteRule ^yedda/(.*)$ OLD_PATHS/web/yedda/$1 [L]
+RewriteRule ^makeover(.*)$ OLD_PATHS/web/makeover/index.php [L]
+RewriteRule ^sampleImplementation/(.*)$ OLD_PATHS/web/sampleImplementation/$1 [L]
+RewriteRule ^survey$ http://www.surveymonkey.com/s.aspx?sm=h8ApKtLNiRQw51Jo_2fClOPA_3d_3d
+
+RewriteCond %{QUERY_STRING}  service=stats&action=collect
+RewriteRule api_v3/index.php /alive.html [L]

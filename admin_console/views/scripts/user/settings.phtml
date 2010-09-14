@@ -1,0 +1,10 @@
+
+<p><?php echo $this->translate('users chnage settings'); ?></p>
+	<?php if ($this->done): ?>
+	<script type="text/javascript">
+		alert('<?php echo $this->translate('credentials saved'); ?>');
+		window.location.href = '<?php echo $this->url(array('controller' => 'user', 'action' => 'index'), null, true); ?>';
+	</script>
+	<?php else: ?>
+		<?php echo $this->myInfoForm; ?>
+	<?php endif; ?>

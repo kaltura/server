@@ -1,0 +1,78 @@
+
+	<strong>Created between:</strong>
+	<div>
+		<?php echo $this->createdAtFrom; ?> -&nbsp; <?php echo $this->createdAtTo; ?>
+		<p id="clear_dates"><a id="clearDates" class="secondary"><?php echo $this->translate('Clear Dates'); ?></a></p>
+	</div>
+	<hr noshade="noshade" size="1" />
+	<label title="<?php echo $this->translate('jobs in-progress filter entry tooltip'); ?>">
+		<?php echo $this->translate('jobs in-progress filter entry label') . ": " . $this->entryId; ?></label>
+	<label title="<?php echo $this->translate('jobs in-progress filter partner tooltip'); ?>">
+		<?php echo $this->translate('jobs in-progress filter partner label') . ": " . $this->partnerId; ?></label>
+	<hr noshade="noshade" size="1" />
+	<label><?php echo $this->allJobs . ' ' . $this->translate('jobs in-progress filter all jobs'); ?></label>
+
+	<ul id="tasks_list">
+	<?php 
+        $fieldName = '';
+        $label = '';
+        
+		foreach($this->jobTypes as $jobType => $jobSubTypes)
+		{
+        	if(is_array($jobSubTypes))
+        	{
+	        	foreach($jobSubTypes as $jobSubType => $checked)
+	        	{
+	        		$fieldName = "job_{$jobType}_{$jobSubType}";
+	        		$label = $this->jobTypeTranslate($jobType, $jobSubType);
+		        	?>
+							<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
+		        	<?php
+	        	}
+        	}
+        	else
+        	{
+	        	$fieldName = "job_{$jobType}";
+	        	$label = $this->jobTypeTranslate($jobType);
+	        	?>
+					<?php echo '<li><label>' . $this->$fieldName . ' ' . $label . '</label></li>'; ?>
+	        	<?php
+        	}
+		}
+	?>
+	</ul>
+		<?php echo $this->search; ?>
+
+<?php echo $this->pageSize; ?>	
+<?php echo $this->inProgressPage; ?>
+<?php echo $this->inQueuePage; ?>
+
+<script type="text/javascript">
+	$(function(){
+		$("#allJobs").click(function(){
+			window.check_all_flag = window.check_all_flag || false;
+		//	alert("window.check_all_flag="+window.check_all_flag);
+			var lis = $("#tasks_list input");
+			if(!window.check_all_flag) {
+				$.each(lis,function(){$(this).attr("checked","checked");});
+				window.check_all_flag = true;
+			}
+			else {
+				$.each(lis,function(){$(this).removeAttr("checked");});
+				window.check_all_flag = false;
+			}
+		});
+
+		$("#tasks_list input").click(function(){
+			$("#allJobs").removeAttr("checked");
+			window.check_all_flag = false;
+		});
+
+		jQuery('#createdAtFrom, #createdAtTo').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+
+		jQuery('#clearDates').click(function() {
+			jQuery('#createdAtFrom').val("");
+			jQuery('#createdAtTo').val("");
+		});
+	});
+</script>

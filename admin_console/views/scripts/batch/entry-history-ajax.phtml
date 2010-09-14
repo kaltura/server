@@ -1,0 +1,377 @@
+
+<?php echo $this->headLink()->appendStylesheet($this->baseUrl('ext/resources/css/ext-all.css')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('js/Kaltura/webtoolkit.md5.js')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('js/Kaltura/ox.ajast.js')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('js/Kaltura/KalturaClientBase.js')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('js/Kaltura/KalturaClient.js')).PHP_EOL; ?>
+
+<?php echo $this->headScript()->appendFile($this->baseUrl('js/jquery-1.3.2.min.js')).PHP_EOL; ?>
+
+<?php echo $this->headScript()->appendFile($this->baseUrl('ext/adapter/jquery/ext-jquery-adapter.js')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('ext/adapter/ext/ext-base.js')).PHP_EOL; ?>
+<?php echo $this->headScript()->appendFile($this->baseUrl('ext/ext-all-debug.js')).PHP_EOL; ?>
+
+
+<h1><?php echo $this->translate('entry-history title'); ?></h1>
+<p>
+<?php echo $this->translate('entry-history intro text'); ?>
+</p>
+
+<?php
+	if($this->errorDescription)
+		echo '<font color="red"><b>' . $this->translate($this->errorDescription) . '</b></font>'; 
+?>
+
+<table>
+	<tr>
+		<td><?php echo $this->translate('entry-history search label'); ?></td>
+		<td><input type="text" id="txtEntryId" value=""/></td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="button" id="cmdSearch" value="<?php echo $this->translate('entry-history search button'); ?>" disabled="disabled" onclick="searchEntry()"/></td>
+	</tr>
+</table>
+
+<br/><br/><br/>
+
+<div id="dvEntry" style="display: none">
+	<h2><?php echo $this->translate('entry-history info title'); ?></h2>
+	<table>
+		<tr>
+			<td><?php echo $this->translate('entry-history info entry id label'); ?></td>
+			<td id="tdEntryId"></td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('entry-history info entry name label'); ?></td>
+			<td title="<?php echo $this->translate('entry-history info entry name tooltip'); ?>">
+				<!-- TODO -->
+				<a href="#" onclick="alert('TODO - implement')" id="aEntryName"></a>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('entry-history info account label'); ?></td>
+			<td title="<?php echo $this->translate('entry-history info account tooltip'); ?>">
+				<!-- TODO -->
+				<a href="#" onclick="alert('TODO - implement')" id="aPartnerName"></a>
+			</td>
+		</tr>
+	</table>
+	
+	<br/><br/><br/>
+	
+	<h2><?php echo $this->translate('entry-history history title'); ?></h2>
+	
+	<?php echo $this->translate('entry-history history update label'); ?>
+	<span id="spnStatusTime"></span>
+	
+	<br/>
+	
+	<?php echo $this->translate('entry-history history links desc'); ?>
+	<!-- TODO -->
+	<a href="#" onclick="alert('TODO - implement')"><?php echo $this->translate('entry-history history in-queue link'); ?></a>
+	<a href="#" onclick="alert('TODO - implement')"><?php echo $this->translate('entry-history history in-process link'); ?></a>
+	<a href="#" onclick="alert('TODO - implement')"><?php echo $this->translate('entry-history history failed link'); ?></a>
+	
+	<br/><br/>
+	
+	<div id="dvGrid"></div>
+</div>
+
+
+
+<script type="text/javascript">
+
+	var entryId;
+	
+	var kConfig = new KalturaConfiguration(<?php echo Kaltura_ClientHelper::getPartnerId(); ?>);
+	kConfig.serviceUrl = "<?php echo Kaltura_ClientHelper::getServiceUrl(); ?>";
+	
+	var kClient = new KalturaClient(kConfig);
+	kClient.setKs("<?php echo Kaltura_ClientHelper::getKs(); ?>");
+
+	// Path to the blank image must point to a valid location on your server
+	Ext.BLANK_IMAGE_URL = 'ext/resources/images/default/s.gif';
+
+	// Main application entry point
+	Ext.onReady(function() {
+		document.getElementById("cmdSearch").disabled = false;
+	});
+
+	var EntryHistoryDataStore = null;
+	var EntryHistoryColumnModel = null;
+	var EntryHistoryEditorGrid = null;
+	var EntryHistoryWindow = null;
+	
+	function generateGrid(arrData){
+
+		if(EntryHistoryDataStore)
+		{
+			EntryHistoryDataStore.loadData(arrData);
+			//EntryHistoryEditorGrid.update();
+			return;
+		}
+		
+		EntryHistoryDataStore = new Ext.data.JsonStore({
+			autoDestroy: false,
+			storeId: 'jobsStore',
+			idProperty: 'id',
+			fields: ['job', 'info', 'createdAt', 'queueTime', 'finishTime', 'status', 'executionAttempts'],
+			data: arrData
+		});
+		
+		EntryHistoryColumnModel = new Ext.grid.ColumnModel([{
+				header: '<?php echo $this->translate('entry-history history batch th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history batch tooltip'); ?>',
+				dataIndex: 'job',
+				width: 150
+			},{
+				header: '<?php echo $this->translate('entry-history history info th'); ?>',
+				dataIndex: 'info',
+				width: 300
+			},{
+				header: '<?php echo $this->translate('entry-history history create time th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history create time tooltip'); ?>',
+				dataIndex: 'createdAt',
+				width: 100
+			},{
+				header: '<?php echo $this->translate('entry-history history start time th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history start time tooltip'); ?>',
+				dataIndex: 'queueTime',
+				width: 100
+			},{
+				header: '<?php echo $this->translate('entry-history history end time th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history end time tooltip'); ?>',
+				dataIndex: 'finishTime',
+				width: 100
+			},{
+				header: '<?php echo $this->translate('entry-history history status th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history status tooltip'); ?>',
+				dataIndex: 'status',
+				width: 120
+			},{
+				header: '<?php echo $this->translate('entry-history history attempts th'); ?>',
+				tooltip: '<?php echo $this->translate('entry-history history attempts tooltip'); ?>',
+				dataIndex: 'executionAttempts',
+				width: 160
+			}]
+		);
+		EntryHistoryColumnModel.defaultSortable= true;
+
+		EntryHistoryEditorGrid =  new Ext.grid.GridPanel({
+		    id: 'EntryHistoryEditorGrid',
+			store: EntryHistoryDataStore, // the datastore is defined here
+			cm: EntryHistoryColumnModel,// the columnmodel is defined here
+			enableColLock:false,
+			clicksToEdit:1,
+			selModel: new Ext.grid.RowSelectionModel({singleSelect:false}),
+			renderTo: 'dvGrid',
+			autoHeight: true,
+			width: 1100
+		});
+		
+		EntryHistoryEditorGrid.show(); // Display our Grid
+	}
+
+	function translateJobStatus(status)
+	{
+		switch(status)
+		{
+			<?php
+			 
+				$oClass = new ReflectionClass('KalturaBatchJobStatus');
+				$constants = $oClass->getConstants();
+				
+				foreach($constants as $constName => $constValue)
+				{
+					?>
+						case <?php echo $constValue; ?>:
+							return "<?php echo $this->translate("KalturaBatchJobStatus::$constName"); ?>"
+					<?php
+				} 
+			?>
+		}
+	}
+
+	function translateJobType(jobType, jobSubType)
+	{
+		if(jobType == <?php echo KalturaBatchJobType::CONVERT; ?>)
+		{
+			switch(jobSubType)
+			{
+				<?php
+				 
+					$oClass = new ReflectionClass('KalturaConversionEngineType');
+					$constants = $oClass->getConstants();
+					
+					foreach($constants as $constName => $constValue)
+					{
+						?>
+							case <?php echo $constValue; ?>:
+								return "<?php echo $this->translate("KalturaConversionEngineType::$constName"); ?>"
+						<?php
+					} 
+				?>
+			}
+		}
+		
+		switch(jobType)
+		{
+			<?php
+			 
+				$oClass = new ReflectionClass('KalturaBatchJobType');
+				$constants = $oClass->getConstants();
+				
+				foreach($constants as $constName => $constValue)
+				{
+					?>
+						case <?php echo $constValue; ?>:
+							return "<?php echo $this->translate("KalturaBatchJobType::$constName"); ?>"
+					<?php
+				} 
+			?>
+		}
+	}
+
+	function formatNumber(value, len)
+	{
+		value += "";
+		while(value.length < len)
+			value = "0" + value;
+
+		return value;
+	}
+
+	function formatTime(timestamp)
+	{
+		var d;
+		
+		if(timestamp)
+		{
+			d = new Date(timestamp * 1000);
+		}
+		else
+		{
+			d = new Date();
+		}
+
+		var hh = formatNumber(d.getHours(), 2);
+		var ii = formatNumber(d.getMinutes(), 2);
+		var ss = formatNumber(d.getSeconds(), 2);
+
+		return hh + ":" + ii + ":" + ss;
+	}
+	
+	function formatDate(timestamp)
+	{
+		var d;
+		
+		if(timestamp)
+		{
+			d = new Date(timestamp * 1000);
+		}
+		else
+		{
+			d = new Date();
+		}
+
+		var yyyy = d.getYear() + 1900;
+		var mm = formatNumber(d.getMonth() + 1, 2);
+		var dd = formatNumber(d.getDate(), 2);
+
+		var hh = formatNumber(d.getHours(), 2);
+		var ii = formatNumber(d.getMinutes(), 2);
+		var ss = formatNumber(d.getSeconds(), 2);
+		
+		return dd + "/" + mm + "/" + yyyy + " " + hh + ":" + ii;
+	}
+		
+	function onPartnerFound(success, partner)
+	{
+		if(!success)
+		{
+			alert("Partner not found");
+			return;
+		}
+		
+		if(partner.code && partner.message)
+		{
+			alert(partner.message);
+			return;
+		}
+		
+		$("#aPartnerName").text(partner.name);
+
+		searchJobs();
+	}
+
+	function onEntryFound(success, entry)
+	{
+		if(!success)
+		{
+			alert("Entry not found");
+			return;
+		}
+		
+		if(entry.code && entry.message)
+		{
+			alert(entry.message);
+			return;
+		}
+
+		$("#dvEntry").show();
+		$("#aEntryName").text(entry.name);
+		kClient.partner.get(onPartnerFound, entry.partnerId);
+	}
+
+	function onJobsFound(success, jobsList)
+	{
+		if(!success)
+		{
+			alert("Entry tasks not found");
+			return;
+		}
+		
+		var jobs = new Array();
+		for(var i = 0; i < jobsList.objects.length; i++)
+		{
+			var job = jobsList.objects[i];
+
+			var status = translateJobStatus(job.status);
+			if(job.deletedAt)
+				status +=  " (<?php echo $this->translate('DELETED'); ?>)";
+						
+			var viewJob = {
+				job: translateJobType(job.jobType, job.jobSubType) + " (" + job.id + ")",
+				info: job.description,
+				createdAt: formatDate(job.createdAt),
+				queueTime: formatDate(job.queueTime),
+				finishTime: formatDate(job.finishTime),
+				status: status,
+				executionAttempts: job.executionAttempts
+			};
+			
+			jobs.push(viewJob);
+		}
+		
+		generateGrid(jobs);
+		$("#spnStatusTime").text(formatTime());
+
+		setTimeout(searchJobs, 30000)
+	}
+
+	function searchJobs()
+	{
+		var filter = new KalturaBatchJobFilter();
+		filter.entryIdEqual = entryId;
+		kClient.jobs.listBatchJobs(onJobsFound, filter);
+	}
+
+	function searchEntry()
+	{
+		entryId = document.getElementById("txtEntryId").value;
+
+		$("#tdEntryId").text(entryId);
+		kClient.baseEntry.get(onEntryFound, entryId);
+	}
+	
+</script>

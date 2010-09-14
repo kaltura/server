@@ -1,0 +1,357 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+------------------------------------------------------------------------------------------------
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
+------------------------------------------------------------------------------------------------
+session.start						|			|0		|1	|0		|0		|1		|r	|		|	|	|
+session.startwidgetsession			|			|0		|0	|0		|0		|1		|r	|		|	|	|
+
+uiconf.add							|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
+uiconf.update						|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
+uiconf.get							|			|0		|1	|0		|0		|1		|r 	|		|1	|	|app-studio,kdp,kcw,kse
+uiconf.delete						|			|2		|1	|0		|0		|1		|r 	|		|	|	|app-studio
+uiconf.clone						|			|2		|1	|0		|0		|1		|r 	|		|1	|	|app-studio
+uiconf.list							|			|1,2		|1	|0		|0		|1		|r 	|		|	|	|app-studio
+uiconf.listtemplates				|			|2		|1	|0		|0		|1		|r 	|		|	|	|kmc
+
+user.add							|			|2		|1	|0		|0		|1		|	|		|	|   |
+user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |
+user.update							|			|2		|1	|2		|1		|1		|	|		|	|   |
+user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |
+user.updateid						|			|2		|1	|0		|0		|1		|	|		|	|   |
+user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |
+user.notifyban						|			|2		|1	|0		|0		|1		|	|		|	|   |
+
+widget.add							|			|1		|1	|0		|0		|1		|	|		|	|   |
+widget.clone						|			|1		|1	|0		|0		|1		|	|		|	|   |
+widget.get							|			|0		|1	|0		|0		|1		|	|		|	|   |kdp
+widget.update						|			|2		|1	|0		|0		|1		|	|		|	|   |
+widget.list							|			|2		|1	|0		|0		|1		|	|		|	|   |
+
+partner.register					|			|0		|0	|0		|0		|1		|	|		|	|   |
+partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |
+partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
+partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |kmc
+partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|kmc
+
+adminuser.updatepassword			|			|2		|1	|0		|0		|0		|	|		|	|   |kmc
+adminuser.resetpassword				|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
+adminuser.login						|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
+
+search.search						|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+search.getmediainfo					|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+search.searchurl					|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+search.externallogin				|			|0		|1	|0		|0		|1		|	|		|	|   |kcw
+
+playlist.add						|			|2		|1	|1		|2		|1		|rw	|		|	|   |
+playlist.update						|			|2		|1	|1		|1		|1		|	|		|	|   |
+playlist.get						|			|1,2	|1	|0		|0		|1		|	|		|	|   |kpl
+playlist.delete						|			|2		|1	|1		|0		|1		|	|		|	|   |
+playlist.list						|			|1,2		|1	|0		|0		|1		|	|		|	|   |
+playlist.execute					|			|0		|0	|0		|0		|1		|	|		|1	|   |kpl
+playlist.executefromcontent			|			|2		|0	|0		|0		|1		|	|		|1	|   |kmc
+playlist.executefromfilters			|			|2		|0	|0		|0		|1		|	|		|1	|   |kmc
+playlist.getstatsfromcontent		|			|2		|1	|0		|0		|1		|	|		|1	|   |kmc
+
+media.addfrombulk					|			|N		|1	|0		|0		|1		|rw	|		|	|   |
+media.addfromurl					|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.addfromsearchresult			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.addfromuploadedfile			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.addfromrecordedwebcam			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |
+media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.list							|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.count							|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.updatethumbnail				|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.updatethumbnailjpeg			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.updatethumbnailfromurl			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.updatethumbnailfromsourceentry			|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.requestconversion				|			|1		|1	|1		|2		|1		|	|		|	|   |
+media.flag							|			|0		|0	|1		|2		|1		|	|		|	|   |
+media.reject						|			|2		|1	|1		|2		|1		|	|		|	|   |
+media.approve						|			|2		|1	|1		|2		|1		|	|		|	|   |
+media.listflags						|			|2		|1	|1		|2		|1		|	|		|	|   |
+media.anonymousrank					|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+
+livestream.add							|			|2		|1	|1		|2		|1		|	|		|	|   |
+livestream.get							|			|1		|1	|1		|2		|1		|	|		|	|   |
+livestream.getadmin						|			|2		|1	|1		|2		|1		|	|		|	|   |
+livestream.update						|			|2		|1	|1		|2		|1		|	|		|	|   |
+livestream.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |
+livestream.list							|			|1		|1	|1		|2		|1		|	|		|	|   |
+livestream.updateofflinethumbnailjpeg	|			|1		|1	|1		|2		|1		|	|		|	|   |
+livestream.updateofflinethumbnailfromurl|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+
+mixing.add							|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |
+mixing.update						|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.list							|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.count						|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.clone						|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.appendmediaentry				|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.requestflattening			|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.getmixesbymediaid			|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.getreadymediaentries			|			|1		|1	|1		|2		|1		|	|		|	|   |
+mixing.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+data.add							|			|1		|1	|1		|2		|1		|	|		|	|   |
+data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |
+data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |
+data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |
+data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |
+baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |
+baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.getbyids					|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.updatethumbnailjpeg		|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.updatethumbnailfromurl			|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.updatethumbnailfromsourceentry		|			|1		|1	|1		|2		|1		|	|		|	|   |
+baseentry.flag						|			|0		|0	|1		|2		|1		|	|		|	|   |
+baseentry.reject					|			|2		|1	|1		|2		|1		|	|		|	|   |
+baseentry.approve					|			|2		|1	|1		|2		|1		|	|		|	|   |
+baseentry.listflags					|			|2		|1	|1		|2		|1		|	|		|	|   |
+baseentry.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+bulkupload.add						|			|2		|1	|1		|2		|1		|	|		|	|   |
+bulkupload.get						|			|2		|1	|1		|2		|1		|	|		|	|   |
+bulkupload.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
+bulkupload.list						|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+jobs.abortmail						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortbulkupload				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortprovisionprovide			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortprovisiondelete			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortconvertcollection			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortconvert					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortpostconvert				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortextractmedia				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortstorageexport				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortstoragedelete				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortimport					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortpull						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortnotification				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortconvertprofile			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.abortremoteconvert				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletemail						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletebulkupload				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteprovisionprovide			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteprovisiondelete			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteconvertcollection		|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteconvert					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletepostconvert				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteextractmedia				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletestorageexport			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletestoragedelete			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteimport					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletepull						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deletenotification				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteconvertprofile			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.deleteremoteconvert			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrymail						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrybulkupload				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryprovisionprovide			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryprovisiondelete			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryconvertcollection			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryconvert					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrypostconvert				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryextractmedia				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrystorageexport				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrystoragedelete				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryimport					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrypull						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retrynotification				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryconvertprofile			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.retryremoteconvert				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.addmailjob						|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getpostconvertstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getextractmediastatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getstorageexportstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getstoragedeletestatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getimportstatus				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getpullstatus					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getbulkuploadstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getprovisionprovidestatus		|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getprovisiondeletestatus		|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getconvertcollectionstatus		|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getconvertstatus				|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getnotificationstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getconvertprofilestatus		|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getremoteconvertstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.getmailstatus					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+jobs.listbatchjobs					|			|N		|1	|0		|0		|1		|rw	|		|	|   |jobs
+
+batchcontrol.configloaded			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.reportstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.setscheduleconfig		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.setworkerconfig		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.kill					|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.stopschedule			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.stopworker				|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.startworker			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.getcommand				|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.setcommandresult		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+batchcontrol.getfullstatus			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batchcontrol
+
+batch.getqueuesize					|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.checkfileexists				|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.cleanexclusivejobs			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.addbulkuploadresult			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getbulkuploadlastresult		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updatebulkuploadresults		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.addmediainfo					|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivepostconvertjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivepostconvertjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivepostconvertjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveextractmediajobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivestorageexportjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivestoragedeletejobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveextractmediajob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivestorageexportjob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivestoragedeletejob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveextractmediajob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivestorageexportjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivestoragedeletejob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveimportjobs		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveimportjob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveimportjob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivepulljobs			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivepulljob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivepulljob			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivebulkuploadjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveprovisionprovidejobs|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveprovisiondeletejobs|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveconvertcollectionjobs	|		|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivebulkuploadjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveprovisionprovidejob|		|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveprovisiondeletejob	|		|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveconvertcollectionjob|		|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivebulkuploadjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveprovisionprovidejob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveprovisiondeletejob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveconvertcollectionjob	|		|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusiveconvertjobs		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveconvertjob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveconvertjob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivenotificationjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivenotificationjob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivenotificationjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivemailjobs			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivemailjob		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivemailjob			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveconvertprofilejob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusiveremoteconvertjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivebulkdownloadjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusivebulkdownloadjob|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.freeexclusivebulkdownloadjob	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.logconversion					|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.resetjobexecutionattempts		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+
+batch.updateexclusiveconvertjobsubtype			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.updateexclusiveconvertprofilejob			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneconvertjobs			|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneconvertprofilejobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneremoteconvertjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdonebulkuploadjobs		|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneprovisionprovidejobs|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneprovisiondeletejobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdoneconvertcollectionjobs|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+batch.getexclusivealmostdonebulkdownloadjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |batch
+
+
+report.getgraphs					|			|2		|1	|0		|0		|1		|rw	|		|	|   |reports
+report.gettotal						|			|2		|1	|0		|0		|1		|rw	|		|	|   |reports
+report.gettable						|			|2		|1	|0		|0		|1		|rw	|		|	|   |reports
+report.geturlforreportascsv			|			|2		|1	|0		|0		|1		|rw	|		|	|   |reports
+
+stats.collect						|			|0		|0	|0		|0		|1		|rw	|		|	|   |ui-components
+stats.kmccollect					|			|0		|0	|0		|0		|1		|rw	|		|	|   |kmc
+stats.reportkceerror				|			|0		|0	|0		|0		|1		|w	|		|	|	|kalturaCE
+
+system.ping							|			|0		|0	|0		|0		|1		|	|		|	|   |
+
+notification.getclientnotification	|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+conversionprofile.add				|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.get				|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.update			|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.delete			|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.list				|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.addflavorparams	|			|2		|1	|1		|2		|1		|	|		|	|   |
+conversionprofile.removeflavorparams|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+flavorparams.add					|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorparams.get					|			|2		|1	|1		|2		|1		|	|0,		|	|   |
+flavorparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |
+flavorparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+flavorasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorasset.getbyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
+flavorasset.getwebplayablebyentryid |			|1		|1	|1		|2		|1		|	|		|	|   |
+flavorasset.convert 				|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorasset.reconvert 				|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
+flavorasset.getflavorassetswithparams|			|2		|1	|1		|2		|1		|	|0,		|	|   |
+flavorasset.getdownloadurl			|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+syndicationfeed.add					|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.get					|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.update				|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.delete				|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.list				|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.getentrycount			|			|2		|1	|1		|2		|1		|	|		|	|   |
+syndicationfeed.requestconversion		|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+accesscontrol.add					|			|2		|1	|1		|2		|1		|	|		|	|   |
+accesscontrol.get					|			|2		|1	|1		|2		|1		|	|		|	|   |
+accesscontrol.update				|			|2		|1	|1		|2		|1		|	|		|	|   |
+accesscontrol.delete				|			|2		|1	|1		|2		|1		|	|		|	|   |
+accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |
+category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |
+category.update						|			|2		|1	|1		|2		|1		|	|		|	|   |
+category.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |
+category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+upload.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |
+upload.getuploadedfiletokenbyfilename|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+uploadtoken.add						|			|1		|1	|1		|2		|1		|	|		|	|   |
+uploadtoken.get						|			|1		|1	|1		|2		|1		|	|		|	|   |
+uploadtoken.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |
+uploadtoken.list					|			|1		|1	|1		|2		|1		|	|		|	|   |
+uploadtoken.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |
+
+xinternal.xaddbulkdownload			|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+---------------------------------------------------------------------------------------------------

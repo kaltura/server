@@ -1,0 +1,1 @@
+ALTER TABLE `batch_job` ADD `deleted_at` DATETIME AFTER `updated_by`;

@@ -1,0 +1,24 @@
+/var/log/KGenericBatchMgr.log {
+    nodateext
+    compress
+    rotate 40
+    create 644
+    missingok
+    notifempty
+    prerotate
+        /sbin/service batchMgr stop 2>&1 >/dev/null || true
+    endscript
+    postrotate
+        /sbin/service batchMgr start 2>&1 >/dev/null || true
+    endscript
+}
+
+/var/log/batch/*log {
+    nodateext
+    compress
+    notifempty
+    rotate 40
+    create 644
+    missingok
+}
+

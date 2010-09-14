@@ -1,0 +1,28 @@
+2010-05-16:
+CNG - WMA/Speach/Voice added to the Mencoder black list to avoid huge traget files on lectures/presentation transcoding
+
+auto deinterlace
+multi-stream support
+alpha/apps/lib/batch2/model/kConvertJobData.php
+admin_console/../en.php
+admin_console/lib/Kaltura/KalturaClient.php - KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS
+api_v3/lib/types/enums/KalturaConversionEngineType.php - KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS
+batch/batches/convert/engines/KConversionEngine.class.php - $engine = new KConversionEngineQuickTimePlayerTools( $engine_config );
+	to add batch/batches/convert/Engines/KConversionEngineQuickTimePlayerTools.class.php
+batch/batches/convert/OperationEngines/KOperationManager.php - return new KOperationEngineQuickTimePlayerTools($taskConfig->params->quickTimePlayerToolsCmd);
+	to add batch/batches/convert/OperationEngines/KOperationEngineQuickTimeTools.php
+	to add quickTimePlayerToolsCmd to taskConfig->params->params/config 
+batch/batches/convert/KAsyncConvert.class.php - add to supported
+batch/batches/convert/KAsyncConvert.class.php - shorten the length of the tmp filename
+
+batch/client/KalturaClient.php - const QUICK_TIME_TOOLS = 6
+infra/mediaInfoParser/KMediaInfoMediaParser.php - support for scan_type/deinterlace
+
+/web/kaltura/app/alpha/apps/kaltura/modules/system/actions/flavorParamsAction.class.php - add operators for the flavorParams utility
+/web/kaltura/app/alpha/apps/kaltura/modules/system/templates/flavorParamsSuccess.php
+
+kConf.php - to add FastStartPlugin and QuickTimeToolsPlugin to default_plugins
+batch_config.ini - 'params.useFastStart = true' & 'params.fastStartCmd		= qt-faststart'
+
+2010-09-01
+fix - KDLWrap: on the cdl2kdl conv copy cmd for flavorParamsOutput as well

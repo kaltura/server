@@ -1,0 +1,183 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+
+!!!! will override the ticket and pg columns !!!!
+------------------------------------------------------------------------------------------------
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
+------------------------------------------------------------------------------------------------
+media.addfrombulk					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |media
+media.upload				    	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |media
+media.addfromuploadedfile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |media
+baseentry.addfromuploadedfile		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |media
+
+jobs.abortmail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortbulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortpostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortstorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortstoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortpull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortnotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.abortremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletemail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletebulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteconvertcollection		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletepostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletestorageexport			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletestoragedelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletepull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deletenotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.deleteremoteconvert			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrymail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrybulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrypostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrystorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrystoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrypull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retrynotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.retryremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getpullstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getimportstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getpostconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getextractmediastatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getstorageexportstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getstoragedeletestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getbulkuploadstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getconvertcollectionstatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getprovisionprovidestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getprovisiondeletestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getconvertstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getnotificationstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getconvertprofilestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getremoteconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.getmailstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+
+batch.getqueuesize					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.checkfileexists				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivepulljobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivepulljob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivepulljob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveimportjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.cleanexclusivejobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.addbulkuploadresult			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getbulkuploadlastresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updatebulkuploadresults		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.addmediainfo					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivepostconvertjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveextractmediajobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveextractmediajob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveextractmediajob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivestorageexportjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivestoragedeletejobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivestorageexportjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivestoragedeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivestorageexportjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivestoragedeletejob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivebulkuploadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveconvertcollectionjobs	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveprovisionprovidejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveprovisiondeletejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveconvertcollectionjob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveprovisionprovidejob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveprovisiondeletejob	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveconvertcollectionjob |		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveprovisionprovidejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveprovisiondeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusiveconvertjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivenotificationjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivenotificationjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivenotificationjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivemailjobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivemailjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivemailjob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveconvertprofilejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusiveremoteconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivebulkdownloadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivebulkdownloadjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivebulkdownloadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.logconversion					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.resetjobexecutionattempts		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+batch.updateexclusiveconvertjobsubtype			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.updateexclusiveconvertprofilejob			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneconvertjobs			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneconvertprofilejobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdonebulkuploadjobs		|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneconvertcollectionjobs|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneprovisionprovidejobs|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+
+batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.getcommand				|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.setcommandresult		|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+batchcontrol.getfullstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
+
+emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+filesync.sync						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |file-sync
+
+metadatabatch.getexclusiveimportmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.updateexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.freeexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.getexclusivetransformmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.updateexclusivetransformmetadatajob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.freeexclusivetransformmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.gettransformmetadataobjects		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadatabatch.upgrademetadataobjects			|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+metadata.update									|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+metadata.invalidate								|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+filesyncimportbatch.updateexclusivefilesyncimportjob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+filesyncimportbatch.freeexclusivefilesyncimportjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+filesyncimportbatch.getexclusivefilesyncimportjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+filesyncimportbatch.getexclusivealmostdonefilesyncimportjobs		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+---------------------------------------------------------------------------------------------------

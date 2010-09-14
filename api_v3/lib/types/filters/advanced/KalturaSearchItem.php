@@ -1,0 +1,15 @@
+<?php
+/**
+ * @package api
+ * @subpackage filters
+ */
+class KalturaSearchItem extends KalturaObject
+{
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
+		$object_to_fill->setKalturaClass(get_class($this));
+		
+		return $object_to_fill;		
+	}
+}

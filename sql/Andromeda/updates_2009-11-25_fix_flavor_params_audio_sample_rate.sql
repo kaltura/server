@@ -1,0 +1,1 @@
+update flavor_params set audio_sample_rate = '44100' where audio_sample_rate = '44000';

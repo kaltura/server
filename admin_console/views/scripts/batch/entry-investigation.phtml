@@ -1,0 +1,869 @@
+
+<p><?php echo $this->translate('entry investigate intro text'); ?></p>
+<br>
+<?php 
+	$enableActions = $this->enableActions;
+	$investigateData = null;
+	$entry = null;
+	if($this->investigateData && $this->investigateData->entry)
+	{
+		$investigateData = $this->investigateData;
+		$entry = $investigateData->entry;
+		?>
+			<p><?php echo $this->translate('entry-history history links desc'); ?> &nbsp;
+			<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks', 'entryId' => $entry->id, 'entry' => true)); ?>#a_in_queue"><?php echo $this->translate('entry-investigate history in-queue link'); ?></a>&nbsp; | &nbsp;
+			<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks', 'entryId' => $entry->id, 'entry' => true)); ?>#a_in_progress"><?php echo $this->translate('entry-investigate history in-process link'); ?></a>&nbsp; | &nbsp;
+			<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'failed-tasks', 'entryId' => $entry->id, 'entry' => true)); ?>"><?php echo $this->translate('entry-investigate history failed link'); ?></a></p>
+		<?php 
+	}
+	
+	if($this->ticketId)
+	{
+		?>
+		<div class="message">
+			<ul>
+				<li><?php echo $this->translate('entry-investigate entry support sent') . $this->ticketId; ?></li>
+			</ul>
+		</div>
+		<?php 
+	}
+	
+	if(count($this->errors))
+	{
+		?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php 
+	}
+?>
+
+<?php echo $this->searchEntryForm; ?>
+
+<br class="clear" />
+
+<?php 
+	if($entry)
+	{
+		$exportLink = $this->url(array('controller' => 'batch', 'action' => 'export-investigation', 'entryId' => $entry->id));
+		?>
+<br />
+<h2><?php echo $this->translate('entry-investigate info title'); ?> <span>(<?php echo $this->translate('entry-investigate history update label'); ?> <?php echo date($this->translate('date format')); ?> | <a href="<?php echo $exportLink; ?>"><?php echo $this->translate('entry-investigate entry support export'); ?></a>)</span></h2>
+			<br />
+			<table>
+				<tr>
+					<th><?php echo $this->translate('entry-investigate info entry id label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry name label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry partner id label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry tags label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry admin tags label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry pv label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry status label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry type label'); ?></th>
+					<?php 
+						if($entry instanceof KalturaLiveStreamAdminEntry)
+						{
+							?>
+								<th><?php echo $this->translate('entry-investigate info entry ip1 label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry ip2 label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry streamPassword label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry streamUsername label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry offlineMessage label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry connect rtmp label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry stream label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry encoder rtmp label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry encoder bk rtmp label'); ?></th>
+							<?php 
+						}
+						elseif($entry instanceof KalturaMediaEntry)
+						{
+							?>
+								<th><?php echo $this->translate('entry-investigate info entry media type label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry source type label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry cq label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry media date label'); ?></th>
+							<?php 
+						}
+					?>
+					<th><?php echo $this->translate('entry-investigate info entry thumb label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry data label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry size label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry duration label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry search text label'); ?></th>
+					<th><?php echo $this->translate('entry-investigate info entry created label'); ?></th>
+					<?php if($enableActions): ?>
+						<th><?php echo $this->translate('entry-investigate info entry actions label'); ?></th>
+					<?php endif; ?>
+				</tr>
+				<tr class="<?php echo $this->cycle(array('odd', 'even'), 'entry')->next(); ?>">
+					<?php
+						$status = $this->enumTranslate('KalturaEntryStatus', $entry->status);
+						if($entry->status == KalturaEntryStatus::READY)
+							$status = "<font color=\"green\">$status</font>";
+						elseif($entry->status < 0)
+							$status = "<font color=\"red\">$status</font>";
+							
+					?>
+					<td><?php echo $entry->id; ?></td>
+					<td><?php echo $entry->name; ?></td>
+					<td><?php echo $entry->partnerId; ?></td>
+					<td><?php echo $entry->tags; ?></td>
+					<td><?php echo $entry->adminTags; ?></td>
+					<td><?php echo 'p: ' . $entry->plays . '<br>v: ' . $entry->views; ?></td>
+					<td><?php echo $status; ?></td>
+					<td><?php echo $this->enumTranslate('KalturaEntryType', $entry->type); ?></td>
+					<?php 
+						if($entry instanceof KalturaLiveStreamAdminEntry)
+						{
+							?>
+								<td><?php echo $entry->encodingIP1; ?></td>
+								<td><?php echo $entry->encodingIP2; ?></td>
+								<td><?php echo $entry->streamPassword; ?></td>
+								<td><?php echo $entry->streamUsername; ?></td>
+								<td><?php echo $entry->offlineMessage; ?></td>
+								<td>rtmp://cp<?php echo $entry->streamUsername; ?>.live.edgefcs.net/live/</td>
+								<td><?php echo $entry->id . '@' . $entry->streamRemoteId; ?></td>
+								<td>rtmp://p.ep<?php echo $entry->streamRemoteId; ?>.i.akamaientrypoint.net/EntryPoint</td>
+								<td>rtmp://b.ep<?php echo $entry->streamRemoteBackupId; ?>.i.akamaientrypoint.net/EntryPoint</td>
+							<?php 
+						}
+						elseif($entry instanceof KalturaMediaEntry)
+						{
+							?>
+								<td><?php echo $this->enumTranslate('KalturaMediaType', $entry->mediaType); ?></td>
+								<td><?php echo $this->enumTranslate('KalturaSourceType', $entry->sourceType); ?></td>
+								<td><?php echo $entry->conversionQuality; ?></td>
+								<td><?php echo date($this->translate('date format'), $entry->mediaDate); ?></td>
+							<?php 
+						}
+					?>
+					<td><div class="thumbWrap"><img height="15px" width="20px" src="<?php echo $entry->thumbnailUrl; ?>" class="thumb"/></div></td>
+					<td><?php echo $entry->partnerData; ?></td>
+					<td><?php echo $entry->width . "x" . $entry->height; ?></td>
+					<td><?php echo $entry->duration; ?></td>
+					<td><?php echo $entry->searchText; ?></td>
+					<td><?php echo date($this->translate('date format'), $entry->createdAt); ?></td>
+					<?php if($enableActions): ?>
+						<td><button onclick="doReconvertEntry();"><?php echo $this->translate('entry-investigate entry reconvert'); ?></button></td>
+					<?php endif; ?>
+				</tr>
+			</table>
+			<br />
+			<ul>
+				<?php 
+					if($entry instanceof KalturaLiveStreamAdminEntry)
+					{
+						$getBroadcast = http_build_query(array(
+							'entryId' => $entry->id,
+							'streamUsername' => $entry->streamUsername,
+							'streamPassword' => $entry->streamPassword,
+							'streamRemoteId' => $entry->streamRemoteId,
+							'streamRemoteBackupId' => $entry->streamRemoteBackupId,
+						));
+						
+						$getSimplePlay = http_build_query(array(
+							'entryId' => $entry->id,
+							'streamUsername' => $entry->streamUsername,
+							'streamRemoteId' => $entry->streamRemoteId,
+						));
+						
+						$getXml = http_build_query(array(
+							'entryId' => $entry->id,
+						));
+						
+						?>
+							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/AkamaiBroadcaster.php?' . $getBroadcast); ?>"><?php echo $this->translate('entry-investigate info entry broadcast label'); ?></a></li>
+							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/SimpleJWPlayer.php?' . $getSimplePlay); ?>"><?php echo $this->translate('entry-investigate info entry play simple label'); ?></a></li>
+							<li><a target="_blank" href="<?php echo $this->baseUrl('tools/XmlJWPlayer.php?' . $getXml); ?>"><?php echo $this->translate('entry-investigate info entry play xml label'); ?></a>
+							<li><a target="_blank" href="/index.php/extwidget/streamclipper?<?php echo $getXml; ?>"><?php echo $this->translate('entry-investigate info entry config xml label'); ?></a>
+							<li><a target="_blank" href="/p/<?php echo $entry->partnerId; ?>/sp/<?php echo $entry->partnerId; ?>00/playManifest/entryId/<?php echo $entry->id; ?>/format/rtmp/a/a.f4m"><?php echo $this->translate('entry-investigate info entry manifest label'); ?></a>
+						<?php 
+					}
+					elseif($entry instanceof KalturaMediaEntry)
+					{
+						?>
+							<li><?php echo $this->translate('entry-investigate info entry www label'); ?> - <a target="_blank" href="<?php echo str_replace( "cdn" , "www" , $entry->dataUrl ); ?>"><?php echo str_replace( "cdn" , "www" , $entry->dataUrl ); ?></a></li>
+							<li><?php echo $this->translate('entry-investigate info entry cdn label'); ?> - <a target="_blank" href="<?php echo $entry->dataUrl; ?>"><?php echo $entry->dataUrl; ?></a></li>
+							<li><?php echo $this->translate('entry-investigate info entry raw label'); ?> - <a target="_blank" href="<?php echo $entry->downloadUrl; ?>"><?php echo $entry->downloadUrl; ?></a>
+							<li><a target="_blank" href="/p/<?php echo $entry->partnerId; ?>/sp/<?php echo $entry->partnerId; ?>00/playManifest/entryId/<?php echo $entry->id; ?>/a/a.f4m"><?php echo $this->translate('entry-investigate info entry manifest label'); ?></a>
+						<?php 
+					}
+				?>
+			</ul>
+			<br/>
+			
+			<?php 
+				if($enableActions && Kaltura_Support::isEnabled())
+				{
+					?>
+						<button onclick="openRequestDialog();"><?php echo $this->translate('entry-investigate entry request support'); ?></button>
+						
+						<div id="dvRequestDialog" style="display: none">
+							<form id="frmSupport" class="simple" method="post" action="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation'), null, true); ?>">
+								<fieldset>
+									<label for="entryId" class="required"><?php echo $this->translate('entry-investigate entry support description'); ?>:</label><br/>
+									<textarea rows="5" cols="60" name="supportDescription"><?php echo $this->translate('entry-investigate entry support default description'); ?></textarea><br/>
+									<button onclick="doRequestSupport();"><?php echo $this->translate('entry-investigate entry support send'); ?></button>
+									<input type="hidden" name="entryId" value="<?php echo $entry->id; ?>">
+									<input type="hidden" name="requestAction" value="requestSupport">
+								</fieldset>
+							</form>
+						</div>
+					<?php
+				}
+			?>
+			<br/><br/>
+			
+			<h2><?php echo $this->translate('entry-investigate files title'); ?></h2>
+			<table>
+				<thead>
+					<tr>
+						<th><?php echo $this->translate('entry-investigate files id th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files version th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files sub type th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files dc th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files original th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files created th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files ready time th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files sync time th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files type th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files link id th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files link count th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files root th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files path th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files size th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate files disc size th'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if($investigateData->fileSyncs && $investigateData->fileSyncs->totalCount): ?>
+						<?php foreach($investigateData->fileSyncs->objects as $file): ?>
+							<tr class="<?php echo $this->cycle(array('odd', 'even'), 'entryFiles')->next(); ?>">
+								<?php 
+									if(strlen($file->fileContent))
+									{
+										?>
+										<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
+										<?php
+									}
+									elseif($file->status == KalturaFileSyncStatus::READY)
+									{
+										?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+									}
+									else
+									{
+										?><td><?php echo $file->id; ?></td><?php
+									}
+								?>
+								<td><?php echo $file->version; ?></td>
+								<td><?php echo $this->fileSyncSubTypeTranslate($file->objectType, $file->objectSubType); ?></td>
+								<td><?php echo $file->dc; ?></td>
+								<td><?php echo $file->original; ?></td>
+								<td><?php echo date($this->translate('date format'), $file->createdAt); ?></td>
+								<td><?php echo date($this->translate('date format'), $file->readyAt); ?></td>
+								<td><?php echo date($this->translate('date format'), $file->syncTime); ?></td>
+								<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
+								<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+								<td><?php echo $file->linkedId; ?></td>
+								<td><?php echo $file->linkCount; ?></td>
+								<td><?php echo $file->fileRoot; ?></td>
+								<td><?php echo $file->filePath; ?></td>
+								<td><?php echo $file->fileSize; ?></td>
+								<td><?php echo $file->fileDiscSize; ?></td>
+							</tr>
+							<?php 
+								if(strlen($file->fileContent))
+								{
+									?>
+									<tr class="additionalData" id="tr_filesync_data_<?php echo $file->id; ?>" style="display: none">
+										<td colspan="16"><textarea rows="20" cols="150"><?php echo $file->fileContent; ?></textarea> </td>
+									</tr>
+									<?php
+								}
+							?>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<tr class="odd">
+							<td colspan="16"><?php echo $this->translate('no results'); ?></td>
+						</tr>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			
+			<br/><br/>
+			
+			<h2><?php echo $this->translate('entry-investigate assets title'); ?></h2>
+			<table>
+				<thead>
+					<tr>
+						<th><?php echo $this->translate('entry-investigate asset id th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset version th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset tags th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset created th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset updated th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset deleted th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset description th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset width th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset height th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset bitrate th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset framerate th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset size th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset original th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset ext th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset format th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset codec th'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php 
+				
+					if($investigateData->flavorAssets && count($investigateData->flavorAssets))
+					{
+						foreach($investigateData->flavorAssets as $flavor)
+						{
+							$flavorAsset = $flavor->flavorAsset;
+							$flavorParams = $flavor->flavorParams;
+							$flavorParamsOutputs = $flavor->flavorParamsOutputs;
+							$mediaInfos = $flavor->mediaInfos;
+							$flavorFiles = $flavor->fileSyncs;
+							
+							?>
+								
+								<tr class="<?php echo $this->cycle(array('odd', 'even'), 'asset')->next(); ?>">
+									<td class="link" onclick="toggleView('tr_flavor_data_<?php echo $flavorAsset->id; ?>')"><?php echo $flavorAsset->id; ?></td>
+									<td><?php echo $flavorAsset->version; ?></td>
+									<td><?php echo $flavorAsset->tags; ?></td>
+									<td><?php echo date($this->translate('date format'), $flavorAsset->createdAt); ?></td>
+									<td><?php echo date($this->translate('date format'), $flavorAsset->updatedAt); ?></td>
+									<td><?php echo date($this->translate('date format'), $flavorAsset->deletedAt); ?></td>
+									<td><?php echo $this->enumTranslate('KalturaFlavorAssetStatus', $flavorAsset->status); ?></td>
+									<td><?php echo $flavorAsset->description; ?></td>
+									<td><?php echo $flavorAsset->width; ?></td>
+									<td><?php echo $flavorAsset->height; ?></td>
+									<td><?php echo $flavorAsset->bitrate; ?></td>
+									<td><?php echo $flavorAsset->frameRate; ?></td>
+									<td><?php echo $flavorAsset->size; ?></td>
+									<td><?php echo $flavorAsset->isOriginal; ?></td>
+									<td><?php echo $flavorAsset->fileExt; ?></td>
+									<td><?php echo $flavorAsset->containerFormat; ?></td>
+									<td><?php echo $flavorAsset->videoCodecId; ?></td>
+								</tr>
+								<tr class="additionalData" id="tr_flavor_data_<?php echo $flavorAsset->id; ?>" style="display: none">
+									<td colspan="18">
+										<?php 
+											if($enableActions && !$flavorAsset->isOriginal)
+											{
+												?>
+													<button onclick="doReconvert('<?php echo $flavorAsset->id; ?>');"><?php echo $this->translate('entry-investigate flavor reconvert'); ?></button>
+													<br/><br/>
+												<?php
+											}
+											
+											if($flavorParams)
+											{
+												?>
+												<h3><?php echo $this->translate('entry-investigate flavor params title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate flavor params id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params name th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params description th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params createdAt th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params isSystemDefault th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params tags th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params format th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params videoCodec th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params videoBitrate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioCodec th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioBitrate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioChannels th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioSampleRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params width th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params height th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params frameRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params gopSize th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params conversionEngines th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params conversionEnginesExtraParams th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params twoPass th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "flavorParams$flavorAsset->id")->next(); ?>">
+															<td><?php echo $flavorParams->id; ?></td>
+															<td><?php echo $flavorParams->name; ?></td>
+															<td><?php echo $flavorParams->description; ?></td>
+															<td><?php echo $flavorParams->createdAt; ?></td>
+															<td><?php echo $flavorParams->isSystemDefault; ?></td>
+															<td><?php echo $flavorParams->tags; ?></td>
+															<td><?php echo $flavorParams->format; ?></td>
+															<td><?php echo $flavorParams->videoCodec; ?></td>
+															<td><?php echo $flavorParams->videoBitrate; ?></td>
+															<td><?php echo $flavorParams->audioCodec; ?></td>
+															<td><?php echo $flavorParams->audioBitrate; ?></td>
+															<td><?php echo $flavorParams->audioChannels; ?></td>
+															<td><?php echo $flavorParams->audioSampleRate; ?></td>
+															<td><?php echo $flavorParams->width; ?></td>
+															<td><?php echo $flavorParams->height; ?></td>
+															<td><?php echo $flavorParams->frameRate; ?></td>
+															<td><?php echo $flavorParams->gopSize; ?></td>
+															<td><?php echo $this->convertEnginesTranslate($flavorParams->conversionEngines); ?></td>
+															<td><?php echo $flavorParams->conversionEnginesExtraParams; ?></td>
+															<td><?php echo $flavorParams->twoPass; ?></td>
+														</tr>
+													</tbody>
+												</table>
+												<?php
+											}
+											
+											if($flavorParamsOutputs && $flavorParamsOutputs->totalCount)
+											{
+												?>
+												<br/><br/>
+												<h3><?php echo $this->translate('entry-investigate flavor params output title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate flavor params id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params name th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output flavorParamsId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output flavorParamsVersion th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output flavorAssetId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output flavorAssetVersion th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output readyBehavior th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params description th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params createdAt th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params isSystemDefault th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params tags th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params format th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params videoCodec th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params videoBitrate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioCodec th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioBitrate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioChannels th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params audioSampleRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params width th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params height th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params frameRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params gopSize th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params conversionEngines th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params conversionEnginesExtraParams th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params twoPass th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate flavor params output commandLinesStr th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<?php foreach($flavorParamsOutputs->objects as $flavorParams): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "flavorParamsOutputFiles$flavorAsset->id")->next(); ?>">
+															<td><?php echo $flavorParams->id; ?></td>
+															<td><?php echo $flavorParams->name; ?></td>
+															<td><?php echo $flavorParams->flavorParamsId; ?></td>
+															<td><?php echo $flavorParams->flavorParamsVersion; ?></td>
+															<td><?php echo $flavorParams->flavorAssetId; ?></td>
+															<td><?php echo $flavorParams->flavorAssetVersion; ?></td>
+															<td><?php echo $flavorParams->readyBehavior; ?></td>
+															<td><?php echo $flavorParams->description; ?></td>
+															<td><?php echo $flavorParams->createdAt; ?></td>
+															<td><?php echo $flavorParams->isSystemDefault; ?></td>
+															<td><?php echo $flavorParams->tags; ?></td>
+															<td><?php echo $flavorParams->format; ?></td>
+															<td><?php echo $flavorParams->videoCodec; ?></td>
+															<td><?php echo $flavorParams->videoBitrate; ?></td>
+															<td><?php echo $flavorParams->audioCodec; ?></td>
+															<td><?php echo $flavorParams->audioBitrate; ?></td>
+															<td><?php echo $flavorParams->audioChannels; ?></td>
+															<td><?php echo $flavorParams->audioSampleRate; ?></td>
+															<td><?php echo $flavorParams->width; ?></td>
+															<td><?php echo $flavorParams->height; ?></td>
+															<td><?php echo $flavorParams->frameRate; ?></td>
+															<td><?php echo $flavorParams->gopSize; ?></td>
+															<td><?php echo $this->convertEnginesTranslate($flavorParams->conversionEngines); ?></td>
+															<td><?php echo $flavorParams->conversionEnginesExtraParams; ?></td>
+															<td><?php echo $flavorParams->twoPass; ?></td>
+															<td><?php echo $flavorParams->commandLinesStr; ?></td>
+														</tr>
+														<?php endforeach; ?>
+													</tbody>
+												</table>
+												<?php
+											} 
+											
+											if($mediaInfos && $mediaInfos->totalCount)
+											{
+												?>
+												<br/><br/>
+												<h3><?php echo $this->translate('entry-investigate media info title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate media info id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info flavorAssetId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info fileSize th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info containerFormat th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info containerId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info containerProfile th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info containerDuration th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info containerBitRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoFormat th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoCodecId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoDuration th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoBitRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoBitRateMode th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoWidth th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoHeight th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoFrameRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoDar th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info videoRotation th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioFormat th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioCodecId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioDuration th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioBitRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioBitRateMode th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioChannels th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioSamplingRate th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info audioResolution th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info writingLib th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate media info rawData th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<?php foreach($mediaInfos->objects as $mediaInfo): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "flavorFiles$flavorAsset->id")->next(); ?>">
+															<td><?php echo $mediaInfo->id; ?></td>
+															<td><?php echo $mediaInfo->flavorAssetId; ?></td>
+															<td><?php echo $mediaInfo->fileSize; ?></td>
+															<td><?php echo $mediaInfo->containerFormat; ?></td>
+															<td><?php echo $mediaInfo->containerId; ?></td>
+															<td><?php echo $mediaInfo->containerProfile; ?></td>
+															<td><?php echo $mediaInfo->containerDuration; ?></td>
+															<td><?php echo $mediaInfo->containerBitRate; ?></td>
+															<td><?php echo $mediaInfo->videoFormat; ?></td>
+															<td><?php echo $mediaInfo->videoCodecId; ?></td>
+															<td><?php echo $mediaInfo->videoDuration; ?></td>
+															<td><?php echo $mediaInfo->videoBitRate; ?></td>
+															<td><?php echo $this->enumTranslate('KalturaBitRateMode', $mediaInfo->videoBitRateMode); ?></td>
+															<td><?php echo $mediaInfo->videoWidth; ?></td>
+															<td><?php echo $mediaInfo->videoHeight; ?></td>
+															<td><?php echo $mediaInfo->videoFrameRate; ?></td>
+															<td><?php echo $mediaInfo->videoDar; ?></td>
+															<td><?php echo $mediaInfo->videoRotation; ?></td>
+															<td><?php echo $mediaInfo->audioFormat; ?></td>
+															<td><?php echo $mediaInfo->audioCodecId; ?></td>
+															<td><?php echo $mediaInfo->audioDuration; ?></td>
+															<td><?php echo $mediaInfo->audioBitRate; ?></td>
+															<td><?php echo $this->enumTranslate('KalturaBitRateMode', $mediaInfo->audioBitRateMode); ?></td>
+															<td><?php echo $mediaInfo->audioChannels; ?></td>
+															<td><?php echo $mediaInfo->audioSamplingRate; ?></td>
+															<td><?php echo $mediaInfo->audioResolution; ?></td>
+															<td><?php echo $mediaInfo->writingLib; ?></td>
+															<td><?php echo $mediaInfo->rawData; ?></td>
+														</tr>
+														<?php endforeach; ?>
+													</tbody>
+												</table>
+												<?php
+											} 
+											
+											if($flavorFiles && $flavorFiles->totalCount)
+											{
+												?>
+												<br/><br/>
+												<h3><?php echo $this->translate('entry-investigate files title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate files id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files version th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files sub type th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files dc th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files original th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files created th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files ready time th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files sync time th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files status th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files type th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files link id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files link count th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files root th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files path th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files size th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files disc size th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<?php foreach($flavorFiles->objects as $file): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "flavorFiles$flavorAsset->id")->next(); ?>">
+															<?php 
+																if(strlen($file->fileContent))
+																{
+																	?>
+																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
+																	<?php
+																}
+																elseif($file->status == KalturaFileSyncStatus::READY)
+																{
+																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+																}
+																else
+																{
+																	?><td><?php echo $file->id; ?></td><?php
+																}
+															?>
+															<td><?php echo $file->version; ?></td>
+															<td><?php echo $this->fileSyncSubTypeTranslate($file->objectType, $file->objectSubType); ?></td>
+															<td><?php echo $file->dc; ?></td>
+															<td><?php echo $file->original; ?></td>
+															<td><?php echo date($this->translate('date format'), $file->createdAt); ?></td>
+															<td><?php echo date($this->translate('date format'), $file->readyAt); ?></td>
+															<td><?php echo date($this->translate('date format'), $file->syncTime); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+															<td><?php echo $file->linkedId; ?></td>
+															<td><?php echo $file->linkCount; ?></td>
+															<td><?php echo $file->fileRoot; ?></td>
+															<td><?php echo $file->filePath; ?></td>
+															<td><?php echo $file->fileSize; ?></td>
+															<td><?php echo $file->fileDiscSize; ?></td>
+														</tr>
+														<?php 
+															if(strlen($file->fileContent))
+															{
+																?>
+																<tr class="additionalData" id="tr_filesync_data_<?php echo $file->id; ?>" style="display: none">
+																	<td colspan="15"><textarea rows="20" cols="150"><?php echo $file->fileContent; ?></textarea> </td>
+																</tr>
+																<?php
+															}
+														?>
+														<?php endforeach; ?>
+													</tbody>
+												</table>
+												<?php
+											} 
+										?>
+									</td>
+								</tr>
+						
+							<?php 
+						}
+					}
+					else
+					{
+						?>
+							<tr class="odd">
+								<td colspan="18"><?php echo $this->translate('no results'); ?></td>
+							</tr>
+						<?php
+					}
+					
+				?>
+				</tbody>
+			</table>
+			
+			<br/><br/>
+			
+			<h2><?php echo $this->translate('entry-investigate history title'); ?></h2>
+			<table>
+				<thead>
+					<tr>
+						<th title="<?php echo $this->translate('entry-investigate history batch tooltip'); ?>"><?php echo $this->translate('entry-investigate history batch th'); ?></th>
+						<th title="<?php echo $this->translate('entry-investigate history status tooltip'); ?>"><?php echo $this->translate('entry-investigate history status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history abort th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history recheck th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history progress th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history msg th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history info th'); ?></th>
+						<th title="<?php echo $this->translate('entry-investigate history create time tooltip'); ?>"><?php echo $this->translate('entry-investigate history create time th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history delete time th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history priority th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history work group th'); ?></th>
+						<th title="<?php echo $this->translate('entry-investigate history start time tooltip'); ?>"><?php echo $this->translate('entry-investigate history start time th'); ?></th>
+						<th title="<?php echo $this->translate('entry-investigate history end time tooltip'); ?>"><?php echo $this->translate('entry-investigate history end time th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history scheduler th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history worker th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history batch th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history expire th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history lock version th'); ?></th>
+						<th title="<?php echo $this->translate('entry-investigate history attempts tooltip'); ?>"><?php echo $this->translate('entry-investigate history attempts th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history last scheduler th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history last worker th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history distrib th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history parent th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history twin th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history bulk th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history root th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history dc th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history err type th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history err num th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate history divert th'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if($investigateData->jobs && $investigateData->jobs->totalCount): ?>
+						<?php foreach($investigateData->jobs->objects as $job): ?>
+							<tr class="<?php echo $this->cycle(array('odd', 'even'), 'jobs')->next(); ?>">
+								<td class="link" onclick="toggleView('tr_job_data_<?php echo $job->id; ?>')">
+									<?php 
+										echo $this->jobTypeTranslate($job->jobType, $job->jobSubType);
+										echo " ($job->id)";
+									?>
+								</td>
+								<td>
+									<?php 
+										$color = 'black';
+										switch($job->status)
+										{
+											case KalturaBatchJobStatus::FINISHED:
+											case KalturaBatchJobStatus::DONT_PROCESS:
+												$color = 'green';
+												break;
+												
+											case KalturaBatchJobStatus::ABORTED:
+											case KalturaBatchJobStatus::FAILED:										
+											case KalturaBatchJobStatus::FATAL:
+												$color = 'red';
+												break;
+										}
+										
+										$status = $this->enumTranslate('KalturaBatchJobStatus', $job->status);
+										echo "<font color=\"$color\">$status</font>";
+										
+										if($job->deletedAt)
+											echo ' (<font color="red">' . $this->translate('DELETED') . '</font>)';
+									?>
+								</td>
+								<td><?php echo $job->abort; ?></td>
+								<td><?php echo ($job->checkAgainTimeout ? date($this->translate('date format'), $job->checkAgainTimeout) : ''); ?></td>
+								<td><?php echo $job->progress; ?></td>
+								<td><?php echo htmlspecialchars($job->message); ?></td>
+								<td><?php echo nl2br(htmlspecialchars(trim($job->description))); ?></td>
+								<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
+								<td><?php echo ($job->deletedAt ? date($this->translate('date format'), $job->deletedAt) : ''); ?></td>
+								<td><?php echo $job->priority; ?></td>
+								<td><?php echo $job->workGroupId; ?></td>
+								<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
+								<td><?php echo date($this->translate('date format'), $job->finishTime); ?></td>
+								<td><?php echo $job->schedulerId; ?></td>
+								<td><?php echo $job->workerId; ?></td>
+								<td><?php echo $job->batchIndex; ?></td>
+								<td><?php echo $job->processorExpiration; ?></td>
+								<td><?php echo $job->lockVersion; ?></td>
+								<td><?php echo $job->executionAttempts; ?></td>
+								<td><?php echo $job->lastSchedulerId; ?></td>
+								<td><?php echo $job->lastWorkerId; ?></td>
+								<td><?php echo ($job->lastWorkerRemote ? 'True' : 'False'); ?></td>
+								<td><?php echo $job->parentJobId; ?></td>
+								<td><?php echo $job->twinJobId; ?></td>
+								<td><?php echo $job->bulkJobId; ?></td>
+								<td><?php echo $job->rootJobId; ?></td>
+								<td><?php echo $job->dc; ?></td>
+								<td><?php echo $job->errType; ?></td>
+								<td><?php echo $job->errNumber; ?></td>
+								<td><?php echo $job->onStressDivertTo; ?></td>
+							</tr>
+							<tr class="additionalData" id="tr_job_data_<?php echo $job->id; ?>" style="display: none">
+								<td colspan="28">
+									<?php 
+										if($enableActions)
+										{
+											?>
+												<button onclick="doRetry(<?php echo "$job->id, $job->jobType"; ?>);"><?php echo $this->translate('entry-investigate history retry'); ?></button>
+												<br/>
+											<?php
+										}
+									?>
+									<br/>
+									<?php echo $this->printKalturaObject($job->data); ?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<tr class="odd">
+							<td colspan="28"><?php echo $this->translate('no results'); ?></td>
+						</tr>
+					<?php endif; ?>
+				</tbody>
+			</table>
+		<?php
+	}
+?>
+<br /><br />&nbsp;
+<script type="text/javascript">
+
+	function doThumbs() {
+		$(".thumbWrap").mouseover(function(){
+			$(this).children("img").addClass("on");
+		});
+		$(".thumbWrap").mouseout(function(){
+			$(this).children("img").removeClass("on");
+		});
+	}
+
+	function toggleView(entityId) {
+		$("#" + entityId).toggle();
+	}
+
+	jQuery(function() {
+		doThumbs();
+	});
+
+</script>
+
+
+<script type="text/javascript">
+
+	function openRequestDialog(){
+		$('#dvRequestDialog').show();
+	}
+	
+	function doRequestSupport(){
+		var frm = document.getElementById("frmSupport");
+		frm.submit();
+	}
+
+	function doReconvertEntry(){
+		var frm = document.getElementById("frmSearch");
+		frm.reset();
+		
+		$('#submitAction').val('reconvertEntry');
+	
+		frm.submit();
+	}
+
+	function doReconvert(flavorAssetId){
+		var frm = document.getElementById("frmSearch");
+		frm.reset();
+		
+		$('#actionFlavorAssetId').val(flavorAssetId);
+		$('#submitAction').val('reconvert');
+
+		frm.submit();
+	}
+	
+	function doRetry(jobId, jobType) {
+
+		var frm = document.getElementById("frmSearch");
+		frm.reset();
+		
+		$('#actionJobId').val(jobId);
+		$('#actionJobType').val(jobType);
+		$('#submitAction').val('retry');
+
+		frm.submit();
+	}
+
+</script>

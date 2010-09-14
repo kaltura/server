@@ -1,0 +1,32 @@
+# KALTURA-INSTALL 
+# default values
+all:
+  enable_remember_me: on
+  conversion_client:
+    sleep_between_cycles_sec: 5
+    skip_writing_sleep: 36
+  conversion_server:
+    sleep_between_cycles_sec: 3
+    skip_writing_sleep: 120
+  mailer:
+    sleep_between_cycles_sec: 15
+    skip_writing_sleep: 12
+  importer:
+    sleep_between_cycles_sec: 3
+    skip_writing_sleep: 60
+  notifications:
+    sleep_between_cycles_sec: 5
+    skip_writing_sleep: 60
+    seconds_between_retry_notify: 180
+    max_send_attempts: 10
+    ignore_indicator_max_count: 60
+    kaltura_notification_support_email: notification-errors@kaltura.com
+  entry_delete:
+    sleep_between_cycles_sec: 3
+    skip_writing_sleep: 60
+  health_test:
+    sleep_between_cycles_sec: 3
+    skip_writing_sleep: 2
+  download:
+    sleep_between_cycles_sec: 1
+    skip_writing_sleep: 10

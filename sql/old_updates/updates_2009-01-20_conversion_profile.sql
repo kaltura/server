@@ -1,0 +1,1 @@
+alter table conversion_profile add column profile_type_suffix varchar(32);

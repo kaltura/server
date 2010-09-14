@@ -1,0 +1,2 @@
+insert into conversion_profile_2 (partner_id, name, created_at, updated_at, deleted_at, description, crop_left, crop_top, crop_width, crop_height, clip_start, clip_duration) VALUES
+('99', 'Default', now(), now(), NULL, 'The default set of flavors. If not specified otherwise all media uploaded will be converted based on the definition in this profile', '-1', '-1', '-1', '-1', '-1', '-1');

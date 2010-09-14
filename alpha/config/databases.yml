@@ -1,0 +1,112 @@
+# KALTURA-INSTALL
+#all:
+#  propel:
+#    class:          sfPropelDatabase
+#    param:
+#      dsn:          mysql://root:@localhost/dbname
+prod: 
+  propel: 
+    param: 
+      host:               pa-db
+      database:           kaltura
+      username:           kaltura 
+      password:           kaltura 
+      dsn:                mysql://root:root@pa-db/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+  propel2: 
+    param: 
+      host:               pa-mysql2
+      database:           kaltura
+      username:           kaltura_read
+      password:           kaltura_read
+      datasource:         propel2
+      dsn:                mysql://root:root@pa-mysql2/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+            
+  propel3: 
+    param: 
+      host:               pa-mysql3
+      database:           kaltura
+      username:           kaltura_read
+      password:           kaltura_read
+      datasource:         propel3
+      dsn:                mysql://root:root@pa-mysql3/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+            
+  kaltura_stats: 
+    param: 
+      host:               pa-reports
+      database:           kaltura_stats
+      username:           root
+      password:           root
+      datasource:         kaltura_stats
+      dsn:                mysql://root:root@pa-reports/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+            
+all: 
+  propel: 
+    class:                sfPropelDatabase 
+    param: 
+      phptype:            mysql
+      host:               pa-db:3306
+      database:           kaltura
+      username:           kaltura
+      password:           kaltura
+      compat_assoc_lower: true
+      datasource:         propel
+      dsn:                mysql://root:root@pa-db:3306/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+      
+  propel2: 
+    class:                sfPropelDatabase 
+    param: 
+      phptype:            mysql
+      host:               pa-mysql2:3306
+      database:           kaltura
+      username:           kaltura_read
+      password:           kaltura_read
+      compat_assoc_lower: true
+      datasource:         propel2
+      dsn:                mysql://root:root@pa-mysql2:3306/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+      
+  propel3: 
+    class:                sfPropelDatabase 
+    param: 
+      phptype:            mysql
+      host:               pa-mysql3
+      database:           kaltura
+      username:           kaltura_read
+      password:           kaltura_read
+      compat_assoc_lower: true
+      datasource:         propel3
+      dsn:                mysql://root:root@pa-mysql3/kaltura
+#      persistent:         true
+#      pooling:            true      
+      
+  kaltura_stats: 
+    class:                sfPropelDatabase 
+    param: 
+      phptype:            mysql
+      host:               pa-reports:3306
+      database:           kaltura_stats
+      username:           root
+      password:           root
+      compat_assoc_lower: true
+      datasource:         kaltura_stats
+      dsn:                mysql://root:root@pa-reports:3306/kaltura
+#      persistent:         true
+#      pooling:            true      
+      

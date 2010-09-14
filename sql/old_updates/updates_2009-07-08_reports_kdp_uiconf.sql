@@ -1,0 +1,2 @@
+insert into ui_conf (id, obj_type, partner_id, subp_id, conf_file_path, name, width, height, html_params, swf_url, created_at, updated_at, conf_vars, use_cdn, tags, custom_data, status, description, display_in_search, creation_mode) VALUES
+('48500', '1', '0', NULL, '/web/content/uiconf/kaltura/reports/kdp_2.1.2/ui_conf.xml', 'Reports KDP', '400', '365', NULL, '/flash/kdp/v2.5.0.30245/kdp.swf', now(), now(), NULL, NULL, 'Player', 'a:2:{s:8:"autoplay";s:5:"false";s:9:"automuted";s:5:"false";}', '2', NULL, '0', '2');

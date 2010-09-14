@@ -1,0 +1,32 @@
+rendering: ~
+web_debug: ~
+security:  ~
+
+# generally, you will want to insert your own filters here
+
+my_security:
+  class: myHealthCheckAndSecurityFilter
+  file: lib/filter/myHealthCheckAndSecurityFilter.class.php
+  param:
+    enable: true
+    health_check: false
+    security: true
+
+#remember:                 # Filters need a unique name
+#  class: rememberFilter
+#  file: lib/filter/rememberFilter.class.php
+#  param:
+#    cookie_name: kalt
+#    condition:   %APP_ENABLE_REMEMBER_ME%
+
+
+#safariblock:                 # Filters need a unique name
+#  class: safariblockFilter
+#  file: lib/filter/safariblockFilter.class.php
+
+
+cache:     ~
+common:    ~
+flash:     ~
+execution: ~
+
