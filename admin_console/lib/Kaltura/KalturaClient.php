@@ -3049,6 +3049,13 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $freeText = null;
+
 
 }
 
@@ -3406,6 +3413,16 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 	 */
 	public $destFilePath = null;
 
+
+}
+
+class KalturaPdfFlavorParams extends KalturaFlavorParams
+{
+
+}
+
+class KalturaSwfFlavorParams extends KalturaFlavorParams
+{
 
 }
 
