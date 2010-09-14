@@ -1,7 +1,6 @@
 <?php
 $start = microtime(true);
 require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
-ActKeyUtils::checkCurrent();
 
 // check cache before loading anything
 require_once("../lib/KalturaResponseCacher.php");
@@ -10,6 +9,7 @@ $cache->checkOrStart();
 
 require_once("../bootstrap.php");
 
+ActKeyUtils::checkCurrent();
 KalturaLog::setContext("API");
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
