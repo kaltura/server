@@ -1,6 +1,0 @@
-default:
-  has_layout:     on
-  layout:         emptylayout
-  javascripts:    [  ]
-  stylesheets:  [  ]  
-  
