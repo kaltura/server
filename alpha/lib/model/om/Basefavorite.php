@@ -68,6 +68,20 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [kuser_id] column value.
 	 * 
 	 * @return     int
@@ -125,6 +139,9 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[favoritePeer::KUSER_ID]))
+			$this->oldColumnsValues[favoritePeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -149,6 +166,9 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	 */
 	public function setSubjectType($v)
 	{
+		if(!isset($this->oldColumnsValues[favoritePeer::SUBJECT_TYPE]))
+			$this->oldColumnsValues[favoritePeer::SUBJECT_TYPE] = $this->getSubjectType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -169,6 +189,9 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	 */
 	public function setSubjectId($v)
 	{
+		if(!isset($this->oldColumnsValues[favoritePeer::SUBJECT_ID]))
+			$this->oldColumnsValues[favoritePeer::SUBJECT_ID] = $this->getSubjectId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -189,6 +212,9 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	 */
 	public function setPrivacy($v)
 	{
+		if(!isset($this->oldColumnsValues[favoritePeer::PRIVACY]))
+			$this->oldColumnsValues[favoritePeer::PRIVACY] = $this->getPrivacy();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -209,6 +235,9 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[favoritePeer::ID]))
+			$this->oldColumnsValues[favoritePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -481,6 +510,16 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

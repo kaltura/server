@@ -84,6 +84,20 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -181,6 +195,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[kvotePeer::ID]))
+			$this->oldColumnsValues[kvotePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -201,6 +218,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function setKshowId($v)
 	{
+		if(!isset($this->oldColumnsValues[kvotePeer::KSHOW_ID]))
+			$this->oldColumnsValues[kvotePeer::KSHOW_ID] = $this->getKshowId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -225,6 +245,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[kvotePeer::ENTRY_ID]))
+			$this->oldColumnsValues[kvotePeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -249,6 +272,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[kvotePeer::KUSER_ID]))
+			$this->oldColumnsValues[kvotePeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -273,6 +299,9 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function setRank($v)
 	{
+		if(!isset($this->oldColumnsValues[kvotePeer::RANK]))
+			$this->oldColumnsValues[kvotePeer::RANK] = $this->getRank();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -617,6 +646,16 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

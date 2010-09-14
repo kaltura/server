@@ -141,6 +141,20 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -388,6 +402,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::ID]))
+			$this->oldColumnsValues[TrackEntryPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -408,6 +425,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setTrackEventTypeId($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_TYPE_ID]))
+			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_TYPE_ID] = $this->getTrackEventTypeId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -428,6 +448,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setPsVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::PS_VERSION]))
+			$this->oldColumnsValues[TrackEntryPeer::PS_VERSION] = $this->getPsVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -448,6 +471,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setContext($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::CONTEXT]))
+			$this->oldColumnsValues[TrackEntryPeer::CONTEXT] = $this->getContext();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -468,6 +494,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARTNER_ID]))
+			$this->oldColumnsValues[TrackEntryPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -488,6 +517,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::ENTRY_ID]))
+			$this->oldColumnsValues[TrackEntryPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -508,6 +540,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setHostName($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::HOST_NAME]))
+			$this->oldColumnsValues[TrackEntryPeer::HOST_NAME] = $this->getHostName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -528,6 +563,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setUid($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::UID]))
+			$this->oldColumnsValues[TrackEntryPeer::UID] = $this->getUid();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -548,6 +586,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setTrackEventStatusId($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_STATUS_ID]))
+			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_STATUS_ID] = $this->getTrackEventStatusId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -568,6 +609,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setChangedProperties($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::CHANGED_PROPERTIES]))
+			$this->oldColumnsValues[TrackEntryPeer::CHANGED_PROPERTIES] = $this->getChangedProperties();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -588,6 +632,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setParam1Str($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_1_STR]))
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_1_STR] = $this->getParam1Str();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -608,6 +655,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setParam2Str($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_2_STR]))
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_2_STR] = $this->getParam2Str();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -628,6 +678,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setParam3Str($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_3_STR]))
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_3_STR] = $this->getParam3Str();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -648,6 +701,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setKs($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::KS]))
+			$this->oldColumnsValues[TrackEntryPeer::KS] = $this->getKs();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -668,6 +724,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::DESCRIPTION]))
+			$this->oldColumnsValues[TrackEntryPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -786,6 +845,9 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	 */
 	public function setUserIp($v)
 	{
+		if(!isset($this->oldColumnsValues[TrackEntryPeer::USER_IP]))
+			$this->oldColumnsValues[TrackEntryPeer::USER_IP] = $this->getUserIp();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1055,6 +1117,16 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

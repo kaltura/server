@@ -147,6 +147,20 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -434,6 +448,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::ID]))
+			$this->oldColumnsValues[FileSyncPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -454,6 +471,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::PARTNER_ID]))
+			$this->oldColumnsValues[FileSyncPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -474,6 +494,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setObjectType($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_TYPE] = $this->getObjectType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -494,6 +517,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setObjectId($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_ID]))
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_ID] = $this->getObjectId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -514,6 +540,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::VERSION]))
+			$this->oldColumnsValues[FileSyncPeer::VERSION] = $this->getVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -534,6 +563,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setObjectSubType($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_SUB_TYPE]))
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_SUB_TYPE] = $this->getObjectSubType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -554,6 +586,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setDc($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::DC]))
+			$this->oldColumnsValues[FileSyncPeer::DC] = $this->getDc();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -574,6 +609,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setOriginal($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::ORIGINAL]))
+			$this->oldColumnsValues[FileSyncPeer::ORIGINAL] = $this->getOriginal();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -693,6 +731,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setReadyAt($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::READY_AT]))
+			$this->oldColumnsValues[FileSyncPeer::READY_AT] = $this->getReadyAt();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -741,6 +782,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setSyncTime($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::SYNC_TIME]))
+			$this->oldColumnsValues[FileSyncPeer::SYNC_TIME] = $this->getSyncTime();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -761,6 +805,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::STATUS]))
+			$this->oldColumnsValues[FileSyncPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -781,6 +828,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setFileType($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_TYPE]))
+			$this->oldColumnsValues[FileSyncPeer::FILE_TYPE] = $this->getFileType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -801,6 +851,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setLinkedId($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::LINKED_ID]))
+			$this->oldColumnsValues[FileSyncPeer::LINKED_ID] = $this->getLinkedId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -821,6 +874,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setLinkCount($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::LINK_COUNT]))
+			$this->oldColumnsValues[FileSyncPeer::LINK_COUNT] = $this->getLinkCount();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -841,6 +897,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setFileRoot($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_ROOT]))
+			$this->oldColumnsValues[FileSyncPeer::FILE_ROOT] = $this->getFileRoot();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -861,6 +920,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setFilePath($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_PATH]))
+			$this->oldColumnsValues[FileSyncPeer::FILE_PATH] = $this->getFilePath();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -881,6 +943,9 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	 */
 	public function setFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_SIZE]))
+			$this->oldColumnsValues[FileSyncPeer::FILE_SIZE] = $this->getFileSize();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1151,6 +1216,16 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

@@ -177,6 +177,20 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -544,6 +558,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -662,6 +679,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setBulkUploadJobId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::BULK_UPLOAD_JOB_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::BULK_UPLOAD_JOB_ID] = $this->getBulkUploadJobId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -682,6 +702,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setLineIndex($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::LINE_INDEX]))
+			$this->oldColumnsValues[BulkUploadResultPeer::LINE_INDEX] = $this->getLineIndex();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -702,6 +725,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::PARTNER_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -722,6 +748,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ENTRY_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -742,6 +771,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setEntryStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ENTRY_STATUS]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ENTRY_STATUS] = $this->getEntryStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -762,6 +794,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setRowData($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ROW_DATA]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ROW_DATA] = $this->getRowData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -782,6 +817,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setTitle($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::TITLE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::TITLE] = $this->getTitle();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -802,6 +840,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::DESCRIPTION]))
+			$this->oldColumnsValues[BulkUploadResultPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -822,6 +863,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setTags($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::TAGS]))
+			$this->oldColumnsValues[BulkUploadResultPeer::TAGS] = $this->getTags();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -842,6 +886,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setUrl($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::URL]))
+			$this->oldColumnsValues[BulkUploadResultPeer::URL] = $this->getUrl();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -862,6 +909,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setContentType($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CONTENT_TYPE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::CONTENT_TYPE] = $this->getContentType();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -882,6 +932,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setConversionProfileId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CONVERSION_PROFILE_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::CONVERSION_PROFILE_ID] = $this->getConversionProfileId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -902,6 +955,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setAccessControlProfileId($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ACCESS_CONTROL_PROFILE_ID] = $this->getAccessControlProfileId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -922,6 +978,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setCategory($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::CATEGORY]))
+			$this->oldColumnsValues[BulkUploadResultPeer::CATEGORY] = $this->getCategory();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -943,6 +1002,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setScheduleStartDate($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_START_DATE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_START_DATE] = $this->getScheduleStartDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -992,6 +1054,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setScheduleEndDate($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_END_DATE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::SCHEDULE_END_DATE] = $this->getScheduleEndDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -1040,6 +1105,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setThumbnailUrl($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_URL]))
+			$this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_URL] = $this->getThumbnailUrl();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1060,6 +1128,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setThumbnailSaved($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_SAVED]))
+			$this->oldColumnsValues[BulkUploadResultPeer::THUMBNAIL_SAVED] = $this->getThumbnailSaved();
+
 		if ($v !== null) {
 			$v = (boolean) $v;
 		}
@@ -1080,6 +1151,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerData($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::PARTNER_DATA]))
+			$this->oldColumnsValues[BulkUploadResultPeer::PARTNER_DATA] = $this->getPartnerData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1100,6 +1174,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setErrorDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ERROR_DESCRIPTION]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ERROR_DESCRIPTION] = $this->getErrorDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1120,6 +1197,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setPluginsData($v)
 	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::PLUGINS_DATA]))
+			$this->oldColumnsValues[BulkUploadResultPeer::PLUGINS_DATA] = $this->getPluginsData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1395,6 +1475,16 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

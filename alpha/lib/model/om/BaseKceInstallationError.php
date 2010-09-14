@@ -93,6 +93,20 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -200,6 +214,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::ID]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -220,6 +237,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::PARTNER_ID]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -240,6 +260,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setBrowser($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::BROWSER]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::BROWSER] = $this->getBrowser();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -260,6 +283,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setServerIp($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::SERVER_IP]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_IP] = $this->getServerIp();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -280,6 +306,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setServerOs($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::SERVER_OS]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_OS] = $this->getServerOs();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -300,6 +329,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setPhpVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::PHP_VERSION]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::PHP_VERSION] = $this->getPhpVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -320,6 +352,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setCeAdminEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::CE_ADMIN_EMAIL]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::CE_ADMIN_EMAIL] = $this->getCeAdminEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -340,6 +375,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::TYPE]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -360,6 +398,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::DESCRIPTION]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -380,6 +421,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function setData($v)
 	{
+		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::DATA]))
+			$this->oldColumnsValues[KceInstallationErrorPeer::DATA] = $this->getData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -641,6 +685,16 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

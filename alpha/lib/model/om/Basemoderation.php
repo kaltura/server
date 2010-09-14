@@ -116,6 +116,20 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -313,6 +327,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::ID]))
+			$this->oldColumnsValues[moderationPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -333,6 +350,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::PARTNER_ID]))
+			$this->oldColumnsValues[moderationPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -353,6 +373,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::SUBP_ID]))
+			$this->oldColumnsValues[moderationPeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -373,6 +396,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setObjectId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::OBJECT_ID]))
+			$this->oldColumnsValues[moderationPeer::OBJECT_ID] = $this->getObjectId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -393,6 +419,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setObjectType($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[moderationPeer::OBJECT_TYPE] = $this->getObjectType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -413,6 +442,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::KUSER_ID]))
+			$this->oldColumnsValues[moderationPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -437,6 +469,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setPuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::PUSER_ID]))
+			$this->oldColumnsValues[moderationPeer::PUSER_ID] = $this->getPuserId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -457,6 +492,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::STATUS]))
+			$this->oldColumnsValues[moderationPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -575,6 +613,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setComments($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::COMMENTS]))
+			$this->oldColumnsValues[moderationPeer::COMMENTS] = $this->getComments();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -595,6 +636,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setGroupId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::GROUP_ID]))
+			$this->oldColumnsValues[moderationPeer::GROUP_ID] = $this->getGroupId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -615,6 +659,9 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	 */
 	public function setReportCode($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationPeer::REPORT_CODE]))
+			$this->oldColumnsValues[moderationPeer::REPORT_CODE] = $this->getReportCode();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -895,6 +942,16 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

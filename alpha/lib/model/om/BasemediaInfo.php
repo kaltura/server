@@ -248,6 +248,20 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -665,6 +679,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::ID]))
+			$this->oldColumnsValues[mediaInfoPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -783,6 +800,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setFlavorAssetId($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_ID]))
+			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_ID] = $this->getFlavorAssetId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -807,6 +827,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::FILE_SIZE]))
+			$this->oldColumnsValues[mediaInfoPeer::FILE_SIZE] = $this->getFileSize();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -827,6 +850,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setContainerFormat($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_FORMAT]))
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_FORMAT] = $this->getContainerFormat();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -847,6 +873,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setContainerId($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_ID]))
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_ID] = $this->getContainerId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -867,6 +896,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setContainerProfile($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_PROFILE]))
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_PROFILE] = $this->getContainerProfile();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -887,6 +919,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setContainerDuration($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_DURATION]))
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_DURATION] = $this->getContainerDuration();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -907,6 +942,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setContainerBitRate($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_BIT_RATE]))
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_BIT_RATE] = $this->getContainerBitRate();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -927,6 +965,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoFormat($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_FORMAT]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FORMAT] = $this->getVideoFormat();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -947,6 +988,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoCodecId($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_CODEC_ID]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_CODEC_ID] = $this->getVideoCodecId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -967,6 +1011,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoDuration($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_DURATION]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DURATION] = $this->getVideoDuration();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -987,6 +1034,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoBitRate($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE] = $this->getVideoBitRate();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1007,6 +1057,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoBitRateMode($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE_MODE]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE_MODE] = $this->getVideoBitRateMode();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1027,6 +1080,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoWidth($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_WIDTH]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_WIDTH] = $this->getVideoWidth();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1047,6 +1103,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoHeight($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_HEIGHT]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_HEIGHT] = $this->getVideoHeight();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1067,6 +1126,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoFrameRate($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_FRAME_RATE]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FRAME_RATE] = $this->getVideoFrameRate();
+
 		if ($v !== null) {
 			$v = (double) $v;
 		}
@@ -1087,6 +1149,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoDar($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_DAR]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DAR] = $this->getVideoDar();
+
 		if ($v !== null) {
 			$v = (double) $v;
 		}
@@ -1107,6 +1172,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setVideoRotation($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_ROTATION]))
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_ROTATION] = $this->getVideoRotation();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1127,6 +1195,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioFormat($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_FORMAT]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_FORMAT] = $this->getAudioFormat();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1147,6 +1218,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioCodecId($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_CODEC_ID]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CODEC_ID] = $this->getAudioCodecId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1167,6 +1241,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioDuration($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_DURATION]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_DURATION] = $this->getAudioDuration();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1187,6 +1264,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioBitRate($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE] = $this->getAudioBitRate();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1207,6 +1287,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioBitRateMode($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE_MODE]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE_MODE] = $this->getAudioBitRateMode();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1227,6 +1310,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioChannels($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_CHANNELS]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CHANNELS] = $this->getAudioChannels();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1247,6 +1333,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioSamplingRate($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_SAMPLING_RATE]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_SAMPLING_RATE] = $this->getAudioSamplingRate();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1267,6 +1356,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setAudioResolution($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_RESOLUTION]))
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_RESOLUTION] = $this->getAudioResolution();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1287,6 +1379,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setWritingLib($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::WRITING_LIB]))
+			$this->oldColumnsValues[mediaInfoPeer::WRITING_LIB] = $this->getWritingLib();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1327,6 +1422,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setRawData($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::RAW_DATA]))
+			$this->oldColumnsValues[mediaInfoPeer::RAW_DATA] = $this->getRawData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1347,6 +1445,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setMultiStreamInfo($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM_INFO]))
+			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM_INFO] = $this->getMultiStreamInfo();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1367,6 +1468,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setFlavorAssetVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_VERSION]))
+			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_VERSION] = $this->getFlavorAssetVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1387,6 +1491,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setScanType($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::SCAN_TYPE]))
+			$this->oldColumnsValues[mediaInfoPeer::SCAN_TYPE] = $this->getScanType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1407,6 +1514,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	 */
 	public function setMultiStream($v)
 	{
+		if(!isset($this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM]))
+			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM] = $this->getMultiStream();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1709,6 +1819,18 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -2518,15 +2640,55 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			$this->aflavorAsset = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -2535,6 +2697,10 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -2542,18 +2708,33 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -2563,6 +2744,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -2570,6 +2754,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // BasemediaInfo

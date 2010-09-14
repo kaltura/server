@@ -82,6 +82,20 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -250,6 +264,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setKaltToken($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::KALT_TOKEN]))
+			$this->oldColumnsValues[flickrTokenPeer::KALT_TOKEN] = $this->getKaltToken();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -270,6 +287,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setFrob($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::FROB]))
+			$this->oldColumnsValues[flickrTokenPeer::FROB] = $this->getFrob();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -290,6 +310,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setToken($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::TOKEN]))
+			$this->oldColumnsValues[flickrTokenPeer::TOKEN] = $this->getToken();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -310,6 +333,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setNsid($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::NSID]))
+			$this->oldColumnsValues[flickrTokenPeer::NSID] = $this->getNsid();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -330,6 +356,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setResponse($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::RESPONSE]))
+			$this->oldColumnsValues[flickrTokenPeer::RESPONSE] = $this->getResponse();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -350,6 +379,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 	 */
 	public function setIsValid($v)
 	{
+		if(!isset($this->oldColumnsValues[flickrTokenPeer::IS_VALID]))
+			$this->oldColumnsValues[flickrTokenPeer::IS_VALID] = $this->getIsValid();
+
 		if ($v !== null) {
 			$v = (boolean) $v;
 		}
@@ -706,6 +738,16 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

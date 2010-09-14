@@ -434,6 +434,20 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -1115,6 +1129,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::ID]))
+			$this->oldColumnsValues[kshowPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1135,6 +1152,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setProducerId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::PRODUCER_ID]))
+			$this->oldColumnsValues[kshowPeer::PRODUCER_ID] = $this->getProducerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1159,6 +1179,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setEpisodeId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::EPISODE_ID]))
+			$this->oldColumnsValues[kshowPeer::EPISODE_ID] = $this->getEpisodeId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1179,6 +1202,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::NAME]))
+			$this->oldColumnsValues[kshowPeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1199,6 +1225,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSubdomain($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SUBDOMAIN]))
+			$this->oldColumnsValues[kshowPeer::SUBDOMAIN] = $this->getSubdomain();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1219,6 +1248,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::DESCRIPTION]))
+			$this->oldColumnsValues[kshowPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1239,6 +1271,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::STATUS]))
+			$this->oldColumnsValues[kshowPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1259,6 +1294,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::TYPE]))
+			$this->oldColumnsValues[kshowPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1279,6 +1317,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setMediaType($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::MEDIA_TYPE]))
+			$this->oldColumnsValues[kshowPeer::MEDIA_TYPE] = $this->getMediaType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1299,6 +1340,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setFormatType($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::FORMAT_TYPE]))
+			$this->oldColumnsValues[kshowPeer::FORMAT_TYPE] = $this->getFormatType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1319,6 +1363,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setLanguage($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::LANGUAGE]))
+			$this->oldColumnsValues[kshowPeer::LANGUAGE] = $this->getLanguage();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1340,6 +1387,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setStartDate($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::START_DATE]))
+			$this->oldColumnsValues[kshowPeer::START_DATE] = $this->getStartDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -1389,6 +1439,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setEndDate($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::END_DATE]))
+			$this->oldColumnsValues[kshowPeer::END_DATE] = $this->getEndDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -1437,6 +1490,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSkin($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SKIN]))
+			$this->oldColumnsValues[kshowPeer::SKIN] = $this->getSkin();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1457,6 +1513,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setThumbnail($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::THUMBNAIL]))
+			$this->oldColumnsValues[kshowPeer::THUMBNAIL] = $this->getThumbnail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1477,6 +1536,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setShowEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SHOW_ENTRY_ID]))
+			$this->oldColumnsValues[kshowPeer::SHOW_ENTRY_ID] = $this->getShowEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1497,6 +1559,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setIntroId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::INTRO_ID]))
+			$this->oldColumnsValues[kshowPeer::INTRO_ID] = $this->getIntroId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1517,6 +1582,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setViews($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::VIEWS]))
+			$this->oldColumnsValues[kshowPeer::VIEWS] = $this->getViews();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1537,6 +1605,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setVotes($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::VOTES]))
+			$this->oldColumnsValues[kshowPeer::VOTES] = $this->getVotes();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1557,6 +1628,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setComments($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::COMMENTS]))
+			$this->oldColumnsValues[kshowPeer::COMMENTS] = $this->getComments();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1577,6 +1651,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setFavorites($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::FAVORITES]))
+			$this->oldColumnsValues[kshowPeer::FAVORITES] = $this->getFavorites();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1597,6 +1674,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setRank($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::RANK]))
+			$this->oldColumnsValues[kshowPeer::RANK] = $this->getRank();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1617,6 +1697,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setEntries($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::ENTRIES]))
+			$this->oldColumnsValues[kshowPeer::ENTRIES] = $this->getEntries();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1637,6 +1720,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setContributors($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::CONTRIBUTORS]))
+			$this->oldColumnsValues[kshowPeer::CONTRIBUTORS] = $this->getContributors();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1657,6 +1743,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSubscribers($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SUBSCRIBERS]))
+			$this->oldColumnsValues[kshowPeer::SUBSCRIBERS] = $this->getSubscribers();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1677,6 +1766,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setNumberOfUpdates($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::NUMBER_OF_UPDATES]))
+			$this->oldColumnsValues[kshowPeer::NUMBER_OF_UPDATES] = $this->getNumberOfUpdates();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1697,6 +1789,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setTags($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::TAGS]))
+			$this->oldColumnsValues[kshowPeer::TAGS] = $this->getTags();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1737,6 +1832,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setIndexedCustomData1($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_1]))
+			$this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_1] = $this->getIndexedCustomData1();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1757,6 +1855,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setIndexedCustomData2($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_2]))
+			$this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_2] = $this->getIndexedCustomData2();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1777,6 +1878,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setIndexedCustomData3($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_3]))
+			$this->oldColumnsValues[kshowPeer::INDEXED_CUSTOM_DATA_3] = $this->getIndexedCustomData3();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1797,6 +1901,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setReoccurence($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::REOCCURENCE]))
+			$this->oldColumnsValues[kshowPeer::REOCCURENCE] = $this->getReoccurence();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1817,6 +1924,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setLicenseType($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::LICENSE_TYPE]))
+			$this->oldColumnsValues[kshowPeer::LICENSE_TYPE] = $this->getLicenseType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1837,6 +1947,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setLengthInMsecs($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::LENGTH_IN_MSECS]))
+			$this->oldColumnsValues[kshowPeer::LENGTH_IN_MSECS] = $this->getLengthInMsecs();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1857,6 +1970,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setViewPermissions($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::VIEW_PERMISSIONS]))
+			$this->oldColumnsValues[kshowPeer::VIEW_PERMISSIONS] = $this->getViewPermissions();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1877,6 +1993,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setViewPassword($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::VIEW_PASSWORD]))
+			$this->oldColumnsValues[kshowPeer::VIEW_PASSWORD] = $this->getViewPassword();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1897,6 +2016,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setContribPermissions($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::CONTRIB_PERMISSIONS]))
+			$this->oldColumnsValues[kshowPeer::CONTRIB_PERMISSIONS] = $this->getContribPermissions();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1917,6 +2039,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setContribPassword($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::CONTRIB_PASSWORD]))
+			$this->oldColumnsValues[kshowPeer::CONTRIB_PASSWORD] = $this->getContribPassword();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1937,6 +2062,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setEditPermissions($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::EDIT_PERMISSIONS]))
+			$this->oldColumnsValues[kshowPeer::EDIT_PERMISSIONS] = $this->getEditPermissions();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1957,6 +2085,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setEditPassword($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::EDIT_PASSWORD]))
+			$this->oldColumnsValues[kshowPeer::EDIT_PASSWORD] = $this->getEditPassword();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1977,6 +2108,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSalt($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SALT]))
+			$this->oldColumnsValues[kshowPeer::SALT] = $this->getSalt();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2095,6 +2229,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::PARTNER_ID]))
+			$this->oldColumnsValues[kshowPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -2115,6 +2252,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setDisplayInSearch($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::DISPLAY_IN_SEARCH]))
+			$this->oldColumnsValues[kshowPeer::DISPLAY_IN_SEARCH] = $this->getDisplayInSearch();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -2135,6 +2275,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SUBP_ID]))
+			$this->oldColumnsValues[kshowPeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -2155,6 +2298,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setSearchText($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::SEARCH_TEXT]))
+			$this->oldColumnsValues[kshowPeer::SEARCH_TEXT] = $this->getSearchText();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2175,6 +2321,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setPermissions($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::PERMISSIONS]))
+			$this->oldColumnsValues[kshowPeer::PERMISSIONS] = $this->getPermissions();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2195,6 +2344,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setGroupId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::GROUP_ID]))
+			$this->oldColumnsValues[kshowPeer::GROUP_ID] = $this->getGroupId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2215,6 +2367,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setPlays($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::PLAYS]))
+			$this->oldColumnsValues[kshowPeer::PLAYS] = $this->getPlays();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -2235,6 +2390,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerData($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::PARTNER_DATA]))
+			$this->oldColumnsValues[kshowPeer::PARTNER_DATA] = $this->getPartnerData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2255,6 +2413,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function setIntId($v)
 	{
+		if(!isset($this->oldColumnsValues[kshowPeer::INT_ID]))
+			$this->oldColumnsValues[kshowPeer::INT_ID] = $this->getIntId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -2702,6 +2863,18 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -5486,15 +5659,55 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 			$this->akuser = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -5503,6 +5716,10 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -5510,18 +5727,33 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -5531,6 +5763,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -5538,6 +5773,7 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // Basekshow

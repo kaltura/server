@@ -134,6 +134,20 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -361,6 +375,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::ID]))
+			$this->oldColumnsValues[conversionPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -381,6 +398,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::ENTRY_ID]))
+			$this->oldColumnsValues[conversionPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -405,6 +425,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setInFileName($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::IN_FILE_NAME]))
+			$this->oldColumnsValues[conversionPeer::IN_FILE_NAME] = $this->getInFileName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -425,6 +448,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setInFileExt($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::IN_FILE_EXT]))
+			$this->oldColumnsValues[conversionPeer::IN_FILE_EXT] = $this->getInFileExt();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -445,6 +471,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setInFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::IN_FILE_SIZE]))
+			$this->oldColumnsValues[conversionPeer::IN_FILE_SIZE] = $this->getInFileSize();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -465,6 +494,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setSource($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::SOURCE]))
+			$this->oldColumnsValues[conversionPeer::SOURCE] = $this->getSource();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -485,6 +517,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::STATUS]))
+			$this->oldColumnsValues[conversionPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -505,6 +540,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setConversionParams($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::CONVERSION_PARAMS]))
+			$this->oldColumnsValues[conversionPeer::CONVERSION_PARAMS] = $this->getConversionParams();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -525,6 +563,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setOutFileName($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::OUT_FILE_NAME]))
+			$this->oldColumnsValues[conversionPeer::OUT_FILE_NAME] = $this->getOutFileName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -545,6 +586,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setOutFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::OUT_FILE_SIZE]))
+			$this->oldColumnsValues[conversionPeer::OUT_FILE_SIZE] = $this->getOutFileSize();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -565,6 +609,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setOutFileName2($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::OUT_FILE_NAME_2]))
+			$this->oldColumnsValues[conversionPeer::OUT_FILE_NAME_2] = $this->getOutFileName2();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -585,6 +632,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setOutFileSize2($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::OUT_FILE_SIZE_2]))
+			$this->oldColumnsValues[conversionPeer::OUT_FILE_SIZE_2] = $this->getOutFileSize2();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -605,6 +655,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setConversionTime($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::CONVERSION_TIME]))
+			$this->oldColumnsValues[conversionPeer::CONVERSION_TIME] = $this->getConversionTime();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -625,6 +678,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 	 */
 	public function setTotalProcessTime($v)
 	{
+		if(!isset($this->oldColumnsValues[conversionPeer::TOTAL_PROCESS_TIME]))
+			$this->oldColumnsValues[conversionPeer::TOTAL_PROCESS_TIME] = $this->getTotalProcessTime();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1006,6 +1062,16 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

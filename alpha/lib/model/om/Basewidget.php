@@ -138,6 +138,20 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     string
@@ -355,6 +369,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::ID]))
+			$this->oldColumnsValues[widgetPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -375,6 +392,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setIntId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::INT_ID]))
+			$this->oldColumnsValues[widgetPeer::INT_ID] = $this->getIntId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -395,6 +415,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setSourceWidgetId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::SOURCE_WIDGET_ID]))
+			$this->oldColumnsValues[widgetPeer::SOURCE_WIDGET_ID] = $this->getSourceWidgetId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -415,6 +438,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setRootWidgetId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::ROOT_WIDGET_ID]))
+			$this->oldColumnsValues[widgetPeer::ROOT_WIDGET_ID] = $this->getRootWidgetId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -435,6 +461,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::PARTNER_ID]))
+			$this->oldColumnsValues[widgetPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -455,6 +484,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::SUBP_ID]))
+			$this->oldColumnsValues[widgetPeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -475,6 +507,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setKshowId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::KSHOW_ID]))
+			$this->oldColumnsValues[widgetPeer::KSHOW_ID] = $this->getKshowId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -499,6 +534,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::ENTRY_ID]))
+			$this->oldColumnsValues[widgetPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -523,6 +561,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setUiConfId($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::UI_CONF_ID]))
+			$this->oldColumnsValues[widgetPeer::UI_CONF_ID] = $this->getUiConfId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -567,6 +608,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setSecurityType($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::SECURITY_TYPE]))
+			$this->oldColumnsValues[widgetPeer::SECURITY_TYPE] = $this->getSecurityType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -587,6 +631,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setSecurityPolicy($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::SECURITY_POLICY]))
+			$this->oldColumnsValues[widgetPeer::SECURITY_POLICY] = $this->getSecurityPolicy();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -705,6 +752,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerData($v)
 	{
+		if(!isset($this->oldColumnsValues[widgetPeer::PARTNER_DATA]))
+			$this->oldColumnsValues[widgetPeer::PARTNER_DATA] = $this->getPartnerData();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1004,6 +1054,18 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -1703,15 +1765,55 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			$this->auiConf = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -1720,6 +1822,10 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -1727,18 +1833,33 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -1748,6 +1869,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -1755,6 +1879,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // Basewidget

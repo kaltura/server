@@ -90,6 +90,20 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -208,6 +222,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::ID]))
+			$this->oldColumnsValues[SphinxLogPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -228,6 +245,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::ENTRY_ID]))
+			$this->oldColumnsValues[SphinxLogPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -252,6 +272,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::PARTNER_ID]))
+			$this->oldColumnsValues[SphinxLogPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -276,6 +299,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setDc($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::DC]))
+			$this->oldColumnsValues[SphinxLogPeer::DC] = $this->getDc();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -296,6 +322,9 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	 */
 	public function setSql($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogPeer::SQL]))
+			$this->oldColumnsValues[SphinxLogPeer::SQL] = $this->getSql();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -644,6 +673,16 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

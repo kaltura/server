@@ -141,6 +141,20 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -388,6 +402,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -457,6 +474,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setCreatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY] = $this->getCreatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -526,6 +546,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setUpdatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::UPDATED_BY]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::UPDATED_BY] = $this->getUpdatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -546,6 +569,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setCreatedById($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY_ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY_ID] = $this->getCreatedById();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -566,6 +592,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setSchedulerId($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_ID] = $this->getSchedulerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -586,6 +615,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setSchedulerConfiguredId($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID] = $this->getSchedulerConfiguredId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -606,6 +638,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setWorkerId($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_ID] = $this->getWorkerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -626,6 +661,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setWorkerConfiguredId($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_CONFIGURED_ID]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_CONFIGURED_ID] = $this->getWorkerConfiguredId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -646,6 +684,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setWorkerName($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_NAME]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_NAME] = $this->getWorkerName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -666,6 +707,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setBatchIndex($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::BATCH_INDEX]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::BATCH_INDEX] = $this->getBatchIndex();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -686,6 +730,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::TYPE]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -706,6 +753,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setTargetType($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::TARGET_TYPE]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::TARGET_TYPE] = $this->getTargetType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -726,6 +776,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::STATUS]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -746,6 +799,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setCause($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CAUSE]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::CAUSE] = $this->getCause();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -766,6 +822,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::DESCRIPTION]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -786,6 +845,9 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function setErrorDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::ERROR_DESCRIPTION]))
+			$this->oldColumnsValues[ControlPanelCommandPeer::ERROR_DESCRIPTION] = $this->getErrorDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1055,6 +1117,16 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

@@ -97,6 +97,20 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -265,6 +279,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::ID]))
+			$this->oldColumnsValues[PuserRolePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -285,6 +302,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setKshowId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::KSHOW_ID]))
+			$this->oldColumnsValues[PuserRolePeer::KSHOW_ID] = $this->getKshowId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -309,6 +329,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::PARTNER_ID]))
+			$this->oldColumnsValues[PuserRolePeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -333,6 +356,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setPuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::PUSER_ID]))
+			$this->oldColumnsValues[PuserRolePeer::PUSER_ID] = $this->getPuserId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -357,6 +383,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setRole($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::ROLE]))
+			$this->oldColumnsValues[PuserRolePeer::ROLE] = $this->getRole();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -475,6 +504,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserRolePeer::SUBP_ID]))
+			$this->oldColumnsValues[PuserRolePeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -776,6 +808,16 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

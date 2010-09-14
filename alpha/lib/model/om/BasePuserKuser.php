@@ -119,6 +119,20 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -307,6 +321,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::ID]))
+			$this->oldColumnsValues[PuserKuserPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -327,6 +344,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::PARTNER_ID]))
+			$this->oldColumnsValues[PuserKuserPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -347,6 +367,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setPuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::PUSER_ID]))
+			$this->oldColumnsValues[PuserKuserPeer::PUSER_ID] = $this->getPuserId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -367,6 +390,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::KUSER_ID]))
+			$this->oldColumnsValues[PuserKuserPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -391,6 +417,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setPuserName($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::PUSER_NAME]))
+			$this->oldColumnsValues[PuserKuserPeer::PUSER_NAME] = $this->getPuserName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -529,6 +558,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setContext($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::CONTEXT]))
+			$this->oldColumnsValues[PuserKuserPeer::CONTEXT] = $this->getContext();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -549,6 +581,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[PuserKuserPeer::SUBP_ID]))
+			$this->oldColumnsValues[PuserKuserPeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -852,6 +887,18 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -1834,15 +1881,55 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 			$this->akuser = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -1851,6 +1938,10 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -1858,18 +1949,33 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -1879,6 +1985,9 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -1886,6 +1995,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // BasePuserKuser

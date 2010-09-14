@@ -39,6 +39,20 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [email] column value.
 	 * 
 	 * @return     string
@@ -56,6 +70,9 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 	 */
 	public function setEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[blockedEmailPeer::EMAIL]))
+			$this->oldColumnsValues[blockedEmailPeer::EMAIL] = $this->getEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -303,6 +320,16 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

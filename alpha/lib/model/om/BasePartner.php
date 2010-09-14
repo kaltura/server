@@ -322,6 +322,20 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -837,6 +851,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ID]))
+			$this->oldColumnsValues[PartnerPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -857,6 +874,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerName($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PARTNER_NAME]))
+			$this->oldColumnsValues[PartnerPeer::PARTNER_NAME] = $this->getPartnerName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -877,6 +897,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerAlias($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PARTNER_ALIAS]))
+			$this->oldColumnsValues[PartnerPeer::PARTNER_ALIAS] = $this->getPartnerAlias();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -897,6 +920,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setUrl1($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::URL1]))
+			$this->oldColumnsValues[PartnerPeer::URL1] = $this->getUrl1();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -917,6 +943,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setUrl2($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::URL2]))
+			$this->oldColumnsValues[PartnerPeer::URL2] = $this->getUrl2();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -937,6 +966,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setSecret($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::SECRET]))
+			$this->oldColumnsValues[PartnerPeer::SECRET] = $this->getSecret();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -957,6 +989,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAdminSecret($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ADMIN_SECRET]))
+			$this->oldColumnsValues[PartnerPeer::ADMIN_SECRET] = $this->getAdminSecret();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -977,6 +1012,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setMaxNumberOfHitsPerDay($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::MAX_NUMBER_OF_HITS_PER_DAY]))
+			$this->oldColumnsValues[PartnerPeer::MAX_NUMBER_OF_HITS_PER_DAY] = $this->getMaxNumberOfHitsPerDay();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -997,6 +1035,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAppearInSearch($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::APPEAR_IN_SEARCH]))
+			$this->oldColumnsValues[PartnerPeer::APPEAR_IN_SEARCH] = $this->getAppearInSearch();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1017,6 +1058,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setDebugLevel($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::DEBUG_LEVEL]))
+			$this->oldColumnsValues[PartnerPeer::DEBUG_LEVEL] = $this->getDebugLevel();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1037,6 +1081,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setInvalidLoginCount($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::INVALID_LOGIN_COUNT]))
+			$this->oldColumnsValues[PartnerPeer::INVALID_LOGIN_COUNT] = $this->getInvalidLoginCount();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1155,6 +1202,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAnonymousKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ANONYMOUS_KUSER_ID]))
+			$this->oldColumnsValues[PartnerPeer::ANONYMOUS_KUSER_ID] = $this->getAnonymousKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1179,6 +1229,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setKsMaxExpiryInSeconds($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::KS_MAX_EXPIRY_IN_SECONDS]))
+			$this->oldColumnsValues[PartnerPeer::KS_MAX_EXPIRY_IN_SECONDS] = $this->getKsMaxExpiryInSeconds();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1199,6 +1252,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setCreateUserOnDemand($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::CREATE_USER_ON_DEMAND]))
+			$this->oldColumnsValues[PartnerPeer::CREATE_USER_ON_DEMAND] = $this->getCreateUserOnDemand();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1219,6 +1275,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPrefix($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PREFIX]))
+			$this->oldColumnsValues[PartnerPeer::PREFIX] = $this->getPrefix();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1239,6 +1298,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAdminName($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ADMIN_NAME]))
+			$this->oldColumnsValues[PartnerPeer::ADMIN_NAME] = $this->getAdminName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1259,6 +1321,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAdminEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ADMIN_EMAIL]))
+			$this->oldColumnsValues[PartnerPeer::ADMIN_EMAIL] = $this->getAdminEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1279,6 +1344,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::DESCRIPTION]))
+			$this->oldColumnsValues[PartnerPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1299,6 +1367,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setCommercialUse($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::COMMERCIAL_USE]))
+			$this->oldColumnsValues[PartnerPeer::COMMERCIAL_USE] = $this->getCommercialUse();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1319,6 +1390,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setModerateContent($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::MODERATE_CONTENT]))
+			$this->oldColumnsValues[PartnerPeer::MODERATE_CONTENT] = $this->getModerateContent();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1339,6 +1413,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setNotify($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::NOTIFY]))
+			$this->oldColumnsValues[PartnerPeer::NOTIFY] = $this->getNotify();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1379,6 +1456,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setServiceConfigId($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::SERVICE_CONFIG_ID]))
+			$this->oldColumnsValues[PartnerPeer::SERVICE_CONFIG_ID] = $this->getServiceConfigId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1399,6 +1479,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::STATUS]))
+			$this->oldColumnsValues[PartnerPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1419,6 +1502,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setContentCategories($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::CONTENT_CATEGORIES]))
+			$this->oldColumnsValues[PartnerPeer::CONTENT_CATEGORIES] = $this->getContentCategories();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1439,6 +1525,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::TYPE]))
+			$this->oldColumnsValues[PartnerPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1459,6 +1548,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPhone($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PHONE]))
+			$this->oldColumnsValues[PartnerPeer::PHONE] = $this->getPhone();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1479,6 +1571,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setDescribeYourself($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::DESCRIBE_YOURSELF]))
+			$this->oldColumnsValues[PartnerPeer::DESCRIBE_YOURSELF] = $this->getDescribeYourself();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1499,6 +1594,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setAdultContent($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::ADULT_CONTENT]))
+			$this->oldColumnsValues[PartnerPeer::ADULT_CONTENT] = $this->getAdultContent();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1519,6 +1617,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerPackage($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PARTNER_PACKAGE]))
+			$this->oldColumnsValues[PartnerPeer::PARTNER_PACKAGE] = $this->getPartnerPackage();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1539,6 +1640,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setUsagePercent($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::USAGE_PERCENT]))
+			$this->oldColumnsValues[PartnerPeer::USAGE_PERCENT] = $this->getUsagePercent();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1559,6 +1663,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setStorageUsage($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::STORAGE_USAGE]))
+			$this->oldColumnsValues[PartnerPeer::STORAGE_USAGE] = $this->getStorageUsage();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1579,6 +1686,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setEightyPercentWarning($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::EIGHTY_PERCENT_WARNING]))
+			$this->oldColumnsValues[PartnerPeer::EIGHTY_PERCENT_WARNING] = $this->getEightyPercentWarning();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1599,6 +1709,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setUsageLimitWarning($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::USAGE_LIMIT_WARNING]))
+			$this->oldColumnsValues[PartnerPeer::USAGE_LIMIT_WARNING] = $this->getUsageLimitWarning();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1619,6 +1732,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setMonitorUsage($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::MONITOR_USAGE]))
+			$this->oldColumnsValues[PartnerPeer::MONITOR_USAGE] = $this->getMonitorUsage();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1639,6 +1755,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPriorityGroupId($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PRIORITY_GROUP_ID]))
+			$this->oldColumnsValues[PartnerPeer::PRIORITY_GROUP_ID] = $this->getPriorityGroupId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1659,6 +1778,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerGroupType($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PARTNER_GROUP_TYPE]))
+			$this->oldColumnsValues[PartnerPeer::PARTNER_GROUP_TYPE] = $this->getPartnerGroupType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1679,6 +1801,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerParentId($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::PARTNER_PARENT_ID]))
+			$this->oldColumnsValues[PartnerPeer::PARTNER_PARENT_ID] = $this->getPartnerParentId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1699,6 +1824,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function setKmcVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[PartnerPeer::KMC_VERSION]))
+			$this->oldColumnsValues[PartnerPeer::KMC_VERSION] = $this->getKmcVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -2101,6 +2229,18 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -3377,15 +3517,55 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$this->akuser = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -3394,6 +3574,10 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -3401,18 +3585,33 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -3422,6 +3621,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -3429,6 +3631,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // BasePartner

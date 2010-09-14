@@ -114,6 +114,20 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -291,6 +305,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::ID]))
+			$this->oldColumnsValues[moderationFlagPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -311,6 +328,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::PARTNER_ID]))
+			$this->oldColumnsValues[moderationFlagPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -331,6 +351,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::KUSER_ID]))
+			$this->oldColumnsValues[moderationFlagPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -355,6 +378,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setObjectType($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[moderationFlagPeer::OBJECT_TYPE] = $this->getObjectType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -375,6 +401,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setFlaggedEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAGGED_ENTRY_ID]))
+			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_ENTRY_ID] = $this->getFlaggedEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -399,6 +428,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setFlaggedKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAGGED_KUSER_ID]))
+			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_KUSER_ID] = $this->getFlaggedKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -423,6 +455,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::STATUS]))
+			$this->oldColumnsValues[moderationFlagPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -541,6 +576,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setComments($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::COMMENTS]))
+			$this->oldColumnsValues[moderationFlagPeer::COMMENTS] = $this->getComments();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -561,6 +599,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	 */
 	public function setFlagType($v)
 	{
+		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAG_TYPE]))
+			$this->oldColumnsValues[moderationFlagPeer::FLAG_TYPE] = $this->getFlagType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -861,6 +902,16 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

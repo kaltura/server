@@ -124,6 +124,20 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -362,6 +376,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ID]))
+			$this->oldColumnsValues[ConversionProfilePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -382,6 +399,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PARTNER_ID]))
+			$this->oldColumnsValues[ConversionProfilePeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -402,6 +422,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setEnabled($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ENABLED]))
+			$this->oldColumnsValues[ConversionProfilePeer::ENABLED] = $this->getEnabled();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -422,6 +445,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::NAME]))
+			$this->oldColumnsValues[ConversionProfilePeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -442,6 +468,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setProfileType($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE]))
+			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE] = $this->getProfileType();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -462,6 +491,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setCommercialTranscoder($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::COMMERCIAL_TRANSCODER]))
+			$this->oldColumnsValues[ConversionProfilePeer::COMMERCIAL_TRANSCODER] = $this->getCommercialTranscoder();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -482,6 +514,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setWidth($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::WIDTH]))
+			$this->oldColumnsValues[ConversionProfilePeer::WIDTH] = $this->getWidth();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -502,6 +537,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setHeight($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::HEIGHT]))
+			$this->oldColumnsValues[ConversionProfilePeer::HEIGHT] = $this->getHeight();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -522,6 +560,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setAspectRatio($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ASPECT_RATIO]))
+			$this->oldColumnsValues[ConversionProfilePeer::ASPECT_RATIO] = $this->getAspectRatio();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -542,6 +583,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setBypassFlv($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::BYPASS_FLV]))
+			$this->oldColumnsValues[ConversionProfilePeer::BYPASS_FLV] = $this->getBypassFlv();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -562,6 +606,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setUseWithBulk($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::USE_WITH_BULK]))
+			$this->oldColumnsValues[ConversionProfilePeer::USE_WITH_BULK] = $this->getUseWithBulk();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -680,6 +727,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setProfileTypeSuffix($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE_SUFFIX]))
+			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE_SUFFIX] = $this->getProfileTypeSuffix();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -700,6 +750,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	 */
 	public function setConversionProfile2Id($v)
 	{
+		if(!isset($this->oldColumnsValues[ConversionProfilePeer::CONVERSION_PROFILE_2_ID]))
+			$this->oldColumnsValues[ConversionProfilePeer::CONVERSION_PROFILE_2_ID] = $this->getConversionProfile2Id();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -970,6 +1023,16 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

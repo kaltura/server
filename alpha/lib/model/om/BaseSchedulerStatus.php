@@ -105,6 +105,20 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -292,6 +306,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::ID]))
+			$this->oldColumnsValues[SchedulerStatusPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -361,6 +378,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setCreatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::CREATED_BY]))
+			$this->oldColumnsValues[SchedulerStatusPeer::CREATED_BY] = $this->getCreatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -430,6 +450,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setUpdatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::UPDATED_BY]))
+			$this->oldColumnsValues[SchedulerStatusPeer::UPDATED_BY] = $this->getUpdatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -450,6 +473,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setSchedulerId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_ID]))
+			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_ID] = $this->getSchedulerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -470,6 +496,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setSchedulerConfiguredId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_CONFIGURED_ID]))
+			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_CONFIGURED_ID] = $this->getSchedulerConfiguredId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -490,6 +519,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setWorkerId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_ID]))
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_ID] = $this->getWorkerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -510,6 +542,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setWorkerConfiguredId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_CONFIGURED_ID]))
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_CONFIGURED_ID] = $this->getWorkerConfiguredId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -530,6 +565,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setWorkerType($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_TYPE]))
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_TYPE] = $this->getWorkerType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -550,6 +588,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::TYPE]))
+			$this->oldColumnsValues[SchedulerStatusPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -570,6 +611,9 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	 */
 	public function setValue($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::VALUE]))
+			$this->oldColumnsValues[SchedulerStatusPeer::VALUE] = $this->getValue();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -833,6 +877,16 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

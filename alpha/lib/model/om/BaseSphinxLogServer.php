@@ -74,6 +74,20 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -201,6 +215,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::ID]))
+			$this->oldColumnsValues[SphinxLogServerPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -221,6 +238,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function setServer($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::SERVER]))
+			$this->oldColumnsValues[SphinxLogServerPeer::SERVER] = $this->getServer();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -241,6 +261,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function setDc($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::DC]))
+			$this->oldColumnsValues[SphinxLogServerPeer::DC] = $this->getDc();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -261,6 +284,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function setLastLogId($v)
 	{
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::LAST_LOG_ID]))
+			$this->oldColumnsValues[SphinxLogServerPeer::LAST_LOG_ID] = $this->getLastLogId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -636,6 +662,16 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

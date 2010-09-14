@@ -117,6 +117,20 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -335,6 +349,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::ID]))
+			$this->oldColumnsValues[UploadTokenPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -355,6 +372,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setIntId($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::INT_ID]))
+			$this->oldColumnsValues[UploadTokenPeer::INT_ID] = $this->getIntId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -375,6 +395,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::PARTNER_ID]))
+			$this->oldColumnsValues[UploadTokenPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -395,6 +418,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::KUSER_ID]))
+			$this->oldColumnsValues[UploadTokenPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -419,6 +445,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::STATUS]))
+			$this->oldColumnsValues[UploadTokenPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -439,6 +468,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setFileName($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::FILE_NAME]))
+			$this->oldColumnsValues[UploadTokenPeer::FILE_NAME] = $this->getFileName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -459,6 +491,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::FILE_SIZE]))
+			$this->oldColumnsValues[UploadTokenPeer::FILE_SIZE] = $this->getFileSize();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -479,6 +514,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setUploadedFileSize($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::UPLOADED_FILE_SIZE]))
+			$this->oldColumnsValues[UploadTokenPeer::UPLOADED_FILE_SIZE] = $this->getUploadedFileSize();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -499,6 +537,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setUploadTempPath($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::UPLOAD_TEMP_PATH]))
+			$this->oldColumnsValues[UploadTokenPeer::UPLOAD_TEMP_PATH] = $this->getUploadTempPath();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -519,6 +560,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setUserIp($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::USER_IP]))
+			$this->oldColumnsValues[UploadTokenPeer::USER_IP] = $this->getUserIp();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -637,6 +681,9 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	 */
 	public function setDc($v)
 	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::DC]))
+			$this->oldColumnsValues[UploadTokenPeer::DC] = $this->getDc();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -916,6 +963,16 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

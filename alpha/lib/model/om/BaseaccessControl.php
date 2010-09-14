@@ -135,6 +135,20 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -404,6 +418,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::ID]))
+			$this->oldColumnsValues[accessControlPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -424,6 +441,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::PARTNER_ID]))
+			$this->oldColumnsValues[accessControlPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -444,6 +464,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::NAME]))
+			$this->oldColumnsValues[accessControlPeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -464,6 +487,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::DESCRIPTION]))
+			$this->oldColumnsValues[accessControlPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -583,6 +609,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setDeletedAt($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::DELETED_AT]))
+			$this->oldColumnsValues[accessControlPeer::DELETED_AT] = $this->getDeletedAt();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -631,6 +660,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setSiteRestrictType($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::SITE_RESTRICT_TYPE]))
+			$this->oldColumnsValues[accessControlPeer::SITE_RESTRICT_TYPE] = $this->getSiteRestrictType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -651,6 +683,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setSiteRestrictList($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::SITE_RESTRICT_LIST]))
+			$this->oldColumnsValues[accessControlPeer::SITE_RESTRICT_LIST] = $this->getSiteRestrictList();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -671,6 +706,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setCountryRestrictType($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::COUNTRY_RESTRICT_TYPE]))
+			$this->oldColumnsValues[accessControlPeer::COUNTRY_RESTRICT_TYPE] = $this->getCountryRestrictType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -691,6 +729,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setCountryRestrictList($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::COUNTRY_RESTRICT_LIST]))
+			$this->oldColumnsValues[accessControlPeer::COUNTRY_RESTRICT_LIST] = $this->getCountryRestrictList();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -711,6 +752,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setKsRestrictPrivilege($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::KS_RESTRICT_PRIVILEGE]))
+			$this->oldColumnsValues[accessControlPeer::KS_RESTRICT_PRIVILEGE] = $this->getKsRestrictPrivilege();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -731,6 +775,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setPrvRestrictPrivilege($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::PRV_RESTRICT_PRIVILEGE]))
+			$this->oldColumnsValues[accessControlPeer::PRV_RESTRICT_PRIVILEGE] = $this->getPrvRestrictPrivilege();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -751,6 +798,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setPrvRestrictLength($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::PRV_RESTRICT_LENGTH]))
+			$this->oldColumnsValues[accessControlPeer::PRV_RESTRICT_LENGTH] = $this->getPrvRestrictLength();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -771,6 +821,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function setKdirRestrictType($v)
 	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::KDIR_RESTRICT_TYPE]))
+			$this->oldColumnsValues[accessControlPeer::KDIR_RESTRICT_TYPE] = $this->getKdirRestrictType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1056,6 +1109,16 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

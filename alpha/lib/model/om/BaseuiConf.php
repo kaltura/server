@@ -169,6 +169,20 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -446,6 +460,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::ID]))
+			$this->oldColumnsValues[uiConfPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -466,6 +483,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setObjType($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::OBJ_TYPE]))
+			$this->oldColumnsValues[uiConfPeer::OBJ_TYPE] = $this->getObjType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -486,6 +506,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::PARTNER_ID]))
+			$this->oldColumnsValues[uiConfPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -506,6 +529,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setSubpId($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::SUBP_ID]))
+			$this->oldColumnsValues[uiConfPeer::SUBP_ID] = $this->getSubpId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -526,6 +552,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setConfFilePath($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::CONF_FILE_PATH]))
+			$this->oldColumnsValues[uiConfPeer::CONF_FILE_PATH] = $this->getConfFilePath();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -546,6 +575,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::NAME]))
+			$this->oldColumnsValues[uiConfPeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -566,6 +598,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setWidth($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::WIDTH]))
+			$this->oldColumnsValues[uiConfPeer::WIDTH] = $this->getWidth();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -586,6 +621,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setHeight($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::HEIGHT]))
+			$this->oldColumnsValues[uiConfPeer::HEIGHT] = $this->getHeight();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -606,6 +644,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setHtmlParams($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::HTML_PARAMS]))
+			$this->oldColumnsValues[uiConfPeer::HTML_PARAMS] = $this->getHtmlParams();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -626,6 +667,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setSwfUrl($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::SWF_URL]))
+			$this->oldColumnsValues[uiConfPeer::SWF_URL] = $this->getSwfUrl();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -744,6 +788,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setConfVars($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::CONF_VARS]))
+			$this->oldColumnsValues[uiConfPeer::CONF_VARS] = $this->getConfVars();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -764,6 +811,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setUseCdn($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::USE_CDN]))
+			$this->oldColumnsValues[uiConfPeer::USE_CDN] = $this->getUseCdn();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -784,6 +834,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setTags($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::TAGS]))
+			$this->oldColumnsValues[uiConfPeer::TAGS] = $this->getTags();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -824,6 +877,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::STATUS]))
+			$this->oldColumnsValues[uiConfPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -844,6 +900,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::DESCRIPTION]))
+			$this->oldColumnsValues[uiConfPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -864,6 +923,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setDisplayInSearch($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::DISPLAY_IN_SEARCH]))
+			$this->oldColumnsValues[uiConfPeer::DISPLAY_IN_SEARCH] = $this->getDisplayInSearch();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -884,6 +946,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setCreationMode($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::CREATION_MODE]))
+			$this->oldColumnsValues[uiConfPeer::CREATION_MODE] = $this->getCreationMode();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -904,6 +969,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	 */
 	public function setVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::VERSION]))
+			$this->oldColumnsValues[uiConfPeer::VERSION] = $this->getVersion();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1187,6 +1255,18 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		$this->setCustomDataObj();
+    	
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -2054,15 +2134,55 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		$this->collwidgets = null;
 	}
 
-/* ---------------------- CustomData functions ------------------------- */
-	private $m_custom_data = null;
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
 	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function putInCustomData ( $name , $value , $namespace = null )
 	{
 		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
 		$customData->put ( $name , $value , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
 	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
 	{
 		$customData = $this->getCustomDataObj( );
@@ -2071,6 +2191,10 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		return $res;
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
 	public function removeFromCustomData ( $name , $namespace = null)
 	{
 
@@ -2078,18 +2202,33 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		return $customData->remove ( $name , $namespace );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function incInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj( );
 		return $customData->inc ( $name , $delta , $namespace  );
 	}
 
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
 	public function decInCustomData ( $name , $delta = 1, $namespace = null)
 	{
 		$customData = $this->getCustomDataObj(  );
 		return $customData->dec ( $name , $delta , $namespace );
 	}
 
+	/**
+	 * @return myCustomData
+	 */
 	public function getCustomDataObj( )
 	{
 		if ( ! $this->m_custom_data )
@@ -2099,6 +2238,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		return $this->m_custom_data;
 	}
 	
+	/**
+	 * Must be called before saving the object
+	 */
 	public function setCustomDataObj()
 	{
 		if ( $this->m_custom_data != null )
@@ -2106,6 +2248,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$this->setCustomData( $this->m_custom_data->toString() );
 		}
 	}
-/* ---------------------- CustomData functions ------------------------- */
+	
+	/* ---------------------- CustomData functions ------------------------- */
 	
 } // BaseuiConf

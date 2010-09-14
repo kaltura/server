@@ -102,6 +102,20 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -259,6 +273,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::ID]))
+			$this->oldColumnsValues[roughcutEntryPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -279,6 +296,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setRoughcutId($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_ID]))
+			$this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_ID] = $this->getRoughcutId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -303,6 +323,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setRoughcutVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_VERSION]))
+			$this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_VERSION] = $this->getRoughcutVersion();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -323,6 +346,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setRoughcutKshowId($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_KSHOW_ID]))
+			$this->oldColumnsValues[roughcutEntryPeer::ROUGHCUT_KSHOW_ID] = $this->getRoughcutKshowId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -347,6 +373,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setEntryId($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::ENTRY_ID]))
+			$this->oldColumnsValues[roughcutEntryPeer::ENTRY_ID] = $this->getEntryId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -371,6 +400,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::PARTNER_ID]))
+			$this->oldColumnsValues[roughcutEntryPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -391,6 +423,9 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 	 */
 	public function setOpType($v)
 	{
+		if(!isset($this->oldColumnsValues[roughcutEntryPeer::OP_TYPE]))
+			$this->oldColumnsValues[roughcutEntryPeer::OP_TYPE] = $this->getOpType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -787,6 +822,16 @@ abstract class BaseroughcutEntry extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

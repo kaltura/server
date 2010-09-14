@@ -189,6 +189,20 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -587,6 +601,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::ID]))
+			$this->oldColumnsValues[MailJobPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -607,6 +624,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setMailType($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::MAIL_TYPE]))
+			$this->oldColumnsValues[MailJobPeer::MAIL_TYPE] = $this->getMailType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -627,6 +647,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setMailPriority($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::MAIL_PRIORITY]))
+			$this->oldColumnsValues[MailJobPeer::MAIL_PRIORITY] = $this->getMailPriority();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -647,6 +670,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setRecipientName($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::RECIPIENT_NAME]))
+			$this->oldColumnsValues[MailJobPeer::RECIPIENT_NAME] = $this->getRecipientName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -667,6 +693,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setRecipientEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::RECIPIENT_EMAIL]))
+			$this->oldColumnsValues[MailJobPeer::RECIPIENT_EMAIL] = $this->getRecipientEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -687,6 +716,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setRecipientId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::RECIPIENT_ID]))
+			$this->oldColumnsValues[MailJobPeer::RECIPIENT_ID] = $this->getRecipientId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -711,6 +743,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setFromName($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::FROM_NAME]))
+			$this->oldColumnsValues[MailJobPeer::FROM_NAME] = $this->getFromName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -731,6 +766,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setFromEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::FROM_EMAIL]))
+			$this->oldColumnsValues[MailJobPeer::FROM_EMAIL] = $this->getFromEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -751,6 +789,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setBodyParams($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::BODY_PARAMS]))
+			$this->oldColumnsValues[MailJobPeer::BODY_PARAMS] = $this->getBodyParams();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -771,6 +812,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setSubjectParams($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::SUBJECT_PARAMS]))
+			$this->oldColumnsValues[MailJobPeer::SUBJECT_PARAMS] = $this->getSubjectParams();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -791,6 +835,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setTemplatePath($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::TEMPLATE_PATH]))
+			$this->oldColumnsValues[MailJobPeer::TEMPLATE_PATH] = $this->getTemplatePath();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -811,6 +858,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setCulture($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::CULTURE]))
+			$this->oldColumnsValues[MailJobPeer::CULTURE] = $this->getCulture();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -831,6 +881,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::STATUS]))
+			$this->oldColumnsValues[MailJobPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -900,6 +953,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setCampaignId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::CAMPAIGN_ID]))
+			$this->oldColumnsValues[MailJobPeer::CAMPAIGN_ID] = $this->getCampaignId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -921,6 +977,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setMinSendDate($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::MIN_SEND_DATE]))
+			$this->oldColumnsValues[MailJobPeer::MIN_SEND_DATE] = $this->getMinSendDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -969,6 +1028,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setSchedulerId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::SCHEDULER_ID]))
+			$this->oldColumnsValues[MailJobPeer::SCHEDULER_ID] = $this->getSchedulerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -989,6 +1051,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setWorkerId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::WORKER_ID]))
+			$this->oldColumnsValues[MailJobPeer::WORKER_ID] = $this->getWorkerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1009,6 +1074,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setBatchIndex($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::BATCH_INDEX]))
+			$this->oldColumnsValues[MailJobPeer::BATCH_INDEX] = $this->getBatchIndex();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1030,6 +1098,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setProcessorExpiration($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::PROCESSOR_EXPIRATION]))
+			$this->oldColumnsValues[MailJobPeer::PROCESSOR_EXPIRATION] = $this->getProcessorExpiration();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -1078,6 +1149,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setExecutionAttempts($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::EXECUTION_ATTEMPTS]))
+			$this->oldColumnsValues[MailJobPeer::EXECUTION_ATTEMPTS] = $this->getExecutionAttempts();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1098,6 +1172,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setLockVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::LOCK_VERSION]))
+			$this->oldColumnsValues[MailJobPeer::LOCK_VERSION] = $this->getLockVersion();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1118,6 +1195,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::PARTNER_ID]))
+			$this->oldColumnsValues[MailJobPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -1187,6 +1267,9 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 	 */
 	public function setDc($v)
 	{
+		if(!isset($this->oldColumnsValues[MailJobPeer::DC]))
+			$this->oldColumnsValues[MailJobPeer::DC] = $this->getDc();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1483,6 +1566,16 @@ abstract class BaseMailJob extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

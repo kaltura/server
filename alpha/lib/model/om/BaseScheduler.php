@@ -103,6 +103,20 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -334,6 +348,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::ID]))
+			$this->oldColumnsValues[SchedulerPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -403,6 +420,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setCreatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::CREATED_BY]))
+			$this->oldColumnsValues[SchedulerPeer::CREATED_BY] = $this->getCreatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -472,6 +492,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setUpdatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::UPDATED_BY]))
+			$this->oldColumnsValues[SchedulerPeer::UPDATED_BY] = $this->getUpdatedBy();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -492,6 +515,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setConfiguredId($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::CONFIGURED_ID]))
+			$this->oldColumnsValues[SchedulerPeer::CONFIGURED_ID] = $this->getConfiguredId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -512,6 +538,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::NAME]))
+			$this->oldColumnsValues[SchedulerPeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -532,6 +561,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setDescription($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::DESCRIPTION]))
+			$this->oldColumnsValues[SchedulerPeer::DESCRIPTION] = $this->getDescription();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -552,6 +584,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setStatuses($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::STATUSES]))
+			$this->oldColumnsValues[SchedulerPeer::STATUSES] = $this->getStatuses();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -573,6 +608,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setLastStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::LAST_STATUS]))
+			$this->oldColumnsValues[SchedulerPeer::LAST_STATUS] = $this->getLastStatus();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -621,6 +659,9 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 	 */
 	public function setHost($v)
 	{
+		if(!isset($this->oldColumnsValues[SchedulerPeer::HOST]))
+			$this->oldColumnsValues[SchedulerPeer::HOST] = $this->getHost();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -899,6 +940,16 @@ abstract class BaseScheduler extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

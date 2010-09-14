@@ -85,6 +85,20 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -222,6 +236,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::ID]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -242,6 +259,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function setConversionProfileId($v)
 	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID] = $this->getConversionProfileId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -266,6 +286,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function setFlavorParamsId($v)
 	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID] = $this->getFlavorParamsId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -290,6 +313,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function setReadyBehavior($v)
 	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::READY_BEHAVIOR]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::READY_BEHAVIOR] = $this->getReadyBehavior();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -310,6 +336,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function setForceNoneComplied($v)
 	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED] = $this->getForceNoneComplied();
+
 		if ($v !== null) {
 			$v = (boolean) $v;
 		}
@@ -693,6 +722,16 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

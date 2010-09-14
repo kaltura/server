@@ -118,6 +118,20 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -406,6 +420,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::ID]))
+			$this->oldColumnsValues[SystemUserPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -426,6 +443,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setEmail($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::EMAIL]))
+			$this->oldColumnsValues[SystemUserPeer::EMAIL] = $this->getEmail();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -446,6 +466,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setFirstName($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::FIRST_NAME]))
+			$this->oldColumnsValues[SystemUserPeer::FIRST_NAME] = $this->getFirstName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -466,6 +489,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setLastName($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::LAST_NAME]))
+			$this->oldColumnsValues[SystemUserPeer::LAST_NAME] = $this->getLastName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -486,6 +512,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setSha1Password($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::SHA1_PASSWORD]))
+			$this->oldColumnsValues[SystemUserPeer::SHA1_PASSWORD] = $this->getSha1Password();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -506,6 +535,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setSalt($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::SALT]))
+			$this->oldColumnsValues[SystemUserPeer::SALT] = $this->getSalt();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -526,6 +558,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setCreatedBy($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::CREATED_BY]))
+			$this->oldColumnsValues[SystemUserPeer::CREATED_BY] = $this->getCreatedBy();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -546,6 +581,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::STATUS]))
+			$this->oldColumnsValues[SystemUserPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -566,6 +604,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setIsPrimary($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::IS_PRIMARY]))
+			$this->oldColumnsValues[SystemUserPeer::IS_PRIMARY] = $this->getIsPrimary();
+
 		if ($v !== null) {
 			$v = (boolean) $v;
 		}
@@ -587,6 +628,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setStatusUpdatedAt($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::STATUS_UPDATED_AT]))
+			$this->oldColumnsValues[SystemUserPeer::STATUS_UPDATED_AT] = $this->getStatusUpdatedAt();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -734,6 +778,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setDeletedAt($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::DELETED_AT]))
+			$this->oldColumnsValues[SystemUserPeer::DELETED_AT] = $this->getDeletedAt();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -782,6 +829,9 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 	 */
 	public function setRole($v)
 	{
+		if(!isset($this->oldColumnsValues[SystemUserPeer::ROLE]))
+			$this->oldColumnsValues[SystemUserPeer::ROLE] = $this->getRole();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -1051,6 +1101,16 @@ abstract class BaseSystemUser extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

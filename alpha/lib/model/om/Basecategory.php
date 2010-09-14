@@ -96,6 +96,20 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
 	 * equivalent initialization method).
@@ -316,6 +330,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::ID]))
+			$this->oldColumnsValues[categoryPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -336,6 +353,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setParentId($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PARENT_ID]))
+			$this->oldColumnsValues[categoryPeer::PARENT_ID] = $this->getParentId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -356,6 +376,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setDepth($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::DEPTH]))
+			$this->oldColumnsValues[categoryPeer::DEPTH] = $this->getDepth();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -376,6 +399,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::PARTNER_ID]))
+			$this->oldColumnsValues[categoryPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -396,6 +422,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::NAME]))
+			$this->oldColumnsValues[categoryPeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -416,6 +445,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setFullName($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::FULL_NAME]))
+			$this->oldColumnsValues[categoryPeer::FULL_NAME] = $this->getFullName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -436,6 +468,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setEntriesCount($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::ENTRIES_COUNT]))
+			$this->oldColumnsValues[categoryPeer::ENTRIES_COUNT] = $this->getEntriesCount();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -555,6 +590,9 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	 */
 	public function setDeletedAt($v)
 	{
+		if(!isset($this->oldColumnsValues[categoryPeer::DELETED_AT]))
+			$this->oldColumnsValues[categoryPeer::DELETED_AT] = $this->getDeletedAt();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -856,6 +894,16 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

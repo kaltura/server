@@ -86,6 +86,20 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -233,6 +247,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::ID]))
+			$this->oldColumnsValues[commentPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -253,6 +270,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::KUSER_ID]))
+			$this->oldColumnsValues[commentPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -277,6 +297,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setCommentType($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::COMMENT_TYPE]))
+			$this->oldColumnsValues[commentPeer::COMMENT_TYPE] = $this->getCommentType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -297,6 +320,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setSubjectId($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::SUBJECT_ID]))
+			$this->oldColumnsValues[commentPeer::SUBJECT_ID] = $this->getSubjectId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -318,6 +344,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setBaseDate($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::BASE_DATE]))
+			$this->oldColumnsValues[commentPeer::BASE_DATE] = $this->getBaseDate();
+
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
 		if ($v === null || $v === '') {
@@ -366,6 +395,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setReplyTo($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::REPLY_TO]))
+			$this->oldColumnsValues[commentPeer::REPLY_TO] = $this->getReplyTo();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -386,6 +418,9 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	 */
 	public function setComment($v)
 	{
+		if(!isset($this->oldColumnsValues[commentPeer::COMMENT]))
+			$this->oldColumnsValues[commentPeer::COMMENT] = $this->getComment();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -710,6 +745,16 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

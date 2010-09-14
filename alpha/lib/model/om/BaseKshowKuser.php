@@ -73,6 +73,20 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [kshow_id] column value.
 	 * 
 	 * @return     string
@@ -130,6 +144,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function setKshowId($v)
 	{
+		if(!isset($this->oldColumnsValues[KshowKuserPeer::KSHOW_ID]))
+			$this->oldColumnsValues[KshowKuserPeer::KSHOW_ID] = $this->getKshowId();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -154,6 +171,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function setKuserId($v)
 	{
+		if(!isset($this->oldColumnsValues[KshowKuserPeer::KUSER_ID]))
+			$this->oldColumnsValues[KshowKuserPeer::KUSER_ID] = $this->getKuserId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -178,6 +198,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function setSubscriptionType($v)
 	{
+		if(!isset($this->oldColumnsValues[KshowKuserPeer::SUBSCRIPTION_TYPE]))
+			$this->oldColumnsValues[KshowKuserPeer::SUBSCRIPTION_TYPE] = $this->getSubscriptionType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -198,6 +221,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function setAlertType($v)
 	{
+		if(!isset($this->oldColumnsValues[KshowKuserPeer::ALERT_TYPE]))
+			$this->oldColumnsValues[KshowKuserPeer::ALERT_TYPE] = $this->getAlertType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -218,6 +244,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[KshowKuserPeer::ID]))
+			$this->oldColumnsValues[KshowKuserPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -501,6 +530,16 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
