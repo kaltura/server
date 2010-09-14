@@ -99,6 +99,20 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -276,6 +290,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::ID]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -394,6 +411,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setMetadataProfileId($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_ID]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_ID] = $this->getMetadataProfileId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -414,6 +434,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setMetadataProfileVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_VERSION]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_VERSION] = $this->getMetadataProfileVersion();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -434,6 +457,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::PARTNER_ID]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -454,6 +480,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setLabel($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::LABEL]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::LABEL] = $this->getLabel();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -474,6 +503,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setKey($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::KEY]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::KEY] = $this->getKey();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -494,6 +526,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setType($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::TYPE]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::TYPE] = $this->getType();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -514,6 +549,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setXpath($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::XPATH]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::XPATH] = $this->getXpath();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -534,6 +572,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::STATUS]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -796,6 +837,16 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con

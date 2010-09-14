@@ -87,6 +87,20 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	protected $alreadyInValidation = false;
 
 	/**
+	 * Store columns old values before the changes
+	 * @var        array
+	 */
+	protected $oldColumnsValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getColumnsOldValues()
+	{
+		return $this->oldColumnsValues;
+	}
+
+	/**
 	 * Get the [id] column value.
 	 * 
 	 * @return     int
@@ -244,6 +258,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setId($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::ID]))
+			$this->oldColumnsValues[MetadataProfilePeer::ID] = $this->getId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -362,6 +379,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::VERSION]))
+			$this->oldColumnsValues[MetadataProfilePeer::VERSION] = $this->getVersion();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -382,6 +402,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setViewsVersion($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::VIEWS_VERSION]))
+			$this->oldColumnsValues[MetadataProfilePeer::VIEWS_VERSION] = $this->getViewsVersion();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -402,6 +425,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setPartnerId($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::PARTNER_ID]))
+			$this->oldColumnsValues[MetadataProfilePeer::PARTNER_ID] = $this->getPartnerId();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -422,6 +448,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setName($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::NAME]))
+			$this->oldColumnsValues[MetadataProfilePeer::NAME] = $this->getName();
+
 		if ($v !== null) {
 			$v = (string) $v;
 		}
@@ -442,6 +471,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setStatus($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::STATUS]))
+			$this->oldColumnsValues[MetadataProfilePeer::STATUS] = $this->getStatus();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -462,6 +494,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function setObjectType($v)
 	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[MetadataProfilePeer::OBJECT_TYPE] = $this->getObjectType();
+
 		if ($v !== null) {
 			$v = (int) $v;
 		}
@@ -722,6 +757,16 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		return $affectedRows;
 	} // doSave()
 
+	/**
+	 * Code to be run before persisting the object
+	 * @param PropelPDO $con
+	 * @return bloolean
+	 */
+	public function preSave(PropelPDO $con = null)
+	{
+		return parent::preSave($con);
+	}
+	
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
