@@ -95,6 +95,22 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 		$script .= "
 		return parent::preSave(\$con);
 	}
+
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO \$con
+	 */
+	public function postSave(PropelPDO \$con = null) 
+	{
+		\$this->oldColumnsValues = array();";
+		
+		if($customDataColumn)
+		$script .= "
+		\$this->oldCustomDataValues = array();
+    	";
+		
+		$script .= " 
+	}
 	
 	/**
 	 * Code to be run before inserting to database
