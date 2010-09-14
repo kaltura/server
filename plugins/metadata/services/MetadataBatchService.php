@@ -206,7 +206,7 @@ class MetadataBatchService extends BatchService
 	 * @param int $jobType The type of the job - could be a custom extended type
 	 * @return KalturaMetadataBatchJobArray 
 	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 		return KalturaMetadataBatchJobArray::fromBatchJobArray($jobs);

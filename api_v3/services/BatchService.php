@@ -1386,7 +1386,7 @@ class BatchService extends KalturaBaseService
 	 * @param int $jobType The type of the job - could be a custom extended type
 	 * @return KalturaBatchJobArray 
 	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
@@ -1403,7 +1403,7 @@ class BatchService extends KalturaBaseService
 	 * @param int $jobType The type of the job - could be a custom extended type
 	 * @return KalturaBatchJobArray 
 	 */
-	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobsFilter = new BatchJobFilter();
 		if (!$filter)

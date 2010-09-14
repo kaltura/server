@@ -141,7 +141,7 @@ class FileSyncImportBatchService extends BatchService
 	 * @param int $jobType The type of the job - could be a custom extended type
 	 * @return KalturaFileSyncImportBatchJobArray 
 	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 		return KalturaFileSyncImportBatchJobArray::fromBatchJobArray($jobs);
@@ -160,7 +160,7 @@ class FileSyncImportBatchService extends BatchService
 	 * @param int $jobType The type of the job - could be a custom extended type
 	 * @return KalturaFileSyncImportBatchJobArray 
 	 */
-	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$jobsFilter = new BatchJobFilter();
 		if (!$filter)
