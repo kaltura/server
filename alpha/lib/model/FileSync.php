@@ -92,7 +92,7 @@ class FileSync extends BaseFileSync
 		if($this->isColumnModified(FileSyncPeer::STATUS) && $this->getStatus() == self::FILE_SYNC_STATUS_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 }
 

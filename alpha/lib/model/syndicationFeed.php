@@ -56,6 +56,6 @@ class syndicationFeed extends BasesyndicationFeed
 		if($this->isColumnModified(BasesyndicationFeedPeer::STATUS) && $this->getStatus() == self::SYNDICATION_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 }

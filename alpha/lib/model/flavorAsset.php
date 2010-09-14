@@ -79,7 +79,7 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 		if($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 	
 	public function incrementVersion()

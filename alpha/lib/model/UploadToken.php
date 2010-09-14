@@ -58,7 +58,7 @@ class UploadToken extends BaseUploadToken
 		if($this->isColumnModified(UploadTokenPeer::STATUS) && $this->getStatus() == self::UPLOAD_TOKEN_DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return $this->preUpdate($con);
+		return parent::preUpdate($con);
 	}
 	
 	public function calculateId()
