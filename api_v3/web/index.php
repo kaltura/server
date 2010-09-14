@@ -1,9 +1,7 @@
 <?php
 $start = microtime(true);
 require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
-if (@include_once(dirname(__FILE__).'/../../infra/general/ActKeyUtils.class.php')) {
-	ActKeyUtils::checkCurrent();
-}
+ActKeyUtils::checkCurrent();
 
 // check cache before loading anything
 require_once("../lib/KalturaResponseCacher.php");

@@ -22,8 +22,6 @@ $application = new Zend_Application(
     APPLICATION_ENV,
     APPLICATION_PATH . '/configs/application.ini'
 );
-if (@include_once(dirname(__FILE__).'/../../infra/general/ActKeyUtils.class.php')) {
-	ActKeyUtils::checkCurrent();
-}
+ActKeyUtils::checkCurrent();
 $application->bootstrap()
             ->run();

@@ -196,7 +196,5 @@ DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
 KalturaLog::setLogger(sfContext::getInstance()->getLogger());
-if (@include_once(dirname(__FILE__).'/../../infra/general/ActKeyUtils.class.php')) {
-	ActKeyUtils::checkCurrent();
-}
+ActKeyUtils::checkCurrent();
 sfContext::getInstance()->getController()->dispatch();

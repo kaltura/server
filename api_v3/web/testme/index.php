@@ -14,9 +14,7 @@
 <body>
 	<?php 
 		require_once("../../bootstrap.php");
-		if (@include_once(dirname(__FILE__).'/../../../infra/general/ActKeyUtils.class.php')) {
-			ActKeyUtils::checkCurrent();
-		}
+		ActKeyUtils::checkCurrent();
 		KalturaLog::setContext("TESTME");
 		$serviceMap = KalturaServicesMap::getMap();
 		$serviceIds = array_keys($serviceMap);
