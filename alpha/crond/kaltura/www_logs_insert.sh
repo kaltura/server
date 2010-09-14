@@ -49,35 +49,3 @@ mysql -h${DBSTATS} kaltura_stats -uroot -proot < cookie_res.sql
 
 rm -f cookie_res.sql
 
-# extract collect stats
-
-zcat /data/logs/investigate/??-apache*-access_log-$WHEN.gz |php /opt/kaltura/app/alpha/scripts/analyze_collect_stats.php >collect_res.sql
-
-## cat collect_res.sql | cut -f2 -d"(" | cut -f1 -d")" | tr -d "'" > collect_res.sql.csv
-
-## mysql -h${DB} kaltura -uroot -proot -e "load data local infile 'collect_res.sql.csv' into table collect_stats fields terminated by ',' lines terminated by '\n';"
-
-mysql -h${DBSTATS} kaltura_stats -uroot -proot < collect_res.sql
-
-rm -f collect_res.sql
-
-# update partner_activity
-/opt/kaltura/app/alpha/scripts/update_partner_activity.sh $WHEN2
-
-# update entry views and plays
-SQLDATE=`mysql -h${SLAVEDB} kaltura -ukaltura -pkaltura -s -N -e "select max(created_at) from entry where views>0"`
-echo $SQLDATE
-
-LOGDATE=${SQLDATE// /-}
-LOGDATE=${LOGDATE//:/-}
-
-echo $LOGDATE
-
-# make a backup 
-mysql -h${SLAVEDB} -ukaltura -pkaltura kaltura -e "select id,views,plays from entry" >all_entries-$LOGDATE
-
-mysql -h${DBSTATS} -uroot -proot kaltura_stats -ss -e "select entry_id,sum(command='view'),sum(command='play') from collect_stats where date>'$SQLDATE' and entry_id<>'' group by entry_id;" > inc_entry-$LOGDATE
-
-cat inc_entry-$LOGDATE| awk 'BEGIN {print "#!/bin/bash"} {print "mysql -hpa-db kaltura -proot -e \x27update entry set views=views+\""$2"\",plays=plays+\""$3"\" where id=\""$1"\";\x27"}'>inc-$LOGDATE.sh
-chmod +x inc-$LOGDATE.sh
-./inc-$LOGDATE.sh
