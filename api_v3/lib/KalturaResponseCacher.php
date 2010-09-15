@@ -36,7 +36,8 @@ class KalturaResponseCacher
 			}
 		}
 				
-		if (isset($params['nocache']))
+		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
+		if ($isAdminLogin || isset($params['nocache']))
 		{
 			$this->_useCache = false;
 			return;
