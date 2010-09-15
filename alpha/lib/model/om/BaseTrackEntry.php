@@ -403,7 +403,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::ID]))
-			$this->oldColumnsValues[TrackEntryPeer::ID] = $this->getId();
+			$this->oldColumnsValues[TrackEntryPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -426,7 +426,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setTrackEventTypeId($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_TYPE_ID]))
-			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_TYPE_ID] = $this->getTrackEventTypeId();
+			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_TYPE_ID] = $this->track_event_type_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -449,7 +449,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setPsVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::PS_VERSION]))
-			$this->oldColumnsValues[TrackEntryPeer::PS_VERSION] = $this->getPsVersion();
+			$this->oldColumnsValues[TrackEntryPeer::PS_VERSION] = $this->ps_version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -472,7 +472,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setContext($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::CONTEXT]))
-			$this->oldColumnsValues[TrackEntryPeer::CONTEXT] = $this->getContext();
+			$this->oldColumnsValues[TrackEntryPeer::CONTEXT] = $this->context;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -495,7 +495,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARTNER_ID]))
-			$this->oldColumnsValues[TrackEntryPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[TrackEntryPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -518,7 +518,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::ENTRY_ID]))
-			$this->oldColumnsValues[TrackEntryPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[TrackEntryPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -541,7 +541,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setHostName($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::HOST_NAME]))
-			$this->oldColumnsValues[TrackEntryPeer::HOST_NAME] = $this->getHostName();
+			$this->oldColumnsValues[TrackEntryPeer::HOST_NAME] = $this->host_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -564,7 +564,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setUid($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::UID]))
-			$this->oldColumnsValues[TrackEntryPeer::UID] = $this->getUid();
+			$this->oldColumnsValues[TrackEntryPeer::UID] = $this->uid;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -587,7 +587,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setTrackEventStatusId($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_STATUS_ID]))
-			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_STATUS_ID] = $this->getTrackEventStatusId();
+			$this->oldColumnsValues[TrackEntryPeer::TRACK_EVENT_STATUS_ID] = $this->track_event_status_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -610,7 +610,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setChangedProperties($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::CHANGED_PROPERTIES]))
-			$this->oldColumnsValues[TrackEntryPeer::CHANGED_PROPERTIES] = $this->getChangedProperties();
+			$this->oldColumnsValues[TrackEntryPeer::CHANGED_PROPERTIES] = $this->changed_properties;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -633,7 +633,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setParam1Str($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_1_STR]))
-			$this->oldColumnsValues[TrackEntryPeer::PARAM_1_STR] = $this->getParam1Str();
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_1_STR] = $this->param_1_str;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -656,7 +656,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setParam2Str($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_2_STR]))
-			$this->oldColumnsValues[TrackEntryPeer::PARAM_2_STR] = $this->getParam2Str();
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_2_STR] = $this->param_2_str;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -679,7 +679,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setParam3Str($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::PARAM_3_STR]))
-			$this->oldColumnsValues[TrackEntryPeer::PARAM_3_STR] = $this->getParam3Str();
+			$this->oldColumnsValues[TrackEntryPeer::PARAM_3_STR] = $this->param_3_str;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -702,7 +702,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setKs($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::KS]))
-			$this->oldColumnsValues[TrackEntryPeer::KS] = $this->getKs();
+			$this->oldColumnsValues[TrackEntryPeer::KS] = $this->ks;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -725,7 +725,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::DESCRIPTION]))
-			$this->oldColumnsValues[TrackEntryPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[TrackEntryPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -846,7 +846,7 @@ abstract class BaseTrackEntry extends BaseObject  implements Persistent {
 	public function setUserIp($v)
 	{
 		if(!isset($this->oldColumnsValues[TrackEntryPeer::USER_IP]))
-			$this->oldColumnsValues[TrackEntryPeer::USER_IP] = $this->getUserIp();
+			$this->oldColumnsValues[TrackEntryPeer::USER_IP] = $this->user_ip;
 
 		if ($v !== null) {
 			$v = (string) $v;

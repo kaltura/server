@@ -358,7 +358,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::ID]))
-			$this->oldColumnsValues[adminKuserPeer::ID] = $this->getId();
+			$this->oldColumnsValues[adminKuserPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -381,7 +381,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setScreenName($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::SCREEN_NAME]))
-			$this->oldColumnsValues[adminKuserPeer::SCREEN_NAME] = $this->getScreenName();
+			$this->oldColumnsValues[adminKuserPeer::SCREEN_NAME] = $this->screen_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -404,7 +404,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setFullName($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::FULL_NAME]))
-			$this->oldColumnsValues[adminKuserPeer::FULL_NAME] = $this->getFullName();
+			$this->oldColumnsValues[adminKuserPeer::FULL_NAME] = $this->full_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -427,7 +427,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setEmail($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::EMAIL]))
-			$this->oldColumnsValues[adminKuserPeer::EMAIL] = $this->getEmail();
+			$this->oldColumnsValues[adminKuserPeer::EMAIL] = $this->email;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -450,7 +450,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setSha1Password($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::SHA1_PASSWORD]))
-			$this->oldColumnsValues[adminKuserPeer::SHA1_PASSWORD] = $this->getSha1Password();
+			$this->oldColumnsValues[adminKuserPeer::SHA1_PASSWORD] = $this->sha1_password;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -473,7 +473,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setSalt($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::SALT]))
-			$this->oldColumnsValues[adminKuserPeer::SALT] = $this->getSalt();
+			$this->oldColumnsValues[adminKuserPeer::SALT] = $this->salt;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -496,7 +496,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setPicture($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::PICTURE]))
-			$this->oldColumnsValues[adminKuserPeer::PICTURE] = $this->getPicture();
+			$this->oldColumnsValues[adminKuserPeer::PICTURE] = $this->picture;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -519,7 +519,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setIcon($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::ICON]))
-			$this->oldColumnsValues[adminKuserPeer::ICON] = $this->getIcon();
+			$this->oldColumnsValues[adminKuserPeer::ICON] = $this->icon;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -640,7 +640,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::PARTNER_ID]))
-			$this->oldColumnsValues[adminKuserPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[adminKuserPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -668,7 +668,7 @@ abstract class BaseadminKuser extends BaseObject  implements Persistent {
 	public function setLoginBlockedUntil($v)
 	{
 		if(!isset($this->oldColumnsValues[adminKuserPeer::LOGIN_BLOCKED_UNTIL]))
-			$this->oldColumnsValues[adminKuserPeer::LOGIN_BLOCKED_UNTIL] = $this->getLoginBlockedUntil();
+			$this->oldColumnsValues[adminKuserPeer::LOGIN_BLOCKED_UNTIL] = $this->login_blocked_until;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.

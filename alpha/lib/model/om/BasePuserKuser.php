@@ -322,7 +322,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::ID]))
-			$this->oldColumnsValues[PuserKuserPeer::ID] = $this->getId();
+			$this->oldColumnsValues[PuserKuserPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -345,7 +345,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::PARTNER_ID]))
-			$this->oldColumnsValues[PuserKuserPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[PuserKuserPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -368,7 +368,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::PUSER_ID]))
-			$this->oldColumnsValues[PuserKuserPeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[PuserKuserPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -391,7 +391,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::KUSER_ID]))
-			$this->oldColumnsValues[PuserKuserPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[PuserKuserPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -418,7 +418,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setPuserName($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::PUSER_NAME]))
-			$this->oldColumnsValues[PuserKuserPeer::PUSER_NAME] = $this->getPuserName();
+			$this->oldColumnsValues[PuserKuserPeer::PUSER_NAME] = $this->puser_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -559,7 +559,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setContext($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::CONTEXT]))
-			$this->oldColumnsValues[PuserKuserPeer::CONTEXT] = $this->getContext();
+			$this->oldColumnsValues[PuserKuserPeer::CONTEXT] = $this->context;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -582,7 +582,7 @@ abstract class BasePuserKuser extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserKuserPeer::SUBP_ID]))
-			$this->oldColumnsValues[PuserKuserPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[PuserKuserPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;

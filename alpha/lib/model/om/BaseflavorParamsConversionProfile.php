@@ -237,7 +237,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::ID]))
-			$this->oldColumnsValues[flavorParamsConversionProfilePeer::ID] = $this->getId();
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -260,7 +260,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function setConversionProfileId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID]))
-			$this->oldColumnsValues[flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID] = $this->getConversionProfileId();
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID] = $this->conversion_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -287,7 +287,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function setFlavorParamsId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID]))
-			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID] = $this->getFlavorParamsId();
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID] = $this->flavor_params_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -314,7 +314,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function setReadyBehavior($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::READY_BEHAVIOR]))
-			$this->oldColumnsValues[flavorParamsConversionProfilePeer::READY_BEHAVIOR] = $this->getReadyBehavior();
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::READY_BEHAVIOR] = $this->ready_behavior;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -337,7 +337,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function setForceNoneComplied($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED]))
-			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED] = $this->getForceNoneComplied();
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED] = $this->force_none_complied;
 
 		if ($v !== null) {
 			$v = (boolean) $v;

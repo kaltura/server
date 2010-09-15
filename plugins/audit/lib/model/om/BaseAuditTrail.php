@@ -483,7 +483,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::ID]))
-			$this->oldColumnsValues[AuditTrailPeer::ID] = $this->getId();
+			$this->oldColumnsValues[AuditTrailPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -556,7 +556,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setParsedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::PARSED_AT]))
-			$this->oldColumnsValues[AuditTrailPeer::PARSED_AT] = $this->getParsedAt();
+			$this->oldColumnsValues[AuditTrailPeer::PARSED_AT] = $this->parsed_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -607,7 +607,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::STATUS]))
-			$this->oldColumnsValues[AuditTrailPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[AuditTrailPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -630,7 +630,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[AuditTrailPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[AuditTrailPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -653,7 +653,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::OBJECT_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::OBJECT_ID] = $this->getObjectId();
+			$this->oldColumnsValues[AuditTrailPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -676,7 +676,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setRelatedObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_ID] = $this->getRelatedObjectId();
+			$this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_ID] = $this->related_object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -699,7 +699,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setRelatedObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_TYPE]))
-			$this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_TYPE] = $this->getRelatedObjectType();
+			$this->oldColumnsValues[AuditTrailPeer::RELATED_OBJECT_TYPE] = $this->related_object_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -722,7 +722,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::ENTRY_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[AuditTrailPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -745,7 +745,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setMasterPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::MASTER_PARTNER_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::MASTER_PARTNER_ID] = $this->getMasterPartnerId();
+			$this->oldColumnsValues[AuditTrailPeer::MASTER_PARTNER_ID] = $this->master_partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -768,7 +768,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::PARTNER_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[AuditTrailPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -791,7 +791,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setRequestId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::REQUEST_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::REQUEST_ID] = $this->getRequestId();
+			$this->oldColumnsValues[AuditTrailPeer::REQUEST_ID] = $this->request_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -814,7 +814,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::KUSER_ID]))
-			$this->oldColumnsValues[AuditTrailPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[AuditTrailPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -837,7 +837,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setAction($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::ACTION]))
-			$this->oldColumnsValues[AuditTrailPeer::ACTION] = $this->getAction();
+			$this->oldColumnsValues[AuditTrailPeer::ACTION] = $this->action;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -860,7 +860,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setData($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::DATA]))
-			$this->oldColumnsValues[AuditTrailPeer::DATA] = $this->getData();
+			$this->oldColumnsValues[AuditTrailPeer::DATA] = $this->data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -883,7 +883,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setKs($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::KS]))
-			$this->oldColumnsValues[AuditTrailPeer::KS] = $this->getKs();
+			$this->oldColumnsValues[AuditTrailPeer::KS] = $this->ks;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -906,7 +906,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setContext($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::CONTEXT]))
-			$this->oldColumnsValues[AuditTrailPeer::CONTEXT] = $this->getContext();
+			$this->oldColumnsValues[AuditTrailPeer::CONTEXT] = $this->context;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -929,7 +929,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setEntryPoint($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::ENTRY_POINT]))
-			$this->oldColumnsValues[AuditTrailPeer::ENTRY_POINT] = $this->getEntryPoint();
+			$this->oldColumnsValues[AuditTrailPeer::ENTRY_POINT] = $this->entry_point;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -952,7 +952,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setServerName($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::SERVER_NAME]))
-			$this->oldColumnsValues[AuditTrailPeer::SERVER_NAME] = $this->getServerName();
+			$this->oldColumnsValues[AuditTrailPeer::SERVER_NAME] = $this->server_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -975,7 +975,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setIpAddress($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::IP_ADDRESS]))
-			$this->oldColumnsValues[AuditTrailPeer::IP_ADDRESS] = $this->getIpAddress();
+			$this->oldColumnsValues[AuditTrailPeer::IP_ADDRESS] = $this->ip_address;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -998,7 +998,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setUserAgent($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::USER_AGENT]))
-			$this->oldColumnsValues[AuditTrailPeer::USER_AGENT] = $this->getUserAgent();
+			$this->oldColumnsValues[AuditTrailPeer::USER_AGENT] = $this->user_agent;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1021,7 +1021,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::DESCRIPTION]))
-			$this->oldColumnsValues[AuditTrailPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[AuditTrailPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1044,7 +1044,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function setErrorDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailPeer::ERROR_DESCRIPTION]))
-			$this->oldColumnsValues[AuditTrailPeer::ERROR_DESCRIPTION] = $this->getErrorDescription();
+			$this->oldColumnsValues[AuditTrailPeer::ERROR_DESCRIPTION] = $this->error_description;
 
 		if ($v !== null) {
 			$v = (string) $v;

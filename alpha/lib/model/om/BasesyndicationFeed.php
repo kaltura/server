@@ -483,7 +483,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::ID] = $this->getId();
+			$this->oldColumnsValues[syndicationFeedPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -506,7 +506,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setIntId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::INT_ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::INT_ID] = $this->getIntId();
+			$this->oldColumnsValues[syndicationFeedPeer::INT_ID] = $this->int_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -529,7 +529,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::PARTNER_ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[syndicationFeedPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -552,7 +552,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setPlaylistId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::PLAYLIST_ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::PLAYLIST_ID] = $this->getPlaylistId();
+			$this->oldColumnsValues[syndicationFeedPeer::PLAYLIST_ID] = $this->playlist_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -575,7 +575,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::NAME]))
-			$this->oldColumnsValues[syndicationFeedPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[syndicationFeedPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -598,7 +598,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::STATUS]))
-			$this->oldColumnsValues[syndicationFeedPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[syndicationFeedPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -621,7 +621,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::TYPE]))
-			$this->oldColumnsValues[syndicationFeedPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[syndicationFeedPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -644,7 +644,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setLandingPage($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::LANDING_PAGE]))
-			$this->oldColumnsValues[syndicationFeedPeer::LANDING_PAGE] = $this->getLandingPage();
+			$this->oldColumnsValues[syndicationFeedPeer::LANDING_PAGE] = $this->landing_page;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -667,7 +667,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setFlavorParamId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::FLAVOR_PARAM_ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::FLAVOR_PARAM_ID] = $this->getFlavorParamId();
+			$this->oldColumnsValues[syndicationFeedPeer::FLAVOR_PARAM_ID] = $this->flavor_param_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -690,7 +690,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setPlayerUiconfId($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::PLAYER_UICONF_ID]))
-			$this->oldColumnsValues[syndicationFeedPeer::PLAYER_UICONF_ID] = $this->getPlayerUiconfId();
+			$this->oldColumnsValues[syndicationFeedPeer::PLAYER_UICONF_ID] = $this->player_uiconf_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -713,7 +713,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setAllowEmbed($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::ALLOW_EMBED]))
-			$this->oldColumnsValues[syndicationFeedPeer::ALLOW_EMBED] = $this->getAllowEmbed();
+			$this->oldColumnsValues[syndicationFeedPeer::ALLOW_EMBED] = $this->allow_embed;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -736,7 +736,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setAdultContent($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::ADULT_CONTENT]))
-			$this->oldColumnsValues[syndicationFeedPeer::ADULT_CONTENT] = $this->getAdultContent();
+			$this->oldColumnsValues[syndicationFeedPeer::ADULT_CONTENT] = $this->adult_content;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -759,7 +759,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setTranscodeExistingContent($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::TRANSCODE_EXISTING_CONTENT]))
-			$this->oldColumnsValues[syndicationFeedPeer::TRANSCODE_EXISTING_CONTENT] = $this->getTranscodeExistingContent();
+			$this->oldColumnsValues[syndicationFeedPeer::TRANSCODE_EXISTING_CONTENT] = $this->transcode_existing_content;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -782,7 +782,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setAddToDefaultConversionProfile($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::ADD_TO_DEFAULT_CONVERSION_PROFILE]))
-			$this->oldColumnsValues[syndicationFeedPeer::ADD_TO_DEFAULT_CONVERSION_PROFILE] = $this->getAddToDefaultConversionProfile();
+			$this->oldColumnsValues[syndicationFeedPeer::ADD_TO_DEFAULT_CONVERSION_PROFILE] = $this->add_to_default_conversion_profile;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -805,7 +805,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setCategories($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::CATEGORIES]))
-			$this->oldColumnsValues[syndicationFeedPeer::CATEGORIES] = $this->getCategories();
+			$this->oldColumnsValues[syndicationFeedPeer::CATEGORIES] = $this->categories;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -828,7 +828,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setFeedDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::FEED_DESCRIPTION]))
-			$this->oldColumnsValues[syndicationFeedPeer::FEED_DESCRIPTION] = $this->getFeedDescription();
+			$this->oldColumnsValues[syndicationFeedPeer::FEED_DESCRIPTION] = $this->feed_description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -851,7 +851,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setLanguage($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::LANGUAGE]))
-			$this->oldColumnsValues[syndicationFeedPeer::LANGUAGE] = $this->getLanguage();
+			$this->oldColumnsValues[syndicationFeedPeer::LANGUAGE] = $this->language;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -874,7 +874,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setFeedLandingPage($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::FEED_LANDING_PAGE]))
-			$this->oldColumnsValues[syndicationFeedPeer::FEED_LANDING_PAGE] = $this->getFeedLandingPage();
+			$this->oldColumnsValues[syndicationFeedPeer::FEED_LANDING_PAGE] = $this->feed_landing_page;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -897,7 +897,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setOwnerName($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::OWNER_NAME]))
-			$this->oldColumnsValues[syndicationFeedPeer::OWNER_NAME] = $this->getOwnerName();
+			$this->oldColumnsValues[syndicationFeedPeer::OWNER_NAME] = $this->owner_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -920,7 +920,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setOwnerEmail($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::OWNER_EMAIL]))
-			$this->oldColumnsValues[syndicationFeedPeer::OWNER_EMAIL] = $this->getOwnerEmail();
+			$this->oldColumnsValues[syndicationFeedPeer::OWNER_EMAIL] = $this->owner_email;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -943,7 +943,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setFeedImageUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::FEED_IMAGE_URL]))
-			$this->oldColumnsValues[syndicationFeedPeer::FEED_IMAGE_URL] = $this->getFeedImageUrl();
+			$this->oldColumnsValues[syndicationFeedPeer::FEED_IMAGE_URL] = $this->feed_image_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -966,7 +966,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	public function setFeedAuthor($v)
 	{
 		if(!isset($this->oldColumnsValues[syndicationFeedPeer::FEED_AUTHOR]))
-			$this->oldColumnsValues[syndicationFeedPeer::FEED_AUTHOR] = $this->getFeedAuthor();
+			$this->oldColumnsValues[syndicationFeedPeer::FEED_AUTHOR] = $this->feed_author;
 
 		if ($v !== null) {
 			$v = (string) $v;

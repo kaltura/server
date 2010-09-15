@@ -483,7 +483,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::ID]))
-			$this->oldColumnsValues[StorageProfilePeer::ID] = $this->getId();
+			$this->oldColumnsValues[StorageProfilePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -604,7 +604,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::PARTNER_ID]))
-			$this->oldColumnsValues[StorageProfilePeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[StorageProfilePeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -627,7 +627,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::NAME]))
-			$this->oldColumnsValues[StorageProfilePeer::NAME] = $this->getName();
+			$this->oldColumnsValues[StorageProfilePeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -650,7 +650,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setDesciption($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::DESCIPTION]))
-			$this->oldColumnsValues[StorageProfilePeer::DESCIPTION] = $this->getDesciption();
+			$this->oldColumnsValues[StorageProfilePeer::DESCIPTION] = $this->desciption;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -673,7 +673,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STATUS]))
-			$this->oldColumnsValues[StorageProfilePeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[StorageProfilePeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -696,7 +696,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setProtocol($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::PROTOCOL]))
-			$this->oldColumnsValues[StorageProfilePeer::PROTOCOL] = $this->getProtocol();
+			$this->oldColumnsValues[StorageProfilePeer::PROTOCOL] = $this->protocol;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -719,7 +719,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStorageUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STORAGE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::STORAGE_URL] = $this->getStorageUrl();
+			$this->oldColumnsValues[StorageProfilePeer::STORAGE_URL] = $this->storage_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -742,7 +742,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStorageBaseDir($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STORAGE_BASE_DIR]))
-			$this->oldColumnsValues[StorageProfilePeer::STORAGE_BASE_DIR] = $this->getStorageBaseDir();
+			$this->oldColumnsValues[StorageProfilePeer::STORAGE_BASE_DIR] = $this->storage_base_dir;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -765,7 +765,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStorageUsername($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STORAGE_USERNAME]))
-			$this->oldColumnsValues[StorageProfilePeer::STORAGE_USERNAME] = $this->getStorageUsername();
+			$this->oldColumnsValues[StorageProfilePeer::STORAGE_USERNAME] = $this->storage_username;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -788,7 +788,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStoragePassword($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STORAGE_PASSWORD]))
-			$this->oldColumnsValues[StorageProfilePeer::STORAGE_PASSWORD] = $this->getStoragePassword();
+			$this->oldColumnsValues[StorageProfilePeer::STORAGE_PASSWORD] = $this->storage_password;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -811,7 +811,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setStorageFtpPassiveMode($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::STORAGE_FTP_PASSIVE_MODE]))
-			$this->oldColumnsValues[StorageProfilePeer::STORAGE_FTP_PASSIVE_MODE] = $this->getStorageFtpPassiveMode();
+			$this->oldColumnsValues[StorageProfilePeer::STORAGE_FTP_PASSIVE_MODE] = $this->storage_ftp_passive_mode;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -834,7 +834,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setDeliveryHttpBaseUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_HTTP_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_HTTP_BASE_URL] = $this->getDeliveryHttpBaseUrl();
+			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_HTTP_BASE_URL] = $this->delivery_http_base_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -857,7 +857,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setDeliveryRmpBaseUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_RMP_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_RMP_BASE_URL] = $this->getDeliveryRmpBaseUrl();
+			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_RMP_BASE_URL] = $this->delivery_rmp_base_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -880,7 +880,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setDeliveryIisBaseUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_IIS_BASE_URL]))
-			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_IIS_BASE_URL] = $this->getDeliveryIisBaseUrl();
+			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_IIS_BASE_URL] = $this->delivery_iis_base_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -903,7 +903,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setMinFileSize($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::MIN_FILE_SIZE]))
-			$this->oldColumnsValues[StorageProfilePeer::MIN_FILE_SIZE] = $this->getMinFileSize();
+			$this->oldColumnsValues[StorageProfilePeer::MIN_FILE_SIZE] = $this->min_file_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -926,7 +926,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setMaxFileSize($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::MAX_FILE_SIZE]))
-			$this->oldColumnsValues[StorageProfilePeer::MAX_FILE_SIZE] = $this->getMaxFileSize();
+			$this->oldColumnsValues[StorageProfilePeer::MAX_FILE_SIZE] = $this->max_file_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -949,7 +949,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setFlavorParamsIds($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::FLAVOR_PARAMS_IDS]))
-			$this->oldColumnsValues[StorageProfilePeer::FLAVOR_PARAMS_IDS] = $this->getFlavorParamsIds();
+			$this->oldColumnsValues[StorageProfilePeer::FLAVOR_PARAMS_IDS] = $this->flavor_params_ids;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -972,7 +972,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setMaxConcurrentConnections($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::MAX_CONCURRENT_CONNECTIONS]))
-			$this->oldColumnsValues[StorageProfilePeer::MAX_CONCURRENT_CONNECTIONS] = $this->getMaxConcurrentConnections();
+			$this->oldColumnsValues[StorageProfilePeer::MAX_CONCURRENT_CONNECTIONS] = $this->max_concurrent_connections;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1015,7 +1015,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setPathManagerClass($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::PATH_MANAGER_CLASS]))
-			$this->oldColumnsValues[StorageProfilePeer::PATH_MANAGER_CLASS] = $this->getPathManagerClass();
+			$this->oldColumnsValues[StorageProfilePeer::PATH_MANAGER_CLASS] = $this->path_manager_class;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1038,7 +1038,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function setUrlManagerClass($v)
 	{
 		if(!isset($this->oldColumnsValues[StorageProfilePeer::URL_MANAGER_CLASS]))
-			$this->oldColumnsValues[StorageProfilePeer::URL_MANAGER_CLASS] = $this->getUrlManagerClass();
+			$this->oldColumnsValues[StorageProfilePeer::URL_MANAGER_CLASS] = $this->url_manager_class;
 
 		if ($v !== null) {
 			$v = (string) $v;

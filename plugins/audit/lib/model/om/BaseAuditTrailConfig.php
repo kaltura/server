@@ -135,7 +135,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::ID]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::ID] = $this->getId();
+			$this->oldColumnsValues[AuditTrailConfigPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -158,7 +158,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::PARTNER_ID]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[AuditTrailConfigPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -181,7 +181,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[AuditTrailConfigPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -204,7 +204,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function setDescriptors($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::DESCRIPTORS]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::DESCRIPTORS] = $this->getDescriptors();
+			$this->oldColumnsValues[AuditTrailConfigPeer::DESCRIPTORS] = $this->descriptors;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -227,7 +227,7 @@ abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 	public function setActions($v)
 	{
 		if(!isset($this->oldColumnsValues[AuditTrailConfigPeer::ACTIONS]))
-			$this->oldColumnsValues[AuditTrailConfigPeer::ACTIONS] = $this->getActions();
+			$this->oldColumnsValues[AuditTrailConfigPeer::ACTIONS] = $this->actions;
 
 		if ($v !== null) {
 			$v = (string) $v;

@@ -291,7 +291,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::ID]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::ID] = $this->getId();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -412,7 +412,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setMetadataProfileId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_ID]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_ID] = $this->getMetadataProfileId();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_ID] = $this->metadata_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -435,7 +435,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setMetadataProfileVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_VERSION]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_VERSION] = $this->getMetadataProfileVersion();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::METADATA_PROFILE_VERSION] = $this->metadata_profile_version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -458,7 +458,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::PARTNER_ID]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -481,7 +481,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setLabel($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::LABEL]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::LABEL] = $this->getLabel();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::LABEL] = $this->label;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -504,7 +504,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setKey($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::KEY]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::KEY] = $this->getKey();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::KEY] = $this->key;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -527,7 +527,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::TYPE]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -550,7 +550,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setXpath($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::XPATH]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::XPATH] = $this->getXpath();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::XPATH] = $this->xpath;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -573,7 +573,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::STATUS]))
-			$this->oldColumnsValues[MetadataProfileFieldPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[MetadataProfileFieldPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;

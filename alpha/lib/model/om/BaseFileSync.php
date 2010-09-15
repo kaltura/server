@@ -449,7 +449,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::ID]))
-			$this->oldColumnsValues[FileSyncPeer::ID] = $this->getId();
+			$this->oldColumnsValues[FileSyncPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -472,7 +472,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::PARTNER_ID]))
-			$this->oldColumnsValues[FileSyncPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[FileSyncPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -495,7 +495,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[FileSyncPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -518,7 +518,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_ID]))
-			$this->oldColumnsValues[FileSyncPeer::OBJECT_ID] = $this->getObjectId();
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -541,7 +541,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::VERSION]))
-			$this->oldColumnsValues[FileSyncPeer::VERSION] = $this->getVersion();
+			$this->oldColumnsValues[FileSyncPeer::VERSION] = $this->version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -564,7 +564,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setObjectSubType($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::OBJECT_SUB_TYPE]))
-			$this->oldColumnsValues[FileSyncPeer::OBJECT_SUB_TYPE] = $this->getObjectSubType();
+			$this->oldColumnsValues[FileSyncPeer::OBJECT_SUB_TYPE] = $this->object_sub_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -587,7 +587,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setDc($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::DC]))
-			$this->oldColumnsValues[FileSyncPeer::DC] = $this->getDc();
+			$this->oldColumnsValues[FileSyncPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -610,7 +610,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setOriginal($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::ORIGINAL]))
-			$this->oldColumnsValues[FileSyncPeer::ORIGINAL] = $this->getOriginal();
+			$this->oldColumnsValues[FileSyncPeer::ORIGINAL] = $this->original;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -732,7 +732,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setReadyAt($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::READY_AT]))
-			$this->oldColumnsValues[FileSyncPeer::READY_AT] = $this->getReadyAt();
+			$this->oldColumnsValues[FileSyncPeer::READY_AT] = $this->ready_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -783,7 +783,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setSyncTime($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::SYNC_TIME]))
-			$this->oldColumnsValues[FileSyncPeer::SYNC_TIME] = $this->getSyncTime();
+			$this->oldColumnsValues[FileSyncPeer::SYNC_TIME] = $this->sync_time;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -806,7 +806,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::STATUS]))
-			$this->oldColumnsValues[FileSyncPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[FileSyncPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -829,7 +829,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setFileType($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_TYPE]))
-			$this->oldColumnsValues[FileSyncPeer::FILE_TYPE] = $this->getFileType();
+			$this->oldColumnsValues[FileSyncPeer::FILE_TYPE] = $this->file_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -852,7 +852,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setLinkedId($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::LINKED_ID]))
-			$this->oldColumnsValues[FileSyncPeer::LINKED_ID] = $this->getLinkedId();
+			$this->oldColumnsValues[FileSyncPeer::LINKED_ID] = $this->linked_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -875,7 +875,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setLinkCount($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::LINK_COUNT]))
-			$this->oldColumnsValues[FileSyncPeer::LINK_COUNT] = $this->getLinkCount();
+			$this->oldColumnsValues[FileSyncPeer::LINK_COUNT] = $this->link_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -898,7 +898,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setFileRoot($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_ROOT]))
-			$this->oldColumnsValues[FileSyncPeer::FILE_ROOT] = $this->getFileRoot();
+			$this->oldColumnsValues[FileSyncPeer::FILE_ROOT] = $this->file_root;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -921,7 +921,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setFilePath($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_PATH]))
-			$this->oldColumnsValues[FileSyncPeer::FILE_PATH] = $this->getFilePath();
+			$this->oldColumnsValues[FileSyncPeer::FILE_PATH] = $this->file_path;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -944,7 +944,7 @@ abstract class BaseFileSync extends BaseObject  implements Persistent {
 	public function setFileSize($v)
 	{
 		if(!isset($this->oldColumnsValues[FileSyncPeer::FILE_SIZE]))
-			$this->oldColumnsValues[FileSyncPeer::FILE_SIZE] = $this->getFileSize();
+			$this->oldColumnsValues[FileSyncPeer::FILE_SIZE] = $this->file_size;
 
 		if ($v !== null) {
 			$v = (string) $v;

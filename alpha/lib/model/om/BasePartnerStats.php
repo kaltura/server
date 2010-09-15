@@ -387,7 +387,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::PARTNER_ID]))
-			$this->oldColumnsValues[PartnerStatsPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[PartnerStatsPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -410,7 +410,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setViews($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::VIEWS]))
-			$this->oldColumnsValues[PartnerStatsPeer::VIEWS] = $this->getViews();
+			$this->oldColumnsValues[PartnerStatsPeer::VIEWS] = $this->views;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -433,7 +433,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setPlays($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::PLAYS]))
-			$this->oldColumnsValues[PartnerStatsPeer::PLAYS] = $this->getPlays();
+			$this->oldColumnsValues[PartnerStatsPeer::PLAYS] = $this->plays;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -456,7 +456,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setVideos($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::VIDEOS]))
-			$this->oldColumnsValues[PartnerStatsPeer::VIDEOS] = $this->getVideos();
+			$this->oldColumnsValues[PartnerStatsPeer::VIDEOS] = $this->videos;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -479,7 +479,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setAudios($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::AUDIOS]))
-			$this->oldColumnsValues[PartnerStatsPeer::AUDIOS] = $this->getAudios();
+			$this->oldColumnsValues[PartnerStatsPeer::AUDIOS] = $this->audios;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -502,7 +502,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setImages($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::IMAGES]))
-			$this->oldColumnsValues[PartnerStatsPeer::IMAGES] = $this->getImages();
+			$this->oldColumnsValues[PartnerStatsPeer::IMAGES] = $this->images;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -525,7 +525,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setEntries($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::ENTRIES]))
-			$this->oldColumnsValues[PartnerStatsPeer::ENTRIES] = $this->getEntries();
+			$this->oldColumnsValues[PartnerStatsPeer::ENTRIES] = $this->entries;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -548,7 +548,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setUsers1($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::USERS_1]))
-			$this->oldColumnsValues[PartnerStatsPeer::USERS_1] = $this->getUsers1();
+			$this->oldColumnsValues[PartnerStatsPeer::USERS_1] = $this->users_1;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -571,7 +571,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setUsers2($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::USERS_2]))
-			$this->oldColumnsValues[PartnerStatsPeer::USERS_2] = $this->getUsers2();
+			$this->oldColumnsValues[PartnerStatsPeer::USERS_2] = $this->users_2;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -594,7 +594,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setRc1($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::RC_1]))
-			$this->oldColumnsValues[PartnerStatsPeer::RC_1] = $this->getRc1();
+			$this->oldColumnsValues[PartnerStatsPeer::RC_1] = $this->rc_1;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -617,7 +617,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setRc2($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::RC_2]))
-			$this->oldColumnsValues[PartnerStatsPeer::RC_2] = $this->getRc2();
+			$this->oldColumnsValues[PartnerStatsPeer::RC_2] = $this->rc_2;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -640,7 +640,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setKshows1($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::KSHOWS_1]))
-			$this->oldColumnsValues[PartnerStatsPeer::KSHOWS_1] = $this->getKshows1();
+			$this->oldColumnsValues[PartnerStatsPeer::KSHOWS_1] = $this->kshows_1;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -663,7 +663,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setKshows2($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::KSHOWS_2]))
-			$this->oldColumnsValues[PartnerStatsPeer::KSHOWS_2] = $this->getKshows2();
+			$this->oldColumnsValues[PartnerStatsPeer::KSHOWS_2] = $this->kshows_2;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -804,7 +804,7 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	public function setWidgets($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerStatsPeer::WIDGETS]))
-			$this->oldColumnsValues[PartnerStatsPeer::WIDGETS] = $this->getWidgets();
+			$this->oldColumnsValues[PartnerStatsPeer::WIDGETS] = $this->widgets;
 
 		if ($v !== null) {
 			$v = (int) $v;

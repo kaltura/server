@@ -680,7 +680,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::ID]))
-			$this->oldColumnsValues[mediaInfoPeer::ID] = $this->getId();
+			$this->oldColumnsValues[mediaInfoPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -801,7 +801,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setFlavorAssetId($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_ID]))
-			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_ID] = $this->getFlavorAssetId();
+			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_ID] = $this->flavor_asset_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -828,7 +828,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setFileSize($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::FILE_SIZE]))
-			$this->oldColumnsValues[mediaInfoPeer::FILE_SIZE] = $this->getFileSize();
+			$this->oldColumnsValues[mediaInfoPeer::FILE_SIZE] = $this->file_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -851,7 +851,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setContainerFormat($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_FORMAT]))
-			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_FORMAT] = $this->getContainerFormat();
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_FORMAT] = $this->container_format;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -874,7 +874,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setContainerId($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_ID]))
-			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_ID] = $this->getContainerId();
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_ID] = $this->container_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -897,7 +897,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setContainerProfile($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_PROFILE]))
-			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_PROFILE] = $this->getContainerProfile();
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_PROFILE] = $this->container_profile;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -920,7 +920,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setContainerDuration($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_DURATION]))
-			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_DURATION] = $this->getContainerDuration();
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_DURATION] = $this->container_duration;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -943,7 +943,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setContainerBitRate($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::CONTAINER_BIT_RATE]))
-			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_BIT_RATE] = $this->getContainerBitRate();
+			$this->oldColumnsValues[mediaInfoPeer::CONTAINER_BIT_RATE] = $this->container_bit_rate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -966,7 +966,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoFormat($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_FORMAT]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FORMAT] = $this->getVideoFormat();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FORMAT] = $this->video_format;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -989,7 +989,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoCodecId($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_CODEC_ID]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_CODEC_ID] = $this->getVideoCodecId();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_CODEC_ID] = $this->video_codec_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1012,7 +1012,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoDuration($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_DURATION]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DURATION] = $this->getVideoDuration();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DURATION] = $this->video_duration;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1035,7 +1035,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoBitRate($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE] = $this->getVideoBitRate();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE] = $this->video_bit_rate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1058,7 +1058,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoBitRateMode($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE_MODE]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE_MODE] = $this->getVideoBitRateMode();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_BIT_RATE_MODE] = $this->video_bit_rate_mode;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1081,7 +1081,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_WIDTH]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_WIDTH] = $this->getVideoWidth();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_WIDTH] = $this->video_width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1104,7 +1104,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_HEIGHT]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_HEIGHT] = $this->getVideoHeight();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_HEIGHT] = $this->video_height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1127,7 +1127,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoFrameRate($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_FRAME_RATE]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FRAME_RATE] = $this->getVideoFrameRate();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_FRAME_RATE] = $this->video_frame_rate;
 
 		if ($v !== null) {
 			$v = (double) $v;
@@ -1150,7 +1150,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoDar($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_DAR]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DAR] = $this->getVideoDar();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_DAR] = $this->video_dar;
 
 		if ($v !== null) {
 			$v = (double) $v;
@@ -1173,7 +1173,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setVideoRotation($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::VIDEO_ROTATION]))
-			$this->oldColumnsValues[mediaInfoPeer::VIDEO_ROTATION] = $this->getVideoRotation();
+			$this->oldColumnsValues[mediaInfoPeer::VIDEO_ROTATION] = $this->video_rotation;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1196,7 +1196,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioFormat($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_FORMAT]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_FORMAT] = $this->getAudioFormat();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_FORMAT] = $this->audio_format;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1219,7 +1219,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioCodecId($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_CODEC_ID]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CODEC_ID] = $this->getAudioCodecId();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CODEC_ID] = $this->audio_codec_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1242,7 +1242,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioDuration($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_DURATION]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_DURATION] = $this->getAudioDuration();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_DURATION] = $this->audio_duration;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1265,7 +1265,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioBitRate($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE] = $this->getAudioBitRate();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE] = $this->audio_bit_rate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1288,7 +1288,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioBitRateMode($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE_MODE]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE_MODE] = $this->getAudioBitRateMode();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_BIT_RATE_MODE] = $this->audio_bit_rate_mode;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1311,7 +1311,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioChannels($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_CHANNELS]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CHANNELS] = $this->getAudioChannels();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_CHANNELS] = $this->audio_channels;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1334,7 +1334,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioSamplingRate($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_SAMPLING_RATE]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_SAMPLING_RATE] = $this->getAudioSamplingRate();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_SAMPLING_RATE] = $this->audio_sampling_rate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1357,7 +1357,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setAudioResolution($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::AUDIO_RESOLUTION]))
-			$this->oldColumnsValues[mediaInfoPeer::AUDIO_RESOLUTION] = $this->getAudioResolution();
+			$this->oldColumnsValues[mediaInfoPeer::AUDIO_RESOLUTION] = $this->audio_resolution;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1380,7 +1380,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setWritingLib($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::WRITING_LIB]))
-			$this->oldColumnsValues[mediaInfoPeer::WRITING_LIB] = $this->getWritingLib();
+			$this->oldColumnsValues[mediaInfoPeer::WRITING_LIB] = $this->writing_lib;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1423,7 +1423,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setRawData($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::RAW_DATA]))
-			$this->oldColumnsValues[mediaInfoPeer::RAW_DATA] = $this->getRawData();
+			$this->oldColumnsValues[mediaInfoPeer::RAW_DATA] = $this->raw_data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1446,7 +1446,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setMultiStreamInfo($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM_INFO]))
-			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM_INFO] = $this->getMultiStreamInfo();
+			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM_INFO] = $this->multi_stream_info;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1469,7 +1469,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setFlavorAssetVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_VERSION]))
-			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_VERSION] = $this->getFlavorAssetVersion();
+			$this->oldColumnsValues[mediaInfoPeer::FLAVOR_ASSET_VERSION] = $this->flavor_asset_version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1492,7 +1492,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setScanType($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::SCAN_TYPE]))
-			$this->oldColumnsValues[mediaInfoPeer::SCAN_TYPE] = $this->getScanType();
+			$this->oldColumnsValues[mediaInfoPeer::SCAN_TYPE] = $this->scan_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1515,7 +1515,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function setMultiStream($v)
 	{
 		if(!isset($this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM]))
-			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM] = $this->getMultiStream();
+			$this->oldColumnsValues[mediaInfoPeer::MULTI_STREAM] = $this->multi_stream;
 
 		if ($v !== null) {
 			$v = (string) $v;

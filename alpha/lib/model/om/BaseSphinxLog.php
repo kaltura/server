@@ -223,7 +223,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[SphinxLogPeer::ID]))
-			$this->oldColumnsValues[SphinxLogPeer::ID] = $this->getId();
+			$this->oldColumnsValues[SphinxLogPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -246,7 +246,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[SphinxLogPeer::ENTRY_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[SphinxLogPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -273,7 +273,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[SphinxLogPeer::PARTNER_ID]))
-			$this->oldColumnsValues[SphinxLogPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[SphinxLogPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -300,7 +300,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function setDc($v)
 	{
 		if(!isset($this->oldColumnsValues[SphinxLogPeer::DC]))
-			$this->oldColumnsValues[SphinxLogPeer::DC] = $this->getDc();
+			$this->oldColumnsValues[SphinxLogPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -323,7 +323,7 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function setSql($v)
 	{
 		if(!isset($this->oldColumnsValues[SphinxLogPeer::SQL]))
-			$this->oldColumnsValues[SphinxLogPeer::SQL] = $this->getSql();
+			$this->oldColumnsValues[SphinxLogPeer::SQL] = $this->sql;
 
 		if ($v !== null) {
 			$v = (string) $v;

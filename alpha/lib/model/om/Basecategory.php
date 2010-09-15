@@ -331,7 +331,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::ID]))
-			$this->oldColumnsValues[categoryPeer::ID] = $this->getId();
+			$this->oldColumnsValues[categoryPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -354,7 +354,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setParentId($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::PARENT_ID]))
-			$this->oldColumnsValues[categoryPeer::PARENT_ID] = $this->getParentId();
+			$this->oldColumnsValues[categoryPeer::PARENT_ID] = $this->parent_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -377,7 +377,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setDepth($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::DEPTH]))
-			$this->oldColumnsValues[categoryPeer::DEPTH] = $this->getDepth();
+			$this->oldColumnsValues[categoryPeer::DEPTH] = $this->depth;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -400,7 +400,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::PARTNER_ID]))
-			$this->oldColumnsValues[categoryPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[categoryPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -423,7 +423,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::NAME]))
-			$this->oldColumnsValues[categoryPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[categoryPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -446,7 +446,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setFullName($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::FULL_NAME]))
-			$this->oldColumnsValues[categoryPeer::FULL_NAME] = $this->getFullName();
+			$this->oldColumnsValues[categoryPeer::FULL_NAME] = $this->full_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -469,7 +469,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setEntriesCount($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::ENTRIES_COUNT]))
-			$this->oldColumnsValues[categoryPeer::ENTRIES_COUNT] = $this->getEntriesCount();
+			$this->oldColumnsValues[categoryPeer::ENTRIES_COUNT] = $this->entries_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -591,7 +591,7 @@ abstract class Basecategory extends BaseObject  implements Persistent {
 	public function setDeletedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[categoryPeer::DELETED_AT]))
-			$this->oldColumnsValues[categoryPeer::DELETED_AT] = $this->getDeletedAt();
+			$this->oldColumnsValues[categoryPeer::DELETED_AT] = $this->deleted_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.

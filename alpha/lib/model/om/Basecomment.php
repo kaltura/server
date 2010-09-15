@@ -248,7 +248,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::ID]))
-			$this->oldColumnsValues[commentPeer::ID] = $this->getId();
+			$this->oldColumnsValues[commentPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -271,7 +271,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::KUSER_ID]))
-			$this->oldColumnsValues[commentPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[commentPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -298,7 +298,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setCommentType($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::COMMENT_TYPE]))
-			$this->oldColumnsValues[commentPeer::COMMENT_TYPE] = $this->getCommentType();
+			$this->oldColumnsValues[commentPeer::COMMENT_TYPE] = $this->comment_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -321,7 +321,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setSubjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::SUBJECT_ID]))
-			$this->oldColumnsValues[commentPeer::SUBJECT_ID] = $this->getSubjectId();
+			$this->oldColumnsValues[commentPeer::SUBJECT_ID] = $this->subject_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -345,7 +345,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setBaseDate($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::BASE_DATE]))
-			$this->oldColumnsValues[commentPeer::BASE_DATE] = $this->getBaseDate();
+			$this->oldColumnsValues[commentPeer::BASE_DATE] = $this->base_date;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -396,7 +396,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setReplyTo($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::REPLY_TO]))
-			$this->oldColumnsValues[commentPeer::REPLY_TO] = $this->getReplyTo();
+			$this->oldColumnsValues[commentPeer::REPLY_TO] = $this->reply_to;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -419,7 +419,7 @@ abstract class Basecomment extends BaseObject  implements Persistent {
 	public function setComment($v)
 	{
 		if(!isset($this->oldColumnsValues[commentPeer::COMMENT]))
-			$this->oldColumnsValues[commentPeer::COMMENT] = $this->getComment();
+			$this->oldColumnsValues[commentPeer::COMMENT] = $this->comment;
 
 		if ($v !== null) {
 			$v = (string) $v;

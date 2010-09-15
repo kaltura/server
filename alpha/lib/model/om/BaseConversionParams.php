@@ -371,7 +371,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::ID]))
-			$this->oldColumnsValues[ConversionParamsPeer::ID] = $this->getId();
+			$this->oldColumnsValues[ConversionParamsPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -394,7 +394,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::PARTNER_ID]))
-			$this->oldColumnsValues[ConversionParamsPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[ConversionParamsPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -417,7 +417,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setEnabled($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::ENABLED]))
-			$this->oldColumnsValues[ConversionParamsPeer::ENABLED] = $this->getEnabled();
+			$this->oldColumnsValues[ConversionParamsPeer::ENABLED] = $this->enabled;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -440,7 +440,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::NAME]))
-			$this->oldColumnsValues[ConversionParamsPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[ConversionParamsPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -463,7 +463,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setProfileType($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE]))
-			$this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE] = $this->getProfileType();
+			$this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE] = $this->profile_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -486,7 +486,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setProfileTypeIndex($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE_INDEX]))
-			$this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE_INDEX] = $this->getProfileTypeIndex();
+			$this->oldColumnsValues[ConversionParamsPeer::PROFILE_TYPE_INDEX] = $this->profile_type_index;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -509,7 +509,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::WIDTH]))
-			$this->oldColumnsValues[ConversionParamsPeer::WIDTH] = $this->getWidth();
+			$this->oldColumnsValues[ConversionParamsPeer::WIDTH] = $this->width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -532,7 +532,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::HEIGHT]))
-			$this->oldColumnsValues[ConversionParamsPeer::HEIGHT] = $this->getHeight();
+			$this->oldColumnsValues[ConversionParamsPeer::HEIGHT] = $this->height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -555,7 +555,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setAspectRatio($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::ASPECT_RATIO]))
-			$this->oldColumnsValues[ConversionParamsPeer::ASPECT_RATIO] = $this->getAspectRatio();
+			$this->oldColumnsValues[ConversionParamsPeer::ASPECT_RATIO] = $this->aspect_ratio;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -578,7 +578,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setGopSize($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::GOP_SIZE]))
-			$this->oldColumnsValues[ConversionParamsPeer::GOP_SIZE] = $this->getGopSize();
+			$this->oldColumnsValues[ConversionParamsPeer::GOP_SIZE] = $this->gop_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -601,7 +601,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setBitrate($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::BITRATE]))
-			$this->oldColumnsValues[ConversionParamsPeer::BITRATE] = $this->getBitrate();
+			$this->oldColumnsValues[ConversionParamsPeer::BITRATE] = $this->bitrate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -624,7 +624,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setQscale($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::QSCALE]))
-			$this->oldColumnsValues[ConversionParamsPeer::QSCALE] = $this->getQscale();
+			$this->oldColumnsValues[ConversionParamsPeer::QSCALE] = $this->qscale;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -647,7 +647,7 @@ abstract class BaseConversionParams extends BaseObject  implements Persistent {
 	public function setFileSuffix($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionParamsPeer::FILE_SUFFIX]))
-			$this->oldColumnsValues[ConversionParamsPeer::FILE_SUFFIX] = $this->getFileSuffix();
+			$this->oldColumnsValues[ConversionParamsPeer::FILE_SUFFIX] = $this->file_suffix;
 
 		if ($v !== null) {
 			$v = (string) $v;

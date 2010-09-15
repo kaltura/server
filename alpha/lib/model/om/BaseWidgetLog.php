@@ -408,7 +408,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::ID]))
-			$this->oldColumnsValues[WidgetLogPeer::ID] = $this->getId();
+			$this->oldColumnsValues[WidgetLogPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -431,7 +431,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::KSHOW_ID]))
-			$this->oldColumnsValues[WidgetLogPeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[WidgetLogPeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -454,7 +454,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::ENTRY_ID]))
-			$this->oldColumnsValues[WidgetLogPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[WidgetLogPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -481,7 +481,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setKmediaType($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::KMEDIA_TYPE]))
-			$this->oldColumnsValues[WidgetLogPeer::KMEDIA_TYPE] = $this->getKmediaType();
+			$this->oldColumnsValues[WidgetLogPeer::KMEDIA_TYPE] = $this->kmedia_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -504,7 +504,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setWidgetType($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::WIDGET_TYPE]))
-			$this->oldColumnsValues[WidgetLogPeer::WIDGET_TYPE] = $this->getWidgetType();
+			$this->oldColumnsValues[WidgetLogPeer::WIDGET_TYPE] = $this->widget_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -527,7 +527,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setReferer($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::REFERER]))
-			$this->oldColumnsValues[WidgetLogPeer::REFERER] = $this->getReferer();
+			$this->oldColumnsValues[WidgetLogPeer::REFERER] = $this->referer;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -550,7 +550,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setViews($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::VIEWS]))
-			$this->oldColumnsValues[WidgetLogPeer::VIEWS] = $this->getViews();
+			$this->oldColumnsValues[WidgetLogPeer::VIEWS] = $this->views;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -573,7 +573,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setIp1($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::IP1]))
-			$this->oldColumnsValues[WidgetLogPeer::IP1] = $this->getIp1();
+			$this->oldColumnsValues[WidgetLogPeer::IP1] = $this->ip1;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -596,7 +596,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setIp1Count($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::IP1_COUNT]))
-			$this->oldColumnsValues[WidgetLogPeer::IP1_COUNT] = $this->getIp1Count();
+			$this->oldColumnsValues[WidgetLogPeer::IP1_COUNT] = $this->ip1_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -619,7 +619,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setIp2($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::IP2]))
-			$this->oldColumnsValues[WidgetLogPeer::IP2] = $this->getIp2();
+			$this->oldColumnsValues[WidgetLogPeer::IP2] = $this->ip2;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -642,7 +642,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setIp2Count($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::IP2_COUNT]))
-			$this->oldColumnsValues[WidgetLogPeer::IP2_COUNT] = $this->getIp2Count();
+			$this->oldColumnsValues[WidgetLogPeer::IP2_COUNT] = $this->ip2_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -763,7 +763,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setPlays($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::PLAYS]))
-			$this->oldColumnsValues[WidgetLogPeer::PLAYS] = $this->getPlays();
+			$this->oldColumnsValues[WidgetLogPeer::PLAYS] = $this->plays;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -786,7 +786,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::PARTNER_ID]))
-			$this->oldColumnsValues[WidgetLogPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[WidgetLogPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -809,7 +809,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[WidgetLogPeer::SUBP_ID]))
-			$this->oldColumnsValues[WidgetLogPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[WidgetLogPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;

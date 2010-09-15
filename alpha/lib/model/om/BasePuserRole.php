@@ -280,7 +280,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::ID]))
-			$this->oldColumnsValues[PuserRolePeer::ID] = $this->getId();
+			$this->oldColumnsValues[PuserRolePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -303,7 +303,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::KSHOW_ID]))
-			$this->oldColumnsValues[PuserRolePeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[PuserRolePeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -330,7 +330,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::PARTNER_ID]))
-			$this->oldColumnsValues[PuserRolePeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[PuserRolePeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -357,7 +357,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::PUSER_ID]))
-			$this->oldColumnsValues[PuserRolePeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[PuserRolePeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -384,7 +384,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setRole($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::ROLE]))
-			$this->oldColumnsValues[PuserRolePeer::ROLE] = $this->getRole();
+			$this->oldColumnsValues[PuserRolePeer::ROLE] = $this->role;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -505,7 +505,7 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[PuserRolePeer::SUBP_ID]))
-			$this->oldColumnsValues[PuserRolePeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[PuserRolePeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;

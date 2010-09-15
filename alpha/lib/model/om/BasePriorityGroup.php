@@ -259,7 +259,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::ID]))
-			$this->oldColumnsValues[PriorityGroupPeer::ID] = $this->getId();
+			$this->oldColumnsValues[PriorityGroupPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -331,7 +331,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setCreatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::CREATED_BY]))
-			$this->oldColumnsValues[PriorityGroupPeer::CREATED_BY] = $this->getCreatedBy();
+			$this->oldColumnsValues[PriorityGroupPeer::CREATED_BY] = $this->created_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -403,7 +403,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setUpdatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::UPDATED_BY]))
-			$this->oldColumnsValues[PriorityGroupPeer::UPDATED_BY] = $this->getUpdatedBy();
+			$this->oldColumnsValues[PriorityGroupPeer::UPDATED_BY] = $this->updated_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -426,7 +426,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::NAME]))
-			$this->oldColumnsValues[PriorityGroupPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[PriorityGroupPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -449,7 +449,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::DESCRIPTION]))
-			$this->oldColumnsValues[PriorityGroupPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[PriorityGroupPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -472,7 +472,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setPriority($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::PRIORITY]))
-			$this->oldColumnsValues[PriorityGroupPeer::PRIORITY] = $this->getPriority();
+			$this->oldColumnsValues[PriorityGroupPeer::PRIORITY] = $this->priority;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -495,7 +495,7 @@ abstract class BasePriorityGroup extends BaseObject  implements Persistent {
 	public function setBulkPriority($v)
 	{
 		if(!isset($this->oldColumnsValues[PriorityGroupPeer::BULK_PRIORITY]))
-			$this->oldColumnsValues[PriorityGroupPeer::BULK_PRIORITY] = $this->getBulkPriority();
+			$this->oldColumnsValues[PriorityGroupPeer::BULK_PRIORITY] = $this->bulk_priority;
 
 		if ($v !== null) {
 			$v = (int) $v;

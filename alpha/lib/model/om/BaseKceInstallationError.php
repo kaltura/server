@@ -215,7 +215,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::ID]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::ID] = $this->getId();
+			$this->oldColumnsValues[KceInstallationErrorPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -238,7 +238,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::PARTNER_ID]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[KceInstallationErrorPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -261,7 +261,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setBrowser($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::BROWSER]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::BROWSER] = $this->getBrowser();
+			$this->oldColumnsValues[KceInstallationErrorPeer::BROWSER] = $this->browser;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -284,7 +284,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setServerIp($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::SERVER_IP]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_IP] = $this->getServerIp();
+			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_IP] = $this->server_ip;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -307,7 +307,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setServerOs($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::SERVER_OS]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_OS] = $this->getServerOs();
+			$this->oldColumnsValues[KceInstallationErrorPeer::SERVER_OS] = $this->server_os;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -330,7 +330,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setPhpVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::PHP_VERSION]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::PHP_VERSION] = $this->getPhpVersion();
+			$this->oldColumnsValues[KceInstallationErrorPeer::PHP_VERSION] = $this->php_version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -353,7 +353,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setCeAdminEmail($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::CE_ADMIN_EMAIL]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::CE_ADMIN_EMAIL] = $this->getCeAdminEmail();
+			$this->oldColumnsValues[KceInstallationErrorPeer::CE_ADMIN_EMAIL] = $this->ce_admin_email;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -376,7 +376,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::TYPE]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[KceInstallationErrorPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -399,7 +399,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::DESCRIPTION]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[KceInstallationErrorPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -422,7 +422,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	public function setData($v)
 	{
 		if(!isset($this->oldColumnsValues[KceInstallationErrorPeer::DATA]))
-			$this->oldColumnsValues[KceInstallationErrorPeer::DATA] = $this->getData();
+			$this->oldColumnsValues[KceInstallationErrorPeer::DATA] = $this->data;
 
 		if ($v !== null) {
 			$v = (string) $v;

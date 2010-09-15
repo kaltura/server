@@ -788,7 +788,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::ID]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::ID] = $this->getId();
+			$this->oldColumnsValues[flavorParamsOutputPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -811,7 +811,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFlavorParamsId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_ID]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_ID] = $this->getFlavorParamsId();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_ID] = $this->flavor_params_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -838,7 +838,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFlavorParamsVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_VERSION]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_VERSION] = $this->getFlavorParamsVersion();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_PARAMS_VERSION] = $this->flavor_params_version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -861,7 +861,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::PARTNER_ID]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[flavorParamsOutputPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -884,7 +884,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::ENTRY_ID]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[flavorParamsOutputPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -911,7 +911,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFlavorAssetId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_ID]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_ID] = $this->getFlavorAssetId();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_ID] = $this->flavor_asset_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -938,7 +938,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFlavorAssetVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_VERSION]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_VERSION] = $this->getFlavorAssetVersion();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FLAVOR_ASSET_VERSION] = $this->flavor_asset_version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -961,7 +961,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::NAME]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[flavorParamsOutputPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -984,7 +984,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setTags($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::TAGS]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::TAGS] = $this->getTags();
+			$this->oldColumnsValues[flavorParamsOutputPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1007,7 +1007,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::DESCRIPTION]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[flavorParamsOutputPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1030,7 +1030,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setReadyBehavior($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::READY_BEHAVIOR]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::READY_BEHAVIOR] = $this->getReadyBehavior();
+			$this->oldColumnsValues[flavorParamsOutputPeer::READY_BEHAVIOR] = $this->ready_behavior;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1152,7 +1152,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setDeletedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::DELETED_AT]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::DELETED_AT] = $this->getDeletedAt();
+			$this->oldColumnsValues[flavorParamsOutputPeer::DELETED_AT] = $this->deleted_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1203,7 +1203,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setIsDefault($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::IS_DEFAULT]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::IS_DEFAULT] = $this->getIsDefault();
+			$this->oldColumnsValues[flavorParamsOutputPeer::IS_DEFAULT] = $this->is_default;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1226,7 +1226,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFormat($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FORMAT]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FORMAT] = $this->getFormat();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FORMAT] = $this->format;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1249,7 +1249,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setVideoCodec($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_CODEC]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_CODEC] = $this->getVideoCodec();
+			$this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_CODEC] = $this->video_codec;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1272,7 +1272,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setVideoBitrate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_BITRATE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_BITRATE] = $this->getVideoBitrate();
+			$this->oldColumnsValues[flavorParamsOutputPeer::VIDEO_BITRATE] = $this->video_bitrate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1295,7 +1295,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setAudioCodec($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CODEC]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CODEC] = $this->getAudioCodec();
+			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CODEC] = $this->audio_codec;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1318,7 +1318,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setAudioBitrate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_BITRATE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_BITRATE] = $this->getAudioBitrate();
+			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_BITRATE] = $this->audio_bitrate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1341,7 +1341,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setAudioChannels($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CHANNELS]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CHANNELS] = $this->getAudioChannels();
+			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_CHANNELS] = $this->audio_channels;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1364,7 +1364,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setAudioSampleRate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_SAMPLE_RATE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_SAMPLE_RATE] = $this->getAudioSampleRate();
+			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_SAMPLE_RATE] = $this->audio_sample_rate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1387,7 +1387,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setAudioResolution($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_RESOLUTION]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_RESOLUTION] = $this->getAudioResolution();
+			$this->oldColumnsValues[flavorParamsOutputPeer::AUDIO_RESOLUTION] = $this->audio_resolution;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1410,7 +1410,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::WIDTH]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::WIDTH] = $this->getWidth();
+			$this->oldColumnsValues[flavorParamsOutputPeer::WIDTH] = $this->width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1433,7 +1433,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::HEIGHT]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::HEIGHT] = $this->getHeight();
+			$this->oldColumnsValues[flavorParamsOutputPeer::HEIGHT] = $this->height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1456,7 +1456,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFrameRate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FRAME_RATE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FRAME_RATE] = $this->getFrameRate();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FRAME_RATE] = $this->frame_rate;
 
 		if ($v !== null) {
 			$v = (double) $v;
@@ -1479,7 +1479,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setGopSize($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::GOP_SIZE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::GOP_SIZE] = $this->getGopSize();
+			$this->oldColumnsValues[flavorParamsOutputPeer::GOP_SIZE] = $this->gop_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1502,7 +1502,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setTwoPass($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::TWO_PASS]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::TWO_PASS] = $this->getTwoPass();
+			$this->oldColumnsValues[flavorParamsOutputPeer::TWO_PASS] = $this->two_pass;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -1525,7 +1525,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setConversionEngines($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES] = $this->getConversionEngines();
+			$this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES] = $this->conversion_engines;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1548,7 +1548,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setConversionEnginesExtraParams($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES_EXTRA_PARAMS]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES_EXTRA_PARAMS] = $this->getConversionEnginesExtraParams();
+			$this->oldColumnsValues[flavorParamsOutputPeer::CONVERSION_ENGINES_EXTRA_PARAMS] = $this->conversion_engines_extra_params;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1591,7 +1591,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setCommandLines($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::COMMAND_LINES]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::COMMAND_LINES] = $this->getCommandLines();
+			$this->oldColumnsValues[flavorParamsOutputPeer::COMMAND_LINES] = $this->command_lines;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1614,7 +1614,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setFileExt($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::FILE_EXT]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::FILE_EXT] = $this->getFileExt();
+			$this->oldColumnsValues[flavorParamsOutputPeer::FILE_EXT] = $this->file_ext;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1637,7 +1637,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setDeinterlice($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::DEINTERLICE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::DEINTERLICE] = $this->getDeinterlice();
+			$this->oldColumnsValues[flavorParamsOutputPeer::DEINTERLICE] = $this->deinterlice;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1660,7 +1660,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setRotate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::ROTATE]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::ROTATE] = $this->getRotate();
+			$this->oldColumnsValues[flavorParamsOutputPeer::ROTATE] = $this->rotate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1683,7 +1683,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setOperators($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::OPERATORS]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::OPERATORS] = $this->getOperators();
+			$this->oldColumnsValues[flavorParamsOutputPeer::OPERATORS] = $this->operators;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1706,7 +1706,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function setEngineVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::ENGINE_VERSION]))
-			$this->oldColumnsValues[flavorParamsOutputPeer::ENGINE_VERSION] = $this->getEngineVersion();
+			$this->oldColumnsValues[flavorParamsOutputPeer::ENGINE_VERSION] = $this->engine_version;
 
 		if ($v !== null) {
 			$v = (int) $v;

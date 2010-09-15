@@ -461,7 +461,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::ID]))
-			$this->oldColumnsValues[uiConfPeer::ID] = $this->getId();
+			$this->oldColumnsValues[uiConfPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -484,7 +484,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setObjType($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::OBJ_TYPE]))
-			$this->oldColumnsValues[uiConfPeer::OBJ_TYPE] = $this->getObjType();
+			$this->oldColumnsValues[uiConfPeer::OBJ_TYPE] = $this->obj_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -507,7 +507,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::PARTNER_ID]))
-			$this->oldColumnsValues[uiConfPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[uiConfPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -530,7 +530,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::SUBP_ID]))
-			$this->oldColumnsValues[uiConfPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[uiConfPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -553,7 +553,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setConfFilePath($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::CONF_FILE_PATH]))
-			$this->oldColumnsValues[uiConfPeer::CONF_FILE_PATH] = $this->getConfFilePath();
+			$this->oldColumnsValues[uiConfPeer::CONF_FILE_PATH] = $this->conf_file_path;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -576,7 +576,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::NAME]))
-			$this->oldColumnsValues[uiConfPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[uiConfPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -599,7 +599,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::WIDTH]))
-			$this->oldColumnsValues[uiConfPeer::WIDTH] = $this->getWidth();
+			$this->oldColumnsValues[uiConfPeer::WIDTH] = $this->width;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -622,7 +622,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::HEIGHT]))
-			$this->oldColumnsValues[uiConfPeer::HEIGHT] = $this->getHeight();
+			$this->oldColumnsValues[uiConfPeer::HEIGHT] = $this->height;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -645,7 +645,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setHtmlParams($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::HTML_PARAMS]))
-			$this->oldColumnsValues[uiConfPeer::HTML_PARAMS] = $this->getHtmlParams();
+			$this->oldColumnsValues[uiConfPeer::HTML_PARAMS] = $this->html_params;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -668,7 +668,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setSwfUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::SWF_URL]))
-			$this->oldColumnsValues[uiConfPeer::SWF_URL] = $this->getSwfUrl();
+			$this->oldColumnsValues[uiConfPeer::SWF_URL] = $this->swf_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -789,7 +789,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setConfVars($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::CONF_VARS]))
-			$this->oldColumnsValues[uiConfPeer::CONF_VARS] = $this->getConfVars();
+			$this->oldColumnsValues[uiConfPeer::CONF_VARS] = $this->conf_vars;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -812,7 +812,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setUseCdn($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::USE_CDN]))
-			$this->oldColumnsValues[uiConfPeer::USE_CDN] = $this->getUseCdn();
+			$this->oldColumnsValues[uiConfPeer::USE_CDN] = $this->use_cdn;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -835,7 +835,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setTags($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::TAGS]))
-			$this->oldColumnsValues[uiConfPeer::TAGS] = $this->getTags();
+			$this->oldColumnsValues[uiConfPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -878,7 +878,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::STATUS]))
-			$this->oldColumnsValues[uiConfPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[uiConfPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -901,7 +901,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::DESCRIPTION]))
-			$this->oldColumnsValues[uiConfPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[uiConfPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -924,7 +924,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setDisplayInSearch($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::DISPLAY_IN_SEARCH]))
-			$this->oldColumnsValues[uiConfPeer::DISPLAY_IN_SEARCH] = $this->getDisplayInSearch();
+			$this->oldColumnsValues[uiConfPeer::DISPLAY_IN_SEARCH] = $this->display_in_search;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -947,7 +947,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setCreationMode($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::CREATION_MODE]))
-			$this->oldColumnsValues[uiConfPeer::CREATION_MODE] = $this->getCreationMode();
+			$this->oldColumnsValues[uiConfPeer::CREATION_MODE] = $this->creation_mode;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -970,7 +970,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function setVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[uiConfPeer::VERSION]))
-			$this->oldColumnsValues[uiConfPeer::VERSION] = $this->getVersion();
+			$this->oldColumnsValues[uiConfPeer::VERSION] = $this->version;
 
 		if ($v !== null) {
 			$v = (string) $v;

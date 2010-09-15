@@ -275,7 +275,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::ID]))
-			$this->oldColumnsValues[MetadataPeer::ID] = $this->getId();
+			$this->oldColumnsValues[MetadataPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -396,7 +396,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::VERSION]))
-			$this->oldColumnsValues[MetadataPeer::VERSION] = $this->getVersion();
+			$this->oldColumnsValues[MetadataPeer::VERSION] = $this->version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -419,7 +419,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setMetadataProfileId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_ID]))
-			$this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_ID] = $this->getMetadataProfileId();
+			$this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_ID] = $this->metadata_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -442,7 +442,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setMetadataProfileVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_VERSION]))
-			$this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_VERSION] = $this->getMetadataProfileVersion();
+			$this->oldColumnsValues[MetadataPeer::METADATA_PROFILE_VERSION] = $this->metadata_profile_version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -465,7 +465,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::PARTNER_ID]))
-			$this->oldColumnsValues[MetadataPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[MetadataPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -488,7 +488,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::OBJECT_ID]))
-			$this->oldColumnsValues[MetadataPeer::OBJECT_ID] = $this->getObjectId();
+			$this->oldColumnsValues[MetadataPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -511,7 +511,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[MetadataPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[MetadataPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -534,7 +534,7 @@ abstract class BaseMetadata extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[MetadataPeer::STATUS]))
-			$this->oldColumnsValues[MetadataPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[MetadataPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;

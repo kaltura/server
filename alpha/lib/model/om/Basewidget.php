@@ -370,7 +370,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::ID]))
-			$this->oldColumnsValues[widgetPeer::ID] = $this->getId();
+			$this->oldColumnsValues[widgetPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -393,7 +393,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setIntId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::INT_ID]))
-			$this->oldColumnsValues[widgetPeer::INT_ID] = $this->getIntId();
+			$this->oldColumnsValues[widgetPeer::INT_ID] = $this->int_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -416,7 +416,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setSourceWidgetId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::SOURCE_WIDGET_ID]))
-			$this->oldColumnsValues[widgetPeer::SOURCE_WIDGET_ID] = $this->getSourceWidgetId();
+			$this->oldColumnsValues[widgetPeer::SOURCE_WIDGET_ID] = $this->source_widget_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -439,7 +439,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setRootWidgetId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::ROOT_WIDGET_ID]))
-			$this->oldColumnsValues[widgetPeer::ROOT_WIDGET_ID] = $this->getRootWidgetId();
+			$this->oldColumnsValues[widgetPeer::ROOT_WIDGET_ID] = $this->root_widget_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -462,7 +462,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::PARTNER_ID]))
-			$this->oldColumnsValues[widgetPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[widgetPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -485,7 +485,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::SUBP_ID]))
-			$this->oldColumnsValues[widgetPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[widgetPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -508,7 +508,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::KSHOW_ID]))
-			$this->oldColumnsValues[widgetPeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[widgetPeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -535,7 +535,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::ENTRY_ID]))
-			$this->oldColumnsValues[widgetPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[widgetPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -562,7 +562,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setUiConfId($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::UI_CONF_ID]))
-			$this->oldColumnsValues[widgetPeer::UI_CONF_ID] = $this->getUiConfId();
+			$this->oldColumnsValues[widgetPeer::UI_CONF_ID] = $this->ui_conf_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -609,7 +609,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setSecurityType($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::SECURITY_TYPE]))
-			$this->oldColumnsValues[widgetPeer::SECURITY_TYPE] = $this->getSecurityType();
+			$this->oldColumnsValues[widgetPeer::SECURITY_TYPE] = $this->security_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -632,7 +632,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setSecurityPolicy($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::SECURITY_POLICY]))
-			$this->oldColumnsValues[widgetPeer::SECURITY_POLICY] = $this->getSecurityPolicy();
+			$this->oldColumnsValues[widgetPeer::SECURITY_POLICY] = $this->security_policy;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -753,7 +753,7 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	public function setPartnerData($v)
 	{
 		if(!isset($this->oldColumnsValues[widgetPeer::PARTNER_DATA]))
-			$this->oldColumnsValues[widgetPeer::PARTNER_DATA] = $this->getPartnerData();
+			$this->oldColumnsValues[widgetPeer::PARTNER_DATA] = $this->partner_data;
 
 		if ($v !== null) {
 			$v = (string) $v;

@@ -403,7 +403,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::ID] = $this->getId();
+			$this->oldColumnsValues[ControlPanelCommandPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -475,7 +475,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setCreatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY] = $this->getCreatedBy();
+			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY] = $this->created_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -547,7 +547,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setUpdatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::UPDATED_BY]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::UPDATED_BY] = $this->getUpdatedBy();
+			$this->oldColumnsValues[ControlPanelCommandPeer::UPDATED_BY] = $this->updated_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -570,7 +570,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setCreatedById($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY_ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY_ID] = $this->getCreatedById();
+			$this->oldColumnsValues[ControlPanelCommandPeer::CREATED_BY_ID] = $this->created_by_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -593,7 +593,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_ID] = $this->getSchedulerId();
+			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_ID] = $this->scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -616,7 +616,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setSchedulerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID] = $this->getSchedulerConfiguredId();
+			$this->oldColumnsValues[ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID] = $this->scheduler_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -639,7 +639,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_ID] = $this->getWorkerId();
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_ID] = $this->worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -662,7 +662,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setWorkerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_CONFIGURED_ID]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_CONFIGURED_ID] = $this->getWorkerConfiguredId();
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_CONFIGURED_ID] = $this->worker_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -685,7 +685,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setWorkerName($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::WORKER_NAME]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_NAME] = $this->getWorkerName();
+			$this->oldColumnsValues[ControlPanelCommandPeer::WORKER_NAME] = $this->worker_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -708,7 +708,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setBatchIndex($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::BATCH_INDEX]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::BATCH_INDEX] = $this->getBatchIndex();
+			$this->oldColumnsValues[ControlPanelCommandPeer::BATCH_INDEX] = $this->batch_index;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -731,7 +731,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::TYPE]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[ControlPanelCommandPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -754,7 +754,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setTargetType($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::TARGET_TYPE]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::TARGET_TYPE] = $this->getTargetType();
+			$this->oldColumnsValues[ControlPanelCommandPeer::TARGET_TYPE] = $this->target_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -777,7 +777,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::STATUS]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[ControlPanelCommandPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -800,7 +800,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setCause($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::CAUSE]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::CAUSE] = $this->getCause();
+			$this->oldColumnsValues[ControlPanelCommandPeer::CAUSE] = $this->cause;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -823,7 +823,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::DESCRIPTION]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[ControlPanelCommandPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -846,7 +846,7 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	public function setErrorDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[ControlPanelCommandPeer::ERROR_DESCRIPTION]))
-			$this->oldColumnsValues[ControlPanelCommandPeer::ERROR_DESCRIPTION] = $this->getErrorDescription();
+			$this->oldColumnsValues[ControlPanelCommandPeer::ERROR_DESCRIPTION] = $this->error_description;
 
 		if ($v !== null) {
 			$v = (string) $v;

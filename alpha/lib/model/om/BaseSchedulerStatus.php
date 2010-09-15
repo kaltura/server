@@ -307,7 +307,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::ID]))
-			$this->oldColumnsValues[SchedulerStatusPeer::ID] = $this->getId();
+			$this->oldColumnsValues[SchedulerStatusPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -379,7 +379,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setCreatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::CREATED_BY]))
-			$this->oldColumnsValues[SchedulerStatusPeer::CREATED_BY] = $this->getCreatedBy();
+			$this->oldColumnsValues[SchedulerStatusPeer::CREATED_BY] = $this->created_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -451,7 +451,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setUpdatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::UPDATED_BY]))
-			$this->oldColumnsValues[SchedulerStatusPeer::UPDATED_BY] = $this->getUpdatedBy();
+			$this->oldColumnsValues[SchedulerStatusPeer::UPDATED_BY] = $this->updated_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -474,7 +474,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_ID] = $this->getSchedulerId();
+			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_ID] = $this->scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -497,7 +497,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setSchedulerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_CONFIGURED_ID]))
-			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_CONFIGURED_ID] = $this->getSchedulerConfiguredId();
+			$this->oldColumnsValues[SchedulerStatusPeer::SCHEDULER_CONFIGURED_ID] = $this->scheduler_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -520,7 +520,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_ID]))
-			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_ID] = $this->getWorkerId();
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_ID] = $this->worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -543,7 +543,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setWorkerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_CONFIGURED_ID]))
-			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_CONFIGURED_ID] = $this->getWorkerConfiguredId();
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_CONFIGURED_ID] = $this->worker_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -566,7 +566,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setWorkerType($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::WORKER_TYPE]))
-			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_TYPE] = $this->getWorkerType();
+			$this->oldColumnsValues[SchedulerStatusPeer::WORKER_TYPE] = $this->worker_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -589,7 +589,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::TYPE]))
-			$this->oldColumnsValues[SchedulerStatusPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[SchedulerStatusPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -612,7 +612,7 @@ abstract class BaseSchedulerStatus extends BaseObject  implements Persistent {
 	public function setValue($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerStatusPeer::VALUE]))
-			$this->oldColumnsValues[SchedulerStatusPeer::VALUE] = $this->getValue();
+			$this->oldColumnsValues[SchedulerStatusPeer::VALUE] = $this->value;
 
 		if ($v !== null) {
 			$v = (int) $v;

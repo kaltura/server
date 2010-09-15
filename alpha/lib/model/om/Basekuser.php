@@ -979,7 +979,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ID]))
-			$this->oldColumnsValues[kuserPeer::ID] = $this->getId();
+			$this->oldColumnsValues[kuserPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1002,7 +1002,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setScreenName($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::SCREEN_NAME]))
-			$this->oldColumnsValues[kuserPeer::SCREEN_NAME] = $this->getScreenName();
+			$this->oldColumnsValues[kuserPeer::SCREEN_NAME] = $this->screen_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1025,7 +1025,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setFullName($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::FULL_NAME]))
-			$this->oldColumnsValues[kuserPeer::FULL_NAME] = $this->getFullName();
+			$this->oldColumnsValues[kuserPeer::FULL_NAME] = $this->full_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1048,7 +1048,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setEmail($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::EMAIL]))
-			$this->oldColumnsValues[kuserPeer::EMAIL] = $this->getEmail();
+			$this->oldColumnsValues[kuserPeer::EMAIL] = $this->email;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1071,7 +1071,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setSha1Password($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::SHA1_PASSWORD]))
-			$this->oldColumnsValues[kuserPeer::SHA1_PASSWORD] = $this->getSha1Password();
+			$this->oldColumnsValues[kuserPeer::SHA1_PASSWORD] = $this->sha1_password;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1094,7 +1094,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setSalt($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::SALT]))
-			$this->oldColumnsValues[kuserPeer::SALT] = $this->getSalt();
+			$this->oldColumnsValues[kuserPeer::SALT] = $this->salt;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1118,7 +1118,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setDateOfBirth($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::DATE_OF_BIRTH]))
-			$this->oldColumnsValues[kuserPeer::DATE_OF_BIRTH] = $this->getDateOfBirth();
+			$this->oldColumnsValues[kuserPeer::DATE_OF_BIRTH] = $this->date_of_birth;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1169,7 +1169,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setCountry($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::COUNTRY]))
-			$this->oldColumnsValues[kuserPeer::COUNTRY] = $this->getCountry();
+			$this->oldColumnsValues[kuserPeer::COUNTRY] = $this->country;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1192,7 +1192,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setState($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::STATE]))
-			$this->oldColumnsValues[kuserPeer::STATE] = $this->getState();
+			$this->oldColumnsValues[kuserPeer::STATE] = $this->state;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1215,7 +1215,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setCity($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::CITY]))
-			$this->oldColumnsValues[kuserPeer::CITY] = $this->getCity();
+			$this->oldColumnsValues[kuserPeer::CITY] = $this->city;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1238,7 +1238,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setZip($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ZIP]))
-			$this->oldColumnsValues[kuserPeer::ZIP] = $this->getZip();
+			$this->oldColumnsValues[kuserPeer::ZIP] = $this->zip;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1261,7 +1261,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setUrlList($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::URL_LIST]))
-			$this->oldColumnsValues[kuserPeer::URL_LIST] = $this->getUrlList();
+			$this->oldColumnsValues[kuserPeer::URL_LIST] = $this->url_list;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1284,7 +1284,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setPicture($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::PICTURE]))
-			$this->oldColumnsValues[kuserPeer::PICTURE] = $this->getPicture();
+			$this->oldColumnsValues[kuserPeer::PICTURE] = $this->picture;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1307,7 +1307,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setIcon($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ICON]))
-			$this->oldColumnsValues[kuserPeer::ICON] = $this->getIcon();
+			$this->oldColumnsValues[kuserPeer::ICON] = $this->icon;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1330,7 +1330,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setAboutMe($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ABOUT_ME]))
-			$this->oldColumnsValues[kuserPeer::ABOUT_ME] = $this->getAboutMe();
+			$this->oldColumnsValues[kuserPeer::ABOUT_ME] = $this->about_me;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1353,7 +1353,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setTags($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::TAGS]))
-			$this->oldColumnsValues[kuserPeer::TAGS] = $this->getTags();
+			$this->oldColumnsValues[kuserPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1376,7 +1376,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setTagline($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::TAGLINE]))
-			$this->oldColumnsValues[kuserPeer::TAGLINE] = $this->getTagline();
+			$this->oldColumnsValues[kuserPeer::TAGLINE] = $this->tagline;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1399,7 +1399,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setNetworkHighschool($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::NETWORK_HIGHSCHOOL]))
-			$this->oldColumnsValues[kuserPeer::NETWORK_HIGHSCHOOL] = $this->getNetworkHighschool();
+			$this->oldColumnsValues[kuserPeer::NETWORK_HIGHSCHOOL] = $this->network_highschool;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1422,7 +1422,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setNetworkCollege($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::NETWORK_COLLEGE]))
-			$this->oldColumnsValues[kuserPeer::NETWORK_COLLEGE] = $this->getNetworkCollege();
+			$this->oldColumnsValues[kuserPeer::NETWORK_COLLEGE] = $this->network_college;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1445,7 +1445,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setNetworkOther($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::NETWORK_OTHER]))
-			$this->oldColumnsValues[kuserPeer::NETWORK_OTHER] = $this->getNetworkOther();
+			$this->oldColumnsValues[kuserPeer::NETWORK_OTHER] = $this->network_other;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1468,7 +1468,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setMobileNum($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::MOBILE_NUM]))
-			$this->oldColumnsValues[kuserPeer::MOBILE_NUM] = $this->getMobileNum();
+			$this->oldColumnsValues[kuserPeer::MOBILE_NUM] = $this->mobile_num;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1491,7 +1491,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setMatureContent($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::MATURE_CONTENT]))
-			$this->oldColumnsValues[kuserPeer::MATURE_CONTENT] = $this->getMatureContent();
+			$this->oldColumnsValues[kuserPeer::MATURE_CONTENT] = $this->mature_content;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1514,7 +1514,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setGender($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::GENDER]))
-			$this->oldColumnsValues[kuserPeer::GENDER] = $this->getGender();
+			$this->oldColumnsValues[kuserPeer::GENDER] = $this->gender;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1537,7 +1537,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setRegistrationIp($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::REGISTRATION_IP]))
-			$this->oldColumnsValues[kuserPeer::REGISTRATION_IP] = $this->getRegistrationIp();
+			$this->oldColumnsValues[kuserPeer::REGISTRATION_IP] = $this->registration_ip;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1560,7 +1560,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setRegistrationCookie($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::REGISTRATION_COOKIE]))
-			$this->oldColumnsValues[kuserPeer::REGISTRATION_COOKIE] = $this->getRegistrationCookie();
+			$this->oldColumnsValues[kuserPeer::REGISTRATION_COOKIE] = $this->registration_cookie;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1583,7 +1583,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setImList($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::IM_LIST]))
-			$this->oldColumnsValues[kuserPeer::IM_LIST] = $this->getImList();
+			$this->oldColumnsValues[kuserPeer::IM_LIST] = $this->im_list;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1606,7 +1606,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setViews($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::VIEWS]))
-			$this->oldColumnsValues[kuserPeer::VIEWS] = $this->getViews();
+			$this->oldColumnsValues[kuserPeer::VIEWS] = $this->views;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1629,7 +1629,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setFans($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::FANS]))
-			$this->oldColumnsValues[kuserPeer::FANS] = $this->getFans();
+			$this->oldColumnsValues[kuserPeer::FANS] = $this->fans;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1652,7 +1652,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setEntries($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ENTRIES]))
-			$this->oldColumnsValues[kuserPeer::ENTRIES] = $this->getEntries();
+			$this->oldColumnsValues[kuserPeer::ENTRIES] = $this->entries;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1675,7 +1675,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setStorageSize($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::STORAGE_SIZE]))
-			$this->oldColumnsValues[kuserPeer::STORAGE_SIZE] = $this->getStorageSize();
+			$this->oldColumnsValues[kuserPeer::STORAGE_SIZE] = $this->storage_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1698,7 +1698,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setProducedKshows($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::PRODUCED_KSHOWS]))
-			$this->oldColumnsValues[kuserPeer::PRODUCED_KSHOWS] = $this->getProducedKshows();
+			$this->oldColumnsValues[kuserPeer::PRODUCED_KSHOWS] = $this->produced_kshows;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1721,7 +1721,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::STATUS]))
-			$this->oldColumnsValues[kuserPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[kuserPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1842,7 +1842,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::PARTNER_ID]))
-			$this->oldColumnsValues[kuserPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[kuserPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1865,7 +1865,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setDisplayInSearch($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::DISPLAY_IN_SEARCH]))
-			$this->oldColumnsValues[kuserPeer::DISPLAY_IN_SEARCH] = $this->getDisplayInSearch();
+			$this->oldColumnsValues[kuserPeer::DISPLAY_IN_SEARCH] = $this->display_in_search;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1888,7 +1888,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setSearchText($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::SEARCH_TEXT]))
-			$this->oldColumnsValues[kuserPeer::SEARCH_TEXT] = $this->getSearchText();
+			$this->oldColumnsValues[kuserPeer::SEARCH_TEXT] = $this->search_text;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1911,7 +1911,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setPartnerData($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::PARTNER_DATA]))
-			$this->oldColumnsValues[kuserPeer::PARTNER_DATA] = $this->getPartnerData();
+			$this->oldColumnsValues[kuserPeer::PARTNER_DATA] = $this->partner_data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1934,7 +1934,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::PUSER_ID]))
-			$this->oldColumnsValues[kuserPeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[kuserPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1957,7 +1957,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setAdminTags($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::ADMIN_TAGS]))
-			$this->oldColumnsValues[kuserPeer::ADMIN_TAGS] = $this->getAdminTags();
+			$this->oldColumnsValues[kuserPeer::ADMIN_TAGS] = $this->admin_tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1980,7 +1980,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setIndexedPartnerDataInt($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_INT]))
-			$this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_INT] = $this->getIndexedPartnerDataInt();
+			$this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_INT] = $this->indexed_partner_data_int;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2003,7 +2003,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function setIndexedPartnerDataString($v)
 	{
 		if(!isset($this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_STRING]))
-			$this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_STRING] = $this->getIndexedPartnerDataString();
+			$this->oldColumnsValues[kuserPeer::INDEXED_PARTNER_DATA_STRING] = $this->indexed_partner_data_string;
 
 		if ($v !== null) {
 			$v = (string) $v;

@@ -371,7 +371,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::ID] = $this->getId();
+			$this->oldColumnsValues[SchedulerConfigPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -443,7 +443,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setCreatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::CREATED_BY]))
-			$this->oldColumnsValues[SchedulerConfigPeer::CREATED_BY] = $this->getCreatedBy();
+			$this->oldColumnsValues[SchedulerConfigPeer::CREATED_BY] = $this->created_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -515,7 +515,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setUpdatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::UPDATED_BY]))
-			$this->oldColumnsValues[SchedulerConfigPeer::UPDATED_BY] = $this->getUpdatedBy();
+			$this->oldColumnsValues[SchedulerConfigPeer::UPDATED_BY] = $this->updated_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -538,7 +538,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setCommandId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::COMMAND_ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::COMMAND_ID] = $this->getCommandId();
+			$this->oldColumnsValues[SchedulerConfigPeer::COMMAND_ID] = $this->command_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -561,7 +561,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setCommandStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::COMMAND_STATUS]))
-			$this->oldColumnsValues[SchedulerConfigPeer::COMMAND_STATUS] = $this->getCommandStatus();
+			$this->oldColumnsValues[SchedulerConfigPeer::COMMAND_STATUS] = $this->command_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -584,7 +584,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_ID] = $this->getSchedulerId();
+			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_ID] = $this->scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -607,7 +607,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setSchedulerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_CONFIGURED_ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_CONFIGURED_ID] = $this->getSchedulerConfiguredId();
+			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_CONFIGURED_ID] = $this->scheduler_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -630,7 +630,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setSchedulerName($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_NAME]))
-			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_NAME] = $this->getSchedulerName();
+			$this->oldColumnsValues[SchedulerConfigPeer::SCHEDULER_NAME] = $this->scheduler_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -653,7 +653,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::WORKER_ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_ID] = $this->getWorkerId();
+			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_ID] = $this->worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -676,7 +676,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setWorkerConfiguredId($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::WORKER_CONFIGURED_ID]))
-			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_CONFIGURED_ID] = $this->getWorkerConfiguredId();
+			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_CONFIGURED_ID] = $this->worker_configured_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -699,7 +699,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setWorkerName($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::WORKER_NAME]))
-			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_NAME] = $this->getWorkerName();
+			$this->oldColumnsValues[SchedulerConfigPeer::WORKER_NAME] = $this->worker_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -722,7 +722,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setVariable($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::VARIABLE]))
-			$this->oldColumnsValues[SchedulerConfigPeer::VARIABLE] = $this->getVariable();
+			$this->oldColumnsValues[SchedulerConfigPeer::VARIABLE] = $this->variable;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -745,7 +745,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setVariablePart($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::VARIABLE_PART]))
-			$this->oldColumnsValues[SchedulerConfigPeer::VARIABLE_PART] = $this->getVariablePart();
+			$this->oldColumnsValues[SchedulerConfigPeer::VARIABLE_PART] = $this->variable_part;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -768,7 +768,7 @@ abstract class BaseSchedulerConfig extends BaseObject  implements Persistent {
 	public function setValue($v)
 	{
 		if(!isset($this->oldColumnsValues[SchedulerConfigPeer::VALUE]))
-			$this->oldColumnsValues[SchedulerConfigPeer::VALUE] = $this->getValue();
+			$this->oldColumnsValues[SchedulerConfigPeer::VALUE] = $this->value;
 
 		if ($v !== null) {
 			$v = (string) $v;

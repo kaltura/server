@@ -329,7 +329,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::ID]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::ID] = $this->getId();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -352,7 +352,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::NAME]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::NAME] = $this->getName();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -375,7 +375,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::DESCRIPTION]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -398,7 +398,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setEmailAddress($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::EMAIL_ADDRESS]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::EMAIL_ADDRESS] = $this->getEmailAddress();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::EMAIL_ADDRESS] = $this->email_address;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -421,7 +421,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setMailboxId($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::MAILBOX_ID]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::MAILBOX_ID] = $this->getMailboxId();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::MAILBOX_ID] = $this->mailbox_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -444,7 +444,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::PARTNER_ID]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -467,7 +467,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setConversionProfile2Id($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::CONVERSION_PROFILE_2_ID]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::CONVERSION_PROFILE_2_ID] = $this->getConversionProfile2Id();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::CONVERSION_PROFILE_2_ID] = $this->conversion_profile_2_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -490,7 +490,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setModerationStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::MODERATION_STATUS]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::MODERATION_STATUS] = $this->getModerationStatus();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::MODERATION_STATUS] = $this->moderation_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -533,7 +533,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[EmailIngestionProfilePeer::STATUS]))
-			$this->oldColumnsValues[EmailIngestionProfilePeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[EmailIngestionProfilePeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;

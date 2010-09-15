@@ -328,7 +328,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::ID]))
-			$this->oldColumnsValues[moderationPeer::ID] = $this->getId();
+			$this->oldColumnsValues[moderationPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -351,7 +351,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::PARTNER_ID]))
-			$this->oldColumnsValues[moderationPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[moderationPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -374,7 +374,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::SUBP_ID]))
-			$this->oldColumnsValues[moderationPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[moderationPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -397,7 +397,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::OBJECT_ID]))
-			$this->oldColumnsValues[moderationPeer::OBJECT_ID] = $this->getObjectId();
+			$this->oldColumnsValues[moderationPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -420,7 +420,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[moderationPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[moderationPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -443,7 +443,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::KUSER_ID]))
-			$this->oldColumnsValues[moderationPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[moderationPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -470,7 +470,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::PUSER_ID]))
-			$this->oldColumnsValues[moderationPeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[moderationPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -493,7 +493,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::STATUS]))
-			$this->oldColumnsValues[moderationPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[moderationPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -614,7 +614,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setComments($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::COMMENTS]))
-			$this->oldColumnsValues[moderationPeer::COMMENTS] = $this->getComments();
+			$this->oldColumnsValues[moderationPeer::COMMENTS] = $this->comments;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -637,7 +637,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setGroupId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::GROUP_ID]))
-			$this->oldColumnsValues[moderationPeer::GROUP_ID] = $this->getGroupId();
+			$this->oldColumnsValues[moderationPeer::GROUP_ID] = $this->group_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -660,7 +660,7 @@ abstract class Basemoderation extends BaseObject  implements Persistent {
 	public function setReportCode($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationPeer::REPORT_CODE]))
-			$this->oldColumnsValues[moderationPeer::REPORT_CODE] = $this->getReportCode();
+			$this->oldColumnsValues[moderationPeer::REPORT_CODE] = $this->report_code;
 
 		if ($v !== null) {
 			$v = (int) $v;

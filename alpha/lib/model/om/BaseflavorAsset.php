@@ -543,7 +543,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::ID]))
-			$this->oldColumnsValues[flavorAssetPeer::ID] = $this->getId();
+			$this->oldColumnsValues[flavorAssetPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -566,7 +566,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setIntId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::INT_ID]))
-			$this->oldColumnsValues[flavorAssetPeer::INT_ID] = $this->getIntId();
+			$this->oldColumnsValues[flavorAssetPeer::INT_ID] = $this->int_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -589,7 +589,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::PARTNER_ID]))
-			$this->oldColumnsValues[flavorAssetPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[flavorAssetPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -612,7 +612,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setTags($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::TAGS]))
-			$this->oldColumnsValues[flavorAssetPeer::TAGS] = $this->getTags();
+			$this->oldColumnsValues[flavorAssetPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -734,7 +734,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setDeletedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::DELETED_AT]))
-			$this->oldColumnsValues[flavorAssetPeer::DELETED_AT] = $this->getDeletedAt();
+			$this->oldColumnsValues[flavorAssetPeer::DELETED_AT] = $this->deleted_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -785,7 +785,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::ENTRY_ID]))
-			$this->oldColumnsValues[flavorAssetPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[flavorAssetPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -812,7 +812,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setFlavorParamsId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::FLAVOR_PARAMS_ID]))
-			$this->oldColumnsValues[flavorAssetPeer::FLAVOR_PARAMS_ID] = $this->getFlavorParamsId();
+			$this->oldColumnsValues[flavorAssetPeer::FLAVOR_PARAMS_ID] = $this->flavor_params_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -839,7 +839,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::STATUS]))
-			$this->oldColumnsValues[flavorAssetPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[flavorAssetPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -862,7 +862,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::VERSION]))
-			$this->oldColumnsValues[flavorAssetPeer::VERSION] = $this->getVersion();
+			$this->oldColumnsValues[flavorAssetPeer::VERSION] = $this->version;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -885,7 +885,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::DESCRIPTION]))
-			$this->oldColumnsValues[flavorAssetPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[flavorAssetPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -908,7 +908,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::WIDTH]))
-			$this->oldColumnsValues[flavorAssetPeer::WIDTH] = $this->getWidth();
+			$this->oldColumnsValues[flavorAssetPeer::WIDTH] = $this->width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -931,7 +931,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::HEIGHT]))
-			$this->oldColumnsValues[flavorAssetPeer::HEIGHT] = $this->getHeight();
+			$this->oldColumnsValues[flavorAssetPeer::HEIGHT] = $this->height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -954,7 +954,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setBitrate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::BITRATE]))
-			$this->oldColumnsValues[flavorAssetPeer::BITRATE] = $this->getBitrate();
+			$this->oldColumnsValues[flavorAssetPeer::BITRATE] = $this->bitrate;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -977,7 +977,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setFrameRate($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::FRAME_RATE]))
-			$this->oldColumnsValues[flavorAssetPeer::FRAME_RATE] = $this->getFrameRate();
+			$this->oldColumnsValues[flavorAssetPeer::FRAME_RATE] = $this->frame_rate;
 
 		if ($v !== null) {
 			$v = (double) $v;
@@ -1000,7 +1000,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setSize($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::SIZE]))
-			$this->oldColumnsValues[flavorAssetPeer::SIZE] = $this->getSize();
+			$this->oldColumnsValues[flavorAssetPeer::SIZE] = $this->size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1023,7 +1023,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setIsOriginal($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::IS_ORIGINAL]))
-			$this->oldColumnsValues[flavorAssetPeer::IS_ORIGINAL] = $this->getIsOriginal();
+			$this->oldColumnsValues[flavorAssetPeer::IS_ORIGINAL] = $this->is_original;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -1046,7 +1046,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setFileExt($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::FILE_EXT]))
-			$this->oldColumnsValues[flavorAssetPeer::FILE_EXT] = $this->getFileExt();
+			$this->oldColumnsValues[flavorAssetPeer::FILE_EXT] = $this->file_ext;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1069,7 +1069,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setContainerFormat($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::CONTAINER_FORMAT]))
-			$this->oldColumnsValues[flavorAssetPeer::CONTAINER_FORMAT] = $this->getContainerFormat();
+			$this->oldColumnsValues[flavorAssetPeer::CONTAINER_FORMAT] = $this->container_format;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1092,7 +1092,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function setVideoCodecId($v)
 	{
 		if(!isset($this->oldColumnsValues[flavorAssetPeer::VIDEO_CODEC_ID]))
-			$this->oldColumnsValues[flavorAssetPeer::VIDEO_CODEC_ID] = $this->getVideoCodecId();
+			$this->oldColumnsValues[flavorAssetPeer::VIDEO_CODEC_ID] = $this->video_codec_id;
 
 		if ($v !== null) {
 			$v = (string) $v;

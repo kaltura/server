@@ -218,7 +218,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::ID]))
-			$this->oldColumnsValues[flagPeer::ID] = $this->getId();
+			$this->oldColumnsValues[flagPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -241,7 +241,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::KUSER_ID]))
-			$this->oldColumnsValues[flagPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[flagPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -268,7 +268,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setSubjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::SUBJECT_TYPE]))
-			$this->oldColumnsValues[flagPeer::SUBJECT_TYPE] = $this->getSubjectType();
+			$this->oldColumnsValues[flagPeer::SUBJECT_TYPE] = $this->subject_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -291,7 +291,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setSubjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::SUBJECT_ID]))
-			$this->oldColumnsValues[flagPeer::SUBJECT_ID] = $this->getSubjectId();
+			$this->oldColumnsValues[flagPeer::SUBJECT_ID] = $this->subject_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -314,7 +314,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setFlagType($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::FLAG_TYPE]))
-			$this->oldColumnsValues[flagPeer::FLAG_TYPE] = $this->getFlagType();
+			$this->oldColumnsValues[flagPeer::FLAG_TYPE] = $this->flag_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -337,7 +337,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setOther($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::OTHER]))
-			$this->oldColumnsValues[flagPeer::OTHER] = $this->getOther();
+			$this->oldColumnsValues[flagPeer::OTHER] = $this->other;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -360,7 +360,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	public function setComment($v)
 	{
 		if(!isset($this->oldColumnsValues[flagPeer::COMMENT]))
-			$this->oldColumnsValues[flagPeer::COMMENT] = $this->getComment();
+			$this->oldColumnsValues[flagPeer::COMMENT] = $this->comment;
 
 		if ($v !== null) {
 			$v = (string) $v;

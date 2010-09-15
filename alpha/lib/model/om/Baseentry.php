@@ -1291,7 +1291,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::ID]))
-			$this->oldColumnsValues[entryPeer::ID] = $this->getId();
+			$this->oldColumnsValues[entryPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1314,7 +1314,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::KSHOW_ID]))
-			$this->oldColumnsValues[entryPeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[entryPeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1341,7 +1341,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::KUSER_ID]))
-			$this->oldColumnsValues[entryPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[entryPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1368,7 +1368,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::NAME]))
-			$this->oldColumnsValues[entryPeer::NAME] = $this->getName();
+			$this->oldColumnsValues[entryPeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1391,7 +1391,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::TYPE]))
-			$this->oldColumnsValues[entryPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[entryPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1414,7 +1414,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setMediaType($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::MEDIA_TYPE]))
-			$this->oldColumnsValues[entryPeer::MEDIA_TYPE] = $this->getMediaType();
+			$this->oldColumnsValues[entryPeer::MEDIA_TYPE] = $this->media_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1437,7 +1437,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setData($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::DATA]))
-			$this->oldColumnsValues[entryPeer::DATA] = $this->getData();
+			$this->oldColumnsValues[entryPeer::DATA] = $this->data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1460,7 +1460,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setThumbnail($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::THUMBNAIL]))
-			$this->oldColumnsValues[entryPeer::THUMBNAIL] = $this->getThumbnail();
+			$this->oldColumnsValues[entryPeer::THUMBNAIL] = $this->thumbnail;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1483,7 +1483,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setViews($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::VIEWS]))
-			$this->oldColumnsValues[entryPeer::VIEWS] = $this->getViews();
+			$this->oldColumnsValues[entryPeer::VIEWS] = $this->views;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1506,7 +1506,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setVotes($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::VOTES]))
-			$this->oldColumnsValues[entryPeer::VOTES] = $this->getVotes();
+			$this->oldColumnsValues[entryPeer::VOTES] = $this->votes;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1529,7 +1529,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setComments($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::COMMENTS]))
-			$this->oldColumnsValues[entryPeer::COMMENTS] = $this->getComments();
+			$this->oldColumnsValues[entryPeer::COMMENTS] = $this->comments;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1552,7 +1552,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setFavorites($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::FAVORITES]))
-			$this->oldColumnsValues[entryPeer::FAVORITES] = $this->getFavorites();
+			$this->oldColumnsValues[entryPeer::FAVORITES] = $this->favorites;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1575,7 +1575,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setTotalRank($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::TOTAL_RANK]))
-			$this->oldColumnsValues[entryPeer::TOTAL_RANK] = $this->getTotalRank();
+			$this->oldColumnsValues[entryPeer::TOTAL_RANK] = $this->total_rank;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1598,7 +1598,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setRank($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::RANK]))
-			$this->oldColumnsValues[entryPeer::RANK] = $this->getRank();
+			$this->oldColumnsValues[entryPeer::RANK] = $this->rank;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1621,7 +1621,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setTags($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::TAGS]))
-			$this->oldColumnsValues[entryPeer::TAGS] = $this->getTags();
+			$this->oldColumnsValues[entryPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1644,7 +1644,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setAnonymous($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::ANONYMOUS]))
-			$this->oldColumnsValues[entryPeer::ANONYMOUS] = $this->getAnonymous();
+			$this->oldColumnsValues[entryPeer::ANONYMOUS] = $this->anonymous;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1667,7 +1667,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::STATUS]))
-			$this->oldColumnsValues[entryPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[entryPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1690,7 +1690,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSource($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SOURCE]))
-			$this->oldColumnsValues[entryPeer::SOURCE] = $this->getSource();
+			$this->oldColumnsValues[entryPeer::SOURCE] = $this->source;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1713,7 +1713,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSourceId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SOURCE_ID]))
-			$this->oldColumnsValues[entryPeer::SOURCE_ID] = $this->getSourceId();
+			$this->oldColumnsValues[entryPeer::SOURCE_ID] = $this->source_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1736,7 +1736,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSourceLink($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SOURCE_LINK]))
-			$this->oldColumnsValues[entryPeer::SOURCE_LINK] = $this->getSourceLink();
+			$this->oldColumnsValues[entryPeer::SOURCE_LINK] = $this->source_link;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1759,7 +1759,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setLicenseType($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::LICENSE_TYPE]))
-			$this->oldColumnsValues[entryPeer::LICENSE_TYPE] = $this->getLicenseType();
+			$this->oldColumnsValues[entryPeer::LICENSE_TYPE] = $this->license_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1782,7 +1782,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setCredit($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::CREDIT]))
-			$this->oldColumnsValues[entryPeer::CREDIT] = $this->getCredit();
+			$this->oldColumnsValues[entryPeer::CREDIT] = $this->credit;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1805,7 +1805,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setLengthInMsecs($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::LENGTH_IN_MSECS]))
-			$this->oldColumnsValues[entryPeer::LENGTH_IN_MSECS] = $this->getLengthInMsecs();
+			$this->oldColumnsValues[entryPeer::LENGTH_IN_MSECS] = $this->length_in_msecs;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1926,7 +1926,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::PARTNER_ID]))
-			$this->oldColumnsValues[entryPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[entryPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1949,7 +1949,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setDisplayInSearch($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::DISPLAY_IN_SEARCH]))
-			$this->oldColumnsValues[entryPeer::DISPLAY_IN_SEARCH] = $this->getDisplayInSearch();
+			$this->oldColumnsValues[entryPeer::DISPLAY_IN_SEARCH] = $this->display_in_search;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1972,7 +1972,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SUBP_ID]))
-			$this->oldColumnsValues[entryPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[entryPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2015,7 +2015,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSearchText($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SEARCH_TEXT]))
-			$this->oldColumnsValues[entryPeer::SEARCH_TEXT] = $this->getSearchText();
+			$this->oldColumnsValues[entryPeer::SEARCH_TEXT] = $this->search_text;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2038,7 +2038,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setScreenName($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SCREEN_NAME]))
-			$this->oldColumnsValues[entryPeer::SCREEN_NAME] = $this->getScreenName();
+			$this->oldColumnsValues[entryPeer::SCREEN_NAME] = $this->screen_name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2061,7 +2061,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSiteUrl($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SITE_URL]))
-			$this->oldColumnsValues[entryPeer::SITE_URL] = $this->getSiteUrl();
+			$this->oldColumnsValues[entryPeer::SITE_URL] = $this->site_url;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2084,7 +2084,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setPermissions($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::PERMISSIONS]))
-			$this->oldColumnsValues[entryPeer::PERMISSIONS] = $this->getPermissions();
+			$this->oldColumnsValues[entryPeer::PERMISSIONS] = $this->permissions;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2107,7 +2107,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setGroupId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::GROUP_ID]))
-			$this->oldColumnsValues[entryPeer::GROUP_ID] = $this->getGroupId();
+			$this->oldColumnsValues[entryPeer::GROUP_ID] = $this->group_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2130,7 +2130,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setPlays($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::PLAYS]))
-			$this->oldColumnsValues[entryPeer::PLAYS] = $this->getPlays();
+			$this->oldColumnsValues[entryPeer::PLAYS] = $this->plays;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2153,7 +2153,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setPartnerData($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::PARTNER_DATA]))
-			$this->oldColumnsValues[entryPeer::PARTNER_DATA] = $this->getPartnerData();
+			$this->oldColumnsValues[entryPeer::PARTNER_DATA] = $this->partner_data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2176,7 +2176,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setIntId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::INT_ID]))
-			$this->oldColumnsValues[entryPeer::INT_ID] = $this->getIntId();
+			$this->oldColumnsValues[entryPeer::INT_ID] = $this->int_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2199,7 +2199,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setIndexedCustomData1($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::INDEXED_CUSTOM_DATA_1]))
-			$this->oldColumnsValues[entryPeer::INDEXED_CUSTOM_DATA_1] = $this->getIndexedCustomData1();
+			$this->oldColumnsValues[entryPeer::INDEXED_CUSTOM_DATA_1] = $this->indexed_custom_data_1;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2222,7 +2222,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::DESCRIPTION]))
-			$this->oldColumnsValues[entryPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[entryPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2246,7 +2246,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setMediaDate($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::MEDIA_DATE]))
-			$this->oldColumnsValues[entryPeer::MEDIA_DATE] = $this->getMediaDate();
+			$this->oldColumnsValues[entryPeer::MEDIA_DATE] = $this->media_date;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -2297,7 +2297,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setAdminTags($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::ADMIN_TAGS]))
-			$this->oldColumnsValues[entryPeer::ADMIN_TAGS] = $this->getAdminTags();
+			$this->oldColumnsValues[entryPeer::ADMIN_TAGS] = $this->admin_tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2320,7 +2320,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setModerationStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::MODERATION_STATUS]))
-			$this->oldColumnsValues[entryPeer::MODERATION_STATUS] = $this->getModerationStatus();
+			$this->oldColumnsValues[entryPeer::MODERATION_STATUS] = $this->moderation_status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2343,7 +2343,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setModerationCount($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::MODERATION_COUNT]))
-			$this->oldColumnsValues[entryPeer::MODERATION_COUNT] = $this->getModerationCount();
+			$this->oldColumnsValues[entryPeer::MODERATION_COUNT] = $this->moderation_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2367,7 +2367,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setModifiedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::MODIFIED_AT]))
-			$this->oldColumnsValues[entryPeer::MODIFIED_AT] = $this->getModifiedAt();
+			$this->oldColumnsValues[entryPeer::MODIFIED_AT] = $this->modified_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -2418,7 +2418,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::PUSER_ID]))
-			$this->oldColumnsValues[entryPeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[entryPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2441,7 +2441,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setAccessControlId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::ACCESS_CONTROL_ID]))
-			$this->oldColumnsValues[entryPeer::ACCESS_CONTROL_ID] = $this->getAccessControlId();
+			$this->oldColumnsValues[entryPeer::ACCESS_CONTROL_ID] = $this->access_control_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2468,7 +2468,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setConversionProfileId($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::CONVERSION_PROFILE_ID]))
-			$this->oldColumnsValues[entryPeer::CONVERSION_PROFILE_ID] = $this->getConversionProfileId();
+			$this->oldColumnsValues[entryPeer::CONVERSION_PROFILE_ID] = $this->conversion_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2495,7 +2495,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setCategories($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::CATEGORIES]))
-			$this->oldColumnsValues[entryPeer::CATEGORIES] = $this->getCategories();
+			$this->oldColumnsValues[entryPeer::CATEGORIES] = $this->categories;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2518,7 +2518,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setCategoriesIds($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::CATEGORIES_IDS]))
-			$this->oldColumnsValues[entryPeer::CATEGORIES_IDS] = $this->getCategoriesIds();
+			$this->oldColumnsValues[entryPeer::CATEGORIES_IDS] = $this->categories_ids;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2542,7 +2542,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setStartDate($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::START_DATE]))
-			$this->oldColumnsValues[entryPeer::START_DATE] = $this->getStartDate();
+			$this->oldColumnsValues[entryPeer::START_DATE] = $this->start_date;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -2594,7 +2594,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setEndDate($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::END_DATE]))
-			$this->oldColumnsValues[entryPeer::END_DATE] = $this->getEndDate();
+			$this->oldColumnsValues[entryPeer::END_DATE] = $this->end_date;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -2645,7 +2645,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setSearchTextDiscrete($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::SEARCH_TEXT_DISCRETE]))
-			$this->oldColumnsValues[entryPeer::SEARCH_TEXT_DISCRETE] = $this->getSearchTextDiscrete();
+			$this->oldColumnsValues[entryPeer::SEARCH_TEXT_DISCRETE] = $this->search_text_discrete;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2668,7 +2668,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setFlavorParamsIds($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::FLAVOR_PARAMS_IDS]))
-			$this->oldColumnsValues[entryPeer::FLAVOR_PARAMS_IDS] = $this->getFlavorParamsIds();
+			$this->oldColumnsValues[entryPeer::FLAVOR_PARAMS_IDS] = $this->flavor_params_ids;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -2692,7 +2692,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	public function setAvailableFrom($v)
 	{
 		if(!isset($this->oldColumnsValues[entryPeer::AVAILABLE_FROM]))
-			$this->oldColumnsValues[entryPeer::AVAILABLE_FROM] = $this->getAvailableFrom();
+			$this->oldColumnsValues[entryPeer::AVAILABLE_FROM] = $this->available_from;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.

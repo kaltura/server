@@ -140,7 +140,7 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[favoritePeer::KUSER_ID]))
-			$this->oldColumnsValues[favoritePeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[favoritePeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -167,7 +167,7 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	public function setSubjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[favoritePeer::SUBJECT_TYPE]))
-			$this->oldColumnsValues[favoritePeer::SUBJECT_TYPE] = $this->getSubjectType();
+			$this->oldColumnsValues[favoritePeer::SUBJECT_TYPE] = $this->subject_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -190,7 +190,7 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	public function setSubjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[favoritePeer::SUBJECT_ID]))
-			$this->oldColumnsValues[favoritePeer::SUBJECT_ID] = $this->getSubjectId();
+			$this->oldColumnsValues[favoritePeer::SUBJECT_ID] = $this->subject_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -213,7 +213,7 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	public function setPrivacy($v)
 	{
 		if(!isset($this->oldColumnsValues[favoritePeer::PRIVACY]))
-			$this->oldColumnsValues[favoritePeer::PRIVACY] = $this->getPrivacy();
+			$this->oldColumnsValues[favoritePeer::PRIVACY] = $this->privacy;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -236,7 +236,7 @@ abstract class Basefavorite extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[favoritePeer::ID]))
-			$this->oldColumnsValues[favoritePeer::ID] = $this->getId();
+			$this->oldColumnsValues[favoritePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;

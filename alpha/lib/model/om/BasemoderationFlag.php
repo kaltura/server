@@ -306,7 +306,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::ID]))
-			$this->oldColumnsValues[moderationFlagPeer::ID] = $this->getId();
+			$this->oldColumnsValues[moderationFlagPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -329,7 +329,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::PARTNER_ID]))
-			$this->oldColumnsValues[moderationFlagPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[moderationFlagPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -352,7 +352,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::KUSER_ID]))
-			$this->oldColumnsValues[moderationFlagPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[moderationFlagPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -379,7 +379,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[moderationFlagPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[moderationFlagPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -402,7 +402,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setFlaggedEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAGGED_ENTRY_ID]))
-			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_ENTRY_ID] = $this->getFlaggedEntryId();
+			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_ENTRY_ID] = $this->flagged_entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -429,7 +429,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setFlaggedKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAGGED_KUSER_ID]))
-			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_KUSER_ID] = $this->getFlaggedKuserId();
+			$this->oldColumnsValues[moderationFlagPeer::FLAGGED_KUSER_ID] = $this->flagged_kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -456,7 +456,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::STATUS]))
-			$this->oldColumnsValues[moderationFlagPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[moderationFlagPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -577,7 +577,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setComments($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::COMMENTS]))
-			$this->oldColumnsValues[moderationFlagPeer::COMMENTS] = $this->getComments();
+			$this->oldColumnsValues[moderationFlagPeer::COMMENTS] = $this->comments;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -600,7 +600,7 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 	public function setFlagType($v)
 	{
 		if(!isset($this->oldColumnsValues[moderationFlagPeer::FLAG_TYPE]))
-			$this->oldColumnsValues[moderationFlagPeer::FLAG_TYPE] = $this->getFlagType();
+			$this->oldColumnsValues[moderationFlagPeer::FLAG_TYPE] = $this->flag_type;
 
 		if ($v !== null) {
 			$v = (int) $v;

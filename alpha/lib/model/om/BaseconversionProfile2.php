@@ -443,7 +443,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::ID]))
-			$this->oldColumnsValues[conversionProfile2Peer::ID] = $this->getId();
+			$this->oldColumnsValues[conversionProfile2Peer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -466,7 +466,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::PARTNER_ID]))
-			$this->oldColumnsValues[conversionProfile2Peer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[conversionProfile2Peer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -489,7 +489,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::NAME]))
-			$this->oldColumnsValues[conversionProfile2Peer::NAME] = $this->getName();
+			$this->oldColumnsValues[conversionProfile2Peer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -611,7 +611,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setDeletedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::DELETED_AT]))
-			$this->oldColumnsValues[conversionProfile2Peer::DELETED_AT] = $this->getDeletedAt();
+			$this->oldColumnsValues[conversionProfile2Peer::DELETED_AT] = $this->deleted_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -662,7 +662,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::DESCRIPTION]))
-			$this->oldColumnsValues[conversionProfile2Peer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[conversionProfile2Peer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -685,7 +685,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setCropLeft($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CROP_LEFT]))
-			$this->oldColumnsValues[conversionProfile2Peer::CROP_LEFT] = $this->getCropLeft();
+			$this->oldColumnsValues[conversionProfile2Peer::CROP_LEFT] = $this->crop_left;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -708,7 +708,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setCropTop($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CROP_TOP]))
-			$this->oldColumnsValues[conversionProfile2Peer::CROP_TOP] = $this->getCropTop();
+			$this->oldColumnsValues[conversionProfile2Peer::CROP_TOP] = $this->crop_top;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -731,7 +731,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setCropWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CROP_WIDTH]))
-			$this->oldColumnsValues[conversionProfile2Peer::CROP_WIDTH] = $this->getCropWidth();
+			$this->oldColumnsValues[conversionProfile2Peer::CROP_WIDTH] = $this->crop_width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -754,7 +754,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setCropHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CROP_HEIGHT]))
-			$this->oldColumnsValues[conversionProfile2Peer::CROP_HEIGHT] = $this->getCropHeight();
+			$this->oldColumnsValues[conversionProfile2Peer::CROP_HEIGHT] = $this->crop_height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -777,7 +777,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setClipStart($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CLIP_START]))
-			$this->oldColumnsValues[conversionProfile2Peer::CLIP_START] = $this->getClipStart();
+			$this->oldColumnsValues[conversionProfile2Peer::CLIP_START] = $this->clip_start;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -800,7 +800,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setClipDuration($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CLIP_DURATION]))
-			$this->oldColumnsValues[conversionProfile2Peer::CLIP_DURATION] = $this->getClipDuration();
+			$this->oldColumnsValues[conversionProfile2Peer::CLIP_DURATION] = $this->clip_duration;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -823,7 +823,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setInputTagsMap($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::INPUT_TAGS_MAP]))
-			$this->oldColumnsValues[conversionProfile2Peer::INPUT_TAGS_MAP] = $this->getInputTagsMap();
+			$this->oldColumnsValues[conversionProfile2Peer::INPUT_TAGS_MAP] = $this->input_tags_map;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -846,7 +846,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function setCreationMode($v)
 	{
 		if(!isset($this->oldColumnsValues[conversionProfile2Peer::CREATION_MODE]))
-			$this->oldColumnsValues[conversionProfile2Peer::CREATION_MODE] = $this->getCreationMode();
+			$this->oldColumnsValues[conversionProfile2Peer::CREATION_MODE] = $this->creation_mode;
 
 		if ($v !== null) {
 			$v = (int) $v;

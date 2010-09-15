@@ -71,7 +71,7 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 	public function setEmail($v)
 	{
 		if(!isset($this->oldColumnsValues[blockedEmailPeer::EMAIL]))
-			$this->oldColumnsValues[blockedEmailPeer::EMAIL] = $this->getEmail();
+			$this->oldColumnsValues[blockedEmailPeer::EMAIL] = $this->email;
 
 		if ($v !== null) {
 			$v = (string) $v;

@@ -196,7 +196,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[kvotePeer::ID]))
-			$this->oldColumnsValues[kvotePeer::ID] = $this->getId();
+			$this->oldColumnsValues[kvotePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -219,7 +219,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[kvotePeer::KSHOW_ID]))
-			$this->oldColumnsValues[kvotePeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[kvotePeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -246,7 +246,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[kvotePeer::ENTRY_ID]))
-			$this->oldColumnsValues[kvotePeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[kvotePeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -273,7 +273,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[kvotePeer::KUSER_ID]))
-			$this->oldColumnsValues[kvotePeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[kvotePeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -300,7 +300,7 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	public function setRank($v)
 	{
 		if(!isset($this->oldColumnsValues[kvotePeer::RANK]))
-			$this->oldColumnsValues[kvotePeer::RANK] = $this->getRank();
+			$this->oldColumnsValues[kvotePeer::RANK] = $this->rank;
 
 		if ($v !== null) {
 			$v = (int) $v;

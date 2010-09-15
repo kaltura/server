@@ -309,7 +309,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::ID]))
-			$this->oldColumnsValues[PartnerActivityPeer::ID] = $this->getId();
+			$this->oldColumnsValues[PartnerActivityPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -332,7 +332,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::PARTNER_ID]))
-			$this->oldColumnsValues[PartnerActivityPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[PartnerActivityPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -356,7 +356,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setActivityDate($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::ACTIVITY_DATE]))
-			$this->oldColumnsValues[PartnerActivityPeer::ACTIVITY_DATE] = $this->getActivityDate();
+			$this->oldColumnsValues[PartnerActivityPeer::ACTIVITY_DATE] = $this->activity_date;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -407,7 +407,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setActivity($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::ACTIVITY]))
-			$this->oldColumnsValues[PartnerActivityPeer::ACTIVITY] = $this->getActivity();
+			$this->oldColumnsValues[PartnerActivityPeer::ACTIVITY] = $this->activity;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -430,7 +430,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setSubActivity($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::SUB_ACTIVITY]))
-			$this->oldColumnsValues[PartnerActivityPeer::SUB_ACTIVITY] = $this->getSubActivity();
+			$this->oldColumnsValues[PartnerActivityPeer::SUB_ACTIVITY] = $this->sub_activity;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -453,7 +453,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT] = $this->getAmount();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT] = $this->amount;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -476,7 +476,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount1($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT1]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT1] = $this->getAmount1();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT1] = $this->amount1;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -499,7 +499,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount2($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT2]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT2] = $this->getAmount2();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT2] = $this->amount2;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -522,7 +522,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount3($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT3]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT3] = $this->getAmount3();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT3] = $this->amount3;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -545,7 +545,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount4($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT4]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT4] = $this->getAmount4();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT4] = $this->amount4;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -568,7 +568,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount5($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT5]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT5] = $this->getAmount5();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT5] = $this->amount5;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -591,7 +591,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount6($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT6]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT6] = $this->getAmount6();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT6] = $this->amount6;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -614,7 +614,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount7($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT7]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT7] = $this->getAmount7();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT7] = $this->amount7;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -637,7 +637,7 @@ abstract class BasePartnerActivity extends BaseObject  implements Persistent {
 	public function setAmount9($v)
 	{
 		if(!isset($this->oldColumnsValues[PartnerActivityPeer::AMOUNT9]))
-			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT9] = $this->getAmount9();
+			$this->oldColumnsValues[PartnerActivityPeer::AMOUNT9] = $this->amount9;
 
 		if ($v !== null) {
 			$v = (int) $v;

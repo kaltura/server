@@ -933,7 +933,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ID]))
-			$this->oldColumnsValues[BatchJobPeer::ID] = $this->getId();
+			$this->oldColumnsValues[BatchJobPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -956,7 +956,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setJobType($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::JOB_TYPE]))
-			$this->oldColumnsValues[BatchJobPeer::JOB_TYPE] = $this->getJobType();
+			$this->oldColumnsValues[BatchJobPeer::JOB_TYPE] = $this->job_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -979,7 +979,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setJobSubType($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::JOB_SUB_TYPE]))
-			$this->oldColumnsValues[BatchJobPeer::JOB_SUB_TYPE] = $this->getJobSubType();
+			$this->oldColumnsValues[BatchJobPeer::JOB_SUB_TYPE] = $this->job_sub_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1002,7 +1002,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setData($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::DATA]))
-			$this->oldColumnsValues[BatchJobPeer::DATA] = $this->getData();
+			$this->oldColumnsValues[BatchJobPeer::DATA] = $this->data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1025,7 +1025,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setFileSize($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::FILE_SIZE]))
-			$this->oldColumnsValues[BatchJobPeer::FILE_SIZE] = $this->getFileSize();
+			$this->oldColumnsValues[BatchJobPeer::FILE_SIZE] = $this->file_size;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1048,7 +1048,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setDuplicationKey($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::DUPLICATION_KEY]))
-			$this->oldColumnsValues[BatchJobPeer::DUPLICATION_KEY] = $this->getDuplicationKey();
+			$this->oldColumnsValues[BatchJobPeer::DUPLICATION_KEY] = $this->duplication_key;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1071,7 +1071,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::STATUS]))
-			$this->oldColumnsValues[BatchJobPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[BatchJobPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1094,7 +1094,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setAbort($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ABORT]))
-			$this->oldColumnsValues[BatchJobPeer::ABORT] = $this->getAbort();
+			$this->oldColumnsValues[BatchJobPeer::ABORT] = $this->abort;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1117,7 +1117,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setCheckAgainTimeout($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::CHECK_AGAIN_TIMEOUT]))
-			$this->oldColumnsValues[BatchJobPeer::CHECK_AGAIN_TIMEOUT] = $this->getCheckAgainTimeout();
+			$this->oldColumnsValues[BatchJobPeer::CHECK_AGAIN_TIMEOUT] = $this->check_again_timeout;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1140,7 +1140,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setProgress($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::PROGRESS]))
-			$this->oldColumnsValues[BatchJobPeer::PROGRESS] = $this->getProgress();
+			$this->oldColumnsValues[BatchJobPeer::PROGRESS] = $this->progress;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1163,7 +1163,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setMessage($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::MESSAGE]))
-			$this->oldColumnsValues[BatchJobPeer::MESSAGE] = $this->getMessage();
+			$this->oldColumnsValues[BatchJobPeer::MESSAGE] = $this->message;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1186,7 +1186,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setDescription($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::DESCRIPTION]))
-			$this->oldColumnsValues[BatchJobPeer::DESCRIPTION] = $this->getDescription();
+			$this->oldColumnsValues[BatchJobPeer::DESCRIPTION] = $this->description;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1209,7 +1209,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setUpdatesCount($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::UPDATES_COUNT]))
-			$this->oldColumnsValues[BatchJobPeer::UPDATES_COUNT] = $this->getUpdatesCount();
+			$this->oldColumnsValues[BatchJobPeer::UPDATES_COUNT] = $this->updates_count;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1281,7 +1281,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setCreatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::CREATED_BY]))
-			$this->oldColumnsValues[BatchJobPeer::CREATED_BY] = $this->getCreatedBy();
+			$this->oldColumnsValues[BatchJobPeer::CREATED_BY] = $this->created_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1353,7 +1353,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setUpdatedBy($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::UPDATED_BY]))
-			$this->oldColumnsValues[BatchJobPeer::UPDATED_BY] = $this->getUpdatedBy();
+			$this->oldColumnsValues[BatchJobPeer::UPDATED_BY] = $this->updated_by;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1377,7 +1377,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setDeletedAt($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::DELETED_AT]))
-			$this->oldColumnsValues[BatchJobPeer::DELETED_AT] = $this->getDeletedAt();
+			$this->oldColumnsValues[BatchJobPeer::DELETED_AT] = $this->deleted_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1428,7 +1428,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setPriority($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::PRIORITY]))
-			$this->oldColumnsValues[BatchJobPeer::PRIORITY] = $this->getPriority();
+			$this->oldColumnsValues[BatchJobPeer::PRIORITY] = $this->priority;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1451,7 +1451,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setWorkGroupId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::WORK_GROUP_ID]))
-			$this->oldColumnsValues[BatchJobPeer::WORK_GROUP_ID] = $this->getWorkGroupId();
+			$this->oldColumnsValues[BatchJobPeer::WORK_GROUP_ID] = $this->work_group_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1475,7 +1475,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setQueueTime($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::QUEUE_TIME]))
-			$this->oldColumnsValues[BatchJobPeer::QUEUE_TIME] = $this->getQueueTime();
+			$this->oldColumnsValues[BatchJobPeer::QUEUE_TIME] = $this->queue_time;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1527,7 +1527,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setFinishTime($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::FINISH_TIME]))
-			$this->oldColumnsValues[BatchJobPeer::FINISH_TIME] = $this->getFinishTime();
+			$this->oldColumnsValues[BatchJobPeer::FINISH_TIME] = $this->finish_time;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1578,7 +1578,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setEntryId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ENTRY_ID]))
-			$this->oldColumnsValues[BatchJobPeer::ENTRY_ID] = $this->getEntryId();
+			$this->oldColumnsValues[BatchJobPeer::ENTRY_ID] = $this->entry_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -1601,7 +1601,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::PARTNER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[BatchJobPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1624,7 +1624,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setSubpId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::SUBP_ID]))
-			$this->oldColumnsValues[BatchJobPeer::SUBP_ID] = $this->getSubpId();
+			$this->oldColumnsValues[BatchJobPeer::SUBP_ID] = $this->subp_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1647,7 +1647,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::SCHEDULER_ID] = $this->getSchedulerId();
+			$this->oldColumnsValues[BatchJobPeer::SCHEDULER_ID] = $this->scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1670,7 +1670,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::WORKER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::WORKER_ID] = $this->getWorkerId();
+			$this->oldColumnsValues[BatchJobPeer::WORKER_ID] = $this->worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1693,7 +1693,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setBatchIndex($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::BATCH_INDEX]))
-			$this->oldColumnsValues[BatchJobPeer::BATCH_INDEX] = $this->getBatchIndex();
+			$this->oldColumnsValues[BatchJobPeer::BATCH_INDEX] = $this->batch_index;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1716,7 +1716,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setLastSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::LAST_SCHEDULER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::LAST_SCHEDULER_ID] = $this->getLastSchedulerId();
+			$this->oldColumnsValues[BatchJobPeer::LAST_SCHEDULER_ID] = $this->last_scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1739,7 +1739,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setLastWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::LAST_WORKER_ID]))
-			$this->oldColumnsValues[BatchJobPeer::LAST_WORKER_ID] = $this->getLastWorkerId();
+			$this->oldColumnsValues[BatchJobPeer::LAST_WORKER_ID] = $this->last_worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1762,7 +1762,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setLastWorkerRemote($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::LAST_WORKER_REMOTE]))
-			$this->oldColumnsValues[BatchJobPeer::LAST_WORKER_REMOTE] = $this->getLastWorkerRemote();
+			$this->oldColumnsValues[BatchJobPeer::LAST_WORKER_REMOTE] = $this->last_worker_remote;
 
 		if ($v !== null) {
 			$v = (boolean) $v;
@@ -1786,7 +1786,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setProcessorExpiration($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::PROCESSOR_EXPIRATION]))
-			$this->oldColumnsValues[BatchJobPeer::PROCESSOR_EXPIRATION] = $this->getProcessorExpiration();
+			$this->oldColumnsValues[BatchJobPeer::PROCESSOR_EXPIRATION] = $this->processor_expiration;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -1837,7 +1837,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setExecutionAttempts($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::EXECUTION_ATTEMPTS]))
-			$this->oldColumnsValues[BatchJobPeer::EXECUTION_ATTEMPTS] = $this->getExecutionAttempts();
+			$this->oldColumnsValues[BatchJobPeer::EXECUTION_ATTEMPTS] = $this->execution_attempts;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1860,7 +1860,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setLockVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::LOCK_VERSION]))
-			$this->oldColumnsValues[BatchJobPeer::LOCK_VERSION] = $this->getLockVersion();
+			$this->oldColumnsValues[BatchJobPeer::LOCK_VERSION] = $this->lock_version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1883,7 +1883,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setTwinJobId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::TWIN_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::TWIN_JOB_ID] = $this->getTwinJobId();
+			$this->oldColumnsValues[BatchJobPeer::TWIN_JOB_ID] = $this->twin_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1906,7 +1906,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setBulkJobId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID] = $this->getBulkJobId();
+			$this->oldColumnsValues[BatchJobPeer::BULK_JOB_ID] = $this->bulk_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1929,7 +1929,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setRootJobId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID] = $this->getRootJobId();
+			$this->oldColumnsValues[BatchJobPeer::ROOT_JOB_ID] = $this->root_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1952,7 +1952,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setParentJobId($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID]))
-			$this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID] = $this->getParentJobId();
+			$this->oldColumnsValues[BatchJobPeer::PARENT_JOB_ID] = $this->parent_job_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1975,7 +1975,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setDc($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::DC]))
-			$this->oldColumnsValues[BatchJobPeer::DC] = $this->getDc();
+			$this->oldColumnsValues[BatchJobPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -1998,7 +1998,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setErrType($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ERR_TYPE]))
-			$this->oldColumnsValues[BatchJobPeer::ERR_TYPE] = $this->getErrType();
+			$this->oldColumnsValues[BatchJobPeer::ERR_TYPE] = $this->err_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2021,7 +2021,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setErrNumber($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ERR_NUMBER]))
-			$this->oldColumnsValues[BatchJobPeer::ERR_NUMBER] = $this->getErrNumber();
+			$this->oldColumnsValues[BatchJobPeer::ERR_NUMBER] = $this->err_number;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -2044,7 +2044,7 @@ abstract class BaseBatchJob extends BaseObject  implements Persistent {
 	public function setOnStressDivertTo($v)
 	{
 		if(!isset($this->oldColumnsValues[BatchJobPeer::ON_STRESS_DIVERT_TO]))
-			$this->oldColumnsValues[BatchJobPeer::ON_STRESS_DIVERT_TO] = $this->getOnStressDivertTo();
+			$this->oldColumnsValues[BatchJobPeer::ON_STRESS_DIVERT_TO] = $this->on_stress_divert_to;
 
 		if ($v !== null) {
 			$v = (int) $v;

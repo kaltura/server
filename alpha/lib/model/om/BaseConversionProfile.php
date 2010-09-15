@@ -377,7 +377,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ID]))
-			$this->oldColumnsValues[ConversionProfilePeer::ID] = $this->getId();
+			$this->oldColumnsValues[ConversionProfilePeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -400,7 +400,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PARTNER_ID]))
-			$this->oldColumnsValues[ConversionProfilePeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[ConversionProfilePeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -423,7 +423,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setEnabled($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ENABLED]))
-			$this->oldColumnsValues[ConversionProfilePeer::ENABLED] = $this->getEnabled();
+			$this->oldColumnsValues[ConversionProfilePeer::ENABLED] = $this->enabled;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -446,7 +446,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setName($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::NAME]))
-			$this->oldColumnsValues[ConversionProfilePeer::NAME] = $this->getName();
+			$this->oldColumnsValues[ConversionProfilePeer::NAME] = $this->name;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -469,7 +469,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setProfileType($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE]))
-			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE] = $this->getProfileType();
+			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE] = $this->profile_type;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -492,7 +492,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setCommercialTranscoder($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::COMMERCIAL_TRANSCODER]))
-			$this->oldColumnsValues[ConversionProfilePeer::COMMERCIAL_TRANSCODER] = $this->getCommercialTranscoder();
+			$this->oldColumnsValues[ConversionProfilePeer::COMMERCIAL_TRANSCODER] = $this->commercial_transcoder;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -515,7 +515,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setWidth($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::WIDTH]))
-			$this->oldColumnsValues[ConversionProfilePeer::WIDTH] = $this->getWidth();
+			$this->oldColumnsValues[ConversionProfilePeer::WIDTH] = $this->width;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -538,7 +538,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setHeight($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::HEIGHT]))
-			$this->oldColumnsValues[ConversionProfilePeer::HEIGHT] = $this->getHeight();
+			$this->oldColumnsValues[ConversionProfilePeer::HEIGHT] = $this->height;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -561,7 +561,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setAspectRatio($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::ASPECT_RATIO]))
-			$this->oldColumnsValues[ConversionProfilePeer::ASPECT_RATIO] = $this->getAspectRatio();
+			$this->oldColumnsValues[ConversionProfilePeer::ASPECT_RATIO] = $this->aspect_ratio;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -584,7 +584,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setBypassFlv($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::BYPASS_FLV]))
-			$this->oldColumnsValues[ConversionProfilePeer::BYPASS_FLV] = $this->getBypassFlv();
+			$this->oldColumnsValues[ConversionProfilePeer::BYPASS_FLV] = $this->bypass_flv;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -607,7 +607,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setUseWithBulk($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::USE_WITH_BULK]))
-			$this->oldColumnsValues[ConversionProfilePeer::USE_WITH_BULK] = $this->getUseWithBulk();
+			$this->oldColumnsValues[ConversionProfilePeer::USE_WITH_BULK] = $this->use_with_bulk;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -728,7 +728,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setProfileTypeSuffix($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE_SUFFIX]))
-			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE_SUFFIX] = $this->getProfileTypeSuffix();
+			$this->oldColumnsValues[ConversionProfilePeer::PROFILE_TYPE_SUFFIX] = $this->profile_type_suffix;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -751,7 +751,7 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 	public function setConversionProfile2Id($v)
 	{
 		if(!isset($this->oldColumnsValues[ConversionProfilePeer::CONVERSION_PROFILE_2_ID]))
-			$this->oldColumnsValues[ConversionProfilePeer::CONVERSION_PROFILE_2_ID] = $this->getConversionProfile2Id();
+			$this->oldColumnsValues[ConversionProfilePeer::CONVERSION_PROFILE_2_ID] = $this->conversion_profile_2_id;
 
 		if ($v !== null) {
 			$v = (int) $v;

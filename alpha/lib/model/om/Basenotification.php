@@ -471,7 +471,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::ID]))
-			$this->oldColumnsValues[notificationPeer::ID] = $this->getId();
+			$this->oldColumnsValues[notificationPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -494,7 +494,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setPartnerId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::PARTNER_ID]))
-			$this->oldColumnsValues[notificationPeer::PARTNER_ID] = $this->getPartnerId();
+			$this->oldColumnsValues[notificationPeer::PARTNER_ID] = $this->partner_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -517,7 +517,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setPuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::PUSER_ID]))
-			$this->oldColumnsValues[notificationPeer::PUSER_ID] = $this->getPuserId();
+			$this->oldColumnsValues[notificationPeer::PUSER_ID] = $this->puser_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -540,7 +540,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setType($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::TYPE]))
-			$this->oldColumnsValues[notificationPeer::TYPE] = $this->getType();
+			$this->oldColumnsValues[notificationPeer::TYPE] = $this->type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -563,7 +563,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setObjectId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::OBJECT_ID]))
-			$this->oldColumnsValues[notificationPeer::OBJECT_ID] = $this->getObjectId();
+			$this->oldColumnsValues[notificationPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -586,7 +586,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setStatus($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::STATUS]))
-			$this->oldColumnsValues[notificationPeer::STATUS] = $this->getStatus();
+			$this->oldColumnsValues[notificationPeer::STATUS] = $this->status;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -609,7 +609,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setNotificationData($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::NOTIFICATION_DATA]))
-			$this->oldColumnsValues[notificationPeer::NOTIFICATION_DATA] = $this->getNotificationData();
+			$this->oldColumnsValues[notificationPeer::NOTIFICATION_DATA] = $this->notification_data;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -632,7 +632,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setNumberOfAttempts($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::NUMBER_OF_ATTEMPTS]))
-			$this->oldColumnsValues[notificationPeer::NUMBER_OF_ATTEMPTS] = $this->getNumberOfAttempts();
+			$this->oldColumnsValues[notificationPeer::NUMBER_OF_ATTEMPTS] = $this->number_of_attempts;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -753,7 +753,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setNotificationResult($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::NOTIFICATION_RESULT]))
-			$this->oldColumnsValues[notificationPeer::NOTIFICATION_RESULT] = $this->getNotificationResult();
+			$this->oldColumnsValues[notificationPeer::NOTIFICATION_RESULT] = $this->notification_result;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -776,7 +776,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setObjectType($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::OBJECT_TYPE]))
-			$this->oldColumnsValues[notificationPeer::OBJECT_TYPE] = $this->getObjectType();
+			$this->oldColumnsValues[notificationPeer::OBJECT_TYPE] = $this->object_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -799,7 +799,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setSchedulerId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::SCHEDULER_ID]))
-			$this->oldColumnsValues[notificationPeer::SCHEDULER_ID] = $this->getSchedulerId();
+			$this->oldColumnsValues[notificationPeer::SCHEDULER_ID] = $this->scheduler_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -822,7 +822,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setWorkerId($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::WORKER_ID]))
-			$this->oldColumnsValues[notificationPeer::WORKER_ID] = $this->getWorkerId();
+			$this->oldColumnsValues[notificationPeer::WORKER_ID] = $this->worker_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -845,7 +845,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setBatchIndex($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::BATCH_INDEX]))
-			$this->oldColumnsValues[notificationPeer::BATCH_INDEX] = $this->getBatchIndex();
+			$this->oldColumnsValues[notificationPeer::BATCH_INDEX] = $this->batch_index;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -869,7 +869,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setProcessorExpiration($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::PROCESSOR_EXPIRATION]))
-			$this->oldColumnsValues[notificationPeer::PROCESSOR_EXPIRATION] = $this->getProcessorExpiration();
+			$this->oldColumnsValues[notificationPeer::PROCESSOR_EXPIRATION] = $this->processor_expiration;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -920,7 +920,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setExecutionAttempts($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::EXECUTION_ATTEMPTS]))
-			$this->oldColumnsValues[notificationPeer::EXECUTION_ATTEMPTS] = $this->getExecutionAttempts();
+			$this->oldColumnsValues[notificationPeer::EXECUTION_ATTEMPTS] = $this->execution_attempts;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -943,7 +943,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setLockVersion($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::LOCK_VERSION]))
-			$this->oldColumnsValues[notificationPeer::LOCK_VERSION] = $this->getLockVersion();
+			$this->oldColumnsValues[notificationPeer::LOCK_VERSION] = $this->lock_version;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -966,7 +966,7 @@ abstract class Basenotification extends BaseObject  implements Persistent {
 	public function setDc($v)
 	{
 		if(!isset($this->oldColumnsValues[notificationPeer::DC]))
-			$this->oldColumnsValues[notificationPeer::DC] = $this->getDc();
+			$this->oldColumnsValues[notificationPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (string) $v;

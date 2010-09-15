@@ -145,7 +145,7 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	public function setKshowId($v)
 	{
 		if(!isset($this->oldColumnsValues[KshowKuserPeer::KSHOW_ID]))
-			$this->oldColumnsValues[KshowKuserPeer::KSHOW_ID] = $this->getKshowId();
+			$this->oldColumnsValues[KshowKuserPeer::KSHOW_ID] = $this->kshow_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
@@ -172,7 +172,7 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	public function setKuserId($v)
 	{
 		if(!isset($this->oldColumnsValues[KshowKuserPeer::KUSER_ID]))
-			$this->oldColumnsValues[KshowKuserPeer::KUSER_ID] = $this->getKuserId();
+			$this->oldColumnsValues[KshowKuserPeer::KUSER_ID] = $this->kuser_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -199,7 +199,7 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	public function setSubscriptionType($v)
 	{
 		if(!isset($this->oldColumnsValues[KshowKuserPeer::SUBSCRIPTION_TYPE]))
-			$this->oldColumnsValues[KshowKuserPeer::SUBSCRIPTION_TYPE] = $this->getSubscriptionType();
+			$this->oldColumnsValues[KshowKuserPeer::SUBSCRIPTION_TYPE] = $this->subscription_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -222,7 +222,7 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	public function setAlertType($v)
 	{
 		if(!isset($this->oldColumnsValues[KshowKuserPeer::ALERT_TYPE]))
-			$this->oldColumnsValues[KshowKuserPeer::ALERT_TYPE] = $this->getAlertType();
+			$this->oldColumnsValues[KshowKuserPeer::ALERT_TYPE] = $this->alert_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
@@ -245,7 +245,7 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	public function setId($v)
 	{
 		if(!isset($this->oldColumnsValues[KshowKuserPeer::ID]))
-			$this->oldColumnsValues[KshowKuserPeer::ID] = $this->getId();
+			$this->oldColumnsValues[KshowKuserPeer::ID] = $this->id;
 
 		if ($v !== null) {
 			$v = (int) $v;
