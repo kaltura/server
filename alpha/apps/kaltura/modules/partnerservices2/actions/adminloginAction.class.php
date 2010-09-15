@@ -49,7 +49,7 @@ class adminloginAction extends defPartnerservices2Action
 		}
 
 		try {
-			$canLogin = adminKuserPeer::adminLogin($email, $password);
+			$adminKuser = adminKuserPeer::adminLogin($email, $password);
 		}
 		catch (kAdminKuserException $e) {
 			$code = $e->getCode();
@@ -72,12 +72,12 @@ class adminloginAction extends defPartnerservices2Action
 			$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 			return null;
 		}
-		if (!$canLogin) {
+		if (!$adminKuser) {
 			$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
 			return null;
 		}
 		
-		$partner = PartnerPeer::retrieveByPK( $admin->getPartnerId() );
+		$partner = PartnerPeer::retrieveByPK( $adminKuser->getPartnerId() );
 		
 		if ( ! $partner )
 		{

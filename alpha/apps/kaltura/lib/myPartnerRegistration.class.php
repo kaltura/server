@@ -254,11 +254,12 @@ class myPartnerRegistration
 		$adminKuser->setLoginBlockedUntil(null);
 		$adminKuser->resetPreviousPasswords();
 		$adminKuser->setPartnerId($newPartner->getId());
-		$hashKey = $adminKuser->newPassHashKey();
-		$adminKuser->setPasswordHashKey($hashKey);	
 		$adminKuser->save();
-
-		$adminKuserId = $adminKuser->getId();
+		
+		// now $adminKusr has an id and hash key can be generated
+		$hashKey = $adminKuser->newPassHashKey();
+		$adminKuser->setPasswordHashKey($hashKey);
+		$adminKuser->save();
 
 		return array($password, $hashKey);
 	}

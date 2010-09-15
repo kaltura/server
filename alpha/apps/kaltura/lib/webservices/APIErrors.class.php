@@ -232,7 +232,7 @@
 		
 		// admin kuser password related errors
 		
-		const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID,The password you entered has an invalid structure";
+		const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID,The password you entered has an invalid structure.\nPasswords must obey the following rules :\n- Must be of length between 8 and 14.\n- Must not contain your name\n- Must contain at least one lowercase letter (a-z).\n- Must contain at least one digit (0-9).\n- Must contain at least one of the following symbols:  %%~!@#\$^*=+?[]{}";
 		
 		const PASSWORD_ALREADY_USED = "PASSWORD_ALREADY_USED,Chosen password has already been used";
 		
@@ -240,7 +240,7 @@
 		
 		const LOGIN_BLOCKED = "LOGIN_BLOCKED,You account is locked";
 		
-		const LOGIN_RETRIES_EXCEEDED = "LOGIN_RETRIES_EXCEEDED,Your account has been locked and will not be available for 24 hours";
+		const LOGIN_RETRIES_EXCEEDED = "LOGIN_RETRIES_EXCEEDED,Maximum login retries exceeded. Your account has been locked and will not be available for 24 hours";
 		
 		const NEW_PASSWORD_HASH_KEY_INVALID = "NEW_PASSWORD_HASH_KEY_INVALID,Given hash key is invalid";
 		

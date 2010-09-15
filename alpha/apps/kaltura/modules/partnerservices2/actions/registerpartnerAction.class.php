@@ -56,7 +56,9 @@ class registerpartnerAction extends defPartnerservices2Action
 				$cms_password = $this->getP ( "cms_password" );
 				
 				if ($cmsPassword) {
-					if (!adminKuserPeer::isPasswordStructureValid($cmsPassword)) {
+					if (!adminKuserPeer::isPasswordStructureValid($cmsPassword)   ||
+						stripos($cmsPassword, $partner->getName()) !== false     ||
+				  		stripos($cmsPassword, $partner->getAdminName() !== false)    ) {
 						$this->addError( APIErrors::PASSWORD_STRUCTURE_INVALID);
 						return;
 					}

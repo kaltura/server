@@ -104,20 +104,21 @@ var kmc = {};
 	if ( !loginF ( null , null , null , null , true ) ) {
 		var flashVars = {
 			<?php
-				if ($this->setPassHashKey) {
-					echo 'hashCode: "'.$this->setPassHashKey.'",';
+				if (isset($setPassHashKey) && $setPassHashKey) {
+					echo 'hashKey: "'.$setPassHashKey.'",';
 				}
 			?>
 			<?php
-				if ($this->hashKeyErrorCode) {
-					echo 'errorCode: "'.$this->hashKeyErrorCode.'",';
+				if (isset($hashKeyErrorCode) && $hashKeyErrorCode) {
+					echo 'errorCode: "'.$hashKeyErrorCode.'",';
 				}
 			?>
 			loginF: "loginF" ,
 			closeF: "closeLoginF" ,
 			host: "<?php echo $host ?>",
 			visibleSignup: "<?php echo (kConf::get('kmc_login_show_signup_link'))? 'true': 'false'; ?>",
-			urchinNumber: "UA-12055206-1"
+			urchinNumber: "UA-12055206-1",
+			srvurl: "api_v3/index.php"
 		}
 	
 		var params = {
@@ -126,9 +127,9 @@ var kmc = {};
 			bgcolor: "#272929",
 			quality: "high",
 			wmode: "window" ,
-			movie: "<?php echo $flash_dir ?>/kmc/login/v1.0.12/login.swf"
+			movie: "<?php echo $flash_dir ?>/kmc/login/v1.1.4/login.swf"
 		};
-		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/v1.0.12/login.swf", "login_swf", "384", "350", "9.0.0", false, flashVars, params);
+		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/v1.1.4/login.swf", "login_swf", "384", "350", "9.0.0", false, flashVars, params);
 	}
 </script>
 

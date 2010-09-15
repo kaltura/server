@@ -65,6 +65,7 @@ class defPartnerservices2baseAction extends kalturaAction
 			return;	
 		}
 		$isStartSession = (@$params['service'] == 'startsession' || strpos($_SERVER['PATH_INFO'],'startsession'));		
+		$isAdminLogin   = (@$params['service'] == 'adminlogin'   || strpos($_SERVER['PATH_INFO'],'adminlogin'));
 
 		$params = $_GET + $_POST;
 		
@@ -84,7 +85,7 @@ class defPartnerservices2baseAction extends kalturaAction
 		if ($validUntil && $validUntil < time())
 			return;
 			
-		if ($uid != "0" && $uid != "" && !$isStartSession)
+		if ($isAdminLogin || ($uid != "0" && $uid != "" && !$isStartSession))
 			return;
 	
 		unset($params['ks']);
