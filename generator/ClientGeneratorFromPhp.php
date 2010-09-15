@@ -313,7 +313,10 @@ abstract class ClientGeneratorFromPhp
 	{
 		$serviceName = $serviceReflector->getServiceName();
 		if($serviceReflector->isDeprecated())
+		{
 			KalturaLog::info("Service deprecated [$serviceName]");
+			return;
+		}
 			
 		if (array_key_exists($serviceName, $this->_services))
 			throw new Exception("Service already exists [$serviceName]");
@@ -326,7 +329,10 @@ abstract class ClientGeneratorFromPhp
 		$type = $objectReflector->getType();
 		
 		if($objectReflector->isDeprecated())
+		{
 			KalturaLog::info("Type deprecated [$type]");
+			return;
+		}
 			
 		if (!array_key_exists($type, $this->_types))
 			$this->_types[$type] = $objectReflector;
