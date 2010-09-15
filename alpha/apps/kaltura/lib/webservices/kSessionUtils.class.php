@@ -112,6 +112,10 @@ class kSessionUtils
 		return 0;
 	}
 
+	/**
+	 * @param string $ks_str
+	 * @return ks
+	 */
 	public static function crackKs ( $ks_str )
 	{
 		$ks = ks::fromSecureString( $ks_str );
@@ -193,11 +197,13 @@ class kSessionUtils
 
 	public static function killKSession ( $ks )
 	{
-		$ksObj = ks::fromSecureString($ks);
-		$invalidSession = new invalidSession();
-		$invalidSession->setKs($ks);
-		$invalidSession->setKsValidUntil($ksObj->valid_until);
-		$invalidSession->save();		
+		try
+		{
+			$ksObj = ks::fromSecureString($ks);
+			if($ksObj)
+				invalidSessionPeer::invalidateKs($ksObj);
+		}
+		catch(Exception $e){}	
 	}
 }
 
@@ -262,6 +268,10 @@ class ks
 		return $this->original_str;
 	}
 	
+	/**
+	 * @param string $encoded_str
+	 * @return ks
+	 */
 	public static function fromSecureString ( $encoded_str )
 	{
 		if ( empty ( $encoded_str ) ) return null;

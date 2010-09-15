@@ -8,18 +8,7 @@ class logoutAction extends kalturaAction
 	{
 		$ksStr = $this->getP("kmcks");
 		if($ksStr)
-		{
-			try 
-			{
-				$ks = kSessionUtils::crackKs($ksStr);
-				if($ks)
-					invalidSessionPeer::invalidateKs($ks);
-			}
-			catch(Exception $e)
-			{
-				// no need to invalidate the ks, it's already invalid
-			}
-		}
+			kSessionUtils::killKSession($ksStr);
 		
 		setcookie('pid', "", 0, "/");
 		setcookie('subpid', "", 0, "/");
