@@ -106,7 +106,7 @@ class adminKuser extends BaseadminKuser
 			}
 		}
 
-		$curValue = $this->getPasswordUpdatedAt(null);
+		$curValue = $this->getPasswordUpdatedAt();
 		if ( $curValue !== null || $dt !== null ) {
 			// (nested ifs are a little easier to read in this case)
 
