@@ -191,9 +191,13 @@ class kSessionUtils
 		return $kas->isValid( $partner_id , $puser_id  , ks::TYPE_KAS );
 	}
 
-	public static  function killKSession ( $ks )
+	public static function killKSession ( $ks )
 	{
-		// nothing really to do here because we don't have this  anywhere in the DB
+		$ksObj = ks::fromSecureString($ks);
+		$invalidSession = new invalidSession();
+		$invalidSession->setKs($ks);
+		$invalidSession->setKsValidUntil($ksObj->valid_until);
+		$invalidSession->save();		
 	}
 }
 

@@ -39,6 +39,20 @@ class SessionService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
 		}
 	}
+	
+	
+	/**
+	 * End a session with the Kaltura server, making the current KS invalid.
+	 * 
+	 * @action end
+	 *
+	 * @throws ????
+	 */
+	function endAction()
+	{
+		$ks = $this->getKs();
+		kSessionUtils::killKSession($ks);
+	}
 
 	/**
 	 * Start an impersonated session with Kaltura's server.
