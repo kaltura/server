@@ -48,6 +48,10 @@
 			<div class="param">
 				<label for="ks">KS (string):</label><input type="text" class="" name="ks" size="30"/> <input type="checkbox" checked="checked"/>
 			</div>
+			
+			<div class="param">
+				<label for="ks">No Cache (bool):</label><input type="text" class="" name="nocache" size="30"/> <input type="checkbox"/>
+			</div>
 
 			<div class="param">
 				<label for="service">Select service:</label>
