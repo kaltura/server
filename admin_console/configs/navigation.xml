@@ -4,7 +4,7 @@
 		<label>Publishers</label>
 		<controller>partner</controller>
 		<action>list</action>
-		<role>ps</role>
+
 		<pages>
 			<accounts-management>
 				<label>Publisher Management</label>
@@ -27,7 +27,7 @@
 		<label>Users</label>
 		<controller>user</controller>
 		<action>index</action>
-		<role>admin</role>
+
 		<pages>
 			<users-management>
 				<label>User Management</label>
@@ -50,7 +50,7 @@
 		<label>Batch Process Control</label>
 		<controller>batch</controller>
 		<action>in-progress-tasks</action>
-		<role>ps</role>
+
 		<pages>
 			<in-progress-tasks>
 				<label>In-Progress Tasks</label>
@@ -83,7 +83,7 @@
 		<label>Monitoring</label>
 		<controller>monitoring</controller>
 		<action>xymon</action>
-		<role>admin</role>
+
 		<pages>
 			<xymon>
 				<label>Status</label>
@@ -101,6 +101,6 @@
 		<label>Developer</label>
 		<controller>index</controller>
 		<action>testme</action>
-		<role>ps</role>
+
 	</developer>
 </configdata>

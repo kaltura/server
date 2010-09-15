@@ -1,7 +1,7 @@
 #!/bin/bash
 
 find @WEB_DIR@/content/uploads -ctime +7 -delete
-find @WEB_DIR@/content@WEB_DIR@cam -ctime +7 -delete
+find @WEB_DIR@/content/webcam -ctime +7 -delete
 find @WEB_DIR@/content/preconvert -ctime +7 -delete
 find @WEB_DIR@/content/imports -ctime +7 -delete
 find @WEB_DIR@/content/new_preconvert/ -ctime +7 -delete

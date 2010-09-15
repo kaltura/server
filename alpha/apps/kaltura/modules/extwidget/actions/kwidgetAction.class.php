@@ -3,7 +3,7 @@ require_once ( MODULES . "/partnerservices2/actions/getwidgetAction.class.php" )
 
 function klog ( $str )
 {
-	kLog::log( "kwidgetAction: " . $str );
+	KalturaLog::log( "kwidgetAction: " . $str );
 }
 
 class kwidgetAction extends sfAction
@@ -125,7 +125,7 @@ class kwidgetAction extends sfAction
 				$valid_country = requestUtils::matchIpCountry( $countries_str , $current_country );
 				if ( ! $valid_country )
 				{
-					kLog::log ( "kwidgetAction: Attempting to access widget [$widget_id] and entry [$entry_id] from country [$current_country]. Retrning entry_id: [$fallback_entry_id] kshow_id [$fallback_kshow_id]" );
+					KalturaLog::log ( "kwidgetAction: Attempting to access widget [$widget_id] and entry [$entry_id] from country [$current_country]. Retrning entry_id: [$fallback_entry_id] kshow_id [$fallback_kshow_id]" );
 					$entry_id= $fallback_entry_id;
 					$kshow_id = $fallback_kshow_id;
 				}

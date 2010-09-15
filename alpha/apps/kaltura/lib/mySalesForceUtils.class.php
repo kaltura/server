@@ -3,7 +3,7 @@ class mySalesForceUtils
 {
 	public static function sendRegistrationInformationToSalesforce($partner , $force_send = false )
 	{
-		return false;
+		// not in use anymore
 	}
 }
 ?>

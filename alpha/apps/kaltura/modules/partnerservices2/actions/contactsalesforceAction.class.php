@@ -14,7 +14,7 @@ class contactsalesforceAction extends defPartnerservices2Action
 		return false;
 	}
 	
-	private function sendLeadToSalesForce($lead_array)
+	private function sendLeadToMarketo($lead_array)
 	{
 		return false;
 	}
