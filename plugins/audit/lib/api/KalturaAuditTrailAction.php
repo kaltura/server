@@ -8,4 +8,5 @@ class KalturaAuditTrailAction extends KalturaStringEnum
 	const DELETED = 'DELETED';
 	const VIEWED = 'VIEWED';
 	const CONTENT_VIEWED = 'CONTENT_VIEWED';
+	const FILE_SYNC_CREATED = 'FILE_SYNC_CREATED';
 }

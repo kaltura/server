@@ -39,6 +39,8 @@ class AuditTrail extends BaseAuditTrail
 		KalturaAuditTrailObjectType::UI_CONF,
 		KalturaAuditTrailObjectType::UPLOAD_TOKEN,
 		KalturaAuditTrailObjectType::WIDGET,
+		KalturaAuditTrailObjectType::METADATA,
+		KalturaAuditTrailObjectType::METADATA_PROFILE,
 	);
 	
 	private static $uniqueRequestId = null;
@@ -162,6 +164,7 @@ class AuditTrail extends BaseAuditTrail
 		if(kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
 			return parent::save($con);
 			
+		KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
 		return 0;
 	} // save()
 	

@@ -10,14 +10,23 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public static function traceEnabled($partnerId, AuditTrail $auditTrail = null) 
 	{
 		if(is_null($partnerId))
+		{
+			KalturaLog::debug("Partner id is null");
 			return false;
+		}
 			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
+		{
+			KalturaLog::debug("Partner not found");
 			return false;
+		}
 			
 		if(!$partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME))
+		{
+			KalturaLog::debug("Parner audit trail is disabled");
 			return false;
+		}
 			
 		// validate only partner
 		if(is_null($auditTrail))
@@ -25,7 +34,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		$auditTrailConfig = self::getAuditTrailConfig($partnerId, $auditTrail->getObjectType());
 		if(is_null($auditTrailConfig))
+		{
+			KalturaLog::debug("Audit trail config not found");
 			return false;
+		}
 			
 		return $auditTrailConfig->actionEnabled($auditTrail->getAction());
 	}
@@ -84,6 +96,9 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(method_exists($object, 'getEntryId'))
 			return $object->getEntryId();
 			
+		if($object instanceof Metadata && $object->getObjectType() == Metadata::TYPE_ENTRY)
+			return $object->getObjectId();
+			
 		KalturaLog::info("Can't get entry id for object type [" . get_class($object) . "]");
 		return null;
 	}
@@ -141,10 +156,131 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	}
 
 	/**
+	 * @param int $objectType
+	 * @param int $objectSubType
+	 * @return KalturaAuditTrailFileSyncSubType
+	 */
+	public static function translateSubTypeToEnum($objectType, $objectSubType) 
+	{
+		switch($objectType)
+		{
+			case FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY:
+				switch($objectSubType)
+				{
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_DATA;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_DATA_EDIT;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_THUMB;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_ARCHIVE;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_DOWNLOAD;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_OFFLINE_THUMB;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_ISM;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_ISMC;
+					case entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG:
+						return KalturaAuditTrailFileSyncSubType::ENTRY_CONVERSION_LOG;
+				}
+				return null;
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_UICONF:
+				switch($objectSubType)
+				{
+					case uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA:
+						return KalturaAuditTrailFileSyncSubType::UICONF_DATA;
+					case uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES:
+						return KalturaAuditTrailFileSyncSubType::UICONF_FEATURES;
+				}
+				return null;
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB:
+				switch($objectSubType)
+				{
+					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV:
+						return KalturaAuditTrailFileSyncSubType::BATCHJOB_BULKUPLOADCSV;
+					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG:
+						return KalturaAuditTrailFileSyncSubType::BATCHJOB_BULKUPLOADLOG;
+					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG:
+						return KalturaAuditTrailFileSyncSubType::BATCHJOB_CONFIG;
+				}
+				return null;
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET:
+				switch($objectSubType)
+				{
+					case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+						return KalturaAuditTrailFileSyncSubType::FLAVOR_ASSET_ASSET;
+					case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
+						return KalturaAuditTrailFileSyncSubType::FLAVOR_ASSET_CONVERT_LOG;
+				}
+				return null;
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				switch($objectSubType)
+				{
+					case Metadata::FILE_SYNC_METADATA_DATA:
+						return KalturaAuditTrailFileSyncSubType::METADATA_DATA;
+				}
+				return null;
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				switch($objectSubType)
+				{
+					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
+						return KalturaAuditTrailFileSyncSubType::METADATA_PROFILE_DEFINITION;
+					case MetadataProfile::FILE_SYNC_METADATA_VIEWS:
+						return KalturaAuditTrailFileSyncSubType::METADATA_PROFILE_VIEWS;
+				}
+				return null;
+		}
+		return null;
+	}
+
+	/**
+	 * @param BaseObject $object
+	 */
+	public function fileSyncCreated(FileSync $fileSync) 
+	{
+		KalturaLog::debug("id [" . $fileSync->getId() . "]");
+		$object = kFileSyncUtils::retrieveObjectForFileSync($fileSync);
+		if(!$object || !($object instanceof ISyncableFile))
+		{
+			KalturaLog::debug("Not instance of ISyncableFile");
+			return;
+		}
+			
+		$auditTrail = self::createAuditTrail($object);
+		if(!$auditTrail)
+		{
+			KalturaLog::debug("No audit created");
+			return;
+		}
+			
+		$data = new KalturaAuditTrailFileSyncCreateInfo();
+		$data->version = $fileSync->getVersion();
+		$data->objectSubType = self::translateSubTypeToEnum($fileSync->getObjectType(), $fileSync->getObjectSubType());
+		$data->dc = $fileSync->getDc();
+		$data->original = $fileSync->getOriginal();
+		$data->fileType = $fileSync->getFileType();
+		
+		$auditTrail->setData($data);
+		$auditTrail->setAction(KalturaAuditTrailAction::FILE_SYNC_CREATED);
+		$auditTrail->save();
+	}
+
+	/**
 	 * @param BaseObject $object
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
+		if($object instanceof FileSync)
+			$this->fileSyncCreated($object);
+			
 		$auditTrail = self::createAuditTrail($object);
 		if(!$auditTrail)
 			return;

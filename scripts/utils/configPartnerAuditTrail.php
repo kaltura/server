@@ -13,6 +13,7 @@ require_once(ROOT_DIR . '/infra/KAutoloader.php');
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "audit", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
 KAutoloader::setClassMapFilePath('../cache/classMap.cache');
 KAutoloader::register();
 
@@ -22,6 +23,7 @@ $objectsToTrack = array(
 		'actions' => array(
 			KalturaAuditTrailAction::CHANGED,
 			KalturaAuditTrailAction::CREATED,
+			KalturaAuditTrailAction::DELETED,
 		),
 		'descriptors' => array(
 			entryPeer::NAME,
@@ -35,11 +37,22 @@ $objectsToTrack = array(
 		'actions' => array(
 			KalturaAuditTrailAction::CHANGED,
 			KalturaAuditTrailAction::CREATED,
+			KalturaAuditTrailAction::FILE_SYNC_CREATED,
 		),
 		'descriptors' => array(
 			flavorAssetPeer::TAGS,
 			flavorAssetPeer::VERSION,
 			flavorAssetPeer::STATUS,
+		),
+	),
+	'Metadata' => array(
+		'actions' => array(
+			KalturaAuditTrailAction::CHANGED,
+			KalturaAuditTrailAction::CREATED,
+		),
+		'descriptors' => array(
+			MetadataPeer::VERSION,
+			MetadataPeer::STATUS,
 		),
 	),
 );
