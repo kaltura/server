@@ -57,6 +57,7 @@ class KalturaBaseEntryFilter extends KalturaFilter
 		"tagsNameMultiLikeAnd" => "_mlikeand_tags-name",
 		"tagsAdminTagsMultiLikeAnd" => "_mlikeand_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeAnd" => "_mlikeand_tags-admin_tags-name",
+		"freeText" => "_free_text",
 	);
 
 	private $order_by_map = array
@@ -419,4 +420,9 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $freeText;
 }
