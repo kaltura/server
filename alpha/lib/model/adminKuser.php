@@ -213,7 +213,7 @@ class adminKuser extends BaseadminKuser
 	{
 		$partner = $this->getPartner();
 		if (!$partner) {
-			return null;
+			return kConf::get('admin_kuser_max_login_attempts');
 		}
 		return $partner->getMaxLoginAttempts();
 	}
@@ -222,16 +222,16 @@ class adminKuser extends BaseadminKuser
 	{
 		$partner = $this->getPartner();
 		if (!$partner) {
-			return null;
+			return kConf::get('admin_kuser_login_block_period');
 		}
-		return $partner->getNumPrevPassToKeep();
+		return $partner->getLoginBlockPeriod();
 	}
 		
 	public function getNumPrevPassToKeep()
 	{
 		$partner = $this->getPartner();
 		if (!$partner) {
-			return null;
+			return kConf::get('admin_kuser_num_prev_passwords_to_keep');
 		}
 		return $partner->getNumPrevPassToKeep();
 	}
@@ -240,9 +240,9 @@ class adminKuser extends BaseadminKuser
 	{
 		$partner = $this->getPartner();
 		if (!$partner) {
-			return null;
+			return kConf::get('admin_kuser_password_replace_freq');
 		}
-		return $partner->getNumPrevPassToKeep();
+		return $partner->getPassReplaceFreq();
 	}
 	
 	
