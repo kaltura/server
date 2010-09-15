@@ -452,7 +452,6 @@ class kBusinessPreConvertDL
 		// gets the list of flavor params of the conversion profile - except for the source
 		$c = new Criteria();
 		$c->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $profile->getId());
-		$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParams::SOURCE_PARAMS_ID , Criteria::NOT_EQUAL);
 		$list = flavorParamsConversionProfilePeer::doSelect($c);
 		if(! count($list))
 		{
@@ -504,7 +503,11 @@ class kBusinessPreConvertDL
 			
 		// gets the flavor params by the id
 		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
-		KalturaLog::log(count($flavorsIds) . " flavors found for this profile[" . $profile->getId() . "]");
+		foreach($flavors as $index => $flavor)
+			if($flavor->hasTag(flavorParams::TAG_SOURCE))
+				unset($flavors[$index]);
+				
+		KalturaLog::log(count($flavors) . " flavors found for this profile[" . $profile->getId() . "]");
 		
 		$errDescription = null;
 		$finalFlavors = self::validateConversionProfile($mediaInfo, $flavors, $flavorParamsConversionProfiles, $errDescription);

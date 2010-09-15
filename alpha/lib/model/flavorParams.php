@@ -59,8 +59,6 @@ class flavorParams extends BaseflavorParams
 	const TAG_SLWEB = "slweb";
 	
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
-		
-	const SOURCE_PARAMS_ID = 0;
 	
 	const SYSTEM_DEFAULT = 1; 
 	

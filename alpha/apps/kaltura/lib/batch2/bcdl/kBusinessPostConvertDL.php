@@ -82,7 +82,7 @@ class kBusinessPostConvertDL
 				$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
 				if($profile)
 				{
-					$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile(flavorParams::SOURCE_FLAVOR_ID, $profile->getId());
+					$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($currentFlavorAsset->getFlavorParamsId(), $profile->getId());
 					if($flavorParamsConversionProfile)
 						$currentReadyBehavior = $flavorParamsConversionProfile->getReadyBehavior();
 				}
@@ -153,7 +153,7 @@ class kBusinessPostConvertDL
 					$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
 					if($profile)
 					{
-						$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile(flavorParams::SOURCE_FLAVOR_ID, $profile->getId());
+						$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($siblingFlavorAsset->getFlavorParamsId(), $profile->getId());
 						if($flavorParamsConversionProfile)
 							$readyBehavior = $flavorParamsConversionProfile->getReadyBehavior();
 					}

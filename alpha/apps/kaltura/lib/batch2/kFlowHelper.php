@@ -29,8 +29,6 @@ class kFlowHelper
 			return $flavorAsset;
 		}
 		
-		$status = flavorAsset::FLAVOR_ASSET_STATUS_READY;
-		
 		try{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		
@@ -47,12 +45,19 @@ class kFlowHelper
 			return null;
 		}
 	
-		$c = new Criteria();
-		$c->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $profile->getId());
-		$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParams::SOURCE_PARAMS_ID );
-		$hasSourceFlavor = flavorParamsConversionProfilePeer::doCount($c);
-		if(!$hasSourceFlavor)
+		$status = flavorAsset::FLAVOR_ASSET_STATUS_READY;
+		$flavorParamsId = null;
+		
+		$srcFlavors = flavorParamsPeer::retrieveByProfileAndTag($profile->getId(), flavorParams::TAG_SOURCE);
+		if(count($srcFlavors))
+		{
+			$srcFlavor = reset($srcFlavors);
+			$flavorParamsId = $srcFlavor->getId();
+		}
+		else
+		{
 			$status = flavorAsset::FLAVOR_ASSET_STATUS_DELETED;
+		}
 		
 		// creates the flavor asset
 		$flavorAsset = new flavorAsset();
@@ -61,7 +66,7 @@ class kFlowHelper
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_PARAMS_ID);
+		$flavorAsset->setFlavorParamsId($flavorParamsId);
 		$flavorAsset->save();
 		
 		if($status == flavorAsset::FLAVOR_ASSET_STATUS_READY)
@@ -69,7 +74,7 @@ class kFlowHelper
 			$entry = entryPeer::retrieveByPK($entryId);
 			if($entry)
 			{
-				$entry->addFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+				$entry->addFlavorParamsId($flavorParamsId);
 				$entry->save();
 			}
 		}

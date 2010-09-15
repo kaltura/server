@@ -26,4 +26,21 @@ class flavorParamsConversionProfilePeer extends BaseflavorParamsConversionProfil
 
 		return flavorParamsConversionProfilePeer::doSelectOne($criteria, $con);
 	}
+	
+	/**
+	 * 
+	 * @param int $conversionProfileId
+	 * @param $con
+	 * 
+	 * @return array
+	 */
+	public static function getFlavorIdsByProfileId($conversionProfileId, $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->addSelectColumn(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID);
+		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfileId);
+
+		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 }

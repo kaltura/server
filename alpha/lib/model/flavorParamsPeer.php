@@ -41,6 +41,30 @@ class flavorParamsPeer extends BaseflavorParamsPeer
 	}
 	
 	/**
+	 * @param int $conversionProfileId
+	 * @param string $tag
+	 * @param $con
+	 * @return array<flavorParamsOutput>
+	 */
+	public static function retrieveByProfileAndTag($conversionProfileId, $tag, $con = null)
+	{
+		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
+		
+		$criteria = new Criteria();
+		$criteria->add(flavorParamsPeer::ID, $flavorIds, Criteria::IN);
+
+		$flavorParams = flavorParamsPeer::doSelect($criteria, $con);
+		
+		$ret = array();
+		
+		foreach($flavorParams as $flavorParamsItem)
+			if($flavorParamsItem->hasTag($tag))
+				$ret[] = $flavorParamsItem;
+		
+		return $ret;
+	}
+	
+	/**
 	 * Allow access to partner X besides the current session partner
 	 */
 	public static function allowAccessToSystemDefaultParamsAndPartnerX($partnerXId)
