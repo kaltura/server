@@ -213,6 +213,7 @@ class ks
 	const INVALID_USER = -3;
 	const INVALID_TYPE = -4;
 	const EXPIRED = -5;
+	const LOGOUT = -6;
 	const OK = 1;
 
 	const INVALID_LKS = -7;
@@ -248,12 +249,17 @@ class ks
 		if ( self::$ERROR_MAP == null )
 		{
 			self::$ERROR_MAP  = array ( self::INVALID_STR => "INVALID_STR" , self::INVALID_PARTNER => "INVALID_PARTNER" , self::INVALID_USER => "INVALID_USER" ,
-				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED");
+				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED");
 		}
 		
 		$str =  @self::$ERROR_MAP[$code];
 		if ( ! $str ) $str = "?";
 		return $str;
+	}
+	
+	public static function getOriginalString()
+	{
+		return $this->original_str;
 	}
 	
 	public static function fromSecureString ( $encoded_str )
@@ -317,7 +323,14 @@ class ks
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
 		if ( ! $this->type == $type  ) return self::INVALID_TYPE;
 		if ( $this->expired ( ) ) return self::EXPIRED ;
-
+	
+		if($this->original_str)
+		{
+			$invalid = invalidSessionPeer::isInvalid($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+			if($invalid)
+				return self::LOGOUT;
+		}
+		
 		return self::OK;
 	}
 	

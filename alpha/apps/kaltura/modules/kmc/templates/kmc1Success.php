@@ -1045,15 +1045,7 @@ function closeLoginF()
 
 function logout()
 {
-	var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
-	expiry = expiry.toGMTString();
-	document.cookie = "pid=; expires=" + expiry + "; path=/";
-	document.cookie = "subpid=; expires=" + expiry + "; path=/";
-	document.cookie = "uid=; expires=" + expiry + "; path=/";
-	document.cookie = "kmcks=; expires=" + expiry + "; path=/";
-	document.cookie = "screen_name=; expires=" + expiry + "; path=/";
-	document.cookie = "email=; expires=" + expiry + "; path=/";
-	window.location = "<? echo $service_url; ?>/index.php/kmc/kmc?logout";
+	window.location = "<? echo $service_url; ?>/index.php/kmc/logout?logout";
 }
 
 // will load the content modul by default

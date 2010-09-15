@@ -215,16 +215,8 @@ $(function(){
 			return myString;
 		},
 		logout : function() {
-			var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
-			expiry = expiry.toGMTString();
-			document.cookie = "pid=; expires=" + expiry + "; path=/";
-			document.cookie = "subpid=; expires=" + expiry + "; path=/";
-			document.cookie = "uid=; expires=" + expiry + "; path=/";
-			document.cookie = "kmcks=; expires=" + expiry + "; path=/";
-			document.cookie = "screen_name=; expires=" + expiry + "; path=/";
-			document.cookie = "email=; expires=" + expiry + "; path=/";
 			var state = kmc.mediator.readUrlHash();
-			window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.module + "|" + state.subtab;
+			window.location = kmc.vars.service_url + "/index.php/kmc/logout#" + state.module + "|" + state.subtab;
 		},
 		copyCode : function () {
 			$("#copy_msg").show();

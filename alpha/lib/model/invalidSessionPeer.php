@@ -14,4 +14,32 @@
  */
 class invalidSessionPeer extends BaseinvalidSessionPeer {
 
+	/**
+	 * @param      string $ks
+	 * @param      PropelPDO $con the connection to use
+	 * @return     bool
+	 */
+	public static function isInvalid($ks, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(invalidSessionPeer::KS, $ks);
+
+		$cnt = invalidSessionPeer::doCount($criteria, $con);
+		return ($cnt > 0);
+	}
+	
+	/**
+	 * @param      ks $ks
+	 * @return     invalidSession
+	 */
+	public static function invalidateKs(ks $ks)
+	{
+		$invalidSession = new invalidSession();
+		$invalidSession->setKs($ks->getOriginalString());
+		$invalidSession->setKsValidUntil($ks->valid_until);
+		$invalidSession->save();
+		
+		return $invalidSession;
+	}
+	
 } // invalidSessionPeer
