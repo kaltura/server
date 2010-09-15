@@ -1846,5 +1846,22 @@ CREATE TABLE `sphinx_log_server`
 		REFERENCES `sphinx_log` (`id`)
 )Type=MyISAM;
 
+#-----------------------------------------------------------------------------
+#-- invalid_session
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `invalid_session`;
+
+
+CREATE TABLE `invalid_session`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`ks` VARCHAR(40),
+	`ks_valid_until` DATETIME,
+	`created_at` DATETIME,
+	PRIMARY KEY (`id`),
+	KEY `ks_index`(`ks`)
+)Type=MyISAM;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
