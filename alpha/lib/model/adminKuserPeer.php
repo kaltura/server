@@ -73,12 +73,12 @@ class adminKuserPeer extends BaseadminKuserPeer
 		
 		if ($requested_password && 
 				(!adminKuserPeer::isPasswordStructureValid($requested_password) ||
-				  stripos($requested_password, $user->getScreenName()) !== 0)   ||
-				  stripos($requested_password, $user->getFullName() !== 0)         ){
+				  stripos($requested_password, $user->getScreenName()) !== false)   ||
+				  stripos($requested_password, $user->getFullName() !== false)         ){
 			throw new kAdminKuserException('', kAdminKuserException::PASSWORD_STRUCTURE_INVALID);
 		}
 				
-		if ($requested_password && $user->passwordUsedBefore($requested_password, 0)) {
+		if ($requested_password && $user->passwordUsedBefore($requested_password)) {
 			throw new kAdminKuserException('', kAdminKuserException::PASSWORD_ALREADY_USED);
 		}		
 		
@@ -89,10 +89,8 @@ class adminKuserPeer extends BaseadminKuserPeer
 			$user->setEmail($new_email);
 		}
 		
-		$hashKey = $user->getPasswordHashKey();
-
 		$user->save();
-		$this->emailResetPassword($user->getPartnerId(), $user->getEmail(), $user->getFullName(), self::getPassResetLink($hashKey));
+		$this->emailResetPassword($user->getPartnerId(), $user->getEmail(), $user->getFullName(), self::getPassResetLink($user->getPasswordHashKey()));
 
 		
 		return array ( $password , $new_email);
@@ -143,7 +141,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 	
 	public static function generateNewPassword()
 	{
-		$minPassLength = 5;
+		$minPassLength = 8;
 		$maxPassLength = 14;
 		
 		$mustCharset[] = 'abcdefghijklmnopqrstuvwxyz';
@@ -159,7 +157,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 			$i = mt_rand(0, strlen($newPassword));
 			$newPassword = substr($newPassword, 0, $i) . $c . substr($newPassword, $i);
 		}
-		
+
 		return $newPassword;		
 	}
 		
@@ -185,6 +183,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 	public static function isHashKeyValid($hashKey)
 	{
 		// check hash key
+		$hashKey = str_replace('.','=', $hashKey);
 		$id = self::getAdminKuserIdFromHashKey($hashKey);
 		if (!$id) {
 			throw new kAdminKuserException ('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
@@ -207,6 +206,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 	public static function setInitialPassword($hashKey, $newPassword)
 	{
 		// might throw exception
+		$hashKey = str_replace('.','=', $hashKey);
 		$adminKuser = self::isHashKeyValid($hashKey);
 		
 		if (!$adminKuser) {
@@ -221,6 +221,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 		$adminKuser->setPassword($newPassword);
 		$adminKuser->setLoginAttempts(0);
 		$adminKuser->setLoginBlockedUntil(null);
+		$adminKuser->setPasswordHashKey(null);
 		$adminKuser->save();
 		return true;
 	}
@@ -230,7 +231,8 @@ class adminKuserPeer extends BaseadminKuserPeer
 		if (!$hashKey) {
 			return null;
 		}
-		return kConf::get('apphome_url').'/kmc/setpasshashkey/'.$hashKey;
+		$hashKey = str_replace('=', '.', $hashKey);
+		return kConf::get('apphome_url').'/index.php/kmc/kmc/setpasshashkey/'.$hashKey;
 	}
 	
 	public static function adminLogin($email, $password)
@@ -245,7 +247,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 			if (time() < $adminKuser->getLoginBlockedUntil(null)) {
 				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
 			}
-			if ($adminKuser->getLoginAttempts() >= $adminKuser->getMaxLoginAttempts()) {
+			if ($adminKuser->getLoginAttempts()+1 >= $adminKuser->getMaxLoginAttempts()) {
 				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()*60*60) );
 				$adminKuser->save();
 				throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
@@ -262,11 +264,12 @@ class adminKuserPeer extends BaseadminKuserPeer
 			}
 			
 			$adminKuser->setLoginAttempts(0);
+			$adminKuser->save();
 			$passUpdatedAt = $adminKuser->getPasswordUpdatedAt(null);
 			if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq()*60*60*24)) {
 				throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
 			}
 		}
-		return true;
+		return $adminKuser;
 	}
 }
