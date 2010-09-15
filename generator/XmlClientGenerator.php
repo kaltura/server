@@ -40,6 +40,13 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$servicesElement = $this->_doc->createElement("services");
 		foreach($this->_services as $serviceReflector)
 		{
+			if(!isset($this->_includeList[strtolower($serviceReflector->getServiceId())]))
+			{
+				KalturaLog::debug("Service [" . $serviceReflector->getServiceName() . "] exluded");
+				continue;
+			}
+				
+		    $serviceIncludeList = $this->_includeList[strtolower($serviceReflector->getServiceId())];
 		    $serviceElement = $this->_doc->createElement("service");
 			$serviceElement->setAttribute("id", $serviceReflector->getServiceId());
 			$serviceElement->setAttribute("name", $serviceReflector->getServiceName());
@@ -52,6 +59,12 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$actions = array_keys($actions);
 			foreach($actions as $action)
 			{
+				if(!isset($serviceIncludeList[strtolower($action)]))
+				{
+					KalturaLog::debug("Action [" . $serviceReflector->getServiceName() . ".$action] exluded");
+					continue;
+				}
+					
 				$actionInfo = $serviceReflector->getActionInfo($action);
 				
 				if($actionInfo->deprecated || $actionInfo->serverOnly)
