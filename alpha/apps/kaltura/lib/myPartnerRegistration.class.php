@@ -288,6 +288,16 @@ class myPartnerRegistration
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
 
+		if ($password) {
+			if (!adminKuserPeer::isPasswordStructureValid($password)   ||
+				stripos($password, $partner_name) !== false     ||
+		  		stripos($password, $contact) !== false    ) {
+		  		$pos = strpos(APIErrors::PASSWORD_STRUCTURE_INVALID, ",");
+		  		$errMessage = substr(APIErrors::PASSWORD_STRUCTURE_INVALID, $pos + 1);
+		  		throw new SignupException($errMessage, SignupException::PASSWORD_STRUCTURE_INVALID);
+			}
+		}
+			
 		// TODO: log request
 		$newPartner = NULL;
 		$newSubPartner = NULL;
@@ -321,6 +331,7 @@ class SignupException extends Exception
     const UNKNOWN_ERROR = 500;
     const INVALID_FIELD_VALUE = 501;
     const EMAIL_ALREADY_EXISTS = 502;
+    const PASSWORD_STRUCTURE_INVALID = 503;
 
     // Redefine the exception so message/code isn't optional
     public function __construct($message, $code) {

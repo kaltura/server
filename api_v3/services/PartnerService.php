@@ -42,13 +42,6 @@ class PartnerService extends KalturaBaseService
 				$cmsPassword = null;
 			}
 			
-			if ($cmsPassword) {
-				if (!adminKuserPeer::isPasswordStructureValid($cmsPassword)   ||
-					stripos($cmsPassword, $partner->name) !== false      ||
-				  	stripos($cmsPassword, $partner->adminName) !== false    ) {
-					throw new KalturaAPIException (KalturaErrors::PASSWORD_STRUCTURE_INVALID);
-				}
-			}
 			
 			$parentPartnerId = null;
 			if ( $this->getKs() && $this->getKs()->isAdmin() )
