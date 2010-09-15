@@ -1,0 +1,35 @@
+#
+# The CSV should have the following fields for each media clip; separated by comma:
+#  -  Name – mandatory; name of the media
+#  -  Description – optional; description of the media
+#  -  Tag – optional; tags to be added to the media. Multiple tags can be assigned using double quotation marks for the entire field; and commas to separate between tags. For example: “ tag  1; tag 2”
+#  -  URL – mandatory; the URL from which the media is to be pulled. 
+#         Kaltura supports the following protocols: http; https; ftp. 
+#         In addition Kaltura supports user:password additions into the URL in the following format:
+#         protocol://username:password@domain/filepathname
+#         for example:
+#         ftp://projects8:741@ftp.kaltura.com/kaltura final 4_CD.wmv 
+#  -  Media Type – mandatory; must be one of the following: video; audio; image.
+#  -  Transcoding Profile ID – optional. Allows the user to specify the transcoding profile that will define the specific transcoding of the file.  If left blank; the system will use the default transcoding profile. If the ID does not exist; then the entry will be skipped and an error will be logged.
+#  -  Access Control Profile ID - optional. Allows the user to specify the Access Control Profile for each entry. If left blank; the system will use the default profile. If the ID does not exist; then the entry will be skipped and an error will be logged.
+#  -  Category – optional; if the category specified does not exist in the system; it will be created. 
+#         Multiple categories can be assigned using double quotation marks for the entire field; and commas to separate between categories. 
+#         Categories hierarchy can be created using the ‘greater than’ sign. 
+#         For example “Root Category >Sub Category”   
+#  -  Scheduling Start Date – optional; can be left blank. 
+#         Date format is based on ISO 8601 using the YYYY-MM-DDThh:mm:ss format where the capital letter T is used to separate the date and time components. 
+#         Example: 2003-04-01T13:01:02 represents one minute and two seconds after one o'clock in the afternoon of 2003-04-01.  For further information please refer to : http://www.iso.org/iso/date_and_time_format#how-it-works
+#  -  Scheduling End Date - optional; can be left blank. See Start Date for date format.
+#  -  Thumbnail URL – optional; will pull the image from the URL and set it as the entry’s thumbnail. If left blank the system will take a frame from 5 seconds into the video.
+#  -  Partner Data – optional; can be left blank. 
+#         Arbitrary data that may be relevant for this entry; stored in Partner Data column. This data is not exposed in the KMC; and can currently only be retrieved via API.
+#
+#
+#
+# Name, Description, Tag, URL , Media Type , Transcoding Profile ID , Access Control Profile ID , Category , Scheduling Start Date , Scheduling End Date, Thumbnail URL , Partner Data
+Home,Homepage video with music,"Homepage, Creative",http://sites.google.com/site/demokmc/Home/KalturaSiteAlt.flv,Video,,,,,,,
+Companies to watch,Five companies to watch in 2009 report,"Kaltura, Press",http://sites.google.com/site/demokmc/Home/VideoFishbowl-TheFiveOnlineVideoCompaniesToWatchIn2009612.flv,Video,,,,,,,
+Creating together,Collaboration video,Collaboration,http://sites.google.com/site/demokmc/Home/spot.whats.mov,Video,,,,,,,
+Titanic in 5 Seconds,Titanic movie summarized in 5 seconds,"Titanic, Short",http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv,Video,,,,,,,
+Humor,Promotional funny video,"Humor, Promotional",ftp://projects8:741@ftp.kaltura.com/kaltura final 4_CD.wmv,Video,,,,,,,
+Big Buck Bunny Trailer,A funny and furry 3D short about a giant rabbit who gets even with bullying rodents,"Big buck bunny, trailer",ftp://projects8:741@ftp.kaltura.com/BigBuckBunnyTrailerHD.mov,Video,,,,,,,
