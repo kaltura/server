@@ -10,7 +10,7 @@ require_once 'propel/engine/builder/om/php5/PHP5ObjectBuilder.php';
  *
  * @package    infra.propel.php5
  */
-class KalturaObjectBuilder extends PHP5ObjectBuilder 
+class KalturaObjectBuilder extends PHP5ObjectBuilder
 {
 	const KALTURA_COLUMN_CREATED_AT = 'created_at';
 	const KALTURA_COLUMN_UPDATED_AT = 'updated_at';
@@ -254,10 +254,9 @@ class KalturaObjectBuilder extends PHP5ObjectBuilder
 			return;
 			
 		$fullColumnName = $this->getColumnConstant($col);
-		$cfc = $col->getPhpName();
 		$script .= "
 		if(!isset(\$this->oldColumnsValues[$fullColumnName]))
-			\$this->oldColumnsValues[$fullColumnName] = \$this->get$cfc();
+			\$this->oldColumnsValues[$fullColumnName] = \$this->$clo;
 ";
 	}
 	
