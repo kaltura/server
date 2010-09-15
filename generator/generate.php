@@ -112,7 +112,7 @@ function getServicesIncludeList($include, $exclude)
 		$serviceReflector = new KalturaServiceReflector($service);
 		$actions = $serviceReflector->getActions();
 		foreach($actions as &$action) // we need only the keys
-			$action = null;
+			$action = true;
 		$fullList[$service] = $actions;
 	}
 				
@@ -139,7 +139,7 @@ function getServicesIncludeList($include, $exclude)
 				$includeList[$service] = $fullList[$service];
 			} 
 			else 
-				$includeList[$service][$action] = null; 
+				$includeList[$service][$action] = true; 
 		}
 	}
 	else if ($exclude !== null)
@@ -155,9 +155,15 @@ function getServicesIncludeList($include, $exclude)
 				list($service, $action) = explode(".", $item);
 				
 			if ($action == "*")
+			{
+//				KalturaLog::debug("Excluding service [$service]");
 				unset($includeList[$service]);
-			else 
-				unset($includeList[$service][$action]); 
+			}
+			else
+			{ 
+//				KalturaLog::debug("Excluding action [$service.$action]");
+				unset($includeList[$service][$action]);
+			} 
 		}
 	}
 	else
