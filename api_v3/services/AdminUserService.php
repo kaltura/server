@@ -105,8 +105,9 @@ class AdminUserService extends KalturaBaseService
 	 */		
 	function loginAction($email, $password)
 	{
+		
 		try {
-			$canLogin = adminKuserPeer::adminLogin($email, $password);
+			$adminKuser = adminKuserPeer::adminLogin($email, $password);
 		}
 		catch (kAdminKuserException $e) {
 			$code = $e->getCode();
@@ -124,9 +125,10 @@ class AdminUserService extends KalturaBaseService
 			}
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
-		if (!$canLogin) {
+		if (!$adminKuser) {
 			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
 		}
+		
 		
 		$partner = PartnerPeer::retrieveByPK($adminKuser->getPartnerId());
 		
