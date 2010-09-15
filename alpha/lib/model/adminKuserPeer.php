@@ -262,7 +262,8 @@ class adminKuserPeer extends BaseadminKuserPeer
 			}
 			
 			$adminKuser->setLoginAttempts(0);
-			if (time() > $adminKuser->getPasswordUpdatedAt() + $adminKuser->getPassReplaceFreq()*60*60*24) {
+			$passUpdatedAt = $adminKuser->getPasswordUpdatedAt(null);
+			if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq()*60*60*24)) {
 				throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
 			}
 		}
