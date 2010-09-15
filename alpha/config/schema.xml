@@ -2543,4 +2543,18 @@
 			<reference local="last_log_id" foreign="id" />
 		</foreign-key>
 	</table>
+	<table skipSql="false" abstract="false" name="invalid_session"
+		phpName="invalidSession">
+		<column lazyLoad="false" name="id" type="integer"
+			required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="ks" type="varchar" size="40" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="ks_valid_until" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="created_at" type="timestamp" />
+		<index name="ks_index">
+			<index-column name="ks" />
+		</index>
+	</table>
 </database>
