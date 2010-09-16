@@ -146,7 +146,7 @@ class adddownloadAction extends defPartnerservices2Action
 		$this->addMsg("download", $jobWrapperClass);
 
 		// Backwards compatebilty for document entries 
-		if ( $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_DOCUMENT )
+		if ( $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_DOCUMENT || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_PDF )
 		{
 			$this->addMsg("OOconvert", $jobWrapperClass);
 			
