@@ -127,9 +127,9 @@ var kmc = {};
 			bgcolor: "#272929",
 			quality: "high",
 			wmode: "window" ,
-			movie: "<?php echo $flash_dir ?>/kmc/login/v1.1.4/login.swf"
+			movie: "<?php echo $flash_dir ?>/kmc/login/v1.1.5/login.swf"
 		};
-		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/v1.1.4/login.swf", "login_swf", "384", "350", "9.0.0", false, flashVars, params);
+		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/v1.1.5/login.swf", "login_swf", "384", "350", "9.0.0", false, flashVars, params);
 	}
 </script>
 
