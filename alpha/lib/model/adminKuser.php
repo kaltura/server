@@ -251,7 +251,7 @@ class adminKuser extends BaseadminKuser
 	public function newPassHashKey()
 	{
 		$adminKuserId = $this->getId();
-		$expiryTime = time() + (60*60*kConf::get('admin_kuser_set_password_hash_key_validity')); // now + 24 hours
+		$expiryTime = time() + (kConf::get('admin_kuser_set_password_hash_key_validity')); // now + 24 hours
 		$random = sha1( uniqid() . (time() * rand(0,1)) );
 		$hashKey = base64_encode(implode('|', array($adminKuserId, $expiryTime, $random)));
 		return $hashKey;

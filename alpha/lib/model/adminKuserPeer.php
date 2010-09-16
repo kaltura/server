@@ -211,9 +211,10 @@ class adminKuserPeer extends BaseadminKuserPeer
 		if (!$adminKuser) {
 			throw new kAdminKuserException ('', kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
-				
 		// check password structure
-		if (!self::isPasswordStructureValid($newPassword)) {
+		if (!self::isPasswordStructureValid($newPassword) ||
+			stripos($requested_password, $adminKuser->getScreenName() !== false)   ||
+			stripos($requested_password, $adminKuser->getFullName() !== false)         ) {
 			throw new kAdminKuserException ('', kAdminKuserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
@@ -251,7 +252,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
 			}
 			if ($adminKuser->getLoginAttempts()+1 >= $adminKuser->getMaxLoginAttempts()) {
-				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()*60*60) );
+				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()) );
 				$adminKuser->save();
 				throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
 			}
@@ -269,7 +270,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 			$adminKuser->setLoginAttempts(0);
 			$adminKuser->save();
 			$passUpdatedAt = $adminKuser->getPasswordUpdatedAt(null);
-			if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq()*60*60*24)) {
+			if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq())) {
 				throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
 			}
 		}
