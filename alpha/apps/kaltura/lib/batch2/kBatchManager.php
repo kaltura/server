@@ -261,7 +261,15 @@ class kBatchManager
 		$createdAt = time() - kConf::get('priority_time_range');		
 //		$createdAt = kConf::get('priority_time_range');
 		
-
+		$c = new Criteria();
+		$c->add(BatchJobPeer::CREATED_AT, $createdAt, Criteria::GREATER_THAN);
+		$c->add(BatchJobPeer::JOB_TYPE, $jobType);
+		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_PENDING);
+		$c->clearSelectColumns();
+		$c->addSelectColumn('MAX(' . BatchJobPeer::PRIORITY . ')');
+		$stmt = BatchJobPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		$maxPriority = $stmt->fetchColumn();
+		
 		// gets the current queues
 		$c = new Criteria();
 		$c->add(BatchJobPeer::CREATED_AT, $createdAt, Criteria::GREATER_THAN);
@@ -284,6 +292,9 @@ class kBatchManager
 		// go over the priorities and see if its percent not used
 		foreach($priorities as $priority => $top_percent)
 		{
+			if($priority > $maxPriority)
+				continue;
+				
 			if(! isset($queues_size[$priority]))
 				return $priority;
 			
