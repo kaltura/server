@@ -86,7 +86,7 @@ class myPartnerRegistration
 	 	if(kConf::get('kaltura_installation_type') == 'CE')
 		{
 			$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-			$bodyParams = array($admin_name, $pid, $subpid, $cms_email, $passResetLink, $admin_secret, $secret, $cms_email, $passResetLink);
+			$bodyParams = array($admin_name, $cms_email, $pid, $passResetLink);
 		}
 		else
 		{
@@ -94,11 +94,11 @@ class myPartnerRegistration
 			{
 				case 1: // KMC signup
 					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$cms_email,$passResetLink,$pid);
+				 	$bodyParams = array($admin_name,$cms_email,$pid,$passResetLink);
 					break;
 				default: // all others
 				 	$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$cms_email,$passResetLink,$pid, $subpid, $cms_email, $hashKey, $admin_secret, $secret );
+				 	$bodyParams = array($admin_name,$pid,$cms_email,$passResetLink);
 			}
 		}
 		if ( $recipient_email == null ) $recipient_email = $cms_email;
