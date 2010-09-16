@@ -10,6 +10,8 @@ class kCoreException extends Exception
 		$this->code = $code;
 	}
 	
+	const INVALID_QUERY = "INVALID_QUERY";
+	
 	const DUPLICATE_CATEGORY = "DUPLICATE_CATEGORY";
 	
 	const PARENT_ID_IS_CHILD = "PARENT_ID_IS_CHILD";

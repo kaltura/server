@@ -24,14 +24,14 @@ class myReportsMgr
 	{
 		if ( strpos ($query_file,".") === 0 || strpos ($query_file,"/") === 0 || strpos ($query_file,"http") === 0 )
 		{
-			die ( "Will not search for invalid report_type [$query_file" );
+			throw new kCoreException("Will not search for invalid report_type [$query_file", kCoreException::INVALID_QUERY);
 		}
 		$file_path = dirname(__FILE__)."/". $query_file . ".sql";
 		
 		$sql_raw_content = file_get_contents( $file_path );
 		if ( ! $sql_raw_content )
 		{
-			die ( "Cannot find sql for [$query_file] at [$file_path]" );
+			throw new kCoreException("Cannot find sql for [$query_file] at [$file_path]", kCoreException::INVALID_QUERY);
 		}	
 
 		// replace all params in $sql_raw_content with map
@@ -429,7 +429,7 @@ class myReportsMgr
 			{
 				if ( strpos ($report_type,".") === 0 || strpos ($report_type,"/") === 0 || strpos ($report_type,"http") === 0 )
 				{
-					die ( "Will not search for invalid report_type [$report_type" );
+					throw new kCoreException("Will not search for invalid report_type [$report_type", kCoreException::INVALID_QUERY);
 				}
 				$file_path = dirname(__FILE__)."/". $report_type . ".sql";
 			}
@@ -437,13 +437,13 @@ class myReportsMgr
 			$sql_raw_content = file_get_contents( $file_path );
 			if ( ! $sql_raw_content )
 			{
-				die ( "Cannot find sql for [$report_type] [$report_flavor] at [$file_path]" );
+				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::INVALID_QUERY);
 			}
 			
 			if ( $object_ids )
 			{
-				//the object ids are not supposed to include single quotes - if they do hhave them - escape them
-				$object_ids = str_replace ( "'" , "\'" , $object_ids ) ; 
+				//the object ids are not supposed to include single quotes - if they do have them - remove them
+				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
 				// quote all the objects with SINGLE-QUOTES			
 				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
 	
@@ -656,9 +656,6 @@ class myReportsMgr
 // TODO - remove when timezone is correct on the client's side
 date_default_timezone_set ('UTC' );
 		
-		if(!preg_match('/^[0-9_a-z,]+$/', $obj_ids_clause))
-			$obj_ids_clause = null;
-			
 		$obj_ids_str = $obj_ids_clause ? $obj_ids_clause : "1=1";
 		
 // TODO - remove ! nasty hack until client will suply rounded dates that don't depend on the timezone  
@@ -727,7 +724,7 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 		$db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
 		
 		if (!$db_selected) {
-    		die ('Can\'t use foo : ' . mysql_error());
+    		throw new kCoreException('Can\'t use foo : ' . mysql_error(), kCoreException::INVALID_QUERY);
 		}
 
 		$result = mysql_query($query);
@@ -737,9 +734,9 @@ KalturaLog::log( "Reports query using database host: [$host] user [" . $db_confi
 		if (!$result) 
 		{
 		
-		    $message  = 'Invalid query: ' . mysql_error() . "\n";
-		    $message .= 'Whole query: ' . $query;
-		    die($message);
+		    KalturaLog::err('Invalid query: ' . mysql_error());
+		    $message = 'Invalid query';
+		    throw new kCoreException($message, kCoreException::INVALID_QUERY);
 		}
 			
 		$res = array();
