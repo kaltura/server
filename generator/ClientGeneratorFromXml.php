@@ -90,8 +90,13 @@ abstract class ClientGeneratorFromXml
 	
 	protected function camelCaseToUnderscoreAndLower($value)
 	{
-		$filter = new Zend_Filter_Word_CamelCaseToUnderscore();
-		return strtolower($filter->filter($value));
+		$separator = '_';
+		$matchPattern = array('#(?<=(?:[A-Z]))([A-Z]+)([A-Z][A-z])#', '#(?<=(?:[a-z]))([A-Z])#');
+		$replacement = array('\1' . $separator . '\2', $separator . '\1');
+		$newValue = preg_replace($matchPattern, $replacement, $value);
+		return strtolower($newValue);
+		//$filter = new Zend_Filter_Word_CamelCaseToUnderscore();
+		//return strtolower($filter->filter($value));
 	}
 	
 	protected function isSimpleType($type)
