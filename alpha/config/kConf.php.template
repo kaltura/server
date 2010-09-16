@@ -220,6 +220,19 @@ class kConf
 				"template_partner_id" => 99,
 				"kaltura_email_hash" => "admin",
 				
+				'admin_kuser_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
+                'admin_kuser_max_login_attempts' => 5000,
+                'admin_kuser_login_block_period' => 0,
+                'admin_kuser_num_prev_passwords_to_keep' => 0,
+                'admin_kuser_password_replace_freq' => 60*60*24*5000, /* 5000 days */
+                'admin_kuser_password_structure' => array(
+					'/^.{8,14}$/',
+					'/[0-9]+/',
+					'/[a-z]+/',
+					'/[~!@#$%^*=+?\(\)\-\[\]\{\}]+/',
+				),
+
+				
 		);
 	}
 
