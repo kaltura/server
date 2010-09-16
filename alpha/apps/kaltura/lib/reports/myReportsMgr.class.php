@@ -656,6 +656,9 @@ class myReportsMgr
 // TODO - remove when timezone is correct on the client's side
 date_default_timezone_set ('UTC' );
 		
+		if(!preg_match('/^[0-9_a-z,]+$/', $obj_ids_clause))
+			$obj_ids_clause = null;
+			
 		$obj_ids_str = $obj_ids_clause ? $obj_ids_clause : "1=1";
 		
 // TODO - remove ! nasty hack until client will suply rounded dates that don't depend on the timezone  
