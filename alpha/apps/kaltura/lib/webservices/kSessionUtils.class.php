@@ -263,7 +263,7 @@ class ks
 		return $str;
 	}
 	
-	public static function getOriginalString()
+	public function getOriginalString()
 	{
 		return $this->original_str;
 	}
