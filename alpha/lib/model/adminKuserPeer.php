@@ -217,6 +217,11 @@ class adminKuserPeer extends BaseadminKuserPeer
 			throw new kAdminKuserException ('', kAdminKuserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
+		// check that password wasn't used before
+		if ($adminKuser->passwordUsedBefore($newPassword)) {
+			throw new kAdminKuserException ('', kAdminKuserException::PASSWORD_ALREADY_USED);
+		}
+		
 		$adminKuser->setPassword($newPassword);
 		$adminKuser->setLoginAttempts(0);
 		$adminKuser->setLoginBlockedUntil(null);

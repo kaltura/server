@@ -174,6 +174,10 @@ class AdminUserService extends KalturaBaseService
 			if ($code == kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID) {
 				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID);
 			}
+			if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
+			}
+			
 			throw $e;
 		}
 		if (!$result) {
