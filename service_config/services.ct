@@ -117,7 +117,7 @@ startsession				|			|0		|1	|0		|0		|1		|	|		|	|   |
 startwidgetsession			|			|0		|0	|0		|0		|1		|	|		|	|   |kdp
 testnotification			|			|1		|1	|0		|0		|1		|	|		|	|	|
 transcode					|			|2		|1	|1		|2		|1		|rw	|		|	|   |saysme-project
-updateadminpassword			|			|2		|1	|0		|0		|0		|	|		|	|   |kmc
+updateadminpassword			|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
 updatebatchjob				|			|1		|1	|1		|0		|1		|	|		|	|   |
 updatedataentry				|			|1		|1	|1		|1		|1		|	|		|	|   |
 updatedvdentry				|			|1		|1	|1		|1		|1		|	|		|	|   |kdvc
