@@ -50,7 +50,7 @@ partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
 partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |kmc
 partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|kmc
 
-adminuser.updatepassword			|			|2		|1	|0		|0		|0		|	|		|	|   |kmc
+adminuser.updatepassword			|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
 adminuser.resetpassword				|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
 adminuser.login						|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
 adminuser.setinitialpassword 		|			|0		|0	|0		|0		|1		|	|		|	|   |kmc
