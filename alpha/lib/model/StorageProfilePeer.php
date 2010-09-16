@@ -9,6 +9,17 @@
  */ 
 class StorageProfilePeer extends BaseStorageProfilePeer
 {
+	public static function alternativeCon($con)
+	{
+		if($con === null)
+			$con = myDbHelper::alternativeCon($con);
+			
+		if($con === null)
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
+		
+		return $con;
+	}
+	
 	public static function retrieveAutomaticByPartnerId($partnerId, $con = null)
 	{
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);

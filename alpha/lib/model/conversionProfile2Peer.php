@@ -9,6 +9,16 @@
  */ 
 class conversionProfile2Peer extends BaseconversionProfile2Peer
 {
+	public static function alternativeCon($con)
+	{
+		if($con === null)
+			$con = myDbHelper::alternativeCon($con);
+			
+		if($con === null)
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
+		
+		return $con;
+	}
 
 	public static function setDefaultCriteriaFilter ()
 	{

@@ -12,8 +12,18 @@
  *
  * @package    lib.model
  */
-class AuditTrailConfigPeer extends BaseAuditTrailConfigPeer {
-
+class AuditTrailConfigPeer extends BaseAuditTrailConfigPeer 
+{
+	public static function alternativeCon($con)
+	{
+		if($con === null)
+			$con = myDbHelper::alternativeCon($con);
+			
+		if($con === null)
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
+		
+		return $con;
+	}
 
 	/**
 	 * Retrieve multiple objects by partner id.

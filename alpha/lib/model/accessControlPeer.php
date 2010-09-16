@@ -9,6 +9,17 @@
  */ 
 class accessControlPeer extends BaseaccessControlPeer
 {
+	public static function alternativeCon($con)
+	{
+		if($con === null)
+			$con = myDbHelper::alternativeCon($con);
+			
+		if($con === null)
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
+		
+		return $con;
+	}
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )

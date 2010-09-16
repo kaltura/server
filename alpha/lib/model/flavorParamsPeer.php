@@ -12,6 +12,17 @@ class flavorParamsPeer extends BaseflavorParamsPeer
 	// cache classes by their type
 	private static $class_types_cache = array();
 	
+	public static function alternativeCon($con)
+	{
+		if($con === null)
+			$con = myDbHelper::alternativeCon($con);
+			
+		if($con === null)
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL3);
+		
+		return $con;
+	}
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
