@@ -45,13 +45,12 @@ class SessionService extends KalturaBaseService
 	 * End a session with the Kaltura server, making the current KS invalid.
 	 * 
 	 * @action end
-	 *
-	 * @throws ????
 	 */
 	function endAction()
 	{
 		$ks = $this->getKs();
-		kSessionUtils::killKSession($ks);
+		if($ks)
+			$ks->kill();
 	}
 
 	/**

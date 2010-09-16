@@ -201,7 +201,7 @@ class kSessionUtils
 		{
 			$ksObj = ks::fromSecureString($ks);
 			if($ksObj)
-				invalidSessionPeer::invalidateKs($ksObj);
+				$ksObj->kill();
 		}
 		catch(Exception $e){}	
 	}
@@ -427,6 +427,11 @@ class ks
 	private static function hash ( $salt , $str )
 	{
 		return sha1($salt.$str);
+	}
+	
+	public function kill()
+	{
+		invalidSessionPeer::invalidateKs($this);		
 	}
 }
 

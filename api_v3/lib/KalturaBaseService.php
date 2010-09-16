@@ -6,6 +6,9 @@
  */
 abstract class KalturaBaseService 
 {
+	/**
+	 * @var ks
+	 */
 	private $ks = null;
 	
 	/**
