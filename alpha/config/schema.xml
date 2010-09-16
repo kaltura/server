@@ -2548,7 +2548,7 @@
 		<column lazyLoad="false" name="id" type="integer"
 			required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="ks" type="varchar" size="40" />
+			lazyLoad="false" name="ks" type="varchar" size="300"/>
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="ks_valid_until" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false"
