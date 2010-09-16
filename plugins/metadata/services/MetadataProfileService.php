@@ -244,6 +244,12 @@ class MetadataProfileService extends KalturaBaseService
 		}
 			
 		$dbMetadataProfile->save();
+	
+		if($viewsData)
+		{
+			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+			kFileSyncUtils::file_put_contents($key, $viewsData);
+		}
 		
 		if($xsdData)
 		{
@@ -256,19 +262,17 @@ class MetadataProfileService extends KalturaBaseService
 			}
 			catch(kXsdException $e)
 			{
+				// revert back to previous version
+				$dbMetadataProfile->setVersion($oldVersion);
+				$dbMetadataProfile->save();
+				
 				throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
 			}
 		}
 	
-		if($viewsData)
-		{
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-			kFileSyncUtils::file_put_contents($key, $viewsData);
-		}
 		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
 		
 		$metadataProfile->fromObject($dbMetadataProfile);
-		
 		return $metadataProfile;
 	}	
 	
