@@ -183,7 +183,6 @@ class adminKuserPeer extends BaseadminKuserPeer
 	public static function isHashKeyValid($hashKey)
 	{
 		// check hash key
-		$hashKey = str_replace('.','=', $hashKey);
 		$id = self::getAdminKuserIdFromHashKey($hashKey);
 		if (!$id) {
 			throw new kAdminKuserException ('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
@@ -231,7 +230,6 @@ class adminKuserPeer extends BaseadminKuserPeer
 		if (!$hashKey) {
 			return null;
 		}
-		$hashKey = str_replace('=', '.', $hashKey);
 		return kConf::get('apphome_url').'/index.php/kmc/kmc/setpasshashkey/'.$hashKey;
 	}
 	

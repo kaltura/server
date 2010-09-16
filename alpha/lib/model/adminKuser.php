@@ -193,7 +193,7 @@ class adminKuser extends BaseadminKuser
 	
 	private function getPreviousPasswords()
 	{
-		$this->getFromCustomData('previous_passwords', null, null);
+		return $this->getFromCustomData('previous_passwords', null, null);
 	}
 	
 	public function passwordUsedBefore($pass)
@@ -260,7 +260,7 @@ class adminKuser extends BaseadminKuser
 	public function isPassHashKeyValid($hashKey)
 	{
 		// check if same as user's saved hash key
-		if ($hashKey != $this->getPasswordHashKey()) {
+		if (base64_decode($hashKey) != base64_decode($this->getPasswordHashKey())) {
 			throw new kAdminKuserException('', kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
 		
