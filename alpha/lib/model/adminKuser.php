@@ -211,7 +211,7 @@ class adminKuser extends BaseadminKuser
 	
 	public function getMaxLoginAttempts()
 	{
-		$partner = $this->getPartner();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if (!$partner) {
 			return kConf::get('admin_kuser_max_login_attempts');
 		}
@@ -220,7 +220,7 @@ class adminKuser extends BaseadminKuser
 	
 	public function getLoginBlockPeriod()
 	{
-		$partner = $this->getPartner();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if (!$partner) {
 			return kConf::get('admin_kuser_login_block_period');
 		}
@@ -229,7 +229,7 @@ class adminKuser extends BaseadminKuser
 		
 	public function getNumPrevPassToKeep()
 	{
-		$partner = $this->getPartner();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if (!$partner) {
 			return kConf::get('admin_kuser_num_prev_passwords_to_keep');
 		}
@@ -238,7 +238,7 @@ class adminKuser extends BaseadminKuser
 		
 	public function getPassReplaceFreq()
 	{
-		$partner = $this->getPartner();
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if (!$partner) {
 			return kConf::get('admin_kuser_password_replace_freq');
 		}
