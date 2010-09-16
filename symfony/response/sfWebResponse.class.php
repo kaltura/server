@@ -365,7 +365,7 @@ class sfWebResponse extends sfResponse
     $currentHeaders = array();
     if ($vary)
     {
-      $currentHeaders = split('/\s*,\s*/', $vary);
+      $currentHeaders = preg_split('/\s*,\s*/', $vary);
     }
     $header = $this->normalizeHeaderName($header);
 
@@ -388,7 +388,7 @@ class sfWebResponse extends sfResponse
     $currentHeaders = array();
     if ($cacheControl)
     {
-      foreach (split('/\s*,\s*/', $cacheControl) as $tmp)
+      foreach (preg_split('/\s*,\s*/', $cacheControl) as $tmp)
       {
         $tmp = explode('=', $tmp);
         $currentHeaders[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : null;

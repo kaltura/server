@@ -374,11 +374,11 @@ abstract class myBaseObject implements Iterator
 			return;
 		}
 
-		$name_value_pairs = split ( myBaseObject::FIELD_SEPARATOR , $obj_str );
+		$name_value_pairs = explode( myBaseObject::FIELD_SEPARATOR , $obj_str );
 
 		foreach ( $name_value_pairs as $pair )
 		{
-			$tokens = split ( myBaseObject::FIELD_EQUAL , $pair );
+			$tokens = explode ( myBaseObject::FIELD_EQUAL , $pair );
 			$tok_count = count ( $tokens ) ;
 			if ( $tok_count == 0 ) continue;
 			elseif ( $tok_count == 1 )

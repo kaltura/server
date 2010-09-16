@@ -50,7 +50,7 @@ class skinContainer extends myBaseObject
 	// which is the css-rule name and $prop will hold the name of the property
 	static function splitRuleProperty ( $str , &$rule , &$prop_name )
 	{
-		$tokens = split ( self::RULE_PROPERTY_SEPARATOR , $str );
+		$tokens = explode( self::RULE_PROPERTY_SEPARATOR , $str );
 		$rule = $tokens[0];
 		$prop_name = $tokens[1];
 	}
@@ -66,7 +66,7 @@ class skinContainer extends myBaseObject
 	// it assume neither $cls_name nore $propert included '__' and that there is a prefix to the string ( most probably skin__ )
 	static public function getSkinClassAndPropertyFromHtmlFields ( $field_name , &$cls_name , &$property )
 	{
-		$tokens = split ( self::RULE_PROPERTY_SEPARATOR , $field_name );
+		$tokens = explode( self::RULE_PROPERTY_SEPARATOR , $field_name );
 		$cls_name = $str_arr[1];
 		$property = $str_arr[2];
 	}

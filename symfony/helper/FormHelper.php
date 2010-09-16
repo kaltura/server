@@ -419,7 +419,7 @@ function textarea_tag($name, $content = null, $options = array())
 
   if ($size = _get_option($options, 'size'))
   {
-    list($options['cols'], $options['rows']) = split('x', $size, 2);
+    list($options['cols'], $options['rows']) = explode('x', $size, 2);
   }
 
   // rich control?

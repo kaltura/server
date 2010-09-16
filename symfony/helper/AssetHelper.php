@@ -281,7 +281,7 @@ function image_tag($source, $options = array())
 
   if (isset($options['size']))
   {
-    list($options['width'], $options['height']) = split('x', $options['size'], 2);
+    list($options['width'], $options['height']) = explode('x', $options['size'], 2);
     unset($options['size']);
   }
 
