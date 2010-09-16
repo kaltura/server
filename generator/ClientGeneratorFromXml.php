@@ -16,7 +16,7 @@ abstract class ClientGeneratorFromXml
 			throw new Exception("The file [" . $this->_xmlFile . "] was not found");
 			
 		if (($sourcePath !== null) && !(file_exists($sourcePath)))
-			throw new Exception("Source path was not found");
+			throw new Exception("Source path was not found [$sourcePath]");
 			
 		if (is_dir($this->_sourcePath))
 			$this->addSourceFiles($this->_sourcePath);
