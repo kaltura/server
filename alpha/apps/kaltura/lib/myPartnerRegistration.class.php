@@ -287,8 +287,10 @@ class myPartnerRegistration
 
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
-
-		if ($password) {
+			
+		// Gonen 19-09-2010 - removed checking of sent password
+		// this was breaking backward compatibility - Drupal extension is sending cms_password in the API
+		/*if ($password) {
 			if (!adminKuserPeer::isPasswordStructureValid($password)   ||
 				stripos($password, $partner_name) !== false     ||
 		  		stripos($password, $contact) !== false    ) {
@@ -296,7 +298,7 @@ class myPartnerRegistration
 		  		$errMessage = substr(APIErrors::PASSWORD_STRUCTURE_INVALID, $pos + 1);
 		  		throw new SignupException($errMessage, SignupException::PASSWORD_STRUCTURE_INVALID);
 			}
-		}
+		}*/
 			
 		// TODO: log request
 		$newPartner = NULL;
