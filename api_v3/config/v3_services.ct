@@ -21,6 +21,7 @@ name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags
 ------------------------------------------------------------------------------------------------
 session.start						|			|0		|1	|0		|0		|1		|r	|		|	|	|
 session.startwidgetsession			|			|0		|0	|0		|0		|1		|r	|		|	|	|
+session.end							|			|1		|1	|0		|0		|1		|rw |		|	|	|
 
 uiconf.add							|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
 uiconf.update						|			|2		|1	|0		|0		|1		|rw |		|	|	|app-studio
