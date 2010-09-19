@@ -2640,7 +2640,7 @@ class KalturaScheduler extends KalturaObjectBase
 
 }
 
-class KalturaSearchItem extends KalturaObjectBase
+abstract class KalturaSearchItem extends KalturaObjectBase
 {
 
 }
@@ -2664,7 +2664,7 @@ class KalturaFilter extends KalturaObjectBase
 
 }
 
-class KalturaBaseJobFilter extends KalturaFilter
+abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -2711,7 +2711,12 @@ class KalturaBaseJobFilter extends KalturaFilter
 
 }
 
-class KalturaBatchJobFilter extends KalturaBaseJobFilter
+class KalturaBaseJobFilter extends KalturaBaseJobBaseFilter
+{
+
+}
+
+abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 {
 	/**
 	 * 
@@ -2839,6 +2844,11 @@ class KalturaBatchJobFilter extends KalturaBaseJobFilter
 	 */
 	public $fileSizeGreaterThan = null;
 
+
+}
+
+class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
+{
 
 }
 
@@ -3093,7 +3103,7 @@ class KalturaSchedulerStatusResponse extends KalturaObjectBase
 
 }
 
-class KalturaControlPanelCommandFilter extends KalturaFilter
+abstract class KalturaControlPanelCommandBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -3172,6 +3182,11 @@ class KalturaControlPanelCommandFilter extends KalturaFilter
 	 */
 	public $statusIn = null;
 
+
+}
+
+class KalturaControlPanelCommandFilter extends KalturaControlPanelCommandBaseFilter
+{
 
 }
 
@@ -5126,7 +5141,7 @@ class KalturaSearchOperator extends KalturaSearchItem
 
 }
 
-class KalturaAccessControlFilter extends KalturaFilter
+abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5159,17 +5174,32 @@ class KalturaAccessControlFilter extends KalturaFilter
 
 }
 
-class KalturaMailJobFilter extends KalturaBaseJobFilter
+class KalturaAccessControlFilter extends KalturaAccessControlBaseFilter
 {
 
 }
 
-class KalturaNotificationFilter extends KalturaBaseJobFilter
+abstract class KalturaMailJobBaseFilter extends KalturaBaseJobFilter
 {
 
 }
 
-class KalturaConversionProfileFilter extends KalturaFilter
+class KalturaMailJobFilter extends KalturaMailJobBaseFilter
+{
+
+}
+
+abstract class KalturaNotificationBaseFilter extends KalturaBaseJobFilter
+{
+
+}
+
+class KalturaNotificationFilter extends KalturaNotificationBaseFilter
+{
+
+}
+
+abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5188,7 +5218,12 @@ class KalturaConversionProfileFilter extends KalturaFilter
 
 }
 
-class KalturaFlavorParamsFilter extends KalturaFilter
+class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
+{
+
+}
+
+abstract class KalturaFlavorParamsBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5207,7 +5242,12 @@ class KalturaFlavorParamsFilter extends KalturaFilter
 
 }
 
-class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsFilter
+class KalturaFlavorParamsFilter extends KalturaFlavorParamsBaseFilter
+{
+
+}
+
+abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
 	/**
 	 * 
@@ -5240,17 +5280,32 @@ class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsFilter
 
 }
 
-class KalturaMediaFlavorParamsFilter extends KalturaFlavorParamsFilter
+class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputBaseFilter
 {
 
 }
 
-class KalturaMediaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputFilter
+abstract class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 
 }
 
-class KalturaMediaInfoFilter extends KalturaFilter
+class KalturaMediaFlavorParamsFilter extends KalturaMediaFlavorParamsBaseFilter
+{
+
+}
+
+abstract class KalturaMediaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+class KalturaMediaFlavorParamsOutputFilter extends KalturaMediaFlavorParamsOutputBaseFilter
+{
+
+}
+
+abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5262,7 +5317,12 @@ class KalturaMediaInfoFilter extends KalturaFilter
 
 }
 
-class KalturaBaseEntryFilter extends KalturaFilter
+class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
+{
+
+}
+
+abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 {
 	/**
 	 * This filter should be in use for retrieving only a specific entry (identified by its entryId).
@@ -5638,6 +5698,11 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd = null;
 
+
+}
+
+class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
+{
 	/**
 	 * 
 	 *
@@ -5648,12 +5713,17 @@ class KalturaBaseEntryFilter extends KalturaFilter
 
 }
 
-class KalturaDataEntryFilter extends KalturaBaseEntryFilter
+abstract class KalturaDataEntryBaseFilter extends KalturaBaseEntryFilter
 {
 
 }
 
-class KalturaPlayableEntryFilter extends KalturaBaseEntryFilter
+class KalturaDataEntryFilter extends KalturaDataEntryBaseFilter
+{
+
+}
+
+abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	/**
 	 * 
@@ -5721,7 +5791,12 @@ class KalturaPlayableEntryFilter extends KalturaBaseEntryFilter
 
 }
 
-class KalturaMediaEntryFilter extends KalturaPlayableEntryFilter
+class KalturaPlayableEntryFilter extends KalturaPlayableEntryBaseFilter
+{
+
+}
+
+abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 	/**
 	 * 
@@ -5768,32 +5843,62 @@ class KalturaMediaEntryFilter extends KalturaPlayableEntryFilter
 
 }
 
-class KalturaLiveStreamEntryFilter extends KalturaMediaEntryFilter
+class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 {
 
 }
 
-class KalturaLiveStreamAdminEntryFilter extends KalturaLiveStreamEntryFilter
+abstract class KalturaLiveStreamEntryBaseFilter extends KalturaMediaEntryFilter
 {
 
 }
 
-class KalturaMixEntryFilter extends KalturaPlayableEntryFilter
+class KalturaLiveStreamEntryFilter extends KalturaLiveStreamEntryBaseFilter
 {
 
 }
 
-class KalturaPlaylistFilter extends KalturaBaseEntryFilter
+abstract class KalturaLiveStreamAdminEntryBaseFilter extends KalturaLiveStreamEntryFilter
 {
 
 }
 
-class KalturaBaseSyndicationFeedFilter extends KalturaFilter
+class KalturaLiveStreamAdminEntryFilter extends KalturaLiveStreamAdminEntryBaseFilter
 {
 
 }
 
-class KalturaCategoryFilter extends KalturaFilter
+abstract class KalturaMixEntryBaseFilter extends KalturaPlayableEntryFilter
+{
+
+}
+
+class KalturaMixEntryFilter extends KalturaMixEntryBaseFilter
+{
+
+}
+
+abstract class KalturaPlaylistBaseFilter extends KalturaBaseEntryFilter
+{
+
+}
+
+class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
+{
+
+}
+
+abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
+{
+
+}
+
+class KalturaBaseSyndicationFeedFilter extends KalturaBaseSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaCategoryBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5847,12 +5952,27 @@ class KalturaCategoryFilter extends KalturaFilter
 
 }
 
-class KalturaGoogleVideoSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 {
 
 }
 
-class KalturaITunesSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+abstract class KalturaGoogleVideoSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaGoogleVideoSyndicationFeedFilter extends KalturaGoogleVideoSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaITunesSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaITunesSyndicationFeedFilter extends KalturaITunesSyndicationFeedBaseFilter
 {
 
 }
@@ -5869,7 +5989,7 @@ class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 
 }
 
-class KalturaPartnerFilter extends KalturaFilter
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5937,12 +6057,22 @@ class KalturaPartnerFilter extends KalturaFilter
 
 }
 
-class KalturaTubeMogulSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
 {
 
 }
 
-class KalturaUiConfFilter extends KalturaFilter
+abstract class KalturaTubeMogulSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaTubeMogulSyndicationFeedFilter extends KalturaTubeMogulSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaUiConfBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -6031,7 +6161,12 @@ class KalturaUiConfFilter extends KalturaFilter
 
 }
 
-class KalturaUploadTokenFilter extends KalturaFilter
+class KalturaUiConfFilter extends KalturaUiConfBaseFilter
+{
+
+}
+
+abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -6071,7 +6206,12 @@ class KalturaUploadTokenFilter extends KalturaFilter
 
 }
 
-class KalturaUserFilter extends KalturaFilter
+class KalturaUploadTokenFilter extends KalturaUploadTokenBaseFilter
+{
+
+}
+
+abstract class KalturaUserBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -6153,7 +6293,12 @@ class KalturaUserFilter extends KalturaFilter
 
 }
 
-class KalturaWidgetFilter extends KalturaFilter
+class KalturaUserFilter extends KalturaUserBaseFilter
+{
+
+}
+
+abstract class KalturaWidgetBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -6242,7 +6387,17 @@ class KalturaWidgetFilter extends KalturaFilter
 
 }
 
-class KalturaYahooSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaWidgetFilter extends KalturaWidgetBaseFilter
+{
+
+}
+
+abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
 {
 
 }
@@ -7669,7 +7824,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -7687,7 +7842,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -9041,7 +9196,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -10045,7 +10200,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -10191,7 +10346,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -10209,7 +10364,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
