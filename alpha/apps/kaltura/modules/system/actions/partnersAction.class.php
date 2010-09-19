@@ -29,7 +29,8 @@ class partnersAction extends kalturaSystemAction
 				"landingPage" , "userLandingPage", "status" , "serviceConfigId", "partnerPackage", "moderateContent" , "currentConversionProfileType" , "monitorUsage",
 				"templatePartnerId", "addEntryMaxFiles" , "defaultConversionProfileId", "partnerGroupType", "partnerParentId", "enableAnalyticsTab",
 				"liveStreamEnabled", "storageServePriority", "storageDeleteFromKaltura", "enableSilverLight", "partnerSpecificServices", "partnerSpecificServices", "enabledPlugins",
-				"enable508Players", "enableVast", "appStudioExampleEntry", "appStudioExamplePlayList0", "appStudioExamplePlayList1", "delivryBlockCountries");
+				"enable508Players", "enableVast", "appStudioExampleEntry", "appStudioExamplePlayList0", "appStudioExamplePlayList1", "delivryBlockCountries",
+				"maxLoginAttempts", "loginBlockPeriod", "numPrevPassToKeep", "passReplaceFreq");
 			$allowed_params = array_merge ( $pw->getUpdateableFields() , $extra_fields );	
 
 			$fields_modified = baseObjectUtils::fillObjectFromMap ( $_REQUEST , $partner , "partner_" , $allowed_params , BasePeer::TYPE_PHPNAME , true );

@@ -292,6 +292,12 @@ if ( count ( $partner_list ) > 1 )
 <?php echo  prop ( $partner , "storageDeleteFromKaltura"  , "select" , "1" , "0"  , "boolean_int_type" , "Indicates if file should be deleted from kaltura data centers after exporting to external storage"  ) ?>
 <?php echo  prop ( $partner , "storageServePriority"  , "select" , "1" , "1"  , "net_storage_priority" , "Indicates what storage will be used for files delivery"  ) ?>
 
+<tr><td style="font-weight:bold; text-" colspan="3"><hr/>Password Security</td></tr>
+<?php echo  prop ( $partner , "maxLoginAttempts"  , "text" , "60" , ""  , ""  , "maximum login attempts before being blocked"  ) ?>
+<?php echo  prop ( $partner , "loginBlockPeriod"  , "text" , "60" , ""  , ""  , "for how long is login block valid"  ) ?>
+<?php echo  prop ( $partner , "numPrevPassToKeep"  , "text" , "60" , ""  , ""  , "number of previous passwords to keep (and not allow re-use)"  ) ?>
+<?php echo  prop ( $partner , "passReplaceFreq"  , "text" , "60" , ""  , ""  , "password replacement frequency"  ) ?>
+
 
 
 <tr><td style="font-weight:bold; text-" colspan="3"><hr/>Andromeda - KMC2</td></tr>
