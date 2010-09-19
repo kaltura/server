@@ -90,8 +90,9 @@ class adminKuserPeer extends BaseadminKuserPeer
 		}
 		
 		$user->save();
-		$this->emailResetPassword($user->getPartnerId(), $user->getEmail(), $user->getFullName(), self::getPassResetLink($user->getPasswordHashKey()));
-
+		if (!$requested_password) {
+			$this->emailResetPassword($user->getPartnerId(), $user->getEmail(), $user->getFullName(), self::getPassResetLink($user->getPasswordHashKey()));
+		}
 		
 		return array ( $password , $new_email);
 	}
