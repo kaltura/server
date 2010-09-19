@@ -2,7 +2,9 @@
 $service_url = requestUtils::getHost();
 $host = str_replace ( "http://" , "" , $service_url );
 if ( $host == "www.kaltura.com" ) $host = "1";
-$flash_dir = $service_url . myContentStorage::getFSFlashRootPath ();
+
+$www_host = kConf::get('www_host');
+$flash_dir = 'https://'. $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 
 $beta_str = $beta ? "/beta/{$beta}" : "";
 ?>
@@ -115,7 +117,7 @@ var kmc = {};
 			?>
 			loginF: "loginF" ,
 			closeF: "closeLoginF" ,
-			host: "<?php echo $host ?>",
+			host: "<?php echo $www_host ?>",
 			visibleSignup: "<?php echo (kConf::get('kmc_login_show_signup_link'))? 'true': 'false'; ?>",
 			urchinNumber: "UA-12055206-1",
 			srvurl: "api_v3/index.php"
