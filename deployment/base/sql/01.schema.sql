@@ -1,5 +1,3 @@
-
-
 DROP TABLE IF EXISTS `access_control`;
 
 CREATE TABLE `access_control` (
@@ -20,7 +18,6 @@ CREATE TABLE `access_control` (
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
 
 
 DROP TABLE IF EXISTS `admin_kuser`;
@@ -44,11 +41,7 @@ CREATE TABLE `admin_kuser` (
   KEY `email_index` (`email`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
-
-
 DROP TABLE IF EXISTS `admin_permission`;
-
 
 CREATE TABLE `admin_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -58,9 +51,7 @@ CREATE TABLE `admin_permission` (
   KEY `admin_permission_FI_1` (`admin_kuser_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
 DROP TABLE IF EXISTS `alert`;
-
 
 CREATE TABLE `alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -73,9 +64,7 @@ CREATE TABLE `alert` (
   KEY `subject_index` (`alert_type`,`subject_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
 DROP TABLE IF EXISTS `batch_job`;
-
 
 CREATE TABLE `batch_job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -135,11 +124,7 @@ CREATE TABLE `batch_job` (
   KEY `parent_job_id_index` (`parent_job_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
-
-
-
 DROP TABLE IF EXISTS `bb_forum`;
-
 
 CREATE TABLE `bb_forum` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -622,8 +607,6 @@ CREATE TABLE `flavor_asset` (
 
 
 DROP TABLE IF EXISTS `flavor_params`;
-
-
 
 CREATE TABLE `flavor_params` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

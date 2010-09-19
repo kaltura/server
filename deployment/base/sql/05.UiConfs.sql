@@ -46,9 +46,6 @@ INSERT IGNORE INTO `ui_conf` (id,obj_type,partner_id,subp_id,conf_file_path,name
 (48411,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/player_light_400_335.xml','Light player','400','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:45:12','2009-07-15 18:45:12',NULL,1,'player',NULL,2,NULL,2,1),
 (48308,1,0,0,'content/uiconf/kaltura/kmc/kdp_kmc_preview_combo.xml','kmc players','400','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:45:47','2009-07-15 18:45:47',NULL,1,'',NULL,2,NULL,2,1);
 
-
-
-
 INSERT IGNORE INTO `file_sync` (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
 VALUES
 (0,2,'199',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/generic/kdp/kdp_regular.xml',14603),
@@ -101,9 +98,6 @@ VALUES
 (0,2,'609',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_whiteblue_view.xml',4610),
 (0,2,'610',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/cw_drupal_comments.xml',996);
 
-
-
-
 INSERT IGNORE INTO ui_conf (id,obj_type,partner_id,subp_id,conf_file_path,name,width,height,html_params,swf_url,created_at,updated_at, conf_vars, use_cdn,tags,display_in_search) 
 VALUES(48601,3,0,0,'content/uiconf/kaltura/kmc/kse/kse_kmc_v216.xml','Andromeda KSE For KMC', 0,0,'','/flash/kse/v2.1.8/simpleeditor.swf',NOW(),NOW(), NULL, 1, "andromeda_kse_for_kmc", 2);
 INSERT INTO ui_conf (id,obj_type,partner_id,subp_id,conf_file_path,name,width,height,html_params,swf_url,created_at,updated_at, conf_vars, use_cdn,tags,display_in_search) 
@@ -143,9 +137,6 @@ INSERT INTO `ui_conf` VALUES
 (31010,8,0,0,'content/uiconf/kaltura/kmc/appstudio/kdp3/multiplaylist_30_ui.xml','Multi playlist template kdp3 appstudio 2','720','360',NULL,'/flash/kdp3/v3.3.9.2/kdp3.swf',now(),now(),NULL,1,NULL,NULL,2,NULL,2,1,NULL),
 (31020,8,0,0,'content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_vertical_ui.xml','vertical playlist template kdp3 appstudio 2','400','620','','/flash/kdp3/v3.3.9.2/kdp3.swf',now(),now(),NULL,1,NULL,NULL,2,NULL,2,1,'1');
 
-
-
-
 INSERT IGNORE INTO `file_sync` (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
 VALUES
 (0,2,'48501',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/content/kdp_kmc_content_light.xml',6173),
@@ -161,8 +152,6 @@ VALUES
 (0,2,'48612',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/kcw/kcw_kmc-kae_dark.xml',6431),
 (0,2,'48613',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/kcw/andromeda_kmc_kcw.xml',6432);
 
-
-
 INSERT INTO `file_sync`
 (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
 VALUES
@@ -174,11 +163,6 @@ VALUES
 (0,2,'31010',NULL,2,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/appstudio/kdp3/multiplaylist_30_ui.features.xml',66924),
 (0,2,'31020','1',1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_vertical_ui.xml',39731),
 (0,2,'31020','1',2,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_vertical_ui.features.xml',39731);
-
-
-
-
-
 
 INSERT INTO `ui_conf`
 VALUES

@@ -1,7 +1,6 @@
 insert into `flavor_params` (`id`, `version`, `partner_id`, `name`, `tags`, `description`, `ready_behavior`, `created_at`, `updated_at`, `deleted_at`, `is_default`, `format`, `video_codec`, `video_bitrate`, `audio_codec`, `audio_bitrate`, `audio_channels`, `audio_sample_rate`, `audio_resolution`, `width`, `height`, `frame_rate`, `gop_size`, `two_pass`, `conversion_engines`, `conversion_engines_extra_params`, `custom_data`, `view_order`, `creation_mode`) 
 values(0,'0','0','Source','source','Maintains the original format and settings of the file - duplicate of the source file','0',NOW(),NOW(),NULL,'1','','','0','','0','0','0','0','0','0','0','0','0','','',NULL,'0','1');
 
-
 update flavor_params set id = 0 where id = 1;
 ALTER TABLE flavor_params AUTO_INCREMENT = 1;
 
