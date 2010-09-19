@@ -47,6 +47,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 	{
 		if ($type->isFilterable())
 		{
+			$this->writeBaseFilterForType($type);
 			$this->writeFilterForType($type);
 			$this->writeOrderByEnumForType($type);
 		}
@@ -59,8 +60,14 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 			return;
 		
 		$filterClassName = $type->getType() . "Filter";
+		$filterBaseClassName = $type->getType() . "BaseFilter";
 		
 		$filterPath = dirname($map[$type->getType()]) . "/filters/$filterClassName.php";
+		if(file_exists($filterPath))
+		{
+			KalturaLog::notice("Filter already exists [$filterPath]");
+			return;
+		}
 		$this->_txt = "";
 			
 		
@@ -78,6 +85,41 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$this->appendLine("/**");
 		$this->appendLine(" * @package api");
 		$this->appendLine(" * @subpackage filters");
+		$this->appendLine(" */");
+		$this->appendLine("class $filterClassName extends $filterBaseClassName");
+		$this->appendLine("{");
+		$this->appendLine("}");
+		
+		$this->writeToFile($filterPath, $this->_txt);
+	}
+	
+	private function writeBaseFilterForType(KalturaTypeReflector $type)
+	{
+		$map = KAutoloader::getClassMap();
+		if(!isset($map[$type->getType()]))
+			return;
+		
+		$filterClassName = $type->getType() . "BaseFilter";
+		
+		$filterPath = dirname($map[$type->getType()]) . "/filters/base/$filterClassName.php";
+		$this->_txt = "";
+			
+		
+		$parentType = $type;
+		while(1)
+		{
+			$parentType = $parentType->getParentTypeReflector();
+			if ($parentType === null || $parentType->isFilterable())
+				break;			
+		}
+		
+		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : "KalturaFilter");
+		
+		$this->appendLine("<?php");
+		$this->appendLine("/**");
+		$this->appendLine(" * @package api");
+		$this->appendLine(" * @subpackage filters.base");
+		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");
 		$this->appendLine("class $filterClassName extends $partnetClassName");
 		$this->appendLine("{");
