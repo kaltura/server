@@ -232,7 +232,7 @@ $(function(){
 		},
 		logout : function() {
 			var state = kmc.mediator.readUrlHash();
-			window.location = kmc.vars.service_url + "/index.php/kmc/logout#" + state.module + "|" + state.subtab;
+			window.location = "/index.php/kmc/logout#" + state.module + "|" + state.subtab;
 		},
 		copyCode : function () {
 			$("#copy_msg").show();

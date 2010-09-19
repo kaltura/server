@@ -1045,7 +1045,7 @@ function closeLoginF()
 
 function logout()
 {
-	window.location = "<? echo $service_url; ?>/index.php/kmc/logout?logout";
+	window.location = "/index.php/kmc/logout?logout=";
 }
 
 // will load the content modul by default
