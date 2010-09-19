@@ -30,8 +30,8 @@ class AuditTrailFilter extends baseObjectFilter
 				"_in_partner_id",
 				"_eq_request_id",
 				"_in_request_id",
-				"_eq_puser_id",
-				"_in_puser_id",
+				"_eq_user_id",
+				"_in_user_id",
 				"_eq_action",
 				"_in_action",
 				"_eq_context",
@@ -46,6 +46,9 @@ class AuditTrailFilter extends baseObjectFilter
 
 		$this->allowed_order_fields = array ("created_at" , "parsed_at");
 			
+		$this->aliases = array ( 
+			"user_id" => "kuser_id",
+		);
 	}
 
 	public function describe() 
