@@ -27,6 +27,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_FILTER = "/\\@filter ([\\w\\,\\s]*)/";
     
+    const DOCCOMMENT_ABSTRACT = "/\\@abstract/i";
+    
     const DOCCOMMENT_DEPRECATED = "/\\@deprecated/i";
     
     const DOCCOMMENT_SERVER_ONLY = "/\\@serverOnly/i";
@@ -104,6 +106,11 @@ class KalturaDocCommentParser
     /**
      * @var bool
      */
+    public $abstract = false;
+    
+    /**
+     * @var bool
+     */
     public $deprecated = false;
     
     /**
@@ -127,6 +134,7 @@ class KalturaDocCommentParser
     {
         $this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
+        $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
 

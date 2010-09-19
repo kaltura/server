@@ -58,6 +58,11 @@ class KalturaTypeReflector
 	private $_deprecated = false;
 	
 	/**
+	 * @var bool
+	 */
+	private $_abstract = false;
+	
+	/**
 	 * Contructs new type reflector instance
 	 *
 	 * @param string $type
@@ -77,6 +82,7 @@ class KalturaTypeReflector
 	    {
 	    	$commentsParser = new KalturaDocCommentParser($comments);
 	    	$this->_deprecated = $commentsParser->deprecated;
+	    	$this->_abstract = $commentsParser->abstract;
 	    }
 	}
 	
@@ -273,6 +279,16 @@ class KalturaTypeReflector
 	public function isDeprecated()
 	{
 		return $this->_deprecated; 
+	}
+	
+	/**
+	 * Returns true when the type is abstract
+	 *
+	 * @return boolean
+	 */
+	public function isAbstract()
+	{
+		return $this->_abstract; 
 	}
 	
 	/**

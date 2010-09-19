@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage filters
+ * @abstract
  */
 class KalturaSearchItem extends KalturaObject
 {
