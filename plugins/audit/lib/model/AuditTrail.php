@@ -14,6 +14,8 @@
  */
 class AuditTrail extends BaseAuditTrail 
 {	
+	protected $puserId = null;
+	
 	private static $allwodObjectTypes = array(
 		KalturaAuditTrailObjectType::ACCESS_CONTROL,
 		KalturaAuditTrailObjectType::ADMIN_KUSER,
@@ -155,6 +157,20 @@ class AuditTrail extends BaseAuditTrail
 			return null;
 		}
 	} 
+	
+	public function getPuserId()
+	{
+		if(!$this->puserId)
+			$this->puserId = PuserKuserPeer::getPuserIdFromKuserId($this->getPartnerId(), $this->getKuserId());
+			
+		return $this->puserId;
+	}
+	
+	public function setPuserId($v)
+	{
+		$this->puserId = $v;
+		return $this->setKuserId(PuserKuserPeer::getKuserIdFromPuserId($this->getPartnerId(), $this->puserId));
+	}
 	
 	/* (non-PHPdoc)
 	 * @see audit/lib/model/om/BaseAuditTrail#save()

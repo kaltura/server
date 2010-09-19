@@ -31,8 +31,7 @@ class AuditTrailService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaAuditTrailFilter;
 			
-		$auditTrailFilter = new AuditTrailFilter();
-		$filter->toObject($auditTrailFilter);
+		$auditTrailFilter = $filter->toObject($auditTrailFilter);
 		
 		$c = new Criteria();
 		$auditTrailFilter->attachToCriteria($c);
