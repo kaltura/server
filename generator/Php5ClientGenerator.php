@@ -70,11 +70,15 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	{
 		$type = $classNode->getAttribute("name");
 		
+		$abstract = '';
+		if ($classNode->hasAttribute("abstract"))
+			$abstract = 'abstract ';
+		
 		// class definition
 		if ($classNode->hasAttribute("base"))
-			$this->appendLine("class $type extends " . $classNode->getAttribute("base"));
+			$this->appendLine($abstract . "class $type extends " . $classNode->getAttribute("base"));
 		else
-			$this->appendLine("class $type extends KalturaObjectBase");
+			$this->appendLine($abstract . "class $type extends KalturaObjectBase");
 		$this->appendLine("{");
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)

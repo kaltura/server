@@ -119,6 +119,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 
 	    $parentTypeReflector = $typeReflector->getParentTypeReflector();
 	    
+	    if($typeReflector->isAbstract())
+	    {
+            $classElement->setAttribute("abstract", true);    
+	    }
+	    
 	    if ($parentTypeReflector)
 	    {
             $parentType = $parentTypeReflector->getType();
