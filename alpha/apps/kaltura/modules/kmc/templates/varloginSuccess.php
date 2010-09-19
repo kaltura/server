@@ -122,9 +122,9 @@ body { background-image:none !important; }
 			bgcolor: "#272929",
 			quality: "high",
 			wmode: "window" ,
-			movie: "<?php echo $flash_dir ?>/kmc/login/v1.0.8/login.swf"
+			movie: "<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf"
 		};
-		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/v1.0.8/login.swf", 
+		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf", 
 			"kaltura_flash_obj", "358", "350", "9.0.0", false, flashVars , params);
 	}
 
