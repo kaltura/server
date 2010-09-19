@@ -48,11 +48,10 @@ class AuditTrail extends BaseAuditTrail
 	private static $uniqueRequestId = null;
 	
 	public function __construct()
-	{
+	{	
 		$this->setRequestId($this->getUniqueRequestId());
 		$this->setContext($this->getContext());
 		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
-		$this->setKuserId(kCurrentContext::$uid);
 		$this->setKs(kCurrentContext::$ks);
 		$this->setIpAddress(kCurrentContext::$user_ip);
 		$this->setServerName(kCurrentContext::$host);
@@ -179,7 +178,13 @@ class AuditTrail extends BaseAuditTrail
 	{
 		if(kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
 			return parent::save($con);
-			
+
+		if(is_null($this->getKuserId()))
+		{
+			$kuserId = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, kCurrentContext::$uid);
+			$this->setKuserId($kuserId);
+		}
+		
 		KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
 		return 0;
 	} // save()
