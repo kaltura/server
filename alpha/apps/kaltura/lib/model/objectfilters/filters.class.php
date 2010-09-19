@@ -558,7 +558,7 @@ abstract class baseObjectFilter extends myBaseObject
 		{
 			$pos = strpos ( $field , baseObjectFilter::FILTER_PREFIX );
 
-//			echo ( "attachToCriteria " . $field . " prefix [" . baseObjectFilter::FILTER_PREFIX . "] [" .  $name  . "] <br>" );
+//			KalturaLog::debug( "field [$field] prefix [" . baseObjectFilter::FILTER_PREFIX . "] name[$name]" );
 
 			if ( $pos === 0 )
 			{
