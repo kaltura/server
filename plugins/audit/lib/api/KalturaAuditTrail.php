@@ -85,7 +85,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	 * @var string
 	 * @filter eq,in
 	 */
-	public $puserId;
+	public $userId;
 
 	/**
 	 * @var KalturaAuditTrailAction
@@ -100,6 +100,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @filter eq
 	 * @readonly
 	 */
 	public $ks;
@@ -163,7 +164,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		"masterPartnerId",
 		"partnerId",
 		"requestId",
-		"puserId",
+		"userId" => "puserId",
 		"action",
 		"data",
 		"ks",
