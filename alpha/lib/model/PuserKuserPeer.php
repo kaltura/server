@@ -129,6 +129,19 @@ class PuserKuserPeer extends BasePuserKuserPeer
 		$puser_id = $cache->remove ( "puser_kuser_id" , $key );
 	}
 	
+	public static  function getKuserIdFromPuserId ( $partner_id , $puser_id )
+	{
+		$c = new Criteria();
+		$c->add ( self::PARTNER_ID , $partner_id );
+		$c->add ( self::PUSER_ID , $puser_id );
+		$puser_kusers = self::doSelect( $c );
+		if(!count($puser_kusers))
+			return null;
+
+		$puser_kuser = reset($puser_kusers);
+		return $puser_kuser->getKuserId();
+	}
+	
 	public static  function getPuserIdFromKuserId ( $partner_id , $kuser_id )
 	{
 		$cache = new myObjectCache ( );
