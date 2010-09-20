@@ -22,7 +22,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	public static function isInvalid($ks, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, $ks);
+		$criteria->add(invalidSessionPeer::KS, base64_decode($ks));
 
 		$cnt = invalidSessionPeer::doCount($criteria, $con);
 		return ($cnt > 0);
@@ -35,7 +35,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	public static function invalidateKs(ks $ks)
 	{
 		$invalidSession = new invalidSession();
-		$invalidSession->setKs($ks->getOriginalString());
+		$invalidSession->setKs(base64_decode($ks->getOriginalString()));
 		$invalidSession->setKsValidUntil($ks->valid_until);
 		$invalidSession->save();
 		
