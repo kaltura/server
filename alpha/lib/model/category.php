@@ -175,6 +175,9 @@ class category extends Basecategory
 	 */
 	public function decrementEntriesCount($decrease = 1)
 	{
+		if($this->getDeletedAt(null))
+			return;
+			
 		$newCount = $this->getEntriesCount() - $decrease;
 		if ($newCount <= 0) // don't allow zero values
 			$this->setEntriesCount(0);
@@ -344,7 +347,7 @@ class category extends Basecategory
 	 */
 	public function getParentCategory()
 	{
-		if ($this->parent_category === null)
+		if ($this->parent_category === null && $this->getParentId())
 			$this->parent_category = $this->getPeer()->retrieveByPK($this->getParentId());
 			
 		return $this->parent_category;
