@@ -141,6 +141,12 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @filter eq
+	 */
+	public $clientTag;
+
+	/**
+	 * @var string
 	 */
 	public $description;
 
@@ -173,6 +179,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		"serverName",
 		"ipAddress",
 		"userAgent",
+		"clientTag",
 		"description",
 		"errorDescription",
 	);
