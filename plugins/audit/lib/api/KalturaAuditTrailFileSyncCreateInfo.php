@@ -7,7 +7,7 @@ class KalturaAuditTrailFileSyncCreateInfo extends KalturaAuditTrailInfo
 	public $version;
 
 	/**
-	 * @var KalturaAuditTrailFileSyncSubType
+	 * @var int
 	 */
 	public $objectSubType;
 
