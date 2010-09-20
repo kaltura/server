@@ -241,13 +241,13 @@ $(function(){
 			document.cookie = "email=; expires=" + expiry + "; path=/";
 			var state = kmc.mediator.readUrlHash();
 			$.ajax({
-				url: "/index.php/kmc/logout",
-				type: "POST",
-				data: { "ks": kmc.vars.ks },
-				dataType: "json",
-				complete: function() {
-					window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.module + "|" + state.subtab;
-				}
+                url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
+                type: "POST",
+                data: { "ks": kmc.vars.ks },
+                dataType: "json",
+                complete: function() {
+                        window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.module + "|" + state.subtab;
+                }
 			});
 		},
 		copyCode : function () {

@@ -1054,7 +1054,7 @@ function logout()
 	document.cookie = "screen_name=; expires=" + expiry + "; path=/";
 	document.cookie = "email=; expires=" + expiry + "; path=/";
 	$.ajax({
-		url: "/index.php/kmc/logout",
+		url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
 		type: "POST",
 		data: { "ks": kmc.vars.ks },
 		dataType: "json",

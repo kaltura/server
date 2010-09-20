@@ -225,7 +225,7 @@ $(function(){
 			document.cookie = "email=; expires=" + expiry + "; path=/";
 			var state = kmc.mediator.readUrlHash();
 			$.ajax({
-				url: "/index.php/kmc/logout",
+				url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
 				type: "POST",
 				data: { "ks": kmc.vars.ks },
 				dataType: "json",
