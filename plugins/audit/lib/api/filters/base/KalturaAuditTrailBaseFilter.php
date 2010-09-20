@@ -44,6 +44,7 @@ class KalturaAuditTrailBaseFilter extends KalturaFilter
 		"serverNameIn" => "_in_server_name",
 		"ipAddressEqual" => "_eq_ip_address",
 		"ipAddressIn" => "_in_ip_address",
+		"clientTagEqual" => "_eq_client_tag",
 	);
 
 	private $order_by_map = array
@@ -315,4 +316,11 @@ class KalturaAuditTrailBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $ipAddressIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $clientTagEqual;
 }
