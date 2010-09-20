@@ -254,6 +254,7 @@ class adminKuserPeer extends BaseadminKuserPeer
 			}
 			if ($adminKuser->getLoginAttempts()+1 >= $adminKuser->getMaxLoginAttempts()) {
 				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()) );
+				$adminKuser->setLoginAttempts(0);
 				$adminKuser->save();
 				throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
 			}
