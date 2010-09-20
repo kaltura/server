@@ -690,7 +690,6 @@
 						<th title="<?php echo $this->translate('entry-investigate history create time tooltip'); ?>"><?php echo $this->translate('entry-investigate history create time th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history delete time th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history priority th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate history work group th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history start time tooltip'); ?>"><?php echo $this->translate('entry-investigate history start time th'); ?></th>
 						<th title="<?php echo $this->translate('entry-investigate history end time tooltip'); ?>"><?php echo $this->translate('entry-investigate history end time th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate history scheduler th'); ?></th>
@@ -754,7 +753,6 @@
 								<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
 								<td><?php echo ($job->deletedAt ? date($this->translate('date format'), $job->deletedAt) : ''); ?></td>
 								<td><?php echo $job->priority; ?></td>
-								<td><?php echo $job->workGroupId; ?></td>
 								<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
 								<td><?php echo date($this->translate('date format'), $job->finishTime); ?></td>
 								<td><?php echo $job->schedulerId; ?></td>
