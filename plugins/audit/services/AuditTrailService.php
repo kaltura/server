@@ -54,6 +54,7 @@ class AuditTrailService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaAuditTrail $auditTrail
 	 * @return KalturaAuditTrail
+	 * @throws AuditTrailErrors::AUDIT_TRAIL_DISABLED
 	 */
 	function addAction(KalturaAuditTrail $auditTrail)
 	{
@@ -64,6 +65,11 @@ class AuditTrailService extends KalturaBaseService
 		
 		$dbAuditTrail = $auditTrail->toInsertableObject();
 		$dbAuditTrail->setContext(KalturaAuditTrailContext::CLIENT);
+		
+		$enabled = kAuditTrailManager::traceEnabled($this->getPartnerId(), $dbAuditTrail);
+		if(!$enabled)
+			throw new KalturaAPIException(AuditTrailErrors::AUDIT_TRAIL_DISABLED, $this->getPartnerId(), $dbAuditTrail->getObjectType(), $dbAuditTrail->getAction());
+			
 		$created = $dbAuditTrail->save();
 		if(!$created)
 			return null;
@@ -80,6 +86,7 @@ class AuditTrailService extends KalturaBaseService
 	 * @action get
 	 * @param int $id 
 	 * @return KalturaAuditTrail
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
 	function getAction($id)
 	{
