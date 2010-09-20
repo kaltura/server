@@ -35,7 +35,11 @@ class partnersAction extends kalturaSystemAction
 
 			$fields_modified = baseObjectUtils::fillObjectFromMap ( $_REQUEST , $partner , "partner_" , $allowed_params , BasePeer::TYPE_PHPNAME , true );
 			
-			$partner->setPluginEnabled(MetadataPlugin::PLUGIN_NAME, $_REQUEST['partner_enableMetadata']);
+			if(class_exists('MetadataPlugin'))
+				$partner->setPluginEnabled(MetadataPlugin::PLUGIN_NAME, $_REQUEST['partner_enableMetadata']);
+			
+			if(class_exists('AuditPlugin'))
+				$partner->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
 			
 			if(!isset($_REQUEST['partner_partnerParentId']) || $_REQUEST['partner_partnerParentId'] == '' )
 			{

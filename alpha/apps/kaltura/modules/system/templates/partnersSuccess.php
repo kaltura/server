@@ -321,33 +321,73 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 <?php echo  prop ( $partner , "enableSilverLight"  , "select" , "1" , "0"  , "boolean_int_type" , "Silver Light players enabled"  ) ?>
 <?php echo  prop ( $partner , "enableVast"  , "select" , "1" , "0"  , "boolean_int_type" , "VAST support in app-studio enabled"  ) ?>
 <?php echo  prop ( $partner , "enable508Players"  , "select" , "1" , "0"  , "boolean_int_type" , "508 players in the KMC preview&embed are available"  ) ?>
-<tr class='prop'>
-	<td>Enable Metadata</td>
-	<td>
-		<select id="partner_enableMetadata" style="font-family:arial; font-size:12px;" name="partner_enableMetadata" onkeyup="updateSelect( this )" onchange="updateSelect( this )">
-		<?php 
-			$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
-		
-			$default_value = false;
-			if($partner)
-				$default_value = $partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME);
-				
-			$default_value_selected = "";
-			foreach ( $list as $value => $option  )
-			{
-				// not always the default value is found 
-				if ( $value == $default_value ) $default_value_selected = $default_value;
-				$selected = ($value == $default_value ) ? 'selected="selected"' : '' ;
-				echo "<option value=\"$value\" $selected>$option</option>\n";
-			}
+<?php 
+	if(class_exists('MetadataPlugin'))
+	{
 		?>
-		</select>
-		<span style="color:blue;" id="partner_enableMetadata_current_value"><?php echo $default_value_selected; ?></span>
-	</td>
-	<td style="color:gray; font-size:11px; font-family:arial;">
-		Custom data enabled
-	</td>
-</tr>
+			<tr class='prop'>
+				<td>Enable Metadata</td>
+				<td>
+					<select id="partner_enableMetadata" style="font-family:arial; font-size:12px;" name="partner_enableMetadata" onkeyup="updateSelect( this )" onchange="updateSelect( this )">
+					<?php 
+						$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
+					
+						$default_value = false;
+						if($partner)
+							$default_value = $partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME);
+							
+						$default_value_selected = "";
+						foreach ( $list as $value => $option  )
+						{
+							// not always the default value is found 
+							if ( $value == $default_value ) $default_value_selected = $default_value;
+							$selected = ($value == $default_value ) ? 'selected="selected"' : '' ;
+							echo "<option value=\"$value\" $selected>$option</option>\n";
+						}
+					?>
+					</select>
+					<span style="color:blue;" id="partner_enableMetadata_current_value"><?php echo $default_value_selected; ?></span>
+				</td>
+				<td style="color:gray; font-size:11px; font-family:arial;">
+					Custom data enabled
+				</td>
+			</tr>
+		<?php
+	} 
+	
+	if(class_exists('AuditPlugin'))
+	{
+		?>
+			<tr class='prop'>
+				<td>Enable Audit Trail</td>
+				<td>
+					<select id="partner_enableAuditTrail" style="font-family:arial; font-size:12px;" name="partner_enableAuditTrail" onkeyup="updateSelect( this )" onchange="updateSelect( this )">
+					<?php 
+						$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
+					
+						$default_value = false;
+						if($partner)
+							$default_value = $partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME);
+							
+						$default_value_selected = "";
+						foreach ( $list as $value => $option  )
+						{
+							// not always the default value is found 
+							if ( $value == $default_value ) $default_value_selected = $default_value;
+							$selected = ($value == $default_value ) ? 'selected="selected"' : '' ;
+							echo "<option value=\"$value\" $selected>$option</option>\n";
+						}
+					?>
+					</select>
+					<span style="color:blue;" id="partner_enableAuditTrail_current_value"><?php echo $default_value_selected; ?></span>
+				</td>
+				<td style="color:gray; font-size:11px; font-family:arial;">
+					Custom data enabled
+				</td>
+			</tr>
+		<?php 
+	}
+?>
 </table>
 </div>
 
