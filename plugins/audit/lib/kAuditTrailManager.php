@@ -156,98 +156,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	}
 
 	/**
-	 * @param int $objectType
-	 * @param int $objectSubType
-	 * @return KalturaAuditTrailFileSyncSubType
-	 */
-	public static function translateSubTypeToEnum($objectType, $objectSubType) 
-	{
-		switch($objectType)
-		{
-			case FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY:
-				switch($objectSubType)
-				{
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_DATA;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_DATA_EDIT;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_THUMB;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_ARCHIVE;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_DOWNLOAD;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_OFFLINE_THUMB;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_ISM;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_ISMC;
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG:
-						return KalturaAuditTrailFileSyncSubType::ENTRY_CONVERSION_LOG;
-				}
-				return null;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_UICONF:
-				switch($objectSubType)
-				{
-					case uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA:
-						return KalturaAuditTrailFileSyncSubType::UICONF_DATA;
-					case uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES:
-						return KalturaAuditTrailFileSyncSubType::UICONF_FEATURES;
-				}
-				return null;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB:
-				switch($objectSubType)
-				{
-					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV:
-						return KalturaAuditTrailFileSyncSubType::BATCHJOB_BULKUPLOADCSV;
-					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG:
-						return KalturaAuditTrailFileSyncSubType::BATCHJOB_BULKUPLOADLOG;
-					case BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG:
-						return KalturaAuditTrailFileSyncSubType::BATCHJOB_CONFIG;
-				}
-				return null;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET:
-				switch($objectSubType)
-				{
-					case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
-						return KalturaAuditTrailFileSyncSubType::FLAVOR_ASSET_ASSET;
-					case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
-						return KalturaAuditTrailFileSyncSubType::FLAVOR_ASSET_CONVERT_LOG;
-				}
-				return null;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
-				if(!class_exists('Metadata'))
-					return null;
-					
-				switch($objectSubType)
-				{
-					case Metadata::FILE_SYNC_METADATA_DATA:
-						return KalturaAuditTrailFileSyncSubType::METADATA_DATA;
-				}
-				return null;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
-				if(!class_exists('MetadataProfile'))
-					return null;
-					
-				switch($objectSubType)
-				{
-					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
-						return KalturaAuditTrailFileSyncSubType::METADATA_PROFILE_DEFINITION;
-					case MetadataProfile::FILE_SYNC_METADATA_VIEWS:
-						return KalturaAuditTrailFileSyncSubType::METADATA_PROFILE_VIEWS;
-				}
-				return null;
-		}
-		return null;
-	}
-
-	/**
 	 * @param BaseObject $object
 	 */
 	public function fileSyncCreated(FileSync $fileSync) 
@@ -269,7 +177,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		$data = new KalturaAuditTrailFileSyncCreateInfo();
 		$data->version = $fileSync->getVersion();
-		$data->objectSubType = self::translateSubTypeToEnum($fileSync->getObjectType(), $fileSync->getObjectSubType());
+		$data->objectSubType = $fileSync->getObjectSubType();
 		$data->dc = $fileSync->getDc();
 		$data->original = $fileSync->getOriginal();
 		$data->fileType = $fileSync->getFileType();
