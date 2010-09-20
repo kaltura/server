@@ -1056,7 +1056,7 @@ function logout()
 	$.ajax({
 		url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
 		type: "POST",
-		data: { "ks": kmc.vars.ks },
+		data: { "ks": ks },
 		dataType: "json",
 		complete: function() {
 			window.location = "<?php echo $service_url; ?>/index.php/kmc/kmc?logout=";
