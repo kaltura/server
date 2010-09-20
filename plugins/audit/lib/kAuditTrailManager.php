@@ -96,7 +96,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(method_exists($object, 'getEntryId'))
 			return $object->getEntryId();
 			
-		if($object instanceof Metadata && $object->getObjectType() == Metadata::TYPE_ENTRY)
+		if(class_exists('Metadata') && $object instanceof Metadata && $object->getObjectType() == Metadata::TYPE_ENTRY)
 			return $object->getObjectId();
 			
 		KalturaLog::info("Can't get entry id for object type [" . get_class($object) . "]");
@@ -221,6 +221,9 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 				return null;
 				
 			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				if(!class_exists('Metadata'))
+					return null;
+					
 				switch($objectSubType)
 				{
 					case Metadata::FILE_SYNC_METADATA_DATA:
@@ -229,6 +232,9 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 				return null;
 				
 			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				if(!class_exists('MetadataProfile'))
+					return null;
+					
 				switch($objectSubType)
 				{
 					case MetadataProfile::FILE_SYNC_METADATA_DEFINITION:
