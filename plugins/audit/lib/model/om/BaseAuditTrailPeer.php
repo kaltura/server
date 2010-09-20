@@ -25,7 +25,7 @@ abstract class BaseAuditTrailPeer {
 	const TM_CLASS = 'AuditTrailTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 23;
+	const NUM_COLUMNS = 24;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -93,6 +93,9 @@ abstract class BaseAuditTrailPeer {
 	/** the column name for the USER_AGENT field */
 	const USER_AGENT = 'audit_trail.USER_AGENT';
 
+	/** the column name for the CLIENT_TAG field */
+	const CLIENT_TAG = 'audit_trail.CLIENT_TAG';
+
 	/** the column name for the DESCRIPTION field */
 	const DESCRIPTION = 'audit_trail.DESCRIPTION';
 
@@ -115,11 +118,11 @@ abstract class BaseAuditTrailPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'ParsedAt', 'Status', 'ObjectType', 'ObjectId', 'RelatedObjectId', 'RelatedObjectType', 'EntryId', 'MasterPartnerId', 'PartnerId', 'RequestId', 'KuserId', 'Action', 'Data', 'Ks', 'Context', 'EntryPoint', 'ServerName', 'IpAddress', 'UserAgent', 'Description', 'ErrorDescription', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'parsedAt', 'status', 'objectType', 'objectId', 'relatedObjectId', 'relatedObjectType', 'entryId', 'masterPartnerId', 'partnerId', 'requestId', 'kuserId', 'action', 'data', 'ks', 'context', 'entryPoint', 'serverName', 'ipAddress', 'userAgent', 'description', 'errorDescription', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::PARSED_AT, self::STATUS, self::OBJECT_TYPE, self::OBJECT_ID, self::RELATED_OBJECT_ID, self::RELATED_OBJECT_TYPE, self::ENTRY_ID, self::MASTER_PARTNER_ID, self::PARTNER_ID, self::REQUEST_ID, self::KUSER_ID, self::ACTION, self::DATA, self::KS, self::CONTEXT, self::ENTRY_POINT, self::SERVER_NAME, self::IP_ADDRESS, self::USER_AGENT, self::DESCRIPTION, self::ERROR_DESCRIPTION, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'parsed_at', 'status', 'object_type', 'object_id', 'related_object_id', 'related_object_type', 'entry_id', 'master_partner_id', 'partner_id', 'request_id', 'kuser_id', 'action', 'data', 'ks', 'context', 'entry_point', 'server_name', 'ip_address', 'user_agent', 'description', 'error_description', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'ParsedAt', 'Status', 'ObjectType', 'ObjectId', 'RelatedObjectId', 'RelatedObjectType', 'EntryId', 'MasterPartnerId', 'PartnerId', 'RequestId', 'KuserId', 'Action', 'Data', 'Ks', 'Context', 'EntryPoint', 'ServerName', 'IpAddress', 'UserAgent', 'ClientTag', 'Description', 'ErrorDescription', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'parsedAt', 'status', 'objectType', 'objectId', 'relatedObjectId', 'relatedObjectType', 'entryId', 'masterPartnerId', 'partnerId', 'requestId', 'kuserId', 'action', 'data', 'ks', 'context', 'entryPoint', 'serverName', 'ipAddress', 'userAgent', 'clientTag', 'description', 'errorDescription', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::PARSED_AT, self::STATUS, self::OBJECT_TYPE, self::OBJECT_ID, self::RELATED_OBJECT_ID, self::RELATED_OBJECT_TYPE, self::ENTRY_ID, self::MASTER_PARTNER_ID, self::PARTNER_ID, self::REQUEST_ID, self::KUSER_ID, self::ACTION, self::DATA, self::KS, self::CONTEXT, self::ENTRY_POINT, self::SERVER_NAME, self::IP_ADDRESS, self::USER_AGENT, self::CLIENT_TAG, self::DESCRIPTION, self::ERROR_DESCRIPTION, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'parsed_at', 'status', 'object_type', 'object_id', 'related_object_id', 'related_object_type', 'entry_id', 'master_partner_id', 'partner_id', 'request_id', 'kuser_id', 'action', 'data', 'ks', 'context', 'entry_point', 'server_name', 'ip_address', 'user_agent', 'client_tag', 'description', 'error_description', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -129,11 +132,11 @@ abstract class BaseAuditTrailPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'ParsedAt' => 2, 'Status' => 3, 'ObjectType' => 4, 'ObjectId' => 5, 'RelatedObjectId' => 6, 'RelatedObjectType' => 7, 'EntryId' => 8, 'MasterPartnerId' => 9, 'PartnerId' => 10, 'RequestId' => 11, 'KuserId' => 12, 'Action' => 13, 'Data' => 14, 'Ks' => 15, 'Context' => 16, 'EntryPoint' => 17, 'ServerName' => 18, 'IpAddress' => 19, 'UserAgent' => 20, 'Description' => 21, 'ErrorDescription' => 22, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'parsedAt' => 2, 'status' => 3, 'objectType' => 4, 'objectId' => 5, 'relatedObjectId' => 6, 'relatedObjectType' => 7, 'entryId' => 8, 'masterPartnerId' => 9, 'partnerId' => 10, 'requestId' => 11, 'kuserId' => 12, 'action' => 13, 'data' => 14, 'ks' => 15, 'context' => 16, 'entryPoint' => 17, 'serverName' => 18, 'ipAddress' => 19, 'userAgent' => 20, 'description' => 21, 'errorDescription' => 22, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::PARSED_AT => 2, self::STATUS => 3, self::OBJECT_TYPE => 4, self::OBJECT_ID => 5, self::RELATED_OBJECT_ID => 6, self::RELATED_OBJECT_TYPE => 7, self::ENTRY_ID => 8, self::MASTER_PARTNER_ID => 9, self::PARTNER_ID => 10, self::REQUEST_ID => 11, self::KUSER_ID => 12, self::ACTION => 13, self::DATA => 14, self::KS => 15, self::CONTEXT => 16, self::ENTRY_POINT => 17, self::SERVER_NAME => 18, self::IP_ADDRESS => 19, self::USER_AGENT => 20, self::DESCRIPTION => 21, self::ERROR_DESCRIPTION => 22, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'parsed_at' => 2, 'status' => 3, 'object_type' => 4, 'object_id' => 5, 'related_object_id' => 6, 'related_object_type' => 7, 'entry_id' => 8, 'master_partner_id' => 9, 'partner_id' => 10, 'request_id' => 11, 'kuser_id' => 12, 'action' => 13, 'data' => 14, 'ks' => 15, 'context' => 16, 'entry_point' => 17, 'server_name' => 18, 'ip_address' => 19, 'user_agent' => 20, 'description' => 21, 'error_description' => 22, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'ParsedAt' => 2, 'Status' => 3, 'ObjectType' => 4, 'ObjectId' => 5, 'RelatedObjectId' => 6, 'RelatedObjectType' => 7, 'EntryId' => 8, 'MasterPartnerId' => 9, 'PartnerId' => 10, 'RequestId' => 11, 'KuserId' => 12, 'Action' => 13, 'Data' => 14, 'Ks' => 15, 'Context' => 16, 'EntryPoint' => 17, 'ServerName' => 18, 'IpAddress' => 19, 'UserAgent' => 20, 'ClientTag' => 21, 'Description' => 22, 'ErrorDescription' => 23, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'parsedAt' => 2, 'status' => 3, 'objectType' => 4, 'objectId' => 5, 'relatedObjectId' => 6, 'relatedObjectType' => 7, 'entryId' => 8, 'masterPartnerId' => 9, 'partnerId' => 10, 'requestId' => 11, 'kuserId' => 12, 'action' => 13, 'data' => 14, 'ks' => 15, 'context' => 16, 'entryPoint' => 17, 'serverName' => 18, 'ipAddress' => 19, 'userAgent' => 20, 'clientTag' => 21, 'description' => 22, 'errorDescription' => 23, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::PARSED_AT => 2, self::STATUS => 3, self::OBJECT_TYPE => 4, self::OBJECT_ID => 5, self::RELATED_OBJECT_ID => 6, self::RELATED_OBJECT_TYPE => 7, self::ENTRY_ID => 8, self::MASTER_PARTNER_ID => 9, self::PARTNER_ID => 10, self::REQUEST_ID => 11, self::KUSER_ID => 12, self::ACTION => 13, self::DATA => 14, self::KS => 15, self::CONTEXT => 16, self::ENTRY_POINT => 17, self::SERVER_NAME => 18, self::IP_ADDRESS => 19, self::USER_AGENT => 20, self::CLIENT_TAG => 21, self::DESCRIPTION => 22, self::ERROR_DESCRIPTION => 23, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'parsed_at' => 2, 'status' => 3, 'object_type' => 4, 'object_id' => 5, 'related_object_id' => 6, 'related_object_type' => 7, 'entry_id' => 8, 'master_partner_id' => 9, 'partner_id' => 10, 'request_id' => 11, 'kuser_id' => 12, 'action' => 13, 'data' => 14, 'ks' => 15, 'context' => 16, 'entry_point' => 17, 'server_name' => 18, 'ip_address' => 19, 'user_agent' => 20, 'client_tag' => 21, 'description' => 22, 'error_description' => 23, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
 	);
 
 	/**
@@ -224,6 +227,7 @@ abstract class BaseAuditTrailPeer {
 		$criteria->addSelectColumn(AuditTrailPeer::SERVER_NAME);
 		$criteria->addSelectColumn(AuditTrailPeer::IP_ADDRESS);
 		$criteria->addSelectColumn(AuditTrailPeer::USER_AGENT);
+		$criteria->addSelectColumn(AuditTrailPeer::CLIENT_TAG);
 		$criteria->addSelectColumn(AuditTrailPeer::DESCRIPTION);
 		$criteria->addSelectColumn(AuditTrailPeer::ERROR_DESCRIPTION);
 	}

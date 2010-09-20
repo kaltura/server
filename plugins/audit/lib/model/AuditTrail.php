@@ -171,14 +171,20 @@ class AuditTrail extends BaseAuditTrail
 	 */
 	public function save(PropelPDO $con = null)
 	{
-		if(kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
-			return parent::save($con);
+		if(!kAuditTrailManager::traceEnabled($this->getPartnerId(), $this))
+		{
+			KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
+			return 0;
+		}
 
 		if(is_null($this->getKuserId()))
 		{
 			$kuserId = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, kCurrentContext::$uid);
 			$this->setKuserId($kuserId);
 		}
+	
+		if(is_null($this->getClientTag()))
+			$this->setClientTag(kCurrentContext::$client_lang);
 		
 		$this->setRequestId($this->getUniqueRequestId());
 		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
@@ -188,8 +194,7 @@ class AuditTrail extends BaseAuditTrail
 		$this->setEntryPoint(kCurrentContext::getEntryPoint());
 		$this->setUserAgent(requestUtils::getRemoteUserAgent());
 		
-		KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
-		return 0;
+		return parent::save($con);
 	} // save()
 	
 } // AuditTrail

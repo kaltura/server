@@ -33,6 +33,7 @@ CREATE TABLE `audit_trail`
 	`server_name` VARCHAR(63),
 	`ip_address` VARCHAR(15),
 	`user_agent` VARCHAR(127),
+	`client_tag` VARCHAR(127),
 	`description` VARCHAR(1023),
 	`error_description` VARCHAR(1023),
 	PRIMARY KEY (`id`),

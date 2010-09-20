@@ -100,6 +100,7 @@ class KalturaDispatcher
 		kCurrentContext::$ps_vesion = "ps3";
 		kCurrentContext::$service = $reflector->getServiceName();
 		kCurrentContext::$action =  $action;
+		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		
 		// initialize the service before invoking the action on it
 		$serviceInstance->initService ( $p , $userId , $ksStr , $reflector->getServiceName() , $action );

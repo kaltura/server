@@ -145,6 +145,12 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	protected $user_agent;
 
 	/**
+	 * The value for the client_tag field.
+	 * @var        string
+	 */
+	protected $client_tag;
+
+	/**
 	 * The value for the description field.
 	 * @var        string
 	 */
@@ -452,6 +458,16 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	public function getUserAgent()
 	{
 		return $this->user_agent;
+	}
+
+	/**
+	 * Get the [client_tag] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getClientTag()
+	{
+		return $this->client_tag;
 	}
 
 	/**
@@ -1013,6 +1029,29 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 	} // setUserAgent()
 
 	/**
+	 * Set the value of [client_tag] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     AuditTrail The current object (for fluent API support)
+	 */
+	public function setClientTag($v)
+	{
+		if(!isset($this->oldColumnsValues[AuditTrailPeer::CLIENT_TAG]))
+			$this->oldColumnsValues[AuditTrailPeer::CLIENT_TAG] = $this->client_tag;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->client_tag !== $v) {
+			$this->client_tag = $v;
+			$this->modifiedColumns[] = AuditTrailPeer::CLIENT_TAG;
+		}
+
+		return $this;
+	} // setClientTag()
+
+	/**
 	 * Set the value of [description] column.
 	 * 
 	 * @param      string $v new value
@@ -1111,8 +1150,9 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 			$this->server_name = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->ip_address = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->user_agent = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->description = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->error_description = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->client_tag = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->description = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->error_description = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1122,7 +1162,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 23; // 23 = AuditTrailPeer::NUM_COLUMNS - AuditTrailPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 24; // 24 = AuditTrailPeer::NUM_COLUMNS - AuditTrailPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating AuditTrail object", $e);
@@ -1543,9 +1583,12 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 				return $this->getUserAgent();
 				break;
 			case 21:
-				return $this->getDescription();
+				return $this->getClientTag();
 				break;
 			case 22:
+				return $this->getDescription();
+				break;
+			case 23:
 				return $this->getErrorDescription();
 				break;
 			default:
@@ -1590,8 +1633,9 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 			$keys[18] => $this->getServerName(),
 			$keys[19] => $this->getIpAddress(),
 			$keys[20] => $this->getUserAgent(),
-			$keys[21] => $this->getDescription(),
-			$keys[22] => $this->getErrorDescription(),
+			$keys[21] => $this->getClientTag(),
+			$keys[22] => $this->getDescription(),
+			$keys[23] => $this->getErrorDescription(),
 		);
 		return $result;
 	}
@@ -1626,6 +1670,7 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AuditTrailPeer::SERVER_NAME)) $criteria->add(AuditTrailPeer::SERVER_NAME, $this->server_name);
 		if ($this->isColumnModified(AuditTrailPeer::IP_ADDRESS)) $criteria->add(AuditTrailPeer::IP_ADDRESS, $this->ip_address);
 		if ($this->isColumnModified(AuditTrailPeer::USER_AGENT)) $criteria->add(AuditTrailPeer::USER_AGENT, $this->user_agent);
+		if ($this->isColumnModified(AuditTrailPeer::CLIENT_TAG)) $criteria->add(AuditTrailPeer::CLIENT_TAG, $this->client_tag);
 		if ($this->isColumnModified(AuditTrailPeer::DESCRIPTION)) $criteria->add(AuditTrailPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(AuditTrailPeer::ERROR_DESCRIPTION)) $criteria->add(AuditTrailPeer::ERROR_DESCRIPTION, $this->error_description);
 
@@ -1721,6 +1766,8 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 		$copyObj->setIpAddress($this->ip_address);
 
 		$copyObj->setUserAgent($this->user_agent);
+
+		$copyObj->setClientTag($this->client_tag);
 
 		$copyObj->setDescription($this->description);
 

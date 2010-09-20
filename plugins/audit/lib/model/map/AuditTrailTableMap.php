@@ -57,6 +57,7 @@ class AuditTrailTableMap extends TableMap {
 		$this->addColumn('SERVER_NAME', 'ServerName', 'VARCHAR', false, 63, null);
 		$this->addColumn('IP_ADDRESS', 'IpAddress', 'VARCHAR', false, 15, null);
 		$this->addColumn('USER_AGENT', 'UserAgent', 'VARCHAR', false, 127, null);
+		$this->addColumn('CLIENT_TAG', 'ClientTag', 'VARCHAR', false, 127, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 1023, null);
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'VARCHAR', false, 1023, null);
 		// validators
