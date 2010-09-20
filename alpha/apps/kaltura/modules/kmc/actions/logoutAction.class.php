@@ -6,9 +6,14 @@ class logoutAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
-		$ksStr = $this->getP("kmcks");
-		if($ksStr)
+		$ksStr = $this->getP("ks");
+		if($ksStr) {
 			kSessionUtils::killKSession($ksStr);
+			KalturaLog::debug("Killing session with ks - [$ksStr]");
+		}
+		else {
+			KalturaLog::err('logoutAction called with no KS');
+		}
 		
 		setcookie('pid', "", 0, "/");
 		setcookie('subpid', "", 0, "/");
@@ -16,9 +21,6 @@ class logoutAction extends kalturaAction
 		setcookie('kmcks', "", 0, "/");
 		setcookie('screen_name', "", 0, "/");
 		setcookie('email', "", 0, "/");
-		
-		$queryString = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '';
-		$this->redirect('/kmc/kmc' . $queryString);
 	}
 }
 ?>

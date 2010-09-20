@@ -1045,7 +1045,21 @@ function closeLoginF()
 
 function logout()
 {
-	window.location = "/index.php/kmc/logout?logout=";
+	var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
+	expiry = expiry.toGMTString();
+	document.cookie = "pid=; expires=" + expiry + "; path=/";
+	document.cookie = "subpid=; expires=" + expiry + "; path=/";
+	document.cookie = "uid=; expires=" + expiry + "; path=/";
+	document.cookie = "kmcks=; expires=" + expiry + "; path=/";
+	document.cookie = "screen_name=; expires=" + expiry + "; path=/";
+	document.cookie = "email=; expires=" + expiry + "; path=/";
+	$.ajax({
+		url: kmc.vars.service_url + "/index.php/kmc/logout#",
+		type: "POST",
+		data: { "ks": kmc.vars.ks },
+		dataType: "json"
+	});
+	window.location = "<?php echo $service_url; ?>/index.php/kmc/kmc?logout=";
 }
 
 // will load the content modul by default

@@ -179,7 +179,7 @@ else
       <a id="Logout" href="#login">Logout</a>
       <?php } else { ?>
       <a id="Quickstart Guide" href="<?php echo $service_url ?>/lib/pdf/KMC_Quick_Start_Guide__Butterfly.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
-	  <a id="Logout" href="/kmc/logout#logout">Logout</a> &nbsp; | &nbsp;
+	  <a id="Logout" href="#logout">Logout</a> &nbsp; | &nbsp;
 	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
       <?php } ?>
 	 </div>
