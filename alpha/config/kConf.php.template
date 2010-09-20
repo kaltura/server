@@ -133,7 +133,7 @@ class kConf
 				"kmc_appstudio_version" => 'v2.1.8',
 				"kmc_rna_version" => 'v1.1.5',
 				"kmc_dashboard_version" => 'v1.0.13',
-				"kmc_login_version" => 'v1.1.7',
+				"kmc_login_version" => 'v1.1.9',
 
 				"paypal_data" => array (),
 				
