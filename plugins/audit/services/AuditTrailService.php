@@ -75,7 +75,7 @@ class AuditTrailService extends KalturaBaseService
 	}
 	
 	/**
-	 * Retrieve a audit trail object by id
+	 * Retrieve an audit trail object by id
 	 * 
 	 * @action get
 	 * @param int $id 
