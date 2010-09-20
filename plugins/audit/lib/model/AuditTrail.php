@@ -49,14 +49,9 @@ class AuditTrail extends BaseAuditTrail
 	
 	public function __construct()
 	{	
-		$this->setRequestId($this->getUniqueRequestId());
+		parent::__construct();
+		
 		$this->setContext($this->getDefaultContext());
-		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
-		$this->setKs(kCurrentContext::$ks);
-		$this->setIpAddress(kCurrentContext::$user_ip);
-		$this->setServerName(kCurrentContext::$host);
-		$this->setEntryPoint(kCurrentContext::getEntryPoint());
-		$this->setUserAgent(requestUtils::getRemoteUserAgent());
 	}
 
 	/**
@@ -184,6 +179,14 @@ class AuditTrail extends BaseAuditTrail
 			$kuserId = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, kCurrentContext::$uid);
 			$this->setKuserId($kuserId);
 		}
+		
+		$this->setRequestId($this->getUniqueRequestId());
+		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
+		$this->setKs(kCurrentContext::$ks);
+		$this->setIpAddress(kCurrentContext::$user_ip);
+		$this->setServerName(kCurrentContext::$host);
+		$this->setEntryPoint(kCurrentContext::getEntryPoint());
+		$this->setUserAgent(requestUtils::getRemoteUserAgent());
 		
 		KalturaLog::debug("No audit created object type [$this->object_type] action [$this->action]");
 		return 0;

@@ -64,7 +64,9 @@ class AuditTrailService extends KalturaBaseService
 		
 		$dbAuditTrail = $auditTrail->toInsertableObject();
 		$dbAuditTrail->setContext(KalturaAuditTrailContext::CLIENT);
-		$dbAuditTrail->save();
+		$created = $dbAuditTrail->save();
+		if(!$created)
+			return null;
 		
 		$auditTrail = new KalturaAuditTrail();
 		$auditTrail->fromObject($dbAuditTrail);

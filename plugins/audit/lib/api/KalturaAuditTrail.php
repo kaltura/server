@@ -215,6 +215,6 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		if(is_null($dbAuditTrail))
 			$dbAuditTrail = new AuditTrail();
 			
-		return $this->toInsertableObject($dbAuditTrail, $propsToSkip);
+		return parent::toInsertableObject($dbAuditTrail, $propsToSkip);
 	}
 }
