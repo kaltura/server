@@ -50,7 +50,7 @@ class AuditTrail extends BaseAuditTrail
 	public function __construct()
 	{	
 		$this->setRequestId($this->getUniqueRequestId());
-		$this->setContext($this->getContext());
+		$this->setContext($this->getDefaultContext());
 		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
 		$this->setKs(kCurrentContext::$ks);
 		$this->setIpAddress(kCurrentContext::$user_ip);
@@ -86,7 +86,7 @@ class AuditTrail extends BaseAuditTrail
 	/**
 	 * @return int context
 	 */
-	public function getContext() 
+	public function getDefaultContext() 
 	{
 		switch (kCurrentContext::$ps_vesion) 
 		{
