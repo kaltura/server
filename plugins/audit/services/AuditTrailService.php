@@ -49,7 +49,7 @@ class AuditTrailService extends KalturaBaseService
 	}
 	
 	/**
-	 * Allows you to add a audit trail object and audit trail content associated with Kaltura object
+	 * Allows you to add an audit trail object and audit trail content associated with Kaltura object
 	 * 
 	 * @action add
 	 * @param KalturaAuditTrail $auditTrail
@@ -63,6 +63,8 @@ class AuditTrailService extends KalturaBaseService
 		$auditTrail->validatePropertyMaxLength("description", 1000);
 		
 		$dbAuditTrail = $auditTrail->toInsertableObject();
+		$dbAuditTrail->setContext(KalturaAuditTrailContext::CLIENT);
+		$dbAuditTrail->save();
 		
 		$auditTrail = new KalturaAuditTrail();
 		$auditTrail->fromObject($dbAuditTrail);
