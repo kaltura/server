@@ -10,6 +10,9 @@ package com.kaltura.config {
 		function get srvUrl():String;
 		function set srvUrl(value:String):void;
 		
+		function set protocol(value:String):void;
+		function get protocol():String;
+		
 		function get domain():String;
 		function set domain(value:String):void;
 	

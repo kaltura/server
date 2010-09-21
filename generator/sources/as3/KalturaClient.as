@@ -15,12 +15,31 @@ package com.kaltura
 		}
 		
 		//Setters & Getters
+		/**
+		 * @copy KalturaConfig#partnerId
+		 */	
 		public function get partnerId():String  { return _currentConfig ? this._currentConfig.partnerId : null; }
+		
+		/**
+		 * @copy KalturaConfig#domain
+		 */	
 		public function get domain():String { return _currentConfig ? this._currentConfig.domain : null; }
 		
+		/**
+		 * @copy KalturaConfig#ks
+		 */
 		public function set ks( currentConfig : String ):void  {  _currentConfig.ks = currentConfig; }
 		[Bindable]public function get ks():String  { return _currentConfig ? this._currentConfig.ks : null; }
 		
+		/**
+		 * @copy KalturaConfig#protocol
+		 */		
+		public function set protocol(value:String):void { _currentConfig.protocol = value; }
+		public function get protocol():String { return _currentConfig.protocol; }
+		
+		/**
+		 * @copy KalturaConfig#clientTag
+		 */
 		public function set clientTag(value:String):void { _currentConfig.clientTag = value; }
 		public function get clientTag():String { return _currentConfig.clientTag; }
 		
