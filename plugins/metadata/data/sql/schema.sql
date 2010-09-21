@@ -72,7 +72,7 @@ CREATE TABLE `metadata`
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `profile_id_and_version`(`metadata_profile_id`, `metadata_profile_version`),
-	KEY `object_id_and_type`(`object_id`, `object_type`)
+	KEY `object_id_and_type`(`object_type`, `object_id`)
 )Type=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier

@@ -53,8 +53,8 @@
 			<index-column name="metadata_profile_version" />
 		</index>
 		<index name="object_id_and_type">
-			<index-column name="object_id" />
 			<index-column name="object_type" />
+			<index-column name="object_id" />
 		</index>
 	</table>
 </database>
