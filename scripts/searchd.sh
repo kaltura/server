@@ -13,12 +13,12 @@
 
 SUDO_USER=searchd
 
-BASE_PATH=/opt/kaltura/sphinx
+BASE_PATH=@BIN_DIR@/sphinx
 PID_FILE=$BASE_PATH/searchd.pid
-CONFIG_FILE=/opt/kaltura/app/configurations/sphinx/kaltura.conf
+CONFIG_FILE=@APP_DIR@/configurations/sphinx/kaltura.conf
 
 EXEC_PATH=$BASE_PATH
-LOG_PATH=$EXEC_PATH
+LOG_PATH=@LOG_DIR@/sphinx
 
 RETVAL=0
 prog="searchd"
