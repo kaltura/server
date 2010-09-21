@@ -119,4 +119,12 @@ class flavorParams extends BaseflavorParams
 				
 		$this->setTags(implode(',', $finalTags));
 	}	
+	
+	public function setDynamicAttribute($attributeName, $v)
+	{
+		$this->putInCustomData($attributeName, $v);
+	}
+	
+	public function getClipOffset()		{return $this->getFromCustomData('ClipOffset');}
+	public function getClipDuration()	{return $this->getFromCustomData('ClipDuration');}
 }

@@ -99,4 +99,10 @@ class flavorParamsOutput extends BaseflavorParamsOutput
 		}
 		return null;
 	}
+	
+	public function setClipOffset($v)	{$this->putInCustomData('ClipOffset', $v);}
+	public function getClipOffset()		{return $this->getFromCustomData('ClipOffset');}
+
+	public function setClipDuration($v)	{$this->putInCustomData('ClipDuration', $v);}
+	public function getClipDuration()	{return $this->getFromCustomData('ClipDuration');}
 }
