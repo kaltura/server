@@ -1,15 +1,7 @@
 <?php
 class kConf
 {
-
-// Did not find where to put:
-//				"kaltura_activation_key" => false,
-//				"replace_passwords" => false,
-//				"kaltura_version" => "@KALTURA_VERSION@",
-//				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",													
-//				"default_flow_manager_class" => "kFlowManager",
-//				"kmc_rna_allowed_partners" => array(),
-				
+			
 	private static $map = null;
 	
 	private static function init()
@@ -24,7 +16,7 @@ class kConf
                  // take over the symfony config (sfConfig)
  			    "sf_debug" => false, // TODO: Should be commented out or not?
 				"sf_logging_enabled" => true, // TODO: Should be commented out or not?
-				"sf_root_dir" => @APP_DIR.'/alpha/', // TODO: Should be commented out or not?
+				"sf_root_dir" => @APP_DIR@.'/alpha/', // TODO: Should be commented out or not?
 
 				"cdn_host" => "@CDN_HOST@",
 				"iis_host" => "@IIS_HOST@",
@@ -144,8 +136,8 @@ class kConf
 				"akamai_auth_smooth_salt" => "",
 				"akamai_auth_smooth_seconds" => 300,
 				
-				"marketo_access_key" => "kaltura1_892512424C1FC1B8BA53F2", // TODO: Should be removed?
-				"marketo_secret_key" => "061698860392609144CC11FFCC11BB9ABBAA7BCCA530", // TODO: Should be removed?
+				"marketo_access_key" => "", 
+				"marketo_secret_key" => "",
 							
 				'kdpwrapper_track_url' => "http://kalstats.kaltura.com/index.php/events/player_event",//TODO: CHANGE!
 				"kaltura_partner_id" => "",
@@ -153,7 +145,7 @@ class kConf
 				
 				"reports_db_config" => array (
 					"host" => "@DWH_HOST@",
-					"user" => "@DWH_USER@" ,
+					"user" => "@DWH_USER@",
 					"port" => "@DWH_PORT@",
 					"password" => "@DWH_PASS@" ,
 					"db_name" => "@DWH_DATABASE_NAME@" , 
@@ -210,7 +202,13 @@ class kConf
 					'/[a-z]+/',
 					'/[~!@#$%^*=+?\(\)\-\[\]\{\}]+/',
 				),
-                
+				
+				// ce only settings
+				"kaltura_activation_key" => false,
+				"replace_passwords" => false,
+				"kaltura_version" => "@KALTURA_VERSION@",
+				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",
+                // end of ce only settings
 			);
 	}
 	
