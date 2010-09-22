@@ -217,6 +217,7 @@ class MetadataProfileService extends KalturaBaseService
 	 * @return KalturaMetadataProfile
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
+	 * @throws MetadataErrors::METADATA_TRANSFORMING
 	 */	
 	function updateAction($id, KalturaMetadataProfile $metadataProfile, $xsdData = null, $viewsData = null)
 	{
@@ -225,6 +226,9 @@ class MetadataProfileService extends KalturaBaseService
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
+		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
+			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
+		
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
