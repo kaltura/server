@@ -226,7 +226,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
                 $entry_full_path = myUploadUtils::getUploadPath( $token , $file_alias , null , $file_extension );
             	if (!file_exists($entry_full_path)) {
                 	sfLogger::getInstance()->err ( "Invalid UPLOAD PATH [".$entry_full_path."] while trying to add entry for partner id [".$partner_id."] with token [".$token."] & original name [".$this->getP($prefix."name")."]");
-                	$this->addError(APIErros::INVALID_FILE_NAME);
+                	$this->addError(APIErrors::INVALID_FILE_NAME);
                 	continue;
                 }
             	myEntryUtils::setEntryTypeAndMediaTypeFromFile($entry, $entry_full_path);
