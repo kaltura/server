@@ -11,6 +11,8 @@ class MetadataErrors extends KalturaErrors
 	
 	const METADATA_FILE_NOT_FOUND = "METADATA_FILE_NOT_FOUND,Metadata file not found [%s]";
 	
+	const METADATA_TRANSFORMING = "METADATA_TRANSFORMING,Metadata profile is currently transforming";
+	
 	const METADATA_UNABLE_TO_TRANSFORM = "METADATA_UNABLE_TO_TRANSFORM,Unable to transform metadata [%s]";
 	
 	const METADATA_ALREADY_EXISTS = "METADATA_ALREADY_EXISTS,Metadata already exists id [%s]";
