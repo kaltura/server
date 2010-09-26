@@ -332,7 +332,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					<?php 
 						$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
 					
-						$default_value = false;
+						$default_value = '0';
 						if($partner)
 							$default_value = $partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME);
 							
@@ -365,7 +365,7 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 					<?php 
 						$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
 					
-						$default_value = false;
+						$default_value = '0';
 						if($partner)
 							$default_value = $partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME);
 							
