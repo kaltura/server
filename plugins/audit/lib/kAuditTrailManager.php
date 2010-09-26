@@ -203,7 +203,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_CREATED);
 		$auditTrail->save();
 	}
 
@@ -217,7 +217,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_COPIED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_COPIED);
 		$auditTrail->save();
 	}
 
@@ -230,7 +230,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_DELETED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_DELETED);
 		$auditTrail->save();
 	}
 
@@ -260,7 +260,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$supportedDescriptors = explode(',', $auditTrailConfig->getDescriptors());
 		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
 		
-		if(class_exists('KalturaAuditTrailChangeItem'))
+		if(class_exists('KalturaAuditTrailChangeInfo'))
 		{
 			$changedItems = new KalturaAuditTrailChangeItemArray();
 			foreach($columnsOldValues as $column => $oldValue)
@@ -312,7 +312,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			$auditTrail->setData($data);
 		}
 		
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CHANGED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_CHANGED);
 		$auditTrail->save();
 	}
 
