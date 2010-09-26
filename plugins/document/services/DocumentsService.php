@@ -35,9 +35,19 @@ class DocumentsService extends KalturaEntryService
 	    		
     		throw $ex;
 	    }
-	    
+	    	
 		if (!file_exists($entryFullPath))
-			throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+		{
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+			if($remoteDCHost)
+			{
+				kFile::dumpApiRequest($remoteDCHost);
+			}
+			else
+			{
+				throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+			}
+		}
 			
         $documentEntry->validatePropertyNotNull("documentType");
 		if (!$documentEntry->name)

@@ -25,6 +25,7 @@ class kUploadTokenMgr
 		$this->_uploadToken->setUploadedFileSize(null);
 		$this->_uploadToken->setUploadTempPath(null);
 		$this->_uploadToken->setUserIp(requestUtils::getRemoteAddress());
+		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		$this->_uploadToken->save();
 	}
 	
@@ -79,6 +80,7 @@ class kUploadTokenMgr
 		}
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
+		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
 		
@@ -282,13 +284,19 @@ class kUploadTokenMgr
 	 * get DC host for remote upload token
 	 *
 	 * @param $uploadTokenId
+	 * @param $localDcId
 	 * @return string
 	 */
-	public static function getRemoteHostForUploadToken($uploadTokenId)
+	public static function getRemoteHostForUploadToken($uploadTokenId, $localDcId = null)
 	{
 		$uploadToken = uploadTokenPeer::retrieveByPK($uploadTokenId);
 		if(!$uploadToken)
 		{
+			return FALSE;
+		}
+		if ($localDcId && $localDcId == $uploadToken->getDc())
+		{
+			// return FALSE if token's DC is not remote, but the same as $localDcId
 			return FALSE;
 		}
 		return kDataCenterMgr::getRemoteDcExternalUrlByDcId($uploadToken->getDc());
