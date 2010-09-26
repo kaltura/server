@@ -64,6 +64,8 @@ class AuditTrailService extends KalturaBaseService
 		$auditTrail->validatePropertyMaxLength("description", 1000);
 		
 		$dbAuditTrail = $auditTrail->toInsertableObject();
+		$dbAuditTrail->setPartnerId($this->getPartnerId());
+		$dbAuditTrail->setStatus(AuditTrail::AUDIT_TRAIL_STATUS_READY);
 		$dbAuditTrail->setContext(KalturaAuditTrailContext::CLIENT);
 		
 		$enabled = kAuditTrailManager::traceEnabled($this->getPartnerId(), $dbAuditTrail);
