@@ -294,9 +294,9 @@ if ( count ( $partner_list ) > 1 )
 
 <tr><td style="font-weight:bold; text-" colspan="3"><hr/>Password Security</td></tr>
 <?php echo  prop ( $partner , "maxLoginAttempts"  , "text" , "60" , ""  , ""  , "maximum login attempts before being blocked"  ) ?>
-<?php echo  prop ( $partner , "loginBlockPeriod"  , "text" , "60" , ""  , ""  , "for how long is login block valid"  ) ?>
+<?php echo  prop ( $partner , "loginBlockPeriod"  , "text" , "60" , ""  , ""  , "for how long is login block valid (in seconds!)"  ) ?>
 <?php echo  prop ( $partner , "numPrevPassToKeep"  , "text" , "60" , ""  , ""  , "number of previous passwords to keep (and not allow re-use)"  ) ?>
-<?php echo  prop ( $partner , "passReplaceFreq"  , "text" , "60" , ""  , ""  , "password replacement frequency"  ) ?>
+<?php echo  prop ( $partner , "passReplaceFreq"  , "text" , "60" , ""  , ""  , "password replacement frequency (in seconds!)"  ) ?>
 
 
 
