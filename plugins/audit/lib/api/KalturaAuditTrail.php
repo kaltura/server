@@ -172,7 +172,6 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		"requestId",
 		"userId" => "puserId",
 		"action",
-		"data",
 		"ks",
 		"context",
 		"entryPoint",
@@ -209,7 +208,40 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		if(is_null($dbAuditTrail))
 			$dbAuditTrail = new AuditTrail();
 			
-		return parent::toObject($dbAuditTrail, $propsToSkip);
+		$dbAuditTrail = parent::toObject($dbAuditTrail, $propsToSkip);
+		$dbAuditTrail->setData($this->data->toObject());
+		return $dbAuditTrail;
+	}
+
+	/**
+	 * @param AuditTrail $dbAuditTrail
+	 */
+	public function fromObject($dbAuditTrail)
+	{
+		parent::fromObject($dbAuditTrail);
+		
+		$dbData = $dbAuditTrail->getData();
+		switch(get_class($dbData))
+		{
+			case 'kAuditTrailChangeInfo':
+				$this->data = new KalturaAuditTrailChangeInfo();
+				break;
+				
+			case 'kAuditTrailFileSyncCreateInfo':
+				$this->data = new KalturaAuditTrailFileSyncCreateInfo();
+				break;
+				
+			case 'kAuditTrailTextInfo':
+				$this->data = new KalturaAuditTrailTextInfo();
+				break;
+				
+			default:
+				$this->data = new KalturaAuditTrailInfo();
+				break;
+		}
+		
+		if($this->data && $dbData)
+			$this->data->fromObject($dbData);
 	}
 	
 	/**

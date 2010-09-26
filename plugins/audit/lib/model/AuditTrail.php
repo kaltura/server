@@ -167,13 +167,13 @@ class AuditTrail extends BaseAuditTrail
 	/**
 	 * Serialize the object and set the value of [data] column.
 	 * 
-	 * @param      KalturaAuditTrailInfo $v new value
+	 * @param      kAuditTrailInfo $v new value
 	 * @return     AuditTrail The current object (for fluent API support)
 	 */
 	public function setData($v)
 	{
 		$data = null;
-		if(class_exists('KalturaAuditTrailInfo') && $v instanceof KalturaAuditTrailInfo)
+		if($v instanceof kAuditTrailInfo)
 			$data = serialize($v);
 		
 		return parent::setData($data);
@@ -182,13 +182,10 @@ class AuditTrail extends BaseAuditTrail
 	/**
 	 * Get the [data] column value and unserialize to object.
 	 * 
-	 * @return     KalturaAuditTrailInfo
+	 * @return     kAuditTrailInfo
 	 */
 	public function getData()
 	{
-		if(!class_exists('KalturaAuditTrailInfo'))
-			return null;
-			
 		$data = parent::getData();
 		if(is_null($data))
 			return null;
