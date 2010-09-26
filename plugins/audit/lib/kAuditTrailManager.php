@@ -270,11 +270,24 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
 					continue;
 				}
-					
+
+				$newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
+				if(is_null($newValue) && is_null($oldValue))
+				{
+					KalturaLog::debug("Old and new values are null");
+					continue;
+				}
+			
+				if($newValue == $oldValue)
+				{
+					KalturaLog::debug("Old and new values are identical");
+					continue;
+				}
+				
 				$changedItem = new KalturaAuditTrailChangeItem();
 				$changedItem->descriptor = $column;
 				$changedItem->oldValue = $oldValue;
-				$changedItem->newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
+				$changedItem->newValue = $newValue;
 				$changedItems[] = $changedItem;
 			}
 			foreach($customDataOldValues as $namespace => $oldValues)
