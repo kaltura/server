@@ -272,12 +272,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 				}
 
 				$newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
-				if(is_null($newValue) && is_null($oldValue))
-				{
-					KalturaLog::debug("Old and new values are null");
-					continue;
-				}
-			
 				if($newValue == $oldValue)
 				{
 					KalturaLog::debug("Old and new values are identical");
