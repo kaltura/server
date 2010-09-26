@@ -142,7 +142,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			$auditTrail = new AuditTrail();
 			$auditTrail->setPartnerId($partnerId);
 			$auditTrail->setObjectType($objectType);
-			$auditTrail->setStatus(KalturaAuditTrailStatus::READY);
+			$auditTrail->setStatus(AuditTrail::AUDIT_TRAIL_STATUS_READY);
 			$auditTrail->setObjectId($object->getId());
 			$auditTrail->setEntryId($this->getEntryId($object));
 		}
@@ -175,15 +175,19 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return;
 		}
 			
-		$data = new KalturaAuditTrailFileSyncCreateInfo();
-		$data->version = $fileSync->getVersion();
-		$data->objectSubType = $fileSync->getObjectSubType();
-		$data->dc = $fileSync->getDc();
-		$data->original = $fileSync->getOriginal();
-		$data->fileType = $fileSync->getFileType();
+		if(class_exists('KalturaAuditTrailFileSyncCreateInfo'))
+		{
+			$data = new KalturaAuditTrailFileSyncCreateInfo();
+			$data->version = $fileSync->getVersion();
+			$data->objectSubType = $fileSync->getObjectSubType();
+			$data->dc = $fileSync->getDc();
+			$data->original = $fileSync->getOriginal();
+			$data->fileType = $fileSync->getFileType();
+			
+			$auditTrail->setData($data);
+		}
 		
-		$auditTrail->setData($data);
-		$auditTrail->setAction(KalturaAuditTrailAction::FILE_SYNC_CREATED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		$auditTrail->save();
 	}
 
@@ -199,7 +203,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(KalturaAuditTrailAction::CREATED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		$auditTrail->save();
 	}
 
@@ -213,7 +217,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(KalturaAuditTrailAction::COPIED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_COPIED);
 		$auditTrail->save();
 	}
 
@@ -226,7 +230,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(KalturaAuditTrailAction::DELETED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_DELETED);
 		$auditTrail->save();
 	}
 
@@ -256,55 +260,59 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$supportedDescriptors = explode(',', $auditTrailConfig->getDescriptors());
 		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
 		
-		$changedItems = new KalturaAuditTrailChangeItemArray();
-		foreach($columnsOldValues as $column => $oldValue)
+		if(class_exists('KalturaAuditTrailChangeItem'))
 		{
-			if(!in_array($column, $supportedDescriptors))
+			$changedItems = new KalturaAuditTrailChangeItemArray();
+			foreach($columnsOldValues as $column => $oldValue)
 			{
-				KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
-				continue;
-			}
-				
-			$changedItem = new KalturaAuditTrailChangeItem();
-			$changedItem->descriptor = $column;
-			$changedItem->oldValue = $oldValue;
-			$changedItem->newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
-			$changedItems[] = $changedItem;
-		}
-		foreach($customDataOldValues as $namespace => $oldValues)
-		{
-			if(!is_array($oldValues))
-				continue;
-			
-			if(!strlen($namespace))
-				$namespace = null;
-		
-			$prefix = is_null($namespace) ? '' : "$namespace/";
-					
-			foreach($oldValues as $name => $oldValue)
-			{
-				$descriptor = $prefix . $name;
-				if(!in_array($descriptor, $supportedDescriptors))
+				if(!in_array($column, $supportedDescriptors))
 				{
-					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] descriptor[$descriptor] not supported");
+					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
 					continue;
 				}
 					
 				$changedItem = new KalturaAuditTrailChangeItem();
-				$changedItem->descriptor = $descriptor;
+				$changedItem->descriptor = $column;
 				$changedItem->oldValue = $oldValue;
-				$changedItem->newValue = $object->getFromCustomData($name, $namespace);
+				$changedItem->newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
 				$changedItems[] = $changedItem;
 			}
-		}
-		if(!$changedItems->count)
-			return;
+			foreach($customDataOldValues as $namespace => $oldValues)
+			{
+				if(!is_array($oldValues))
+					continue;
+				
+				if(!strlen($namespace))
+					$namespace = null;
 			
-		$data = new KalturaAuditTrailChangeInfo();
-		$data->changedItems = $changedItems;
+				$prefix = is_null($namespace) ? '' : "$namespace/";
+						
+				foreach($oldValues as $name => $oldValue)
+				{
+					$descriptor = $prefix . $name;
+					if(!in_array($descriptor, $supportedDescriptors))
+					{
+						KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] descriptor[$descriptor] not supported");
+						continue;
+					}
+						
+					$changedItem = new KalturaAuditTrailChangeItem();
+					$changedItem->descriptor = $descriptor;
+					$changedItem->oldValue = $oldValue;
+					$changedItem->newValue = $object->getFromCustomData($name, $namespace);
+					$changedItems[] = $changedItem;
+				}
+			}
+			if(!$changedItems->count)
+				return;
+				
+			$data = new KalturaAuditTrailChangeInfo();
+			$data->changedItems = $changedItems;
+			
+			$auditTrail->setData($data);
+		}
 		
-		$auditTrail->setData($data);
-		$auditTrail->setAction(KalturaAuditTrailAction::CHANGED);
+		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CHANGED);
 		$auditTrail->save();
 	}
 
