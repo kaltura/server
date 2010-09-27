@@ -35,6 +35,17 @@ class Metadata extends BaseMetadata implements ISyncableFile
 		return parent::preInsert($con);
 	}
 
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseMetadata#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(MetadataPeer::STATUS) && $this->getStatus() == self::STATUS_DELETED)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
+	}
+
 	public function incrementVersion()
 	{
 		$this->setVersion($this->getVersion() + 1);
