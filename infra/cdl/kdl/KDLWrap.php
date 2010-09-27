@@ -13,6 +13,22 @@ class KDLWrap
 	public	$_warnings = array();
 	public  $_rv=true;
 	
+	static $TranscodersCdl2Kdl = array(
+		0=>KDLTranscoders::KALTURA,
+		1=>KDLTranscoders::ON2,
+		2=>KDLTranscoders::FFMPEG,
+		3=>KDLTranscoders::MENCODER,
+		4=>KDLTranscoders::ENCODING_COM,
+		99=>KDLTranscoders::FFMPEG_AUX,
+		98=>KDLTranscoders::FFMPEG_VP8,
+		5=>KDLTranscoders::EE3,
+		6=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
+		7=>KDLTranscoders::QT_FASTSTART,
+		201=>KDLTranscoders::PDF2SWF,
+		202=>KDLTranscoders::PDF_CREATOR,
+		203=>KDLTranscoders::OPENOFFICE_UCONV,
+	);
+	
 	/* ------------------------------
 	 * function CDLGenerateTargetFlavors
 	 */
@@ -169,7 +185,12 @@ kLog::log(__METHOD__."==>\n");
 		else {
 			$flavor->_isNonComply = false;
 		}
-		$flavor->_errors = $flavor->_errors + $target->_errors;
+		if($target->_clipStart)
+			$flavor->setClipOffset($target->_clipStart);
+		if($target->_clipDur)
+			$flavor->setClipDuration($target->_clipDur);
+			
+		$flavor->_errors   = $flavor->_errors + $target->_errors;
 		$flavor->_warnings = $flavor->_warnings + $target->_warnings;
 		
 		if($target->_container)
@@ -200,61 +221,23 @@ kLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		}
 		else {
 			$flavor->setEngineVersion(0);
-		$convEnginesAssociated = null;
-		$commandLines = array();
-		foreach($target->_transcoders as $key => $transObj) {
-			$extra = $transObj->_extra;
-//			if($flag) 
-			{
+			$convEnginesAssociated = null;
+			$commandLines = array();
+			foreach($target->_transcoders as $key => $transObj) {
+				$extra = $transObj->_extra;
+	
+					/* -------------------------
+					 * Translate KDL transcoders enums to CDL
+					 */
 				$str = null;
-				switch($transObj->_id){
-					case KDLTranscoders::KALTURA:
-						$str = kConvertJobData::CONVERSION_ENGINE_KALTURA_COM; // "0";
-						$commandLines[kConvertJobData::CONVERSION_ENGINE_KALTURA_COM]=$transObj->_id;
-						break;
-					case KDLTranscoders::ON2:
-						$str = kConvertJobData::CONVERSION_ENGINE_ON2; // "1";
-						$commandLines[kConvertJobData::CONVERSION_ENGINE_ON2]=$transObj->_cmd;;
-						break;
-					case KDLTranscoders::FFMPEG:
-						$str = kConvertJobData::CONVERSION_ENGINE_FFMPEG; // "2";
-						$cmdStr=$transObj->_cmd;;
-						if($flavor->getFormat()=="mp4"){
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_FFMPEG]=$cmdStr.kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
-						}
-						else
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_FFMPEG]=$cmdStr;
-						break;
-					case KDLTranscoders::MENCODER:
-						$str = kConvertJobData::CONVERSION_ENGINE_MENCODER; // "3";
-						$cmdStr=$transObj->_cmd;;
-						if($flavor->getFormat()=="mp4"){
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_MENCODER]=$cmdStr.kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
-						}
-						else
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_MENCODER]=$cmdStr;
-						break;
-					case KDLTranscoders::ENCODING_COM:
-						$str = kConvertJobData::CONVERSION_ENGINE_ENCODING_COM; //"4";
-						$commandLines[kConvertJobData::CONVERSION_ENGINE_ENCODING_COM]=$transObj->_cmd;;
-						break;
-					case KDLTranscoders::FFMPEG_AUX:
-						$str = kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX; // "99;
-						$cmdStr=$transObj->_cmd;;
-						if($flavor->getFormat()=="mp4"){
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX]=$cmdStr.kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
-						}
-						else
-							$commandLines[kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX]=$cmdStr;
-						break;
-					case KDLTranscoders::EE3:
-						$str = kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3; //"5";
-						$commandLines[kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3]=$transObj->_cmd;;
-						break;
-					case KDLTranscoders::FFMPEG_VP8:
-						$str = kConvertJobData::CONVERSION_ENGINE_FFMPEG_VP8; //"98";
-						$commandLines[kConvertJobData::CONVERSION_ENGINE_FFMPEG_VP8]=$transObj->_cmd;;
-						break;
+				$cdlTrnsId=array_search($transObj->_id,self::$TranscodersCdl2Kdl);
+				if($cdlTrnsId!==false){
+					$str = $cdlTrnsId;
+					$commandLines[$cdlTrnsId]=$transObj->_cmd;
+				}
+				if($flavor->getFormat()=="mp4" && ($cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_FFMPEG || $cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX || $cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_MENCODER)){
+					$fsAddonStr = kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
+					$commandLines[$cdlTrnsId].=$fsAddonStr;
 				}
 				if($convEnginesAssociated!==null) {
 					$convEnginesAssociated = $convEnginesAssociated.",".$str;
@@ -262,11 +245,11 @@ kLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 				else {
 					$convEnginesAssociated = $str;
 				}					
-//echo "transcoder-->".$key." flag:".$flag." str:".$trnsStr."<br>\n";
+	//echo "transcoder-->".$key." flag:".$flag." str:".$trnsStr."<br>\n";
+				
 			}
-		}
-		$flavor->setCommandLines($commandLines);
-		$flavor->setConversionEngines($convEnginesAssociated);
+			$flavor->setCommandLines($commandLines);
+			$flavor->setConversionEngines($convEnginesAssociated);
 		}
 		$flavor->setFileExt($target->EvaluateFileExt());
 		$flavor->_errors = $flavor->_errors + $target->_errors;
@@ -293,6 +276,8 @@ kLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		$kdlFlavor->_id = $cdlFlavor->getId();
 		$kdlFlavor->_ready_behavior = $cdlFlavor->getReadyBehavior();
 		$kdlFlavor->_tags = $cdlFlavor->getTags(); 
+		$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
+		$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
 		
 			/* 
 			 * Media container initialization
@@ -363,12 +348,9 @@ $cmdLines = $cdlFlavor->getCommandLines();
 kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 		}
 
-		KDLUtils::RecursiveScan($transObjArr, "transcoderSetFuncWrap", KDLConstants::$TranscodersCdl2Kdl, "");
+		KDLUtils::RecursiveScan($transObjArr, "transcoderSetFuncWrap", self::$TranscodersCdl2Kdl, "");
 		$kdlFlavor->_transcoders = $transObjArr;
 		
-		if(strstr($cdlFlavor->getCustomData(),KDLConstants::ForceCommandLineToken)) {
-			$kdlFlavor->_flags = $kdlFlavor->_flags | KDLFlavor::ForceCommandLineFlagBit;
-		}
 		if($cdlFlavor instanceof flavorParamsOutputWrap) {
 			if($cdlFlavor->_isRedundant) {
 				$kdlFlavor->_flags = $kdlFlavor->_flags | KDLFlavor::RedundantFlagBit;
@@ -537,7 +519,7 @@ $oprSets = new kOperatorSets();
 			if(is_array($transObj)) {
 				foreach($transObj as $tr) {
 					$opr = new kOperator();
-					$key=array_search($tr->_id,KDLConstants::$TranscodersCdl2Kdl);
+					$key=array_search($tr->_id,self::$TranscodersCdl2Kdl);
 					if($key===false)
 						$opr->id = $tr->_id;
 					else
@@ -549,7 +531,7 @@ $oprSets = new kOperatorSets();
 			}
 			else {
 				$opr = new kOperator();
-				$key=array_search($transObj->_id,KDLConstants::$TranscodersCdl2Kdl);
+				$key=array_search($transObj->_id,self::$TranscodersCdl2Kdl);
 				if($key===false)
 					$opr->id = $transObj->_id;
 				else
