@@ -209,7 +209,10 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 			$dbAuditTrail = new AuditTrail();
 			
 		$dbAuditTrail = parent::toObject($dbAuditTrail, $propsToSkip);
-		$dbAuditTrail->setData($this->data->toObject());
+		
+		if($this->data && $this->data instanceof KalturaAuditTrailInfo)
+			$dbAuditTrail->setData($this->data->toObject());
+			
 		return $dbAuditTrail;
 	}
 
