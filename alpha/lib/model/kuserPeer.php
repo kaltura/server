@@ -17,6 +17,12 @@ class kuserPeer extends BasekuserPeer
 		return self::doSelectOne( $c ); 
 	}
 	
+	/**
+	 * @param int $partner_id
+	 * @param string $puser_id
+	 * @param bool $ignore_puser_kuser
+	 * @return kuser
+	 */
 	public static function getKuserByPartnerAndUid($partner_id , $puser_id, $ignore_puser_kuser = false)
 	{
 		if (defined("KALTURA_API_V3") || $ignore_puser_kuser)
