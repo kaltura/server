@@ -92,7 +92,6 @@ class EntrySphinxCriteria extends SphinxCriteria
 		if(count($this->matchClause))
 		{
 			$matches = implode(' & ', $this->matchClause);
-			$matches = str_replace("'", "\\'", $matches);
 			$this->whereClause[] = "MATCH('$matches')";
 		}
 		
@@ -251,7 +250,9 @@ class EntrySphinxCriteria extends SphinxCriteria
 			$additionalConditions = array();
 			if(preg_match('/^"[^"]+"$/', $freeTexts))
 			{
-				$freeText = preg_replace('/^"([^"]+)"$/', '^$1\$', $freeTexts);
+				$freeText = str_replace('"', '', $freeTexts);
+				$freeText = SphinxCriteria::escapeString($freeText);
+				$freeText = "^$freeText$";
 				$additionalConditions[] = "@(name,tags,description) $freeText";
 			}
 			else
@@ -262,8 +263,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 				
 					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 							
 					foreach($freeTextsArr as $freeText)
 					{
@@ -274,8 +279,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 				{
 					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($freeTextsArr[$valIndex]);
+						else
+							$freeTextsArr[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 							
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 					$additionalConditions[] = "(@(name,tags,description) $freeTextExpr)";
@@ -336,8 +345,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 				case baseObjectFilter::MATCH_OR:
 					$vals = explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 					
 					if(count($vals))
 					{
@@ -355,8 +368,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 						$vals = $val;
 						
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 					
 					if(count($vals))
 					{
@@ -375,8 +392,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 						$vals = $val;
 						
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 					
 					if(count($vals))
 					{
@@ -389,8 +410,9 @@ class EntrySphinxCriteria extends SphinxCriteria
 				
 				
 				case baseObjectFilter::EQ:
-					if(is_numeric($valValue) || strlen($valValue) > 1)
+					if(is_numeric($val) || strlen($val) > 1)
 					{
+						$val = SphinxCriteria::escapeString($val);
 						$this->matchClause[] = "@$sphinxField ^$val$";
 						$filter->unsetByName($field);
 					}
@@ -401,8 +423,12 @@ class EntrySphinxCriteria extends SphinxCriteria
 				case baseObjectFilter::LIKE:
 					$vals = explode(' ', $val);
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 							
 					if(count($vals))
 					{

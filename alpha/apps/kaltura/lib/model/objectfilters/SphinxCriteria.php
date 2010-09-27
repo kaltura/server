@@ -26,4 +26,13 @@ class SphinxCriteria extends Criteria
 		foreach($this->filters as $filter)
 			$filter->attachToFinalCriteria($this);
 	}
+	
+	
+	public static function escapeString($str)
+	{
+		$from = array ( '\'',	'\\',	'(',')',	'|',	'-',	'!',	'@',	'~',	'"',	'&',	'/',	'^',	'$',	'='		);
+		$to   = array ( '\\\'',	'\\\\',	'\(','\)',	'\|',	'\-',	'\!',	'\@',	'\~',	'\"',	'\&',	'\/',	'\^',	'\$',	'\='	);
+
+		return str_replace($from, $to, $str);
+	}
 }

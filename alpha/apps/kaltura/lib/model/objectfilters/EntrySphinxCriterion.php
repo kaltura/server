@@ -109,6 +109,7 @@ class EntrySphinxCriterion extends Criterion
 			switch($comparison)
 			{
 				case Criteria::EQUAL:
+					$value = SphinxCriteria::escapeString($value);
 					$matchClause[] = "@$sphinxField ^$value$";
 					break;
 					
@@ -120,8 +121,12 @@ class EntrySphinxCriterion extends Criterion
 						$vals = $value;
 						
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 					
 					if(count($vals))
 					{
@@ -139,8 +144,12 @@ class EntrySphinxCriterion extends Criterion
 						$vals = $value;
 						
 					foreach($vals as $valIndex => $valValue)
+					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxCriteria::escapeString($valValue);
+					}
 					
 					if(count($vals))
 					{
@@ -151,6 +160,7 @@ class EntrySphinxCriterion extends Criterion
 					break;
 					
 				default:
+					$value = SphinxCriteria::escapeString($value);
 					$matchClause[] = "@$sphinxField $value";
 					break;
 			}

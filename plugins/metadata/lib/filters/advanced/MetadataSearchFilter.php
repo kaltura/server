@@ -58,6 +58,7 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 					if(isset($xPaths[$field]))
 					{
 						$value = $item->getValue();
+						$value = SphinxCriteria::escapeString($value);
 						$fieldId = $xPaths[$field];
 						$condition = "\"{$pluginName}_{$fieldId} $value mdend\"";
 					}
@@ -85,11 +86,12 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 	{
 		if(preg_match('/^"[^"]+"$/', $freeTexts))
 		{
-			$freeText = preg_replace('/^"([^"]+)"$/', '^$1\$', $freeTexts);
+			$freeText = str_replace('"', '', $freeTexts);
+			$freeText = SphinxCriteria::escapeString($freeText);
+			$freeText = "^$freeText$";
+			
 			$additionalConditions[] = "(@(name,tags,description) $freeText)";
-			
 			$additionalConditions[] = '(@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts)";
-			
 			
 			return $additionalConditions;
 		}
