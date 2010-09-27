@@ -74,6 +74,17 @@ class flavorParams extends BaseflavorParams
 		self::TAG_IPHONE,
 		self::TAG_EDIT,
 	);
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseflavorParams#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(flavorParamsPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
+	}
 	
 	public function setTags($v)
 	{

@@ -24,6 +24,7 @@ class kuser extends Basekuser
 	// enum for different status
 	const KUSER_STATUS_SUSPENDED = 0;
 	const KUSER_STATUS_ACTIVE = 1;
+	const KUSER_STATUS_DELETED = 2;	
 	
 	// different sort orders for browsing kswhos
 	const KUSER_SORT_MOST_VIEWED = 1;  
@@ -52,6 +53,17 @@ class kuser extends Basekuser
 		mySearchUtils::setDisplayInSearch( $this );
 		
 		return parent::save( $con );	
+	}
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Basekuser#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == self::KUSER_STATUS_DELETED)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
 	}
 	
 	public static function isAdmin ( $kuser_id )

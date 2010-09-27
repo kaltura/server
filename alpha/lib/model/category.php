@@ -93,6 +93,17 @@ class category extends Basecategory
 		
 		parent::save($con);
 	}
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Basecategory#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(categoryPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
+	}
 	
 	public function setName($v)
 	{

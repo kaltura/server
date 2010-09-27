@@ -9,6 +9,8 @@
  */ 
 class conversionProfile2 extends BaseconversionProfile2
 {
+	const CONVERSION_PROFILE_NONE = -1;
+	
 	const CONVERSION_PROFILE_2_CREATION_MODE_MANUAL = 1;
 	const CONVERSION_PROFILE_2_CREATION_MODE_KMC = 2;
 	const CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC = 3;
@@ -55,6 +57,17 @@ class conversionProfile2 extends BaseconversionProfile2
 			$partner->setDefaultConversionProfileId($this->getId());
 			$partner->save();
 		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseconversionProfile2#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(conversionProfile2Peer::DELETED_AT) && !is_null($this->getDeletedAt()))
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
 	}
 	
 	public function copyInto($copyObj, $deepCopy = false)

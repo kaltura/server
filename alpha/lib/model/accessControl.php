@@ -57,6 +57,17 @@ class accessControl extends BaseaccessControl
 			$partner->save();
 		}
 	}
+
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseaccessControl#preUpdate()
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if($this->isColumnModified(accessControlPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		return parent::preUpdate($con);
+	}
 	
 	public function copyInto($copyObj, $deepCopy = false)
 	{

@@ -76,6 +76,21 @@ class flavorParamsPeer extends BaseflavorParamsPeer
 	}
 	
 	/**
+	 * @param int $conversionProfileId
+	 * @param $con
+	 * @return array<flavorParamsOutput>
+	 */
+	public static function retrieveByProfile($conversionProfileId, $con = null)
+	{
+		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
+		
+		$criteria = new Criteria();
+		$criteria->add(flavorParamsPeer::ID, $flavorIds, Criteria::IN);
+
+		return flavorParamsPeer::doSelect($criteria, $con);
+	}
+	
+	/**
 	 * Allow access to partner X besides the current session partner
 	 */
 	public static function allowAccessToSystemDefaultParamsAndPartnerX($partnerXId)
