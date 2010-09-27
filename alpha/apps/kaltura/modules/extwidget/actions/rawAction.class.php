@@ -11,6 +11,7 @@ class rawAction extends sfAction
 		
 		$entry_id = $this->getRequestParameter( "entry_id" );
 		$type = $this->getRequestParameter( "type" );
+		$ks = $this->getRequestParameter( "ks" );
 		$ret_file_name = "name";
 		
 		$request_file_name = $this->getRequestParameter( "file_name" );
@@ -27,6 +28,9 @@ class rawAction extends sfAction
 		}
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, null);
+		$securyEntryHelper->validateForDownload();
 
 //		Rmoved by Tan-Tan - asked by Eran
 //		// allow access only via cdn unless these are documents (due to the current implementation of convert ppt2swf)
