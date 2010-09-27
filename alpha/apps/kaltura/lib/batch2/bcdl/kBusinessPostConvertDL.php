@@ -32,33 +32,34 @@ class kBusinessPostConvertDL
 		$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		$targetFlavor = flavorParamsOutputPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		
-		try{
-			if(!$currentFlavorAsset->getIsOriginal() && $targetFlavor && $productMediaInfo)
-			{
+		// don't validate in case of bypass, in case target flavor or media info are null 
+		if($dbBatchJob->getJobSubType() != BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_BYPASS && $targetFlavor && $productMediaInfo)
+		{
+			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo);
+			}
+			catch(Exception $e){
+				KalturaLog::err('KDL Error: ' . print_r($e, true));
+			}
+			
+			$err = kBusinessConvertDL::parseFlavorDescription($productFlavor);
+			KalturaLog::debug("BCDL: job id [" . $dbBatchJob->getId() . "] flavor params output id [" . $targetFlavor->getId() . "] flavor asset id [" . $currentFlavorAsset->getId() . "] desc: $err");
+
+			if(!$productFlavor->IsValid())
+			{
+				$description = $currentFlavorAsset->getDescription() . "\n$err";
 				
-				$err = kBusinessConvertDL::parseFlavorDescription($productFlavor);
-				KalturaLog::debug("BCDL: job id [" . $dbBatchJob->getId() . "] flavor params output id [" . $targetFlavor->getId() . "] flavor asset id [" . $currentFlavorAsset->getId() . "] desc: $err");
-	
-				if(!$productFlavor->IsValid())
+				// mark the asset as ready 
+				$currentFlavorAsset->setDescription($description);
+				$currentFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$currentFlavorAsset->save();
+				
+				if(!kConf::get('ignore_cdl_failure'))
 				{
-					$description = $currentFlavorAsset->getDescription() . "\n$err";
-					
-					// mark the asset as ready 
-					$currentFlavorAsset->setDescription($description);
-					$currentFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-					$currentFlavorAsset->save();
-					
-					if(!kConf::get('ignore_cdl_failure'))
-					{
-						kJobsManager::failBatchJob($dbBatchJob, $err);
-						return null;
-					}
+					kJobsManager::failBatchJob($dbBatchJob, $err);
+					return null;
 				}
 			}
-		}
-		catch(Exception $e){
-			KalturaLog::err('BCDL Error: ' . print_r($e, true));
 		}
 		
 		// mark the asset as ready 

@@ -24,31 +24,26 @@ class kBatchManager
 		
 		$flavorAsset = null;
 		if($flavorAssetId)
-		{
-			// creates the flavor asset 
 			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		
+		if(!$flavorAsset)
+			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavor->getFlavorParamsId());
+		
+		if($flavorAsset)
+		{
 			$description = $flavorAsset->getDescription() . "\n" . $description;
 			$flavorAsset->setDescription($description);
 			$flavorAsset->incrementVersion();
-			$flavorAsset->save();	
-		}
+		}	
 		else
 		{
-			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavor->getFlavorParamsId());
-			
-			if($flavorAsset)
-			{ 
-				$flavorAsset->incrementVersion();
-			}
-			else
-			{
-				// creates the flavor asset 
-				$flavorAsset = new flavorAsset();
-				$flavorAsset->setPartnerId($partnerId);
-				$flavorAsset->setEntryId($entryId);
-				$flavorAsset->setDescription($description);
-			}
+			// creates the flavor asset 
+			$flavorAsset = new flavorAsset();
+			$flavorAsset->setPartnerId($partnerId);
+			$flavorAsset->setEntryId($entryId);
+			$flavorAsset->setDescription($description);
 		}
+		
 		$flavorAsset->setTags($flavor->getTags());
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->setFlavorParamsId($flavor->getFlavorParamsId());

@@ -706,7 +706,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 		}
 	}
 	
-	protected function updatedConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
+	protected function updatedConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	{ 
+		return kFlowHelper::handleConvertCollectionPending($dbBatchJob, $data, $entryStatus, $twinJob); 
+	}
 	
 	protected function updatedConvertCollectionQueued(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
 	

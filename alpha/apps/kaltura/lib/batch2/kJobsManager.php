@@ -83,6 +83,9 @@ class kJobsManager
 		return $dbBatchJob;
 	}
 	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 */
 	public static function abortChildJobs(BatchJob $dbBatchJob)
 	{
 		// aborts all child jobs
@@ -92,6 +95,11 @@ class kJobsManager
 				self::abortDbBatchJob($dbChildJob);
 	}
 	
+	/**
+	 * @param int $jobId
+	 * @param int $jobType
+	 * @return BatchJob
+	 */
 	public static function retryJob($jobId, $jobType)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
@@ -499,7 +507,7 @@ class kJobsManager
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJob::BATCHJOB_TYPE_CONVERT, $currentConversionEngine);
 	}
 	
-	public static function addPostConvertJob(BatchJob $parentJob, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob, $jobSubType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
@@ -518,7 +526,20 @@ class kJobsManager
 		if($createThumb)
 		{
 			$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
-			if(!$flavorParamsOutput->getVideoBitrate()) // audio only
+			if(!$flavorParamsOutput)
+			{
+				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+				if($flavorAsset)
+				{
+					$postConvertData->setThumbHeight($flavorAsset->getHeight());
+					$postConvertData->setThumbBitrate($flavorAsset->getBitrate());
+				}
+				else
+				{
+					$postConvertData->setCreateThumb(false);
+				}
+			}
+			elseif(!$flavorParamsOutput->getVideoBitrate()) // audio only
 			{
 				$postConvertData->setCreateThumb(false);
 			}
@@ -563,7 +584,7 @@ class kJobsManager
 		}
 			
 		KalturaLog::log("Post Convert created with file: " . $postConvertData->getSrcFileSyncLocalPath());
-		return kJobsManager::addJob($parentJob->createChild(), $postConvertData, BatchJob::BATCHJOB_TYPE_POSTCONVERT);
+		return kJobsManager::addJob($parentJob->createChild(), $postConvertData, BatchJob::BATCHJOB_TYPE_POSTCONVERT, $jobSubType);
 	}
 	
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl)
@@ -606,8 +627,21 @@ class kJobsManager
 		return self::addJob($jobDb, $data, BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD);
 	}
 	
+	/**
+	 * @param BatchJob $batchJob
+	 * @param entry $entry
+	 * @param string $flavorAssetId
+	 * @param string $inputFileSyncLocalPath
+	 * @return BatchJob
+	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{
+		if($entry->getConversionProfileId() == conversionProfile2::CONVERSION_PROFILE_NONE)
+		{
+			KalturaLog::notice('Entry should not be converted');
+			return null;
+		}
+	
 		$jobData = new kConvertProfileJobData();
 		$jobData->setFlavorAssetId($flavorAssetId);
 		$jobData->setInputFileSyncLocalPath($inputFileSyncLocalPath);

@@ -29,55 +29,21 @@ class kFlowHelper
 			return $flavorAsset;
 		}
 		
-		try{
-			$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
-		
-			if(!$profile)
-			{
-				KalturaLog::err("Conversion profile not found for entry [$entryId] and partner [$partnerId]");
-				$msg = 'Conversion profile not found';
-				return null;
-			}
-		}
-		catch(Exception $e)
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
 		{
-			KalturaLog::err('getConversionProfile2ForEntry Error: ' . $e->getMessage());
+			KalturaLog::err("Entry [$entryId] not found");
 			return null;
-		}
-	
-		$status = flavorAsset::FLAVOR_ASSET_STATUS_READY;
-		$flavorParamsId = null;
-		
-		$srcFlavors = flavorParamsPeer::retrieveByProfileAndTag($profile->getId(), flavorParams::TAG_SOURCE);
-		if(count($srcFlavors))
-		{
-			$srcFlavor = reset($srcFlavors);
-			$flavorParamsId = $srcFlavor->getId();
-		}
-		else
-		{
-			$status = flavorAsset::FLAVOR_ASSET_STATUS_DELETED;
 		}
 		
 		// creates the flavor asset
 		$flavorAsset = new flavorAsset();
-		$flavorAsset->setStatus($status);
+		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-		$flavorAsset->setFlavorParamsId($flavorParamsId);
 		$flavorAsset->save();
-		
-		if($status == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-		{
-			$entry = entryPeer::retrieveByPK($entryId);
-			if($entry)
-			{
-				$entry->addFlavorParamsId($flavorParamsId);
-				$entry->save();
-			}
-		}
 		
 		return $flavorAsset;
 	}
@@ -277,6 +243,35 @@ class kFlowHelper
 	
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kConvertCollectionJobData $data
+	 * @param int $entryStatus
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	{
+		KalturaLog::debug("Convert collection created with source file: " . $data->getSrcFileSyncLocalPath());
+		
+		$flavors = $data->getFlavors();
+		foreach($flavors as $flavor)
+		{
+			$flavorAsset = flavorAssetPeer::retrieveById($flavor->getFlavorAssetId());
+			// verifies that flavor asset exists
+			if(!$flavorAsset)
+			{
+				KalturaLog::err("Error: Flavor asset not found [" . $flavor->getFlavorAssetId() . "]");
+				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
+			}
+			
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
+			$flavorAsset->save();
+		}
+			
+		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
 	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
@@ -388,7 +383,11 @@ class kFlowHelper
 		{
 			if($createThumb || $extractMedia)
 			{
-				kJobsManager::addPostConvertJob($dbBatchJob, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+				$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
+				if($flavorAsset->getIsOriginal())
+					$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE;
+					
+				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 			}
 			else // no need to run post convert
 			{
@@ -669,7 +668,8 @@ class kFlowHelper
 			$ismContent = str_replace("src=\"$oldName\"", "src=\"$newName\"", $ismContent);
 		
 			// creating post convert job (without thumb)
-			kJobsManager::addPostConvertJob($dbBatchJob, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId());
+			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
+			kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId());
 			
 			$finalFlavors[] = $flavor;
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
@@ -869,9 +869,15 @@ class kFlowHelper
 			self::createThumbnail($dbBatchJob, $data);
 		
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
+				
+		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE)
+		{
+			// TODO - continue to destination flavors conversion
+		}
+		
 		if($currentFlavorAsset)
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);	
-				
+		
 		return $dbBatchJob;
 	}
 	
@@ -994,7 +1000,15 @@ class kFlowHelper
 		}
 		else
 		{
-			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $dbBatchJob);
+			
+			if($conversionsCreated)
+			{
+				// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+				$currentFlavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+				if($currentFlavorAsset)
+					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
+			}
 		}
 					
 		// mark the job as almost done
