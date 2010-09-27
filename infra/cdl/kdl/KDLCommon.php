@@ -74,6 +74,14 @@
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV)),
 		);
 		
+		static $BitrateFactorCategory1 = array(KDLVideoTarget::H263,KDLVideoTarget::FLV, "h263", "h.263", "s263", "flv1");
+		static $BitrateFactorCategory2 = array(KDLVideoTarget::VP6, "vp6", "vp6e", "vp6s", "flv4");
+		static $BitrateFactorCategory3 = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, 
+											   KDLVideoTarget::H264M,KDLVideoTarget::H264H,
+											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
+											   "h264", "h.264", "x264", "avc1", "wvc1",
+											   "avc", "wmv3", "wmva", "rv40");
+											   		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;
 		const DefaultAudioSampleRate = 44100;
@@ -88,23 +96,6 @@
 		const PdfIndex = 'pdf';
 		const SwfIndex = 'swf';
 		
-		const ForceCommandLineToken="forcecommandline";
-		
-		static $TranscodersCdl2Kdl = array(
-			0=>KDLTranscoders::KALTURA,
-			1=>KDLTranscoders::ON2,
-			2=>KDLTranscoders::FFMPEG,
-			3=>KDLTranscoders::MENCODER,
-			4=>KDLTranscoders::ENCODING_COM,
-			99=>KDLTranscoders::FFMPEG_AUX,
-			98=>KDLTranscoders::FFMPEG_VP8,
-			5=>KDLTranscoders::EE3,
-			6=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
-			7=>KDLTranscoders::QT_FASTSTART,
-			201=>KDLTranscoders::PDF2SWF,
-			202=>KDLTranscoders::PDF_CREATOR,
-			203=>KDLTranscoders::OPENOFFICE_UCONV,
-		);
 	}
 
 	class KDLTranscoders {
