@@ -117,6 +117,103 @@ class DocumentsService extends KalturaEntryService
 	}
 	
 	/**
+	 * Copy entry into new entry
+	 * 
+	 * @action addFromEntry
+	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
+	 * @param string $sourceEntryId Document entry id to copy from
+	 * @param int $sourceFlavorParamsId The flavor to be used as the new entry source, source flavor will be used if not specified
+	 * @return KalturaDocumentEntry The new document entry
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING
+	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
+	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 */
+	function addFromEntryAction(KalturaDocumentEntry $documentEntry = null, $sourceEntryId, $sourceFlavorParamsId = null)
+	{
+		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
+
+		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
+		
+		$srcFlavorAsset = null;
+		if(is_null($sourceFlavorParamsId))
+		{
+			$srcFlavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($sourceEntryId);
+			if(!$srcFlavorAsset)
+				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+		}
+		else
+		{
+			$srcFlavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
+			if(count($srcFlavorAssets))
+			{
+				$srcFlavorAsset = reset($srcFlavorAssets);
+			}
+			else
+			{
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_NOT_FOUND);
+			}
+		}
+		
+		if ($documentEntry === null)
+			$documentEntry = new KalturaDocumentEntry();
+			
+		$documentEntry->documentType = $srcEntry->getMediaType();
+			
+		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset);
+	}
+	
+	/**
+	 * Copy flavor asset into new entry
+	 * 
+	 * @action addFromFlavorAsset
+	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
+	 * @param string $sourceFlavorAssetId Flavor asset id to be used as the new entry source
+	 * @return KalturaDocumentEntry The new document entry
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 */
+	function addFromFlavorAssetAction(KalturaDocumentEntry $documentEntry = null, $sourceFlavorAssetId)
+	{
+		$srcFlavorAsset = flavorAssetPeer::retrieveByPK($sourceFlavorAssetId);
+
+		if (!$srcFlavorAsset)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $sourceFlavorAssetId);
+		
+		$sourceEntryId = $srcFlavorAsset->getEntryId();
+		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
+
+		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
+		
+		if ($documentEntry === null)
+			$documentEntry = new KalturaDocumentEntry();
+			
+		$documentEntry->documentType = $srcEntry->getMediaType();
+			
+		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset);
+	}
+	
+	/**
+	 * Convert entry
+	 * 
+	 * @action convert
+	 * @param string $entryId Document entry id
+	 * @param int $conversionProfileId
+	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
+	 * @return int job id
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
+	 */
+	function convertAction($entryId, $conversionProfileId = null, KalturaConversionAttributeArray $dynamicConversionAttributes = null)
+	{
+		return $this->convert($entryId, $conversionProfileId, $dynamicConversionAttributes);
+	}
+	
+	/**
 	 * Get document entry by ID.
 	 * 
 	 * @action get
