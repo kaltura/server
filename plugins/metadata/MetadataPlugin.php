@@ -4,6 +4,7 @@ class MetadataPlugin extends KalturaPlugin
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
 	const METADATA_COPY_HANDLER_CLASS = 'kMetadataObjectCopiedHandler';
+	const METADATA_DELETE_HANDLER_CLASS = 'kMetadataObjectDeletedHandler';
 	
 	const BULK_UPLOAD_COLUMN_PROFILE_ID = 'metadataProfileId';
 	const BULK_UPLOAD_COLUMN_XML = 'metadataXml';
@@ -42,6 +43,7 @@ class MetadataPlugin extends KalturaPlugin
 		return array(
 			self::METADATA_FLOW_MANAGER_CLASS,
 			self::METADATA_COPY_HANDLER_CLASS,
+			self::METADATA_DELETE_HANDLER_CLASS,
 		);
 	}
 	

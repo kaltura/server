@@ -308,9 +308,9 @@ class myEntryUtils
 			$text = str_replace( $from , $to , $text );
 		}
 
-		$text = preg_replace ( "/<script[^<]+?<\/script>/s"  , " " , $text ); // remove the html script tag and it's content
+		$text = preg_replace ( "/<script[^<]+?<\\/script>/s"  , " " , $text ); // remove the html script tag and it's content
 		$text = preg_replace ( "/<[^>]+?[>]/s"  , " " , $text ); // remove html tags
-		$text = preg_replace ( "/[^a-zA-Z0-9\-_\n \']/s" , " " , $text ) ; // get rid of all kind of strange characters - allow single quotes
+		$text = preg_replace ( "/[^a-zA-Z0-9\\-_\\n \\']/s" , " " , $text ) ; // get rid of all kind of strange characters - allow single quotes
 		$text = preg_replace ( '/[ \r\t]{2,}/s' , " " , $text ) ; // get rid of multiple spaces
 		$new_text = "";
 
@@ -402,21 +402,27 @@ class myEntryUtils
 
 		$content_path = myContentStorage::getFSContentRootPath();
 
-		$currentDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-		$currentDataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); // replaced__getDataPathEdit
-		$currentThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+//		Remarked by Tan-Tan 27/09/2010
+//		Handled by kObjectDeleteHandler
+//		$currentDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+//		$currentDataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); // replaced__getDataPathEdit
+//		$currentThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
 
 		$entry->setData( $entry->getData() ); 				// once to increment the verions
 		$entry->setData( $template_file ); 					// the other to set the template
 		$entry->setThumbnail( $entry->getThumbnail() );		// once to increment the verions
 		$entry->setThumbnail( $thumb_template_file );		// the other to set the template
 		
-		// move file so there will be no access to it
-		$deleted_content = kFileSyncUtils::deleteSyncFileForKey($currentDataKey);
-		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentDataEditKey,false); // for some entries there may not be an edit version
-		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentThumbKey,false); // for some entries (empty mix / audio) there may not be a thumb FileSync
+//		Remarked by Tan-Tan 27/09/2010
+//		Handled by kObjectDeleteHandler
+//		// move file so there will be no access to it
+//		$deleted_content = kFileSyncUtils::deleteSyncFileForKey($currentDataKey);
+//		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentDataEditKey,false); // for some entries there may not be an edit version
+//		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentThumbKey,false); // for some entries (empty mix / audio) there may not be a thumb FileSync
 		
-		$entry->putInCustomData( "deleted_file_path" , $deleted_content ? $deleted_content : serialize($currentDataKey) ) ;
+//		Remarked by Tan-Tan 27/09/2010
+//		$deleted_content is always null anyway
+//		$entry->putInCustomData( "deleted_file_path" , $deleted_content ? $deleted_content : serialize($currentDataKey) ) ;
 		
 		$entry->setStatus ( entry::ENTRY_STATUS_DELETED ); 
 		
@@ -428,9 +434,6 @@ class myEntryUtils
 		$entry->save();
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_DELETE , $entry, null , null , null , null, $entry->getId());
-
-		
-		// TODO - handle deletion of all flavors
 	}
 
 	// will handle deletion of entries -
