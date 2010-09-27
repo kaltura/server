@@ -154,7 +154,56 @@ class PlaylistService extends KalturaEntryService
 	function deleteAction(  $id )
 	{
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
-	}	
+	}
+	
+	
+	/**
+	 * Clone an existing playlist
+	 * 
+	 * @action clone
+	 * @param string $id  Id of the playlist to clone
+	 * @param KalturaPlaylist $newPlaylist Parameters defined here will override the ones in the cloned playlist
+	 * @return KalturaPlaylist
+	 *
+	 * @throws APIErrors::INVALID_ENTRY_ID
+	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 */	
+	function cloneAction( $id, KalturaPlaylist $newPlaylist = null)
+	{
+		$dbPlaylist = entryPeer::retrieveByPK( $id );
+		
+		if ( !$dbPlaylist )
+			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
+			
+		if ( $dbPlaylist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
+		
+		$oldPlaylist = new KalturaPlaylist();
+		$oldPlaylist->fromPlaylist($dbPlaylist);
+			
+		if (!$newPlaylist) {
+			$newPlaylist = new KalturaPlaylist();
+		}
+		
+		$reflect = new ReflectionClass($newPlaylist);
+		$props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC);
+		foreach ($props as $prop) {
+			$propName = $prop->getName();
+			// do not override new parameters
+			if ($newPlaylist->$propName) {
+				continue;
+			}
+			// do not copy read only parameters
+			if (stristr($prop->getDocComment(), '@readonly')) {
+				continue;
+			}
+			// copy from old to new	
+			$newPlaylist->$propName = $oldPlaylist->$propName;
+		}
+
+		// add the new entry
+		return $this->addAction($newPlaylist, true);
+	}
 	
 	/**
 	 * List available playlists
