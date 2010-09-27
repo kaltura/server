@@ -9,6 +9,11 @@
  */
 class BulkUploadService extends KalturaBaseService
 {
+	// TODO
+	// add listResults action
+	// add listResultsWithEntries action
+	// add listResultsWithImportJobs action
+	
 	/**
 	 * Add new bulk upload batch job
 	 * Conversion profile id can be specified in the API or in the CSV file, the one in the CSV file will be stronger.
