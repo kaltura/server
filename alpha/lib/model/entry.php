@@ -1559,6 +1559,31 @@ class entry extends Baseentry implements ISyncableFile
 	public function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
 	
+	public function setDynamicFlavorAttributes(array $v)
+	{
+		$this->putInCustomData("dynamicFlavorAttributes", serialize($v));
+	}
+	
+	public function getDynamicFlavorAttributes()
+	{
+		$value = $this->getFromCustomData("dynamicFlavorAttributes");
+		if(!$value)
+			return array();
+			
+		try
+		{
+			$arr = unserialize($value);
+			if(!is_array($arr))
+				return array();
+				
+			return $arr;
+		}
+		catch(Exception $e)
+		{
+			return array();
+		}
+	}
+	
 	// privacySettyings is an alias for permissions
 	public function getPrivacySettings ()	{		return $this->getPermissions();	}
 	public function setPrivacySettings ( $v )	{		return $this->setPermissions( $v );	}
