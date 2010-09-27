@@ -1,6 +1,13 @@
 <?php 
 	require_once("../../bootstrap.php"); 
 
+	$config = new Zend_Config_Ini("../../config/testmedoc.ini");
+	$indexConfig = $config->get('index');
+	
+	$include = $indexConfig->get("include");
+	$exclude = $indexConfig->get("exclude");
+	$additional = $indexConfig->get("additional");
+	
 	$serviceMap = KalturaServicesMap::getMap();
 	$services = array_keys($serviceMap);
 	
@@ -9,25 +16,26 @@
 	$currentObject = @$_GET["object"];
 	
 	$clientGenerator = new DummyForDocsClientGenerator();
+	$clientGenerator->setIncludeOrExcludeList($include, $exclude);
+	$clientGenerator->setAdditionalList($additional);
+	$clientGenerator->load();
+	
 	$list = array();
-	$serviceMap = KalturaServicesMap::getMap();
-	$services = array_keys($serviceMap);
-	foreach($services as $index => $service)
+	$services = $clientGenerator->getServices();
+	foreach($services as $serviceName => $serviceReflector)
 	{
-		$serviceReflector = new KalturaServiceReflector($service);
 		if($serviceReflector->isDeprecated())
 		{
-			unset($services[$index]);
+			unset($services[$serviceName]);
 			continue;
 		}
 			
 		$actions = $serviceReflector->getActions();
 		foreach($actions as &$action) // we need only the keys
 			$action = null;
-		$list[$service] = $actions;
+		$list[$serviceName] = $actions;
 	}
 	$clientGenerator->setIncludeList($list);
-	$clientGenerator->load();
 	$enums = $clientGenerator->getEnums();
 	$stringEnums = $clientGenerator->getStringEnums();
 	$arrays = $clientGenerator->getArrays();
@@ -82,9 +90,8 @@
 			<div id="services">
 				<h2>Services</h2>
 				<ul class="services">
-				<?php foreach($services as $serviceId): ?>
+				<?php foreach($services as $serviceId => $serviceReflector): ?>
 					<?php 
-						$serviceReflector = new KalturaServiceReflector($serviceId); 
 						$actions = $serviceReflector->getActions();
 					?>
 					<li class="service<?php echo($currentService == $serviceId) ? " expended": ""?>">

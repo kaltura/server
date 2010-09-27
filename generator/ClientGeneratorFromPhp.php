@@ -9,9 +9,26 @@ abstract class ClientGeneratorFromPhp
 	protected $_sourcePath = "";
 
 	/**
-	 * Ctor
-	 *
+	 * @return the $_services
 	 */
+	public function getServices() {
+		return $this->_services;
+	}
+
+	/**
+	 * @return the $_types
+	 */
+	public function getTypes() {
+		return $this->_types;
+	}
+
+	/**
+	 * @return the $_includeList
+	 */
+	public function getIncludeList() {
+		return $this->_includeList;
+	}
+
 	public function ClientGeneratorFromPhp($sourcePath = null) 
 	{
 		$this->_sourcePath = realpath($sourcePath);
@@ -108,7 +125,7 @@ abstract class ClientGeneratorFromPhp
 		$this->writeFooter();
 	}
 	
-	protected function load()
+	public function load()
 	{
 		$this->loadServicesInfo();
 		
@@ -337,7 +354,80 @@ abstract class ClientGeneratorFromPhp
 		if (!array_key_exists($type, $this->_types))
 			$this->_types[$type] = $objectReflector;
 	}
-	
+
+	public function setIncludeOrExcludeList($include, $exclude)
+	{
+		// load full list of actions and services
+		$fullList = array();
+		$serviceMap = KalturaServicesMap::getMap();
+		$services = array_keys($serviceMap);
+		foreach($services as $service)
+		{
+			$serviceReflector = new KalturaServiceReflector($service);
+			$actions = $serviceReflector->getActions();
+			foreach($actions as &$action) // we need only the keys
+				$action = true;
+			$fullList[$service] = $actions;
+		}
+					
+		$includeList = array();
+		if ($include !== null) 
+		{
+			$tempList = explode(",", str_replace(" ", "", $include));
+			foreach($tempList as $item)
+			{
+				$service = null;
+				$action = null;
+				$item = strtolower($item);
+				if (strpos($item, ".") !== false)
+					list($service, $action) = explode(".", $item);
+					
+				if (!key_exists($service, $includeList))
+					$includeList[$service] = array();
+					
+				if ($action == "*")
+				{
+					if (!array_key_exists($service, $fullList))
+						throw new Exception("Service [$service] not found");
+						
+					$includeList[$service] = $fullList[$service];
+				} 
+				else 
+					$includeList[$service][$action] = true; 
+			}
+		}
+		else if ($exclude !== null)
+		{
+			$includeList = $fullList;
+			$tempList = explode(",", str_replace(" ", "", $exclude));
+			foreach($tempList as $item)
+			{
+				$service = null;
+				$action = null;
+				$item = strtolower($item);
+				if (strpos($item, ".") !== false)
+					list($service, $action) = explode(".", $item);
+					
+				if ($action == "*")
+				{
+	//				KalturaLog::debug("Excluding service [$service]");
+					unset($includeList[$service]);
+				}
+				else
+				{ 
+	//				KalturaLog::debug("Excluding action [$service.$action]");
+					unset($includeList[$service][$action]);
+				} 
+			}
+		}
+		else
+		{
+			$includeList = $fullList;
+		}
+		
+		$this->setIncludeList($includeList);
+	}
+
 	public function setIncludeList($list)
 	{
 		$this->_includeList = $list;
@@ -345,7 +435,23 @@ abstract class ClientGeneratorFromPhp
 	
 	public function setAdditionalList($list)
 	{
-		foreach($list as $class)
+		if ($list === null)
+			return;
+	
+		$includeList = array();
+		if(is_array($list))
+		{
+			$includeList = $list;
+		}
+		else
+		{
+			$tempList = explode(",", str_replace(" ", "", $list));
+			foreach($tempList as $item)
+				if(class_exists($item))
+					$includeList[] = $item;
+		}
+		
+		foreach($includeList as $class)
 		{
 			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
 			if($classTypeReflector)

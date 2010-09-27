@@ -30,9 +30,6 @@ foreach($config as $name => $item)
 		KalturaPluginManager::addPluginByName($pluginName.'Plugin');
 	}
 	
-	$includeList = getServicesIncludeList($include, $exclude);
-	$additionalList = getAdditionalList($additional);
-	
 	$reflectionClass = new ReflectionClass($generator);
 	$fromXml = $reflectionClass->isSubclassOf("ClientGeneratorFromXml");
 	$fromPhp = $reflectionClass->isSubclassOf("ClientGeneratorFromPhp");
@@ -41,8 +38,8 @@ foreach($config as $name => $item)
 		KalturaLog::info("Using XmlSchemaGenerator to generate the api schema");
 		// first generate the xml
 		$xmlGenerator = new XmlClientGenerator();
-		$xmlGenerator->setIncludeList($includeList);
-		$xmlGenerator->setAdditionalList($additionalList);
+		$xmlGenerator->setIncludeOrExcludeList($include, $exclude);
+		$xmlGenerator->setAdditionalList($additional);
 		$xmlGenerator->generate();
 		$files = $xmlGenerator->getOutputFiles();
 		file_put_contents("temp.xml", $files["KalturaClient.xml"]);
@@ -60,8 +57,8 @@ foreach($config as $name => $item)
 	else if ($fromPhp)
 	{
 		$instance = $reflectionClass->newInstance();
-		$instance->setIncludeList($includeList);
-		$instance->setAdditionalList($additionalList);
+		$instance->setIncludeOrExcludeList($include, $exclude);
+		$instance->setAdditionalList($additional);
 	}
 	else
 	{
@@ -99,94 +96,6 @@ foreach($config as $name => $item)
 	}
 		
 	KalturaLog::info("$name generated successfully");
-}
-
-function getServicesIncludeList($include, $exclude)
-{
-	// load full list of actions and services
-	$fullList = array();
-	$serviceMap = KalturaServicesMap::getMap();
-	$services = array_keys($serviceMap);
-	foreach($services as $service)
-	{
-		$serviceReflector = new KalturaServiceReflector($service);
-		$actions = $serviceReflector->getActions();
-		foreach($actions as &$action) // we need only the keys
-			$action = true;
-		$fullList[$service] = $actions;
-	}
-				
-	$includeList = array();
-	if ($include !== null) 
-	{
-		$tempList = explode(",", str_replace(" ", "", $include));
-		foreach($tempList as $item)
-		{
-			$service = null;
-			$action = null;
-			$item = strtolower($item);
-			if (strpos($item, ".") !== false)
-				list($service, $action) = explode(".", $item);
-				
-			if (!key_exists($service, $includeList))
-				$includeList[$service] = array();
-				
-			if ($action == "*")
-			{
-				if (!array_key_exists($service, $fullList))
-					throw new Exception("Service [$service] not found");
-					
-				$includeList[$service] = $fullList[$service];
-			} 
-			else 
-				$includeList[$service][$action] = true; 
-		}
-	}
-	else if ($exclude !== null)
-	{
-		$includeList = $fullList;
-		$tempList = explode(",", str_replace(" ", "", $exclude));
-		foreach($tempList as $item)
-		{
-			$service = null;
-			$action = null;
-			$item = strtolower($item);
-			if (strpos($item, ".") !== false)
-				list($service, $action) = explode(".", $item);
-				
-			if ($action == "*")
-			{
-//				KalturaLog::debug("Excluding service [$service]");
-				unset($includeList[$service]);
-			}
-			else
-			{ 
-//				KalturaLog::debug("Excluding action [$service.$action]");
-				unset($includeList[$service][$action]);
-			} 
-		}
-	}
-	else
-	{
-		$includeList = $fullList;
-	}
-	
-	return $includeList;
-}
-
-
-function getAdditionalList($additional)
-{
-	if ($additional === null)
-		return array();
-
-	$includeList = array();
-	$tempList = explode(",", str_replace(" ", "", $additional));
-	foreach($tempList as $item)
-		if(class_exists($item))
-			$includeList[] = $item;
-	
-	return $includeList;
 }
 
 function createPackage($outputPath, $generatorName)
