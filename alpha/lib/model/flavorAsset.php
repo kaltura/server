@@ -76,7 +76,11 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
+		if(
+			($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
+			||
+			($this->isColumnModified(flavorAssetPeer::DELETED_AT) && !is_null($this->getDeletedAt(null)))
+		)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
 		return parent::preUpdate($con);
