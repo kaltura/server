@@ -92,6 +92,7 @@ class EntrySphinxCriteria extends SphinxCriteria
 		if(count($this->matchClause))
 		{
 			$matches = implode(' & ', $this->matchClause);
+			$matches = str_replace("'", "\\'", $matches);
 			$this->whereClause[] = "MATCH('$matches')";
 		}
 		
