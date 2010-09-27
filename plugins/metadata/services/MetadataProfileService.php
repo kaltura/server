@@ -165,13 +165,7 @@ class MetadataProfileService extends KalturaBaseService
 		$c = new Criteria();
 		$c->add(MetadataPeer::METADATA_PROFILE_ID, $id);
 		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
-		
-		$update = new Criteria();
-		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
-			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		$count = BasePeer::doUpdate($c, $update, $con);
-		
+	
 		$peer = null;
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
@@ -184,6 +178,12 @@ class MetadataProfileService extends KalturaBaseService
 				
 			$peer->saveToSphinx($metadata->getObjectId(), array());
 		}
+		
+		$update = new Criteria();
+		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
+			
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+		BasePeer::doUpdate($c, $update, $con);
 	}
 
 	

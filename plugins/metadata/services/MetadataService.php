@@ -149,6 +149,11 @@ class MetadataService extends KalturaBaseService
 		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $metadata->getMetadataProfileVersion(), Criteria::LESS_THAN);
 		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
 		
+		MetadataPeer::setUseCriteriaFilter(false);
+		$metadatas = MetadataPeer::doSelect($c);
+		foreach($metadatas as $metadata)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
+		
 		$update = new Criteria();
 		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
 			
