@@ -417,7 +417,7 @@ class KAsyncBulkUpload extends KBatchBase
 				}
 				else
 				{
-					$bulkUploadResult->$column = strlen($values[$index]) ? $values[$index] : null;
+					$bulkUploadResult->$column = iconv_strlen($values[$index], 'UTF-8') ? $values[$index] : null;
 					KalturaLog::info("Set value \$bulkUploadResult->{$column} [{$bulkUploadResult->$column}]");
 				}
 			}
@@ -430,7 +430,7 @@ class KAsyncBulkUpload extends KBatchBase
 				{
 					$bulkUploadPlugin = new KalturaBulkUploadPluginData();
 					$bulkUploadPlugin->field = $column;
-					$bulkUploadPlugin->value = strlen($values[$index]) ? $values[$index] : null;
+					$bulkUploadPlugin->value = iconv_strlen($values[$index], 'UTF-8') ? $values[$index] : null;
 					$bulkUploadPlugins[] = $bulkUploadPlugin;
 					
 					KalturaLog::info("Set plugin value $column [{$bulkUploadPlugin->value}]");
