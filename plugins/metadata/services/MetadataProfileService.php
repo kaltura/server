@@ -173,9 +173,12 @@ class MetadataProfileService extends KalturaBaseService
 		$count = BasePeer::doUpdate($c, $update, $con);
 		
 		$peer = null;
+		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
 		foreach($metadatas as $metadata)
 		{
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
+			
 			if(!$peer)
 				$peer = kMetadataManager::getObjectPeer($metadata->getObjectType());
 				
