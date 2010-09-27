@@ -14,7 +14,7 @@ abstract class KBatchBase extends KRunableClass
 	protected $kClient = null;
 	
 	/**
-	 * @var KSchedularTaskConfig
+	 * @var KalturaConfiguration
 	 */
 	protected $kClientConfig = null;
 	
@@ -239,6 +239,7 @@ abstract class KBatchBase extends KRunableClass
 		$this->kClientConfig->setLogger(new KalturaTraccer());
 		$this->kClientConfig->serviceUrl = $this->taskConfig->getServiceUrl();
 		$this->kClientConfig->curlTimeout = $this->taskConfig->getCurlTimeout();
+		$this->kClientConfig->clientTag = 'batch: ' . $this->taskConfig->getSchedulerName();
 		
 		$this->kClient = new KalturaClient($this->kClientConfig);
 		//$ks = $this->kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
