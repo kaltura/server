@@ -5,12 +5,14 @@ class KDLTest
 	/* ------------------------------
 	 * function mediaDs2flavor
 	 */
-	public static function simulateFlavor($fmt, $vcodec, $w=0, $h, $br, $acodec="", $ab=96, $ar=22050)
+	public static function simulateFlavor($fmt, $vcodec, $w=0, $h, $br, $acodec="", $ab=96, $ar=22050, $clipStart=0, $clipDur=0)
 	{
 		$fl = new KDLFlavor();
 		$fl->_audio = new KDLAudioData();
 		$fl->_video = new KDLVideoData();
 		$fl->_container = new KDLContainerData();
+		$fl->_clipDur = $clipDur;
+		$fl->_clipStart = $clipStart;
 		//		$fl = $source;
 		$fl->_container->_id = $fmt;
 		$fl->_video->_id = $vcodec;
@@ -28,7 +30,7 @@ class KDLTest
 		
 /**/		$fl->_transcoders[] = new KDLOperationParams("cli_encode");
 	
-		$fl->_transcoders=KDLUtils::parseTranscoderList(/*"5,1,(1#2#3),4"*/"5,(6#2#7)","", KDLConstants::$TranscodersCdl2Kdl);
+		$fl->_transcoders=KDLUtils::parseTranscoderList(/*"5,1,(1#2#3),4"*/"2,3,99,(6#2#7)","", KDLWrap::$TranscodersCdl2Kdl);
 		/*
 		$fl->_transcoders[] = new KDLOperationParams("encoding.com");
 		$fl->_transcoders[] = new KDLOperationParams("ffmpeg");
@@ -102,20 +104,6 @@ kLog::log( "--------");
 		$mediaInfoObj = new KDLMediaDataSet();
 		$mdLoader->Load($mediaInfoObj);
 
-		$tagList[] = "web";
-		$tagList[] = "mbr";
-		$tagList[] = "flv";
-		$tagList[] = "slweb";
-		$tagList[] = "itunes";
-		kLog::log("In tags-->".KDLUtils::arrayToString($tagList));
-		$tagsOut = $mediaInfoObj->ToTags($tagList);
-		if(count($tagsOut)>0)
-			kLog::log( "Found");
-		else
-			kLog::log( "Not found");
-		
-		kLog::log("Out tags-->".KDLUtils::arrayToString($tagsOut));
-		
 		self::runMediasetTest($mediaInfoObj, $dlPrc, $profile);
 		return;
 	}
@@ -136,6 +124,7 @@ kLog::log( "--------");
 			$dlPrc = new KDLProcessor();
 
 			$dlPrc->Generate($mediaSet, $profile, $targetList);
+			$dlPrc->_targets=$targetList;
 			$errors   = $errors   + $dlPrc->get_errors();
 			$warnings = $warnings + $dlPrc->get_warnings();
 			if(count($errors)>0)
@@ -167,7 +156,7 @@ $rv = 0;
 			
 			if(file_exists($outFile)) unlink($outFile);
 $cmdLineGenerator = $target->SetTranscoderCmdLineGenerator($inFile,$outFile);
-			$cmdLineGenerator->_clipTime = 10;
+			$cmdLineGenerator->_clipDur = 10000;
 $exeStr = "FFMpeg ".$cmdLineGenerator->FFMpeg(null);
 //			kLog::log( ".CMD-->".$exeStr);
 			$exeStr = "cli_encode ".$cmdLineGenerator->Generate(new KDLOperationParams(KDLTranscoders::ON2), 1000);
