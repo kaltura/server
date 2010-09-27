@@ -160,6 +160,19 @@ class flavorAssetPeer extends BaseflavorAssetPeer
 		return flavorAssetPeer::doSelect($c);
 	}
 	
+	/**
+	 * @param string $entryId
+	 * @return flavorAsset
+	 */
+	public static function retreiveOriginalByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
+		$c->add(flavorAssetPeer::IS_ORIGINAL, true);
+		
+		return flavorAssetPeer::doSelectOne($c);
+	}
+	
 	public static function retreiveReadyByEntryId($entryId)
 	{
 		$c = new Criteria();
