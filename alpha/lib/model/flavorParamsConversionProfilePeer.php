@@ -45,6 +45,21 @@ class flavorParamsConversionProfilePeer extends BaseflavorParamsConversionProfil
 	 * 
 	 * @return array
 	 */
+	public static function retrieveByConversionProfile($conversionProfileId, $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfileId);
+
+		return flavorParamsConversionProfilePeer::doSelect($criteria, $con);
+	}
+	
+	/**
+	 * 
+	 * @param int $conversionProfileId
+	 * @param $con
+	 * 
+	 * @return array
+	 */
 	public static function getFlavorIdsByProfileId($conversionProfileId, $con = null)
 	{
 		$criteria = new Criteria();
