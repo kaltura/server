@@ -105,13 +105,15 @@ class KDLTranscoderCommand {
 			
 			public $_inFileName=KDLCmdlinePlaceholders::InFileName;
 			public $_outFileName=KDLCmdlinePlaceholders::OutFileName;
-			public $_clipTime=null;
-	
-	public function KDLTranscoderCommand($inFileName=KDLCmdlinePlaceholders::InFileName, $outFileName=KDLCmdlinePlaceholders::OutFileName, $clipTime=null)
+			public $_clipStart=null;
+			public $_clipDur=null;
+			
+	public function KDLTranscoderCommand($inFileName=KDLCmdlinePlaceholders::InFileName, $outFileName=KDLCmdlinePlaceholders::OutFileName, $clipStart=null, $clipDur=null)
 	{
 		$this->_inFileName=$inFileName;
 		$this->_outFileName=$outFileName;
-		$this->_clipTime=$clipTime;
+		$this->_clipStart=$clipStart;
+		$this->_clipDur=$clipDur;
 	}
 	
 	/* ---------------------------
@@ -266,8 +268,12 @@ $acodec = "libmp3lam";
 			$cmdStr = $cmdStr." -an";
 		}
 		
-		if($this->_clipTime!==null){
-			$cmdStr = $cmdStr." -t ".$this->_clipTime;
+		if($this->_clipStart!==null && $this->_clipStart>0){
+			$cmdStr = $cmdStr." -ss ".$this->_clipStart/1000;
+		}
+		
+		if($this->_clipDur!==null && $this->_clipDur>0){
+			$cmdStr = $cmdStr." -t ".$this->_clipDur/1000;
 		}
 		
 		if($this->_conId!="none") {
@@ -429,8 +435,14 @@ $format = "fl";
 			$cmdStr = $cmdStr." -nosound";
 		}
 		
-		if($this->_clipTime!==null){
-			$cmdStr = $cmdStr." -endpos ".$this->_clipTime;
+		$clipStart=0;
+		if($this->_clipStart!==null && $this->_clipStart>0){
+			$clipStart = $this->_clipStart;
+			$cmdStr = $cmdStr." -ss ".$clipStart/1000;
+		}
+		
+		if($this->_clipDur!==null && $this->_clipDur>0){
+			$cmdStr = $cmdStr." -endpos ".($clipStart+$this->_clipDur)/1000;
 		}
 		
 		if($extra)
@@ -516,8 +528,12 @@ $format = "fl";
 		if($this->_vid2pass==true)
 			$cmdStr = $cmdStr." --FE2_VP6_CXMODE=1 --FE2_VP6_RC_MODE=3";
 		
-		if($this->_clipTime!==null){
-			$cmdStr = $cmdStr." --FE2_CUT_STOP_SEC=".$this->_clipTime;
+			if($this->_clipStart!==null && $this->_clipStart>0){
+			$cmdStr = $cmdStr." --FE2_CUT_START_SEC=".$this->_clipStart/1000;
+		}
+		
+		if($this->_clipDur!==null && $this->_clipDur>0){
+			$cmdStr = $cmdStr." --FE2_CUT_STOP_SEC=".$this->_clipDur/1000;
 		}
 		
 		if($extra)
