@@ -13,6 +13,10 @@ class rawAction extends sfAction
 		$type = $this->getRequestParameter( "type" );
 		$ks = $this->getRequestParameter( "ks" );
 		$ret_file_name = "name";
+		$referrer = $this->getRequestParameter("referrer");
+		$referrer = base64_decode($referrer);
+		if (!is_string($referrer)) // base64_decode can return binary data
+			$referrer = "";
 		
 		$request_file_name = $this->getRequestParameter( "file_name" );
 		if($request_file_name)
@@ -29,7 +33,7 @@ class rawAction extends sfAction
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, null);
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
 		$securyEntryHelper->validateForDownload();
 
 //		Rmoved by Tan-Tan - asked by Eran
