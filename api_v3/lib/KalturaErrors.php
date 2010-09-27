@@ -127,6 +127,12 @@ class KalturaErrors extends APIErrors
 	 */
 	const FLAVOR_PARAMS_ID_NOT_FOUND = "FLAVOR_PARAMS_ID_NOT_FOUND,Flavor params id \"%s\" not found";
 	
+	const FLAVOR_PARAMS_NOT_FOUND = "FLAVOR_PARAMS_NOT_FOUND,Flavor params not found";
+	
+	const FLAVOR_PARAMS_DUPLICATE = "FLAVOR_PARAMS_DUPLICATE,Flavor params [%s] defined more than once";
+	
+	const FLAVOR_PARAMS_SOURCE_DUPLICATE = "FLAVOR_PARAMS_SOURCE_DUPLICATE,More than onc source flavor defined";
+	
 	/**
 	 * FlavorAsset Service
 	 */
@@ -137,6 +143,8 @@ class KalturaErrors extends APIErrors
 	const FLAVOR_ASSET_IS_NOT_READY = "FLAVOR_ASSET_IS_NOT_READY,The flavor asset is not ready";
 	
 	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING,The original flavor asset is missing";
+	
+	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED,The original flavor asset could not be created [%s]";
 	
 	const NO_FLAVORS_FOUND = "NO_FLAVORS_FOUND,No flavors found";
 	

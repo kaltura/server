@@ -2,6 +2,139 @@
 
 class KalturaEntryService extends KalturaBaseService 
 {
+	
+	/**
+	 * Convert entry
+	 * 
+	 * @param string $entryId Media entry id
+	 * @param int $conversionProfileId
+	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
+	 * @return int job id
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
+	 */
+	protected function convert($entryId, $conversionProfileId = null, KalturaConversionAttributeArray $dynamicConversionAttributes = null)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		$srcFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		if(!$srcFlavorAsset)
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+		
+		if($conversionProfileId)
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+			if (!$conversionProfile)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+		}
+		else
+		{
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+			if(!$conversionProfile)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+				
+			$conversionProfileId = $conversionProfile->getId();
+		}
+			
+		if($dynamicConversionAttributes)
+		{
+			$flavors = flavorParamsPeer::retrieveByProfile($conversionProfileId);
+			if(!count($flavors))
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_NOT_FOUND);
+		
+			$srcFlavorParamsId = null;
+			$flavorParams = $entry->getDynamicFlavorAttributes();
+			foreach($flavors as $flavor)
+			{
+				if($flavor->hasTag(flavorParams::TAG_SOURCE))
+					$srcFlavorParamsId = $flavors->getId();
+					
+				$flavorParams[$flavors->getId()] = $flavor;
+			}
+			
+			$dynamicAttributes = array();
+			foreach($dynamicConversionAttributes as $dynamicConversionAttribute)
+			{
+				if(is_null($dynamicConversionAttribute->flavorParamsId))
+					$dynamicConversionAttribute->flavorParamsId = $srcFlavorParamsId;
+					
+				if(is_null($dynamicConversionAttribute->flavorParamsId))
+					continue;
+					
+				$dynamicAttributes[$dynamicConversionAttribute->flavorParamsId][$dynamicConversionAttribute->name] = $dynamicConversionAttribute->value;
+			}
+			
+			if(count($dynamicAttributes))
+			{
+				$entry->setDynamicFlavorAttributes($dynamicAttributes);
+				$entry->save();
+			}
+		}
+		
+		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
+        
+		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
+		return $job->getId();
+	}
+	
+	protected function addEntryFromFlavorAsset(KalturaBaseEntry $newEntry, entry $srcEntry, flavorAsset $srcFlavorAsset)
+	{
+      	$newEntry->type = $searchResult->type;
+      		
+		if ($newEntry->name === null)
+			$newEntry->name = $srcEntry->getName();
+			
+        if ($newEntry->description === null)
+        	$newEntry->description = $srcEntry->getDescription();
+        
+        if ($newEntry->creditUrl === null)
+        	$newEntry->creditUrl = $srcEntry->getSourceLink();
+        	
+       	if ($newEntry->creditUserName === null)
+       		$newEntry->creditUserName = $srcEntry->getCredit();
+       		
+     	if ($newEntry->tags === null)
+      		$newEntry->tags = $srcEntry->getTags();
+       		
+    	$newEntry->sourceType = KalturaSourceType::SEARCH_PROVIDER;
+     	$newEntry->searchProviderType = KalturaSearchProviderType::KALTURA;
+     	
+		$dbEntry = $this->prepareMediaEntryForInsert($newEntry);
+      	$dbEntry->setSourceId( $searchResult->id );
+      	
+     	$kshow = $this->createDummyKShow();
+        $kshowId = $kshow->getId();
+        
+        $msg = null;
+        $flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+        if($flavorAsset)
+        {
+			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
+			
+			$dbEntry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+			$dbEntry->save();
+			
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
+        }
+        
+        $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+
+        $newFilePath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
+		$job = kJobsManager::addConvertProfileJob(null, $dbEntry, $flavorAsset->getId(), $newFilePath);
+		
+		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
+
+		$newEntry->fromObject($dbEntry);
+		return $newEntry;
+	}
+	
 	protected function getEntry($entryId, $version = -1, $entryType = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);

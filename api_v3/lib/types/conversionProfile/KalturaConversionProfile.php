@@ -126,17 +126,31 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	{
 		$flavorParamsIds = $this->getFlavorParamsAsArray();
 		$flavorParams = flavorParamsPeer::retrieveByPKs($flavorParamsIds);
+		
+		$sourceFound = false;
+		$indexedFlavorParams = array();
+		foreach($flavorParams as $flavorParamsItem)
+		{
+			if($flavorParamsItem->hasTag(flavorParams::TAG_SOURCE))
+			{
+				if($sourceFound)
+					throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_SOURCE_DUPLICATE);
+					
+				$sourceFound = true;
+			}
+			$indexedFlavorParams[$flavorParamsItem->getId()] = $flavorParamsItem;
+		}
+			
+		$foundFlavorParams = array();
 		foreach($flavorParamsIds as $id)
 		{
-			$found = false;
-			foreach($flavorParams as $flavorParam)
-			{
-				if ($flavorParam->getId() == $id)
-					$found = true;
-			}
-			
-			if (!$found)
+			if(!isset($indexedFlavorParams[$id]))
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
+				
+			if(in_array($id, $foundFlavorParams))
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_DUPLICATE, $id);
+				
+			$foundFlavorParams[] = $id;
 		}
 	}
 	
