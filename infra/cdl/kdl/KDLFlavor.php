@@ -19,7 +19,8 @@ class KDLFlavor extends KDLMediaDataSet {
 	
 	public	$_flags=0;
 	public	$_isTwoPass=false;
-	public 	$_clipTime=null;
+	public  $_clipStart=null;
+	public 	$_clipDur=null;
 	public	$_transcoders = array();
 
 		/* --------------------------
@@ -96,7 +97,14 @@ class KDLFlavor extends KDLMediaDataSet {
 	 * ToString
 	 */
 	public function ToString(){
-		$rvStr = "flag(".$this->_flags."), ".parent::ToString();
+		$rvStr = "flag($this->_flags)";
+		if($this->_clipStart) {
+			$rvStr .= ",clpStr($this->_clipStart)";
+		}
+		if($this->_clipDur) {
+			$rvStr .= ",clpDur($this->_clipDur)";
+		}
+		$rvStr .= ",".parent::ToString();
 		if(count($this->_errors)){
 			$rvStr = $rvStr.",ERRS(".KDLUtils::arrayToString($this->_errors).")";
 		}
@@ -207,6 +215,8 @@ kLog::log(__METHOD__."==>\n");
 	 */
 	public function ValidateProduct(KDLMediaDataSet $source, KDLFlavor $product)
 	{
+kLog::log(__METHOD__."==>\n");
+		kLog::log( ".TRG-->".$this->ToString());
 		$rv = $product->ValidateFlavor();
 
 		if($this->_video!==null) {
@@ -219,10 +229,17 @@ kLog::log(__METHOD__."==>\n");
 				$trgVid = $this->_video;
 				if($source) $srcVid = $source->_video;
 				else $srcVid = null;
-				if($srcVid && $prdVid->_duration<$srcVid->_duration*KDLConstants::ProductDurationFactor) {
-					$product->_warnings[KDLConstants::VideoIndex][] =
-					KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdVid->_duration, $srcVid->_duration);
+				if($srcVid){
+					if($this->_clipDur && $this->_clipDur>0)
+						$plannedDur = $this->_clipDur;
+					else
+						$plannedDur = $srcVid->_duration;
+					if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
+						$product->_warnings[KDLConstants::VideoIndex][] =
+						KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdVid->_duration, $plannedDur);
+					}
 				}
+				
 				if($prdVid->_bitRate<$trgVid->_bitRate*KDLConstants::ProductBitrateFactor) {
 					$product->_warnings[KDLConstants::VideoIndex][] = // "Product bitrate too low - ".$prdVid->_bitRate."kbps, required - ".$trgVid->_bitRate."kbps.";
 					KDLWarnings::ToString(KDLWarnings::ProductLowBitrate, $prdVid->_bitRate, $srcVid->_bitRate);
@@ -328,7 +345,29 @@ kLog::log(__METHOD__."==>\n");
 			$target->_container = clone $this->_container;
 		}
 
-		$target->_video = null;
+$sourceDur=0;
+			/*
+			 * Evaluate source duration
+			 */
+		if($source) {
+			if($source->_video && $source->_video->_duration>0) {
+				$sourceDur=$source->_video->_duration;
+			}
+			else if($source->_audio && $source->_audio->_duration>0) {
+				$sourceDur=$source->_audio->_duration;
+			}
+			else if($source->_container && $source->_conatiner->_duration>0) {
+				$sourceDur=$source->_container->_duration;
+			}
+		}
+			/*
+			 * Evaluate cliping setting (if any) according to source dur
+			 */
+		if($sourceDur>0 && $sourceDur<$target->_clipStart+$target->_clipDur) {
+			$target->_clipDur=0;
+		}
+		
+$target->_video = null;
 		if($this->_video!="") {
 			if($source->_video!=""){
 				/*
@@ -598,54 +637,24 @@ kLog::log(__METHOD__."==>\n");
 	 */
 	//bitrate calc should take in account source frame size(heightXwidth), relativly to the flavor/target frame size.
 	//therefore the Evaluate frame sze should be called before this func
-	private static function evaluateTargetVideoBitrate(KDLVideoData $source, KDLVideoData $target) {
+	private static function evaluateTargetVideoBitrate(KDLVideoData $source, KDLVideoData $target) 
+	{
 		$ratioFlvr = KDLConstants::BitrateVP6Factor;
-		switch($target->_id){
-			case KDLVideoTarget::H263:
-			case KDLVideoTarget::FLV:
-				$ratioFlvr = KDLConstants::BitrateH263Factor;
-				break;
-			case KDLVideoTarget::VP6:
-				$ratioFlvr = KDLConstants::BitrateVP6Factor;
-				break;
-			case KDLVideoTarget::H264:
-			case KDLVideoTarget::H264B:
-			case KDLVideoTarget::H264M:
-			case KDLVideoTarget::H264H:
-			case KDLVideoTarget::WMV3:
-			case KDLVideoTarget::WVC1A:
-				$ratioFlvr = KDLConstants::BitrateH264Factor;
-				break;
-		}
-		//			$ratioFlvr = $ratioFlvr*$flavor->_height*$flavor->_height;
-			
-		$ratioSrc = KDLConstants::BitrateOthersRatio;
-		switch($source->_id){
-			case "h263":
-			case "h.263":
-			case "s263":
-			case "flv1":
-				$ratioSrc = KDLConstants::BitrateH263Factor;
-				break;
-			case "vp6":
-			case "vp6e":
-			case "vp6s":
-			case "flv4":
-				$ratioSrc = KDLConstants::BitrateVP6Factor;
-				break;
-			case "h264":
-			case "h.264":
-			case "x264":
-			case "avc1":
-			case "wvc1":
-			case "avc":
-			case "wmv3":
-			case "wmva":
-				$ratioSrc = KDLConstants::BitrateH264Factor;
-				break;
-		}
-		//			$ratioSrc = $ratioSrc*$source->_height*$source->_height;
+		if(in_array($target->_id, KDLConstants::$BitrateFactorCategory1))
+			$ratioFlvr = KDLConstants::BitrateH263Factor;
+		else if(in_array($target->_id, KDLConstants::$BitrateFactorCategory2))
+			$ratioFlvr = KDLConstants::BitrateVP6Factor;
+		else if(in_array($target->_id, KDLConstants::$BitrateFactorCategory3))
+			$ratioFlvr = KDLConstants::BitrateH264Factor;
 
+		$ratioSrc = KDLConstants::BitrateOthersRatio;
+		if(in_array($source->_id, KDLConstants::$BitrateFactorCategory1))
+			$ratioSrc = KDLConstants::BitrateH263Factor;
+		else if(in_array($source->_id, KDLConstants::$BitrateFactorCategory2))
+			$ratioSrc = KDLConstants::BitrateVP6Factor;
+		else if(in_array($source->_id, KDLConstants::$BitrateFactorCategory3))
+			$ratioSrc = KDLConstants::BitrateH264Factor;
+			
 		$brSrcNorm = $source->_bitRate*($ratioSrc/$ratioFlvr);
 		if($target->_bitRate>$brSrcNorm){
 			$target->_bitRate = $brSrcNorm;
@@ -808,7 +817,7 @@ kLog::log(__METHOD__."==>\n");
 	 */
 	public function SetTranscoderCmdLineGenerator($inFile=KDLCmdlinePlaceholders::InFileName, $outFile=KDLCmdlinePlaceholders::OutFileName)
 	{
-		$cmdLine = new KDLTranscoderCommand($inFile,$outFile);
+		$cmdLine = new KDLTranscoderCommand($inFile,$outFile, $this->_clipStart, $this->_clipDur);
 
 		if($this->_video){
 			$cmdLine->_vidId = $this->_video->_id;
@@ -820,7 +829,6 @@ kLog::log(__METHOD__."==>\n");
 			$cmdLine->_vid2pass = $this->_isTwoPass;
 			$cmdLine->_vidRotation = $this->_video->_rotation;
 			$cmdLine->_vidScanType = $this->_video->_scanType;
-			$cmdLine->_clipTime = $this->_clipTime;
 		}
 		else
 			$cmdLine->_vidId="none";
