@@ -86,6 +86,48 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 
 	/**
 	 * @param BaseObject $object
+	 */
+	protected function setRelatedObject(AuditTrail $auditTrail, BaseObject $object) 
+	{
+		if($object instanceof FileSync)
+		{
+			switch($object->getObjectType())
+			{
+				case FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_ENTRY);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_UICONF:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_UI_CONF);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_ASSET);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE);
+					$auditTrail->setRelatedObjectId($object->getObjectId());
+					break;
+			}
+		}
+	}
+
+	/**
+	 * @param BaseObject $object
 	 * @return string entry id
 	 */
 	protected function getEntryId(BaseObject $object) 
@@ -145,6 +187,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			$auditTrail->setStatus(AuditTrail::AUDIT_TRAIL_STATUS_READY);
 			$auditTrail->setObjectId($object->getId());
 			$auditTrail->setEntryId($this->getEntryId($object));
+			
+			self::setRelatedObject($auditTrail, $object);
 		}
 		catch(kAuditTrailException $e)
 		{
@@ -183,7 +227,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$data->setFileType($fileSync->getFileType());
 		
 		$auditTrail->setData($data);
-		
 		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		$auditTrail->save();
 	}
