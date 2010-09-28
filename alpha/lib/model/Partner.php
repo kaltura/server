@@ -481,7 +481,7 @@ class Partner extends BasePartner
 	{ 
 		$enabledPlugins = $this->getFromCustomData("enabledPlugins", null, 0);
 		if($enabledPlugins && is_array($enabledPlugins) && isset($enabledPlugins[$pluginNmae]))
-			return $enabledPlugins[$pluginNmae];
+			return (bool) $enabledPlugins[$pluginNmae];
 			
 		return false;
 	}
