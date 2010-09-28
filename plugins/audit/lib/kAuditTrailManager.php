@@ -89,6 +89,21 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	protected function setRelatedObject(AuditTrail $auditTrail, BaseObject $object) 
 	{
+		if(class_exists('Metadata') && $object instanceof Metadata)
+		{
+			$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE);
+			$auditTrail->setRelatedObjectId($object->getMetadataProfileId());
+		}
+		
+		if($auditTrail->getAction() == AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED)
+		{
+			$peer = $object->getPeer();
+			$objectType = $peer->getOMClass(false, null);
+			
+			$auditTrail->setRelatedObjectType($objectType);
+			$auditTrail->setRelatedObjectId($object->getId());
+		}
+		
 		if($object instanceof FileSync)
 		{
 			switch($object->getObjectType())
@@ -183,7 +198,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 * @param BaseObject $object
 	 * @return AuditTrail
 	 */
-	public function createAuditTrail(BaseObject $object) 
+	public function createAuditTrail(BaseObject $object, $action) 
 	{
 		$partnerId = $this->getPartnerId($object);
 		if(!$this->traceEnabled($partnerId))
@@ -200,6 +215,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		try
 		{
 			$auditTrail = new AuditTrail();
+			$auditTrail->setAction($action);
 			$auditTrail->setPartnerId($partnerId);
 			$auditTrail->setObjectType($objectType);
 			$auditTrail->setStatus(AuditTrail::AUDIT_TRAIL_STATUS_READY);
@@ -230,7 +246,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return;
 		}
 			
-		$auditTrail = self::createAuditTrail($object);
+		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		if(!$auditTrail)
 		{
 			KalturaLog::debug("No audit created");
@@ -245,7 +261,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$data->setFileType($fileSync->getFileType());
 		
 		$auditTrail->setData($data);
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		$auditTrail->save();
 	}
 
@@ -257,11 +272,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if($object instanceof FileSync)
 			$this->fileSyncCreated($object);
 			
-		$auditTrail = self::createAuditTrail($object);
+		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_CREATED);
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_CREATED);
 		$auditTrail->save();
 	}
 
@@ -271,11 +285,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject) 
 	{
-		$auditTrail = self::createAuditTrail($toObject);
+		$auditTrail = self::createAuditTrail($toObject, AuditTrail::AUDIT_TRAIL_ACTION_COPIED);
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_COPIED);
 		$auditTrail->save();
 	}
 
@@ -284,11 +297,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function objectDeleted(BaseObject $object) 
 	{
-		$auditTrail = self::createAuditTrail($object);
+		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_DELETED);
 		if(!$auditTrail)
 			return;
 			
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_DELETED);
 		$auditTrail->save();
 	}
 
@@ -298,7 +310,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		$auditTrail = self::createAuditTrail($object);
+		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_CHANGED);
 		if(!$auditTrail)
 			return;
 			
@@ -380,7 +392,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$data->setChangedItems($changedItems);
 		
 		$auditTrail->setData($data);
-		$auditTrail->setAction(AuditTrail::AUDIT_TRAIL_ACTION_CHANGED);
 		$auditTrail->save();
 	}
 
