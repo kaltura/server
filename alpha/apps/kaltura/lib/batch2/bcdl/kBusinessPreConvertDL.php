@@ -502,16 +502,13 @@ class kBusinessPreConvertDL
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 		
-		if(!count($flavors))
-			$shouldConvert = false;
-	
 		if(!$sourceFlavor)
 		{
 			KalturaLog::log("Source flavor params not found");
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->save();
 		}
-		else
+		elseif($shouldConvert)
 		{
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
@@ -546,6 +543,9 @@ class kBusinessPreConvertDL
 			$entry->save();
 		}
 		
+		if(!count($flavors))
+			$shouldConvert = false;
+	
 		if(!$shouldConvert)
 		{		
 			self::bypassConversion($originalFlavorAsset, $entry, $convertProfileJob);
