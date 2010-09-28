@@ -238,7 +238,7 @@ abstract class myBaseObject implements Iterator
 				continue;
 			}
 
-			$this->setByName ( $param_name , (string)$value );  // cast the SimpleXMLElement to string !!
+			$this->setByName ( $param_name , (string)html_entity_decode($value) );  // cast the SimpleXMLElement to string !!
 			$set_field_count++;
 		}
 

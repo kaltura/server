@@ -92,7 +92,7 @@ class categoryPeer extends BasecategoryPeer
 	 */
 	public static function getByFullNameWildcardMatch($fullName, $con = null)
 	{
-		$fullName = str_replace(array('%', '_'), array('\%', '\_'), $fullName);
+		$fullName = str_replace(array('\\', '%', '_'), array('\\\\', '\%', '\_'), $fullName);
 		$c = new Criteria();
 		$c->add(categoryPeer::FULL_NAME, $fullName."%", Criteria::LIKE);
 		

@@ -128,7 +128,7 @@ class KalturaPlaylist extends KalturaBaseEntry
 				{
 					$field = substr($field, 1);
 					if ($value != null)
-						$filterXml->addChild($field, $value);
+						$filterXml->addChild($field, htmlspecialchars($value));
 				}
 				
 				$entryFilter->addAdvancedSearchToXml($filterXml);

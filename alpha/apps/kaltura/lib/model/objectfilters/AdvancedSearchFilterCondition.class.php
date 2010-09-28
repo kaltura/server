@@ -16,8 +16,8 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	{
 		parent::addToXml($xmlElement);
 		
-		$xmlElement->addAttribute('field', $this->field);
-		$xmlElement->addAttribute('value', $this->value);
+		$xmlElement->addAttribute('field', htmlspecialchars($this->field));
+		$xmlElement->addAttribute('value', htmlspecialchars($this->value));
 	}
 	
 	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
@@ -26,10 +26,10 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 		
 		$attr = $xmlElement->attributes();
 		if(isset($attr['field']))
-			$this->field = (string) $attr['field'];
+			$this->field = (string) html_entity_decode($attr['field']);
 			
 		if(isset($attr['value']))
-			$this->value = (string) $attr['value'];
+			$this->value = (string) html_entity_decode($attr['value']);
 	}
 	
 	/**
