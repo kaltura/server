@@ -13,6 +13,7 @@ class entryFilter extends baseObjectFilter
 		entryPeer::DESCRIPTION => 'description',
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'plugins_data',
+		'duration_type',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
