@@ -533,7 +533,7 @@ class kBusinessPreConvertDL
 				$sourceFlavorOutput->save();
 				
 				kJobsManager::addFlavorConvertJob($srcSyncKey, $sourceFlavorOutput, $originalFlavorAsset->getId(), $mediaInfoId, $parentJob);
-				return true;
+				return false;
 			}
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
