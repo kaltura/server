@@ -871,9 +871,7 @@ class kFlowHelper
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
 				
 		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE)
-		{
-			// TODO - continue to destination flavors conversion
-		}
+			kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 		
 		if($currentFlavorAsset)
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);	
