@@ -13,7 +13,7 @@ class entryFilter extends baseObjectFilter
 		entryPeer::DESCRIPTION => 'description',
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'plugins_data',
-		'duration_type',
+		'entry.DURATION_TYPE' => 'duration_type',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
@@ -74,6 +74,7 @@ class entryFilter extends baseObjectFilter
 		'kshow_id' => 'string',
 		'group_id' => 'string',
 		'metadata' => 'string',
+		'duration_type' => 'string',
 		
 		'int_entry_id' => 'int',
 		'kuser_id' => 'int',
@@ -259,7 +260,7 @@ class entryFilter extends baseObjectFilter
 		
 	public static function hasMachableField ( $field_name )
 	{
-		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids", "duration_type"));
+		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids"));
 	}
 	
 	
