@@ -19,6 +19,11 @@ class kCurrentContext
 	 * @var int
 	 */
 	public static $ks_partner_id;
+
+	/**
+	 * @var int
+	 */
+	public static $master_partner_id;
 	
 	/**
 	 * @var string

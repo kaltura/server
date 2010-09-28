@@ -72,6 +72,9 @@ abstract class KalturaBaseService
 			
 			// 2. extract partner_id
 			$ks_partner_id= $ks->partner_id;
+			$master_partner_id = $ks->master_partner_id;
+			if(!$master_partner_id)
+				$master_partner_id = $ks_partner_id;
 			
 			// set the apply_specific_partner_id to know if we should work on a specifi partner or not
 			$apply_specific_partner_id = $partner_id;
@@ -112,6 +115,7 @@ abstract class KalturaBaseService
 			kCurrentContext::$ks = $ks_str;
 			kCurrentContext::$partner_id = $partner_id;
 			kCurrentContext::$ks_partner_id = $ks_partner_id;
+			kCurrentContext::$master_partner_id = $master_partner_id;
 			kCurrentContext::$uid = $puser_id;
 			kCurrentContext::$ks_uid = $ks_puser_id;
 							

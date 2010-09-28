@@ -490,6 +490,9 @@ $this->benchmarkEnd( "signature" );
 			
 			// 2. extract partner_id
 			$ks_partner_id= $ks->partner_id;
+			$master_partner_id = $ks->master_partner_id;
+			if(!$master_partner_id)
+				$master_partner_id = $ks_partner_id;
 
 			if ( ! $partner_id ) $partner_id = $ks_partner_id;
 			// use the user from the ks if not explicity set 
@@ -498,6 +501,7 @@ $this->benchmarkEnd( "signature" );
 			kCurrentContext::$ks = $ks_str;
 			kCurrentContext::$partner_id = $partner_id;
 			kCurrentContext::$ks_partner_id = $ks_partner_id;
+			kCurrentContext::$master_partner_id = $master_partner_id;
 			kCurrentContext::$uid = $puser_id;
 			kCurrentContext::$ks_uid = $ks->user;
 

@@ -233,7 +233,7 @@ class AuditTrail extends BaseAuditTrail
 			$this->setClientTag(kCurrentContext::$client_lang);
 		
 		$this->setRequestId($this->getUniqueRequestId());
-		$this->setMasterPartnerId(kCurrentContext::$ks_partner_id);
+		$this->setMasterPartnerId(kCurrentContext::$master_partner_id);
 		$this->setKs(kCurrentContext::$ks);
 		$this->setIpAddress(kCurrentContext::$user_ip);
 		$this->setServerName(kCurrentContext::$host);
