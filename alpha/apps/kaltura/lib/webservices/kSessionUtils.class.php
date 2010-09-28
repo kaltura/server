@@ -49,7 +49,7 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "")
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
@@ -69,6 +69,7 @@ class kSessionUtils
 				$ks->type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
 
 			$ks->partner_id = $partner_id;
+			$ks->master_partner_id = $master_partner_id;
 			$ks->partner_pattern = $partner_id;
 			$ks->error = 0;
 			$ks->rand = microtime(true);
@@ -238,6 +239,7 @@ class ks
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
 
 	public $partner_id = null;
+	public $master_partner_id = null;
 	public $valid_until = null;
 	public $partner_pattern = null;
 	public $type;
@@ -287,7 +289,7 @@ class ks
 
 		$ks->original_str = $encoded_str;
 
-		@list ( $ks->partner_id , $ks->partner_pattern , $ks->valid_until , $ks->type , $ks->rand , $ks->user , $ks->privileges ) =
+		@list ( $ks->partner_id , $ks->partner_pattern , $ks->valid_until , $ks->type , $ks->rand , $ks->user , $ks->privileges , $ks->master_partner_id ) =
 			@explode ( self::SEPARATOR , $real_str );
 			
 		$salt = $ks->getSalt();
@@ -316,7 +318,7 @@ class ks
 
 	public function toSecureString ()
 	{
-		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges );
+		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id );
 		$str = implode ( self::SEPARATOR , $fields );
 
 		$salt = $this->getSalt();
