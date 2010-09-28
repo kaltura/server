@@ -11,20 +11,20 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	{
 		if(is_null($partnerId))
 		{
-			KalturaLog::debug("Partner id is null");
+//			KalturaLog::debug("Partner id is null");
 			return false;
 		}
 			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
 		{
-			KalturaLog::debug("Partner not found");
+//			KalturaLog::debug("Partner not found");
 			return false;
 		}
 			
 		if(!$partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME))
 		{
-			KalturaLog::debug("Partner audit trail is disabled");
+//			KalturaLog::debug("Partner audit trail is disabled");
 			return false;
 		}
 			
@@ -35,7 +35,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$auditTrailConfig = self::getAuditTrailConfig($partnerId, $auditTrail->getObjectType());
 		if(is_null($auditTrailConfig))
 		{
-			KalturaLog::debug("Audit trail config not found");
+//			KalturaLog::debug("Audit trail config not found");
 			return false;
 		}
 			
@@ -57,7 +57,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		else
 		{
 			$cachePath = realpath( dirname(__FILE__) . '/../cache') . "/$partnerId.cfg";
-			KalturaLog::debug("Audit trail config cache path [$cachePath]");
+//			KalturaLog::debug("Audit trail config cache path [$cachePath]");
 			if(file_exists($cachePath))
 			{
 				$config = unserialize(file_get_contents($cachePath));
@@ -174,7 +174,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(class_exists('Metadata') && $object instanceof Metadata && $object->getObjectType() == Metadata::TYPE_ENTRY)
 			return $object->getObjectId();
 			
-		KalturaLog::info("Can't get entry id for object type [" . get_class($object) . "]");
+//		KalturaLog::info("Can't get entry id for object type [" . get_class($object) . "]");
 		return null;
 	}
 
@@ -190,7 +190,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		if(method_exists($object, 'getPartnerId'))
 			return $object->getPartnerId();
 			
-		KalturaLog::info("Can't get partner id for object type [" . get_class($object) . "]");
+//		KalturaLog::info("Can't get partner id for object type [" . get_class($object) . "]");
 		return kCurrentContext::$partner_id;
 	}
 
@@ -210,7 +210,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$peer = $object->getPeer();
 		$objectType = $peer->getOMClass(false, null);
 		
-		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");
+//		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");
 		
 		try
 		{
@@ -226,7 +226,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		catch(kAuditTrailException $e)
 		{
-			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
+//			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
 			$auditTrail = null;
 		}
 		
@@ -238,18 +238,18 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function fileSyncCreated(FileSync $fileSync) 
 	{
-		KalturaLog::debug("id [" . $fileSync->getId() . "]");
+//		KalturaLog::debug("id [" . $fileSync->getId() . "]");
 		$object = kFileSyncUtils::retrieveObjectForFileSync($fileSync);
 		if(!$object || !($object instanceof ISyncableFile))
 		{
-			KalturaLog::debug("Not instance of ISyncableFile");
+//			KalturaLog::debug("Not instance of ISyncableFile");
 			return;
 		}
 			
 		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_FILE_SYNC_CREATED);
 		if(!$auditTrail)
 		{
-			KalturaLog::debug("No audit created");
+//			KalturaLog::debug("No audit created");
 			return;
 		}
 			
@@ -328,21 +328,21 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return;
 			
 		$supportedDescriptors = explode(',', $auditTrailConfig->getDescriptors());
-		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
+//		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
 		
 		$changedItems = array();
 		foreach($columnsOldValues as $column => $oldValue)
 		{
 			if(!in_array($column, $supportedDescriptors))
 			{
-				KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
+//				KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] column[$column] not supported");
 				continue;
 			}
 
 			$newValue = $object->getByName($column, BasePeer::TYPE_COLNAME);
 			if($newValue == $oldValue)
 			{
-				KalturaLog::debug("Old and new values are identical [$column]");
+//				KalturaLog::debug("Old and new values are identical [$column]");
 				continue;
 			}
 			
@@ -367,14 +367,14 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 				$descriptor = $prefix . $name;
 				if(!in_array($descriptor, $supportedDescriptors))
 				{
-					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] descriptor[$descriptor] not supported");
+//					KalturaLog::debug("Audit trail for object type[" . $auditTrail->getObjectType() . "] descriptor[$descriptor] not supported");
 					continue;
 				}
 			
 				$newValue = $object->getFromCustomData($name, $namespace);
 				if($newValue == $oldValue)
 				{
-					KalturaLog::debug("Old and new values are identical [$descriptor]");
+//					KalturaLog::debug("Old and new values are identical [$descriptor]");
 					continue;
 				}
 				

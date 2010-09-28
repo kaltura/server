@@ -57,7 +57,7 @@ class kEventsManager
 		$consumers = self::getConsumers($consumerInterface);
 		foreach($consumers as $consumerClass)
 		{
-			KalturaLog::debug("Event consumer [$consumerClass] called");
+//			KalturaLog::debug("Event consumer [$consumerClass] called");
 			$event->consume(new $consumerClass());
 		}
 	}
