@@ -516,7 +516,7 @@ class kBusinessPreConvertDL
 			KalturaLog::log("Source flavor params [" . $sourceFlavor->getId() . "] found");
 			$originalFlavorAsset->setFlavorParamsId($sourceFlavor->getId());
 			
-			if(!is_null($sourceFlavor->getOperators()) || !is_null($sourceFlavor->getConversionEngines()))
+			if($sourceFlavor->getOperators() || $sourceFlavor->getConversionEngines())
 			{
 				KalturaLog::log("Source flavor asset requires conversion");
 				
