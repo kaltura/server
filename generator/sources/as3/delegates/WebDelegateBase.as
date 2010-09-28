@@ -2,6 +2,7 @@ package com.kaltura.delegates {
 	
 	import com.kaltura.config.IKalturaConfig;
 	import com.kaltura.config.KalturaConfig;
+	import com.kaltura.core.KClassFactory;
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.net.KalturaCall;
@@ -19,11 +20,13 @@ package com.kaltura.delegates {
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.utils.Timer;
+	import flash.utils.getDefinitionByName;
 	
 	public class WebDelegateBase extends EventDispatcher implements IKalturaCallDelegate {
 		
-		private static const CONNECT_TIME : int = 60000; //60 secs
-		private static const LOAD_TIME : int = 60000; //60 secs
+		public static var CONNECT_TIME : int = 60000; //60 secs
+		public static var LOAD_TIME : int = 60000; //60 secs
+		
 		protected var connectTimer:Timer;
 		protected var loadTimer:Timer;
 		
@@ -127,7 +130,7 @@ package com.kaltura.delegates {
 			createURLLoader();
 			
 			//create the service request for normal calls
-			var url : String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
+			var url : String = _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
 			
 			if( _call.method == URLRequestMethod.GET )url += "&";
 			
@@ -215,7 +218,21 @@ package com.kaltura.delegates {
 		}
 		
 		//override this parssing function in the spasific delegate 
-		public function parse( result : XML ) : * { return null; }
+		public function parse( result : XML ) : * 
+		{ 
+			//by defualt create the response object
+			var cls : Class;
+			try
+			{
+				cls = getDefinitionByName('com.kaltura.vo.'+ result.result.objectType) as Class;
+			}
+			catch( e : Error )
+			{
+				cls = Object;
+			}
+			var obj : * = (new KClassFactory( cls )).newInstanceFromXML( result.result );
+			return obj;
+		}
 		
 		//Overide this to create validation object and fill it
 		protected function validateKalturaResponse(result:String) : KalturaError 
