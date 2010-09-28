@@ -2229,6 +2229,9 @@ class entry extends Baseentry implements ISyncableFile
 			$dataStrings['description'] = $this->getDescription();
 //		if($isInsert || $this->isColumnModified(entryPeer::ADMIN_TAGS))
 			$dataStrings['admin_tags'] = $this->getAdminTags();
+//		if($isInsert || $this->isColumnModified(entryPeer::LENGTH_IN_MSECS))
+			$dataStrings['duration_type'] = entryPeer::getDurationType($this->getDurationInt());
+			
 		
 		// TODO - implement as multi values - one value per plugin
 //		if($isInsert || $this->isColumnModified(entryPeer::CUSTOM_DATA))

@@ -231,8 +231,8 @@ class EntrySphinxCriteria extends SphinxCriteria
 			$filter->unsetByName('_matchor_categories');
 		}
 			
-		if ($filter->get("_matchor_duration_type") !== null)
-			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
+//		if ($filter->get("_matchor_duration_type") !== null)
+//			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			
 		if ($filter->get(baseObjectFilter::ORDER) === "recent")
 		{

@@ -441,6 +441,20 @@ class entryPeer extends BaseentryPeer
 			
 		return parent::doSelect($c, $con);
 	}
+	
+	public static function getDurationType($duration)
+	{
+		if ($duration >= 0 && $duration <= 4*60)
+			return entry::ENTRY_DURATION_TYPE_SHORT;
+			
+		if ($duration > 4*60 && $duration <= 20*60)
+			return entry::ENTRY_DURATION_TYPE_MEDIUM;
+		
+		if ($duration > 20*60)
+			return entry::ENTRY_DURATION_TYPE_LONG;
+		
+		return entry::ENTRY_DURATION_TYPE_NOTAVAILABLE;
+	}
 }
 
 class entryPool

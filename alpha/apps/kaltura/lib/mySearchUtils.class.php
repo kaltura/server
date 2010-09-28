@@ -266,12 +266,7 @@ class mySearchUtils
 		
 		// duration type
 		$duration = $obj->getDurationInt();
-		if ($duration >= 0 && $duration <= 4*60)
-			$searchText[] = self::ENTRY_DURATION_TYPE_PREFIX . entry::ENTRY_DURATION_TYPE_SHORT;
-		else if ($duration > 4*60 && $duration <= 20*60)
-			$searchText[] = self::ENTRY_DURATION_TYPE_PREFIX . entry::ENTRY_DURATION_TYPE_MEDIUM;
-		else if ($duration > 20*60)
-			$searchText[] = self::ENTRY_DURATION_TYPE_PREFIX . entry::ENTRY_DURATION_TYPE_LONG;
+		$searchText[] = self::ENTRY_DURATION_TYPE_PREFIX . entryPeer::getDurationType($duration);
 
 		// flavor params ids
 		$getFlavorParamsIds = explode(",", $obj->getFlavorParamsIds());
