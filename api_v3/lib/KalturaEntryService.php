@@ -51,7 +51,7 @@ class KalturaEntryService extends KalturaBaseService
 			foreach($flavors as $flavor)
 			{
 				if($flavor->hasTag(flavorParams::TAG_SOURCE))
-					$srcFlavorParamsId = $flavors->getId();
+					$srcFlavorParamsId = $flavor->getId();
 					
 				$flavorParams[$flavors->getId()] = $flavor;
 			}
