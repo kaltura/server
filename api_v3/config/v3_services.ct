@@ -77,6 +77,9 @@ media.addfromsearchresult			|			|1		|1	|1		|2		|1		|	|		|	|   |
 media.addfromuploadedfile			|			|1		|1	|1		|2		|1		|	|		|	|   |
 media.addfromrecordedwebcam			|			|1		|1	|1		|2		|1		|	|		|	|   |
 media.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |
+media.convert						|			|1		|1	|1		|2		|1		|	|		|1	|   |
+media.addfromentry					|			|1		|1	|1		|2		|1		|	|		|1	|   |
+media.addfromflavorasset			|			|1		|1	|1		|2		|1		|	|		|1	|   |
 media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |
 media.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |
 media.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |
