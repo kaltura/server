@@ -638,6 +638,9 @@ class kJobsManager
 	{
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
+			$entry->setStatus(entry::ENTRY_STATUS_PENDING);
+			$entry->save();
+			
 			KalturaLog::notice('Entry should not be converted');
 			return null;
 		}
