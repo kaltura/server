@@ -26,3 +26,9 @@ batch_config.ini - 'params.useFastStart = true' & 'params.fastStartCmd		= qt-fas
 
 2010-09-01
 fix - KDLWrap: on the cdl2kdl conv copy cmd for flavorParamsOutput as well
+
+2010-09-29
+KDLCommon - new - webm
+KDLflavor - new - webm 
+KDLTranscodeerComm - new - webm
+KDLWrap - in ConvertMediainfoCdl2FlavorAsset logging
