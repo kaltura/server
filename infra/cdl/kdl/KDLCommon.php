@@ -79,6 +79,7 @@
 		static $BitrateFactorCategory3 = array(KDLVideoTarget::H264, KDLVideoTarget::H264B, 
 											   KDLVideoTarget::H264M,KDLVideoTarget::H264H,
 											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
+											   KDLVideoTarget::VP8,
 											   "h264", "h.264", "x264", "avc1", "wvc1",
 											   "avc", "wmv3", "wmva", "rv40");
 											   		
@@ -134,6 +135,7 @@
 		const WMA = "wma";
 		const ISMV = "ismv";
 		const MKV = "mkv";
+		const WEBM = "webm";
 	};
 
 	class KDLVideoTarget {
