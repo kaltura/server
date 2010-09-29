@@ -39,6 +39,8 @@ class KalturaEntryService extends KalturaBaseService
 				
 			$conversionProfileId = $conversionProfile->getId();
 		}
+		
+		$entry->setConversionQuality($conversionProfileId);
 			
 		if($dynamicConversionAttributes)
 		{
@@ -69,16 +71,18 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			if(count($dynamicAttributes))
-			{
 				$entry->setDynamicFlavorAttributes($dynamicAttributes);
-				$entry->save();
-			}
 		}
+		
+		$entry->save();
 		
 		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         $srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
         
 		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
+		if(!$job)
+			return null;
+			
 		return $job->getId();
 	}
 	
