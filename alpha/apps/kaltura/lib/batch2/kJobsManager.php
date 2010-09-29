@@ -636,7 +636,7 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{
-		if($entry->getConversionProfileId() == conversionProfile2::CONVERSION_PROFILE_NONE)
+		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			KalturaLog::notice('Entry should not be converted');
 			return null;
