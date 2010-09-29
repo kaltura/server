@@ -343,7 +343,7 @@ class EntrySphinxCriteria extends SphinxCriteria
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
 				case baseObjectFilter::MATCH_OR:
-					$vals = explode(',', $val);
+					$vals = explode(baseObjectFilter::IN_SEPARATOR, $val);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
@@ -363,7 +363,7 @@ class EntrySphinxCriteria extends SphinxCriteria
 				case baseObjectFilter::NOT_IN:
 					$vals = array();
 					if(is_string($val))
-						$vals = explode(',', $val);
+						$vals = explode(baseObjectFilter::IN_SEPARATOR, $val);
 					elseif(is_array($val))
 						$vals = $val;
 						
@@ -387,7 +387,7 @@ class EntrySphinxCriteria extends SphinxCriteria
 				case baseObjectFilter::IN:
 					$vals = array();
 					if(is_string($val))
-						$vals = explode(',', $val);
+						$vals = explode(baseObjectFilter::IN_SEPARATOR, $val);
 					elseif(is_array($val))
 						$vals = $val;
 						
@@ -421,7 +421,7 @@ class EntrySphinxCriteria extends SphinxCriteria
 				case baseObjectFilter::MULTI_LIKE_AND:
 				case baseObjectFilter::MATCH_AND:
 				case baseObjectFilter::LIKE:
-					$vals = explode(' ', $val);
+					$vals = explode(baseObjectFilter::IN_SEPARATOR, $val);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
