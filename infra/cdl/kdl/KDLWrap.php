@@ -61,13 +61,14 @@ class KDLWrap
 		if($cdlMediaInfo!=null) {
 			self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		}
+		kLog::log( "...S-->".$mediaSet->ToString());
+		
 		$profile = new KDLProfile();
 		foreach($cdlFlavorList as $cdlFlavor) {
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			$profile->_flavors[] = $kdlFlavor;
 			kLog::log( "...F-->".$kdlFlavor->ToString());
 		}
-		kLog::log( "...S-->".$mediaSet->ToString());
 
 		$trgList = array();
 		{
@@ -444,7 +445,8 @@ kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-kLog::log(__METHOD__."==>\n");
+kLog::log(__METHOD__."==>");
+kLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 /*
 $flavorAsset->setWidth($mediaInfoDb->getVideoWidth());
 $flavorAsset->setHeight($mediaInfoDb->getVideoHeight());
@@ -455,8 +457,9 @@ $flavorAsset->setContainerFormat($mediaInfoDb->getContainerFormat());
 $flavorAsset->setVideoCodecId($mediaInfoDb->getVideoCodecId());
 */
   	$medSet = new KDLMediaDataSet();
-		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
-		
+	self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
+kLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
+	
 //	$fla = new flavorAsset();
 		if(!is_null($medSet->_container)){
 			$fla->setContainerFormat($medSet->_container->GetIdOrFormat());
@@ -475,7 +478,8 @@ $flavorAsset->setVideoCodecId($mediaInfoDb->getVideoCodecId());
 			$fla->setBitrate($medSet->_container->_bitRate);
 		else
 			$fla->setBitrate($vidBr);
-		
+
+kLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
 	}
 
