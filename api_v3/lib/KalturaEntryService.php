@@ -25,22 +25,15 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
-		if($conversionProfileId)
-		{
-			$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
-			if (!$conversionProfile)
-				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
-		}
-		else
-		{
-			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
-			if(!$conversionProfile)
-				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
-				
-			$conversionProfileId = $conversionProfile->getId();
-		}
-		
+		// even if it null
 		$entry->setConversionQuality($conversionProfileId);
+		$entry->save();
+		
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if(!$conversionProfile)
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+		
+		$conversionProfileId = $conversionProfile->getId();
 			
 		if($dynamicConversionAttributes)
 		{
@@ -71,10 +64,11 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			if(count($dynamicAttributes))
+			{
 				$entry->setDynamicFlavorAttributes($dynamicAttributes);
+				$entry->save();
+			}
 		}
-		
-		$entry->save();
 		
 		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         $srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
