@@ -21,11 +21,14 @@ name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags
 ------------------------------------------------------------------------------------------------
 
 documents.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+documents.convert					|			|1		|1	|1		|2		|1		|	|		|1	|   |
+documents.addfromentry				|			|1		|1	|1		|2		|1		|	|		|1	|   |
+documents.addfromflavorasset		|			|1		|1	|1		|2		|1		|	|		|1	|   |
 documents.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |
-documents.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.delete						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+documents.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+documents.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
 documents.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |
-documents.upload						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+documents.upload					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
 documents.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
 documents.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |
 documents.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |
