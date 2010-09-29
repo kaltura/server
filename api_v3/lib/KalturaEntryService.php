@@ -53,7 +53,7 @@ class KalturaEntryService extends KalturaBaseService
 				if($flavor->hasTag(flavorParams::TAG_SOURCE))
 					$srcFlavorParamsId = $flavor->getId();
 					
-				$flavorParams[$flavors->getId()] = $flavor;
+				$flavorParams[$flavor->getId()] = $flavor;
 			}
 			
 			$dynamicAttributes = array();
