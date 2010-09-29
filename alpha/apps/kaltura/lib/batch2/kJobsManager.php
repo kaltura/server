@@ -644,6 +644,9 @@ class kJobsManager
 			KalturaLog::notice('Entry should not be converted');
 			return null;
 		}
+		
+		$entry->setStatus(entry::ENTRY_STATUS_PRECONVERT);
+		$entry->save();
 	
 		$jobData = new kConvertProfileJobData();
 		$jobData->setFlavorAssetId($flavorAssetId);
