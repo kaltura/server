@@ -445,6 +445,9 @@ $target->_video = null;
 				case KDLContainerTarget::ISMV:
 					$targetVid->_id = KDLVideoTarget::WVC1A;
 					break;
+				case KDLContainerTarget::WEBM:
+					$targetVid->_id = KDLVideoTarget::VP8;
+					break;
 			}
 		}
 		/*
@@ -689,7 +692,9 @@ $target->_video = null;
 					case KDLContainerTarget::ISMV:
 						$targetAud->_id=KDLAudioTarget::WMA;
 						break;
-						
+					case KDLContainerTarget::WEBM:
+						$targetAud->_id=KDLAudioTarget::AAC;
+						break;
 				};
 			}
 			else if($target->_video!=null) {
