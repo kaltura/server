@@ -205,7 +205,7 @@ $acodec = "libmp3lam";
 					$vcodecParams = "wmv2";
 					break;
 				case KDLVideoTarget::VP8:
-					$vcodecParams = "libon2vp8sdk";
+					$vcodecParams = "libvpx";
 					break; 
 				case KDLVideoTarget::COPY:
 					$vcodecParams = "copy";
@@ -294,6 +294,9 @@ $acodec = "libmp3lam";
 					break;
 				case KDLContainerTarget::MKV:
 					$format = "matroska";
+					break;
+				case KDLContainerTarget::WEBM:
+					$format = "webm";
 					break;
 			}
 			$cmdStr = $cmdStr." -f ".$format;
