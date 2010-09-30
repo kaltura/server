@@ -6,6 +6,8 @@ KCodeExampleBase.prototype.init = function(entity, codeLanguage)
 {
 	KCodeExampleBase.instance = this;
 	
+	entity.empty();
+	
 	this.lang = codeLanguage;
     this.jqEntity = entity;
 
@@ -29,7 +31,11 @@ KCodeExampleBase.prototype.action = null;
 KCodeExampleBase.prototype.params = null;
 
 KCodeExampleBase.prototype.getNull = function (){
-	return "null";
+	return jQuery("<span class=\"code-" + this.lang + "-system\">null</span>");
+};
+
+KCodeExampleBase.prototype.getVoid = function (){
+	return jQuery("<span class=\"code-" + this.lang + "-system\">void</span>");
 };
 
 KCodeExampleBase.prototype.getObjectDelimiter = function (){
@@ -48,19 +54,31 @@ KCodeExampleBase.prototype.getArrayCloser = function (){
 	return "]";
 };
 
+KCodeExampleBase.prototype.getKsMethod = function (){
+	return "setKs";
+};
+
 KCodeExampleBase.prototype.onParamsChange = function (){
 	var scope = KCodeExampleBase.instance;
-	
-	if(scope.jqParams)
-		scope.jqParams.empty();
+	if(!scope.jqParams)
+		return;
+	scope.jqParams.empty();
 	
 	var params = [];
 	jQuery(".param").each(function(i, item) {
 		var jqItem = jQuery(item);
+		var jqField = jqItem.find("input:text,select");
+		var name = jqField.attr("name");
+		
+		if(name == "ks"){
+			var value = jqField.val();
+			var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
+			scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(), jqSetKs), scope.jqParams);
+			return;
+		}
+		
 		if (jqItem.find("input:checkbox:checked").size() > 0)
 		{
-			var name = jQuery(item).find("input:text,select").attr("name");
-			var jqField = jQuery(item).find("input:text,select");
 			var jqValue = null;
 			
 			if(jqItem.hasClass("enum")){
@@ -141,23 +159,28 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 };
 
 KCodeExampleBase.prototype.setAction = function (service, action, params){
-	if(this.jqAction)
-		this.jqAction.remove();
+	if(this.jqAction){
+		this.jqAction.empty();
+	}
+	else{
+		this.jqAction = jQuery("<div class=\"code-action\"/>");
+		this.jqEntity.append(this.jqAction);
+	}
 
 	var jqInitParams = jQuery("<div class=\"code-action-init-params\"/>");
-	this.jqAction = jQuery("<div class=\"code-action\"/>");
 	this.jqParams = jQuery("<div class=\"code-action-params\"/>");
 	this.jqAction.append(jqInitParams);
 	this.jqAction.append(this.jqParams);
-	this.jqEntity.append(this.jqAction);
 
 	var jqActionArgs = new Array();
 	
 	if(params){
 		for(var i = 0; i < params.length; i++){
 			var jqParam = this.codeVar(params[i].name);
-			var jqAssignNull = this.codeAssign(jqParam.clone());
-			this.addCode(jqAssignNull, jqInitParams);
+			var jqParamDef = this.codeVarDefine(jqParam, params[i].type);
+			var jqParamDeclare = this.codeDeclareVar(jqParamDef.clone(), params[i].type);
+//			var jqAssignNull = this.codeAssign(jqParamDef.clone());
+			this.addCode(jqParamDeclare, jqInitParams);
 			jqActionArgs.push(jqParam);
 		}
 	}
@@ -184,6 +207,35 @@ KCodeExampleBase.prototype.addCode = function (code, entity){
 	
 	entity.append(code);
 	entity.append("<br/>");
+};
+
+KCodeExampleBase.prototype.codePackage = function (packageName){
+	var jqCode = jQuery("<span/>");
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">package </span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-package\">" + packageName + "</span>");
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeImport = function (packageName){
+	var jqCode = jQuery("<span/>");
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">import </span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-package\">" + packageName + "</span>");
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeDeclareVar = function (jqObjectDef, type){
+	return jqObjectDef;
+};
+
+KCodeExampleBase.prototype.codeVarDefine = function (jqObject, type){
+	var jqCode = jQuery("<span class=\"code-" + this.lang + "-var-type\">" + type + "</span>");
+	jqCode.append(" ");
+	jqCode.append(jqObject);
+	return jqCode;
 };
 
 KCodeExampleBase.prototype.codeVar = function (name){
@@ -247,6 +299,97 @@ KCodeExampleBase.prototype.setBracketsEvent = function (bracketCounter, jqBracke
 	}
 };
 
+KCodeExampleBase.prototype.codeClassDeclare = function (className, jqBode, modifiers, parentClass, interfaces){
+	var jqCode = jQuery("<div class=\"code-" + this.lang + "-class\"/>");
+	
+	if(modifiers && modifiers.length){
+		for(var i = 0; i < modifiers.length; i++){
+			jqCode.append("<span class=\"code-" + this.lang + "-system\">" + modifiers[i] + "</span> ");
+		}
+	}
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">class</span> ");
+	jqCode.append(className);
+	
+	if(parentClass){
+		jqCode.append(" extends ");
+		jqCode.append(parentClass);
+	}
+
+	if(interfaces && interfaces.length){
+		jqCode.append(" implements ");
+		for(var i = 0; i < interfaces.length; i++){
+			if(i)
+				jqCode.append(", ");
+			
+			jqCode.append(interfaces[i]);
+		}
+	}
+	
+	jqCode.append("{");
+	jqCode.append(jqBode);
+	jqCode.append("}");
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeFunctionDeclare = function (functionName, jqBode, modifiers, functionArgs, returnType){
+	var bracketCounter = this.bracketsCounter++;
+	var jqOpenBracket = jQuery("<span id=\"bracket-open-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">(</span>");
+	var jqCloseBracket = jQuery("<span id=\"bracket-close-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">)</span>");
+	this.setBracketsEvent(bracketCounter, [jqOpenBracket, jqCloseBracket]);
+	
+	var jqCode = jQuery("<div class=\"code-" + this.lang + "-func\"/>");
+	
+	if(modifiers && modifiers.length){
+		for(var i = 0; i < modifiers.length; i++){
+			jqCode.append("<span class=\"code-" + this.lang + "-system\">" + modifiers[i] + "</span> ");
+		}
+	}
+
+	jqCode.append(returnType);
+	jqCode.append(" " + functionName);
+	jqCode.append(jqOpenBracket);
+
+	if(functionArgs && functionArgs.length){
+		for(var i = 0; i < functionArgs.length; i++){
+			if(i)
+				jqCode.append(", ");
+			
+			jqCode.append(modifiers[functionArgs]);
+		}
+	}
+
+	jqCode.append(jqCloseBracket);
+	jqCode.append("{");
+	jqCode.append(jqBode);
+	jqCode.append("}");
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeTryCatch = function (jqTry, exceptionDeclare, jqCatch){
+	var bracketCounter = this.bracketsCounter++;
+	var jqOpenBracket = jQuery("<span id=\"bracket-open-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">(</span>");
+	var jqCloseBracket = jQuery("<span id=\"bracket-close-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">)</span>");
+	this.setBracketsEvent(bracketCounter, [jqOpenBracket, jqCloseBracket]);
+	
+	var jqCode = jQuery("<div class=\"code-" + this.lang + "-try-catch\"/>");
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">try</span>{");
+	jqCode.append(jqTry);
+	jqCode.append("}");
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">catch</span>");
+
+	jqCode.append(jqOpenBracket);
+	jqCode.append(exceptionDeclare);
+	jqCode.append(jqCloseBracket);
+	jqCode.append("{");
+	jqCode.append(jqCatch);
+	jqCode.append("}");
+	
+	return jqCode;
+};
+
 KCodeExampleBase.prototype.codeUserFunction = function (functionName, functionArgs){
 	var jqCode = jQuery("<span class=\"\"/>");
 	jqCode.append(this.codeFunction(functionName, functionArgs));
@@ -261,12 +404,10 @@ KCodeExampleBase.prototype.codeSystemFunction = function (functionName, function
 
 KCodeExampleBase.prototype.codeFunction = function (functionName, functionArgs){
 	var bracketCounter = this.bracketsCounter++;
-	
 	var jqCode = jQuery("<span class=\"code-" + this.lang + "-call-func\"/>");
 	var jqFunctionName = jQuery("<span class=\"code-" + this.lang + "-func-name\">" + functionName + "</span>");
 	var jqOpenBracket = jQuery("<span id=\"bracket-open-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">(</span>");
 	var jqCloseBracket = jQuery("<span id=\"bracket-close-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">)</span>");
-
 	this.setBracketsEvent(bracketCounter, [jqOpenBracket, jqCloseBracket]);
 	
 	jqCode.append(jqFunctionName);	
@@ -287,7 +428,6 @@ KCodeExampleBase.prototype.codeFunction = function (functionName, functionArgs){
 
 KCodeExampleBase.prototype.codeNewInstance = function (className, constructorArgs){
 	var bracketCounter = this.bracketsCounter++;
-	
 	var jqCode = jQuery("<span class=\"code-" + this.lang + "-new-instance code-" + this.lang + "-system\"/>");
 	var jqClassName = jQuery("<span class=\"code-" + this.lang + "-class-name\">" + className + "</span>");
 	var jqOpenBracket = jQuery("<span id=\"bracket-open-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">(</span>");
@@ -354,6 +494,14 @@ KCodeExamplePHP.prototype.addCode = function (code, entity){
 	KCodeExampleBase.prototype.addCode.apply(this, arguments);
 };
 
+KCodeExamplePHP.prototype.codeDeclareVar = function (jqObjectDef, type){
+	return this.codeAssign(jqObjectDef);
+};
+
+KCodeExamplePHP.prototype.codeVarDefine = function (jqObject, type){
+	return jqObject;
+};
+
 KCodeExamplePHP.prototype.codeVar = function (name){
 	name = "$" + name;
 	return KCodeExampleBase.prototype.codeVar.apply(this, arguments);
@@ -363,3 +511,112 @@ KCodeExamplePHP.prototype.codeString = function (str){
 	return jQuery("<span class=\"code-" + this.lang + "-str\">'" + str + "'</span>");
 };
 
+
+function KCodeExampleJava(entity){
+	this.init(entity, 'java');
+}
+
+KCodeExampleJava.prototype = new KCodeExampleBase();
+
+KCodeExampleJava.prototype.jqImports = null;
+
+KCodeExampleJava.prototype.init = function(entity, codeLanguage){
+	KCodeExampleBase.prototype.init.apply(this, arguments);
+};
+
+KCodeExampleJava.prototype.getKsMethod = function (){
+	return "setSessionId";
+};
+
+KCodeExampleJava.prototype.addCode = function (code, entity){
+	code.append(";");
+	KCodeExampleBase.prototype.addCode.apply(this, arguments);
+};
+
+KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type){
+	switch(type){
+		case "int":
+			return this.codeAssign(jqObjectDef, "0");
+			
+		case "bool":
+			return this.codeAssign(jqObjectDef, "false");
+			
+		default:
+			return this.codeAssign(jqObjectDef);
+	}
+};
+
+KCodeExampleJava.prototype.codeVarDefine = function (jqObject, type){
+	if(type == "string")
+		type = "String";
+	
+	return KCodeExampleBase.prototype.codeVarDefine.apply(this, arguments);
+};
+
+KCodeExampleJava.prototype.codeHeader = function (){
+
+	this.addCode(this.codePackage("com.kaltura.code.example"));
+	
+	this.jqImports = jQuery("<div class=\"code-java-imports\"/>");
+	this.jqEntity.append(this.jqImports);
+
+	this.addCode(this.codeImport("com.kaltura.client.KalturaApiException"), this.jqImports);
+	this.addCode(this.codeImport("com.kaltura.client.KalturaClient"), this.jqImports);
+	this.addCode(this.codeImport("com.kaltura.client.KalturaConfiguration"), this.jqImports);
+
+	this.jqAction = jQuery("<div class=\"code-action\"/>");
+	
+	var jqBody = jQuery("<div/>");
+	var jqConfigObject = this.codeVar("config");
+	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
+	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(), this.codeNewInstance("KalturaConfiguration"));
+	this.addCode(jqConfigObjectInit, jqBody);
+	
+	var jqConfigUrl = this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl");
+	var jqSetServiceUrl = this.codeAssign(jqConfigUrl, this.codeString(location.hostname));
+	this.addCode(jqSetServiceUrl, jqBody);
+
+	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(), "KalturaClient");
+	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone()]));
+	this.addCode(jqClientInit, jqBody);
+	
+	jqBody.append(this.jqAction);
+
+	var jqExceptionObject = this.codeVar("e");
+	var jqExceptionObjectDeclare = this.codeVarDefine(jqExceptionObject.clone(), "KalturaApiException");
+	var jqTraceFunction = this.codeUserFunction("printStackTrace");
+	var jqTrace = this.codeObjectMethod(jqExceptionObject.clone(), jqTraceFunction);
+	
+	var jqTry = jQuery("<div/>");
+	jqTry.addClass("indent");
+	jqTry.append(jqBody);
+	
+	var jqCatch = jQuery("<div/>");
+	jqCatch.addClass("indent");
+	this.addCode(jqTrace, jqCatch);
+	
+	var jqTryCatch = this.codeTryCatch(jqTry, jqExceptionObjectDeclare.clone(), jqCatch);
+	jqTryCatch.addClass("indent");
+	
+	var jqArgsDeclare = this.codeVarDefine("args", "String[]");
+	var jqMain = this.codeFunctionDeclare("main", jqTryCatch, ["public", "static"], [jqArgsDeclare], this.getVoid());
+	jqMain.addClass("indent");
+	
+	var jqClass = this.codeClassDeclare("CodeExample", jqMain);
+		
+	this.jqEntity.append(jqClass);
+};
+
+function switchToCodeGenerator(type, generator){
+	kTestMe.initCodeExample(generator);
+	jQuery(".code-menu").removeClass("active");
+	jQuery(".code-menu-" + type).addClass("active");
+}
+
+function switchToPHP(){
+	switchToCodeGenerator('php', new KCodeExamplePHP(jQuery("#example")));
+}
+
+function switchToJava(){
+	switchToCodeGenerator('php', new KCodeExampleJava(jQuery("#example")));
+}

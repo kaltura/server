@@ -32,9 +32,9 @@ button { background-color: #A0A0A0; border-color: #DEDEDE #202020 #202020 #DEDED
 
 .helpTooltip { }
 #kmcSubMenu { margin: 7px 15px 27px; display:table; zoom:1;}
- #kmcSubMenu li { float:left; display:inline; list-style: none inside none; padding-left:9px; height:19px;}
-  #kmcSubMenu li a, #kmcSubMenu li a:active, #kmcSubMenu li a:visited { height:19px; padding: 1px 12px 0 4px; display:block; font: bold 12px arial,sans-serif; color:#666; text-decoration:none;}
-  #kmcSubMenu li a:hover { color:#000;}
+#kmcSubMenu li { float:left; display:inline; list-style: none inside none; padding-left:9px; height:19px;}
+#kmcSubMenu li a, #kmcSubMenu li a:active, #kmcSubMenu li a:visited { height:19px; padding: 1px 12px 0 4px; display:block; font: bold 12px arial,sans-serif; color:#666; text-decoration:none;}
+#kmcSubMenu li a:hover { color:#000;}
 #kmcSubMenu li.active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
 #kmcSubMenu li.active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
 

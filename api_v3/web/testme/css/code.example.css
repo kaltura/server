@@ -1,9 +1,19 @@
 
+
+#codeSubMenu { margin: 7px 15px 3px; display:table; zoom:1;}
+#codeSubMenu li { float:left; display:inline; list-style:none inside none; padding-left:9px; height:19px;}
+#codeSubMenu li a, #codeSubMenu li a:active, #codeSubMenu li a:visited { height:19px; padding: 1px 12px 0 4px; display:block; font: bold 12px arial,sans-serif; color:#666; text-decoration:none;}
+#codeSubMenu li a:hover { color:#000;}
+#codeSubMenu li active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
+#codeSubMenu li active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
+
+
 .code {overflow: auto;}
 #example { padding-left: 10px; background-color: #FFFFFF; line-height: 20px; font-size: 12px; font-family: monospace; }
 
-.code-php-code {color: #FF0000;}
+.indent {margin-left: 30px}
 
+.code-php-code {color: #FF0000;}
 .code-php-bracket {color: #000000;}
 .code-php-bracket-over {color: #FF00FF; font-weight: bolder;}
 .code-php-var {color: #800000;}
@@ -14,3 +24,17 @@
 .code-php-func-name {} 
 .code-php-str {color: #00BB00;}
 .code-php-system {color: #0000FF;}
+
+
+.code-java-package {}
+.code-java-bracket {color: #000000; font-weight: normal;}
+.code-java-bracket-over {font-weight: bolder;}
+.code-java-var {color: #000000; font-weight: normal;}
+.code-java-assign {}
+.code-java-new-instance {}
+.code-java-class-name {color: #000000; font-weight: normal;}
+.code-java-call-func {}
+.code-java-func-name {} 
+.code-java-str {color: #0000FF;}
+.code-java-system {color: #800000; font-weight: bolder;}
+

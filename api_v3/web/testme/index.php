@@ -50,7 +50,7 @@
 			</div>
 			
 			<div class="param">
-				<label for="ks">KS (string):</label><input type="text" class="" name="ks" size="30"/> <input type="checkbox" checked="checked"/>
+				<label for="ks">KS (string):</label><input type="text" class="" name="ks" size="30"/> <input id="chk-ks" type="checkbox" checked="checked"/>
 			</div>
 			
 			<div class="param">
@@ -90,9 +90,16 @@
 		<iframe id="result" name="result" src=""></iframe>
 	</div>
 	</div>
-   	<hr width="100%"/>
-   <div class="code">
-   	<div id="example"></div>
-   </div>
+	<ul id="codeSubMenu">
+ 		<li class="code-menu code-menu-php active">
+ 			<a href="#" onclick="switchToPHP()">PHP</a>
+ 		</li>
+ 		<li class="code-menu code-menu-java">
+ 			<a href="#" onclick="switchToJava()">Java</a>
+ 		</li>
+	</ul>	
+	<div class="code">
+   		<div id="example"></div>
+	</div>
 </body>
 </html>

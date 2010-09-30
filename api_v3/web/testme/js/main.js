@@ -40,6 +40,8 @@ KTestMe.prototype = {
 	
 	historyItem: null,
 	codeGenerator: null,
+	
+	actionInfo: null,
 		
 	bindToElements: function() {
 		this.jqActions = jQuery("select[name=action]");
@@ -107,7 +109,7 @@ KTestMe.prototype = {
 	},
 	
 	onGetActionInfoSuccess: function(data) {
-		
+		this.actionInfo = data;
 		jQuery("#actionHelp").attr("title", this.jqServices.val() + "." + this.jqActions.val() + " - " + data.description);
 		this.jqObjectsContainer.empty();
 		jQuery.each(data.actionParams, delegate(this, function (i, param) {
@@ -511,11 +513,25 @@ KTestMe.prototype = {
 		this.resultWidth = jQuery("body").innerWidth() - leftBoxWidth - leftBoxLeftMargin - leftBoxRightMargin - 20;
 	},
 	
-	initCodeExample: function() {
-		this.codeGenerator = new KCodeExamplePHP(jQuery("#example"));
+	initCodeExample: function(generator) {
+		if(!generator)
+			generator = new KCodeExamplePHP(jQuery("#example"));
+		
+		this.codeGenerator = generator;
+
+		if(!this.actionInfo)
+			return;
+		
+		var service = this.jqServices.val();
+		var action = this.jqActions.val();
+		
+		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams);
+		this.codeGenerator.setChangeEvent();
+		this.codeGenerator.onParamsChange();
 	}
 };
 
+var kTestMe;
 jQuery(function() {
-	new KTestMe();
+	kTestMe = new KTestMe();
 });
