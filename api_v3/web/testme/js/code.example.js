@@ -28,6 +28,10 @@ KCodeExampleBase.prototype.service = null;
 KCodeExampleBase.prototype.action = null;
 KCodeExampleBase.prototype.params = null;
 
+KCodeExampleBase.prototype.getNull = function (){
+	return "null";
+};
+
 KCodeExampleBase.prototype.getObjectDelimiter = function (){
 	return ".";
 };
@@ -140,8 +144,10 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 	if(this.jqAction)
 		this.jqAction.remove();
 
+	var jqInitParams = jQuery("<div class=\"code-action-init-params\"/>");
 	this.jqAction = jQuery("<div class=\"code-action\"/>");
 	this.jqParams = jQuery("<div class=\"code-action-params\"/>");
+	this.jqAction.append(jqInitParams);
 	this.jqAction.append(this.jqParams);
 	this.jqEntity.append(this.jqAction);
 
@@ -149,7 +155,10 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 	
 	if(params){
 		for(var i = 0; i < params.length; i++){
-			jqActionArgs.push(this.codeVar(params[i].name));
+			var jqParam = this.codeVar(params[i].name);
+			var jqAssignNull = this.codeAssign(jqParam.clone());
+			this.addCode(jqAssignNull, jqInitParams);
+			jqActionArgs.push(jqParam);
 		}
 	}
 
@@ -165,7 +174,7 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 };
 
 KCodeExampleBase.prototype.setChangeEvent = function (){
-    jQuery("input").change(KCodeExampleBase.instance.onParamsChange);
+    jQuery("input,select").change(KCodeExampleBase.instance.onParamsChange);
     jQuery("button").change(KCodeExampleBase.instance.setChangeEvent);
 };
 
@@ -217,7 +226,11 @@ KCodeExampleBase.prototype.codeAssign = function (jqVar, jqVal){
 	
 	jqCode.append(jqVar);	
 	jqCode.append(" = ");
-	jqCode.append(jqVal);
+	
+	if(jqVal)
+		jqCode.append(jqVal);
+	else
+		jqCode.append(this.getNull());
 	
 	return jqCode;
 };
