@@ -1,0 +1,16 @@
+
+.code {overflow: auto;}
+#example { padding-left: 10px; background-color: #FFFFFF; line-height: 20px; font-size: 12px; font-family: monospace; }
+
+.code-php-code {color: #FF0000;}
+
+.code-php-bracket {color: #000000;}
+.code-php-bracket-over {color: #FF00FF; font-weight: bolder;}
+.code-php-var {color: #800000;}
+.code-php-assign {}
+.code-php-new-instance {}
+.code-php-class-name {color: #000000;}
+.code-php-call-func {}
+.code-php-func-name {} 
+.code-php-str {color: #00BB00;}
+.code-php-system {color: #0000FF;}

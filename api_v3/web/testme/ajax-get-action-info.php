@@ -8,29 +8,8 @@ KalturaLog::INFO ( ">------- api_v3 testme [$service][$action]-------");
 
 function toArrayRecursive(KalturaPropertyInfo $propInfo)
 {
-	return $propInfo->toArray(true);
+	return $propInfo->toArray();
 }
-
-KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(KALTURA_API_PATH, "cache", "KalturaClassInheritMap.cache"));
-if(!KalturaTypeReflector::hasClassInheritMapCache())
-{
-	$config = new Zend_Config_Ini("../../config/testme.ini");
-	$indexConfig = $config->get('index');
-	
-	$include = $indexConfig->get("include");
-	$exclude = $indexConfig->get("exclude");
-	$additional = $indexConfig->get("additional");
-	
-	$clientGenerator = new DummyForDocsClientGenerator();
-	$clientGenerator->setIncludeOrExcludeList($include, $exclude);
-	$clientGenerator->setAdditionalList($additional);
-	$clientGenerator->load();
-	
-	$objects = $clientGenerator->getObjects();
-	
-	KalturaTypeReflector::setClassMap(array_keys($objects));
-}
-
 
 $actionInfo = null;
 try

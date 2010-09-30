@@ -15,7 +15,7 @@ class KalturaPropertyInfo
 	private $_description;
 	private $_filters = array();
 	
-	public function KalturaPropertyInfo($type, $name)
+	public function KalturaPropertyInfo($type, $name = '')
 	{
 		$this->_type = $type;
 		$this->_name = $name;
@@ -210,7 +210,7 @@ class KalturaPropertyInfo
 			
 			foreach($typeReflector->getProperties() as $prop)
 			{
-				$array["properties"][] = $prop->toArray();
+				$array["properties"][] = $prop->toArray($withSubTypes);
 			}
 			
 			foreach($typeReflector->getConstants() as $prop)

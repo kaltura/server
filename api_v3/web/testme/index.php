@@ -3,6 +3,7 @@
 <head>
 	<title>Kaltura - Test Me Console</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/code.example.css" />
 	<link rel="stylesheet" type="text/css" href="css/jquery.tooltip.css" />
 	<script type="text/javascript" src="js/jquery-1.3.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery.bgiframe.pack.js"></script>
@@ -10,6 +11,7 @@
 	<script type="text/javascript" src="js/jquery.tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
 	<script type="text/javascript" src="js/jquery.json.min.js"></script>
+	<script type="text/javascript" src="js/code.example.js"></script>
 	<script type="text/javascript" src="js/main.js?r35598"></script>
 </head>
 <body>
@@ -36,6 +38,7 @@
      <a href="../testmeDoc/index.php">API Documentation</a>
     </li>
    </ul>	
+   <div class="testme">
 	<div class="left">
 		<div class="left-content">
 			<!--p>
@@ -86,5 +89,10 @@
 	<div class="right">
 		<iframe id="result" name="result" src=""></iframe>
 	</div>
+	</div>
+   	<hr width="100%"/>
+   <div class="code">
+   	<div id="example"></div>
+   </div>
 </body>
 </html>

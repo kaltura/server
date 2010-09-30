@@ -1,7 +1,7 @@
 function delegate (/*Object*/ scope, /*Function*/ method ) {
 	var f = function () {
 		return method.apply (scope, arguments);
-	}
+	};
 	return f;
 }
 
@@ -18,9 +18,29 @@ KTestMe = function() {
 	
 	this.calculateDimensions();
 	this.jqWindow.resize();
-}
+
+	this.initCodeExample();
+};
 
 KTestMe.prototype = {
+
+	height: null,
+	testmeHeight: null,
+	resultWidth: null,
+
+	jqActions: null,
+	jqServices: null,
+	jqActionParams: null,
+	jqObjectsContainer: null,
+	jqKs: null,
+	jqSend: null,
+	jqHistory: null,
+	jqResultIframe: null,
+	jqWindow: null,
+	
+	historyItem: null,
+	codeGenerator: null,
+		
 	bindToElements: function() {
 		this.jqActions = jQuery("select[name=action]");
 		this.jqServices = jQuery("select[name=service]");
@@ -87,6 +107,7 @@ KTestMe.prototype = {
 	},
 	
 	onGetActionInfoSuccess: function(data) {
+		
 		jQuery("#actionHelp").attr("title", this.jqServices.val() + "." + this.jqActions.val() + " - " + data.description);
 		this.jqObjectsContainer.empty();
 		jQuery.each(data.actionParams, delegate(this, function (i, param) {
@@ -112,6 +133,13 @@ KTestMe.prototype = {
 		if (this.historyItem)
 		{
 			this.loadHistoryData();
+		}
+
+		if(this.codeGenerator){
+			var service = this.jqServices.val();
+			var action = this.jqActions.val();
+			
+			this.codeGenerator.setAction(service, action, data.actionParams);
 		}
 	},
 	
@@ -145,7 +173,7 @@ KTestMe.prototype = {
 		var service = jQuery("select[name=service]").val();
 		var action = jQuery("select[name=action]").val();
 		if (jQuery("input:file").size() > 0)
-			jQuery("form").attr("enctype", "multipart/form-data")
+			jQuery("form").attr("enctype", "multipart/form-data");
 		else
 			jQuery("form").attr("enctype", null);
 			
@@ -180,50 +208,19 @@ KTestMe.prototype = {
 	
 	onWindowResizeHandler: function() {
 		this.calculateDimensions();
-		jQuery(".object-properties").css("height", this.height);
-		jQuery(".right, .left").css("height", this.height); // for margin
+		jQuery(".object-properties").css("height", this.testmeHeight);
+		jQuery(".testme").css("height", this.testmeHeight); // for margin
 		jQuery(".right").css("width", this.resultWidth);
 	},
 	
 	addObjectField: function(/*jQuery*/ container, param, inArray) {
 		
-		var jqObjectType = jQuery("<select id=\"object-type-" + param.name + "\" class=\"object-type\">");
+		var jqObjectType = jQuery("<select id=\"object-type-" + param.name.replace(/:/g, "_") + "\" class=\"object-type\">");
 		jqObjectType.append("<option>" + param.type + "</option>");
 		
 		var scope = this;
 		var objectTypesProps = new Object();
 		
-		if(param.subTypes.length)
-		{
-			for(var i = 0; i < param.subTypes.length; i++)
-			{
-				var subType = param.subTypes[i];
-				jqObjectType.append("<option>" + subType.type + "</option>");
-
-
-				var jqObjectProperties = jQuery("<div class=\"object-properties\">");
-				jqObjectProperties.attr("id", "object-props-" + subType.name + "-" + subType.type);
-				objectTypesProps[subType.type] = jqObjectProperties;
-
-				jQuery.each(subType.properties, delegate(this, function (i, property) {
-					
-					if (property.isReadOnly)
-						return;
-
-					property.name = subType.name + ":" + property.name;
-					
-					if (property.isEnum || property.isStringEnum)
-						scope.addEnumField(jqObjectProperties, property);
-					else if (property.isArray)
-						scope.addArrayField(jqObjectProperties, property);
-					else if (!property.isComplexType)
-						scope.addSimpleField(jqObjectProperties, property);
-					else
-						scope.addObjectField(jqObjectProperties, property);
-				}));
-			}
-		}
-
 		var jqObjectProperties = jQuery("<div class=\"object-properties\">");
 		jqObjectProperties.attr("id", "object-props-" + param.name + "-" + param.type);
 		objectTypesProps[param.type] = jqObjectProperties;
@@ -258,13 +255,18 @@ KTestMe.prototype = {
 				currentPropsWindow: jqObjectProperties,
 				click: function(e){
 					var objectPropsId = propsPoper.currentPropsWindow.attr('id');
-					var count = objectPropsId.split(":").length;
+					var splitId = objectPropsId.split(":");
+					var count = splitId.length;
 
 					if(inArray)
-						count--;
+					{
+						for(var i = 0; i < splitId.length; i++)
+							if(!isNaN(splitId[i][0]))
+								count--;
+					}
 					
 					propsPoper.currentPropsWindow
-						.css("height", this.height)
+						.css("height", this.testmeHeight)
 						.css("left", count * 300)
 						.toggle();
 				},
@@ -273,10 +275,19 @@ KTestMe.prototype = {
 
 					propsPoper.currentPropsWindow = objectTypesProps[jqObjectType.val()];
 					scope.jqObjectsContainer.append(propsPoper.currentPropsWindow);
+					
+					if(scope.codeGenerator)
+					{
+						scope.codeGenerator.setChangeEvent();
+						scope.codeGenerator.onParamsChange();
+					}
 				},
 				remove: function(e){
 					if(propsPoper.currentPropsWindow)
+					{
+						propsPoper.currentPropsWindow.hide();
 						propsPoper.currentPropsWindow.remove();
+					}
 
 					propsPoper.currentPropsWindow = null;
 				} 
@@ -298,6 +309,41 @@ KTestMe.prototype = {
 		
 		jqObject.append(jqObjectTitle);
 		container.append(jqObject);
+
+		jQuery.getJSON(
+			"ajax-get-type-subclasses.php",
+			{ "type": param.type },
+			delegate(this, function(subTypes){
+				
+				for(var i = 0; i < subTypes.length; i++)
+				{
+					var subType = subTypes[i];
+					jqObjectType.append("<option>" + subType.type + "</option>");
+
+
+					var jqObjectProperties = jQuery("<div class=\"object-properties\">");
+					jqObjectProperties.attr("id", "object-props-" + param.name + "-" + subType.type);
+					objectTypesProps[subType.type] = jqObjectProperties;
+
+					jQuery.each(subType.properties, delegate(this, function (i, property) {
+						
+						if (property.isReadOnly)
+							return;
+
+						property.name = param.name + ":" + property.name;
+						
+						if (property.isEnum || property.isStringEnum)
+							scope.addEnumField(jqObjectProperties, property);
+						else if (property.isArray)
+							scope.addArrayField(jqObjectProperties, property);
+						else if (!property.isComplexType)
+							scope.addSimpleField(jqObjectProperties, property);
+						else
+							scope.addObjectField(jqObjectProperties, property);
+					}));
+				}
+			})
+		);
 	},
 	
 	addEnumField: function(/*jQuery*/ container, param) {
@@ -306,17 +352,17 @@ KTestMe.prototype = {
 		
 		var jqSelect = jQuery("<select name=\""+param.name+"\" class=\"disabled\"></select>");
 		jQuery.each(param.constants, function(i, constant) {
-			jqSelect.append("<option value=\""+constant.defaultValue+"\">"+constant.name+"</option>")
+			jqSelect.append("<option value=\""+constant.defaultValue+"\">"+constant.name+"</option>");
 		});
 		
 		jqSelect.focus(delegate(this, this.enableField));
 		
 		jQuery("<div class=\"param enum\">")
-			.append("<label for=\""+param.name+"\">"+param.name+" ("+param.type+"):</label>")
+			.append("<label for=\""+param.name+"\">"+param.name+" (<span class=\"enum-type\">"+param.type+"</span>):</label>")
 			.append(jqSelect)
 			.append(jqCheckBox)
 			.append(this.getHelpJQ(param.name + " - " + param.description))
-			.appendTo(container)
+			.appendTo(container);
 	},
 	
 	addSimpleField: function(/*jQuery*/ container, param) {
@@ -352,10 +398,9 @@ KTestMe.prototype = {
 	},
 	
 	addArrayField: function(/*jQuery*/ container, param) {
-		//param.arrayType.name = param.name + ":" + param.arrayType.name + "XXX";
-		
 		var jqArray = jQuery("<div class=\"array\">");
-		var jqArrayName = jQuery("<div class=\"array-name\">").html(param.name + " (array)");
+		var objectTypeId = "object-type-" + param.name.replace(/:/g, "_");
+		var jqArrayName = jQuery("<div class=\"array-name\">").html(param.name + " (<span id=\"" + objectTypeId + "\" class=\"array-type\">array</span>)");
 		jqArray.append(jqArrayName);
 		
 		var jqAdd = jQuery("<button class=\"array-button\">Add</button>");
@@ -451,7 +496,10 @@ KTestMe.prototype = {
 	},
 	
 	calculateDimensions: function() {
-		this.height = jQuery("body").innerHeight() - jQuery("#kmcSubMenu").outerHeight() - 50
+		this.height = jQuery("body").innerHeight() - jQuery("#kmcSubMenu").outerHeight() - 50;
+		this.testmeHeight = this.height - 180;
+
+		jQuery(".code").css("height", 179);
 		
 		var leftBoxWidth = jQuery(".left").outerWidth();
 		
@@ -461,8 +509,12 @@ KTestMe.prototype = {
 		var leftBoxLeftMargin = jQuery(".left").css("margin-left").replace("px", "");
 		leftBoxLeftMargin = Number(leftBoxLeftMargin);
 		this.resultWidth = jQuery("body").innerWidth() - leftBoxWidth - leftBoxLeftMargin - leftBoxRightMargin - 20;
+	},
+	
+	initCodeExample: function() {
+		this.codeGenerator = new KCodeExamplePHP(jQuery("#example"));
 	}
-}
+};
 
 jQuery(function() {
 	new KTestMe();
