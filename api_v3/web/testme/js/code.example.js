@@ -67,6 +67,9 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 	var params = [];
 	jQuery(".param").each(function(i, item) {
 		var jqItem = jQuery(item);
+		if (!jqItem.find("input:checkbox:checked").size())
+			return;
+		
 		var jqField = jqItem.find("input:text,select");
 		var name = jqField.attr("name");
 		
@@ -77,21 +80,18 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 			return;
 		}
 		
-		if (jqItem.find("input:checkbox:checked").size() > 0)
-		{
-			var jqValue = null;
-			
-			if(jqItem.hasClass("enum")){
-				var jqEnumType = jqItem.find(".enum-type");
-				var enumType = jqEnumType.text();
-				jqValue = enumType + scope.getClassDelimiter() + jqField.find("option:selected").text();
-			}
-			else{
-				var value = jqField.val();
-				jqValue = scope.codeString(value);
-			}
-			params[name] = jqValue;
+		var jqValue = null;
+		
+		if(jqItem.hasClass("enum")){
+			var jqEnumType = jqItem.find(".enum-type");
+			var enumType = jqEnumType.text();
+			jqValue = enumType + scope.getClassDelimiter() + jqField.find("option:selected").text();
 		}
+		else{
+			var value = jqField.val();
+			jqValue = scope.codeString(value);
+		}
+		params[name] = jqValue;
 	});
 	
 	var addedObjects = new Object();
