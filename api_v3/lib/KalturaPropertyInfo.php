@@ -171,7 +171,7 @@ class KalturaPropertyInfo
 		return $this->_filters;
 	}
 
-	public function toArray()
+	public function toArray($withSubTypes = false)
 	{
 		$array = array();
 		$array["type"] 			= $this->getType();
@@ -193,9 +193,21 @@ class KalturaPropertyInfo
 		$array["description"] 	= $this->getDescription() ? $this->getDescription() : "";
 		$array["properties"] 	= array();
 		$array["constants"] 	= array();
+		$array["subTypes"]		= array();
+		
 		$typeReflector = $this->getTypeReflector();
 		if ($typeReflector)
 		{
+			if($withSubTypes)
+			{
+				$subTypes = $typeReflector->getSubTypesNames();
+				foreach($subTypes as $subType)
+				{
+					$subTypeInfo = new KalturaPropertyInfo($subType, $this->_name);
+					$array["subTypes"][] = $subTypeInfo->toArray();
+				}
+			}
+			
 			foreach($typeReflector->getProperties() as $prop)
 			{
 				$array["properties"][] = $prop->toArray();

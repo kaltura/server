@@ -7,6 +7,10 @@
  */
 class KalturaTypeReflector
 {
+	static private $_classMap = array();
+	static private $_classInheritMap = array();
+	static private $_classInheritMapLocation = "";
+	
 	/**
 	 * @var string
 	 */
@@ -200,6 +204,16 @@ class KalturaTypeReflector
             return KalturaTypeReflectorCacher::get($parentClass->getName());
 	    else
 	        return null;
+	}
+	
+	/**
+	 * Return a array of all sub classes names 
+	 *
+	 * @return array
+	 */
+	public function getSubTypesNames()
+	{
+		return self::getSubClasses($this->_type);
 	}
 	
 	/**
@@ -431,5 +445,76 @@ class KalturaTypeReflector
 			$this->getConstants();
 			
 		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_isEnum", "_isStringEnum", "_isArray", "_description");
+	}
+
+
+	/**
+	 * Set the class inherit map cache file path
+	 * 
+	 * @param string $path
+	 */
+	static function setClassInheritMapPath($path)
+	{
+		self::$_classInheritMapLocation = $path;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	static function hasClassInheritMapCache()
+	{
+		return file_exists(self::$_classInheritMapLocation);
+	}
+	
+	/**
+	 * Set the class map array
+	 * 
+	 * @param array $map
+	 */
+	static function setClassMap(array $map)
+	{
+		self::$_classMap = $map;
+	}
+	
+	protected static function loadSubClassesMap()
+	{
+		self::$_classInheritMap = array();
+	
+		if (!file_exists(self::$_classInheritMapLocation))
+		{
+			foreach(self::$_classMap as $class)
+			{
+				if(!class_exists($class))
+					continue;
+					
+				$parentClass = get_parent_class($class);
+				while($parentClass)
+				{
+					if(!isset(self::$_classInheritMap[$parentClass]))
+						self::$_classInheritMap[$parentClass] = array();
+						
+					self::$_classInheritMap[$parentClass][] = $class;
+					
+					$parentClass = get_parent_class($parentClass);
+				}
+			}
+			
+			file_put_contents(self::$_classInheritMapLocation, serialize(self::$_classInheritMap));
+		}
+		else 
+		{
+			self::$_classInheritMap = unserialize(file_get_contents(self::$_classInheritMapLocation));
+		}
+	}
+	
+	public static function getSubClasses($class)
+	{
+		if(!count(self::$_classInheritMap))
+			self::loadSubClassesMap();
+			
+		if(isset(self::$_classInheritMap[$class]))
+			return self::$_classInheritMap[$class];
+			
+		return array();
 	}
 }
