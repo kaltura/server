@@ -1,7 +1,7 @@
 <?php 
 	require_once("../../bootstrap.php"); 
 
-	$config = new Zend_Config_Ini("../../config/testmedoc.ini");
+	$config = new Zend_Config_Ini("../../config/testme.ini");
 	$indexConfig = $config->get('index');
 	
 	$include = $indexConfig->get("include");
