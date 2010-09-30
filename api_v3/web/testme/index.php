@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="js/jquery.dimensions.pack.js"></script>
 	<script type="text/javascript" src="js/jquery.tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
+	<script type="text/javascript" src="js/jquery.json.min.js"></script>
 	<script type="text/javascript" src="js/main.js?r35598"></script>
 </head>
 <body>
