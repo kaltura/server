@@ -185,34 +185,56 @@ KTestMe.prototype = {
 		jQuery(".right").css("width", this.resultWidth);
 	},
 	
-	addObjectField: function(/*jQuery*/ container, param) {
-		var jqObject = jQuery("<div class=\"object\">");
-		jqObject.attr("id", "object-" + param.name);
-		var jqObjectProperties = jQuery("<div class=\"object-properties\">");
-		jqObjectProperties.attr("id", "object-props-" + param.name);
-		var jqObjectName = jQuery("<div class=\"object-name\">").html(param.name+" ("+param.type+")"+":");
+	addObjectField: function(/*jQuery*/ container, param, inArray) {
 		
-		jqObjectName.click(delegate(this, function(e) {
-			var objectPropsId = jQuery(e.target).parent().attr("id").replace("object-", "");
-			var count = objectPropsId.split(":").length;
-			objectPropsId = objectPropsId.replace(/:/g,"\\:"); //escape
-			jQuery("#object-props-"+objectPropsId)
-				.css("height", this.height)
-				.css("left", count * 300)
-				.toggle();
-		}));
-		
-		jqObject.append(jqObjectName);
-		this.jqObjectsContainer.append(jqObjectProperties);
+		var jqObjectType = jQuery("<select id=\"object-type-" + param.name + "\" class=\"object-type\">");
+		jqObjectType.append("<option>" + param.type + "</option>");
 		
 		var scope = this;
+		var objectTypesProps = new Object();
+		
+		if(param.subTypes.length)
+		{
+			for(var i = 0; i < param.subTypes.length; i++)
+			{
+				var subType = param.subTypes[i];
+				jqObjectType.append("<option>" + subType.type + "</option>");
+
+
+				var jqObjectProperties = jQuery("<div class=\"object-properties\">");
+				jqObjectProperties.attr("id", "object-props-" + subType.name + "-" + subType.type);
+				objectTypesProps[subType.type] = jqObjectProperties;
+
+				jQuery.each(subType.properties, delegate(this, function (i, property) {
+					
+					if (property.isReadOnly)
+						return;
+
+					property.name = subType.name + ":" + property.name;
+					
+					if (property.isEnum || property.isStringEnum)
+						scope.addEnumField(jqObjectProperties, property);
+					else if (property.isArray)
+						scope.addArrayField(jqObjectProperties, property);
+					else if (!property.isComplexType)
+						scope.addSimpleField(jqObjectProperties, property);
+					else
+						scope.addObjectField(jqObjectProperties, property);
+				}));
+			}
+		}
+
+		var jqObjectProperties = jQuery("<div class=\"object-properties\">");
+		jqObjectProperties.attr("id", "object-props-" + param.name + "-" + param.type);
+		objectTypesProps[param.type] = jqObjectProperties;
+
 		jQuery.each(param.properties, delegate(this, function (i, property) {
-			var propertyName = property.name;
-			var propertyType = property.type;
+			
 			if (property.isReadOnly)
 				return;
+
+			property.name = param.name + ":" + property.name;
 			
-			property.name = param.name + ":" + propertyName;
 			if (property.isEnum || property.isStringEnum)
 				scope.addEnumField(jqObjectProperties, property);
 			else if (property.isArray)
@@ -223,6 +245,58 @@ KTestMe.prototype = {
 				scope.addObjectField(jqObjectProperties, property);
 		}));
 		
+		var jqObject = jQuery("<div class=\"object\">");
+		jqObject.attr("id", "object-" + param.name);
+		var jqObjectTitle = jQuery("<div>");
+		var jqObjectName = jQuery("<span class=\"object-name\">").html(param.name + " ");
+		jqObjectTitle.append(jqObjectName);
+		jqObjectTitle.append(jqObjectType);
+		
+		this.jqObjectsContainer.append(jqObjectProperties);
+		
+		var propsPoper = {
+				currentPropsWindow: jqObjectProperties,
+				click: function(e){
+					var objectPropsId = propsPoper.currentPropsWindow.attr('id');
+					var count = objectPropsId.split(":").length;
+
+					if(inArray)
+						count--;
+					
+					propsPoper.currentPropsWindow
+						.css("height", this.height)
+						.css("left", count * 300)
+						.toggle();
+				},
+				change: function(e){
+					propsPoper.remove();
+
+					propsPoper.currentPropsWindow = objectTypesProps[jqObjectType.val()];
+					scope.jqObjectsContainer.append(propsPoper.currentPropsWindow);
+				},
+				remove: function(e){
+					if(propsPoper.currentPropsWindow)
+						propsPoper.currentPropsWindow.remove();
+
+					propsPoper.currentPropsWindow = null;
+				} 
+		};
+		
+		jqObjectName.click(delegate(this, propsPoper.click));
+		jqObjectType.change(delegate(this, propsPoper.change));
+
+		if(inArray)
+		{
+			var jqRemove = jQuery("<button class=\"array-button\">Remove</button>");
+			jqObjectTitle.append(jqRemove);
+			
+			jqRemove.click(delegate(this, function(e){
+				propsPoper.remove();
+				jqObject.remove();
+			}));
+		}
+		
+		jqObject.append(jqObjectTitle);
 		container.append(jqObject);
 	},
 	
@@ -278,9 +352,25 @@ KTestMe.prototype = {
 	},
 	
 	addArrayField: function(/*jQuery*/ container, param) {
-		param.arrayType.name = param.name + ":" + param.arrayType.name;
+		//param.arrayType.name = param.name + ":" + param.arrayType.name + "XXX";
+		
 		var jqArray = jQuery("<div class=\"array\">");
-		this.addObjectField(jqArray, param.arrayType);
+		var jqArrayName = jQuery("<div class=\"array-name\">").html(param.name + " (array)");
+		jqArray.append(jqArrayName);
+		
+		var jqAdd = jQuery("<button class=\"array-button\">Add</button>");
+		jqArrayName.append(jqAdd);
+		
+		var index = 0;
+		var scope = this;
+		
+		jqAdd.click(delegate(this, function(e){
+			var theParam = $.evalJSON($.toJSON(param.arrayType)); // clone
+			theParam.name = param.name + ":" + index;
+			scope.addObjectField(jqArray, theParam, true);
+			index++;
+		}));
+		
 		container.append(jqArray);
 	},
 	

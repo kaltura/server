@@ -14,7 +14,7 @@ a:hover { color: #505050; }
 
 #action-params, .param, .object { margin-bottom: 15px; }
 
-.param label, .object-name { display: block; padding-bottom: 2px; font-size: 10px; color: #666; }
+.param label, .object-name, .array-name { display: block; padding-bottom: 2px; font-size: 10px; color: #666; }
 .param select, .param input[type="text"] { font-size: 12px; padding: 2px; border: 1px solid #D7D7D7; }
 .param select { width: 206px; }
 .param input[type="text"] { width: 200px; }
@@ -23,8 +23,12 @@ a:hover { color: #505050; }
 
 button { background-color: #A0A0A0; border-color: #DEDEDE #202020 #202020 #DEDEDE; border-style: solid; border-width: 1px; color: #FFFFFF; font-size: 12px; padding: 2px 10px; text-align: center; cursor: pointer; }
 
+.array-button {font-size: 9px}
+
 .object-name { cursor: pointer; }
+.object-type {font-size: 9px}
 .object-properties { display: none; overflow: scroll; position: absolute; top: 65px; padding: 0 10px; background-color: #F7F7F7;  }
+
 
 .helpTooltip { }
 #kmcSubMenu { margin: 7px 15px 27px; display:table; zoom:1;}
