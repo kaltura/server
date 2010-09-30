@@ -113,16 +113,22 @@ define('SERVICES_JSON_SUPPRESS_ERRORS', 32);
 * </code>
 */
 
-function json_encode( array $var )
+if(!function_exists('json_encode'))
 {
-	$sj = new Services_JSON();
-	return $sj->encode($var);
+	function json_encode( array $var )
+	{
+		$sj = new Services_JSON();
+		return $sj->encode($var);
+	}
 }
 
-function json_decode( string $var )
+if(!function_exists('json_decode'))
 {
-	$sj = new Services_JSON();
-	return $sj->decode($var);
+	function json_decode( string $var )
+	{
+		$sj = new Services_JSON();
+		return $sj->decode($var);
+	}
 }
 
 class Services_JSON
