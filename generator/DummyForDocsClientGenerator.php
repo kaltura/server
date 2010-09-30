@@ -18,22 +18,22 @@ class DummyForDocsClientGenerator extends ClientGeneratorFromPhp
 		{
 			if ($type->isEnum())
 			{
-				$this->_enums[] = $type;
+				$this->_enums[$type->getType()] = $type;
 			}
 			else if ($type->isStringEnum())
 			{
-				$this->_stringEnums[] = $type;
+				$this->_stringEnums[$type->getType()] = $type;
 			}
 			else if ($type->isArray())
 			{
-				$this->_arrays[] = $type;
+				$this->_arrays[$type->getType()] = $type;
 			}
 			else 
 			{
 				if (strpos($type->getType(), "Filter", strlen($type->getType()) - 6))
-					$this->_filters[] = $type;
+					$this->_filters[$type->getType()] = $type;
 				else
-					$this->_objects[] = $type;
+					$this->_objects[$type->getType()] = $type;
 			}
 		}
 	}
