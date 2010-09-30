@@ -1,6 +1,4 @@
 <?php
-require_once ( "myBaseObject.class.php");
-require_once ( "model/kshow.class.php");
 
 /**
  * TODO - think of how's best to work with these classes - $attach_policy and stuff !
@@ -13,7 +11,7 @@ abstract class kshowCustomData extends myBaseObject
 	protected $m_kshow = NULL;
 
 	// when this ctor is called - if the kshow is not NULL, initialize from it
-	protected function __construct( kshow $kshow = NULL , $attach_policy = NULL )
+	public function __construct( kshow $kshow = NULL , $attach_policy = NULL )
 	{
 		if ( $kshow != NULL )
 		{
