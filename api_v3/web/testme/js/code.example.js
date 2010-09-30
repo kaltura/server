@@ -186,10 +186,11 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 	}
 
 	var jqResult = this.codeVar("results");
+	var jqResultDeclare = this.codeVarDefine(jqResult, "Object");
 	var jqService = this.codeObjectAttribute(this.jqClientObject.clone(), service);
 	var jqActionFunction = this.codeUserFunction(action, jqActionArgs);
 	var jqActionCall = this.codeObjectMethod(jqService, jqActionFunction);
-	var jqActionResults = this.codeAssign(jqResult, jqActionCall);
+	var jqActionResults = this.codeAssign(jqResultDeclare, jqActionCall);
 	this.addCode(jqActionResults, this.jqAction);
 
 	this.setChangeEvent();
