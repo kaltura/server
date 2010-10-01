@@ -8,7 +8,7 @@
 #codeSubMenu li active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
 
 
-.code {overflow: auto;}
+.code {}
 #example { padding-left: 10px; background-color: #FFFFFF; line-height: 20px; font-size: 12px; font-family: monospace; }
 
 .indent {margin-left: 30px}
