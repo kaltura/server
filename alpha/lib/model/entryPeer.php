@@ -8,9 +8,6 @@
  */ 
 class entryPeer extends BaseentryPeer 
 {
-	const SPHINX_INDEX_NAME = 'kaltura_entry';
-	const SPHINX_MAX_RECORDS = 10000;
-	
 	// if the count is less that this number - don't cache it so the nubmers will not look strange in small lists
 	const MIN_COUNT_RESULT_TO_CACHE = 100;  
 	
@@ -422,7 +419,7 @@ class entryPeer extends BaseentryPeer
 	{
 		$c = clone $criteria;
 		
-		if($c instanceof SphinxCriteria)
+		if($c instanceof KalturaCriteria)
 			$c->applyFilters();
 			
 		return parent::doSelectJoinkuser($c, $con, $join_behavior);
@@ -436,7 +433,7 @@ class entryPeer extends BaseentryPeer
 	{
 		$c = clone $criteria;
 		
-		if($c instanceof SphinxCriteria)
+		if($c instanceof KalturaCriteria)
 			$c->applyFilters();
 			
 		return parent::doSelect($c, $con);

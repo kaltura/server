@@ -541,7 +541,7 @@ abstract class baseObjectFilter extends myBaseObject
 	public final function attachToCriteria ( Criteria $criteria )
 	{
 		// later will call all filters attachToFinalCriteria before the doSelect
-		if($criteria instanceof SphinxCriteria)
+		if($criteria instanceof KalturaCriteria)
 			return $criteria->attachFilter($this);
 			
 		return $this->attachToFinalCriteria($criteria);

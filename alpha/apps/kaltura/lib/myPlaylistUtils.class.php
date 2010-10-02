@@ -189,7 +189,7 @@ class myPlaylistUtils
 	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $extra_filters = null, $detailed = true)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
-		$c= new EntrySphinxCriteria();
+		$c= KalturaCriteria::create("entry");
 		$c->add ( entryPeer::ID , $entry_id_list , Criteria::IN ); 
 		
 		if (!self::$isAdminKs)
@@ -354,7 +354,7 @@ class myPlaylistUtils
 		{
 			$current_limit = max ( 0 , $total_results - $number_of_entries ); // if the current_limit is < 0 - set it to be 0
 			$exclude_id_list = self::getIds( $entry_list );
-			$c = new EntrySphinxCriteria();
+			$c = KalturaCriteria::create("entry");
 			
 			
 			// don't fetch the same entries twice - filter out all the entries that were already fetched

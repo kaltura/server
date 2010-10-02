@@ -73,7 +73,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 		
 		if ( $should_serach )
 		{
-			$c = new EntrySphinxCriteria();
+			$c = KalturaCriteria::create("entry");
 			$c->add ( entryPeer::KUSER_ID , $kuser_id );
 			$c->add ( entryPeer::MEDIA_TYPE , $media_type );
 			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
@@ -88,7 +88,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 			$c->setOffset( $page * $pageSize );
 			$entry_results = entryPeer::doSelect ( $c );//JoinAll( $c );
 	
-			$number_of_results = $c->getSphinxRecordsCount();
+			$number_of_results = $c->getRecordsCount();
 			$number_of_pages = (int)($number_of_results / $pageSize);
 			if ( $number_of_results % $pageSize != 0 ) $number_of_pages += 1; // if there are some left-overs - there must be a nother page
 			

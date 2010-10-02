@@ -84,7 +84,7 @@ class mrssAction extends defPartnerservices2Action
 		// 2460 - dorimedia
 		$partner_list = array ( 593, 2460 );
 		 
-		$c = new EntrySphinxCriteria();
+		$c = KalturaCriteria::create("entry");
 		$c->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
 		
 		// for now display only entries that are part of the kaltura network
@@ -121,7 +121,7 @@ class mrssAction extends defPartnerservices2Action
 			$list = entryPeer::doSelect( $c );
 			$level = objectWrapperBase::DETAIL_LEVEL_REGULAR ;
 		}
-		$count = $c->getSphinxRecordsCount();
+		$count = $c->getRecordsCount();
 		
 $end_1 = microtime ( true );
 

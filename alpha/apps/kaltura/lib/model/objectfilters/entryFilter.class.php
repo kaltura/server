@@ -1,106 +1,6 @@
 <?php
 class entryFilter extends baseObjectFilter
 {
-	public static $sphinxFields = array(
-		entryPeer::ID => 'int_entry_id',
-		entryPeer::NAME => 'name',
-		entryPeer::TAGS => 'tags',
-		entryPeer::CATEGORIES_IDS => 'categories',
-		entryPeer::FLAVOR_PARAMS_IDS => 'flavor_params',
-		entryPeer::SOURCE_LINK => 'source_link',
-		entryPeer::KSHOW_ID => 'kshow_id',
-		entryPeer::GROUP_ID => 'group_id',
-		entryPeer::DESCRIPTION => 'description',
-		entryPeer::ADMIN_TAGS => 'admin_tags',
-		'plugins_data',
-		'entry.DURATION_TYPE' => 'duration_type',
-		
-		entryPeer::KUSER_ID => 'kuser_id',
-		entryPeer::STATUS => 'entry_status',
-		entryPeer::TYPE => 'type',
-		entryPeer::MEDIA_TYPE => 'media_type',
-		entryPeer::VIEWS => 'views',
-		entryPeer::PARTNER_ID => 'partner_id',
-		entryPeer::MODERATION_STATUS => 'moderation_status',
-		entryPeer::DISPLAY_IN_SEARCH => 'display_in_search',
-		entryPeer::LENGTH_IN_MSECS => 'duration',
-		entryPeer::ACCESS_CONTROL_ID => 'access_control_id',
-		entryPeer::MODERATION_COUNT => 'moderation_count',
-		entryPeer::RANK => 'rank',
-		entryPeer::PLAYS => 'plays',
-		
-		entryPeer::CREATED_AT => 'created_at',
-		entryPeer::UPDATED_AT => 'updated_at',
-		entryPeer::MODIFIED_AT => 'modified_at',
-		entryPeer::MEDIA_DATE => 'media_date',
-		entryPeer::START_DATE => 'start_date',
-		entryPeer::END_DATE => 'end_date',
-		entryPeer::AVAILABLE_FROM => 'available_from',
-	);
-	
-	public static $sphinxOrderFields = array(
-		entryPeer::NAME => 'sort_name',
-		
-		entryPeer::KUSER_ID => 'kuser_id',
-		entryPeer::STATUS => 'entry_status',
-		entryPeer::TYPE => 'type',
-		entryPeer::MEDIA_TYPE => 'media_type',
-		entryPeer::VIEWS => 'views',
-		entryPeer::PARTNER_ID => 'partner_id',
-		entryPeer::MODERATION_STATUS => 'moderation_status',
-		entryPeer::DISPLAY_IN_SEARCH => 'display_in_search',
-		entryPeer::LENGTH_IN_MSECS => 'duration',
-		entryPeer::ACCESS_CONTROL_ID => 'access_control_id',
-		entryPeer::MODERATION_COUNT => 'moderation_count',
-		entryPeer::RANK => 'rank',
-		entryPeer::PLAYS => 'plays',
-		
-		entryPeer::CREATED_AT => 'created_at',
-		entryPeer::UPDATED_AT => 'updated_at',
-		entryPeer::MODIFIED_AT => 'modified_at',
-		entryPeer::MEDIA_DATE => 'media_date',
-		entryPeer::START_DATE => 'start_date',
-		entryPeer::END_DATE => 'end_date',
-		entryPeer::AVAILABLE_FROM => 'available_from',
-	);
-	
-	public static $sphinxTypes = array(
-		'entry_id' => 'string',
-		'name' => 'string',
-		'tags' => 'string',
-		'categories' => 'string',
-		'flavor_params' => 'string',
-		'source_link' => 'string',
-		'kshow_id' => 'string',
-		'group_id' => 'string',
-		'metadata' => 'string',
-		'duration_type' => 'string',
-		
-		'int_entry_id' => 'int',
-		'kuser_id' => 'int',
-		'entry_status' => 'int',
-		'type' => 'int',
-		'media_type' => 'int',
-		'views' => 'int',
-		'partner_id' => 'int',
-		'moderation_status' => 'int',
-		'display_in_search' => 'int',
-		'duration' => 'int',
-		'access_control_id' => 'int',
-		'moderation_count' => 'int',
-		'rank' => 'int',
-		'plays' => 'int',
-		
-		'created_at' => 'timestamp',
-		'updated_at' => 'timestamp',
-		'modified_at' => 'timestamp',
-		'media_date' => 'timestamp',
-		'start_date' => 'timestamp',
-		'end_date' => 'timestamp',
-		'available_from' => 'timestamp',
-	);
-	
-	
 	// allow only 256 charaters when creation a MATCH-AGAINST caluse
 	const MAX_SAERCH_TEXT_SIZE = 256;
 	
@@ -380,28 +280,6 @@ class entryFilter extends baseObjectFilter
 		$this->set('_free_text', $freeText);
 		
 		$this->attachToCriteria($criteria);
-	}
-	
-	public static function getSphinxFieldName($fieldName)
-	{
-		if(strpos($fieldName, '.') === false)
-		{
-			$fieldName = strtoupper($fieldName);
-			$fieldName = "entry.$fieldName";
-		}
-			
-		if(!isset(self::$sphinxFields[$fieldName]))
-			return $fieldName;
-			
-		return self::$sphinxFields[$fieldName];
-	}
-	
-	public static function getSphinxFieldType($fieldName)
-	{
-		if(!isset(self::$sphinxTypes[$fieldName]))
-			return null;
-			
-		return self::$sphinxTypes[$fieldName];
 	}
 }
 

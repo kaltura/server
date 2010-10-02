@@ -2500,49 +2500,6 @@
 			<index-column name="created_at" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="sphinx_log">
-		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
-			required="true" primaryKey="true" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="entry_id" type="varchar" size="20" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="partner_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="dc" type="integer" />			
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="sql" type="clob" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="created_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="partner">
-			<reference local="partner_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
-			<reference local="entry_id" foreign="id" />
-		</foreign-key>
-		<index name="entry_id">
-			<index-column name="entry_id" />
-		</index>
-		<index name="creatd_at">
-			<index-column name="created_at" />
-		</index>
-	</table>
-	<table skipSql="false" abstract="false" name="sphinx_log_server">
-		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
-			required="true" primaryKey="true" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="server" type="varchar" size="63" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="dc" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="last_log_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="updated_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="sphinx_log">
-			<reference local="last_log_id" foreign="id" />
-		</foreign-key>
-	</table>
 	<table skipSql="false" abstract="false" name="invalid_session"
 		phpName="invalidSession">
 		<column lazyLoad="false" name="id" type="integer"

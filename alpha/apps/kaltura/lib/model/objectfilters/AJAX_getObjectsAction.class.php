@@ -92,7 +92,7 @@ abstract class AJAX_getObjectsAction //extends sfAction
 		if ( $base_criteria != null )
 			$c = $base_criteria;
 		else
-			$c = new EntrySphinxCriteria();
+			$c = KalturaCriteria::create("entry");
 		
 		$filter->addSearchMatchToCriteria( $c , $keywords , $this->getSearchableColumnName() );
 		// each entity can do specific modifications to the criteria

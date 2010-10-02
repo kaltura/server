@@ -64,7 +64,7 @@ class listentriesAction extends defPartnerservices2Action
 		kuserPeer::setUseCriteriaFilter( false );		
 		//entryPeer::setUseCriteriaFilter( false );
 
-		$c = new EntrySphinxCriteria();
+		$c = KalturaCriteria::create("entry");
 
 		// filter
 		$filter = new entryFilter(  );
@@ -136,7 +136,7 @@ class listentriesAction extends defPartnerservices2Action
 			$level = objectWrapperBase::DETAIL_LEVEL_REGULAR ;
 		}
 		
-		$count = $c->getSphinxRecordsCount();
+		$count = $c->getRecordsCount();
 		
 		$this->addMsg ( "count" , $count );
 		$this->addMsg ( "page_size" , $limit );

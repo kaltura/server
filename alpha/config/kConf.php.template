@@ -179,7 +179,10 @@ class kConf
 					"MetadataPlugin", // TODO: Should be disabled/enabled?
 					"MultiCentersPlugin", // TODO: Should be disabled/enabled?
 					"DocumentPlugin", // TODO: Should be disabled/enabled?
+					"SphinxSearchPlugin",
 				),
+
+                "search_plugin"	=> "SphinxSearchPlugin",
 											
 				"event_consumers" => array(
                 	"kFlowManager",
