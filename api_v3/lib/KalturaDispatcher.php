@@ -42,7 +42,6 @@ class KalturaDispatcher
 		SchedulerPeer::clearInstancePool();
 		SchedulerStatusPeer::clearInstancePool();
 		SchedulerWorkerPeer::clearInstancePool();
-		SphinxLogPeer::clearInstancePool();
 		StorageProfilePeer::clearInstancePool();
 		syndicationFeedPeer::clearInstancePool();
 		TrackEntryPeer::clearInstancePool();

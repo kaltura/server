@@ -159,7 +159,7 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param KalturaBaseEntryFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @param string $partnerIdForScope
-	 * @return EntrySphinxCriteria
+	 * @return KalturaCriteria
 	 */
 	protected function prepareEntriesCriteriaFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, $partnerIdForScope)
 	{
@@ -195,7 +195,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$filter->toObject($entryFilter);
 
-		$c = new EntrySphinxCriteria();
+		$c = KalturaCriteria::create("entry");
 		
 		if($pager)
 			$pager->attachToCriteria($c);
@@ -216,7 +216,7 @@ class KalturaEntryService extends KalturaBaseService
 		$c = $this->prepareEntriesCriteriaFilter($filter, $pager, $partnerIdForScope);
 		
 		$list = entryPeer::doSelect($c);
-		$totalCount = $c->getSphinxRecordsCount();
+		$totalCount = $c->getRecordsCount();
 		
 		return array($list, $totalCount);        
 	}
@@ -227,7 +227,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$c = $this->prepareEntriesCriteriaFilter($filter, null, null);
 		$c->applyFilters();
-		$totalCount = $c->getSphinxRecordsCount();
+		$totalCount = $c->getRecordsCount();
 		
 		return $totalCount;
 	}

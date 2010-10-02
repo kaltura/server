@@ -21,7 +21,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 	private $flavor;
 	
 	/**
-	 * @var EntrySphinxCriteria
+	 * @var KalturaCriteria
 	 */
 	private $allEntriesCriteria = null;
 	
@@ -94,7 +94,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		
 		if( ! $this->allEntriesCriteria && ! $this->syndicationFeed->playlistId )
 		{
-			$c = new EntrySphinxCriteria();
+			$c = KalturaCriteria::create("entry");
 
 			// allow entry type 1
 			$criterion_clip = $c->getNewCriterion( entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP ) ;
