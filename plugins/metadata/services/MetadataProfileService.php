@@ -173,10 +173,7 @@ class MetadataProfileService extends KalturaBaseService
 		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
 			
-			if(!$peer)
-				$peer = kMetadataManager::getObjectPeer($metadata->getObjectType());
-				
-			$peer->saveToSphinx($metadata->getObjectId(), array());
+			kMetadataManager::updateSearchIndex($metadata);
 		}
 		
 		$update = new Criteria();

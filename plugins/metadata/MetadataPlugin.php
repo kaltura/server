@@ -307,7 +307,7 @@ class MetadataPlugin extends KalturaPlugin
 		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 		if($status == Metadata::STATUS_VALID)
 		{
-			kMetadataManager::parseSearchValues($dbMetadata);
+			kMetadataManager::updateSearchIndex($dbMetadata);
 		}
 		else
 		{

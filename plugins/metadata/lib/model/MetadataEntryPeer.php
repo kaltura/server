@@ -1,6 +1,7 @@
 <?php
 class MetadataEntryPeer extends entryPeer implements iMetadataPeer
 {
+	/*
 	public static function saveToSphinx($objectId, array $data)
 	{
 		$entry = self::retrieveByPK($objectId);
@@ -40,4 +41,5 @@ class MetadataEntryPeer extends entryPeer implements iMetadataPeer
 			KalturaLog::debug("No plugins data should be saved to the entry [$objectId]");
 		}
 	}
+	*/
 }

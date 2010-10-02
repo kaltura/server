@@ -71,14 +71,6 @@ class MetadataService extends KalturaBaseService
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
 		
-		$peer = kMetadataManager::getObjectPeer($objectType);
-		if(!$peer)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT_TYPE, $objectType);
-			
-		$object = $peer->retrieveByPK($objectId);
-		if(!$object)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
-			
 		$dbMetadata = new Metadata();
 		
 		$dbMetadata->setPartnerId($this->getPartnerId());
@@ -87,6 +79,11 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
 		$dbMetadata->setStatus(KalturaMetadataStatus::INVALID);
+
+		// validate object exists
+		kMetadataManager::getObjectFromPeer($dbMetadata);
+			
+		
 		$dbMetadata->save();
 		
 		$this->deleteOldVersions($dbMetadata);
@@ -123,7 +120,7 @@ class MetadataService extends KalturaBaseService
 		if($status == KalturaMetadataStatus::VALID)
 		{
 			$this->deleteOldVersions($dbMetadata);
-			kMetadataManager::parseSearchValues($dbMetadata);
+			kMetadataManager::updateSearchIndex($dbMetadata);
 		}
 		else
 		{
@@ -194,7 +191,7 @@ class MetadataService extends KalturaBaseService
 		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 		if($status == KalturaMetadataStatus::VALID)
 		{
-			kMetadataManager::parseSearchValues($dbMetadata);
+			kMetadataManager::updateSearchIndex($dbMetadata);
 			$this->deleteOldVersions($dbMetadata);
 		}
 		else
@@ -354,7 +351,7 @@ class MetadataService extends KalturaBaseService
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 			if($status == KalturaMetadataStatus::VALID)
 			{
-				kMetadataManager::parseSearchValues($dbMetadata);
+				kMetadataManager::updateSearchIndex($dbMetadata);
 			}
 			else 
 			{
@@ -412,7 +409,7 @@ class MetadataService extends KalturaBaseService
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 			if($status == KalturaMetadataStatus::VALID)
 			{
-				kMetadataManager::parseSearchValues($dbMetadata);
+				kMetadataManager::updateSearchIndex($dbMetadata);
 			}
 			else
 			{

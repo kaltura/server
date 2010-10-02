@@ -26,6 +26,26 @@ class kMetadataManager
 	}
 	
 	/**
+	 * @param Metadata $object
+	 * 
+	 * @return object returns the object referenced by the peer
+	 */
+	public static function getObjectFromPeer($object)
+	{
+		$objectType = $object->getObjectType();
+		$peer = self::getObjectPeer($objectType);
+		if(!$peer)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT_TYPE, $objectType);
+			
+		$objectId = $object->getObjectId();
+		$result = $peer->retrieveByPK($objectId);
+		if(!$result)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
+
+		return $result;
+	}
+	
+	/**
 	 * Parse the XSD and update the list of search fields
 	 * 
 	 * @param MetadataProfile $metadataProfile
@@ -133,17 +153,13 @@ class kMetadataManager
 	 * Parse the XML and update the list of search values
 	 * 
 	 * @param Metadata $metadata
+	 * @param boolean $delete
 	 * 
 	 * @return array
 	 */
-	public static function parseSearchValues(Metadata $metadata)
+	public static function updateSearchIndex(Metadata $metadata)
 	{
-		$searchTexts = self::getSearchValues($metadata);
-		
-		$peer = self::getObjectPeer($metadata->getObjectType());
-		$peer->saveToSphinx($metadata->getObjectId(), $searchTexts);
-		
-		return $searchTexts;
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata);		
 	}
 	
 	/**
@@ -237,8 +253,7 @@ class kMetadataManager
 	
 	public static function removeMetadataFromObject(Metadata $metadata)
 	{
-		$peer = self::getObjectPeer($metadata->getObjectType());
-		$peer->saveToSphinx($metadata->getObjectId(), array());
+		self::updateSearchIndex($metadata);
 	}
 	
 	/**
