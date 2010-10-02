@@ -246,6 +246,18 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * @param string pluginName
+	 * @return KalturaPlugin
+	 */
+	public static function getPluginInstance($pluginName)
+	{
+		//TODO - do we need to get all the instances? maybe create just the required plugin.
+		// unless they are all created at bootstrap anyway for event handling purposes
+		$plugins = self::getPluginInstances();
+		return @$plugins[str_replace('plugin', '', strtolower($pluginName))];
+	}
+	
+	/**
 	 * @return array<string, string> in the form array[pluginName] = pluginClass
 	 */
 	public static function getPlugins()
