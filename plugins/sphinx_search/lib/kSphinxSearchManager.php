@@ -313,7 +313,7 @@ class kSphinxSearchManager implements
 	}
 	*/
 		
-	public function execSphinx($sql)
+	public function execSphinx($sql, $entry)
 	{
 		KalturaLog::debug($sql);
 		
@@ -342,6 +342,6 @@ class kSphinxSearchManager implements
 		if(!$sql)
 			return;
 		
-		$this->execSphinx($sql);
+		$this->execSphinx($sql, $entry);
 	}
 }
