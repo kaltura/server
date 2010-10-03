@@ -1858,7 +1858,7 @@ class entry extends Baseentry implements ISyncableFile
 		{
 			// get from partner if null on entry:
 			$partner = $this->getPartner();
-			$offset = $partner ? $partner->getDefThumbOffset() : 3;
+			$offset = $partner ? $partner->getDefThumbOffset() : $default_offset;
 			if(is_null($offset) || $offset === false)
 				return $default_offset;
 		}
