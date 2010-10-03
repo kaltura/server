@@ -137,7 +137,7 @@ class KalturaEntryService extends KalturaBaseService
         
         $msg = null;
         $flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
-        if($flavorAsset)
+        if(!$flavorAsset)
         {
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
 			
