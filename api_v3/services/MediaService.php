@@ -61,8 +61,7 @@ class MediaService extends KalturaEntryService
 		if($bulkUploadId)
 			$dbEntry->setBulkUploadId($bulkUploadId);
 		
-		$kshow = $this->createDummyKShow();
-        $kshowId = $kshow->getId();
+        $kshowId = $dbEntry->getKshowId();
 		
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
@@ -137,8 +136,7 @@ class MediaService extends KalturaEntryService
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
       	$dbEntry->setSourceId( $searchResult->id );
       	
-     	$kshow = $this->createDummyKShow();
-        $kshowId = $kshow->getId();
+        $kshowId = $dbEntry->getKshowId();
         	
        	// $searchResult->licenseType; // FIXME, No support for licenseType
         // FIXME - no need to clone entry if $dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS
@@ -225,8 +223,7 @@ class MediaService extends KalturaEntryService
 			
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		
-		$kshow = $this->createDummyKShow();
-		$kshowId = $kshow->getId();
+        $kshowId = $dbEntry->getKshowId();
 			
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
@@ -280,8 +277,7 @@ class MediaService extends KalturaEntryService
 			
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		
-		$kshow = $this->createDummyKShow();
-        $kshowId = $kshow->getId();
+        $kshowId = $dbEntry->getKshowId();
 			
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
@@ -600,6 +596,8 @@ class MediaService extends KalturaEntryService
 
 //		$job = myBatchDownloadVideoServer::addJob($this->getKuser()->getPuserId(), $dbEntry, null, $fileFormat);
 		$flavorParams = myConversionProfileUtils::getFlavorParamsFromFileFormat ( $this->getPartnerId() , $fileFormat );
+		
+		$err = null;
 		$job = kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $flavorParams->getId(), $err);
 		
 		if ( $job )	
@@ -673,6 +671,10 @@ class MediaService extends KalturaEntryService
 		return parent::anonymousRankEntry($entryId, KalturaEntryType::MEDIA_CLIP, $rank);
 	}
 	
+	/**
+	 * @param KalturaBaseEntry $entry
+	 * @return entry
+	 */
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
 	{
 		// first validate the input object
@@ -684,6 +686,10 @@ class MediaService extends KalturaEntryService
 		if ( $this->getConversionQualityFromRequest() )
 			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
 			
+		$kshow = $this->createDummyKShow();
+        $kshowId = $kshow->getId();
+        
+        $dbEntry->setKshowId($kshowId);
 		$dbEntry->save();
 		
 		return $dbEntry;
