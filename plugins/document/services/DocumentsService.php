@@ -395,7 +395,9 @@ class DocumentsService extends KalturaEntryService
 		if (!$dbEntry || ($dbEntry->getType() != entry::ENTRY_TYPE_DOCUMENT))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $this->getKs(), null);
+		$ksObj = $this->getKs();
+		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
 		$securyEntryHelper->validateForDownload();	
 					
 		$flavorAsset = null;
@@ -439,7 +441,9 @@ class DocumentsService extends KalturaEntryService
 		if (!$dbEntry || ($dbEntry->getType() != entry::ENTRY_TYPE_DOCUMENT))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
-		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $this->getKs(), null);
+		$ksObj = $this->getKs();
+		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;
