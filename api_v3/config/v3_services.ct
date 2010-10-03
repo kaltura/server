@@ -65,6 +65,7 @@ playlist.add						|			|2		|1	|1		|2		|1		|rw	|		|	|   |
 playlist.update						|			|2		|1	|1		|1		|1		|	|		|	|   |
 playlist.get						|			|1,2	|1	|0		|0		|1		|	|		|	|   |kpl
 playlist.delete						|			|2		|1	|1		|0		|1		|	|		|	|   |
+playlist.clone						|			|2	    |1	|1		|1		|1		|	|		|	|   |
 playlist.list						|			|1,2		|1	|0		|0		|1		|	|		|	|   |
 playlist.execute					|			|0		|0	|0		|0		|1		|	|		|1	|   |kpl
 playlist.executefromcontent			|			|2		|0	|0		|0		|1		|	|		|1	|   |kmc
