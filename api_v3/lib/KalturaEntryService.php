@@ -2,6 +2,33 @@
 
 class KalturaEntryService extends KalturaBaseService 
 {
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
+	{
+		// create a default name if none was given
+		if (!$entry->name)
+			$entry->name = $this->getPartnerId().'_'.time();
+		
+		try
+		{
+			// first copy all the properties to the db entry, then we'll check for security stuff
+			$dbEntry = $entry->toObject(new entry());
+		}
+		catch(kCoreException $ex)
+		{
+			$this->handleCoreException($ex, $dbEntry);
+		}
+
+		$this->checkAndSetValidUser($entry, $dbEntry);
+		$this->checkAdminOnlyInsertProperties($entry);
+		$this->validateAccessControlId($entry);
+		$this->validateEntryScheduleDates($entry);
+			
+		$dbEntry->setPartnerId($this->getPartnerId());
+		$dbEntry->setSubpId($this->getPartnerId() * 100);
+		$dbEntry->setStatusReady();
+				
+		return $dbEntry;
+	}
 	
 	/**
 	 * Convert entry
@@ -82,7 +109,7 @@ class KalturaEntryService extends KalturaBaseService
 	
 	protected function addEntryFromFlavorAsset(KalturaBaseEntry $newEntry, entry $srcEntry, flavorAsset $srcFlavorAsset)
 	{
-      	$newEntry->type = $searchResult->type;
+      	$newEntry->type = $srcEntry->getType();
       		
 		if ($newEntry->name === null)
 			$newEntry->name = $srcEntry->getName();
@@ -102,8 +129,8 @@ class KalturaEntryService extends KalturaBaseService
     	$newEntry->sourceType = KalturaSourceType::SEARCH_PROVIDER;
      	$newEntry->searchProviderType = KalturaSearchProviderType::KALTURA;
      	
-		$dbEntry = $this->prepareMediaEntryForInsert($newEntry);
-      	$dbEntry->setSourceId( $searchResult->id );
+		$dbEntry = $this->prepareEntryForInsert($newEntry);
+      	$dbEntry->setSourceId( $srcEntry->getId() );
       	
      	$kshow = $this->createDummyKShow();
         $kshowId = $kshow->getId();

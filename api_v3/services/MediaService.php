@@ -57,7 +57,7 @@ class MediaService extends KalturaEntryService
 	
 	private function addDbFromUrl(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId = null)
 	{
-		$dbEntry = $this->prepareMediaEntryForInsert($mediaEntry);
+		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		if($bulkUploadId)
 			$dbEntry->setBulkUploadId($bulkUploadId);
 		
@@ -134,7 +134,7 @@ class MediaService extends KalturaEntryService
      	$mediaEntry->searchProviderType = $searchResult->searchSource;
      	$mediaEntry->searchProviderId = $searchResult->id;
      	
-		$dbEntry = $this->prepareMediaEntryForInsert($mediaEntry);
+		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
       	$dbEntry->setSourceId( $searchResult->id );
       	
      	$kshow = $this->createDummyKShow();
@@ -223,7 +223,7 @@ class MediaService extends KalturaEntryService
 			}
 		}
 			
-		$dbEntry = $this->prepareMediaEntryForInsert($mediaEntry);
+		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		
 		$kshow = $this->createDummyKShow();
 		$kshowId = $kshow->getId();
@@ -278,7 +278,7 @@ class MediaService extends KalturaEntryService
 		if (!file_exists($entryFullPath))
 			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
 			
-		$dbEntry = $this->prepareMediaEntryForInsert($mediaEntry);
+		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		
 		$kshow = $this->createDummyKShow();
         $kshowId = $kshow->getId();
@@ -673,36 +673,17 @@ class MediaService extends KalturaEntryService
 		return parent::anonymousRankEntry($entryId, KalturaEntryType::MEDIA_CLIP, $rank);
 	}
 	
-	private function prepareMediaEntryForInsert(KalturaMediaEntry $mediaEntry)
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
 	{
 		// first validate the input object
-		//$mediaEntry->validatePropertyMinLength("name", 1);
-		$mediaEntry->validatePropertyNotNull("mediaType");
+		//$entry->validatePropertyMinLength("name", 1);
+		$entry->validatePropertyNotNull("mediaType");
 		
-		// create a default name if none was given
-		if (!$mediaEntry->name)
-			$mediaEntry->name = $this->getPartnerId().'_'.time();
+		$dbEntry = parent::prepareEntryForInsert($entry);
 		
-		try
-		{
-			// first copy all the properties to the db entry, then we'll check for security stuff
-			$dbEntry = $mediaEntry->toObject(new entry());
-		}
-		catch(kCoreException $ex)
-		{
-			$this->handleCoreException($ex, $dbEntry);
-		}
-
-		$this->checkAndSetValidUser($mediaEntry, $dbEntry);
-		$this->checkAdminOnlyInsertProperties($mediaEntry);
-		$this->validateAccessControlId($mediaEntry);
-		$this->validateEntryScheduleDates($mediaEntry);
-			
-		$dbEntry->setPartnerId($this->getPartnerId());
-		$dbEntry->setSubpId($this->getPartnerId() * 100);
-		$dbEntry->setStatusReady();
 		if ( $this->getConversionQualityFromRequest() )
 			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
+			
 		$dbEntry->save();
 		
 		return $dbEntry;

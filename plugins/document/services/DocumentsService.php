@@ -504,4 +504,20 @@ class DocumentsService extends KalturaEntryService
 			}
 		}	
 	}
+	
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
+	{
+		// first validate the input object
+		//$entry->validatePropertyMinLength("name", 1);
+		$entry->validatePropertyNotNull("documentType");
+		
+		$dbEntry = parent::prepareEntryForInsert($entry);
+		
+		if ( $this->getConversionQualityFromRequest() )
+			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
+			
+		$dbEntry->save();
+		
+		return $dbEntry;
+	}
 }
