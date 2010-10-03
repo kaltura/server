@@ -49,27 +49,7 @@ class DocumentsService extends KalturaEntryService
 			}
 		}
 			
-        $documentEntry->validatePropertyNotNull("documentType");
-		if (!$documentEntry->name)
-			$documentEntry->name = $this->getPartnerId().'_'.time();
-		
-		// first copy all the properties to the db entry, then we'll check for security stuff
-		$dbEntry = $documentEntry->toObject(new DocumentEntry());
-        
-		$this->checkAndSetValidUser($documentEntry, $dbEntry);
-		$this->checkAdminOnlyInsertProperties($documentEntry);
-		$this->validateAccessControlId($documentEntry);
-		$this->validateEntryScheduleDates($documentEntry);
-			
-		$dbEntry->setPartnerId($this->getPartnerId());
-		$dbEntry->setSubpId($this->getPartnerId() * 100);
-		$dbEntry->setKuserId($this->getKuser()->getId());
-		if ($documentEntry->conversionProfileId) {
-			$dbEntry->setStatus(entry::ENTRY_STATUS_PRECONVERT);
-		}
-		else {
-			$dbEntry->setStatusReady();
-		}
+		$dbEntry = $this->prepareEntryForInsert($documentEntry);
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->setSourceLink("file:$entryFullPath");
 		$dbEntry->save();
@@ -516,9 +496,15 @@ class DocumentsService extends KalturaEntryService
 		$entry->validatePropertyNotNull("documentType");
 		
 		$dbEntry = parent::prepareEntryForInsert($entry);
-		
-		if ( $this->getConversionQualityFromRequest() )
-			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
+	
+		if ($entry->conversionProfileId) 
+		{
+			$dbEntry->setStatus(entry::ENTRY_STATUS_PRECONVERT);
+		}
+		else 
+		{
+			$dbEntry->setStatusReady();
+		}
 			
 		$dbEntry->save();
 		
