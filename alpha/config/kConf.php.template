@@ -16,7 +16,7 @@ class kConf
                  // take over the symfony config (sfConfig)
  			    "sf_debug" => false, // TODO: Should be commented out or not?
 				"sf_logging_enabled" => true, // TODO: Should be commented out or not?
-				"sf_root_dir" => @APP_DIR@.'/alpha/', // TODO: Should be commented out or not?
+				"sf_root_dir" => '@APP_DIR@'.'/alpha/', // TODO: Should be commented out or not?
 
 				"cdn_host" => "@CDN_HOST@",
 				"iis_host" => "@IIS_HOST@",
