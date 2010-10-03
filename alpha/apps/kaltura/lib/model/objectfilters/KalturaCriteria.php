@@ -36,11 +36,7 @@ class KalturaCriteria extends Criteria
 	public static function create($objectType)
 	{
 		$searchPluginName = kConf::get("search_plugin");
-/*
-		$x = call_user_func_array($searchPluginName."::getKalturaCriteria", array($objectType) );
-		var_dump($x);
-		die;
-	*/	
+		
 		$searchPlugin = KalturaPluginManager::getPluginInstance($searchPluginName);
 			
 		return $searchPlugin->getKalturaCriteria($objectType);
