@@ -107,7 +107,7 @@ class kSphinxSearchManager implements
 
 	public function saveToSphinxRequired($entry)
 	{
-		$cols = self::$getSphinxFields();
+		$cols = self::getSphinxFields();
 		foreach($cols as $col)
 			if($entry->isColumnModified($col))
 				return true;

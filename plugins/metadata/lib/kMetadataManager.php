@@ -159,7 +159,7 @@ class kMetadataManager
 	 */
 	public static function updateSearchIndex(Metadata $metadata)
 	{
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata);		
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));		
 	}
 	
 	/**
