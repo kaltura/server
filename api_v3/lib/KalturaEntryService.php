@@ -2,6 +2,10 @@
 
 class KalturaEntryService extends KalturaBaseService 
 {
+	/**
+	 * @param KalturaBaseEntry $entry
+	 * @return entry
+	 */
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
 	{
 		// create a default name if none was given
