@@ -363,7 +363,7 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction(KalturaMediaEntry $mediaEntry = null, $sourceFlavorAssetId)
 	{
-		$srcFlavorAsset = flavorAssetPeer::retrieveByPK($sourceFlavorAssetId);
+		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
 
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $sourceFlavorAssetId);
