@@ -88,6 +88,7 @@ class updateentryAction extends defPartnerservices2Action
 		$entry_update_data->setType ( $entry->getType() );
 		$entry_update_data->setMediaType ( $entry->getMediaType() );
 		$entry_update_data->setId ( $entry->getId() );
+		$entry_update_data->setPartnerId ( $entry->getPartnerId() );
 		$entry_update_data->setData ( $entry->getData() , true );
 		
 		$obj_wrapper = objectWrapperBase::getWrapperClass( $entry_update_data , 0 );
