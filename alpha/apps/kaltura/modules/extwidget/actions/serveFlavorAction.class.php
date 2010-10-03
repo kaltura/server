@@ -10,6 +10,10 @@ class serveFlavorAction extends kalturaAction
 
 		$flavorId = $this->getRequestParameter("flavorId");
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
+		$ks = $this->getRequestParameter( "ks" );
+		$referrer = base64_decode($this->getRequestParameter("referrer"));
+		if (!is_string($referrer)) // base64_decode can return binary data
+			$referrer = '';
 		
 		$flavorAsset = flavorAssetPeer::retrieveById($flavorId);
 		if (is_null($flavorAsset))
@@ -21,6 +25,9 @@ class serveFlavorAction extends kalturaAction
 			
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
 
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
+		$securyEntryHelper->validateForDownload();
+		
 		//disabled enforce cdn because of rtmp delivery
 		//requestUtils::enforceCdnDelivery($flavorAsset->getPartnerId());
 			

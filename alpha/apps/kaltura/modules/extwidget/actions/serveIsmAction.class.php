@@ -16,6 +16,11 @@ class serveIsmAction extends sfAction
 		if (!$type || !$objectId)
 			die;
 			
+		$ks = $this->getRequestParameter( "ks" );
+		$referrer = base64_decode($this->getRequestParameter("referrer"));
+		if (!is_string($referrer)) // base64_decode can return binary data
+			$referrer = '';
+			
 		if ($type == "ism" || $type == "ismc")
 		{
 			// backward compatiblity - to be removed once ismc is created with pure objectId.ext instead of entryId_flavorId_version.ext
@@ -30,7 +35,7 @@ class serveIsmAction extends sfAction
 			$entry = entryPeer::retrieveByPK($objectId);
 			if (is_null($entry))
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-
+				
 			$syncKey = $entry->getSyncKey($type == "ism" ? entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM : entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $version);
 		}
 		else if ($type == "ismv")
@@ -48,12 +53,19 @@ class serveIsmAction extends sfAction
 			if (is_null($flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				
+			$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+			if (is_null($entry))
+				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+				
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 		}
 		else
 		{
 			die;
 		}
+		
+		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
+		$securyEntryHelper->validateForDownload();	
 		
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
