@@ -115,7 +115,9 @@ body { background-image:none !important; }
 			loginF: "loginF" ,
 			closeF: "closeLoginF" ,
 			host: "<?php echo $www_host ?>",
-			visibleSignup: "false"
+			visibleSignup: "false",
+			urchinNumber: "UA-12055206-1",
+            srvurl: "api_v3/index.php"
 		}
 	
 		var params = {
