@@ -653,6 +653,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
   				continue;
   			}
 
+  			$file_name = null;
 			$flavor_asset_play = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
 			if(!$flavor_asset_play)
 			{
