@@ -257,6 +257,10 @@ function createInputs ( $arr , $context_id )
 	$str = "";
 	
 	$is_ie = strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false ;
+	
+	if(!is_array($arr))
+		return '';
+		
 	foreach ( $arr as $input )
 	{
 		if ( $input[0] == TESTME_GROUP_START )
