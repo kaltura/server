@@ -228,7 +228,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 	
 	private function stringToSafeXml($string, $now = false)
 	{
-		$string = iconv('utf-8', 'utf-8', $string);
+		$string = @iconv('utf-8', 'utf-8', $string);
 		$partially_safe = kString::xmlEncode($string);
 		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
 		
