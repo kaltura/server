@@ -121,8 +121,12 @@ $acodec = "libmp3lam";
 			//$cmdStr .= " --audio=0";
 		}
 		
-		if($target->_clipTime!==null && $target->_clipTime>0){
-			$cmdStr .= " --duration=".$target->_clipTime;
+		if($target->_clipStart!==null && $target->_clipStart>0){
+//			$cmdStr .= " --strtrtduration=".$target->_clipStart;
+		}
+
+		if($target->_clipDur!==null && $target->_clipDur>0){
+			$cmdStr .= " --duration=".$target->_clipDur;
 		}
 
 		if(0 && $target->_container) {
@@ -137,6 +141,7 @@ $acodec = "libmp3lam";
 				case KDLContainerTarget::MOV:
 				case KDLContainerTarget::MP3:
 				case KDLContainerTarget::OGG:
+				case KDLContainerTarget::WEBM:
 					$format = $cont->_id;
 					break;
 				case KDLContainerTarget::WMV:
