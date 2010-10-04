@@ -17,6 +17,7 @@ class KalturaFlavorParamsFactory
 			case KalturaContainerFormat::WMA:
 			case KalturaContainerFormat::ISMV:
 			case KalturaContainerFormat::MKV:
+			case KalturaContainerFormat::WEBM:
 				return new KalturaFlavorParamsOutput();
 				
 			default:
@@ -44,6 +45,7 @@ class KalturaFlavorParamsFactory
 			case KalturaContainerFormat::WMA:
 			case KalturaContainerFormat::ISMV:
 			case KalturaContainerFormat::MKV:
+			case KalturaContainerFormat::WEBM:
 				return new KalturaFlavorParams();
 				
 			default:
