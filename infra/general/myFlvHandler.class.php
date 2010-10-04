@@ -1235,7 +1235,7 @@ class FlvMetadataVideo extends FlvInfo
 
 		// if there are more than 1 keyframe per second and file size < 100MB its probably and edit flavor and we should maintain all KF
 		// we serve the file from our server and not the cdn anyway because the cdn cant clip the file
-		$lastKF = $this->keyframeTimes[$kf_cnt - 1] / 1000;
+		$lastKF = isset($this->keyframeTimes[$kf_cnt - 1]) ? $this->keyframeTimes[$kf_cnt - 1] / 1000 : 0;
 		$lastKFPos = $this->keyframeBytes[$kf_cnt - 1] / (1000 * 1000);
 		if ($kf_cnt > $lastKF && $lastKFPos < 100)
 			$new_kf_step = 1;
