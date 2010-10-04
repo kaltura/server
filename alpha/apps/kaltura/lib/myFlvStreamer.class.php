@@ -730,6 +730,7 @@ self::log ( __METHOD__ , "before findBytesFromTimestamps" , $flv_file_name );
 							//$use_multi_flavor = myFlvStaticHandler::isMultiFlavor ( $flv_file_name  ) && $timeline == "video";
 
 							$calculated_real_seek_time = $lastTimestamp;
+							$start_time_play = null;
 
 							if ( $use_multi_flavor )
 							{
