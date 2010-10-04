@@ -2,7 +2,9 @@
 $service_url = requestUtils::getHost();
 $host = str_replace ( "http://" , "" , $service_url );
 if ( $host == "www.kaltura.com" ) $host = "1";
-$flash_dir = $service_url . myContentStorage::getFSFlashRootPath ();
+
+$www_host = kConf::get('www_host');
+$flash_dir = 'https://'. $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 
 $beta_str = $beta ? "/beta/{$beta}" : "";
 ?>
@@ -112,7 +114,7 @@ body { background-image:none !important; }
 		var flashVars = {
 			loginF: "loginF" ,
 			closeF: "closeLoginF" ,
-			host: "<?php echo $host ?>",
+			host: "<?php echo $www_host ?>",
 			visibleSignup: "false"
 		}
 	
