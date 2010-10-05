@@ -87,6 +87,10 @@ foreach($sections as $section)
 			{
 				$kdp_for_studio[$configObj->identifier] = $uiconf_id;
 			}
+			if($configObj->features_replace_identifier == 'REPLACE_PLAYER_ID')
+			{
+				uiConfDeployment::updatePlayerIdInFeaturesFile($uiconf, $uiconf_id, '@@REPLACE_PLAYER_ID@@');
+			}
 		}
 		else
 		{
@@ -235,7 +239,17 @@ class uiConfDeployment
 		$uiconf->setHeight(@$confConfigObj->height);
 		$uiconf->setConfVars(@$confConfigObj->conf_vars);
 		
+		$uiconf->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+		
 		return $uiconf;
+	}
+	
+	public static function updatePlayerIdInFeaturesFile(uiConf $uiconf, $uiconfId, $replacementString)
+	{
+		$featuresFile = $uiconf->getConfFileFeatures(true);
+		$newFeatures = str_replace($replacementString, $uiconfId, $featuresFile);
+		$uiconf->setConfFileFeatures($newFeatures);
+		$uiconf->save();
 	}
 	
 	public static function printUsage($message)
