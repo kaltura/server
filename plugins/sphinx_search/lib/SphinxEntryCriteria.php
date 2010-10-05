@@ -265,13 +265,13 @@ class SphinxEntryCriteria extends KalturaCriteria
 				// keeps only ids that appears in both arrays
 				if($comparison == Criteria::IN)
 				{
-					$ids = array_intersect($ids, $entryIds);
+					$ids = array_intersect($ids, array_keys($entryIds));
 				}
 				
 				// removes ids that appears in the comparison array
 				if($comparison == Criteria::NOT_IN)
 				{
-					$ids = array_diff($ids, $entryIds);
+					$ids = array_diff($ids, array_keys($entryIds));
 				}
 			}
 		}
