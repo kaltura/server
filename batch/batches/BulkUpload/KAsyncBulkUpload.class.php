@@ -417,8 +417,15 @@ class KAsyncBulkUpload extends KBatchBase
 				}
 				else
 				{
-					$bulkUploadResult->$column = iconv_strlen($values[$index], 'UTF-8') ? $values[$index] : null;
-					KalturaLog::info("Set value \$bulkUploadResult->{$column} [{$bulkUploadResult->$column}]");
+					if(iconv_strlen($values[$index], 'UTF-8'))
+					{
+						$bulkUploadResult->$column = $values[$index];
+						KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
+					}
+					else
+					{
+						KalturaLog::info("Value $column is empty");
+					}
 				}
 			}
 			
