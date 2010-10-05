@@ -48,9 +48,7 @@ CREATE TABLE `sphinx_log_server`
 -- It "suspends judgement" for fkey relationships until are tables are set.
 SET FOREIGN_KEY_CHECKS = 0;
 
------------------------------------------------------------------------------
 -- metadata_profile
------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `metadata_profile`;
 
@@ -68,9 +66,7 @@ CREATE TABLE `metadata_profile`
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
------------------------------------------------------------------------------
 -- metadata_profile_field
------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `metadata_profile_field`;
 
@@ -90,9 +86,7 @@ CREATE TABLE `metadata_profile_field`
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
------------------------------------------------------------------------------
 -- metadata
------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `metadata`;
 
