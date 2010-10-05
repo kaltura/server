@@ -76,14 +76,11 @@ class kFileSyncUtils
 			$file_sync = self::resolve($file_sync);
 		}
 		
-		if ( $file_sync )
-		{
+		if($file_sync)
 			return self::getContentsByFileSync ( $file_sync , $local , $fetch_from_remote_if_no_local , $strict );
-		}
-		else
-		{
-			KalturaLog::log(__METHOD__." - FileSync not found");
-		}
+		
+		KalturaLog::log(__METHOD__." - FileSync not found");
+		return null;
 	}
 	
 	/**
