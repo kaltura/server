@@ -24,7 +24,7 @@ class kConf
 				"rtmp_url" => "@RTMP_URL@",
 				
 				"kaltura_installation_type" => "@INSTALLATION_TYPE@",
-				"enable_cache" => false,
+				"enable_cache" => true,
 				
 				"corp_action_redirect" => "@CORP_REDIRECT@",
 			
@@ -181,6 +181,7 @@ class kConf
 					"MultiCentersPlugin", // TODO: Should be disabled/enabled?
 					"DocumentPlugin", // TODO: Should be disabled/enabled?
 					"SphinxSearchPlugin",
+                                        "AuditPlugin",
 				),
 
                 "search_plugin"	=> "SphinxSearchPlugin",
@@ -189,11 +190,12 @@ class kConf
                 	"kFlowManager",
                 	"kStorageExporter",
                     "kObjectCopyHandler",
+                    "kObjectDeleteHandler",
                 ),
                 
 				"cache_root_path" => "@APP_DIR@/cache",
                 
-                //"exec_sphinx" => true,
+				"exec_sphinx" => true,
                 
                 'admin_kuser_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
                 'admin_kuser_max_login_attempts' => 5000,
