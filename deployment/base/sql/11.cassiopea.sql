@@ -44,8 +44,8 @@ CREATE TABLE `sphinx_log_server`
 		REFERENCES `sphinx_log` (`id`)
 )Type=MyISAM;
 
-/* This is a fix for InnoDB in MySQL >= 4.1.x
- It "suspends judgement" for fkey relationships until are tables are set. */
+-- This is a fix for InnoDB in MySQL >= 4.1.x
+-- It "suspends judgement" for fkey relationships until are tables are set.
 SET FOREIGN_KEY_CHECKS = 0;
 
 -----------------------------------------------------------------------------
