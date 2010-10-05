@@ -132,6 +132,10 @@ class uiConfDeployment
 		//KAutoloader::dumpExtra();
 		KAutoloader::register();
 		
+		$dbConf = kConf::getDB();
+		DbManager::setConfig($dbConf);
+		DbManager::initialize();		
+		
 		$conf = parse_ini_file($conf_file_path, true);
 		
 		$confObj = new Zend_Config_Ini($conf_file_path);
