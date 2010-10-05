@@ -178,4 +178,54 @@ class UserService extends KalturaBaseService
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_USER_BANNED, $dbUser);
 	}
+
+	/**
+	 * Get a session using user email and password
+	 * 
+	 * @action login
+	 * @param int $partnerId
+	 * @param string $email
+	 * @param string $password
+	 * @param int $expiry
+	 * @param string $privileges
+	 * @return string
+	 *
+	 * @thrown KalturaErrors::USER_NOT_FOUND
+	 * @thrown KalturaErrors::USER_WRONG_PASSWORD
+	 * @thrown KalturaErrors::INVALID_PARTNER_ID
+	 */		
+	function loginAction($partnerId, $email, $password, $expiry = 86400, $privileges = '*')
+	{
+		try {
+			$kuser = kuserPeer::userLogin($email, $password, $partnerId);
+		}
+		catch (kKuserException $e) {
+			switch($e->getCode()) 
+			{
+				case kKuserException::KUSER_NOT_FOUND:
+					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+					
+				case kKuserException::KUSER_WRONG_PASSWORD:
+					throw new KalturaAPIException(KalturaErrors::USER_WRONG_PASSWORD);
+					
+				default:
+					throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+			}
+		}
+		
+		if (!$kuser)
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		
+		if($kuser->getPartnerId() != $partnerId)
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+			
+		$partner = PartnerPeer::retrieveByPK($kuser->getPartnerId());
+		if (!$partner || $partner->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $kuser->getPartnerId());
+		
+		$ks = null;
+		kSessionUtils::createKSessionNoValidations($partner->getId(),  $kuser->getPuserId(), $ks, $expiry, false, "", $privileges);
+		
+		return $ks;
+	}
 }

@@ -38,6 +38,7 @@ user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |
 user.updateid						|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.notifyban						|			|2		|1	|0		|0		|1		|	|		|	|   |
+user.login							|			|0		|1	|0		|0		|1		|	|		|	|   |
 
 widget.add							|			|1		|1	|0		|0		|1		|	|		|	|   |
 widget.clone						|			|1		|1	|0		|0		|1		|	|		|	|   |

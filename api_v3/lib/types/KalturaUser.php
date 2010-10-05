@@ -129,6 +129,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $storageSize;
+	
+	/**
+	 * @var string
+	 * @writeonly
+	 */
+	public $password;
 
 	private static $map_between_objects = array
 	(
@@ -150,7 +156,8 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"createdAt",
 		"updatedAt",
 		"partnerData",
-		"storageSize"
+		"storageSize",
+		"password"
 	);
 
 	public function getMapBetweenObjects ( )

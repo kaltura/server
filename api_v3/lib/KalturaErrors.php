@@ -220,4 +220,7 @@ class KalturaErrors extends APIErrors
 	
 	const INVALID_OBJECT_ID = "INVALID_OBJECT_ID,Invalid object id [%s]";
 	
+	const USER_NOT_FOUND = "USER_NOT_FOUND,User was not found";
+	
+	const USER_WRONG_PASSWORD = "USER_WRONG_PASSWORD,Wrong password supplied";
 }

@@ -268,4 +268,39 @@ class kuserPeer extends BasekuserPeer
 		return 0;
 	}	
 	
+	/**
+	 * @param string $email
+	 * @return kuser
+	 */
+	public static function getKuserByEmail($email, $partnerId = null)
+	{
+		$c = new Criteria();
+		$c->add (kuserPeer::EMAIL, $email);
+		
+		if(!is_null($partnerId))
+			$c->add (kuserPeer::PARTNER_ID, $partnerId);
+			
+		$kuser = kuserPeer::doSelectOne( $c );
+		
+		return $kuser;
+		
+	}
+
+	/**
+	 * @param string $email
+	 * @param string $password
+	 * @param int $partnerId
+	 * @return kuser
+	 */
+	public static function userLogin($email, $password, $partnerId = null)
+	{
+		$kuser = self::getKuserByEmail($email, $partnerId);
+		if (!$kuser)
+			throw new kKuserException('', kKuserException::KUSER_NOT_FOUND);
+
+		if (!$kuser->isPasswordValid($password)) 
+			throw new kKuserException('', kKuserException::KUSER_WRONG_PASSWORD);	
+		
+		return $kuser;
+	}
 }
