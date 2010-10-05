@@ -162,6 +162,9 @@ class KalturaTypeReflector
 								
 								if ($parsedDocComment->insertOnly)
 									$prop->setInsertOnly(true);
+								
+								if ($parsedDocComment->writeOnly)
+									$prop->setWriteOnly(true);
 									
 								$this->_properties[$name] = $prop;
 								

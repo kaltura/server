@@ -12,6 +12,7 @@ class KalturaPropertyInfo
 	private $_arrayTypeReflector;
 	private $_readOnly = false;
 	private $_insertOnly = false;
+	private $_writeOnly = false;
 	private $_description;
 	private $_filters = array();
 	
@@ -138,9 +139,19 @@ class KalturaPropertyInfo
 		$this->_insertOnly = $value;
 	}
 	
+	public function setWriteOnly($value)
+	{
+		$this->_writeOnly = $value;
+	}
+	
 	public function isInsertOnly()
 	{
 		return $this->_insertOnly;
+	}
+	
+	public function isWriteOnly()
+	{
+		return $this->_writeOnly;
 	}
 	
 	public function setDescription($desc)
@@ -190,6 +201,7 @@ class KalturaPropertyInfo
 		}
 		$array["isReadOnly"] 	= $this->isReadOnly();
 		$array["isInsertOnly"] 	= $this->isInsertOnly();
+		$array["isWriteOnly"] 	= $this->isWriteOnly();
 		$array["description"] 	= $this->getDescription() ? $this->getDescription() : "";
 		$array["properties"] 	= array();
 		$array["constants"] 	= array();

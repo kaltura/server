@@ -24,11 +24,17 @@ class KalturaObject
 
 	public function fromObject ( $source_object  )
 	{
+		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$properties = $reflector->getProperties();
+		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
 			if ( is_numeric( $this_prop) ) 
 			    $this_prop = $object_prop;
 			    
+			if(!isset($properties[$this_prop]) || $properties[$this_prop]->isWriteOnly())
+				continue;
+				
             $getter_callback = array ( $source_object ,"get{$object_prop}"  );
             if (is_callable($getter_callback))
                 $this->$this_prop = call_user_func($getter_callback);
