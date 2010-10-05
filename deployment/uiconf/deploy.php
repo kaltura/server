@@ -115,6 +115,7 @@ if($includeCode)
 	echo implode(PHP_EOL, $code);
 }
 
+exit(0);
 
 class uiConfDeployment
 {
@@ -187,7 +188,8 @@ class uiConfDeployment
 		}
 		catch(Exception $ex)
 		{
-			die('Exiting on ERROR: '.$ex->getMessage().PHP_EOL);
+			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
+			exit(1);
 		}
 		echo 'uiconf '.$player.' ID: '.@$pe_conf->getId().PHP_EOL;
 		return $pe_conf->getId();
