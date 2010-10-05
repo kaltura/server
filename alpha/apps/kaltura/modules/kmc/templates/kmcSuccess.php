@@ -4,7 +4,14 @@ $host = str_replace ( "http://" , "" , $service_url );
 if ( $host == "www.kaltura.com" ) $host = "1";
 
 $www_host = kConf::get('www_host');
-$flash_dir = 'https://'. $www_host .'/'. myContentStorage::getFSFlashRootPath ();
+if (kConf::get('kmc_secured_login')) {
+	$flash_dir = 'https://';
+}
+else {
+	$flash_dir = 'http://';
+}
+
+$flash_dir .= $www_host .'/'. myContentStorage::getFSFlashRootPath ();
 
 $beta_str = $beta ? "/beta/{$beta}" : "";
 ?>
