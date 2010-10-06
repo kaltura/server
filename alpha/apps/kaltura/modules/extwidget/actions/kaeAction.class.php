@@ -42,7 +42,7 @@ class kaeAction extends sfAction
 		$params = "contentUrl=".urlencode($swf_url).
 			"&host=" . str_replace("http://", "", str_replace("https://", "", myPartnerUtils::getHost($partner_id))).
 			"&cdnHost=". str_replace("http://", "", str_replace("https://", "", myPartnerUtils::getCdnHost($partner_id))).
-			"&uiConfId=" . $ui_conf_id . "&disableurlhashing=true";
+			"&uiConfId=" . $ui_conf_id . "&disableurlhashing=".kConf::get('disable_url_hashing');
 			
 		$this->redirect(  $cdn_host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/swf/FlexWrapper.swf?$params");
 	}
