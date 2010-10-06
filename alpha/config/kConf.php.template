@@ -209,6 +209,8 @@ class kConf
 					'/[~!@#$%^*=+?\(\)\-\[\]\{\}]+/',
 				),
 				
+				'disable_url_hashing' => 'true',
+				
 				// ce only settings
 				"kaltura_activation_key" => false,
 				"replace_passwords" => false,
