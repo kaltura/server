@@ -701,7 +701,8 @@ class kBusinessPreConvertDL
 			}
 				
 			KalturaLog::log("Adding flavor conversion with flavor params output id [" . $flavor->getId() . "] and flavor params asset id [" . $flavorAsset->getId() . "]");
-			$createdJob = kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $mediaInfo->getId(), $parentJob);
+			$madiaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
+			$createdJob = kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $madiaInfoId, $parentJob);
 			
 			if($createdJob)
 				$conversionsCreated++;
