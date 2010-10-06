@@ -216,99 +216,98 @@ class kwidgetAction extends sfAction
 		$widgetIdStr = "widget_id=$widget_id";
 		$partnerIdStr = "partner_id=$partner_id&subp_id=$subp_id";
 		
-		if (!$uiConf)
-			die; // uiConf is mandatory
-
-		$ks_flashvars = "";
-		$conf_vars = $uiConf->getConfVars();
-		if ($conf_vars)
+		if ($uiConf)
+		{
+			$ks_flashvars = "";
+			$conf_vars = $uiConf->getConfVars();
+			if ($conf_vars)
 			$conf_vars = "&".$conf_vars;
 
-		$wrapper_swf = $base_wrapper_swf;
+			$wrapper_swf = $base_wrapper_swf;
 
-		$partner = PartnerPeer::retrieveByPK($partner_id);
+			$partner = PartnerPeer::retrieveByPK($partner_id);
 
-		if( $partner )
-		{
-			$partner_type = $partner->getType();
-		}
-
-		if (version_compare($uiConf->getSwfUrlVersion(), "3.0", ">="))
-		{
-			$kdp3 = true;
-			// further in the code, $wrapper_swf is being used and not $base_wrapper_swf
-			$wrapper_swf = $base_wrapper_swf = myContentStorage::getFSFlashRootPath ()."/kdp3wrapper/v32.0/kdp3wrapper.swf";
-			$widgetIdStr = "widgetId=$widget_id";
-			$uiconf_id_str = "&uiConfId=$uiconf_id";
-			$partnerIdStr = "partnerId=$partner_id&subpId=$subp_id";
-
-		}
-		
-		// if we are loaded without a wrapper (directly in flex)
-		// 1. dont create the ks - keep url the same for caching
-		// 2. dont patch the uiconf - patching is done only to wrapper anyway
-		if ($nowrapper)
-		{
-			$dynamic_date = 
-				$widgetIdStr.
-				"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
-				"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-				$uiconf_id_str  . // will be empty if nothing to add
-				$conf_vars;
-
-			$url = "$swf_url?$dynamic_date";
-		}
-		else
-		{
-			// if kdp version >= 2.5
-			if (version_compare($uiConf->getSwfUrlVersion(), "2.5", ">="))
+			if( $partner )
 			{
-				// create an anonymous session
-				$ks = "";
-				$result = kSessionUtils::createKSessionNoValidations ( $partner_id , 0 , $ks , 86400 , false , "" , "view:*" );
-				$ks_flashvars = "&$partnerIdStr&uid=0&ts=".microtime(true);
-				if($widget->getSecurityType () != widget::WIDGET_SECURITY_TYPE_FORCE_KS)
+				$partner_type = $partner->getType();
+			}
+
+			if (version_compare($uiConf->getSwfUrlVersion(), "3.0", ">="))
+			{
+				$kdp3 = true;
+				// further in the code, $wrapper_swf is being used and not $base_wrapper_swf
+				$wrapper_swf = $base_wrapper_swf = myContentStorage::getFSFlashRootPath ()."/kdp3wrapper/v32.0/kdp3wrapper.swf";
+				$widgetIdStr = "widgetId=$widget_id";
+				$uiconf_id_str = "&uiConfId=$uiconf_id";
+				$partnerIdStr = "partnerId=$partner_id&subpId=$subp_id";
+
+			}
+			
+			// if we are loaded without a wrapper (directly in flex)
+			// 1. dont create the ks - keep url the same for caching
+			// 2. dont patch the uiconf - patching is done only to wrapper anyway
+			if ($nowrapper)
+			{
+				$dynamic_date = 
+					$widgetIdStr.
+					"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
+					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
+					$uiconf_id_str  . // will be empty if nothing to add
+					$conf_vars;
+
+				$url = "$swf_url?$dynamic_date";
+			}
+			else
+			{
+				// if kdp version >= 2.5
+				if (version_compare($uiConf->getSwfUrlVersion(), "2.5", ">="))
 				{
-					$ks_flashvars = "&ks=$ks".$ks_flashvars;
-				}
-				
-	
-				// patch kdpwrapper with getwidget and getuiconf
-
-				$root = myContentStorage::getFSContentRootPath();
-				$confFile_mtime = $uiConf->getUpdatedAt(null);
-				$new_swf_path = "widget_{$widget_id}_{$widget_type}_{$confFile_mtime}_".md5($base_wrapper_swf.$swf_url).".swf";
-				$md5 = md5($new_swf_path);
-				$new_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$new_swf_path;
-				
-				$cached_swf = "$root/$new_swf_path";
-
-				if (!file_exists($cached_swf) || filemtime($cached_swf) < $confFile_mtime)
-				{
-					kFile::fullMkdir($cached_swf);
-					require_once(SF_ROOT_DIR . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "api_v3" . DIRECTORY_SEPARATOR . "bootstrap.php");
-					$dispatcher = KalturaDispatcher::getInstance();
-					try
+					// create an anonymous session
+					$ks = "";
+					$result = kSessionUtils::createKSessionNoValidations ( $partner_id , 0 , $ks , 86400 , false , "" , "view:*" );
+					$ks_flashvars = "&$partnerIdStr&uid=0&ts=".microtime(true);
+					if($widget->getSecurityType () != widget::WIDGET_SECURITY_TYPE_FORCE_KS)
 					{
-						$widget_result = $dispatcher->dispatch("widget", "get", array("ks"=> $ks, "id" => $widget_id));
-						$ui_conf_result = $dispatcher->dispatch("uiConf", "get", array("ks"=> $ks, "id" => $widget_type));
+						$ks_flashvars = "&ks=$ks".$ks_flashvars;
 					}
-					catch(Exception $ex)
-					{
-						die;
-					}
-						
-					$serializer = new KalturaXmlSerializer(false);
-					$serializer->serialize($widget_result);
-					$widget_xml = $serializer->getSerializedData();
+					
+		
+					// patch kdpwrapper with getwidget and getuiconf
 
-					$serializer = new KalturaXmlSerializer(false);
-					$serializer->serialize($ui_conf_result);
-					$ui_conf_xml = $serializer->getSerializedData();
-					$patcher = new kPatchSwf( $root . $base_wrapper_swf);
-					$result = "<xml><result>$widget_xml</result><result>$ui_conf_xml</result></xml>";
-					$patcher->patch($result, $cached_swf);
-				}
+					$root = myContentStorage::getFSContentRootPath();
+					$confFile_mtime = $uiConf->getUpdatedAt(null);
+					$new_swf_path = "widget_{$widget_id}_{$widget_type}_{$confFile_mtime}_".md5($base_wrapper_swf.$swf_url).".swf";
+					$md5 = md5($new_swf_path);
+					$new_swf_path = "content/cacheswf/".substr($md5, 0, 2)."/".substr($md5, 2, 2)."/".$new_swf_path;
+					
+					$cached_swf = "$root/$new_swf_path";
+
+					if (!file_exists($cached_swf) || filemtime($cached_swf) < $confFile_mtime)
+					{
+						kFile::fullMkdir($cached_swf);
+						require_once(SF_ROOT_DIR . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "api_v3" . DIRECTORY_SEPARATOR . "bootstrap.php");
+						$dispatcher = KalturaDispatcher::getInstance();
+						try
+						{
+							$widget_result = $dispatcher->dispatch("widget", "get", array("ks"=> $ks, "id" => $widget_id));
+							$ui_conf_result = $dispatcher->dispatch("uiConf", "get", array("ks"=> $ks, "id" => $widget_type));
+						}
+						catch(Exception $ex)
+						{
+							die;
+						}
+							
+						$serializer = new KalturaXmlSerializer(false);
+						$serializer->serialize($widget_result);
+						$widget_xml = $serializer->getSerializedData();
+
+						$serializer = new KalturaXmlSerializer(false);
+						$serializer->serialize($ui_conf_result);
+						$ui_conf_xml = $serializer->getSerializedData();
+						$patcher = new kPatchSwf( $root . $base_wrapper_swf);
+						$result = "<xml><result>$widget_xml</result><result>$ui_conf_xml</result></xml>";
+						$patcher->patch($result, $cached_swf);
+					}
 
 				if (file_exists($cached_swf))
 				{
@@ -330,38 +329,50 @@ class kwidgetAction extends sfAction
 			
 			$dynamic_date = $widgetIdStr .
 			$track_wrapper.
-			"&kdpUrl=".urlencode($swf_url).
-			"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
-			"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-			( $show_version ? "&entryVersion=$show_version" : "" ) .
-			( $kshow_id ? "&kshowId=$kshow_id" : "" ).
-			( $entry_id ? "&entryId=$entry_id" : "" ) .
-			$uiconf_id_str  . // will be empty if nothing to add
-			$ks_flashvars.
-			($cache_st ? "&clientTag=cache_st:$cache_st" : "").
-			$conf_vars;
+				"&kdpUrl=".urlencode($swf_url).
+				"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
+				"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
+				( $show_version ? "&entryVersion=$show_version" : "" ) .
+				( $kshow_id ? "&kshowId=$kshow_id" : "" ).
+				( $entry_id ? "&entryId=$entry_id" : "" ) .
+				$uiconf_id_str  . // will be empty if nothing to add
+				$ks_flashvars.
+				($cache_st ? "&clientTag=cache_st:$cache_st" : "").
+				$conf_vars;
 
-			// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
-			$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
-			
-			// patch wrapper with flashvars and dump to browser
-			if (version_compare($uiConf->getSwfUrlVersion(), "2.6.6", ">="))
-			{
-				$patcher = new kPatchSwf( $root . $wrapper_swf, "KALTURA_FLASHVARS_DATA");
-				ob_start();
-				$patcher->patch($dynamic_date."&referer=".urlencode($referer));
-				$wrapper_data = ob_get_contents();
-				ob_end_clean();
-
-				requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0);
-				echo $wrapper_data;
+				// for now changed back to $host since kdp version prior to 1.0.15 didnt support loading by external domain kdpwrapper
+				$url =  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "/$wrapper_swf?$dynamic_date";
 				
-				if ($allowCache)
+				// patch wrapper with flashvars and dump to browser
+				if (version_compare($uiConf->getSwfUrlVersion(), "2.6.6", ">="))
 				{
-					$cache_swfdata->put($requestKey, $wrapper_data);
+					$patcher = new kPatchSwf( $root . $wrapper_swf, "KALTURA_FLASHVARS_DATA");
+					ob_start();
+					$patcher->patch($dynamic_date."&referer=".urlencode($referer));
+					$wrapper_data = ob_get_contents();
+					ob_end_clean();
+	
+					requestUtils::sendCdnHeaders("swf", strlen($wrapper_data), $allowCache ? 60 * 10 : 0);
+					echo $wrapper_data;
+					
+					if ($allowCache)
+					{
+						$cache_swfdata->put($requestKey, $wrapper_data);
+					}
+					die;
 				}
-				die;
 			}
+		}
+		else
+		{
+			$dynamic_date = "kshowId=$kshow_id" .
+			"&host=" . requestUtils::getRequestHostId() .
+			( $show_version ? "&entryVersion=$show_version" : "" ) .
+			( $entry_id ? "&entryId=$entry_id" : "" ) .
+			( $entry_id ? "&KmediaType=$kmedia_type" : "");
+			$dynamic_date .= "&isWidget=$widget_type&referer=".urlencode($referer);
+			$dynamic_date .= "&kdata=$kdata";
+			$url = "$swf_url?$dynamic_date";
 		}
 
 		// if referer has a query string an IE bug will prevent out flashvars to propagate
