@@ -15,6 +15,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'plugins_data',
 		'entry.DURATION_TYPE' => 'duration_type',
+		'entry.SEARCH_TEXT' => '(name,tags,description)',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
@@ -76,6 +77,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		'group_id' => 'string',
 		'metadata' => 'string',
 		'duration_type' => 'string',
+		'(name,tags,description)' => 'string',
 		
 		'int_entry_id' => 'int',
 		'kuser_id' => 'int',
@@ -668,6 +670,6 @@ class SphinxEntryCriteria extends KalturaCriteria
 	
 	public static function hasMatchableField ( $field_name )
 	{
-		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids", "duration_type"));
+		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids", "duration_type", "search_text"));
 	}
 }
