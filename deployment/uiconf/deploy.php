@@ -133,7 +133,7 @@ class uiConfDeployment
 		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*")); // needed for testmeDoc
 		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 		KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator")); // needed for testmeDoc
-		KAutoloader::setClassMapFilePath(KAutoloader::buildPath('..', "cache", "KalturaClassMap.cache"));
+		KAutoloader::setClassMapFilePath(KAutoloader::buildPath(dirname(__FILE__).DIRECTORY_SEPARATOR."..", "cache", "KalturaClassMap.cache"));
 		//KAutoloader::dumpExtra();
 		KAutoloader::register();
 		
