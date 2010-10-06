@@ -9,6 +9,7 @@
  * to dry-run the script add
  *  --no-create
  */
+ini_set("memory_limit", "512M");
 error_reporting(0);
 $code = array();
 $kcw_for_editors = array();
