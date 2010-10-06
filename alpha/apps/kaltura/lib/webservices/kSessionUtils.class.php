@@ -289,8 +289,19 @@ class ks
 
 		$ks->original_str = $encoded_str;
 
-		@list ( $ks->partner_id , $ks->partner_pattern , $ks->valid_until , $ks->type , $ks->rand , $ks->user , $ks->privileges , $ks->master_partner_id ) =
-			@explode ( self::SEPARATOR , $real_str );
+		$parts = explode(self::SEPARATOR, $real_str);
+		list(
+			$ks->partner_id, 
+			$ks->partner_pattern, 
+			$ks->valid_until, 
+			$ks->type, 
+			$ks->rand, 
+			$ks->user, 
+			$ks->privileges
+		) = $parts;
+		
+		if(isset($parts[7]))
+			$ks->master_partner_id = $parts[7];
 			
 		$salt = $ks->getSalt();
 		 
