@@ -61,38 +61,45 @@
 					<th><?php echo $this->translate('entry-investigate info entry partner id label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry tags label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry admin tags label'); ?></th>
-					<th><?php echo $this->translate('entry-investigate info entry pv label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry status label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry type label'); ?></th>
 					<?php 
-						if($entry instanceof KalturaLiveStreamAdminEntry)
+						if($entry instanceof KalturaMediaEntry)
 						{
 							?>
-								<th><?php echo $this->translate('entry-investigate info entry ip1 label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry ip2 label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry streamPassword label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry streamUsername label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry offlineMessage label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry connect rtmp label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry stream label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry encoder rtmp label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry encoder bk rtmp label'); ?></th>
-							<?php 
-						}
-						elseif($entry instanceof KalturaMediaEntry)
-						{
-							?>
-								<th><?php echo $this->translate('entry-investigate info entry media type label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry source type label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry cq label'); ?></th>
-								<th><?php echo $this->translate('entry-investigate info entry media date label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry pv label'); ?></th>
+								<?php 
+									if($entry instanceof KalturaLiveStreamAdminEntry)
+									{
+										?>
+											<th><?php echo $this->translate('entry-investigate info entry ip1 label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry ip2 label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry streamPassword label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry streamUsername label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry offlineMessage label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry connect rtmp label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry stream label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry encoder rtmp label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry encoder bk rtmp label'); ?></th>
+										<?php 
+									}
+									elseif($entry instanceof KalturaMediaEntry)
+									{
+										?>
+											<th><?php echo $this->translate('entry-investigate info entry media type label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry source type label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry cq label'); ?></th>
+											<th><?php echo $this->translate('entry-investigate info entry media date label'); ?></th>
+										<?php 
+									}
+								?>
+								<th><?php echo $this->translate('entry-investigate info entry thumb label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry size label'); ?></th>
+								<th><?php echo $this->translate('entry-investigate info entry duration label'); ?></th>
 							<?php 
 						}
 					?>
-					<th><?php echo $this->translate('entry-investigate info entry thumb label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry data label'); ?></th>
-					<th><?php echo $this->translate('entry-investigate info entry size label'); ?></th>
-					<th><?php echo $this->translate('entry-investigate info entry duration label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry search text label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry created label'); ?></th>
 					<?php if($enableActions): ?>
@@ -113,38 +120,45 @@
 					<td><?php echo $entry->partnerId; ?></td>
 					<td><?php echo $entry->tags; ?></td>
 					<td><?php echo $entry->adminTags; ?></td>
-					<td><?php echo 'p: ' . $entry->plays . '<br>v: ' . $entry->views; ?></td>
 					<td><?php echo $status; ?></td>
 					<td><?php echo $this->enumTranslate('KalturaEntryType', $entry->type); ?></td>
 					<?php 
-						if($entry instanceof KalturaLiveStreamAdminEntry)
+						if($entry instanceof KalturaMediaEntry)
 						{
 							?>
-								<td><?php echo $entry->encodingIP1; ?></td>
-								<td><?php echo $entry->encodingIP2; ?></td>
-								<td><?php echo $entry->streamPassword; ?></td>
-								<td><?php echo $entry->streamUsername; ?></td>
-								<td><?php echo $entry->offlineMessage; ?></td>
-								<td>rtmp://cp<?php echo $entry->streamUsername; ?>.live.edgefcs.net/live/</td>
-								<td><?php echo $entry->id . '@' . $entry->streamRemoteId; ?></td>
-								<td>rtmp://p.ep<?php echo $entry->streamRemoteId; ?>.i.akamaientrypoint.net/EntryPoint</td>
-								<td>rtmp://b.ep<?php echo $entry->streamRemoteBackupId; ?>.i.akamaientrypoint.net/EntryPoint</td>
-							<?php 
-						}
-						elseif($entry instanceof KalturaMediaEntry)
-						{
-							?>
-								<td><?php echo $this->enumTranslate('KalturaMediaType', $entry->mediaType); ?></td>
-								<td><?php echo $this->enumTranslate('KalturaSourceType', $entry->sourceType); ?></td>
-								<td><?php echo $entry->conversionQuality; ?></td>
-								<td><?php echo date($this->translate('date format'), $entry->mediaDate); ?></td>
+								<td><?php echo 'p: ' . $entry->plays . '<br>v: ' . $entry->views; ?></td>
+								<?php 
+									if($entry instanceof KalturaLiveStreamAdminEntry)
+									{
+										?>
+											<td><?php echo $entry->encodingIP1; ?></td>
+											<td><?php echo $entry->encodingIP2; ?></td>
+											<td><?php echo $entry->streamPassword; ?></td>
+											<td><?php echo $entry->streamUsername; ?></td>
+											<td><?php echo $entry->offlineMessage; ?></td>
+											<td>rtmp://cp<?php echo $entry->streamUsername; ?>.live.edgefcs.net/live/</td>
+											<td><?php echo $entry->id . '@' . $entry->streamRemoteId; ?></td>
+											<td>rtmp://p.ep<?php echo $entry->streamRemoteId; ?>.i.akamaientrypoint.net/EntryPoint</td>
+											<td>rtmp://b.ep<?php echo $entry->streamRemoteBackupId; ?>.i.akamaientrypoint.net/EntryPoint</td>
+										<?php 
+									}
+									elseif($entry instanceof KalturaMediaEntry)
+									{
+										?>
+											<td><?php echo $this->enumTranslate('KalturaMediaType', $entry->mediaType); ?></td>
+											<td><?php echo $this->enumTranslate('KalturaSourceType', $entry->sourceType); ?></td>
+											<td><?php echo $entry->conversionQuality; ?></td>
+											<td><?php echo date($this->translate('date format'), $entry->mediaDate); ?></td>
+										<?php 
+									}
+								?>
+								<td><div class="thumbWrap"><img height="15px" width="20px" src="<?php echo $entry->thumbnailUrl; ?>" class="thumb"/></div></td>
+								<td><?php echo $entry->width . "x" . $entry->height; ?></td>
+								<td><?php echo $entry->duration; ?></td>
 							<?php 
 						}
 					?>
-					<td><div class="thumbWrap"><img height="15px" width="20px" src="<?php echo $entry->thumbnailUrl; ?>" class="thumb"/></div></td>
 					<td><?php echo $entry->partnerData; ?></td>
-					<td><?php echo $entry->width . "x" . $entry->height; ?></td>
-					<td><?php echo $entry->duration; ?></td>
 					<td><?php echo $entry->searchText; ?></td>
 					<td><?php echo date($this->translate('date format'), $entry->createdAt); ?></td>
 					<?php if($enableActions): ?>
