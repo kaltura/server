@@ -126,7 +126,7 @@ class FlavorAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
 			
 		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
-		if (is_null($originalFlavorAsset))
+		if (is_null($originalFlavorAsset) || $originalFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 
 		$err = "";

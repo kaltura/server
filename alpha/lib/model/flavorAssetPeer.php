@@ -18,7 +18,7 @@ class flavorAssetPeer extends BaseflavorAssetPeer
 		}
 
 		$c = new Criteria();
-		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
+		$c->add ( self::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL );
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 
