@@ -3,7 +3,7 @@ require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 $type = $_GET["type"];
 $bench_start = microtime(true);
-KalturaLog::INFO ( ">------- api_v3 testme [$service][$action]-------");
+KalturaLog::INFO ( ">------- api_v3 testme type [$type]-------");
 
 function toArrayRecursive(KalturaPropertyInfo $propInfo)
 {
