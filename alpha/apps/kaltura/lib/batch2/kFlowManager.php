@@ -1190,7 +1190,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 		catch ( Exception $ex )
 		{
 			self::alert($dbBatchJob, $ex);
-			KalturaLog::log( "Error:" . $ex->getMessage() );
+			KalturaLog::err( "Error:" . $ex->getMessage() );
 		}
 			
 		return $dbBatchJob;
