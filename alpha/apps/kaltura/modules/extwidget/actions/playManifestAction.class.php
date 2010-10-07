@@ -80,7 +80,7 @@ class playManifestAction extends kalturaAction
 		// <drmMetadata url=\"$metaDataUrl\"/>
 	}
 	
-	private function buildFlavorsArray($oneOnly = false)
+	private function buildFlavorsArray(&$duration, $oneOnly = false)
 	{
 		$flavorAssets = array();
 		
@@ -124,8 +124,19 @@ class playManifestAction extends kalturaAction
 		}
 		
 		$flavors = array();
+		$durationSet = false;
 		foreach($flavorAssets as $flavorAsset)
 		{
+			if(!$durationSet)
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+				if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
+				{
+					$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+					$durationSet = true;
+				}
+			}
+			
 			$flavors[] = array(
 				'url' => $this->getFlavorHttpUrl($flavorAsset),
 				'bitrate' => $flavorAsset->getBitrate(),
@@ -256,7 +267,7 @@ class playManifestAction extends kalturaAction
 					case entry::ENTRY_MEDIA_TYPE_VIDEO:
 					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
 						$duration = $this->entry->getDurationInt();
-						$flavors = $this->buildFlavorsArray(true);
+						$flavors = $this->buildFlavorsArray($duration, true);
 						
 						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration);
 				}
@@ -357,6 +368,16 @@ class playManifestAction extends kalturaAction
 					}
 				}
 				
+				foreach($flavorAssets as $flavorAsset)
+				{
+					$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+					if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
+					{
+						$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+						break;
+					}
+				}
+					
 				$baseUrl = null;
 				$flavors = array();
 				if($this->storageId)
@@ -431,7 +452,6 @@ class playManifestAction extends kalturaAction
 				
 				// TODO - shouldn't be hard coded - maybe get from the entry to support different providers
 				$baseUrl = "rtmp://cp{$streamUsername}.live.edgefcs.net/live";
-				$duration = $this->entry->getDurationInt();
 				$flavors = $this->entry->getStreamBitrates();
 				if(count($flavors))
 				{
@@ -458,7 +478,7 @@ class playManifestAction extends kalturaAction
 	private function serveSilverLight()
 	{
 		$duration = $this->entry->getDurationInt();
-		$flavors = $this->buildFlavorsArray();
+		$flavors = $this->buildFlavorsArray($duration);
 		$streamType = self::PLAY_STREAM_TYPE_RECORDED;
 		
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
