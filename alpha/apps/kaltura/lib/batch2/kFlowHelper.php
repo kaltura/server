@@ -1022,8 +1022,11 @@ class kFlowHelper
 		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
 		
 		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
-			$originalflavorAsset->setDeletedAt(time());
+		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
+		{
+			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalflavorAsset->save();
+		}
 		
 		return $dbBatchJob; 	
 	}
@@ -1033,8 +1036,11 @@ class kFlowHelper
 		KalturaLog::debug("Convert Profile finished");
 		
 		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
-			$originalflavorAsset->setDeletedAt(time());
+		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
+		{
+			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalflavorAsset->save();
+		}
 		
 		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_READY);
 		

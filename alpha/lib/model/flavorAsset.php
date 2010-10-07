@@ -15,6 +15,7 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 	const FLAVOR_ASSET_STATUS_READY = 2;
 	const FLAVOR_ASSET_STATUS_DELETED = 3;
 	const FLAVOR_ASSET_STATUS_NOT_APPLICABLE = 4;
+	const FLAVOR_ASSET_STATUS_TEMP = 5; // used during conversion and should be deleted
 	
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET = 1;
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG = 2;

@@ -505,7 +505,7 @@ class kBusinessPreConvertDL
 		if(!$sourceFlavor)
 		{
 			KalturaLog::log("Source flavor params not found");
-			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_TEMP);
 			$originalFlavorAsset->save();
 		}
 		elseif($shouldConvert)

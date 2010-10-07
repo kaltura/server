@@ -216,7 +216,7 @@ class FlavorAssetService extends KalturaBaseService
 		// get the flavor assets for this entry
 		$c = new Criteria();
 		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->add(flavorAssetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_TEMP), Criteria::NOT_IN);
 		$flavorAssetsDb = flavorAssetPeer::doSelect($c);
 		
 		// find what flavot params are required
