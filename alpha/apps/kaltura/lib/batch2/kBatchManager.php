@@ -147,8 +147,8 @@ class kBatchManager
 		KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfoDb, $flavorAsset);
 		$flavorAsset->save();
 
-		if(!$flavorAsset->hasTag(flavorParams::TAG_MBR))
-			return $mediaInfoDb;
+//		if(!$flavorAsset->hasTag(flavorParams::TAG_MBR))
+//			return $mediaInfoDb;
 			
 		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
 		if(!$entry)
