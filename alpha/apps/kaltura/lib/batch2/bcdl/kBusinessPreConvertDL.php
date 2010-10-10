@@ -521,16 +521,62 @@ class kBusinessPreConvertDL
 				$errDescription = null;
 				$sourceFlavorOutput = self::validateFlavorAndMediaInfo($sourceFlavor, $mediaInfo, $errDescription);
 				
+				// save flavor params
+				$sourceFlavorOutput->setPartnerId($sourceFlavorOutput->getPartnerId());
+				$sourceFlavorOutput->setEntryId($entryId);
+				$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
+				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
+				$sourceFlavorOutput->save();
+				
 				if($errDescription)
 					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-				
+					
+				// ****	
+					
+				$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
+				if($errDescription)
+					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
+		
+				// decided by the business logic layer
+				if($sourceFlavorOutput->_create_anyway)
+				{
+					KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] selected to be created anyway");
+				}
+				else
+				{
+					if(!$sourceFlavorOutput->IsValid())
+					{
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
+						$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$originalFlavorAsset->save();	
+						return false;
+					}
+					
+					if($sourceFlavorOutput->_force)
+					{
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
+					}
+					else
+					{
+						if($sourceFlavorOutput->_isNonComply)
+						{
+							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
+							$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
+							$originalFlavorAsset->save();	
+							return false;
+						}
+						
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
+					}
+				}
+					
 				$originalFlavorAsset->incrementVersion();
 				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 				$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
 				$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
 				$originalFlavorAsset->save();
 				
-				$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
+				// save flavor params
 				$sourceFlavorOutput->setFlavorAssetVersion($originalFlavorAsset->getVersion());
 				$sourceFlavorOutput->save();
 				
