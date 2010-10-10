@@ -93,6 +93,16 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 		$this->setVersion(is_null($version) ? 1 : $version + 1);
 	}
 	
+	public function addTags(array $newTags)
+	{
+		$tags = $this->getTagsArray();
+		foreach($newTags as $newTag)
+			if(!in_array($newTag, $tags))
+				$tags[] = $newTag;
+				
+		$this->setTagsArray($tags);
+	}
+	
 	
 	private static function validateFileSyncSubType ( $sub_type )
 	{
@@ -264,7 +274,7 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 	
 	public function setTagsArray(array $tags)
 	{
-		$this->setTags(join(',', $tags));
+		$this->setTags(implode(',', $tags));
 	}
 	
 	public function getTagsArray()
