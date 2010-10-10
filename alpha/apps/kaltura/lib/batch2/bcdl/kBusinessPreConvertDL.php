@@ -523,9 +523,11 @@ class kBusinessPreConvertDL
 				
 				if($errDescription)
 					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
-					
+				
 				$originalFlavorAsset->incrementVersion();
-				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);	
+				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+				$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
+				$originalFlavorAsset->setFileExt($sourceFlavor->getFileExt());
 				$originalFlavorAsset->save();
 				
 				$sourceFlavorOutput->setFlavorAssetId($originalFlavorAsset->getId());
