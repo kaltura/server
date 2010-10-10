@@ -22,6 +22,7 @@ class kuserFilter extends baseObjectFilter
 			"_lte_id" ,
 			"_notin_id" ) , NULL );
 			
+		$this->allowed_order_fields = array("created_at");
 	}
 
 	public function describe() 
