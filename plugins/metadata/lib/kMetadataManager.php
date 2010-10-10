@@ -219,11 +219,21 @@ class kMetadataManager
 			foreach($nodes as $node)
 				$searchItemValues[] = $node->nodeValue;
 				
-			if(count($searchItemValues))
-				$searchItems[$profileField->getId()] = $searchItemValues;
+			if(!count($searchItemValues))
+				continue;
 				
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT)
-				$textItems[] = implode(' ', $searchItemValues);
+			{
+				$textItem = implode(' ', $searchItemValues);
+				$textItems[] = $textItem;
+				
+				if(iconv_strlen($textItem, 'UTF-8') < 128) 
+					$searchItems[$profileField->getId()] = $searchItemValues;
+			}
+			else
+			{
+				$searchItems[$profileField->getId()] = $searchItemValues;
+			}
 		}
 		
 		foreach($searchItems as $key => $searchItem)
