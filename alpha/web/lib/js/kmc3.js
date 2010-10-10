@@ -51,7 +51,8 @@ $(function(){
 			swf_version : "v3.3.4"
 		};
 
-	kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Quick_Start_Guide__Butterfly.pdf#";
+	// kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Quick_Start_Guide__Butterfly.pdf#";
+	kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
 
 	kmc.functions = {
 		expired : function() {
@@ -484,7 +485,7 @@ $(function(){
 				firstLogin			: kmc.vars.first_login,
 				uploadDocLink		: kmc.vars.quickstart_guide + "page=3",
 				embedDocLink		: kmc.vars.quickstart_guide + "page=5",
-				customizeDocLink	: kmc.vars.quickstart_guide + "page=37"
+				customizeDocLink	: kmc.vars.quickstart_guide + "page=52" // bf=37
 			}
 		},
 		content : {
