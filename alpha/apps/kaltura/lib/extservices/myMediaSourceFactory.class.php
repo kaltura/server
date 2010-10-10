@@ -18,6 +18,10 @@ class myMediaSourceFactory
 
 	 */
 
+	/**
+	 * @param int $media_source
+	 * @return myBaseMediaSource
+	 */
 	public static function getMediaSource ( $media_source )
 	{
 		switch ( $media_source )
