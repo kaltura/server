@@ -133,6 +133,7 @@ class playManifestAction extends kalturaAction
 				if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 				{
 					$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+					$duration /= 1000;
 					$durationSet = true;
 				}
 			}
@@ -374,6 +375,7 @@ class playManifestAction extends kalturaAction
 					if($mediaInfo && ($mediaInfo->getVideoDuration() || $mediaInfo->getAudioDuration() || $mediaInfo->getContainerDuration()))
 					{
 						$duration = ($mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration() : ($mediaInfo->getAudioDuration() ? $mediaInfo->getAudioDuration() : $mediaInfo->getContainerDuration()));
+						$duration /= 1000;
 						break;
 					}
 				}
