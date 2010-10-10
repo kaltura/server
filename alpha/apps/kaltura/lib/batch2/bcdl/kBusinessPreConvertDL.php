@@ -531,8 +531,6 @@ class kBusinessPreConvertDL
 				if($errDescription)
 					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
 					
-				// ****	
-					
 				$errDescription = kBusinessConvertDL::parseFlavorDescription($sourceFlavorOutput);
 				if($errDescription)
 					$originalFlavorAsset->setDescription($originalFlavorAsset->getDescription() . "\n$errDescription");
@@ -549,25 +547,21 @@ class kBusinessPreConvertDL
 						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is invalid");
 						$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$originalFlavorAsset->save();	
+						
+						$errDescription = "Source flavor could not be converted";
+						KalturaLog::err($errDescription);
+						$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
+						kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+						
 						return false;
 					}
 					
 					if($sourceFlavorOutput->_force)
-					{
 						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is forced");
-					}
+					elseif($sourceFlavorOutput->_isNonComply)
+						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
 					else
-					{
-						if($sourceFlavorOutput->_isNonComply)
-						{
-							KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is none-comply");
-							$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE);
-							$originalFlavorAsset->save();	
-							return false;
-						}
-						
 						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
-					}
 				}
 					
 				$originalFlavorAsset->incrementVersion();
