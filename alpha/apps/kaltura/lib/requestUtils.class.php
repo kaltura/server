@@ -393,6 +393,13 @@ class requestUtils
 
 	public static function getRemoteAddress()
 	{
+		// enable access control debug
+		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
+		{
+			header('Debug IP: ' . $_POST['debug_ip']);
+			return $_POST['debug_ip'];
+		}
+			
 		$remote_addr = null;
 		if ( isset ( $_SERVER['HTTP_X_REAL_IP'] ))
 		{
