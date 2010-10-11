@@ -393,7 +393,12 @@ class kFlowHelper
 			{
 				$flavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
 				if($flavorAsset)
-					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);	
+				{
+					if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
+						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+				
+					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
+				}	
 			}
 		}
 		
