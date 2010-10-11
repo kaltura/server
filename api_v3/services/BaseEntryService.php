@@ -366,7 +366,7 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
 		$ks = $this->getKs();
-		$isAdmin = false;
+		$isAdmin = false; 
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 			
