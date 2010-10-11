@@ -66,8 +66,12 @@
                 <Bitrate>
                   <VariableConstrainedBitrate
                     PeakBitrate="1050"
-                    PeakBufferWindow="00:00:04"
+                    PeakBufferWindow="00:00:35"
                     AverageBitrate="700" />
+                  <ConstantBitrate
+                    Bitrate="1111"
+                    IsTwoPass="True"
+                    BufferWindow="00:00:04" />
                 </Bitrate>
               </StreamInfo>
             </Streams>
