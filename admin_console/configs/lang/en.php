@@ -42,6 +42,7 @@ return array(
 	'KalturaConversionEngineType::ENCODING_COM' => 'Convert - Encoding.com',
 	'KalturaConversionEngineType::KALTURA_COM' => 'Convert - Kaltura.com',
 	'KalturaConversionEngineType::EXPRESSION_ENCODER3' => 'Expression Encoder 3',
+	'KalturaConversionEngineType::EXPRESSION_ENCODER' => 'Expression Encoder',
 	'KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS' => 'QuickTime player tools',
 	'KalturaConversionEngineType::FAST_START' => 'Convert - Fast start',
 
