@@ -107,6 +107,7 @@
 		const ENCODING_COM 	= "encoding.com";
 		const FFMPEG_AUX 	= "ffmpeg-aux";
 		const EE3			= "ee3";
+		const EXPRESSION_ENCODER = "expression_encoder";
 		const FFMPEG_VP8 	= "ffmpeg-vp8";
 		const QUICK_TIME_PLAYER_TOOLS = "quick_time_player_tools";
 		const QT_FASTSTART  = "qt-faststart";
