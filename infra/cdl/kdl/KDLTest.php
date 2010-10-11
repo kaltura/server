@@ -5,7 +5,7 @@ class KDLTest
 	/* ------------------------------
 	 * function mediaDs2flavor
 	 */
-	public static function simulateFlavor($fmt, $vcodec, $w=0, $h, $br, $acodec="", $ab=96, $ar=22050, $clipStart=0, $clipDur=0)
+	public static function simulateFlavor($fmt, $vcodec, $w=0, $h, $br, $acodec="", $ab=96, $ar=22050, $clipStart=0, $clipDur=0, $engines="2,3,99,(6#2#7)")
 	{
 		$fl = new KDLFlavor();
 		$fl->_audio = new KDLAudioData();
@@ -28,9 +28,9 @@ class KDLTest
 		$fl->_audio->_bitRate = $ab;
 //		$fl->_audio->_resolution=16;
 		
-/**/		$fl->_transcoders[] = new KDLOperationParams("cli_encode");
+///		$fl->_transcoders[] = new KDLOperationParams("cli_encode");
 	
-		$fl->_transcoders=KDLUtils::parseTranscoderList(/*"5,1,(1#2#3),4"*/"2,3,99,(6#2#7)","", KDLWrap::$TranscodersCdl2Kdl);
+		$fl->_transcoders=KDLUtils::parseTranscoderList($engines,"", KDLWrap::$TranscodersCdl2Kdl);
 		/*
 		$fl->_transcoders[] = new KDLOperationParams("encoding.com");
 		$fl->_transcoders[] = new KDLOperationParams("ffmpeg");
@@ -199,6 +199,9 @@ function transcoderSetFuncTest($oprObj, $transDictionary, $param2)
 	}
 	else if($oprObj->_id==KDLTranscoders::QT_FASTSTART){
 		$engineClassName = "KDLOperatorQTFastStart";
+	}
+	else if($oprObj->_id==KDLTranscoders::EXPRESSION_ENCODER){
+		$engineClassName = "KDLOperatorExpressionEncoder";
 	}
 	else if($oprObj->_id==KDLTranscoders::PDF_CREATOR){
 		$engineClassName = "KDLTranscoderPdfCreator";
