@@ -13,7 +13,7 @@ class myConversionProfileUtils
 	 * @param string $fileFormat
 	 * @return FlavorParams
 	 */
-	public static function getFlavorParamsFromFileFormat( $partnerId , $fileFormat )
+	public static function getFlavorParamsFromFileFormat( $partnerId , $fileFormat, $ignoreSourceTag = true )
 	{
 		$defaultCriteria = flavorParamsPeer::getCriteriaFilter()->getFilter();
 		$defaultCriteria->remove(flavorParamsPeer::PARTNER_ID);
@@ -29,16 +29,21 @@ class myConversionProfileUtils
 		
 		foreach ( $possible_flavor_params as $fp )
 		{
-			if ( $fileFormat == $fp->getFormat() ) 
-			{
-				if ( ! $best_fp ) $best_fp =  $fp;
-				if ( $fp->getPartnerId() == $partnerId )
-				{
-					// same format for the partner
-					$best_fp =  $fp;
-					break;
-				}
-			}	
+			if ( $fileFormat != $fp->getFormat() )
+				continue;
+				
+			if ( $ignoreSourceTag && $fp->hasTag(flavorParams::TAG_SOURCE) )
+				continue;
+				
+			if ( ! $best_fp ) 
+				$best_fp =  $fp;
+				
+			if ( $fp->getPartnerId() != $partnerId )
+				continue;
+				
+			// same format for the partner
+			$best_fp =  $fp;
+			break;
 		}
 		
 		// if not fount any - choose the first flavor params from the list
