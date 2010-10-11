@@ -37,8 +37,8 @@ class SphinxLogTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addForeignKey('ENTRY_ID', 'EntryId', 'VARCHAR', 'entry', 'ID', false, 20, null);
-		$this->addForeignKey('PARTNER_ID', 'PartnerId', 'INTEGER', 'partner', 'ID', false, null, 0);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
 		$this->addColumn('SQL', 'Sql', 'CLOB', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -50,8 +50,6 @@ class SphinxLogTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('Partner', 'Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
-    $this->addRelation('entry', 'entry', RelationMap::MANY_TO_ONE, array('entry_id' => 'id', ), null, null);
     $this->addRelation('SphinxLogServer', 'SphinxLogServer', RelationMap::ONE_TO_MANY, array('id' => 'last_log_id', ), null, null);
 	} // buildRelations()
 

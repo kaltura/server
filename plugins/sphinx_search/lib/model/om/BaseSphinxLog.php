@@ -56,16 +56,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
-	 * @var        Partner
-	 */
-	protected $aPartner;
-
-	/**
-	 * @var        entry
-	 */
-	protected $aentry;
-
-	/**
 	 * @var        array SphinxLogServer[] Collection to store aggregation of SphinxLogServer objects.
 	 */
 	protected $collSphinxLogServers;
@@ -257,10 +247,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = SphinxLogPeer::ENTRY_ID;
 		}
 
-		if ($this->aentry !== null && $this->aentry->getId() !== $v) {
-			$this->aentry = null;
-		}
-
 		return $this;
 	} // setEntryId()
 
@@ -282,10 +268,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		if ($this->partner_id !== $v || $this->isNew()) {
 			$this->partner_id = $v;
 			$this->modifiedColumns[] = SphinxLogPeer::PARTNER_ID;
-		}
-
-		if ($this->aPartner !== null && $this->aPartner->getId() !== $v) {
-			$this->aPartner = null;
 		}
 
 		return $this;
@@ -460,12 +442,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
-		if ($this->aentry !== null && $this->entry_id !== $this->aentry->getId()) {
-			$this->aentry = null;
-		}
-		if ($this->aPartner !== null && $this->partner_id !== $this->aPartner->getId()) {
-			$this->aPartner = null;
-		}
 	} // ensureConsistency
 
 	/**
@@ -505,8 +481,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->aPartner = null;
-			$this->aentry = null;
 			$this->collSphinxLogServers = null;
 			$this->lastSphinxLogServerCriteria = null;
 
@@ -617,25 +591,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
-
-			// We call the save method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aPartner !== null) {
-				if ($this->aPartner->isModified() || $this->aPartner->isNew()) {
-					$affectedRows += $this->aPartner->save($con);
-				}
-				$this->setPartner($this->aPartner);
-			}
-
-			if ($this->aentry !== null) {
-				if ($this->aentry->isModified() || $this->aentry->isNew()) {
-					$affectedRows += $this->aentry->save($con);
-				}
-				$this->setentry($this->aentry);
-			}
 
 			if ($this->isNew() ) {
 				$this->modifiedColumns[] = SphinxLogPeer::ID;
@@ -792,24 +747,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 			$retval = null;
 
 			$failureMap = array();
-
-
-			// We call the validate method on the following object(s) if they
-			// were passed to this object by their coresponding set
-			// method.  This object relates to these object(s) by a
-			// foreign key reference.
-
-			if ($this->aPartner !== null) {
-				if (!$this->aPartner->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aPartner->getValidationFailures());
-				}
-			}
-
-			if ($this->aentry !== null) {
-				if (!$this->aentry->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aentry->getValidationFailures());
-				}
-			}
 
 
 			if (($retval = SphinxLogPeer::doValidate($this, $columns)) !== true) {
@@ -1141,104 +1078,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Declares an association between this object and a Partner object.
-	 *
-	 * @param      Partner $v
-	 * @return     SphinxLog The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setPartner(Partner $v = null)
-	{
-		if ($v === null) {
-			$this->setPartnerId(0);
-		} else {
-			$this->setPartnerId($v->getId());
-		}
-
-		$this->aPartner = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the Partner object, it will not be re-added.
-		if ($v !== null) {
-			$v->addSphinxLog($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated Partner object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     Partner The associated Partner object.
-	 * @throws     PropelException
-	 */
-	public function getPartner(PropelPDO $con = null)
-	{
-		if ($this->aPartner === null && ($this->partner_id !== null)) {
-			$this->aPartner = PartnerPeer::retrieveByPk($this->partner_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aPartner->addSphinxLogs($this);
-			 */
-		}
-		return $this->aPartner;
-	}
-
-	/**
-	 * Declares an association between this object and a entry object.
-	 *
-	 * @param      entry $v
-	 * @return     SphinxLog The current object (for fluent API support)
-	 * @throws     PropelException
-	 */
-	public function setentry(entry $v = null)
-	{
-		if ($v === null) {
-			$this->setEntryId(NULL);
-		} else {
-			$this->setEntryId($v->getId());
-		}
-
-		$this->aentry = $v;
-
-		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the entry object, it will not be re-added.
-		if ($v !== null) {
-			$v->addSphinxLog($this);
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * Get the associated entry object
-	 *
-	 * @param      PropelPDO Optional Connection object.
-	 * @return     entry The associated entry object.
-	 * @throws     PropelException
-	 */
-	public function getentry(PropelPDO $con = null)
-	{
-		if ($this->aentry === null && (($this->entry_id !== "" && $this->entry_id !== null))) {
-			$this->aentry = entryPeer::retrieveByPk($this->entry_id);
-			/* The following can be used additionally to
-			   guarantee the related object contains a reference
-			   to this object.  This level of coupling may, however, be
-			   undesirable since it could result in an only partially populated collection
-			   in the referenced object.
-			   $this->aentry->addSphinxLogs($this);
-			 */
-		}
-		return $this->aentry;
-	}
-
-	/**
 	 * Clears out the collSphinxLogServers collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
@@ -1412,8 +1251,6 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 		} // if ($deep)
 
 		$this->collSphinxLogServers = null;
-			$this->aPartner = null;
-			$this->aentry = null;
 	}
 
 } // BaseSphinxLog

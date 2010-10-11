@@ -13,12 +13,6 @@
 			lazyLoad="false" name="sql" type="clob" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="created_at" type="timestamp" />
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="partner">
-			<reference local="partner_id" foreign="id" />
-		</foreign-key>
-		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
-			<reference local="entry_id" foreign="id" />
-		</foreign-key>
 		<index name="entry_id">
 			<index-column name="entry_id" />
 		</index>
