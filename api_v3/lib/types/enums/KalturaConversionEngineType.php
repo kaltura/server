@@ -10,7 +10,8 @@ class KalturaConversionEngineType extends KalturaEnum
 	const FFMPEG = 2;
 	const MENCODER = 3;
 	const ENCODING_COM = 4;
-	const EXPRESSION_ENCODER3 = 5;
+	const EXPRESSION_ENCODER3 = 55;
+	const EXPRESSION_ENCODER = 5;
 	const QUICK_TIME_PLAYER_TOOLS = 6;
 	const FAST_START = 7;
 	
