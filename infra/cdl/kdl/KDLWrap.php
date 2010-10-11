@@ -14,19 +14,20 @@ class KDLWrap
 	public  $_rv=true;
 	
 	static $TranscodersCdl2Kdl = array(
-		0=>KDLTranscoders::KALTURA,
-		1=>KDLTranscoders::ON2,
-		2=>KDLTranscoders::FFMPEG,
-		3=>KDLTranscoders::MENCODER,
-		4=>KDLTranscoders::ENCODING_COM,
-		99=>KDLTranscoders::FFMPEG_AUX,
-		98=>KDLTranscoders::FFMPEG_VP8,
-		5=>KDLTranscoders::EE3,
-		6=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
-		7=>KDLTranscoders::QT_FASTSTART,
-		201=>KDLTranscoders::PDF2SWF,
-		202=>KDLTranscoders::PDF_CREATOR,
-		203=>KDLTranscoders::OPENOFFICE_UCONV,
+		kConvertJobData::CONVERSION_ENGINE_KALTURA_COM=>KDLTranscoders::KALTURA,
+		kConvertJobData::CONVERSION_ENGINE_ON2=>KDLTranscoders::ON2,
+		kConvertJobData::CONVERSION_ENGINE_FFMPEG=>KDLTranscoders::FFMPEG,
+		kConvertJobData::CONVERSION_ENGINE_MENCODER=>KDLTranscoders::MENCODER,
+		kConvertJobData::CONVERSION_ENGINE_ENCODING_COM=>KDLTranscoders::ENCODING_COM,
+		kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX=>KDLTranscoders::FFMPEG_AUX,
+		kConvertJobData::CONVERSION_ENGINE_FFMPEG_VP8=>KDLTranscoders::FFMPEG_VP8,
+		kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
+		kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER=>KDLTranscoders::EXPRESSION_ENCODER,
+		kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
+		kConvertJobData::CONVERSION_ENGINE_FAST_START=>KDLTranscoders::QT_FASTSTART,
+		kConvertJobData::CONVERSION_ENGINE_PDF2SWF=>KDLTranscoders::PDF2SWF,
+		kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
+		kConvertJobData::CONVERSION_ENGINE_OPENOFFICE_UCONV=>KDLTranscoders::OPENOFFICE_UCONV,
 	);
 	
 	/* ------------------------------
@@ -591,6 +592,9 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 kLog::log(__METHOD__.":operators id=$id :");
 	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
 		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS);
+	}
+	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
+		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER);
 	}
 	else if($id==KDLTranscoders::QT_FASTSTART) {
 		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_FAST_START);
