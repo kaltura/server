@@ -32,3 +32,15 @@ KDLCommon - new - webm
 KDLflavor - new - webm 
 KDLTranscodeerComm - new - webm
 KDLWrap - in ConvertMediainfoCdl2FlavorAsset logging
+
+2010-10-04
+api_v3/lib/KalturaFlavorParamsFactory - WEBM support
+api_v3/lib/types/enums/KalturaContainerFormat - WEBM support
+batch/client/KalturaClinet.php - WEBM suppor
+plugins/quick_time_tools/lib/KDLTranscoderQTPTools/php - WEBM support, clip dur
+
+2010=10-11
+KDLCommon - new EXP_ENC
+KDLFlavor - fix - audio targets (mp3, wma) should not have video object
+KDLWrap - new - support to EXPRESSION_ENCODER plugin
+wnvPresetTemplate.xml - upd - CBR 2 pass support
