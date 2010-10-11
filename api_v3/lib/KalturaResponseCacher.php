@@ -11,12 +11,13 @@ class KalturaResponseCacher
 	protected $_cacheHeadersFilePath = "";
 	protected $_cacheLogFilePath = "";
 	protected $_ks = "";
-	protected $_useCache = true;
+	
+	protected static $_useCache = true;
 	
 	public function __construct()
 	{
-		$this->_useCache = kConf::get('enable_cache');
-		if (!$this->_useCache)
+		self::$_useCache = kConf::get('enable_cache');
+		if (!self::$_useCache)
 			return;
 			
 		$params = $_GET + $_POST;
@@ -30,7 +31,7 @@ class KalturaResponseCacher
 			{
 				if ($matches[1] > time())
 				{
-					$this->_useCache = false;
+					self::$_useCache = false;
 					return;
 				}
 			}
@@ -39,7 +40,7 @@ class KalturaResponseCacher
 		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
 		if ($isAdminLogin || isset($params['nocache']))
 		{
-			$this->_useCache = false;
+			self::$_useCache = false;
 			return;
 		}
 		
@@ -64,9 +65,14 @@ class KalturaResponseCacher
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
 	}
 	
+	public static function disableCache()
+	{
+		self::$_useCache = false;
+	}
+	
 	public function checkOrStart()
 	{
-		if (!$this->_useCache)
+		if (!self::$_useCache)
 			return;
 			
 		$startTime = microtime(true);
@@ -96,7 +102,7 @@ class KalturaResponseCacher
 	
 	public function end()
 	{
-		if (!$this->_useCache)
+		if (!self::$_useCache)
 			return;
 			
 		if (!$this->shouldCache())
