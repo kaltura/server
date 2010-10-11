@@ -53,7 +53,7 @@ class KalturaNotificationJobData extends KalturaJobData
 	 */
 	public $objType;
 	
-	private static $map_between_objects = array("userId", "type", "typeAsString", "objectId", "status", "data", "numberOfAttempts", "notificationResult", "objType");
+	private static $map_between_objects = array("userId", "type", "typeAsString", "objectId", "data", "numberOfAttempts", "notificationResult", "objType");
 	
 	public function getMapBetweenObjects()
 	{
