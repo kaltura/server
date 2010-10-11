@@ -382,6 +382,8 @@ class BaseEntryService extends KalturaEntryService
 		$result->previewLength = -1;
 		if ($accessControl)
 		{
+			KalturaResponseCacher::disableCache();
+			
 			$accessControlScope = accessControlScope::partialInit();
 			$accessControlScope->setReferrer($contextDataParams->referrer);
 			$accessControlScope->setKs($this->getKs());
