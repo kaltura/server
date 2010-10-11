@@ -22,6 +22,8 @@ class kConf
 				"iis_host" => "@IIS_HOST@",
 				"www_host" => "@WWW_HOST@",
 				"rtmp_url" => "@RTMP_URL@",
+
+				"delivery_block_countries" => "", // comma separated
 				
 				"kaltura_installation_type" => "@INSTALLATION_TYPE@",
 				"enable_cache" => true,
