@@ -22,6 +22,7 @@ class flavorParams extends BaseflavorParams
 	const CONTAINER_FORMAT_WMA = "wma";
 	const CONTAINER_FORMAT_ISMV = "ismv";
 	const CONTAINER_FORMAT_MKV = "mkv";
+	const CONTAINER_FORMAT_WEBM = "webm";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
@@ -32,7 +33,7 @@ class flavorParams extends BaseflavorParams
 	const VIDEO_CODEC_H264 = "h264";
 	const VIDEO_CODEC_H264B = "h264b";
 	const VIDEO_CODEC_H264M = "h264m";
-	const VIDEO_CODEC_H264h = "h264h";
+	const VIDEO_CODEC_H264H = "h264h";
 	const VIDEO_CODEC_FLV = "flv";
 	const VIDEO_CODEC_MPEG4 = "mpeg4";
 	const VIDEO_CODEC_THEORA = "theora";
