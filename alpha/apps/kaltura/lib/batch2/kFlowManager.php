@@ -1203,7 +1203,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 		$jobData->setMailPriority( kMailJobData::MAIL_PRIORITY_HIGH);
 		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
 	  	
-		KalturaLog::log ( "Alert: Error in job [{$dbBatchJob->getId()}]\n".$exception);
+		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception);
 		
 		$jobData->setMailType(90); // is the email template
 		$jobData->setBodyParamsArray(array($dbBatchJob->getId(), $exception->getFile(), $exception->getLine(), $exception->getMessage(), $exception->getTraceAsString()));
