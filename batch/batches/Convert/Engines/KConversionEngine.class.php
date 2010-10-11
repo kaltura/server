@@ -80,6 +80,9 @@ abstract class KConversionEngine
 			case KalturaConversionEngineType::EXPRESSION_ENCODER3:
 				$engine = new KConversionEngineExpressionEncoder3( $engine_config );
 				break;
+			case KalturaConversionEngineType::EXPRESSION_ENCODER:
+				$engine = new KConversionEngineExpressionEncoder( $engine_config );
+				break;
 			case KalturaConversionEngineType::FFMPEG_VP8:
 				$engine = new KConversionEngineFfmpegVp8( $engine_config );
 				break;
