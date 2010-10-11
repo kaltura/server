@@ -11,7 +11,8 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 		if(!($object instanceof entry))
 			return;
 
-		$this->createEntryDocument($object);
+		$document = $this->createEntryDocument($object);
+		$this->addDocument($document);
 	}
 
 	/**
@@ -35,7 +36,8 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 		if(!($object instanceof entry))
 			return;
 			
-		$this->createEntryDocument($object);
+		$document = $this->createEntryDocument($object);
+		$this->addDocument($document);
 	}
 	
 	public function createEntryDocument(entry $entry)
@@ -45,10 +47,18 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 		
 		foreach(self::$solrFields as $solrField)
 		{
-			$value = $entry->getByName($solrField->phpName);
-			$solrName = $solrField->solrName;
+			$fieldType = $solrField['type'];
+			$func_name = "get" . $solrField['phpName'];
 			
-			switch($solrField->type) {
+			if ($fieldType == "date")
+				$value = call_user_func ( array ( $entry , $func_name ), "%Y-%m-%dT%H:%M:%SZ");
+			else
+				$value = call_user_func ( array ( $entry , $func_name ) );
+				
+			//$value = $entry->getByName($solrField['phpName']);
+			$solrName = $solrField['solrName'];
+			
+			switch($solrField['type']) {
 			case "array":
 				if ($value != '')
 				{
@@ -60,16 +70,16 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 				}
 				break;
 				
-			case "date":
-				$value = strftime("%Y-%m-%dT%H:%M:%SZ", $value);
-				$document->addField($solrName, $value);
-				break;
-				
 			default:
 				$document->addField($solrName, $value);
 			}
 		}
 
+		return $document;
+	}
+	
+	function addDocument($document)
+	{
 		$solr = createSolrService();
 		$solr->addDocument($document);
 	}
