@@ -369,7 +369,7 @@ $sourceDur=0;
 		
 $target->_video = null;
 		if($this->_video!="") {
-			if($source->_video!=""){
+			if($source->_video!="" && ($target->_container && !($target->_container->_id==KDLContainerTarget::MP3 || $target->_container->_id==KDLContainerTarget::WMA))){
 				/*
 				 * Evaluate flavor frame-size
 				 */
