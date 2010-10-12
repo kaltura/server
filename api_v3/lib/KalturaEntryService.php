@@ -56,16 +56,20 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
+		if(is_null($conversionProfileId) || $conversionProfileId <= 0)
+		{
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+			if(!$conversionProfile)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+			
+			$conversionProfileId = $conversionProfile->getId();
+		}
+			
 		// even if it null
 		$entry->setConversionQuality($conversionProfileId);
+		$entry->setConversionProfileId($conversionProfileId);
 		$entry->save();
 		
-		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
-		if(!$conversionProfile)
-			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
-		
-		$conversionProfileId = $conversionProfile->getId();
-			
 		if($dynamicConversionAttributes)
 		{
 			$flavors = flavorParamsPeer::retrieveByProfile($conversionProfileId);
