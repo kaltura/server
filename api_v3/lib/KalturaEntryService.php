@@ -91,7 +91,7 @@ class KalturaEntryService extends KalturaBaseService
 				if(is_null($dynamicConversionAttribute->flavorParamsId))
 					continue;
 					
-				$dynamicAttributes[$dynamicConversionAttribute->flavorParamsId][$dynamicConversionAttribute->name] = $dynamicConversionAttribute->value;
+				$dynamicAttributes[$dynamicConversionAttribute->flavorParamsId][trim($dynamicConversionAttribute->name)] = trim($dynamicConversionAttribute->value);
 			}
 			
 			if(count($dynamicAttributes))
