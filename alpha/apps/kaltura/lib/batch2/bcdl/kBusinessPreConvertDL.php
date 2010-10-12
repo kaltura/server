@@ -211,7 +211,7 @@ class kBusinessPreConvertDL
 	 * @param string $errDescription
 	 * @return array of flavorParamsOutput
 	 */
-	protected static function validateConversionProfile(mediaInfo $mediaInfo = null, array $flavors, array $conversionProfileFlavorParams, &$errDescription)
+	protected static function validateConversionProfile($partnerId, $entryId, mediaInfo $mediaInfo = null, array $flavors, array $conversionProfileFlavorParams, &$errDescription)
 	{
 		// if there is no media info, the entire profile returned as is, decision layer ignored
 		if(!$mediaInfo)
@@ -286,7 +286,9 @@ class kBusinessPreConvertDL
 					$errDescription = "Business decision layer, required flavor not valid: " . $flavor->getId();
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
-					return null;
+					$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
+					$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $errDescription);
+					continue;
 				}
 			}
 			
@@ -300,7 +302,9 @@ class kBusinessPreConvertDL
 					$errDescription = "Business decision layer, required flavor none complied: id[" . $flavor->getId() . "] flavor params id [" . $flavor->getFlavorParamsId() . "]";
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
-					return null;
+					$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
+					$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $errDescription);
+					continue;
 				}
 			}
 			
@@ -707,7 +711,7 @@ class kBusinessPreConvertDL
 		}
 		
 		$errDescription = null;
-		$finalFlavors = self::validateConversionProfile($mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
+		$finalFlavors = self::validateConversionProfile($convertProfileJob->getPartnerId(), $entryId, $mediaInfo, $flavors, $conversionProfileFlavorParams, $errDescription);
 			
 		KalturaLog::log(count($finalFlavors) . " flavors returned from the decision layer");
 		if(is_null($finalFlavors))
