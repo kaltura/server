@@ -78,11 +78,11 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 			$c->add ( entryPeer::MEDIA_TYPE , $media_type );
 			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
 	
-			$keywords_array = mySearchUtils::getKeywordsFromStr ( $searchText );
+//			$keywords_array = mySearchUtils::getKeywordsFromStr ( $searchText );
 			$filter = new entryFilter();
 			$filter->setPartnerSearchScope(self::$partner_id);
 
-			$filter->addSearchMatchToCriteria($c, $keywords_array, entry::getSearchableColumnName() );
+			$filter->addSearchMatchToCriteria($c, $searchText, entry::getSearchableColumnName() );
 						
 			$c->setLimit( $pageSize );
 			$c->setOffset( $page * $pageSize );

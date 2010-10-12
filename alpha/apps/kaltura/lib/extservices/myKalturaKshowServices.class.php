@@ -73,7 +73,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 		$limit = $pageSize;
 		$offset = $pageSize * ($page-1); // $page starts from 1
 		
-		$keywords_array = mySearchUtils::getKeywordsFromStr ( $searchText );
+//		$keywords_array = mySearchUtils::getKeywordsFromStr ( $searchText );
 
 		// TODO_ change mechanism !
 		//$search_mechanism = self::KALTURA_SERVICE_CRITERIA_FROM_KSHOW;
@@ -86,7 +86,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 		$kshow_crit->addSelectColumn(kshowPeer::ID);
 		$kshow_crit->addSelectColumn(kshowPeer::SHOW_ENTRY_ID);
 		$kshow_crit->setLimit( self::$s_default_count_limit );
-		$kshow_filter->addSearchMatchToCriteria( $kshow_crit , $keywords_array , kshow::getSearchableColumnName() );
+		$kshow_filter->addSearchMatchToCriteria( $kshow_crit , $searchText , kshow::getSearchableColumnName() );
 		
 		if( $search_mechanism == self::KALTURA_SERVICE_CRITERIA_FROM_KSHOW )
 		{
