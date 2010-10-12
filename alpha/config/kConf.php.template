@@ -14,9 +14,9 @@ class kConf
 		self::$map = 
 			array (
                  // take over the symfony config (sfConfig)
- 			    "sf_debug" => false, // TODO: Should be commented out or not?
-				"sf_logging_enabled" => true, // TODO: Should be commented out or not?
-				"sf_root_dir" => '@APP_DIR@'.'/alpha/', // TODO: Should be commented out or not?
+ 			    "sf_debug" => false,
+				"sf_logging_enabled" => true,
+				"sf_root_dir" => '@APP_DIR@'.'/alpha/',
 
 				"cdn_host" => "@CDN_HOST@",
 				"iis_host" => "@IIS_HOST@",
@@ -68,7 +68,7 @@ class kConf
 					16 => 5, //BatchJob::BATCHJOB_TYPE_NOTIFICATION
 					4 => 1, //BatchJob::BATCHJOB_TYPE_BULK_UPLOAD
 					23 => 2, //BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT
-					28 => 10, //BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM // TODO: Should be enabled-disabled?
+					28 => 10, //BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM
 				) ,
 			
 				"default_job_retry_interval" => 20 ,
@@ -77,8 +77,8 @@ class kConf
 					15 => 150, // BatchJob::BATCHJOB_TYPE_MAIL
 					1 => 300, // BatchJob::BATCHJOB_TYPE_IMPORT
 					23 => 300, // BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT
-					4 => 180, // BatchJob::BATCHJOB_TYPE_BULKUPLOAD  // TODO: Should be enabled-disabled?
-					10 => 1800, // BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE  // TODO: Should be enabled-disabled?
+					4 => 180, // BatchJob::BATCHJOB_TYPE_BULKUPLOAD
+					10 => 1800, // BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE
 				) ,
 				
 				"ignore_cdl_failure" => false,
@@ -116,7 +116,7 @@ class kConf
 				"kmc_display_account_tab" => true, 
 				"kmc_content_enable_commercial_transcoding" => true, 
 				"kmc_content_enable_live_streaming" => true,
-				"kmc_login_show_signup_link" => false, // TODO: Should be true or false?
+				"kmc_login_show_signup_link" => false,
 				"kmc_display_developer_tab" => false,
 				"kmc_display_server_tab" => false,
 				"kmc_account_show_usage" => true,			
@@ -142,9 +142,9 @@ class kConf
 				"marketo_access_key" => "", 
 				"marketo_secret_key" => "",
 							
-				'kdpwrapper_track_url' => "http://kalstats.kaltura.com/index.php/events/player_event",//TODO: CHANGE!
+				'kdpwrapper_track_url' => "http://kalstats.kaltura.com/index.php/events/player_event",
 				"kaltura_partner_id" => "",
-				'track_kdpwrapper' =>@TRACK_KDPWRAPPER@,				
+				'track_kdpwrapper' =>@TRACK_KDPWRAPPER@,
 				
 				"reports_db_config" => array (
 					"host" => "@DWH_HOST@",
@@ -174,16 +174,16 @@ class kConf
 				"kaltura_email_hash" => "admin",
                                 
 				"default_plugins" => array(
-					"FileSyncPlugin",
-					"StorageProfilePlugin",                    
-					"SystemUserPlugin", // TODO: Should be disabled/enabled?
-					"SystemPartnerPlugin", // TODO: Should be disabled/enabled?
-					"AdminConsolePlugin", // TODO: Should be disabled/enabled?
-					"MetadataPlugin", // TODO: Should be disabled/enabled?
-					"MultiCentersPlugin", // TODO: Should be disabled/enabled?
-					"DocumentPlugin", // TODO: Should be disabled/enabled?
-					"SphinxSearchPlugin",
-                                        "AuditPlugin",
+					"FileSyncPlugin", // Should be enabled only on servers that run admin console
+					"SystemUserPlugin", // Should be enabled only on servers that run admin console
+					"SystemPartnerPlugin", // Should be enabled only on servers that run admin console
+					"AdminConsolePlugin", // Should be enabled only on servers that run admin console
+					"StorageProfilePlugin", // Should always be enabled
+					"MetadataPlugin", // Should always be enabled
+					// "MultiCentersPlugin", (uncomment to enable moultiple data centers)
+					"DocumentPlugin", // Should be enabled for document entries
+					"SphinxSearchPlugin", // Should always be enabled
+                    "AuditPlugin", // Should be enabled only if audit trail support required
 				),
 
                 "search_plugin"	=> "SphinxSearchPlugin",
@@ -197,7 +197,7 @@ class kConf
                 
 				"cache_root_path" => "@APP_DIR@/cache",
                 
-				"exec_sphinx" => true,
+				"exec_sphinx" => true, // Should be set to false in multiple data centers environments
                 
                 'admin_kuser_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
                 'admin_kuser_max_login_attempts' => 5000,
@@ -227,7 +227,6 @@ class kConf
 		self::init();
 		$res = self::$map [ $param_name ];
 		// for now - throw an exception if now param in config - it will help prevent typos 
-		// TODO - remove exception
 		if ( $res === null ) throw new Exception ( "Cannot find [$param_name] in config" ) ;
 		// KalturaLog::log( "kConf [$param_name]=[$res]" );
 		return $res; 
