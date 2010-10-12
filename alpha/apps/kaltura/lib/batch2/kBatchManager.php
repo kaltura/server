@@ -93,6 +93,50 @@ class kBatchManager
 		return $flavorAsset;
 	}
 	
+	/**
+	 * batch createFlavorAsset orgenize a convert job data 
+	 * 
+	 * @param flavorParamsOutputWrap $flavor
+	 * @param int $partnerId
+	 * @param int $entryId
+	 * @param string $description
+	 * @return flavorAsset
+	 */
+	public static function createErrorFlavorAsset(flavorParamsOutputWrap $flavor, $partnerId, $entryId, $description)
+	{
+		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavor->getFlavorParamsId());
+		
+		if($flavorAsset)
+		{
+			$description = $flavorAsset->getDescription() . "\n" . $description;
+			$flavorAsset->setDescription($description);
+			$flavorAsset->incrementVersion();
+		}	
+		else
+		{
+			// creates the flavor asset 
+			$flavorAsset = new flavorAsset();
+			$flavorAsset->setPartnerId($partnerId);
+			$flavorAsset->setEntryId($entryId);
+			$flavorAsset->setDescription($description);
+		}
+		
+		$flavorAsset->setTags($flavor->getTags());
+		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+		$flavorAsset->setFlavorParamsId($flavor->getFlavorParamsId());
+		$flavorAsset->setFileExt($flavor->getFileExt());
+		$flavorAsset->save();
+		
+		// save flavor params
+		$flavor->setPartnerId($partnerId);
+		$flavor->setEntryId($entryId);
+		$flavor->setFlavorAssetId($flavorAsset->getId());
+		$flavor->setFlavorAssetVersion($flavorAsset->getVersion());
+		$flavor->save();
+			
+		return $flavorAsset;
+	}
+	
 	
 	/**
 	 * batch addMediaInfo adds a media info and updates the flavor asset 
