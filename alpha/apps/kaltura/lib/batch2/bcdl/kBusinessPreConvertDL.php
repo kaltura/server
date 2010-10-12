@@ -267,6 +267,7 @@ class kBusinessPreConvertDL
 	
 		// orgenizing the flavors by the tags
 		$tagedFlavors = array();
+		$hasInvalidRequired = false;
 		foreach($cdl->_targetList as $flavor)
 		{
 			// overwrite ready behavior from the conversion profile
@@ -287,6 +288,7 @@ class kBusinessPreConvertDL
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
 					kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
+					$hasInvalidRequired = true;
 					continue;
 				}
 			}
@@ -302,6 +304,7 @@ class kBusinessPreConvertDL
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
 					kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
+					$hasInvalidRequired = true;
 					continue;
 				}
 			}
@@ -312,6 +315,8 @@ class kBusinessPreConvertDL
 				$tagedFlavors[$tag][$flavor->getFlavorParamsId()] = $flavor;
 			}
 		}
+		if($hasInvalidRequired)
+			return null;
 		
 		// filter out all not forced, none complied, and invalid flavors
 		$finalTagedFlavors = array();
