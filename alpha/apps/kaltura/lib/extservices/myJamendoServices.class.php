@@ -47,7 +47,7 @@ class myJamendoServices extends myBaseMediaSource implements IMediaSource
 	
 	private function searchSounds($searchText, $page, $pageSize)
 	{
-		$url = "http://api.jamendo.com/get2/id+name+stream+artist_name+album_name/track/json/track_album+album_artist/?searchquery=".urlencode($searchText);
+		$url = "http://api.jamendo.com/get2/id+name+stream+artist_name+album_name+album_image/track/json/track_album+album_artist/?searchquery=".urlencode($searchText);
 		return $this->sendRequest($url);
 	}
 	
@@ -82,7 +82,9 @@ class myJamendoServices extends myBaseMediaSource implements IMediaSource
 			$sounds[] = array(
 				'url' => $sound->stream,
 				'title' => $sound->name.' ('.$sound->album_name.') by '.$sound->artist_name,
-				'id' => $sound->id);
+				'id' => $sound->id,
+				'thumb' => $sound->album_image,
+			);
 		}
 
 		$status = 'ok';
