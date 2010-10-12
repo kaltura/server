@@ -37,12 +37,15 @@ class kSphinxSearchManager implements
 	 */
 	public function objectDataChanged(BaseObject $object) 
 	{
-		if(!($object instanceof Metadata))
+		if(!class_exists('Metadata') || !($object instanceof Metadata))
 			return;
 
-		$entry = $object->getObjectFromPeer($object);
-		if ($entry instanceOf entry)
-			$this->saveToSphinx($entry);
+		if($object->getObjectType() == Metadata::TYPE_ENTRY)
+		{
+			$entry = kMetadataManager::getObjectFromPeer($object);
+			if ($entry instanceOf entry)
+				$this->saveToSphinx($entry);
+		}
 	}
 	
 	public function array2sphinxData(array $arr, $pluginName)
@@ -187,12 +190,15 @@ class kSphinxSearchManager implements
 			// TODO - remove after solving the replace bug that removes all fields
 			try
 			{
-				KalturaLog::debug("Loading metadata sphinx texts");
-				$sphinxPluginData = kMetadataManager::getSearchValuesByObject(Metadata::TYPE_ENTRY, $entry->getId());
-				if($sphinxPluginData)
+				if(class_exists('Metadata'))
 				{
-					KalturaLog::debug("Sphinx data for metadata: [$sphinxPluginData]");
-					$sphinxPluginsData[] = $sphinxPluginData;
+					KalturaLog::debug("Loading metadata sphinx texts");
+					$sphinxPluginData = kMetadataManager::getSearchValuesByObject(Metadata::TYPE_ENTRY, $entry->getId());
+					if($sphinxPluginData)
+					{
+						KalturaLog::debug("Sphinx data for metadata: [$sphinxPluginData]");
+						$sphinxPluginsData[] = $sphinxPluginData;
+					}
 				}
 								
 				if(count($sphinxPluginsData))
