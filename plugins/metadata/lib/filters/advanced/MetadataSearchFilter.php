@@ -58,7 +58,7 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 					if(isset($xPaths[$field]))
 					{
 						$value = $item->getValue();
-						$value = SphinxCriteria::escapeString($value);
+						$value = SphinxUtils::escapeString($value);
 						$fieldId = $xPaths[$field];
 						$condition = "\"{$pluginName}_{$fieldId} $value mdend\"";
 					}
