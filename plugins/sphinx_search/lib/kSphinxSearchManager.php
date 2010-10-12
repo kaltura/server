@@ -44,7 +44,7 @@ class kSphinxSearchManager implements
 		{
 			$entry = kMetadataManager::getObjectFromPeer($object);
 			if ($entry instanceOf entry)
-				$this->saveToSphinx($entry);
+				$this->saveToSphinx($entry, false, true);
 		}
 	}
 	
