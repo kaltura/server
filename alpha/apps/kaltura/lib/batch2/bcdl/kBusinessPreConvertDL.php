@@ -85,6 +85,13 @@ class kBusinessPreConvertDL
 			KalturaLog::log(__METHOD__." - ".$errDescription);
 			return null;
 		}
+	
+		if ($originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		{
+			$errDescription = 'Original flavor asset not ready';
+			KalturaLog::log(__METHOD__." - ".$errDescription);
+			return null;
+		}
 		
 		$mediaInfoId = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
