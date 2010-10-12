@@ -113,7 +113,7 @@ class DocumentsService extends KalturaEntryService
 	{
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		$srcFlavorAsset = null;
@@ -165,7 +165,7 @@ class DocumentsService extends KalturaEntryService
 		$sourceEntryId = $srcFlavorAsset->getEntryId();
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		if ($documentEntry === null)
