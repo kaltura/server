@@ -592,7 +592,7 @@ class myEntryUtils
 		// should capture thumbnail from video
 		if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO && $time_offset != -1)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($source_entry->getId(),0);
+			$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($source_entry->getId());
 			if (!$flavorAsset)
 			{
 				$flavorAssets = flavorAssetPeer::retrieveByEntryId($source_entry->getId());
