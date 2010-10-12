@@ -286,8 +286,7 @@ class kBusinessPreConvertDL
 					$errDescription = "Business decision layer, required flavor not valid: " . $flavor->getId();
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
-					$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
-					$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $errDescription);
+					kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
 					continue;
 				}
 			}
@@ -302,8 +301,7 @@ class kBusinessPreConvertDL
 					$errDescription = "Business decision layer, required flavor none complied: id[" . $flavor->getId() . "] flavor params id [" . $flavor->getFlavorParamsId() . "]";
 					$errDescription .= kBusinessConvertDL::parseFlavorDescription($flavor);
 					KalturaLog::log($errDescription);
-					$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
-					$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $errDescription);
+					kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId);
 					continue;
 				}
 			}
