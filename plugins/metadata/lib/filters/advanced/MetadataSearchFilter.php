@@ -87,7 +87,7 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 		if(preg_match('/^"[^"]+"$/', $freeTexts))
 		{
 			$freeText = str_replace('"', '', $freeTexts);
-			$freeText = SphinxCriteria::escapeString($freeText);
+			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
 			$additionalConditions[] = "(@(name,tags,description) $freeText)";
