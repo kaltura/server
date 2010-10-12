@@ -312,15 +312,17 @@ class MetadataPlugin extends KalturaPlugin
 		else
 		{
 			$bulkUploadResult = BulkUploadResultPeer::retrieveByEntryId($entryId, $entry->getBulkUploadId());
-			
-			$msg = $bulkUploadResult->getDescription();
-			if($msg)
-				$msg .= "\n";
-			
-			$msg .= $errorMessage;
+			if($bulkUploadResult)
+			{
+				$msg = $bulkUploadResult->getDescription();
+				if($msg)
+					$msg .= "\n";
 				
-			$bulkUploadResult->setDescription($msg);
-			$bulkUploadResult->save();
+				$msg .= $errorMessage;
+					
+				$bulkUploadResult->setDescription($msg);
+				$bulkUploadResult->save();
+			}
 		}
 	}
 	
