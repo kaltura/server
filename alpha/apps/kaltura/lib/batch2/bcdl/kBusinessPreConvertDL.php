@@ -615,7 +615,7 @@ class kBusinessPreConvertDL
 	{
 		$convertProfileJob = $parentJob->getRootJob();
 		if($convertProfileJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
-			return false;
+			throw new Exception("Root job [" . $convertProfileJob->getId() . "] is not profile conversion");
 		
 		KalturaLog::log("Conversion decision layer continued for entry [" . $parentJob->getEntryId() . "]");
 		$convertProfileData = $convertProfileJob->getData();
@@ -632,7 +632,7 @@ class kBusinessPreConvertDL
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
 			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
 			KalturaLog::err("No flavors created: $errDescription");
-			return false;
+			throw new Exception($errDescription);
 		}
 	
 		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
@@ -642,7 +642,7 @@ class kBusinessPreConvertDL
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
 			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
-			return false;
+			throw new Exception($errDescription);
 		}
 		
 		// gets the list of flavor params of the conversion profile
@@ -657,7 +657,7 @@ class kBusinessPreConvertDL
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->save();
 			
-			return false;
+			throw new Exception($errDescription);
 		}
 			
 		// gets the ids of the flavor params 

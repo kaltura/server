@@ -876,7 +876,18 @@ class kFlowHelper
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
 				
 		if($dbBatchJob->getJobSubType() == BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE)
-			kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+		{
+			try
+			{
+				kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+				return $dbBatchJob;
+			}
+		}
 		
 		if($currentFlavorAsset)
 			kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);	
