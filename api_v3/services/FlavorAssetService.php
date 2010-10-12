@@ -266,13 +266,13 @@ class FlavorAssetService extends KalturaBaseService
 				// than one flavor asset using same params
 				$usedFlavorParams[$flavorParamsId] = $flavorParamsId;
 			}
-			else if ($flavorAssetDb->getIsOriginal())
-			{
-				// create a dummy flavor params
-				$flavorParams = new KalturaFlavorParams();
-				$flavorParams->name = "Original source";
-				$flavorAssetWithParams->flavorParams = $flavorParams;
-			}
+//			else if ($flavorAssetDb->getIsOriginal())
+//			{
+//				// create a dummy flavor params
+//				$flavorParams = new KalturaFlavorParams();
+//				$flavorParams->name = "Original source";
+//				$flavorAssetWithParams->flavorParams = $flavorParams;
+//			}
 			
 			$flavorAssetWithParamsArray[] = $flavorAssetWithParams;
 		}
