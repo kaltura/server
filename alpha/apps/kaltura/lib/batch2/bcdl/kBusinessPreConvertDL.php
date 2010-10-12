@@ -721,9 +721,10 @@ class kBusinessPreConvertDL
 		{
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription);
 			KalturaLog::log("No flavors created");
-			return false;
+			throw new Exception($errDescription);
 		}
-		elseif(strlen($errDescription))
+		
+		if(strlen($errDescription))
 		{
 			$err = $convertProfileJob->getDescription() . $errDescription;
 			$convertProfileJob->setDescription($err);
