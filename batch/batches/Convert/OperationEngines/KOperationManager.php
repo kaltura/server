@@ -14,19 +14,7 @@ class KOperationManager
 	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		$engine = self::createNewEngine($type, $taskConfig, $data);
-		return self::configureEngine($engine, $taskConfig, $data);
-	}
-	
-	/**
-	 * @param KOperationEngine $engine
-	 * @param KSchedularTaskConfig $taskConfig
-	 * @param KalturaConvartableJobData $data
-	 * @return KOperationEngine
-	 */
-	protected static function configureEngine(KOperationEngine $engine, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
-	{
-		$engine->setMediaInfoEnabled($taskConfig->params->mediaInfoEnabled);
-		
+		$engine->configure($taskConfig, $data);
 		return $engine;
 	}
 	
