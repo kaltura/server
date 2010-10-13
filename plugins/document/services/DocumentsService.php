@@ -149,7 +149,7 @@ class DocumentsService extends KalturaEntryService
 			
 		$documentEntry->documentType = $srcEntry->getMediaType();
 			
-		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset);
+		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset, !is_null($documentEntry->conversionProfileId));
 	}
 	
 	/**
@@ -181,7 +181,7 @@ class DocumentsService extends KalturaEntryService
 			
 		$documentEntry->documentType = $srcEntry->getMediaType();
 			
-		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset);
+		return $this->addEntryFromFlavorAsset($documentEntry, $srcEntry, $srcFlavorAsset, !is_null($documentEntry->conversionProfileId));
 	}
 	
 	/**
