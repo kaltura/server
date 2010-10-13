@@ -23,10 +23,16 @@ class LiveStreamService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 */
-	function addAction(KalturaLiveStreamAdminEntry $liveStreamEntry)
+	function addAction(KalturaLiveStreamAdminEntry $liveStreamEntry, KalturaSourceType $sourceType = null)
 	{
-		// TODO - if we will have different providers we will have to create different add action for each one or add it as optional parameter
-		$liveStreamEntry->sourceType = KalturaSourceType::AKAMAI_LIVE;
+		//TODO: allow sourceType that belongs to LIVE entries only - same for mediaType
+		if ($sourceType) {
+			$liveStreamEntry->sourceType = $sourceType;
+		}
+		else {
+			// default sourceType is AKAMAI_LIVE
+			$liveStreamEntry->sourceType = KalturaSourceType::AKAMAI_LIVE;
+		}
 		
 		// if the given password is empty, generate a random 8-character string as the new password
 		if ( ($liveStreamEntry->streamPassword == null) || (strlen(trim($liveStreamEntry->streamPassword)) <= 0) )
