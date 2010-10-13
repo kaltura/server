@@ -25,7 +25,7 @@ class KDistributedFileManager
 	
 	public function getLocalPath($localPath, $remotePath, &$errDescription)
 	{
-		KalturaLog::notice ( "Translating remote path [$remotePath] to local path [$localPath]");
+		KalturaLog::info("Translating remote path [$remotePath] to local path [$localPath]");
 				
 		if(file_exists($localPath))
 		{
@@ -60,8 +60,8 @@ class KDistributedFileManager
 	 */
 	private function fetchFile($remotePath, $localPath, &$errDescription)
 	{
-		KalturaLog::debug("fetchFile($remotePath, $localPath)");
-		
+		KalturaLog::debug("Fetch url [$remotePath] to file [$localPath]");
+				
 		try
 		{
 			$folder = substr($localPath, 0, strrpos($localPath, '/'));
