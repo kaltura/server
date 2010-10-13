@@ -52,6 +52,11 @@ class kProvisionJobData
 	 */
 	private $returnVal;
 	
+	/**
+	 * @var int
+	 */
+	private $mediaType;
+	
 	
 	/**
 	 * @return the $streamID
@@ -124,6 +129,14 @@ class kProvisionJobData
 	{
 		return $this->returnVal;
 	}
+	
+	/**
+	 * @return the $mediaType
+	 */
+	public function getMediaType()
+	{
+		return $this->mediaType;
+	}
 
 	/**
 	 * @param $streamID the $streamID to set
@@ -195,6 +208,14 @@ class kProvisionJobData
 	public function setReturnVal($returnVal)
 	{
 		$this->returnVal = $returnVal;
+	}
+	
+	/**
+	 * @param $mediaType the $mediaType to set
+	 */
+	public function setMediaType($mediaType)
+	{
+		$this->mediaType = $mediaType;
 	}
 }
 
