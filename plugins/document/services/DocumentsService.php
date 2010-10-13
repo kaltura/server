@@ -80,9 +80,17 @@ class DocumentsService extends KalturaEntryService
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey);
 			
-			if ($documentEntry->conversionProfileId) { // user manually passed a conversion profile
+			if ($documentEntry->conversionProfileId) // user manually passed a conversion profile 
+			{
 				$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 				kJobsManager::addConvertProfileJob(null, $dbEntry, $flavorAsset->getId(), $inputFileSyncLocalPath);
+			}
+			elseif(is_null($documentEntry->conversionProfileId))  
+			{
+				// only for documents entry, make the source ready since no conversion profile will be executed by default
+				$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+				$flavorAsset->save();
 			}
 		}
  		
