@@ -124,23 +124,8 @@ class myPartnerRegistration
 		$adminKuser = adminKuserPeer::doSelectOne($c);
 		if ($adminKuser) 
 		{
-			// the user already exist in the system - see if he knows the password
-			if ( $password != null )
-			{
-				if ( $adminKuser->isPasswordValid  ($password ) )
-				{
-					// the admin already exists and wants to create a new partner					
-				}
-				else
-				{
-					// admin exists but does not know the p;assword
-					throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
-				}
-			}
-			else
-			{
-				throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
-			}
+			// the user already exist in the system
+			throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
 		}
 
 		$secret = md5($this->str_makerand(5,10,true, false, true));
