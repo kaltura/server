@@ -171,7 +171,7 @@ class KAsyncConvert extends KBatchBase
 		
 	protected function convertJob(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
-		KalturaLog::notice ( "Converting flavor job");
+		KalturaLog::info("Converting flavor job");
 		
 		// ASSUME:
 		// 1. full input file path ($data->actualSrcFileSyncLocalPath)
@@ -198,6 +198,8 @@ class KAsyncConvert extends KBatchBase
 			$err = null;
 			if(!$this->distributedFileManager->getLocalPath($data->actualSrcFileSyncLocalPath, $data->srcFileSyncRemoteUrl, $err))
 			{
+				if(!$err)
+					$err = 'Failed to translate url to local path';
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_FILE_NOT_FOUND, $err, KalturaBatchJobStatus::RETRY);
 			}
 		}
