@@ -307,6 +307,8 @@ class DocumentsService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		if (is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
 		$sync_key = null;
 		$sync_key = $flavorAsset->getSyncKey( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
