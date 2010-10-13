@@ -54,6 +54,11 @@ abstract class KOperationEngine
 	
 	abstract protected function getCmdLine();
 	
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	{
+		$this->setMediaInfoEnabled($taskConfig->params->mediaInfoEnabled);
+	}
+	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		$this->operator = $operator;
