@@ -587,7 +587,7 @@ class KalturaEntryService extends KalturaBaseService
 		return myEntryUtils::updateThumbnailFromFile($dbEntry, $fileData["tmp_name"], $fileSyncType);
 	}
 	
-	protected function updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset, $entryType = null)
+	protected function updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset, $entryType = null, $flavorParamsId = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
@@ -607,7 +607,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-		$updateThumbnailResult = myEntryUtils::createThumbnailFromEntry($dbEntry, $sourceDbEntry, $timeOffset);
+		$updateThumbnailResult = myEntryUtils::createThumbnailFromEntry($dbEntry, $sourceDbEntry, $timeOffset, $flavorParamsId);
 		
 		if (!$updateThumbnailResult)
 		{

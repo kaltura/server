@@ -585,19 +585,25 @@ class myEntryUtils
 		}
 	}
 	
-	public static function createThumbnailFromEntry ( entry $entry , entry $source_entry, $time_offset )
+	public static function createThumbnailFromEntry ( entry $entry , entry $source_entry, $time_offset, $flavorParamsId = null)
 	{
 		$media_type = $source_entry->getMediaType();
 		
 		// should capture thumbnail from video
 		if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO && $time_offset != -1)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($source_entry->getId());
-			if (!$flavorAsset)
-			{
-				$flavorAssets = flavorAssetPeer::retrieveByEntryId($source_entry->getId());
-				$flavorAsset = $flavorAssets[0]; 
-			}
+			$flavorAsset = null;
+			if($flavorParamsId)
+				$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($source_entry->getId(), $flavorParamsId);
+				
+			if(is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($source_entry->getId());
+				
+			if (is_null($flavorAsset))
+				$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($source_entry->getId());
+			
+			if (is_null($flavorAsset))
+				throw new Exception("Flavor asset not found");
 			
 			$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if (!$flavorSyncKey)

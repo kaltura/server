@@ -508,35 +508,39 @@ class MediaService extends KalturaEntryService
 
 	/**
 	 * Update media entry thumbnail by a specified time offset (In seconds)
+	 * If flavor params id not specified, source flavor will be used by default
 	 * 
 	 * @action updateThumbnail
 	 * @param string $entryId Media entry id
 	 * @param int $timeOffset Time offset (in seconds)
+	 * @param int $flavorParamsId The flavor params id to be used
 	 * @return KalturaMediaEntry The media entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
 	 */
-	function updateThumbnailAction($entryId, $timeOffset)
+	function updateThumbnailAction($entryId, $timeOffset, $flavorParamsId = null)
 	{
-		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $entryId, $timeOffset, KalturaEntryType::MEDIA_CLIP);
+		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $entryId, $timeOffset, KalturaEntryType::MEDIA_CLIP, $flavorParamsId);
 	}
 	
 	/**
 	 * Update media entry thumbnail from a different entry by a specified time offset (In seconds)
+	 * If flavor params id not specified, source flavor will be used by default
 	 * 
 	 * @action updateThumbnailFromSourceEntry
 	 * @param string $entryId Media entry id
 	 * @param string $sourceEntryId Media entry id
 	 * @param int $timeOffset Time offset (in seconds)
+	 * @param int $flavorParamsId The flavor params id to be used
 	 * @return KalturaMediaEntry The media entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
 	 */
-	function updateThumbnailFromSourceEntryAction($entryId, $sourceEntryId, $timeOffset)
+	function updateThumbnailFromSourceEntryAction($entryId, $sourceEntryId, $timeOffset, $flavorParamsId = null)
 	{
-		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset, KalturaEntryType::MEDIA_CLIP);
+		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset, KalturaEntryType::MEDIA_CLIP, $flavorParamsId);
 	}	
 
 	/**
