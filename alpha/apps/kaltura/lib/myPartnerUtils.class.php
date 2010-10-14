@@ -538,7 +538,7 @@ class myPartnerUtils
 		$conversion_quality = "";
 		
 		KalturaLog::log("getConversionProfile2ForEntry: conversion_profile_2_id [$conversion_profile_2_id]");
-		if ( ! $conversion_profile_2_id )
+		if ( is_null($conversion_profile_2_id) || $conversion_profile_2_id <= 0 )
 		{
 			// this is assumed to be the old conversion profile
 			$conversion_quality = $entry->getConversionQuality();
@@ -556,7 +556,7 @@ class myPartnerUtils
 			if ( is_null($partner_kmc_version ) || version_compare( $partner_kmc_version , "2" , "<" ) ) 
 			{
 				// if old kmc - the fallback conversion_quality is the one on the partner->getDefConversionProfileType
-				if ( !$conversion_quality  )
+				if ( is_null($conversion_quality) || $conversion_quality <= 0 )
 				{
 					// search for the default one on the partner
 					$old_conversion_profile = self::getCurrentConversionProfile($partner->getId());
@@ -579,11 +579,11 @@ class myPartnerUtils
 			else
 			{
 				// if new kmc_version - the fallback conversion_quality is the one on the partner->getDefaultConversionProfileId
-	                       if ( !$conversion_quality  )
-        	                {
-                	                // search for the default one on the partner
-                        	        $conversion_quality = $partner->getDefaultConversionProfileId();
-	                        }
+	            if ( is_null($conversion_quality) || $conversion_quality <= 0 )
+				{
+					// search for the default one on the partner
+					$conversion_quality = $partner->getDefaultConversionProfileId();
+				}
 
 
 				// partner with new KMC version - use the $conversion_quality as if it was the conversionProfile2 id
