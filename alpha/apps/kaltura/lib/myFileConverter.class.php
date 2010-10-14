@@ -3,6 +3,11 @@ require_once ( "lib/model/conversion.php");
 
 class myFileConverter
 {
+	const CROP_TYPE_ORIGINAL_ASPECT_RATIO = 1;
+	const CROP_TYPE_WITHIN_BG_COLOR = 2;
+	const CROP_TYPE_EXACT_SIZE = 3;
+	const CROP_TYPE_UPPER = 4;
+	
 	// TODO - change to read from configuration !!
 	//const FFMPEG = "\"C:\\web\\ffmpeg\\ffmpeg-0.4.9\\Riva FLV Encoder 2.0\\ffmpeg.exe\" ";
 	const FFMPEG = "ffmpeg";
@@ -509,6 +514,8 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		$text_output_file = self::createLogFileName ($source_file , $plain_log_file_name );
 		// hq - activate high quality settings
 		// deinterlace - deinterlace pictures
+		
+		// TODO cut long movie and take the image from the short video 
 		$position_str = $position ? " -ss $position " : "";
 		$dimensions = ($width == -1 || $height == -1) ? "" : ("-s ". $width ."x" . $height);
 		$exec_cmd = kConversionEngineFfmpeg::getCmd() . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
@@ -809,22 +816,11 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 	// NOTE: images are only scaled down, so a small image wont be changed (apart for the JPEG quality)
 	// the function returns the $target_file after changing its extension
 	//
-	static public function convertImage ( $source_file , $target_file ,
-	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
-	$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
+	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
 	{
-		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
-		if (!$srcIm)
-		{
-			KalturaLog::log("convertImage - failed to load image [$source_file] while creating [$target_file]");
-			return null;
-		}
+		$attributes = array();
 		
-		if ($src_w)
-			$sourcewidth = $src_w;
-
-		if ($src_h)
-			$sourceheight = $src_h;
+		list($source_width, $source_height, $type, $attr) = getimagesize($source_file);
 
 		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
 			$type = IMAGETYPE_JPEG;
@@ -837,148 +833,102 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
 
-		$new_width = $width;
-		$new_height = $height;
-		
-		if ($crop_type == 3 || $crop_type == 4)
-		{
-			imagedestroy($srcIm);
-			return self::convertImageRectangleCrop($source_file, $target_file, $width, $height, $crop_type, $bgcolor, $quality, $src_x, $src_y, $sourcewidth, $sourceheight);
-		}
+		if($quality)
+			$attributes[] = "-quality $quality";
 			
-		// 1. we'll play with the ratios, so that images retain proportions
-		// 2. non-jpeg images - if the image is smaller we wont touch it
-		// 3. jpeg images - if the image is smaller we just reduce its quality
-		if ($sourcewidth < $width && $sourceheight < $height)
+		// pre-crop
+		if($src_x || $src_y || $src_w || $src_h)
 		{
-			if ($type != IMAGETYPE_JPEG)
-			{
-				if ( file_exists( $source_file ))
-				{
-					KalturaLog::log(__METHOD__." - $source_file file exists");	
-				}
-				else
-				{
-					KalturaLog::log(__METHOD__." - $source_file file doesnt exist");	
-				}
-				copy($source_file, $target_file);
-				return $target_file;
-			}
-
-			$width = $sourcewidth;
-			$height = $sourceheight;
-		}
-		else
-		{
-			if (!$width)
-			{
-				if (!$height || $height > $sourceheight) // we dont wont to enlarge the image
-				{
-					$height = $sourceheight;
-					$width = $sourcewidth;
-				}
-				else
-					$width = floor($height / $sourceheight * $sourcewidth);
-					
-				$new_width = $width;
-			}
-			else if (!$height)
-			{
-				if ($width > $sourcewidth) // we dont wont to enlarge the image
-				{
-					$height = $sourceheight;
-					$width = $sourcewidth;
-				}
-				else
-					$height = floor($width / $sourcewidth * $sourceheight);
-					
-				$new_height = $height;
-			}
-			else
-			{
-				$ratio1=$sourcewidth/$width;
-				$ratio2=$sourceheight/$height;
-				if($ratio1>$ratio2)
-					$height=floor($sourceheight/$ratio1);
-				else
-					$width=floor($sourcewidth/$ratio2);
-			}
-		}
-
-		if ($crop_type == 1) // if crop - use calculated width and height
-		{
-			$new_width = $width;
-			$new_height = $height;
-		}
-
-		if (!$new_width || !$new_height)
-		{
-			KalturaLog::log("convertImage - calculated dimensions [$new_width]x[$new_height] while creating [$target_file]");
-			return null;
+			$geometrics = "{$src_w}x{$src_h}";
+			$geometrics .= ($src_x < 0 ? $src_x : "+$src_x");
+			$geometrics .= ($src_y < 0 ? $src_y : "+$src_y");
+			
+			$attributes[] = "-crop $geometrics";
 		}
 		
-		$im = imagecreatetruecolor( $new_width, $new_height );
-		if (!$im)
+		// crop or resize
+		if($width || $height)
 		{
-			KalturaLog::log("convertImage - failed to create image [$new_width]x[$new_height] while creating [$target_file]");
-			return null;
+			switch($crop_type)
+			{
+				case self::CROP_TYPE_ORIGINAL_ASPECT_RATIO:
+					$w = $width ? $width : '';
+					$h = $height ? $height : '';
+					$attributes[] = "-resize {$w}x{$h}";
+					break;
+					
+				case self::CROP_TYPE_WITHIN_BG_COLOR:
+					if($width && $height)
+					{
+						$borderWidth = 0;
+						$borderHeight = 0;
+						
+						if($width < $height)
+						{
+							$w = $width;
+							$h = ceil($source_height * ($width / $source_width));
+							$borderHeight = ceil(($height - $h) / 2);
+						}
+						else 
+						{
+							$h = $height;
+							$w = ceil($source_width * ($height / $source_height));
+							$borderWidth = ceil(($width - $w) / 2);
+						}
+						
+						$attributes[] = "-bordercolor '#$bgcolor'";
+						$attributes[] = "-resize {$w}x{$h}";
+						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
+					}
+					else 
+					{
+						$w = $width ? $width : '';
+						$h = $height ? $height : '';
+						$attributes[] = "-resize {$w}x{$h}";
+					}
+					break;
+					
+				case self::CROP_TYPE_EXACT_SIZE:
+				case self::CROP_TYPE_UPPER:
+					$w = $width ? $width : $height;
+					$h = $height ? $height : $width;
+					
+					$resizeWidth = '';
+					$resizeHeight = '';
+					
+					if($width > $height)
+						$resizeWidth = $width;
+					else
+						$resizeHeight = $height;
+						
+					
+					if($crop_type == self::CROP_TYPE_EXACT_SIZE)
+						$attributes[] = "-gravity Center";
+					elseif($crop_type == self::CROP_TYPE_UPPER)
+						$attributes[] = "-gravity North";
+						
+					$attributes[] = "-resize {$resizeWidth}x{$resizeHeight}";
+					$attributes[] = "-crop {$w}x{$h}+0+0";
+					break;
+			}
+		}
+
+		// no conversion required
+		if(!count($attributes))
+		{
+			copy($source_file, $target_file);
+			return $target_file;
 		}
 		
-		if ($crop_type == 2 && ($width != $new_width || $height != $new_height)) // if not crop - fill with bgcolor
-		{
-			$col = self::imageColorAllocateFromHex($im, $bgcolor);
-			imagefilledrectangle( $im, 0, 0, $new_width, $new_height, $col );
-		}
-
-		imagecopyresampled( $im, $srcIm, max( ( $new_width - $width ) / 2 , 0), max( ( $new_height - $height ) / 2 , 0), $src_x , $src_y , $width  , $height, $sourcewidth , $sourceheight );
-		imagedestroy($srcIm);
-		self::saveImageByType($im, $type, $target_file, $quality);
-		imagedestroy($im);
-
+		$options = implode(' ', $attributes);
+		$cmd = "convert $options $source_file $target_file";
+		$retValue = null;
+		$output = system($cmd, $retValue);
+		KalturaLog::info("ImageMagic cmd [$cmd] returned value [$retValue] output:\n$output");
+		
 		return $target_file;
 	}
 
-	private static function convertImageRectangleCrop($source_file, $target_file, $width, $height, $crop_type, $bgcolor, $quality,
-	$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
-	{
-		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
-		
-		if ($src_w)
-			$sourcewidth = $src_w;
-
-		if ($src_h)
-			$sourceheight = $src_h;
-
-		if (!$width)
-			$width = $height;
-		else if (!$height)
-			$height = $width;
-			
-		$width_ratio = $sourcewidth / $width;
-		$height_ratio = $sourceheight / $height;
-		$height_crop = 0;
-		$width_crop = 0;
-		if ($width_ratio < $height_ratio)
-			$height_crop =  round($sourceheight - $height * $width_ratio);
-		else
-			$width_crop =  round($sourcewidth - $width * $height_ratio);
-				
-		//die("0, 0, $height_crop, $width_crop, $size, $size, $sourcewidth - $width_crop, $sourceheight - $height_crop");
-		$im = imagecreatetruecolor( $width, $height );
-		
-		if ($crop_type == 3 || $crop_type == 4)
-			$src_x += $width_crop / 2;
-			
-		if ($crop_type == 3)
-			$src_y += $height_crop / 2;
-			
-		imagecopyresampled( $im, $srcIm, 0, 0, $src_x, $src_y, $width, $height, $sourcewidth - $width_crop, $sourceheight - $height_crop );
-		imagedestroy($srcIm);
-		self::saveImageByType($im, $type, $target_file, $quality);
-		imagedestroy($im);
-		return $target_file;
-	}
-	
 	static public function convertImageUsingCropProvider ( $source_file , $target_file ,
 	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $crop_provider = null, $bgcolor = 0xffffff, $force_jpeg = false,
 	$quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
