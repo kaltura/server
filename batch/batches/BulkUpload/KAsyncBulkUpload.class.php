@@ -1,5 +1,8 @@
 <?php
 require_once ("bootstrap.php");
+
+setlocale(LC_ALL, 'en_US.UTF-8');
+
 /**
  * Will initiate a single bulk upload.
  * The state machine of the job is as follows:
