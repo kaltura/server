@@ -219,6 +219,20 @@ class flavorAssetPeer extends BaseflavorAssetPeer
 	}
 	
 	/**
+	 * @param string $entryId
+	 * @return flavorAsset|null
+	 */
+	public static function retrieveHighestBitrateByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
+		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->addDescendingOrderByColumn(flavorAssetPeer::BITRATE);
+		
+		return flavorAssetPeer::doSelectOne($c);
+	}
+	
+	/**
 	 * Leaves only the specified tag in the flavor assets array
 	 * 
 	 * @param array $flavorAssets
