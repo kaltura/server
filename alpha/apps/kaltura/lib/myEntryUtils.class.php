@@ -746,13 +746,13 @@ class myEntryUtils
 						
 					$cache->put($orig_image_path, true);
 					
-					// try the best playable
-					$flavorAsset = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
+					$flavorAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+					if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+					{
+						// try the best playable
+						$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+					}
 					
-					// if not found, try the source (original flavor asset)
-					if (is_null($flavorAsset))
-						$flavorAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-						
 					if (is_null($flavorAsset))
 						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
