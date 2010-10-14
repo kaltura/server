@@ -50,6 +50,6 @@ catch ( Exception $ex )
 //echo print_r($actionInfo);
 echo json_encode($subClasses);
 $bench_end = microtime(true);
-KalturaLog::INFO ( "<------- api_v3 testme [$service][$action][" . ($bench_end - $bench_start) . "] -------");
+KalturaLog::INFO ( "<------- api_v3 testme type [$type][" . ($bench_end - $bench_start) . "] -------");
 
 ?>
