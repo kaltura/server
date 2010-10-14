@@ -833,6 +833,43 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
 
+		$exif_data = exif_read_data($source_file);
+		$orientation = $exif_data["Orientation"];
+		
+		switch($orientation)
+		{
+			case 1: // nothing
+			break;
+		
+			case 2: // horizontal flip
+				$attributes[] = "-flop";
+			break;
+									
+			case 3: // 180 rotate left
+				$attributes[] = "-rotate 180";
+			break;
+						
+			case 4: // vertical flip
+				$attributes[] = "-flip";
+			break;
+					
+			case 5: // vertical flip + 90 rotate right
+				$attributes[] = "-transpose";
+			break;
+					
+			case 6: // 90 rotate right
+				$attributes[] = "-rotate 90";
+			break;
+					
+			case 7: // horizontal flip + 90 rotate right
+				$attributes[] = "-transverse";
+			break;
+					
+			case 8:    // 90 rotate left
+				$attributes[] = "-rotate 270";
+			break;
+		}
+
 		if($quality)
 			$attributes[] = "-quality $quality";
 			
