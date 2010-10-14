@@ -62,36 +62,34 @@ class kMetadataManager
 		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
 		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());
 		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
+		
+		// check all existing fields
 		foreach($profileFields as $profileField)
 		{
 			$xPath = $profileField->getXpath();
+			
+			// field removed
 			if(!isset($xPaths[$xPath]))
 			{
 				$profileField->setStatus(MetadataProfileField::STATUS_DEPRECATED);
 				$profileField->save();
 				continue;
 			}
+			
 			$xPathData = $xPaths[$xPath];
-			
 			$profileField->setStatus(MetadataProfileField::STATUS_ACTIVE);
-			$profileField->setMetadataProfileVersion($metadataProfile->getId());
-			$profileField->setMetadataProfileVersion($metadataProfile->getId());
-			$profileField->setMetadataProfileVersion($metadataProfile->getId());
-			
+			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			if(isset($xPathData['name']))
 				$profileField->setKey($xPathData['name']);
-				
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
-				
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
-				
 			$profileField->save();
-			
 			unset($xPaths[$xPath]);
 		}
 		
+		// add new searchable fields
 		foreach($xPaths as $xPath => $xPathData)
 		{
 			$profileField = new MetadataProfileField();
@@ -101,32 +99,40 @@ class kMetadataManager
 			$profileField->setStatus(MetadataProfileField::STATUS_ACTIVE);
 			$profileField->setXpath($xPath);
 			
-			if(isset($xPathData['key']))
-				$profileField->setKey($xPathData['key']);
-				
+			if(isset($xPathData['name']))
+				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
-				
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
 				
 			$profileField->save();
 		}
 	
+		// set none searchable existing fields
 		$xPaths = kXsd::findXpathsByAppInfo($xsdPath, self::APP_INFO_SEARCH, 'false');
-		
 		foreach($profileFields as $profileField)
 		{
 			$xPath = $profileField->getXpath();
 			if(!isset($xPaths[$xPath]))
 				continue;
 				
+			$xPathData = $xPaths[$xPath];
+			if(isset($xPathData['name']))
+				$profileField->setKey($xPathData['name']);
+			if(isset($xPathData['label']))
+				$profileField->setLabel($xPathData['label']);
+			if(isset($xPathData['type']))
+				$profileField->setType($xPathData['type']);
+				
 			$profileField->setStatus(MetadataProfileField::STATUS_NONE_SEARCHABLE);
+			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			$profileField->save();
 			
 			unset($xPaths[$xPath]);
 		}
 		
+		// add new none searchable fields
 		foreach($xPaths as $xPath => $xPathData)
 		{
 			$profileField = new MetadataProfileField();
@@ -136,15 +142,13 @@ class kMetadataManager
 			$profileField->setStatus(MetadataProfileField::STATUS_NONE_SEARCHABLE);
 			$profileField->setXpath($xPath);
 			
-			if(isset($xPathData['key']))
-				$profileField->setKey($xPathData['key']);
-				
+			if(isset($xPathData['name']))
+				$profileField->setKey($xPathData['name']);
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
-				
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
-				
+
 			$profileField->save();
 		}
 	}
