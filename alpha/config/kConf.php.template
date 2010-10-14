@@ -195,7 +195,7 @@ class kConf
                     "kObjectDeleteHandler",
                 ),
                 
-				"cache_root_path" => "@APP_DIR@/cache",
+				"cache_root_path" => "@BASE_DIR@/cache/content/",
                 
 				"exec_sphinx" => true, // Should be set to false in multiple data centers environments
                 
@@ -213,6 +213,7 @@ class kConf
 				),
 				
 				'disable_url_hashing' => 'true',
+				'response_cache_dir' => '@BASE_DIR@/cache/response/',
 				
 				// ce only settings
 				"kaltura_activation_key" => false,
