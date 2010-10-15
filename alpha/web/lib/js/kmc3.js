@@ -154,14 +154,6 @@ $(function(){
 //						case "Advertising" :
 //							go_to = "tremor";
 //							break;
-
-// FOX custom tabs hardcoded for demo
-						case "Upload" :
-						case "Ad-Marker" :
-						case "FDM-Dashboard" :
-							go_to = {module: tab, subtab: "fox"};
-							break;
-// END-FOX custom tabs hardcoded for demo
 						case "Quickstart Guide" :
 							this.href = kmc.vars.quickstart_guide;
 							return true;
@@ -314,40 +306,6 @@ $(function(){
 				go_to = kmc.vars.next_state; // dbl... checked elsewhere
 				kmc.vars.next_state = null; // ???
 			}
-// FOX custom tabs hardcoded for demo
-			if(go_to.subtab == 'fox')
-			{
-				fox_url = '';
-				switch(go_to.module)
-				{
-					case "Ad-Marker":
-						fox_url = 'http://projects.kaltura.com/fox/fdm/ad-marker.php';
-						break;
-					case "Upload":
-						fox_url = 'http://projects.kaltura.com/fox/fdm/upload.php';
-						break;
-					case "FDM-Dashboard":
-						fox_url = 'http://projects.kaltura.com/fox/fdm/dashboard.php';
-						break;
-				}
-				if(fox_url)
-				{
-					fox_url = fox_url+'?ks='+kmc.vars.ks;
-					kmc.mediator.writeUrlHash(go_to.module,"fox");
-					$("#server_wrap").html('<iframe src="'+fox_url+'" scrolling="no" frameborder="0" marginheight="0" marginwidth="0" width="100%" height="' + $("#main").height() + '"></iframe>');
-					$("#flash_wrap").hide();
-					$("#server_wrap").show();
-					kmc.utils.resize();
-					kmc.mediator.setTab(go_to.module);
-				}
-				return;
-			}
-			else
-			{
-				$("#flash_wrap").show();
-				$("#server_wrap").hide();
-			}
-// END-FOX custom tabs hardcoded for demo
 			if(go_to.subtab == "uploadKMC") {
 //				alert("open kcw");
 //				kmc.functions.openKcw();
