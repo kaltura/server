@@ -107,24 +107,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	{
 		parent::getFromCustomData('insertStop');
 	}
-		
-	/**
-	 * 
-	 * @param string $swfEntryId
-	 */
-	public function setPreloader($swfEntryId)
-	{
-		parent::putInCustomData('preloaderEntryId', $swfEntryId);
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getPreloader()
-	{
-		parent::getFromCustomData('preloaderEntryId');
-	}
-	
+			
 	/**
 	 *
 	 * @param boolean $useShapes

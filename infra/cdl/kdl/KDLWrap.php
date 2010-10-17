@@ -372,7 +372,6 @@ kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_swf->_jpegQuality  = $cdlFlavor->getJpegQuality();
 			$kdlFlavor->_swf->_sameWindow   = $cdlFlavor->getSameWindow();
 			$kdlFlavor->_swf->_insertStop   = $cdlFlavor->getInsertStop();
-			$kdlFlavor->_swf->_preloader    = $cdlFlavor->getPreloader();
 			$kdlFlavor->_swf->_useShapes    = $cdlFlavor->getUseShapes();
 			$kdlFlavor->_swf->_storeFonts   = $cdlFlavor->getStoreFonts();
 			$kdlFlavor->_swf->_flatten      = $cdlFlavor->getFlatten();

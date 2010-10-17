@@ -384,7 +384,6 @@ include_once("KDLCommon.php");
 				$_jpegQuality,
 				$_sameWindow,
 				$_insertStop,
-				$_preloader,
 				$_useShapes,
 				$_storeFonts,
 				$_flatten;
@@ -422,8 +421,6 @@ include_once("KDLCommon.php");
 				$rvStr=$rvStr.","."sameWindow:".$this->_sampleRate;
 			if($this->_insertStop)
 				$rvStr=$rvStr.","."insertStop:".$this->_resolution;
-			if($this->_preloader)
-				$rvStr=$rvStr.","."preloader:".$this->_channels;
 			if($this->_useShapes)
 				$rvStr=$rvStr.","."useShapes:".$this->_sampleRate;
 			if($this->_storeFonts)
@@ -453,8 +450,6 @@ include_once("KDLCommon.php");
 			if($this->_sameWindow)
 				return true;
 			if($this->_insertStop)
-				return true;
-			if($this->_preloader)
 				return true;
 			if($this->_useShapes)
 				return true;

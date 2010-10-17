@@ -69,17 +69,6 @@ interface SwfFlavorParamsInterface
 	 */
 	public function getInsertStop();
 	
-
-	/**
-	 * 
-	 * @param string $swfEntryId
-	 */
-	public function setPreloader($swfEntryId);
-	
-	/**
-	 * @return string
-	 */
-	public function getPreloader();
 	
 	/**
 	 *

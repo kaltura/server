@@ -33,11 +33,6 @@ class KDLTranscoderPdf2Swf extends KDLOperatorBase
 		if ($target->_swf->_insertStop) {
 			$cmdStr .= '--stop ';
 		}
-		/* TODO: implement!
-		if ($target->_swf->_preloader) {
-			$cmdStr .= '--preloader ';
-		}
-		*/
 		if ($target->_swf->_useShapes) {
 			$cmdStr .= '--shapes ';
 		}
