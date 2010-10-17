@@ -43,6 +43,17 @@ class kFlowHelper
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
+		
+		// 2010-10-17 - Hotfix by Dor - source document asset with no conversion profile should be in status READY
+		if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+		{
+			if (is_null($entry->conversionProfileId))
+			{
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+			}
+		}
+		// ----- hotfix end
+		
 		$flavorAsset->save();
 		
 		return $flavorAsset;
