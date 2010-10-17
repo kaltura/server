@@ -63,7 +63,7 @@ package com.kaltura.delegates.bulkUpload
 		{				
 			createURLLoader();
 			
-			var url : String = _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
+			var url : String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
 			
 			for( var str : String in call.args )
 			{	
