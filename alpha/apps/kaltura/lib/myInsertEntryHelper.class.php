@@ -409,13 +409,21 @@ class myInsertEntryHelper
 				myContentStorage::moveFile($thumbBigFullPath, $thumbBigFinalPath, true , $should_copy );
 				*/
 				$entryThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-				if(!$should_copy)
+				try
 				{
-					kFileSyncUtils::moveFromFile($thumbBigFullPath, $entryThumbKey);
+					if(!$should_copy)
+					{
+						kFileSyncUtils::moveFromFile($thumbBigFullPath, $entryThumbKey);
+					}
+					else
+					{
+						kFileSyncUtils::copyFromFile($thumbBigFullPath, $entryThumbKey);
+					}
 				}
-				else
-				{
-					kFileSyncUtils::copyFromFile($thumbBigFullPath, $entryThumbKey);
+				catch (Exception $e) {
+					$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+					$entry->save();											
+					throw $e;
 				}
 			}
 		}
@@ -452,7 +460,17 @@ class myInsertEntryHelper
 					$flavorAsset->save();
 					
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+					
+					try {
+						kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+					}
+					catch (Exception $e) {
+						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$entry->save();
+						$flavorAsset->save();												
+						throw $e;
+					}
 					
 					$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 					kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath);
@@ -504,14 +522,23 @@ class myInsertEntryHelper
 					$flavorAsset->save();
 				
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					if(!$should_copy)
-					{
-						kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+					try {
+						if(!$should_copy)
+						{
+							kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+						}
+						else
+						{
+							// copy & create file sync from $entry_fullPath
+							kFileSyncUtils::copyFromFile($entry_fullPath, $syncKey);
+						}
 					}
-					else
-					{
-						// copy & create file sync from $entry_fullPath
-						kFileSyncUtils::copyFromFile($entry_fullPath, $syncKey);
+					catch (Exception $e) {
+						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$entry->save();
+						$flavorAsset->save();												
+						throw $e;
 					}
 					
 //					// bypass to conversion
@@ -565,14 +592,23 @@ class myInsertEntryHelper
 					$flavorAsset->save();
 				
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					if(!$should_copy)
-					{
-						kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+					try {
+						if(!$should_copy)
+						{
+							kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
+						}
+						else
+						{
+							// copy & create file sync from $entry_fullPath
+							kFileSyncUtils::copyFromFile($entry_fullPath, $syncKey);
+						}
 					}
-					else
-					{
-						// copy & create file sync from $entry_fullPath
-						kFileSyncUtils::copyFromFile($entry_fullPath, $syncKey);
+					catch (Exception $e) {
+						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+						$entry->save();
+						$flavorAsset->save();												
+						throw $e;
 					}
 				}					 
 			}
@@ -582,14 +618,21 @@ class myInsertEntryHelper
 				$entryDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 				if(!kFileSyncUtils::file_exists($entryDataKey))
 				{
-					if(!$should_copy)
-					{
-						kFileSyncUtils::moveFromFile($entry_fullPath, $entryDataKey);
+					try {
+						if(!$should_copy)
+						{
+							kFileSyncUtils::moveFromFile($entry_fullPath, $entryDataKey);
+						}
+						else
+						{
+							// copy & create file sync from $entry_fullPath
+							kFileSyncUtils::copyFromFile($entry_fullPath, $entryDataKey);
+						}
 					}
-					else
-					{
-						// copy & create file sync from $entry_fullPath
-						kFileSyncUtils::copyFromFile($entry_fullPath, $entryDataKey);
+					catch (Exception $e) {
+						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$entry->save();											
+						throw $e;
 					}
 				}
 			}
