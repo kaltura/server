@@ -39,6 +39,16 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 		$document = $this->createEntryDocument($object);
 		$this->addDocument($document);
 	}
+
+	public function writeSolrLog($entry)
+	{
+		KalturaLog::debug("writeSolrLog ". $entry->getId());
+		
+		$solrLog = new SphinxLog();
+		$solrLog->setEntryId($entry->getId());
+		$solrLog->setPartnerId($entry->getPartnerId());
+		$solrLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SOLR_LOG));
+	}
 	
 	public function createEntryDocument(entry $entry)
 	{
