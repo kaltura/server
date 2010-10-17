@@ -184,7 +184,7 @@ class UserService extends KalturaBaseService
 	 * 
 	 * @action login
 	 * @param int $partnerId
-	 * @param string $email
+	 * @param string $userId
 	 * @param string $password
 	 * @param int $expiry
 	 * @param string $privileges
@@ -194,10 +194,10 @@ class UserService extends KalturaBaseService
 	 * @thrown KalturaErrors::USER_WRONG_PASSWORD
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 */		
-	function loginAction($partnerId, $email, $password, $expiry = 86400, $privileges = '*')
+	function loginAction($partnerId, $userId, $password, $expiry = 86400, $privileges = '*')
 	{
 		try {
-			$kuser = kuserPeer::userLogin($email, $password, $partnerId);
+			$kuser = kuserPeer::userLogin($userId, $password, $partnerId);
 		}
 		catch (kKuserException $e) {
 			switch($e->getCode()) 
