@@ -24,9 +24,6 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			
 		myPartnerUtils::blockInactivePartner($flavorAsset->getPartnerId());
-
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
-		$securyEntryHelper->validateForDownload();
 		
 		//disabled enforce cdn because of rtmp delivery
 		//requestUtils::enforceCdnDelivery($flavorAsset->getPartnerId());

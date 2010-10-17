@@ -63,10 +63,7 @@ class serveIsmAction extends sfAction
 		{
 			die;
 		}
-		
-		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer);
-		$securyEntryHelper->validateForDownload();	
-		
+				
 		if (!kFileSyncUtils::file_exists($syncKey, false))
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
