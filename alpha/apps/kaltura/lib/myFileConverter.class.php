@@ -29,36 +29,6 @@ class myFileConverter
 	
 	private static $AUDIO_EXT = array ( "wav" , "mp3" , "wma" , "au" , "ra" , "aac", "amr" );
 
-	static public function getRed5Duration ( $source_file )
-	{
-		$duration = null;
-
-		try
-		{
-			$meta_file_name =  $source_file . '.meta';
-			if ( ! file_exists( $meta_file_name ) )
-			{
-				return -10; // indicates that the file doesn't exist
-			}
-			$xml_doc = new DOMDocument();
-
-			$xml_doc->loadXML( kFile::getFileContent( $source_file . '.meta') );  // sync - OK
-
-			$list = $xml_doc->getElementsByTagName( "FrameMetadata" );
-			if ( $list != null && $list->length > 0 )
-			{
-				$duration = $list->item(0)->getAttribute ( "duration" );
-			}
-		}
-		catch ( Exception $ex)
-		{
-			// indicates some unknown error
-			$duration = -1;
-		}
-
-		return $duration;
-	}
-
 	static public function getFlvDuration ( $source_file )
 	{
 		$source_file = kFile::fixPath ( $source_file );
@@ -67,95 +37,6 @@ class myFileConverter
 		$conversion_info->fillFromMetadata( $source_file );
 
 		return $conversion_info->duration;
-	}
-
-	// "F:\web\ffmpeg\ffmpeg-0.4.9\Riva FLV Encoder 2.0\ffmpeg.exe" -i "F:\web\ffmpeg\robot.avi" -b 360 -r 25 -s 400x300 -hq -deinterlace  -ab 56 -ar 22050 -ac 1  "F:\web\ffmpeg\robot.flv" 2>encode.txt
-	// -hq: activate high quality settings
-	// -deinterlace:  deinterlace pictures
-	/**
-	 * The return value is an array with 2 paramters:
-	 * return_value - the result of the execution
-	 * output - an array of strings whihc were printed by the exec function
-	 */
-	//static public function convert ( $source_file , $target_file , $target_type = "flv" , $text_output_file = NULL , $width = 426 , $height = 350 )
-	static public function convert ( $source_file , $target_file , $target_type = "flv" , $text_output_file = NULL ,
-	$width = 400 , $height = 300 ,
-	$encode_mode = self::ENCODE_BOTH ,
-	$quote = false )
-	{
-		$source_file = kFile::fixPath ( $source_file );
-		$target_file = kFile::fixPath ( $target_file );
-		$text_output_file = kFile::fixPath( $text_output_file );
-
-		if ( $text_output_file == NULL )
-		{
-			$text_output_file = self::createLogFileName ($source_file );
-		}
-			
-		$video_audio  = self::videoAudioStatus ( $source_file );
-
-		// adding the output and return_value makes the call synchronous.
-		$output = array ();
-		$conversion_string = "";
-		$conversion_time  = 0;
-
-		$conversion_info = new conversionInfo();
-		$extra_data = new conversion(); // the DB struct for extra info
-		$conversion_info->extra_data = $extra_data;
-
-		$conversion_info->source_file_name = $source_file;
-		$conversion_info->target_file_name = $target_file;
-
-		$conversion_string_aggr = "" ;
-		$start_time = microtime(true);
-
-		$return_value = -1;
-
-		$fixed_source_file = $quote ? "'$source_file'" :  $source_file;
-
-//TRACE ( "Before calling ffmpegConvert:\n[$fixed_source_file]->[$target_file]")		;
-		if ( $encode_mode & self::ENCODE_FFMPEG )
-		{
-			$return_value = self::ffmpegConvert( $fixed_source_file , $target_file , $text_output_file , $width , $height ,$video_audio , $conversion_info , $output  );
-			$conversion_string_aggr .= $conversion_info->extra_data->getConversionParams();
-		}
-
-		// 0 is success
-		if ( $return_value != 0 && ( $encode_mode & self::ENCODE_MENCODER ))
-		{
-			$return_value = self::mencoderConvert( $fixed_source_file , $target_file , $text_output_file , $width , $height ,$video_audio , $conversion_info  , $output , true  );
-
-			$conversion_string_aggr .= " || mencoder: " . $conversion_info->extra_data->getConversionParams();
-		}
-
-
-		$end_time = microtime(true);
-
-		$conversion_time = (int)( ( $end_time-$start_time ) * 1000 ); // thre time is in seconds with floating point - *1000 to get miliiseconds
-
-		$conversion_info->fillFromMetadata( $target_file );
-
-		$extra_data->setConversionParams( $conversion_string_aggr );
-		$extra_data->setConversionTime( $conversion_time );
-		if ( file_exists( $target_file ))
-		{
-			$extra_data->setOutFileName ( pathinfo ( $target_file, PATHINFO_BASENAME )  );
-			$extra_data->setOutFileSize ( filesize( $target_file ) );
-		}
-
-		$target_file_edit = myContentStorage::getFileNameEdit( $target_file );
-		if ( file_exists(  $target_file_edit) )
-		{
-			$extra_data->setOutFileName2 ( pathinfo ( $target_file_edit, PATHINFO_BASENAME )  );
-			$extra_data->setOutFileSize2 ( filesize( $target_file_edit ) );
-		}
-
-		// try to extract the rest of the data from the output file
-
-		$konverted = false;
-
-		// encapsulte
-		return array ( "return_value" => $return_value , "output" => $output , "conversion_info" => $conversion_info , "konverted" => $konverted );
 	}
 
 	// -b 500kb -r 25 -g 5 -s 400x300 -ar 22050 -ac 2 -y 
@@ -218,194 +99,6 @@ class myFileConverter
 		$conversion_str = str_replace( array ( "{width}" , "{height}" ) , array ( $calculated_width , $calculated_height ) , $conversion_str );
 		return $conversion_str;
 	}
-/*
- * 
- * 
-HD: 
-ffmpeg -i /path/to/your/video -y -vcodec libx264 -acodec libfaac -title 'your title' -f mp4 -mbd rd -flags
-4mv+trell+aic+qprd+mv0 -cmp 2 -subcmp 2 -flags2 dct8x8+skiprd -level 41 -b your_video_bitrate -bf 3 -ac
-your_channels -ab your_audio_bitrate -threads your_threads -pass 1|2 /path/to/your/putput.mp4
-
-$edit_only=true will be used when ffmpeg is used to create the second flavor after mencoder succeeded the first one
- * 
- */
-	public static function ffmpegConvert ( $source_file , $target_file , $text_output_file ,
-	$width , $height , $video_audio , &$conversion_info , &$output ,
-	$append_to_log = false , $edit_only = false )
-	{
-		// once was 260kb & 360kb
-		$bitrate = "400kb" ; // kbit / second
-		$bitrate_2 = "500kb" ; // kbit / second
-		$gop_size = 25;  // the size of the frame group - a keyframe will be forced every <gop_size>
-		$gop_size_2 = 5;  // the size of the frame group - a keyframe will be forced every <gop_size>
-
-		$frame_rate = 25 ; // frames / second
-		$audio_bitrate = "56kb";  //  kbit/s
-		$audio_sampling_rate = 22050; // in Hz
-		$audio_channels = 2; // sterio
-		// TODO - change gop size to 2 !!!!!
-		$qscale = 5; // quality scale - 1 best | 31 worst
-
-		if ( $video_audio == self::AUDIO_ONLY )				$video_audio_str = " -vn "; 	// video none
-		elseif  ( $video_audio == self::VIDEO_ONLY )		$video_audio_str = " -an ";		// audio node
-		else $video_audio_str = " ";
-
-		$conversion_string_2 = "";
-		$target_file_2 = "";
-					
-		// IMPORTANT: qscale omitted ! it causes files to be very very big!
-		// conversion string for play-time
-		if ( !$edit_only )
-		{
-			$conversion_string = self::conversionStringForFile ( $source_file );
-			// if the file is audio only - still use our the hard-coded conversion string 
-			if ( ! $conversion_string || $video_audio == self::AUDIO_ONLY )
-			{
-				$conversion_string = " -b " . $bitrate .
-				//			" -qscale " . $qscale .
-				" -r " . $frame_rate .
-				" -g " . $gop_size .
-				" -s " . $width ."x" . $height .
-				//			" -ab " . $audio_bitrate .
-				" -ar " .  $audio_sampling_rate .
-				" -ac " . $audio_channels .
-				$video_audio_str .
-				//			" -f " . $target_type .
-				" -y ";
-			}
-		}
-
-		// in case of audio-only - there is no reason to create another flavor of the file
-		if ( $video_audio != self::AUDIO_ONLY  )
-		{
-			// conversion string for edit-time
-			$conversion_string_2 = " -b " . $bitrate_2 .
-			//			" -qscale " . $qscale .
-			" -r " . $frame_rate .
-			" -g " . $gop_size_2 .
-			" -s " . $width ."x" . $height .
-			//			" -ab " . $audio_bitrate .
-			" -ar " .  $audio_sampling_rate .
-			" -ac " . $audio_channels .
-			$video_audio_str .
-			//			" -f " . $target_type .
-			" -y ";
-
-			$target_file_2 = myContentStorage::getFileNameEdit ( $target_file );
-		}
-		else
-		{
-			$conversion_string_2 = "";
-			$target_file_2 = "";
-		}
-
-		// if edit_only - set the parameters to empty
-		if ( $edit_only )
-		{
-			$conversion_string = "";
-			$target_file = "";
-		}
-
-		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
-		$exec_cmd = kConversionEngineFfmpeg::getCmd() . " -i " . "\"$source_file\"" .
-		$conversion_string .
-		" \"$target_file\"  $conversion_string_2  \"$target_file_2\"  2" . ">>" . "\"$text_output_file\"";
-
-//TRACE ( "This is what will be executed:\n$exec_cmd" );
-		
-		self::addToLogFile ( $text_output_file , $exec_cmd ) ;
-		self::addToLogFile ( $text_output_file , $conversion_string . "|" .  $conversion_string_2 ) ;
-		
-		//echo ( $target_file . "\n" );
-		//		echo ( "\n\n" . $exec_cmd . "\n");
-
-		// adding the output and return_value makes the call synchronous.
-		$return_value = "";
-
-		exec ( $exec_cmd , $output , $return_value );
-
-		// here we set some data that is important
-		$conversion_info->video_width = $width;
-		$conversion_info->video_height = $height;
-		$conversion_info->video_bitrate = $bitrate;
-		$conversion_info->video_framerate = $frame_rate;
-		$conversion_info->video_gop = $gop_size;
-		if ( !$conversion_info->extra_data )
-		{
-			$conversion_info->extra_data = new conversion(); // the DB struct for extra info
-		}
-		$conversion_info->extra_data->setConversionParams ( " || ffmpeg: " . $conversion_string . "|" . $conversion_string_2 );
-
-		$conversion_info->target_file_name_2 = $target_file_2;
-		// TODO - the return_value should reflect if the conversion worked or not
-		self::addToLogFile ( $text_output_file , "ffmpegConvert return_value:\n" . print_r ( $return_value , true ) ) ;
-		
-		return $return_value;
-	}
-
-	// TODO - find how to create the second converted file
-	public static function mencoderConvert ( $source_file , $target_file , $text_output_file , $width , $height , $video_audio , &$conversion_info , &$output , $append_to_log = false )
-	{
-		$bitrate = "360" ; // kbit / second
-		$frame_rate = 25 ; // frames / second
-		$audio_bitrate = "128";  //  kbit/s
-		$audio_sampling_rate = 22050; // in Hz
-		$audio_channels = 2; // sterio
-		// TODO - change gop size to 2 !!!!!
-		$gop_size = 4;  // the size of the frame group - a keyframe will be forced every <gop_size>
-		$qscale = 5; // quality scale - 1 best | 31 worst
-			
-		$conversion_string = "" .
-		" -of lavf " .
-		" -ofps $frame_rate " .
-		" -oac mp3lame -lameopts abr:br=$audio_bitrate -srate $audio_sampling_rate " ;
-		if ( $video_audio != self::AUDIO_ONLY )
-		$conversion_string .=
-		" -ovc lavc " .
-		" -lavcopts vcodec=flv:vbitrate=$bitrate:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=$gop_size " . // :vqscale=$qscale " .
-		" -vf scale=$width:$height " ;
-		else
-		$conversion_string .= " -ovc frameno ";
-
-//		$conversion_string .= " -lavfopts i_certify_that_my_video_stream_does_not_use_b_frames " ;
-
-
-		$exec_cmd = kConversionEngineMencoder::getCmd() . " " . "\"$source_file\"" .
-		$conversion_string .
-		" -o " . "\"$target_file\""  . " 2" . ( $append_to_log ? ">>" : ">" ) . "\"$text_output_file\"";
-
-		self::addToLogFile ( $text_output_file , $exec_cmd ) ;
-		self::addToLogFile ( $text_output_file , $conversion_string ) ;
-				
-		//echo ( $target_file . "\n" );
-		//		echo ( "\n\n" . $exec_cmd . "\n");
-
-		// adding the output and return_value makes the call synchronous.
-		$return_value = "";
-
-		// benchmark the conversion in microseconds - a float (in seconds) is returned
-		exec ( $exec_cmd , $output , $return_value );
-
-		// now, if all's well - use FFMGET to convert the output to the edit mode
-		// use the target file as the input - use the edit_only=true
-		$ffmpeg_conversion_info = new conversionInfo();
-		$ffmpeg_output = array ();
-		self::ffmpegConvert ( $target_file , $target_file , $text_output_file ,		$width , $height , $video_audio , $ffmpeg_conversion_info , $ffmpeg_output ,		true , true );
-		$conversion_string .= $ffmpeg_conversion_info->extra_data->getConversionParams();
-			
-		// here we set some data that is important
-		$conversion_info->video_width = $width;
-		$conversion_info->video_height = $height;
-		$conversion_info->video_bitrate = $bitrate;
-		$conversion_info->video_framerate = $frame_rate;
-		$conversion_info->video_gop = $gop_size;
-		$conversion_info->extra_data->setConversionParams ( $conversion_string );
-
-		self::addToLogFile ( $text_output_file , "mencoderConvert return_value:\n" . print_r ( $return_value , true ) ) ;
-		
-		// TODO - the return_value should reflect if the conversion worked or not
-		return $return_value;
-	}
 
 	public static function videoAudioStatus ( $source_file )
 	{
@@ -433,38 +126,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 			return $res;
 		}
 		return true;
-	}
-
-	static public function freeConvert ( $source_file , $target_file , $params , $text_output_file , $override_output = true )
-	{
-		$start_time = microtime(true);
-		$source_file = kFile::fixPath ( $source_file );
-		$target_file = kFile::fixPath ( $target_file );
-
-		if ( $text_output_file == NULL )
-		{
-			$text_output_file = $target_file . ".log.txt" ;
-		}
-
-		$text_output_file = kFile::fixPath( $text_output_file );
-
-		$exec_cmd = kConversionEngineFfmpeg::getCmd() . ( $override_output ? " -y " : "" ) . " -benchmark -i " . "\"$source_file\"" . " " .
-		$params .
-		" " . "\"$target_file\"" . " 2>" . $text_output_file;
-
-		//echo ( $target_file . "\n" );
-		//		echo ( "\n\n" . $exec_cmd . "\n");
-
-		// adding the output and return_value makes the call synchronous.
-		$output = array ();
-		$return_value = "";
-		exec ( $exec_cmd , $output , $return_value );
-		$end_time =  microtime(true);
-
-		echo ( "Took [" . ( $end_time - $start_time ) . "] seconds." );
-
-		// encapsulte
-		return array ( "return_value" => $return_value , "output" => $output , "log_file" => $text_output_file );
 	}
 
 	static public function autoCaptureFrame ( $source_file , $thumbTempPrefix , $position = null, $width = 0, $height = 0 , $plain_log_file_name = false )
@@ -543,41 +204,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 
 	}
 
-	/**
-	 * this function reads a file with a similar name as the source_file to be converted but with a suffix of '.conversionString'.
-	 * It adds the -y flag if does not already exist
-	 */
-	public static function conversionStringForFile ( $file_name )
-	{
-		$conversion_string_file_name = $file_name . ".conversionString";
-		if ( file_exists( $conversion_string_file_name ))		$conversion_string = @file_get_contents( $conversion_string_file_name );
-		else $conversion_string ="";
-		
-		if ( empty ( $conversion_string ) ) return null;
-		if ( strpos ( $conversion_string , "-y" ) === FALSE )		$conversion_string .= " -y ";
-		$conversion_string = " " . $conversion_string . " "; // pad left and write with spaces in case the content of the file does not include them
-		//		TRACE ( "Found conversionString for file [$file_name]\n$conversion_string" );
-		return $conversion_string;
-	}
-
-	public static function createConversionStringForFile ( $file_name , $conversion_string )
-	{
-		$conversion_string_file_name = $file_name . ".conversionString";
-		$result = @file_put_contents( $conversion_string_file_name , $conversion_string ); // sync - OK
-		return $result;
-	}
-
-	public static function removeConversionStringForFile ( $file_name )
-	{
-		$conversion_string_file_name = $file_name . ".conversionString";
-		@kFile::deleteFile( $conversion_string_file_name ); 
-	}
-
-	private static function setDurationForFailedFlv( $conversion_info , $source_file , $text_output_file )
-	{
-		$conversion_info->fillFromMetadata( $source_file );
-	}
-
 	// Use ffmpeg to extract the video dimensions
 	public static function getVideoDimensions (  $source_file )
 	{
@@ -607,19 +233,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		return $res; 
 	}
 	
-	static public function getImageInfo ($source_file)
-	{
-		list ($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
-
-		$valid = 0;
-		if ( $sourcewidth > 0 && $sourceheight > 0 )
-		{
-			$valid = 1;
-		}
-		if ( $srcIm )		imagedestroy($srcIm);
-		return array ( $valid , $sourcewidth, $sourceheight  , $type , $attr);
-	}
-
 	static public function createImageByFile($source_file)
 	{
 		global $global_kaltura_memory_limit;
@@ -630,7 +243,7 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		
 		if ( ! file_exists ($source_file))
 		{
-			KalturaLog::log( "changeImageSize:: file not found [$source_file]" ) ;
+			KalturaLog::log( "file not found [$source_file]" ) ;
 			return null;	
 		}
 		
@@ -662,36 +275,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		}
 
 		return array($sourcewidth, $sourceheight, $type, $attr, $srcIm);
-	}
-
-	static public function changeImageSize( $source_file , $target_file , $target_type = "image2" , $width = 0, $height = 0 , $crop=false )
-	{
-		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
-
-		if ($width == 0 || $height == 0)
-		{
-			$width = $sourcewidth;
-			$height = $sourceheight;
-		}
-
-		if ( $crop )
-		{
-			$sourceheight = ($sourcewidth / $width) * $height; // crop height
-		}
-			
-		try
-		{
-			$im = imagecreatetruecolor( $width , $height );
-
-			imagecopyresampled( $im, $srcIm, 0, 0, 0 , 0 , $width  , $height, $sourcewidth , $sourceheight );
-			imagedestroy($srcIm);
-			imagejpeg($im, $target_file);
-			imagedestroy($im);
-		}
-		catch ( Exception $ex )
-		{
-			KalturaLog::log ( "changeImageSize:: Cannot change image size: $source_file [$sourcewidth x $sourceheight]" , 'warning' );
-		}
 	}
 
 	// create a thumbnail from an image
@@ -743,51 +326,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		imagedestroy($im);
 	}
 
-	// create a square thumbnail from an image
-	// source_file:  source file
-	// target_file:  target file
-	// target_type:  target file type
-	// width : target image width
-	// height : target image height
-	static public function createSquareImageThumbnail ( $source_file , $target_file , $target_type, $cropSize, $sourcesize, $sourceleft, $sourcetop  )
-	{
-
-		//echo 'sourcefile:'.$source_file .' , target_file:' . $target_file .' , target_type:' . $target_type.' , cropsize:' . $cropSize.' , sourcesize:' . $sourcesize.' , sourceleft:' . $sourceleft.' , sourcetop:' . $sourcetop ;
-			
-		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
-
-		$im = ImageCreateTrueColor($cropSize,$cropSize);
-
-		imagecopyresampled(
-		$im,
-		$srcIm,
-		0,
-		0,
-		$sourceleft,
-		$sourcetop,
-		$cropSize,
-		$cropSize,
-		$sourcesize,
-		$sourcesize
-		);
-
-		imagedestroy($srcIm);
-		imagejpeg($im, $target_file);
-		imagedestroy($im);
-	}
-
-
-
-	static public function saveImageByType($im, $type, $target_file, $quality)
-	{
-		if ($type == IMAGETYPE_GIF)
-			imagegif($im, $target_file);
-		else if ($type == IMAGETYPE_PNG)
-			imagepng($im, $target_file, 9, PNG_ALL_FILTERS);
-		else
-			imagejpeg($im, $target_file, $quality ? $quality : 75);
-	}
-
 	static public function imageExtByType($type)
 	{
 		if ($type == IMAGETYPE_GIF)
@@ -800,15 +338,6 @@ $edit_only=true will be used when ffmpeg is used to create the second flavor aft
 		return "jpg";
 
 		return "";
-	}
-
-	static public function imageColorAllocateFromHex ($img, $hexstr)
-	{
-		$int = hexdec($hexstr);
-		return ImageColorAllocate ($img,
-		0xFF & ($int >> 0x10),
-		0xFF & ($int >> 0x8),
-		0xFF & $int);
 	}
 
 	// convert an image to a desired size while maintaining its aspect ratio
