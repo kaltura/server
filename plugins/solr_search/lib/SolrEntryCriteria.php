@@ -19,6 +19,7 @@ class SolrEntryCriteria extends KalturaCriteria
 		entryPeer::DESCRIPTION => 'description',
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'plugins_data',
+		'entry.DURATION_TYPE' => 'duration_type',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
