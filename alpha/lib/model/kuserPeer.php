@@ -304,9 +304,9 @@ class kuserPeer extends BasekuserPeer
 	 * @param int $partnerId
 	 * @return kuser
 	 */
-	public static function userLogin($email, $password, $partnerId = null)
+	public static function userLogin($puserId, $password, $partnerId = null)
 	{
-		$kuser = self::getKuserByEmail($email, $partnerId);
+		$kuser = self::getKuserByPartnerAndUid($partnerId , $puserId);
 		if (!$kuser)
 			throw new kKuserException('', kKuserException::KUSER_NOT_FOUND);
 
