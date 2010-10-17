@@ -230,6 +230,7 @@ class uiConfDeployment
 		if($uiconf->getConfFileFeatures() === FALSE) echo "missing features conf file for uiconf {$confConfigObj->name}".PHP_EOL; // conf file is a must, features is not.
 		
 		$uiconf->setPartnerId(0);
+		$uiconf->setSubpId(0);
 		$uiconf->setCreationMode(3);
 		$uiconf->setUseCdn(1);
 		$uiconf->setObjType($objType);
