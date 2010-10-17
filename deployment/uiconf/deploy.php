@@ -249,8 +249,10 @@ class uiConfDeployment
 	
 	public static function updatePlayerIdInFeaturesFile(uiConf $uiconf, $uiconfId, $replacementString)
 	{
+		$conf_file = $uiconf->getConfFile(true);
 		$featuresFile = $uiconf->getConfFileFeatures(true);
 		$newFeatures = str_replace($replacementString, $uiconfId, $featuresFile);
+		$uiconf->setConfFile($conf_file);
 		$uiconf->setConfFileFeatures($newFeatures);
 		$uiconf->save();
 	}
