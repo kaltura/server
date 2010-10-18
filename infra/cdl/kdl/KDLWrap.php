@@ -331,7 +331,7 @@ kLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		
 $operators = $cdlFlavor->getOperators();
 $transObjArr = array();
-kLog::log(__METHOD__."\nFlavor==>\n".print_r($cdlFlavor,true));
+kLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
 		if(!empty($operators) || $cdlFlavor->getEngineVersion()==1) {
 			$transObjArr = KDLWrap::convertOperatorsCdl2Kdl($operators);
 			$kdlFlavor->_engineVersion = 1;
@@ -384,6 +384,7 @@ kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
 		}
 		
+kLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 		return $kdlFlavor;
 	}
 	
@@ -488,21 +489,24 @@ kLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 	 */
 	public static function convertOperatorsCdl2Kdl($operators)
 	{
+kLog::log(__METHOD__."\ncdlOperators==>\n".print_r($operators,true));
 		$transObjArr = array();
 $oprSets = new kOperatorSets();
-		$oprSets->setSerialized(stripslashes($operators));
-//kLog::log(__METHOD__."\noperators==>\n".print_r($oprSets,true));
+//		$operators = stripslashes($operators);
+//kLog::log(__METHOD__."\ncdlOperators(stripslsh)==>\n".print_r($operators,true));
+		$oprSets->setSerialized($operators);
+kLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
 		foreach ($oprSets->getSets() as $oprSet) {
 			if(count($oprSet)==1) {
 				$opr = $oprSet[0];
-//kLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
+kLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
 				$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command);
 				$transObjArr[] = $kdlOpr;
 			}
 			else {
 				$auxArr = array();
 				foreach ($oprSet as $opr) {
-//kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
+kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 					$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command);
 					$auxArr[] = $kdlOpr;
 				}
