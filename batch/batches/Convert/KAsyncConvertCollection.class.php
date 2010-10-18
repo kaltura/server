@@ -121,6 +121,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 		$this->startMonitor($monitorFiles);
 	
 		$operator = $this->getOperator($data);
+		KalturaLog::debug("getOperator(".print_r($data,true).") => operator(".print_r($operator,true).")");
 		$log = null;
 		try
 		{
