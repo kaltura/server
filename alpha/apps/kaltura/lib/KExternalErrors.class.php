@@ -17,6 +17,7 @@ class KExternalErrors
 	const PARTNER_NOT_FOUND = 14;
 	const PARTNER_NOT_ACTIVE = 15;
 	const IP_COUNTRY_BLOCKED = 16;
+	const IMAGE_RESIZE_FAILED = 17;
 	
 	private static $errorDescriptionMap = array(
 		self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -35,6 +36,7 @@ class KExternalErrors
 		self::PARTNER_NOT_FOUND => "requested partner not found",
 		self::PARTNER_NOT_ACTIVE => "requested partner not active",
 		self::IP_COUNTRY_BLOCKED => "", // we rather not explain this error code 
+		self::IMAGE_RESIZE_FAILED => "image resize failed",
 		);
 	
 	public static function dieError($errorCode)
