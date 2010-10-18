@@ -10,14 +10,15 @@ include_once("KDLOperatorBase.php");
 	 */
 class KDLOperatorWrapper extends KDLOperatorBase {
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
-    	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
+    	$srcBlacklist = $sourceBlacklist;
 		if(is_null($sourceBlacklist) && array_key_exists($id, KDLConstants::$TranscodersSourceBlackList)) {
-			$this->_sourceBlacklist = KDLConstants::$TranscodersSourceBlackList[$id];
+			$srcBlacklist = KDLConstants::$TranscodersSourceBlackList[$id];
 		}
-
+		$trgBlacklist = $targetBlacklist;
 		if(is_null($targetBlacklist) && array_key_exists($id, KDLConstants::$TranscodersTargetBlackList)) {
-			$this->_targetBlacklist = KDLConstants::$TranscodersTargetBlackList[$id];
+			$trgBlacklist = KDLConstants::$TranscodersTargetBlackList[$id];
 		}
+    	parent::__construct($id,$name,$srcBlacklist,$trgtBlacklist);
     }
 
 	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target, $extra=null)
