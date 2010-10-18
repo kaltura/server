@@ -186,6 +186,10 @@ class uiConfDeployment
 		try
 		{
 			$pe_conf->save();
+			// chmod parent directory to 777 to allow changes by the apache user
+			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
+			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
+			system('chmod 777 -R '.dirname($localPath));
 		}
 		catch(Exception $ex)
 		{
@@ -257,6 +261,7 @@ class uiConfDeployment
 		$uiconf->setConfFileFeatures($newFeatures);
 		$uiconf->save();
 	}
+	
 	
 	public static function printUsage($message)
 	{
