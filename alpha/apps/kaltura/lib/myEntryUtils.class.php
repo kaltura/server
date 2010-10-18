@@ -744,7 +744,7 @@ class myEntryUtils
 				if (!file_exists($orig_image_path))
 				{
 					// creating the thumbnail is a very heavy operation
-					// prevent calling it in paraller for the same thubmnail for 5 minutes
+					// prevent calling it in parallel for the same thubmnail for 5 minutes
 					$cache = new myCache("thumb-processing", 5 * 60); // 5 minutes
 					$processing = $cache->get($orig_image_path);
 					if ($processing)
@@ -780,13 +780,17 @@ class myEntryUtils
 			kFile::fullMkdir($tempThumbPath);
 			if ($crop_provider)
 			{
-				myFileConverter::convertImageUsingCropProvider($orig_image_path, $tempThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
+				$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $tempThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
 			}
 			else
 			{
-				myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
+				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
 			}
-
+			
+			// die if resize operation failed
+			if ($convertedImagePath === null)
+					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
+			
 			if ($multi)
 			{
 				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($tempThumbPath);
