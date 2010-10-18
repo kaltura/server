@@ -232,7 +232,7 @@
 		
 		// admin kuser password related errors
 		
-		const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID,The password you entered has an invalid structure.\nPasswords must obey the following rules :\n- Must be of length between 8 and 14.\n- Must not contain your name\n- Must contain at least one lowercase letter (a-z).\n- Must contain at least one digit (0-9).\n- Must contain at least one of the following symbols:  %%~!@#\$^*=+?[]{}.\n- Must not contain the following characters: < or >.";
+		const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID,The password you entered has an invalid structure.\nPasswords must obey the following rules :\n- Must be of length between 8 and 14.\n- Must not contain your name\n- Must contain at least one lowercase letter (a-z).\n- Must contain at least one digit (0-9).\n- Must contain at least one of the following symbols:  %%~!@#\$^*=+?[]{}.\n- Must not contain the following characters: &lt; or &gt;.";
 		
 		const PASSWORD_ALREADY_USED = "PASSWORD_ALREADY_USED,Chosen password has already been used";
 		
