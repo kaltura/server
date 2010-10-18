@@ -13,7 +13,8 @@ abstract class KDLOperatorBase {
 	abstract public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null);
 	
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
-		$this->_id=$id;
+		kLog::log("KDLOperatorBase::__construct: id($id), name($name), sourceBlacklist(".print_r($sourceBlacklist,true)."), targetBlacklist(".print_r($targetBlacklist,true).")");
+    	$this->_id=$id;
 		$this->_name=$name;
 		$this->_sourceBlacklist = $sourceBlacklist;
 		$this->_targetBlacklist = $targetBlacklist; 	
