@@ -39,8 +39,42 @@ api_v3/lib/types/enums/KalturaContainerFormat - WEBM support
 batch/client/KalturaClinet.php - WEBM suppor
 plugins/quick_time_tools/lib/KDLTranscoderQTPTools/php - WEBM support, clip dur
 
-2010=10-11
+2010-10-11
 KDLCommon - new EXP_ENC
 KDLFlavor - fix - audio targets (mp3, wma) should not have video object
 KDLWrap - new - support to EXPRESSION_ENCODER plugin
 wnvPresetTemplate.xml - upd - CBR 2 pass support
+admin_console/configs/lang/en.php - new EXPRESSION_ENCODER
+alpha/lib/model/flavorParams - webm support
+batch/batches/Convert/KAsyncConvert.class.php - new EXPRESSION_ENCODER support
+batch/batches/Convert/Engines/KConvertEngineExpressionencoder.class.php - new file
+batch/batches/Convert/Engines/KConversionEngine.class.php - EXPRESSION_ENCODER support
+alpha/apps/kaltura/lib/batch2/model/kConvertJobdata.php - EXPRESSION_ENCODER enum = 5, EXPRESSION_ENCODER3=55
+api_v3/lib/types/enums/KalturaConversionEngineType.class.php - EXPRESSION_ENCODER enum = 5, EXPRESSION_ENCODER3=55
+plugins/expression_encoder - new plugin
+DB flavor_params record - needs json flavor params for ISM -> engine_version 1
+
+2010-10-17 - Reverting to pre ExpressionEncoder-for-ism
+KDLCommon - do not revert (only ExpressionEncoder enum)
+KDLFlavor - do not revert (audio targets fix)
+KDLWrap - do not revert (stripslashes is not activated, better logging)
+KDLOperatorbase - do not revert (logging)
+KDLProcessor - revert - ProceessFlavorsForCollection is allowed for EE3 enum (vs. ExpressionEncoder enum)
+KDLTranscoderComm - do not revert - minor changes in KDLOperatorWrapper constructor (black-list settings)
+
+alpha/lib/model/flavorParams - o not revert (webm support)
+batch/batches/Convert/KAsyncConvert.class.php - do not revert ( EXPRESSION_ENCODER support)
+batch/batches/Convert/Engines/KConversionEngineExpressionEncoder.class.php - new file, revert to original KJobConversionEngine derivation (instead of KCollectionConversionEngine)
+batch/batches/Convert/Engines/KConversionEngine.class.php - do not revert (EXPRESSION_ENCODER support)
+alpha/apps/kaltura/lib/batch2/model/kConvertJobdata.php - revert - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+api_v3/lib/types/enums/KalturaConversionEngineType.class.php - revert - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+
+admin_console/lib/Klatura/KlaturaClient.php - reverted EXPRESSION_ENCODER to 55, EXPRESSION_ENCODER3 to 5
+alpha/apps/kaltura/lib/batch2/kJobsManager - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER)
+alpha/apps/kaltura/lib/storage/kStorageExporter.php - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER)
+batch/batches/Convert/KAsyncConvertCollection.class.php - reverted EXPRESSION_ENCODER3 (instead of EXPRESSION_ENCODER), keep the log
+batch/batches/Convert/OperationEngines/KOperationManager.php - reverted
+batch\client\KalturaClient.php - reverted - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
+
+
+
