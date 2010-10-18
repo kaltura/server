@@ -179,6 +179,7 @@ class KalturaContainerFormat
 	const WMA = "wma";
 	const ISMV = "ismv";
 	const MKV = "mkv";
+	const WEBM = "webm";
 	const SWF = "swf";
 	const PDF = "pdf";
 }
@@ -224,6 +225,7 @@ class KalturaConversionEngineType
 	const MENCODER = 3;
 	const ENCODING_COM = 4;
 	const EXPRESSION_ENCODER3 = 5;
+	const EXPRESSION_ENCODER = 55;
 	const QUICK_TIME_PLAYER_TOOLS = 6;
 	const FAST_START = 7;
 	const FFMPEG_VP8 = 98;
