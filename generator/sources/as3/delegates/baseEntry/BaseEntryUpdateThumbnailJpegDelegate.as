@@ -37,7 +37,7 @@ package com.kaltura.delegates.baseEntry
 
 			//create the service request for normal calls
 			var variables:String = decodeURIComponent(call.args.toString());
-			var req:String = _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action +'&'+variables;
+			var req:String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action +'&'+variables;
 			mrloader.addFile((call as KalturaFileCall).bytes, UIDUtil.createUID(), 'fileData');
 
 			mrloader.dataFormat = URLLoaderDataFormat.TEXT;
