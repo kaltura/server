@@ -166,6 +166,7 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
+		$flavorAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$flavorAssetDb->setDeletedAt(time());
 		$flavorAssetDb->save();
 		
