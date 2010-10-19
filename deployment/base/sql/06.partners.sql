@@ -1,6 +1,8 @@
 
 INSERT INTO `partner` (`id`, `partner_name`, `url1`, `url2`, `secret`, `admin_secret`, `max_number_of_hits_per_day`, `appear_in_search`, `debug_level`, `invalid_login_count`, `created_at`, `updated_at`, `partner_alias`, `ANONYMOUS_KUSER_ID`, `ks_max_expiry_in_seconds`, `create_user_on_demand`, `prefix`, `admin_name`, `admin_email`, `description`, `commercial_use`, `moderate_content`, `notify`, `custom_data`, `service_config_id`, `status`, `content_categories`, `type`, `phone`, `describe_yourself`, `adult_content`, `partner_package`, `usage_percent`, `storage_usage`, `eighty_percent_warning`, `usage_limit_warning`, `monitor_usage`) VALUES
-(0, 'partner 0', '', NULL, '@PARTNER_ZERO_SECRET@', '@PARTNER_ZERO_ADMIN_SECRET@', '-1', '2', '0', NULL, NOW(), NOW(), '@PARTNER_ZERO_PARTNER_ALIAS@', NULL, 86400, 1, 'kal', '', 'partner0@kalturace.com', '', '0', '0', '0', 'a:44:{s:15:"useDefaultKshow";s:1:"1";s:16:"conversionString";s:60:"-b 500kb -r 25 -g 25 -s {width}x{height} -ar 22050 -ac 2 -y ";s:19:"flvConversionString";s:0:"";s:14:"allowQuickEdit";s:1:"1";s:16:"forceUniqueKshow";s:0:"";s:20:"returnDuplicateKshow";s:1:"1";s:19:"notificationsConfig";s:42:"*=0;1=0;2=0;3=0;4=0;5=0;6=0;7=0;21=0;26=0;";s:22:"allowMultiNotification";s:0:"";s:15:"mergeEntryLists";s:1:"0";s:8:"allowLks";s:1:"0";s:15:"nuconomyEnabled";s:1:"0";s:20:"nuconomyProjectToken";s:0:"";s:21:"nuconomyProjectSecret";s:0:"";s:21:"allowAnonymousRanking";s:1:"0";s:11:"landingPage";s:0:"";s:15:"userLandingPage";s:0:"";s:7:"matchIp";s:0:"";s:4:"host";s:23:"http://akmi.kaltura.com";s:7:"cdnHost";s:26:"http://cdnakmi.kaltura.com";s:14:"defThumbOffset";s:1:"3";s:24:"defConversionProfileType";s:4:"high";s:13:"maxUploadSize";s:3:"150";s:15:"curConvProfType";s:6:"109662";s:12:"isFirstLogin";b:0;s:17:"templatePartnerId";i:0;s:22:"defaultAccessControlId";i:4;s:26:"defaultConversionProfileId";s:3:"132";s:18:"categoriesLockTime";i:0;s:7:"rtmpUrl";s:0:"";s:16:"addEntryMaxFiles";i:100;s:18:"enableAnalyticsTab";s:1:"1";s:11:"liveEnabled";i:0;s:16:"flowManagerClass";s:0:"";s:20:"storageServePriority";i:3;s:24:"storageDeleteFromKaltura";i:1;s:17:"enableSilverLight";s:1:"0";s:23:"partnerSpecificServices";s:0:"";s:14:"enabledPlugins";a:1:{s:8:"metadata";b:0;}s:16:"enable508Players";s:1:"0";s:10:"enableVast";s:1:"0";s:21:"appStudioExampleEntry";s:0:"";s:25:"appStudioExamplePlayList0";s:0:"";s:25:"appStudioExamplePlayList1";s:0:"";s:21:"delivryBlockCountries";s:10:"DONT_BLOCK";}', NULL, '1', '', '1', NULL, NULL, '0', '1', '266', '547', NULL, '1274091814', '0');
+(0, 'partner 0', '', NULL, '@PARTNER_ZERO_SECRET@', '@PARTNER_ZERO_ADMIN_SECRET@', -1, 0, 0, NULL, NOW(), NOW(), '@PARTNER_ZERO_PARTNER_ALIAS@', NULL, 86400, 1, 'kal', '', 'partner0@kalturace.com', '', '0', '0', '0', 'a:1:{s:12:"isFirstLogin";b:1;}', NULL, '1', '', '1', NULL, NULL, '0', '1', '266', '547', NULL, '1274091814', '0');
+-- The next update is needed because in an auto increment column, the value 0 explicitly tells the DB to generate an id according to the sequence
+UPDATE `partner` SET id = 0 WHERE `partner_name` = 'partner 0';
 
 INSERT INTO `partner` (`id`, `partner_name`, `url1`, `url2`, `secret`, `admin_secret`, `max_number_of_hits_per_day`, `appear_in_search`, `debug_level`, `invalid_login_count`, `created_at`, `updated_at`, `partner_alias`, `ANONYMOUS_KUSER_ID`, `ks_max_expiry_in_seconds`, `create_user_on_demand`, `prefix`, `admin_name`, `admin_email`, `description`, `commercial_use`, `moderate_content`, `notify`, `custom_data`, `service_config_id`, `status`, `content_categories`, `type`, `phone`, `describe_yourself`, `adult_content`, `partner_package`, `usage_percent`, `storage_usage`, `eighty_percent_warning`, `usage_limit_warning`, `monitor_usage`) VALUES
 (-1, 'batch partner', '', NULL, '@BATCH_PARTNER_SECRET@', '@BATCH_PARTNER_ADMIN_SECRET@', -1, 0, 0, NULL, NOW(), NOW(), '@BATCH_PARTNER_PARTNER_ALIAS@', NULL, 86400, 1, '-10', 'batch admin', '@BATCH_ADMIN_MAIL@', 'Build-in partner - used for batch operations', 0, 0, 0, 'a:1:{s:12:"isFirstLogin";b:1;}', 'services_batch.ct', 1, NULL, 0, NULL, NULL, 0, 1, 0, 0, NULL, NULL, 1);
@@ -8,19 +10,14 @@ INSERT INTO `partner` (`id`, `partner_name`, `url1`, `url2`, `secret`, `admin_se
 INSERT INTO `partner` (`id`, `partner_name`, `url1`, `url2`, `secret`, `admin_secret`, `max_number_of_hits_per_day`, `appear_in_search`, `debug_level`, `invalid_login_count`, `created_at`, `updated_at`, `partner_alias`, `ANONYMOUS_KUSER_ID`, `ks_max_expiry_in_seconds`, `create_user_on_demand`, `prefix`, `admin_name`, `admin_email`, `description`, `commercial_use`, `moderate_content`, `notify`, `custom_data`, `service_config_id`, `status`, `content_categories`, `type`, `phone`, `describe_yourself`, `adult_content`, `partner_package`, `usage_percent`, `storage_usage`, `eighty_percent_warning`, `usage_limit_warning`, `monitor_usage`) VALUES
 (-2,  'admin console', '', NULL, '@ADMIN_CONSOLE_PARTNER_SECRET@', '@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@', -1, 0, 0, NULL, NOW(), NOW(), '@ADMIN_CONSOLE_PARTNER_ALIAS@', NULL, 86400, 1, '-10', 'console admin', '@ADMIN_CONSOLE_ADMIN_MAIL@', 'Build-in partner - used for admin console', 0, 0, 0, 'a:1:{s:12:"isFirstLogin";b:1;}', 'services_console.ct', 1, NULL, 0, NULL, NULL, 0, 1, 0, 0, NULL, NULL, 1);
 
-
-
 INSERT INTO `admin_kuser` ( `id`, `screen_name`, `full_name`, `email`, `sha1_password`, `salt`, `picture`, `icon`, `created_at`, `updated_at`, `partner_id`) VALUES
 ( 99998 , NULL, 'batch admin', '@BATCH_KUSER_MAIL@', '@BATCH_KUSER_SHA1@', '@BATCH_KUSER_SALT@', NULL, NULL, NOW(), NOW(), -1);
 
 INSERT INTO `admin_kuser` (`id`,  `screen_name`, `full_name`, `email`, `sha1_password`, `salt`, `picture`, `icon`, `created_at`, `updated_at`, `partner_id`) VALUES
 ( 99999 , NULL , 'console admin', '@ADMIN_CONSOLE_KUSER_MAIL@', '@ADMIN_CONSOLE_KUSER_SHA1@', '@ADMIN_CONSOLE_KUSER_SALT@', NULL, NULL, NOW(), NOW(), -2);
 
-
-
 insert into `system_user` (`email`, `first_name`, `last_name`, `sha1_password`, `salt`, `created_by`, `status`, `is_primary`, `status_updated_at`, `created_at`, `updated_at`, `deleted_at`, `role`) 
 values('@SYSTEM_USER_ADMIN_EMAIL@','admin','admin','@SYSTEM_USER_ADMIN_SHA1@','@SYSTEM_USER_ADMIN_SALT@','0','1','1',NULL,NOW(),NOW(),NULL,'admin');
-
 
 -- Insert the template partner
 
@@ -29,19 +26,13 @@ INSERT INTO `partner` VALUES
 NULL,86400,1,'17','Template KMC account','@TEMPLATE_PARTNER_MAIL@','Template KMC account is used to load the default content, players & playlists for a new partner',1,0,0,
 'a:3:{s:24:\"defConversionProfileType\";s:3:\"med\";s:22:\"defaultAccessControlId\";i:1;s:26:\"defaultConversionProfileId\";i:1;}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1,NULL,NULL,1,NULL,'1');
 
-
-
 INSERT INTO `admin_kuser` VALUES (36734,'Template','Template','@TEMPLATE_PARTNER_MAIL@','@TEMPLATE_ADMIN_KUSER_SHA1@','@TEMPLATE_ADMIN_KUSER_SALT@',NULL,NULL,now(),now(),99);
 
 INSERT INTO kuser (id,screen_name,full_name,email,puser_id, status,partner_id)
 VALUES (99, 'template kuser', 'template kuser', '@TEMPLATE_KUSER_MAIL@', '1', 1, 99);
 
-
-
 INSERT INTO widget (id, int_id, source_widget_id, root_widget_id, partner_id, subp_id, kshow_id, entry_id, ui_conf_id, custom_data, security_type, security_policy, created_at, updated_at, partner_data) VALUES
 ('_99', '1', NULL, NULL, '99', '9900', NULL, NULL, '200', NULL, NULL, NULL, NOW(), NOW(), NULL);
-
-
 
 INSERT INTO `entry` VALUES
 ('_TPNWQV400','a2w4knohjw',99,'Normal web quality video (400kbps)',1,1,'100000.flv','100000.jpg',9,0,0,0,0,0,'fish',NULL,2,5,NULL,NULL,-1,NULL,29780,now(),now(),99,2,9900,'a:5:{s:18:\"conversion_quality\";s:6:\"101446\";s:7:\"puserId\";N;s:6:\"height\";s:3:\"480\";s:5:\"width\";s:3:\"640\";s:12:\"storage_size\";i:1867662;}','_KAL_NET_ _99_ _MEDIA_TYPE_1|  Normal web quality video (400kbps) fish fish',NULL,NULL,1,NULL,3,NULL,4267710,NULL,'',NULL,'fish',6,0,now(),'1',1,NULL,'fish','4','_CAT_4 _DURATION_short _FLAVOR_',NULL,NULL,NULL,now()),
@@ -63,16 +54,12 @@ VALUES
 ('FA_SKALVID',99,'mbr,web',now(),now(),NULL,'_TPSKALVID',0,2,'100000','',400,300,391,25,328,0,'flv','flash video','h.263'),
 ('FA_NWQV400',99,'mbr,web',now(),now(),NULL,'_TPNWQV400',0,2,'100000','',640,480,391,25,1822,0,'flv','flash video','h.263');
 
-
-
 INSERT INTO `file_sync` (partner_id,object_type,object_id,VERSION,object_sub_type,dc,original,created_at,updated_at,ready_at,sync_time,STATUS,file_type,linked_id,link_count,file_root,file_path,file_size)
 VALUES
 (99,4,'FA_SBBBTHD','100000',1,'0',1,now(),now(),now(),NULL,2,1,NULL,497,'@WEB_DIR@/','content/templates/entry/data/SampleBigBuckBunnyTrailer.flv',11582028),
 (99,4,'FA_NWQV400','100000',1,'0',1,now(),now(),now(),NULL,2,1,NULL,502,'@WEB_DIR@/','content/templates/entry/data/NormalWebQualityVideo.flv',1867662),
 (99,4,'FA_EWQ1200','100000',1,'0',1,now(),now(),now(),NULL,2,1,NULL,500,'@WEB_DIR@/','content/templates/entry/data/ExcellentWebQualityVideo.flv',4825651),
 (99,4,'FA_SKALVID','100000',1,'0',1,now(),now(),now(),NULL,2,1,NULL,501,'@WEB_DIR@/','content/templates/entry/data/SampleKalturaAnimatedLogo.flv',335684);
-
-
 
 INSERT INTO `file_sync` (partner_id,object_type,object_id,VERSION,object_sub_type,dc,original,created_at,updated_at,ready_at,sync_time,STATUS,file_type,linked_id,link_count,file_root,file_path,file_size)
 VALUES
@@ -87,19 +74,13 @@ VALUES
 (99,1,'_TPNWQV400','100000',3,'0',1,now(),now(),now(),NULL,2,1,NULL,511,'@WEB_DIR@/','content/templates/entry/thumbnail/NormalWebQualityVideoThumb.jpg',42262),
 (99,1,'_TPRSVLIST','100000',1,'0',1,now(),now(),now(),NULL,2,1,NULL,498,'@WEB_DIR@/','content/templates/entry/data/RecentSeaVideos.xml',280);
  
-
 INSERT INTO `access_control`
 VALUES (1,99,'Default','default access control profile',now(),now(),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-
-
 
 insert into conversion_profile_2 (id,partner_id, name, created_at, updated_at, deleted_at, description, crop_left, crop_top, crop_width, crop_height, clip_start, clip_duration) VALUES
 (1,'99', 'Default', now(), now(), NULL, 'The default set of flavors. If not specified otherwise all media uploaded will be converted based on the definition in this profile', '-1', '-1', '-1', '-1', '-1', '-1');
 
-
 UPDATE conversion_profile_2 SET input_tags_map = 'web' WHERE input_tags_map IS NULL;
-
-
 
 insert into flavor_params_conversion_profile( conversion_profile_id, flavor_params_id, ready_behavior, force_none_complied, created_at, updated_at)
 values(1, 0, 0, null, now(), now());

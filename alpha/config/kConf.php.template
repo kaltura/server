@@ -127,7 +127,7 @@ class kConf
 				"kmc_appstudio_version" => 'v2.2.1',
 				"kmc_rna_version" => 'v1.1.5',
 				"kmc_dashboard_version" => 'v1.0.13',
-				"kmc_login_version" => 'v1.1.9',
+				"kmc_login_version" => 'v1.1.11',
 				"kmc_secured_login" => false,
 				
 				"paypal_data" => array (),
