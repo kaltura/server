@@ -141,16 +141,16 @@ batch.freeexclusivebulkdownloadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.logconversion					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.resetjobexecutionattempts		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 
-batch.updateexclusiveconvertjobsubtype			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.updateexclusiveconvertprofilejob			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneconvertjobs			|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneconvertprofilejobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdonebulkuploadjobs		|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneconvertcollectionjobs|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneprovisionprovidejobs|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
-batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw*	|		|	|   |batch
+batch.updateexclusiveconvertjobsubtype			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusiveconvertprofilejob			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneconvertjobs			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneconvertprofilejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdonebulkuploadjobs		|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneconvertcollectionjobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneprovisionprovidejobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |batch
 
 batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
 batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
