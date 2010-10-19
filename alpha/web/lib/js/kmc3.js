@@ -44,13 +44,6 @@ $(function(){
 
 /* kmc and kmc.vars defined in script block in kmc2success.php */
 
-	kmc.vars.default_kdp = {
-			uiconf_id	: 48509,
-			width		: 400,
-			height		: 333,
-			swf_version : "v3.3.4"
-		};
-
 	// kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Quick_Start_Guide__Butterfly.pdf#";
 	kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
 
