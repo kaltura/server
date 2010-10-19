@@ -10,7 +10,7 @@ if (!kConf::get('usage_tracking_optin')) {
 }
 		
 $post_parameters = queryUsageReport(QUERIES_FILE);
-$post_parameters['installa_id'] = kConf::get('installation_id');
+$post_parameters['install_id'] = kConf::get('installation_id');
 $post_parameters['report_admin_email'] = kConf::get('report_admin_email');
 $post_parameters['package_version'] = kConf::get('kaltura_version');
 foreach (array_keys($post_parameters) as $key) {
