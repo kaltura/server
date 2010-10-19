@@ -348,8 +348,10 @@ class kBatchManager
 	public static function updateEntry(BatchJob $dbBatchJob, $status)
 	{
 		$entry = $dbBatchJob->getEntry();
-		if(!$entry)
+		if(!$entry) {
+			KalturaLog::debug("Entry was not found for job id [$dbBatchJob->getId()]");
 			return null;
+		}
 		
 		// entry status didn't change - no need to send notification
 		if($entry->getStatus() == $status)
