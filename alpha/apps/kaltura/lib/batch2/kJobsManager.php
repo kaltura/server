@@ -635,7 +635,20 @@ class kJobsManager
 	 * @return BatchJob
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
-	{
+	{	
+		// if file size is 0, do not create conversion profile and set entry status as error converting
+		if (filesize($inputFileSyncLocalPath) == 0)
+		{
+			$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+			$entry->save();
+			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->setDescription('Entry of size 0 should not be converted');
+			$flavorAsset->save();
+			KalturaLog::err('Entry of size 0 should not be converted');
+			return null;
+		}
+		
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entry::ENTRY_STATUS_PENDING);
