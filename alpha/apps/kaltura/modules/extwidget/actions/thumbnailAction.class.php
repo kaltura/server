@@ -96,7 +96,7 @@ class thumbnailAction extends sfAction
 					}
 						
 					// and resize it
-					myFileConverter::convertImage($thumb_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
+					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
 					kFile::dumpFile($thumb_full_path);
 				}
 			}
