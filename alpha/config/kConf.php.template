@@ -213,6 +213,7 @@ class kConf
 				),
 				
 				'disable_url_hashing' => 'true',
+				'report_partner_registration' => false, // whether to report partner registration
 				'response_cache_dir' => '@BASE_DIR@/cache/response/',
 				
 				// ce only settings

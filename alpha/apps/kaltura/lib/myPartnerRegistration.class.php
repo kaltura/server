@@ -50,7 +50,7 @@ class myPartnerRegistration
 											null,
 											$partner->getType());
 											
-		if ( !$skip_emails ) 
+		if ( !$skip_emails && kConf::get("report_partner_registration")) 
 		{											
 			// email the wikisupport@kaltura.com  with this info
 			$this->sendRegistrationInformation($partner->getAdminName(),
