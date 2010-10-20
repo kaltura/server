@@ -54,6 +54,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$flavorAssets = flavorAssetPeer::doSelect($c);
 		foreach($flavorAssets as $flavorAsset)
 		{
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$flavorAsset->setDeletedAt(time());
 			$flavorAsset->save();
 		}

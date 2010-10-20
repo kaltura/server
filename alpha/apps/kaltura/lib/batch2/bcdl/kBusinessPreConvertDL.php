@@ -457,6 +457,7 @@ class kBusinessPreConvertDL
 			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalFlavorAsset->setDeletedAt(time());
 			$originalFlavorAsset->save();
 			
 			return false;
@@ -655,6 +656,7 @@ class kBusinessPreConvertDL
 			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$originalFlavorAsset->setDeletedAt(time());
 			$originalFlavorAsset->save();
 			
 			throw new Exception($errDescription);
