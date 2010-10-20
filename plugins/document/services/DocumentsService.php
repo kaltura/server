@@ -391,6 +391,7 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();	
 					
 		$flavorAsset = null;
+		flavorAssetPeer::setDefaultCriteriaFilter();
 		if($flavorAssetId)
 		{
 			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
@@ -437,6 +438,7 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;
+		flavorAssetPeer::setDefaultCriteriaFilter();
 		if($flavorParamsId)
 		{
 			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorParamsId);
