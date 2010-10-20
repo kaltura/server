@@ -11,7 +11,7 @@ $cache_st = "cache_st/".(time()+ 15 * 60);
 
 $flash_dir = $service_url . myContentStorage::getFSFlashRootPath ();
 //$allow_reports = false;
-$disableurlhashing = false;
+$disableurlhashing = kConf::get('disable_url_hashing');
 if ( !$allow_reports )
 {
   $first_login = true;
@@ -20,7 +20,6 @@ if ( kConf::get('kmc_display_server_tab') )
 {
   $support_url = '#';
   $_SESSION['api_v3_login'] = true;
-  $disableurlhashing = true;
 }
 else
 {

@@ -1,7 +1,7 @@
 <?php
 $jw_swf_name = ($jw_license) ? "licensed" : "non-commercial";
 
-$disableurlhashing = false;
+$disableurlhashing = kConf::get('disable_url_hashing');
 if ( !$allow_reports )
 {
   $first_login = true;
@@ -10,7 +10,6 @@ if ( kConf::get('kmc_display_server_tab') )
 {
 	$support_url = '#support';
 	$_SESSION['api_v3_login'] = true;
-	$disableurlhashing = true;
 }
 else
 {

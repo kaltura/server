@@ -7,7 +7,7 @@ $cdn_host = str_replace ( "http://" , "" , $cdn_url );
 
 $flash_dir = $cdn_url . myContentStorage::getFSFlashRootPath ();	/*** move to action ***/
 //$allow_reports = false;
-$disableurlhashing = false;
+$disableurlhashing = kConf::get('disable_url_hashing');
 if ( !$allow_reports )
 {
   $first_login = true;
@@ -16,7 +16,6 @@ if ( kConf::get('kmc_display_server_tab') )
 {
   $support_url = '#support';
   $_SESSION['api_v3_login'] = true;
-  $disableurlhashing = true;
 }
 else
 {

@@ -1057,6 +1057,7 @@ $(function(){
 			// KAE can read both formats and cases of flashvars:
 			// "partnerId", "subpId", "kshowId", "entryId", "uid", "ks"
 			"terms_of_use"	: kmc.vars.terms_of_use,
+			"disableurlhashing" : kmc.vars.disableurlhashing,
 			"jsDelegate"	: "kmc.editors.kae_functions"
 		},
 		params: {
