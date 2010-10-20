@@ -32,15 +32,6 @@ if($argc > 1 && is_numeric($argv[1]))
 $c->addAscendingOrderByColumn(entryPeer::INT_ID);
 $c->setLimit(10000);
 
-$insertsFile = fopen('inserts.sql', 'a');
-$errorsFile = fopen('errors.sql', 'a');
-
-if(!$insertsFile)
-{
-	echo "upable to open sql file [" . realpath($insertsFile) . "]";
-	exit;
-}
-
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 //$sphinxCon = DbManager::getSphinxConnection();
 
@@ -53,10 +44,11 @@ while(count($entries))
 		KalturaLog::log('entry id ' . $entry->getId() . ' int id[' . $entry->getIntId() . '] crc id[' . $sphinx->getSphinxId($entry) . ']');
 		
 		try {
-			$sphinx->saveToSphinx($entry, true);
+			$ret = $sphinx->saveToSphinx($entry, true);
 		}
 		catch(Exception $e){
-			fputs($errorsFile, $e->getMessage() . "\n");
+			KalturaLog::err($e->getMessage());
+			exit -1;
 		}
 	}
 	
@@ -67,8 +59,5 @@ while(count($entries))
 	MetadataProfileFieldPeer::clearInstancePool();
 	$entries = entryPeer::doSelect($c, $con);
 }
-
-fclose($insertsFile);
-fclose($errorsFile);
 
 KalturaLog::log('Done');
