@@ -119,7 +119,13 @@ class kSphinxSearchManager implements
 	}
 	
 	// TODO remove $force after replace bug solved
-	public function getSphinxSaveSql($entry, $isInsert = false, $force = false)
+	/**
+	 * @param entry $entry
+	 * @param bool $isInsert
+	 * @param bool $force
+	 * @return string|bool
+	 */
+	public function getSphinxSaveSql(entry $entry, $isInsert = false, $force = false)
 	{
 		$id = $entry->getIntId();
 		if(!$id)
@@ -319,7 +325,12 @@ class kSphinxSearchManager implements
 	}
 	*/
 		
-	public function execSphinx($sql, $entry)
+	/**
+	 * @param string $sql
+	 * @param entry $entry
+	 * @return bool
+	 */
+	public function execSphinx($sql, entry $entry)
 	{
 		KalturaLog::debug($sql);
 		
@@ -330,24 +341,31 @@ class kSphinxSearchManager implements
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
 		if(!kConf::hasParam('exec_sphinx') || !kConf::get('exec_sphinx'))
-			return;
+			return true;
 			
 		$con = DbManager::getSphinxConnection();
 		$ret = $con->exec($sql);
-		if(!$ret)
-		{
-			$arr = $con->errorInfo();
-			KalturaLog::err($arr[2]);
-		}
+		if($ret)
+			return true;
+			
+		$arr = $con->errorInfo();
+		KalturaLog::err($arr[2]);
+		return false;
 	}
 		
 	// TODO remove $force after replace bug solved
-	public function saveToSphinx($entry, $isInsert = false, $force = false)
+	/**
+	 * @param entry $entry
+	 * @param bool $isInsert
+	 * @param bool $force
+	 * @return bool
+	 */
+	public function saveToSphinx(entry $entry, $isInsert = false, $force = false)
 	{
 		$sql = $this->getSphinxSaveSql($entry, $isInsert, $force);
 		if(!$sql)
-			return;
+			return true;
 		
-		$this->execSphinx($sql, $entry);
+		return $this->execSphinx($sql, $entry);
 	}
 }
