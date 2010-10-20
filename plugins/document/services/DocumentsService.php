@@ -108,8 +108,8 @@ class DocumentsService extends KalturaEntryService
 	 * Copy entry into new entry
 	 * 
 	 * @action addFromEntry
-	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
 	 * @param string $sourceEntryId Document entry id to copy from
+	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
 	 * @param int $sourceFlavorParamsId The flavor to be used as the new entry source, source flavor will be used if not specified
 	 * @return KalturaDocumentEntry The new document entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
@@ -117,7 +117,7 @@ class DocumentsService extends KalturaEntryService
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
 	 */
-	function addFromEntryAction(KalturaDocumentEntry $documentEntry = null, $sourceEntryId, $sourceFlavorParamsId = null)
+	function addFromEntryAction($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = null)
 	{
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
@@ -156,14 +156,14 @@ class DocumentsService extends KalturaEntryService
 	 * Copy flavor asset into new entry
 	 * 
 	 * @action addFromFlavorAsset
-	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
 	 * @param string $sourceFlavorAssetId Flavor asset id to be used as the new entry source
+	 * @param KalturaDocumentEntry $documentEntry Document entry metadata
 	 * @return KalturaDocumentEntry The new document entry
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
 	 */
-	function addFromFlavorAssetAction(KalturaDocumentEntry $documentEntry = null, $sourceFlavorAssetId)
+	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
 	{
 		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
 

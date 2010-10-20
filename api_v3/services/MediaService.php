@@ -306,8 +306,8 @@ class MediaService extends KalturaEntryService
 	 * Copy entry into new entry
 	 * 
 	 * @action addFromEntry
-	 * @param KalturaMediaEntry $mediaEntry Media entry metadata
 	 * @param string $sourceEntryId Media entry id to copy from
+	 * @param KalturaMediaEntry $mediaEntry Media entry metadata
 	 * @param int $sourceFlavorParamsId The flavor to be used as the new entry source, source flavor will be used if not specified
 	 * @return KalturaMediaEntry The new media entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
@@ -315,7 +315,7 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
 	 */
-	function addFromEntryAction(KalturaMediaEntry $mediaEntry = null, $sourceEntryId, $sourceFlavorParamsId = null)
+	function addFromEntryAction($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null)
 	{
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
@@ -354,14 +354,14 @@ class MediaService extends KalturaEntryService
 	 * Copy flavor asset into new entry
 	 * 
 	 * @action addFromFlavorAsset
-	 * @param KalturaMediaEntry $mediaEntry Media entry metadata
 	 * @param string $sourceFlavorAssetId Flavor asset id to be used as the new entry source
+	 * @param KalturaMediaEntry $mediaEntry Media entry metadata
 	 * @return KalturaMediaEntry The new media entry
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
 	 */
-	function addFromFlavorAssetAction(KalturaMediaEntry $mediaEntry = null, $sourceFlavorAssetId)
+	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
 	{
 		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
 
