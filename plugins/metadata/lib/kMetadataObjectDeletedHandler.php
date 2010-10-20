@@ -41,7 +41,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 		$c = new Criteria();
 		$c->add(MetadataPeer::OBJECT_TYPE, $objectType);
 		$c->add(MetadataPeer::OBJECT_ID, $objectId);
-		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED, Criteria::NOT_EQUAL);
 	
 		$peer = null;
 		MetadataPeer::setUseCriteriaFilter(false);
@@ -54,7 +54,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 		}
 		
 		$update = new Criteria();
-		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
+		$update->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED);
 			
 		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		BasePeer::doUpdate($c, $update, $con);

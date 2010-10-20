@@ -26,10 +26,10 @@ class DocumentPlugin extends KalturaPlugin
 		{
 			switch($enumValue)
 			{
-				case KalturaContainerFormat::PDF:
+				case flavorParams::CONTAINER_FORMAT_PDF:
 					return new KalturaPdfFlavorParams();
 					
-				case KalturaContainerFormat::SWF:
+				case flavorParams::CONTAINER_FORMAT_SWF:
 					return new KalturaSwfFlavorParams();
 				
 				default:
@@ -41,10 +41,10 @@ class DocumentPlugin extends KalturaPlugin
 		{
 			switch($enumValue)
 			{
-				case KalturaContainerFormat::PDF:
+				case flavorParams::CONTAINER_FORMAT_PDF:
 					return new KalturaPdfFlavorParamsOutput();
 					
-				case KalturaContainerFormat::SWF:
+				case flavorParams::CONTAINER_FORMAT_SWF:
 					return new KalturaSwfFlavorParamsOutput();
 				
 				default:
@@ -55,7 +55,7 @@ class DocumentPlugin extends KalturaPlugin
 		
 		// OPERATION ENGINES
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF_CREATOR)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -64,7 +64,7 @@ class DocumentPlugin extends KalturaPlugin
 		}
 
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF2SWF)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF2SWF)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;

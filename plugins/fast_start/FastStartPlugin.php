@@ -10,7 +10,7 @@ class FastStartPlugin extends KalturaPlugin
 	 */
 	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::FAST_START)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_FAST_START)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;

@@ -10,7 +10,7 @@ class QuickTimeToolsPlugin extends KalturaPlugin
 	 */
 	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
