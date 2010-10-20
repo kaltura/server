@@ -75,10 +75,25 @@ class thumbnailAction extends sfAction
 				kFile::fullMkdir($thumb_full_path);
 				if (file_exists($upload_token->getUploadTempPath()))
 				{
-					// capture full frame
-					myFileConverter::captureFrame($upload_token->getUploadTempPath(), $thumb_full_path, 1, "image2", -1, -1, 3 );
-					if (!file_exists($thumb_full_path))
-						myFileConverter::captureFrame($upload_token->getUploadTempPath(), $thumb_full_path, 1, "image2", -1, -1, 0);
+					$src_full_path = $upload_token->getUploadTempPath();
+					$valid_image_types = array(
+						IMAGETYPE_GIF,
+						IMAGETYPE_JPEG,
+						IMAGETYPE_PNG,
+						IMAGETYPE_BMP,
+						IMAGETYPE_WBMP,
+					);
+					
+					$image_type = exif_imagetype($src_full_path);
+					if(!in_array($image_type, $valid_image_types))
+					{
+						// capture full frame
+						myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 3 );
+						if (!file_exists($thumb_full_path))
+							myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 0);
+						
+						$src_full_path = $thumb_full_path;
+					}
 						
 					// and resize it
 					myFileConverter::convertImage($thumb_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
