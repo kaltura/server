@@ -187,3 +187,35 @@ CREATE TABLE `invalid_session`
 	KEY `ks_index`(`ks`),
 	KEY `ks_valid_until_index`(`ks_valid_until`)
 )Type=MyISAM;
+
+CREATE TABLE `temp_entry_update` (
+  `id` varchar(20) NOT NULL DEFAULT '',
+  `views` int(11) DEFAULT '0',
+  `plays` int(11) DEFAULT '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- DWH
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `update_entries`$$
+
+CREATE DEFINER=`etl`@`%` PROCEDURE `update_entries`()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE entry_id CHAR(50);
+    DECLARE new_views, new_plays INT;
+    DECLARE updated_entries CURSOR FOR SELECT id, plays, views FROM temp_entry_update;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    OPEN updated_entries;
+    
+    SET SESSION sql_log_bin = 1;
+    REPEAT
+    FETCH updated_entries INTO entry_id, new_plays, new_views;
+    UPDATE entry SET entry.plays = new_plays, entry.views = new_views WHERE entry.id = entry_id;
+    UNTIL done END REPEAT;
+    SET SESSION sql_log_bin = 0;
+    CLOSE updated_entries;
+    END$$
+
+DELIMITER ;
