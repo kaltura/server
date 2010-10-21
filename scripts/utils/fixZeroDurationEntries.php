@@ -28,20 +28,17 @@ DbManager::initialize();
 $entryCriteria = new Criteria();
 $entryCriteria->add(entryPeer::STATUS, entry::ENTRY_STATUS_READY);
 $entryCriteria->add(entryPeer::MEDIA_TYPE, array(entry::ENTRY_MEDIA_TYPE_AUDIO, entry::ENTRY_MEDIA_TYPE_VIDEO), Criteria::IN);
-$entryCriteria->add(entryPeer::LENGTH_IN_MSECS, 0);
+$entryCriteria->add(entryPeer::LENGTH_IN_MSECS, array(0, null), Criteria::IN);
 if(!is_null($partnerId))
 	$entryCriteria->add(entryPeer::PARTNER_ID, $partnerId);
-//$entryCriteria->setLimit(5000);
+$entryCriteria->setLimit(8000);
 $entryCriteria->clearSelectColumns();
 $entryCriteria->addSelectColumn(entryPeer::ID);
-	
-$rs = entryPeer::doSelectStmt($entryCriteria);
+
+$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+$rs = entryPeer::doSelectStmt($entryCriteria, $con);
 $entries = $rs->fetchAll(PDO::FETCH_COLUMN);
 
-$flavorAssetCriteria = new Criteria();
-$flavorAssetCriteria->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-$flavorAssetCriteria->clearSelectColumns();
-$flavorAssetCriteria->addSelectColumn(flavorAssetPeer::ID);
 $saved = 0;
 foreach($entries as $entryId)
 {
@@ -49,23 +46,29 @@ foreach($entries as $entryId)
 	flavorAssetPeer::clearInstancePool();
 	mediaInfoPeer::clearInstancePool();
 	
-	$c = clone $flavorAssetCriteria;
-	$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
+	$flavorAssetCriteria = new Criteria();
+	$flavorAssetCriteria->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+	$flavorAssetCriteria->clearSelectColumns();
+	$flavorAssetCriteria->addSelectColumn(flavorAssetPeer::ID);
+	$flavorAssetCriteria->add(flavorAssetPeer::ENTRY_ID, $entryId);
 	
-	$rs = flavorAssetPeer::doSelectStmt($c);
+	$rs = flavorAssetPeer::doSelectStmt($flavorAssetCriteria, $con);
 	$flavorAssets = $rs->fetchAll(PDO::FETCH_COLUMN);;
 	if(!count($flavorAssets))
 		continue;
 		
-	$entry = entryPeer::retrieveByPK($entryId);
-	if(!$entry)
-		continue;
-	
 	$criteria = new Criteria();
 	$criteria->add(mediaInfoPeer::FLAVOR_ASSET_ID, $flavorAssets, Criteria::IN);
 	$criteria->addDescendingOrderByColumn(mediaInfoPeer::ID);
 
-	$mediaInfos = mediaInfoPeer::doSelect($criteria);
+	$mediaInfos = mediaInfoPeer::doSelect($criteria, $con);
+	if(!count($mediaInfos))
+		continue;
+	
+	$entry = entryPeer::retrieveByPK($entryId, $con);
+	if(!$entry)
+		continue;
+	
 	foreach($mediaInfos as $mediaInfo)
 	{
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO && $mediaInfo->getVideoDuration())
