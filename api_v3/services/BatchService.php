@@ -1175,7 +1175,6 @@ class BatchService extends KalturaBaseService
 	 * @param int $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
 	 * @param KalturaBatchJob $job
-	 * @param KalturaEntryStatus $entryStatus Optional parameter if the entry of the batch should change 
 	 * @return KalturaBatchJob 
 	 */
 	function updateExclusiveProvisionProvideJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
