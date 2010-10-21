@@ -124,7 +124,7 @@ class kConf
 			/* kmc applications versions */
 				"kmc_content_version" => 'v3.2.5',
 				"kmc_account_version" => 'v3.1.1',
-				"kmc_appstudio_version" => 'v2.2.1',
+				"kmc_appstudio_version" => 'v2.1.8',
 				"kmc_rna_version" => 'v1.1.5',
 				"kmc_dashboard_version" => 'v1.0.13',
 				"kmc_login_version" => 'v1.1.11',
