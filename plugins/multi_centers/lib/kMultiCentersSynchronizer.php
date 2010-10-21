@@ -30,17 +30,27 @@ class kMultiCentersSynchronizer implements kObjectCreatedEventConsumer
 	{
 		if(!($object instanceof FileSync) || $object->getStatus() != FileSync::FILE_SYNC_STATUS_PENDING || $object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
 			return;
-			
-		$kalturaDc = StorageProfilePeer::retrieveByPK($object->getDc());
-		if(!$kalturaDc)
-		{
-			KalturaLog::err('Kaltura DC [' . $object->getDc() . '] not found');
+
+		$c = new Criteria();
+		$c->addAnd(FileSyncPeer::OBJECT_ID, $object->getObjectId());
+		$c->addAnd(FileSyncPeer::VERSION, $object->getVersion());
+		$c->addAnd(FileSyncPeer::OBJECT_TYPE, $object->getObjectType());
+		$c->addAnd(FileSyncPeer::OBJECT_SUB_TYPE, $object->getObjectSubType());
+		$c->addAnd(FileSyncPeer::ORIGINAL, '1');
+		$original_filesync = FileSyncPeer::doSelectOne($c);
+		if (!$original_filesync) {
+			KalturaLog::err('Original filesync not found for object_id['.$object->getObjectId().'] version['.$object->getVersion().'] type['.$object->getObjectType().'] subtype['.$object->getObjectSubType().']');
 			return;
 		}
-			
-		$key = kFileSyncUtils::getKeyForFileSync($object);
-		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($key, true);
-		$entryId = $this->getEntryId($object);
-		$job = kJobsManager::addStorageExportJob(null, $entryId, $object->getPartnerId(), $kalturaDc, $object, $srcFileSyncLocalPath);
+		$sourceFileUrl = $original_filesync->getExternalUrl();
+		if (!$sourceFileUrl) {
+			KalturaLog::err('External URL not found for filesync id [' . $object->getId() . ']');
+			return;
+		}				
+		
+		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object->getPartnerId(), $object->getId(), $sourceFileUrl);
+		
+		$job->setDc($object->getDc());
+		$job->save();
 	}
 }
