@@ -121,6 +121,15 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $createdAt;
 	
 	/**
+	 * Entry update date as Unix timestamp (In seconds)
+	 * 
+	 * @var int
+	 * @readonly
+	 * @filter gte,lte,order
+	 */
+	public $updatedAt;
+	
+	/**
 	 * Calculated rank
 	 * 
 	 * @var float
@@ -239,6 +248,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"status", 
 	 	"type", // this will need to be set according to the class
 	 	"createdAt", 
+	 	"updatedAt", 
 	 	"rank" => "rankAsFloat", 
 	 	"totalRank",
 	 	"votes",
@@ -330,8 +340,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			"createdAtGreaterThanOrEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system after a specific time/date (standard timestamp format).",
 			"createdAtLessThanOrEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system before a specific time/date (standard timestamp format).",
 			
-			//"updatedAtGreaterThanEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system after or at an exact time/date (standard timestamp format).",
-			//"updatedAtLessThenEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system before or at an exact time/date (standard timestamp format).",
+			"updatedAtGreaterThanEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system after or at an exact time/date (standard timestamp format).",
+			"updatedAtLessThenEqual" => "This filter parameter should be in use for retrieving only entries which were created at Kaltura system before or at an exact time/date (standard timestamp format).",
 			
 			"modifiedAtGreaterThanEqual" => "This filter parameter should be in use for retrieving only entries which were updated at Kaltura system after or at an exact time/date (standard timestamp format).",
 			"modifiedAtLessThenEqual" => "This filter parameter should be in use for retrieving only entries which were updated at Kaltura system before or at an exact time/date (standard timestamp format).",

@@ -186,6 +186,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		// class properties
+		$needsArrayList = false;
+		$needsObjectFactory = false;
 		foreach ( $classNode->childNodes as $propertyNode ) 
 		{
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)

@@ -39,6 +39,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"typeIn" => "_in_type",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
+		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
+		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"groupIdEqual" => "_eq_group_id",
 		"searchTextMatchAnd" => "_matchand_search_text",
 		"searchTextMatchOr" => "_matchor_search_text",
@@ -68,6 +70,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"-moderationCount" => "-moderation_count",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
+		"+updatedAt" => "+updated_at",
+		"-updatedAt" => "-updated_at",
 		"+rank" => "+rank",
 		"-rank" => "-rank",
 		"recent" => "recent",
@@ -299,6 +303,20 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual;
 
 	/**
 	 * 

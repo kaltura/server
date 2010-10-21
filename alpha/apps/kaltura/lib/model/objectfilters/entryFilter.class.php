@@ -109,7 +109,7 @@ class entryFilter extends baseObjectFilter
 			"_free_text",
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "views", "name", "media_date" , 
+		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
 			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , "modified_at", "available_from", "duration" ,)	;
 
 		$this->aliases = array ( 
@@ -135,7 +135,8 @@ class entryFilter extends baseObjectFilter
 					"type" => array("type" => "enum,entry,ENTRY_TYPE", "desc" => ""),
 					"media_type" => array("type" => "enum,entry,ENTRY_MEDIA_TYPE", "desc" => ""),
 					"view" => array("type" => "integer", "desc" => ""),
-					"created_at" => array("type" => "date", "desc" => "")
+					"created_at" => array("type" => "date", "desc" => ""),
+					"updated_at" => array("type" => "date", "desc" => "")
 				)
 			);
 	}

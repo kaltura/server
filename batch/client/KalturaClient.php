@@ -25,6 +25,8 @@ class KalturaBaseEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -249,6 +251,8 @@ class KalturaDataEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -409,6 +413,8 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -431,6 +437,8 @@ class KalturaLiveStreamEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -509,6 +517,8 @@ class KalturaMediaEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -564,6 +574,8 @@ class KalturaMixEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -663,6 +675,8 @@ class KalturaPlayableEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -675,6 +689,8 @@ class KalturaPlaylistOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -1682,6 +1698,34 @@ class KalturaProvisionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $returnVal = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $mediaType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
 
 
 }
@@ -4321,6 +4365,15 @@ class KalturaBaseEntry extends KalturaObjectBase
 	public $createdAt = null;
 
 	/**
+	 * Entry update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
 	 * Calculated rank
 	 * 
 	 *
@@ -5570,6 +5623,20 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 *
 	 * @var int
 	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
 	public $groupIdEqual = null;
 
 	/**
@@ -6477,6 +6544,27 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 * @var array of KalturaLiveStreamBitrate
 	 */
 	public $bitrates;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
 
 
 }
