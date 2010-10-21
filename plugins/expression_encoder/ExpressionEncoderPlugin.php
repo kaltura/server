@@ -16,12 +16,12 @@ class ExpressionEncoderPlugin extends KalturaPlugin
 				return null;
 				
 			$params = $constructorArgs['params'];
-			return new KOperationEngineQtTools($params->qtToolsCmd, $constructorArgs['outFilePath']);
+			return new KOperationExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
 		}
 			
 		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
 		{
-			return new KDLTranscoderQTPTools($enumValue);
+			return new KDLOperatorExpressionEncoder($enumValue);
 		}
 		
 		return null;
