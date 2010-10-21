@@ -42,9 +42,9 @@ $tryXML = "<StreamInfo
 		}
 		
 		$xml->Job['OutputDirectory']=KDLCmdlinePlaceholders::OutDir;
-		if($this->_inFileName){
-			$xml->Job['DefaultMediaOutputFileName']=$this->_outFileName.".{DefaultExtension}";
-		}
+//		if($this->_inFileName){
+//			$xml->Job['DefaultMediaOutputFileName']=$this->_outFileName.".{DefaultExtension}";
+//		}
 		if($target->_video){
 			$vid = $target->_video;
 			$vidProfile=null;
