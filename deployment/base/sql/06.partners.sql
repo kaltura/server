@@ -24,7 +24,7 @@ values('@SYSTEM_USER_ADMIN_EMAIL@','admin','admin','@SYSTEM_USER_ADMIN_SHA1@','@
 INSERT INTO `partner` VALUES
 (99,'Template KMC account',NULL,NULL,md5('@TEMPLATE_PARTNER_SECRET@'),md5('@TEMPLATE_PARTNER_ADMIN_SECRET@'),-1,2,0,NULL,now(), now(),'@TEMPLATE_PARTNER_ALIAS@',
 NULL,86400,1,'17','Template KMC account','@TEMPLATE_PARTNER_MAIL@','Template KMC account is used to load the default content, players & playlists for a new partner',1,0,0,
-'a:3:{s:24:\"defConversionProfileType\";s:3:\"med\";s:22:\"defaultAccessControlId\";i:1;s:26:\"defaultConversionProfileId\";i:1;}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1,NULL,NULL,1,NULL,'1');
+'a:6:{s:24:"defConversionProfileType";s:3:"med";s:22:"defaultAccessControlId";i:1;s:26:"defaultConversionProfileId";i:1;s:14:"enabledPlugins";a:2:{s:5:"audit";b:1;s:8:"metadata";b:1;}s:10:"enableVast";b:1;s:11:"liveEnabled";b:1;}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1,NULL,NULL,1,NULL,'1');
 
 INSERT INTO `admin_kuser` VALUES (36734,'Template','Template','@TEMPLATE_PARTNER_MAIL@','@TEMPLATE_ADMIN_KUSER_SHA1@','@TEMPLATE_ADMIN_KUSER_SALT@',NULL,NULL,now(),now(),99);
 
@@ -44,9 +44,7 @@ INSERT INTO `entry` VALUES
 ('_TPMYIMGPL','-1',99,'My images',5,10,'100000.xml',NULL,0,0,0,0,0,0,'',NULL,2,NULL,NULL,NULL,NULL,NULL,0,now(),now(),99,2,9900,'a:1:{s:7:\"puserId\";N;}',NULL,NULL,NULL,1,NULL,0,NULL,4267720,NULL,'All my images 2',NULL,'',2,0,now(),'1',1,NULL,'','','_DURATION_short _FLAVOR_',NULL,NULL,NULL,now()),
 ('_TPMRVLIST','-1',99,'Most recent videos',5,10,'100000.xml',NULL,0,0,0,0,0,0,'',NULL,2,NULL,NULL,NULL,NULL,NULL,0,now(),now(),99,2,9900,'a:1:{s:7:\"puserId\";N;}',NULL,NULL,NULL,1,NULL,0,NULL,4267721,NULL,'10 most  recent videos',NULL,'',2,0,now(),'1',1,NULL,'','','_DURATION_short _FLAVOR_',NULL,NULL,NULL,now()),
 ('_TPMPVLIST','-1',99,'Most popular videos',5,10,'100000.xml',NULL,0,0,0,0,0,0,'',NULL,2,NULL,NULL,NULL,NULL,NULL,0,now(),now(),99,2,9900,'a:1:{s:7:\"puserId\";N;}',NULL,NULL,NULL,1,NULL,0,NULL,4267723,NULL,'Most Popular videos (top 30)',NULL,'',2,0,now(),'1',1,NULL,'','','_DURATION_short _FLAVOR_',NULL,NULL,NULL,now());
-
-
-   
+ 
 INSERT INTO `flavor_asset`(id, partner_id, tags, created_at, updated_at, deleted_at, entry_id, flavor_params_id, status, version, description, width, height, bitrate, frame_rate, size, is_original, file_ext, container_format, video_codec_id)
 VALUES
 ('FA_SBBBTHD',99,'mbr,web',now(),now(),NULL,'_TPSBBBTHD',0,2,'100000','',1280,720,2721,25,11264,0,'flv','flash video','vp6'),
