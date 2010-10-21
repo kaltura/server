@@ -13,30 +13,12 @@ class KalturaFrontController
     {
         $this->dispatcher = KalturaDispatcher::getInstance();
         
-        $this->parseRequest();
+        $this->params = requestUtils::getRequestParams();
         
         $this->service = isset($this->params["service"]) ? $this->params["service"] : null;
 		$this->action = isset($this->params["action"]) ? $this->params["action"] : null;
     }
-    
-    protected function parseRequest()
-    {
-    	$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-    	$pathParts = explode('/', $_SERVER['PHP_SELF']);
-    	$pathParts = array_diff($pathParts, $scriptParts);
-    	
-    	$params = array();
-    	reset($pathParts);
-    	while(current($pathParts))
-    	{
-    		$key = each($pathParts);
-    		$value = each($pathParts);
-    		$params[$key['value']] = $value['value'];
-    	}
-    		
-		$this->params = array_merge($params, $_GET, $_POST);
-    }
-    
+        
 	/**
 	 * Return a singleton KalturaFrontController instance
 	 *
@@ -118,11 +100,22 @@ class KalturaFrontController
                         array_shift($keyArray); // remove the request number
                         $requestKey = implode(":",$keyArray);
                         
+                        /* remarked by Dor - 13/10/2010
+                         * There is no need to remove service and action from the params in case of multirequest
+                         * while they are needed in KalturaResponseCacher
+                         
                         if (in_array($requestKey, array("service", "action"))) // don't add service name and action name to the params
                             continue;
+                        
+                        */ 
                               
                         $listOfRequests[$i]["params"][$requestKey] = $val; // store the param                
-                    }
+                    }                                        
+	            }
+	            
+	            // clientTag param might be used in KalturaResponseCacher
+	            if (isset($this->params['clientTag']) && !isset($listOfRequests[$i]["params"]['clientTag'])) {
+	            	$listOfRequests[$i]["params"]['clientTag'] = $this->params['clientTag'];
 	            }
 	            
 	            // if ks is not set for a specific request, copy the ks from the top params
@@ -185,8 +178,26 @@ class KalturaFrontController
 	        
 	        
 	        try 
-	        {
-	            $currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
+	        {  
+	        	// cached parameters should be different when the request is part of a multirequest
+	        	// as part of multirequest - the cached data is a serialized php object
+	        	// when not part of multirequest - the cached data is the actual response
+	        	$currentParams['multirequest'] = true;
+	        	unset($currentParams['format']);
+	        	
+	        	$cache = new KalturaResponseCacher($currentParams);
+				$cachedResult = $cache->checkCache();
+				if ($cachedResult)
+				{
+					$currentResult = unserialize($cachedResult);
+				}
+				else
+				{		
+	        		$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
+	        		// store serialized resposne in cache
+	        		$cache->storeCache(serialize($currentResult));
+				}	
+	        	
 	        }
 	        catch(Exception $ex)
 	        {

@@ -621,6 +621,7 @@ class MediaService extends KalturaEntryService
 	 */
 	public function flagAction(KalturaModerationFlag $moderationFlag)
 	{
+		KalturaResponseCacher::disableCache();		
 		return parent::flagEntry($moderationFlag, KalturaEntryType::MEDIA_CLIP);
 	}
 	

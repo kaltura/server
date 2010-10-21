@@ -29,6 +29,8 @@ class resetadminpasswordAction extends defPartnerservices2Action
     // TODO - maybe see that the password doesn't change too often 
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		defPartnerservices2baseAction::disableCache();
+		
 		$email = trim ( $this->getPM ( "email" ) );
 		try {	
 			$akp = new adminKuserPeer(); // TODO - why not static ?

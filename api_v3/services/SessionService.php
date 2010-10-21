@@ -26,6 +26,7 @@ class SessionService extends KalturaBaseService
 	 */
 	function startAction($secret, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400 , $privileges = null )
 	{
+		KalturaResponseCacher::disableCache();
 		// make sure the secret fits the one in the partner's table
 		$ks = "";
 		$result = kSessionUtils::startKSession ( $partnerId , $secret , $userId , $ks , $expiry , $type , "" , $privileges );
@@ -48,6 +49,8 @@ class SessionService extends KalturaBaseService
 	 */
 	function endAction()
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$ks = $this->getKs();
 		if($ks)
 			$ks->kill();
@@ -71,6 +74,8 @@ class SessionService extends KalturaBaseService
 	 */
 	function impersonateAction($secret, $impersonatedPartnerId, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400 , $privileges = null )
 	{
+		KalturaResponseCacher::disableCache();
+		
 		// verify partner is allowed to start session for another partner
 		$partners = explode(',', $this->partnerGroup());
 		if(!in_array($impersonatedPartnerId, $partners) || !isset($impersonatedPartnerId) || is_null($impersonatedPartnerId))

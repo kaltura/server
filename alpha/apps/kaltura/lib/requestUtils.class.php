@@ -467,4 +467,22 @@ class requestUtils
 		}
 	}
 	
+	public static function getRequestParams()
+	{
+    	$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
+    	$pathParts = explode('/', $_SERVER['PHP_SELF']);
+    	$pathParts = array_diff($pathParts, $scriptParts);
+    	
+    	$params = array();
+    	reset($pathParts);
+    	while(current($pathParts))
+    	{
+    		$key = each($pathParts);
+    		$value = each($pathParts);
+    		$params[$key['value']] = $value['value'];
+    	}
+    		
+		return array_merge($params, $_GET, $_POST);
+    }
+	
 }

@@ -23,6 +23,8 @@ class AdminUserService extends KalturaBaseService
 	 */
 	function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "" )
 	{
+		KalturaResponseCacher::disableCache();
+		
 		if ($newEmail != "")
 		{
 			if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i', $newEmail))
@@ -67,6 +69,8 @@ class AdminUserService extends KalturaBaseService
 	 */	
 	function resetPasswordAction($email)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		try {
 			$adminKuserPeer = new adminKuserPeer(); // TODO - why not static ?
 			list( $new_password , $new_email) = $adminKuserPeer->resetUserPassword($email);
@@ -105,6 +109,7 @@ class AdminUserService extends KalturaBaseService
 	 */		
 	function loginAction($email, $password)
 	{
+		KalturaResponseCacher::disableCache();
 		
 		try {
 			$adminKuser = adminKuserPeer::adminLogin($email, $password);
@@ -157,6 +162,8 @@ class AdminUserService extends KalturaBaseService
 	 */	
 	function setInitialPasswordAction($hashKey, $newPassword)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		try {
 			$result = adminKuserPeer::setInitialPassword($hashKey, $newPassword);
 		}

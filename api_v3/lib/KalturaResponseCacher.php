@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../../alpha/config/kConf.php');
+require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
 
 class KalturaResponseCacher
 {
@@ -14,13 +15,17 @@ class KalturaResponseCacher
 	
 	protected static $_useCache = true;
 	
-	public function __construct()
+	public function __construct($params = null)
 	{
 		self::$_useCache = kConf::get('enable_cache');
+		$this->_cacheDirectory = rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		
 		if (!self::$_useCache)
 			return;
 			
-		$params = $_GET + $_POST;
+		if (!$params) {
+			$params = requestUtils::getRequestParams();
+		}
 		
 		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
 		if (isset($params['clientTag']))
@@ -56,8 +61,7 @@ class KalturaResponseCacher
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		ksort($this->_params);
 		
-		$keys = array_keys($this->_params);
-		$this->_cacheKey = md5(implode("|", $this->_params).implode("|", $keys));
+		$this->_cacheKey = md5( http_build_query($this->_params) );
 
 		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
@@ -70,29 +74,46 @@ class KalturaResponseCacher
 		self::$_useCache = false;
 	}
 	
-	public function checkOrStart()
+	
+	public function checkCache($cacheHeader = 'cached-dispatcher')
 	{
 		if (!self::$_useCache)
-			return;
+			return false;
 			
 		$startTime = microtime(true);
 		if ($this->hasCache())
 		{
-			$contentType = @file_get_contents($this->_cacheHeadersFilePath);
-			if ($contentType)
-				header("Content-Type: $contentType");
-				
-            $response = @file_get_contents($this->_cacheDataFilePath);
+			$response = @file_get_contents($this->_cacheDataFilePath);
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
-				header("X-Kaltura:cached-dispatcher,$this->_cacheKey,$processingTime");
-				header("Expires: Thu, 19 Nov 2000 08:52:00 GMT");
-				header("Cache-Control" , "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-				header("Pragma" , "no-cache");
-				echo $response;
-				die;
+				header("X-Kaltura:$cacheHeader,$this->_cacheKey,$processingTime", false);
+				return $response;
 			}
+		}
+		
+		return false;				
+	}
+	
+		
+	public function checkOrStart()
+	{
+		if (!self::$_useCache)
+			return;
+					
+		$response = $this->checkCache();
+		
+		if ($response)
+		{
+			if ($contentTypeHdr = @file_get_contents($this->_cacheHeadersFilePath)) {
+				header($contentTypeHdr, true);
+			}	
+			header("Expires: Thu, 19 Nov 2000 08:52:00 GMT", true);
+			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+			header("Pragma: no-cache", true);
+			
+			echo $response;
+			die;
 		}
 		else
 		{
@@ -100,6 +121,7 @@ class KalturaResponseCacher
 		}
 	}
 	
+		
 	public function end()
 	{
 		if (!self::$_useCache)
@@ -121,12 +143,21 @@ class KalturaResponseCacher
 			}
 		}
 		
-		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
-		file_put_contents($this->_cacheHeadersFilePath, $contentType);
-		file_put_contents($this->_cacheDataFilePath, $response);
+		$this->storeCache($response, $contentType);
 		
 		ob_end_flush();
 	}
+	
+	
+	public function storeCache($response, $contentType = null)
+	{
+		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
+		file_put_contents($this->_cacheDataFilePath, $response);
+		if(!is_null($contentType)) {
+			file_put_contents($this->_cacheHeadersFilePath, $contentType);
+		}
+	}
+	
 	
 	private function hasCache()
 	{

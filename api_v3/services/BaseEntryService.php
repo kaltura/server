@@ -298,6 +298,7 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	public function flagAction(KalturaModerationFlag $moderationFlag)
 	{
+		KalturaResponseCacher::disableCache();
 		return parent::flagEntry($moderationFlag);
 	}
 	
@@ -350,6 +351,7 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	public function anonymousRankAction($entryId, $rank)
 	{
+		KalturaResponseCacher::disableCache();
 		return parent::anonymousRankEntry($entryId, null, $rank);
 	}
 	

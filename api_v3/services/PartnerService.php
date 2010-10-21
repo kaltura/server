@@ -30,6 +30,8 @@ class PartnerService extends KalturaBaseService
 	 */
 	function registerAction( KalturaPartner $partner , $cmsPassword = "" )
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$dbPartner = $partner->toPartner();
 		$partner->validatePropertyNotNull("name");
 		$partner->validatePropertyNotNull("adminName");
@@ -136,6 +138,8 @@ class PartnerService extends KalturaBaseService
 	 */
 	function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$c = new Criteria();
 		$c->add ( adminKuserPeer::EMAIL , $adminEmail );
 		$c->add ( adminKuserPeer::PARTNER_ID , $partnerId );

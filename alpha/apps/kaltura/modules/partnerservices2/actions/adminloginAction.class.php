@@ -35,6 +35,8 @@ class adminloginAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		defPartnerservices2baseAction::disableCache();
+		
 		$email = trim ( $this->getPM ( "email" ) );
 		$password = trim (  $this->getPM ( "password" ) );
 		

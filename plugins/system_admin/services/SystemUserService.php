@@ -26,6 +26,8 @@ class SystemUserService extends KalturaBaseService
 	 */
 	function verifyPasswordAction($email, $password)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$user = SystemUserPeer::retrieveByEmail($email);
 		if (!$user)
 			throw new KalturaAPIException(SystemUserErrors::SYSTEM_USER_INVALID_CREDENTIALS); // same error as password not valid
@@ -62,6 +64,8 @@ class SystemUserService extends KalturaBaseService
 	 */
 	function setNewPasswordAction($userId, $password)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$dbSystemUser = SystemUserPeer::retrieveByPK($userId);
 		if (!$dbSystemUser)
 			throw new KalturaAPIException(SystemUserErrors::SYSTEM_USER_NOT_FOUND);

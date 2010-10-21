@@ -2,6 +2,13 @@
 require_once ( "myMultiRequest.class.php");
 class defPartnerservices2baseAction extends kalturaAction
 {
+	protected static $_useCache = true;	
+	
+	public static function disableCache()
+	{
+		self::$_useCache = false;
+	}
+	
 	public function execute()
 	{
 		// can't read using $_REQUEST because the 'myaction' paramter is created in a routing.yml rule
@@ -55,7 +62,7 @@ class defPartnerservices2baseAction extends kalturaAction
 
 	protected function shouldCacheResonse()
 	{
-		return true;	 
+		return self::$_useCache;	 
 	}
 	
 	public function cacheResponse($response)
@@ -65,7 +72,6 @@ class defPartnerservices2baseAction extends kalturaAction
 			return;	
 		}
 		$isStartSession = (@$params['service'] == 'startsession' || strpos($_SERVER['PATH_INFO'],'startsession'));		
-		$isAdminLogin   = (@$params['service'] == 'adminlogin'   || strpos($_SERVER['PATH_INFO'],'adminlogin'));
 
 		$params = $_GET + $_POST;
 		
@@ -85,7 +91,7 @@ class defPartnerservices2baseAction extends kalturaAction
 		if ($validUntil && $validUntil < time())
 			return;
 			
-		if ($isAdminLogin || ($uid != "0" && $uid != "" && !$isStartSession))
+		if ($uid != "0" && $uid != "" && !$isStartSession)
 			return;
 	
 		unset($params['ks']);

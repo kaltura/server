@@ -379,6 +379,8 @@ class DocumentsService extends KalturaEntryService
 	 */
 	public function serveAction($entryId, $flavorAssetId = null, $forceProxy = false)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		entryPeer::setDefaultCriteriaFilter();
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
@@ -426,6 +428,8 @@ class DocumentsService extends KalturaEntryService
 	 */
 	public function serveByFlavorParamsIdAction($entryId, $flavorParamsId = null, $forceProxy = false)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		entryPeer::setDefaultCriteriaFilter();
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 

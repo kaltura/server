@@ -33,6 +33,8 @@ class updateadminpasswordAction extends defPartnerservices2Action
     
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		defPartnerservices2baseAction::disableCache();
+		
 		$email = trim ( $this->getPM ( "adminKuser_email" ) );
 		$new_email = trim ( $this->getP ( "new_email" ) );
 		$old_password = trim (  $this->getPM ( "adminKuser_password" , null ) );

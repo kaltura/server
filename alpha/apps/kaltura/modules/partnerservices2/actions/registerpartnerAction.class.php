@@ -43,6 +43,8 @@ class registerpartnerAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		defPartnerservices2baseAction::disableCache();
+		
 		$partner = new Partner();
 		$obj_wrapper = objectWrapperBase::getWrapperClass( $partner , 0 );
 
