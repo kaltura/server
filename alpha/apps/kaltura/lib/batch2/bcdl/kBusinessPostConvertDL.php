@@ -348,9 +348,15 @@ class kBusinessPostConvertDL
 			if($siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT && $siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_POSTCONVERT)
 				continue;
 					
-			// found job that not failed, no need to fail the root job
-			if($siblingJob->getStatus() != BatchJob::BATCHJOB_STATUS_FAILED && $siblingJob->getStatus() != BatchJob::BATCHJOB_STATUS_FATAL)
-				return false;
+			// found child flavor asset that hasn't failed, no need to fail the root job
+			$siblingFlavorAssetId = $siblingJob->getData()->getFlavorAssetId();
+			$siblingFlavorAsset = flavorAssetPeer::retrieveById($siblingFlavorAssetId);
+			if ($siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
+				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE &&
+				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
+				{
+					return false;
+				}
 		}
 				
 		// all conversions failed, should fail the root job
