@@ -57,6 +57,21 @@ class kProvisionJobData
 	 */
 	private $mediaType;
 	
+	/**
+	 * @var string
+	 */
+	private $primaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	private $secondaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	private $streamName;
+	
 	
 	/**
 	 * @return the $streamID
@@ -129,7 +144,7 @@ class kProvisionJobData
 	{
 		return $this->returnVal;
 	}
-	
+			
 	/**
 	 * @return the $mediaType
 	 */
@@ -137,6 +152,30 @@ class kProvisionJobData
 	{
 		return $this->mediaType;
 	}
+	
+	/**
+	 * @return the $primaryBroadcastingUrl
+	 */
+	public function getPrimaryBroadcastingUrl()
+	{
+		return $this->primaryBroadcastingUrl;
+	}
+	
+	/**
+	 * @return the $secondaryBroadcastingUrl
+	 */
+	public function getSecondaryBroadcastingUrl()
+	{
+		return $this->secondaryBroadcastingUrl;
+	}
+	
+	/**
+	 * @return the $streamName
+	 */
+	public function getStreamName()
+	{
+		return $this->streamName;
+	}	
 
 	/**
 	 * @param $streamID the $streamID to set
@@ -217,6 +256,31 @@ class kProvisionJobData
 	{
 		$this->mediaType = $mediaType;
 	}
+	
+	/**
+	 * @param $primaryBroadcastingUrl the $primaryBroadcastingUrl to set
+	 */
+	public function setPrimaryBroadcastingUrl($primaryBroadcastingUrl)
+	{
+		$this->primaryBroadcastingUrl = $primaryBroadcastingUrl;
+	}
+	
+	/**
+	 * @param $secondaryBroadcastingUrl the $secondaryBroadcastingUrl to set
+	 */
+	public function setSecondaryBroadcastingUrl($secondaryBroadcastingUrl)
+	{
+		$this->secondaryBroadcastingUrl = $secondaryBroadcastingUrl;
+	}
+	
+	/**
+	 * @param $streamName the $streamName to set
+	 */
+	public function setStreamName($streamName)
+	{
+		$this->streamName = $streamName;
+	}	
+	
 }
 
 ?>

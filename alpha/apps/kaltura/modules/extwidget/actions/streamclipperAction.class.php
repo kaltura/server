@@ -19,8 +19,8 @@ class streamclipperAction extends kalturaAction
 			die;
 		}
 				
-		$file = "{$entry_id}_1@" . $entry->getStreamRemoteId();
-		$streamer = 'rtmp://cp' . $entry->getStreamUsername() . '.live.edgefcs.net/live/';
+		$file = $entry->getStreamName();
+		$streamer = $entry->getStreamUrl();
 		$this->logMessage( "streamclipper: serving entry [$entry_id] file[$file] streamer[$streamer]" , "warning" );
 		
 		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>

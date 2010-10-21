@@ -452,8 +452,7 @@ class playManifestAction extends kalturaAction
 				$streamId = $this->entry->getStreamRemoteId();
 				$streamUsername = $this->entry->getStreamUsername();
 				
-				// TODO - shouldn't be hard coded - maybe get from the entry to support different providers
-				$baseUrl = "rtmp://cp{$streamUsername}.live.edgefcs.net/live";
+				$baseUrl = $this->entry->getStreamUrl();
 				$flavors = $this->entry->getStreamBitrates();
 				if(count($flavors))
 				{

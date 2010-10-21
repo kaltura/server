@@ -1189,6 +1189,9 @@ class kFlowHelper
 		$entry->setStreamUrl($data->getRtmp());
 		$entry->setStreamRemoteId($data->getStreamID());
 		$entry->setStreamRemoteBackupId($data->getBackupStreamID());
+		$entry->setPrimaryBroadcastingUrl($data->getPrimaryBroadcastingUrl());
+		$entry->setSecondaryBroadcastingUrl($data->getSecondaryBroadcastingUrl());	
+		$entry->setStreamName($data->getStreamName());
 	
 		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_READY);
 		return $dbBatchJob; 	

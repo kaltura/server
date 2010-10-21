@@ -19,11 +19,12 @@ class LiveStreamService extends KalturaEntryService
 	 * 
 	 * @action add
 	 * @param KalturaLiveStreamAdminEntry $liveStreamEntry Live stream entry metadata  
+	 * @param KalturaSourceType $sourceType  Live stream source type
 	 * @return KalturaLiveStreamAdminEntry The new live stream entry
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 */
-	function addAction(KalturaLiveStreamAdminEntry $liveStreamEntry, KalturaSourceType $sourceType = null)
+	function addAction(KalturaLiveStreamAdminEntry $liveStreamEntry, $sourceType = null)
 	{
 		//TODO: allow sourceType that belongs to LIVE entries only - same for mediaType
 		if ($sourceType) {

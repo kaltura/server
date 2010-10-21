@@ -57,6 +57,21 @@ class KalturaProvisionJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $mediaType;
+	
+	/**
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	public $streamName;
     
 	private static $map_between_objects = array
 	(
@@ -70,6 +85,9 @@ class KalturaProvisionJobData extends KalturaJobData
 		"endDate",
 		"returnVal",
 		"mediaType",
+		"primaryBroadcastingUrl",
+		"secondaryBroadcastingUrl",
+		"streamName",
 	);
 
 	public function getMapBetweenObjects ( )

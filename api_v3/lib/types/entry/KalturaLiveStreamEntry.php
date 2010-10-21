@@ -35,12 +35,30 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $bitrates;
 	
+	/**
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl;
+	
+	/**
+	 * @var string
+	 */
+	public $streamName;
+	
 	
 	private static $map_between_objects = array
 	(
 		"offlineMessage",
 		"streamRemoteId",
 	 	"streamRemoteBackupId",
+		"primaryBroadcastingUrl",
+		"secondaryBroadcastingUrl",
+		"streamName",
 	);
 
 	public function __construct()

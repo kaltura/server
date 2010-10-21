@@ -179,13 +179,6 @@ class kJobsManager
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry)
 	{
-		$data = array(
-	 		'EncoderIP' => $entry->getEncodingIP1(),
-	 		'BackupEncoderIP' => $entry->getEncodingIP2(),
-	 		'EncoderPassword' => $entry->getStreamPassword(),
-	 		'EncoderUsername' => $entry->getStreamUsername(),
-	 		'EndDate' => $entry->getEndDate(null),
-		);
 		
  		$jobData = new kProvisionJobData();
  		$jobData->setEncoderIP($entry->getEncodingIP1());
@@ -193,7 +186,7 @@ class kJobsManager
  		$jobData->setEncoderPassword($entry->getStreamPassword());
  		$jobData->setEncoderUsername($entry->getStreamUsername());
  		$jobData->setEndDate($entry->getEndDate(null));
- 		
+ 		$jobData->setMediaType($entry->getMediaType()); 		
  		
 		$batchJob = null;
 		if($parentJob)

@@ -1533,6 +1533,15 @@ class entry extends Baseentry implements ISyncableFile
 	public function setStreamUrl ( $v )	{	$this->putInCustomData ( "streamUrl" , $v );	}
 	public function getStreamUrl (  )		{	return $this->getFromCustomData( "streamUrl" );	}
 	
+	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
+	public function getPrimaryBroadcastingUrl (  )		{	return $this->getFromCustomData( "primaryBroadcastingUrl" );	}
+	
+	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
+	public function getSecondaryBroadcastingUrl (  )	{	return $this->getFromCustomData( "secondaryBroadcastingUrl" );	}
+	
+	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName" );	}
+	
 	public function setStreamBitrates (array $v )	{	$this->putInCustomData ( "streamBitrates" , $v );	}
 	public function getStreamBitrates (  )		{	return $this->getFromCustomData( "streamBitrates" );	}
 	
