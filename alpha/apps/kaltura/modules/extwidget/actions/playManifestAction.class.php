@@ -459,12 +459,12 @@ class playManifestAction extends kalturaAction
 					foreach($flavors as $index => $flavor)
 					{
 						$brIndex = $index + 1;
-						$flavors[$index]['url'] = "{$this->entryId}_{$brIndex}@{$streamId}";
+						$flavors[$index]['url'] = str_replace('%i', $brIndex, $this->entry->getStreamName());
 					}
 				}
 				else
 				{
-					$flavors[0]['url'] = "{$this->entryId}_1@{$streamId}";
+					$flavors[0]['url'] = str_replace('%i', '1', $this->entry->getStreamName());
 				}
 				
 				if (strpos($this->protocol, "rtmp") === 0)
