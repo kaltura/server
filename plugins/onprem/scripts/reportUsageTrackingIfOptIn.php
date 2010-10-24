@@ -11,7 +11,7 @@ if (!kConf::get('usage_tracking_optin')) {
 		
 $post_parameters = queryUsageReport(QUERIES_FILE);
 $post_parameters['install_id'] = kConf::get('installation_id');
-$post_parameters['report_admin_email'] = kConf::get('report_admin_email');
+$post_parameters['report_admin_email'] = str_replace('@','', kConf::get('report_admin_email'));
 $post_parameters['package_version'] = kConf::get('kaltura_version');
 foreach (array_keys($post_parameters) as $key) {
 	echo "$key = $post_parameters[$key]".PHP_EOL;
@@ -75,7 +75,9 @@ function addPostParameters(&$post_parameters, $statement, $array_name) {
 
 // send a usage tracking report with the given $post_parameters
 function sendReport($url, $post_parameters) {
-	if (extension_loaded("curl")) {		
+	if (!extension_loaded("curl")) {		
+		echo "Failed to send usage tracking report, curl extension is not loaded".PHP_EOL;	
+	} else {
 		// create a new cURL resource
 		$ch = curl_init();		
 		
@@ -93,7 +95,8 @@ function sendReport($url, $post_parameters) {
 		if ($result) {
 			echo "Succefully sent usage tracking report".PHP_EOL;
 		} else {
-			echo "Failed to send usage tracking report".PHP_EOL;		
+			echo "Failed to send usage tracking report".PHP_EOL;	
+			echo curl_error($ch).PHP_EOL;
 		}
 		
 		// close cURL resource, and free up system resources
