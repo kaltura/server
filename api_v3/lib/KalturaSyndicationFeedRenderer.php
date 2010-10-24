@@ -303,7 +303,7 @@ class KalturaSyndicationFeedRenderer
 		$yahooFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
 		$yahooFeed[] = $this->generateFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
 		
-		while($entry = $feedRenderer->getNextEntry())
+		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -436,7 +436,7 @@ class KalturaSyndicationFeedRenderer
 		header ("content-type: text/xml; charset=utf-8");
 		$tubeMoguleFeed[] = $this->generateOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
 		$tubeMoguleFeed[] = $this->generateOpenXmlNode('channel',1);
-		while($entry = $feedRenderer->getNextEntry())
+		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -544,7 +544,7 @@ class KalturaSyndicationFeedRenderer
 			$itunesFeed[] = $this->generateClosingXmlNode('itunes:category', 2);
 		}
 		
-		while($entry = $feedRenderer->getNextEntry())
+		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -593,7 +593,7 @@ class KalturaSyndicationFeedRenderer
 		
 		$googleFeed[] = $this->generateOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
 		'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1" ));
-		while($entry = $feedRenderer->getNextEntry())
+		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);			
