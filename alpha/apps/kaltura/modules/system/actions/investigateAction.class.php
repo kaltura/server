@@ -112,7 +112,7 @@ class investigateAction extends kalturaSystemAction
 		$this->batch_jobs  = $original_batch_jobs ; // new genericObjectWrapper( $original_batch_jobs );
 
 		// use this as a refernece of all the directories
-		myBatchFileConverterServer::init( true );
+//		myBatchFileConverterServer::init( true );
 		
 		$entry_patttern = "/" . $entry_id . "\\..*/";
 		$getFileData_method = array ( 'kFile' , 'getFileData' );
