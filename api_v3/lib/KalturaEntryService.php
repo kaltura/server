@@ -224,9 +224,6 @@ class KalturaEntryService extends KalturaBaseService
 		$this->fixFilterUserId($filter);
 		$this->fixFilterDuration($filter);
 		
-		// this will change the way we filter the entries
-		entryFilter::forceMatch( true ); // use the MATCH mechanism
-		
 		$entryFilter = new entryFilter();
 		if(is_null($partnerIdForScope))
 		{
@@ -239,7 +236,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$filter->toObject($entryFilter);
 
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		
 		if($pager)
 			$pager->attachToCriteria($c);
