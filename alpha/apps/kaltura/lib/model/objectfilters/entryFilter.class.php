@@ -7,9 +7,6 @@ class entryFilter extends baseObjectFilter
 	// allow no more than 100 values in IN and NOT_IN clause
 	const MAX_IN_VALUES = 100;
 	
-	// if set to true - the MATCH mechanism will replace the LIKE operators 
-	private static $force_match = false;
-	
 	// this flag will indicate if the uiser_id set in the _eq_user_id field shouyld be translated to kuser_id or not.
 	// if $user_id_is_kuser_id is true, the switch was already done   
 	public $user_id_is_kuser_id = false;
@@ -87,6 +84,7 @@ class entryFilter extends baseObjectFilter
 			"_matchor_categories_ids", // see alias
 			"_matchand_flavor_params_ids",
 			"_matchor_flavor_params_ids",
+			"_notlike_flavor_params_ids",
 			"_matchor_duration_type", // see alias
 			"_eq_document_type", // for document listing in api_v3
 			"_in_document_type", // for document listing in api_v3
@@ -153,11 +151,6 @@ class entryFilter extends baseObjectFilter
 		return entryPeer::ID;
 	}
 	
-
-	public static function forceMatch( $v )
-	{
-		self::$force_match = $v;
-	}
 		
 	public static function hasMachableField ( $field_name )
 	{
@@ -282,5 +275,131 @@ class entryFilter extends baseObjectFilter
 		
 		$this->attachToCriteria($criteria);
 	}
+	
+	public function setIdEquel($v)
+	{
+		$this->set('_eq_id', $v);
+	}
+	
+	public function setIdIn(array $arr)
+	{
+		$this->set('_in_id', $arr);
+	}
+	
+	public function setStatusEquel($v)
+	{
+		$this->set('_eq_status', $v);
+	}
+	
+	public function setStatusNot($v)
+	{
+		$this->set('_not_status', $v);
+	}
+	
+	public function setStatusIn(array $arr)
+	{
+		$this->set('_in_status', $arr);
+	}
+	
+	public function setStatusNotIn(array $arr)
+	{
+		$this->set('_notin_status', $arr);
+	}
+	
+	public function setUserIdEquel($v)
+	{
+		$this->set('_eq_user_id', $v);
+	}
+	
+	public function setTypeEquel($v)
+	{
+		$this->set('_eq_type', $v);
+	}
+	
+	public function setTypeIn(array $arr)
+	{
+		$this->set('_in_type', $arr);
+	}
+	
+	public function setMediaTypeEquel($v)
+	{
+		$this->set('_eq_media_type', $v);
+	}
+	
+	public function setMediaTypeIn(array $arr)
+	{
+		$this->set('_in_media_type', $arr);
+	}
+	
+	public function setModerationStatusEquel($v)
+	{
+		$this->set('_eq_moderation_status', $v);
+	}
+	
+	public function setModerationStatusNot($v)
+	{
+		$this->set('_not_moderation_status', $v);
+	}
+	
+	public function setModerationStatusIn(array $arr)
+	{
+		$this->set('_in_moderation_status', $arr);
+	}
+	
+	public function setModerationStatusNotIn(array $arr)
+	{
+		$this->set('_notin_moderation_status', $arr);
+	}
+	
+	public function setDurationLessThan($v)
+	{
+		$this->set('_lt_duration', $v);
+	}
+	
+	public function setDurationGreaterThan($v)
+	{
+		$this->set('_gt_duration', $v);
+	}
+	
+	public function setDurationLessThanOrEquel($v)
+	{
+		$this->set('_lte_duration', $v);
+	}
+	
+	public function setDurationGreaterThanOrEquel($v)
+	{
+		$this->set('_gte_duration', $v);
+	}
+	
+	public function setDisplayInSearchEquel($v)
+	{
+		$this->set('_eq_display_in_search', $v);
+	}
+	
+	public function getDisplayInSearchEquel()
+	{
+		$this->get('_eq_display_in_search');
+	}
+	
+	public function unsetDisplayInSearchEquel()
+	{
+		$this->unsetByName('_eq_display_in_search');
+	}
+	
+	public function setPartnerIdEquel($v)
+	{
+		$this->set('_eq_partner_id', $v);
+	}
+	
+	public function setFlavorParamsNotLike($v)
+	{
+		$this->set('_notlike_flavor_params_ids', $v);
+	}
+	
+	public function setFlavorParamsMatchOr($v)
+	{
+		$this->set('_matchor_flavor_params_ids', $v);
+	}
+	
 }
 
