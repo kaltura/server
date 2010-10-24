@@ -162,6 +162,7 @@ class KalturaSyndicationFeedRenderer
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
+			next($this->entriesCurrentPage);
 			$this->lastEntryIntId = $entry->getIntId();
 			return $entry;
 		}
@@ -172,7 +173,10 @@ class KalturaSyndicationFeedRenderer
 	
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
+		{
+			next($this->entriesCurrentPage);
 			$this->lastEntryIntId = $entry->getIntId();
+		}
 			
 		return $entry;
 	}
@@ -231,6 +235,8 @@ class KalturaSyndicationFeedRenderer
 		$filter = current($this->entryFilters);
 		if(!$filter) // no more filters found
 			return null;
+			
+		next($this->entryFilters);
 			
 		$filter->attachToCriteria($c);
 		return $c;
