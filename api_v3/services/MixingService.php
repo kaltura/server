@@ -355,7 +355,7 @@ class MixingService extends KalturaEntryService
 		foreach($entryDataFromMix as $data)
 			$ids[] = $data["id"];
 
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $ids, Criteria::IN);
 		$c->addAnd(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);					
 		
