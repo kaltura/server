@@ -435,7 +435,6 @@ class myPlaylistUtils
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
 			
-			entryFilter::forceMatch ( true ); // use the MATCH mechanism
 			$entry_filter->attachToCriteria( $c );
 
 			if(self::$attachCriteriaHandler != null)
