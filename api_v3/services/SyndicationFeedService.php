@@ -162,17 +162,16 @@ class SyndicationFeedService extends KalturaBaseService
 	{
 		$feedCount = new KalturaSyndicationFeedEntryCount();
 		
-		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId, true);
-		$feedRenderer->fetchEntriesForFeed(true);
-		$feedCount->totalEntryCount = $feedRenderer->feedTotalEntryCount;
+		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+		$feedCount->totalEntryCount = $feedRenderer->getEntriesCount();
 		
-		unset($feedRenderer);
+		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+		$feedRenderer->addFlavorParamsAttachedFilter();
+		$feedCount->actualEntryCount = $feedRenderer->getEntriesCount();
 		
-		$feedRenderer2 = new KalturaSyndicationFeedRenderer($feedId);
-		$feedRenderer2->fetchEntriesForFeed(true);
-		$feedCount->actualEntryCount = $feedRenderer2->feedTotalEntryCount;
-		
-		$feedCount->requireTranscodingCount = $feedCount->totalEntryCount - $feedCount->actualEntryCount;
+		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+		$feedRenderer->addFlavorParamsMissingFilter();
+		$feedCount->requireTranscodingCount = $feedCount->getEntriesCount();
 		
 		return $feedCount;
 	}
@@ -189,25 +188,21 @@ class SyndicationFeedService extends KalturaBaseService
 	{
 		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId()); // the flavor params can be from partner 0 too
 		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId, null);
-		$feedRenderer->fetchEntriesForFeed();
+		$feedRenderer->addFlavorParamsMissingFilter();
 		
 		$createdJobsIds = array();
 		
 		$flavorParamsId = $feedRenderer->syndicationFeed->flavorParamId;
 		
-		foreach($feedRenderer->getEntries() as $entry)
+		while($entry = $feedRenderer->getNextEntry())
 		{
 			$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
-			if (is_null($originalFlavorAsset))
+			if (!is_null($originalFlavorAsset))
 			{
-				// do not add job for entries with no original flavor
-				continue;
-			}
-			$err = "";
-			$job = kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $flavorParamsId, $err);
-			if($job && is_object($job))
-			{
-				$createdJobsIds[] = $job->getId();
+				$err = "";
+				$job = kBusinessPreConvertDL::decideAddEntryFlavor(null, $entry->getId(), $flavorParamsId, $err);
+				if($job && is_object($job))
+					$createdJobsIds[] = $job->getId();
 			}
 		}
 		return(implode(',', $createdJobsIds));

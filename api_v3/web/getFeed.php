@@ -18,6 +18,7 @@ $feedId = $_GET['feedId'];
 try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
+	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
 	$syndicationFeedRenderer->execute();
 }
 catch(Exception $ex)
