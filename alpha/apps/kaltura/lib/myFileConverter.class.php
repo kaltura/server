@@ -365,8 +365,8 @@ class myFileConverter
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
 
-		$exif_data = exif_read_data($source_file);
-		$orientation = $exif_data["Orientation"];
+		$exif_data = @exif_read_data($source_file);
+		$orientation = isset($exif_data["Orientation"]) ? $exif_data["Orientation"] : 1;
 		
 		switch($orientation)
 		{
