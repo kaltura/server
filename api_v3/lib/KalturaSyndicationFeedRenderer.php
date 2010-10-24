@@ -155,27 +155,35 @@ class KalturaSyndicationFeedRenderer
 	public function getNextEntry()
 	{
 		if(!$this->executed)
+		{
 			$this->entriesCurrentPage = array();
-			
-		$this->lastEntryIntId = null;
+			$this->lastEntryIntId = 0;
+		}
 		
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = $entry->getIntId();
+			$this->lastEntryIntId = max($this->lastEntryIntId, $entry->getIntId());
 			return $entry;
 		}
 			
 		$this->fetchNextPage();
 		if(!$this->entriesCurrentPage)
+		{
+			$this->lastEntryIntId = null;
 			return false;
+		}
 	
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = $entry->getIntId();
+			$this->lastEntryIntId = max($this->lastEntryIntId, $entry->getIntId());
+		}
+		else
+		{
+			$this->lastEntryIntId = null;
 		}
 			
 		return $entry;
