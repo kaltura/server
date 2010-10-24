@@ -171,7 +171,7 @@ class SyndicationFeedService extends KalturaBaseService
 		
 		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
 		$feedRenderer->addFlavorParamsMissingFilter();
-		$feedCount->requireTranscodingCount = $feedCount->getEntriesCount();
+		$feedCount->requireTranscodingCount = $feedRenderer->getEntriesCount();
 		
 		return $feedCount;
 	}
