@@ -64,7 +64,7 @@ class listentriesAction extends defPartnerservices2Action
 		kuserPeer::setUseCriteriaFilter( false );		
 		//entryPeer::setUseCriteriaFilter( false );
 
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 
 		// filter
 		$filter = new entryFilter(  );
