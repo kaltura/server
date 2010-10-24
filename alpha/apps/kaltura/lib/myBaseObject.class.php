@@ -294,11 +294,17 @@ abstract class myBaseObject implements Iterator
 
 	public function set ( $field_name , $field_value )
 	{
+		if(is_array($field_value))
+			$field_value = implode(',', $field_value);
+			
 		$this->setByName( $field_name , $field_value );
 	}
 
 	public function setByName ( $field_name , $field_value )
 	{
+		if(is_array($field_value))
+			$field_value = implode(',', $field_value);
+			
 		if ( $this->isFieldValid ( $field_name , $field_value) )
 		{
 			$this->fields[$field_name] = $field_value;
