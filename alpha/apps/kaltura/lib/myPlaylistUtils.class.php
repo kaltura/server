@@ -147,7 +147,7 @@ class myPlaylistUtils
 				$filter_list_content = $playlist->getDataContent( true );
 			}
 			
-			return self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters );
+			return self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $extra_filters , $detailed );
 		}
 		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
 		{
@@ -162,6 +162,47 @@ class myPlaylistUtils
 		}
 	}
 	
+	public static function getPlaylistFiltersById($playlist_id)
+	{
+		$playlist = entryPeer::retrieveByPK( $playlist_id );
+
+		if ( ! $playlist )
+		{
+			throw new Exception( "Invalid entry id [$playlist_id]" ) ; 
+		}
+		
+		if ( $playlist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		{
+			throw new Exception( "Invalid entry id [$playlist_id]" ) ;
+		}
+		
+		return self::getPlaylistFilters ( $playlist );
+	}
+	
+	public static function getPlaylistFilters(entry $playlist)
+	{
+		if($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML)
+		{
+			$xml = $playlist->getDataContent();
+			if(!$xml)
+				$xml = $playlist->getDataContent(true);
+			
+			return self::getDynamicPlaylistFilters($xml);
+		}
+		else
+		{
+			return self::getStaticPlaylistFilters($playlist);
+		}
+	}
+	
+	public static function getStaticPlaylistFilters(entry $playlist)
+	{
+		$entriesList = explode(',', $playlist->getDataContent());
+		$filter = new entryFilter();
+		$filter->setIdIn($entriesList);
+		
+		return array($filter);
+	}
 	
 	public static function executeStaticPlaylist ( entry $playlist , $extra_filters  = null, $detailed = true )
 	{
@@ -189,7 +230,7 @@ class myPlaylistUtils
 	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $extra_filters = null, $detailed = true)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
-		$c= KalturaCriteria::create("entry");
+		$c= KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->add ( entryPeer::ID , $entry_id_list , Criteria::IN ); 
 		
 		if (!self::$isAdminKs)
@@ -211,7 +252,6 @@ class myPlaylistUtils
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
 			
-			entryFilter::forceMatch ( true ); // use the MATCH mechanism
 			$entry_filter->attachToCriteria( $c );
 			
 			if(self::$attachCriteriaHandler != null)
@@ -301,6 +341,23 @@ class myPlaylistUtils
 </playlist>
  
  */	
+	public static function getDynamicPlaylistFilters($xml)
+	{
+		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
+		if ( ! $list_of_filters ) 
+			return array();
+	
+		$entry_filters = array();
+		foreach ( $list_of_filters as $entry_filter_xml )
+		{
+			$entry_filter = new entryFilter();
+			$entry_filter->fillObjectFromXml( $entry_filter_xml , "_" ); 
+			
+			$entry_filters[] = $entry_filter;
+		}
+		return $entry_filters;
+	}
+	
 	public static function executeDynamicPlaylist ( $partner_id , $xml , $extra_filters = null ,$detailed = true )
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
@@ -603,7 +660,7 @@ HTML;
 			}
 			
 			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
-			self::updateEntryFilter( $entry_filter ,  $partner_id , true );
+			self::updateEntryFilter( $entry_filter ,  $partner_id );
 
 			//$entry_filters[] = $entry_filter;
 			$fields = $entry_filter->fields;
@@ -618,27 +675,22 @@ HTML;
 	}
 	
 	// will update the entry filter according to the partner_id, $use_filter_puser_id and some of the attributes in the entry_filter
-	private static function updateEntryFilter ( $entry_filter , $partner_id , $use_filter_puser_id )
+	private static function updateEntryFilter(entryFilter $entry_filter, $partner_id)
 	{
-		if ( true ) // $use_filter_puser_id )
-		{
-			self::setUser ( $partner_id , $entry_filter );
-		}
+		self::setUser ( $partner_id , $entry_filter );
 		
-				// check if the filter allows search in the kaltura network - if not, restrict to partner_id only 
-		$display_in_search = $entry_filter->get( "_eq_display_in_search");
+		$display_in_search = $entry_filter->getDisplayInSearchEquel();
 	
-//		$allow_partner_only = ( $display_in_search !== null && $display_in_search < 2 );
 		// 2009-07-12, Liron: changed the detfault - prferer partner only unless explicitly defined $display_in_search=2;
 		$allow_partner_only = ( $display_in_search === null || $display_in_search < 2 );
 		if ( $allow_partner_only ) 
 		{
-			$entry_filter->set( "_eq_partner_id" , $partner_id );
-			$entry_filter->setPartnerSearchScope ( $partner_id );
+			$entry_filter->setPartnerIdEquel($partner_id);
+			$entry_filter->setPartnerSearchScope($partner_id);
 		}	
 		else
 		{
-			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
+			$entry_filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		}
 	}
 	
