@@ -24,7 +24,7 @@ values('@SYSTEM_USER_ADMIN_EMAIL@','admin','admin','@SYSTEM_USER_ADMIN_SHA1@','@
 INSERT INTO `partner` VALUES
 (99,'Template KMC account',NULL,NULL,md5('@TEMPLATE_PARTNER_SECRET@'),md5('@TEMPLATE_PARTNER_ADMIN_SECRET@'),-1,2,0,NULL,now(), now(),'@TEMPLATE_PARTNER_ALIAS@',
 NULL,86400,1,'17','Template KMC account','@TEMPLATE_PARTNER_MAIL@','Template KMC account is used to load the default content, players & playlists for a new partner',1,0,0,
-'a:6:{s:24:"defConversionProfileType";s:3:"med";s:22:"defaultAccessControlId";i:1;s:26:"defaultConversionProfileId";i:1;s:14:"enabledPlugins";a:2:{s:5:"audit";b:1;s:8:"metadata";b:1;}s:10:"enableVast";b:1;s:11:"liveEnabled";b:1;}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1,NULL,NULL,1,NULL,'1');
+'a:6:{s:24:"defConversionProfileType";s:3:"med";s:22:"defaultAccessControlId";i:1;s:26:"defaultConversionProfileId";i:1;s:14:"enabledPlugins";a:2:{s:5:"audit";b:0;s:8:"metadata";b:1;}s:10:"enableVast";b:1;s:11:"liveEnabled";b:1;}',NULL,1,NULL,1,NULL,NULL,0,1,0,0,NULL,NULL,1,NULL,NULL,1,NULL,'1');
 
 INSERT INTO `admin_kuser` VALUES (36734,'Template','Template','@TEMPLATE_PARTNER_MAIL@','@TEMPLATE_ADMIN_KUSER_SHA1@','@TEMPLATE_ADMIN_KUSER_SALT@',NULL,NULL,now(),now(),99);
 
