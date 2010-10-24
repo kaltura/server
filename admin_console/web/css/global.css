@@ -72,7 +72,7 @@ div#my_info, div#new_admin { clear: both;}
  table, table td, table th  { border: solid 1px #B7BABC; border-collapse:collapse;}
   tfoot td { height:19px; text-align:center; background: url(../images/sprite.png) repeat-x 0 -91px;}
   @-moz-document url-prefix() { table tfoot td { height:29px; } }
- table tr { background:#F4F4F4; color:#333;}
+ table tr { background:#F7F7F7; color:#333;}
   table tr.odd { background:#FFF;}
    table th, table td { padding: 5px;}
    table th { height:13px;  padding-right:12px; text-align:left; background: #ECECEC url(../images/sprite.png) repeat-x 0 0; white-space:nowrap;}
@@ -239,13 +239,13 @@ div#my_info, div#new_admin { clear: both;}
 
 
 tbody tr:hover td { background:#D8EAEF;}
+ 
+ tbody tr.additionalData td { max-width:1450px; padding-bottom:30px; overflow:visible; background:#f4f4f4;}
+  tbody tr.additionalData:hover > td { background:#f4f4f4;}
+  tbody tr.additionalData table { position:relative; z-index:33; margin: 5px 0 10px 50px; min-width:500px;}
+   tbody tr.additionalData table tr td { background:#fff;}
+    tbody tr.additionalData table tr:hover td { background:#D8EAEF;}
 
- tbody tr.additionalData table { margin: 5px 0 10px 50px; min-width:500px;}
-  tbody tr.additionalData table tr td { max-width:none; background:#fcfcfc !important; }
-   tbody tr.additionalData.even td { background:#F4F4F4;}
-    tbody tr.additionalData table tr:hover td { background:#D8EAEF !important;}
-	 tbody tr.additionalData.even:hover td { background:#F4F4F4;}
-	 tbody tr.additionalData.odd:hover td { background:#fff;}
 
 form#new_account { width:350px; padding-top:15px; display:table; clear:both;}
  form#new_account fieldset { width:305px; padding:15px; margin: 0 0 18px 0; display:block;}
@@ -285,7 +285,7 @@ body#monitoring-xymon {}
  body#monitoring-xymon #wrapper { margin: 0 auto;}
   body#monitoring-xymon table { min-width:99px; margin: 10px 0 20px;}
    body#monitoring-xymon table, body#monitoring-xymon td, body#monitoring-xymon th { border: 0 }
-   body#monitoring-xymon tbody td { max-width:100%; overflow:visible;}
+   body#monitoring-xymon tbody td { max-width:1450px; overflow:visible;}
    body#monitoring-xymon tbody tr:hover td { background: transparent; }
    body#monitoring-xymon th { background: transparent; }
     body#monitoring-xymon hr { margin: 0 0 10px;}
@@ -402,3 +402,5 @@ body#monitoring-enable-disable table table, body#monitoring-enable-disable table
  body#monitoring-enable-disable input[type="checkbox"] { margin:0;}
 
 body#index-testme #wrapper { display:block;}
+
+table table td.commandLines { width }
