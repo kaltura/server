@@ -92,7 +92,7 @@ abstract class AJAX_getObjectsAction //extends sfAction
 		if ( $base_criteria != null )
 			$c = $base_criteria;
 		else
-			$c = KalturaCriteria::create("entry");
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		
 		$filter->addSearchMatchToCriteria( $c , $keywords , $this->getSearchableColumnName() );
 		// each entity can do specific modifications to the criteria
