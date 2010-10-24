@@ -541,6 +541,24 @@ class SphinxEntryCriteria extends KalturaCriteria
 					}
 					break;
 					
+				case baseObjectFilter::NOT_LIKE:
+					$vals = explode(' ', $val);
+					foreach($vals as $valIndex => $valValue)
+					{
+						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+							unset($vals[$valIndex]);
+						else
+							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+					}
+							
+					if(count($vals))
+					{
+						$val = '!' . implode(' & !', $vals);
+						$this->matchClause[] = "@$sphinxField $val";
+						$filter->unsetByName($field);
+					}
+					break;
+					
 				default:
 					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
 			}
