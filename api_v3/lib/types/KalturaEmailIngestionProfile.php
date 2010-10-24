@@ -33,6 +33,7 @@ class KalturaEmailIngestionProfile extends KalturaObject
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $partnerId;
 
