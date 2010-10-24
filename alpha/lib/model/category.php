@@ -279,7 +279,7 @@ class category extends Basecategory
 		 * categories returned by baseEntry.get and not the search functionality 
 		 * (because search translates categories to ids and use ids to search)   
 		*/ 
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", $this->getId());
 		$entryFilter->attachToCriteria($c);
@@ -300,7 +300,7 @@ class category extends Basecategory
 		$parentCat = $this->getParentCategory();
 		if ($parentCat)
 		{
-			$c = KalturaCriteria::create("entry");
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$entryFilter = new entryFilter();
 			$entryFilter->set("_matchor_categories_ids", $this->getId());
 			$entryFilter->attachToCriteria($c);
@@ -322,7 +322,7 @@ class category extends Basecategory
 	 */
 	private function removeFromEntries()
 	{
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", $this->getId());
 		$entryFilter->attachToCriteria($c);
