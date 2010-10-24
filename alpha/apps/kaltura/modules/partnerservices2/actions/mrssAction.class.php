@@ -84,7 +84,7 @@ class mrssAction extends defPartnerservices2Action
 		// 2460 - dorimedia
 		$partner_list = array ( 593, 2460 );
 		 
-		$c = KalturaCriteria::create("entry");
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
 		
 		// for now display only entries that are part of the kaltura network
