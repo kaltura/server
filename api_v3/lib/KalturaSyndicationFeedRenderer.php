@@ -1,7 +1,6 @@
 <?php
-class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
+class KalturaSyndicationFeedRenderer
 {
-	const MAX_ENTRIES_PER_FEED = 2000;
 	const ENTRY_PEER_LIMIT_QUERY = 100;
 	const LEVEL_INDENTATION = '  ';
 	
@@ -11,138 +10,238 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 	public $syndicationFeed = null;
 	
 	/**
-	 * @var entries
+	 * Array of entry filters, based on playlist or entire entries pool
+	 * @var array
 	 */
-	private $entries = array();
+	private $entryFilters = array();
 	
 	/**
-	 * @var flavor_params
+	 * Stores the current page of entries
+	 * @var array<entry>
 	 */
-	private $flavor;
+	private $entriesCurrentPage = null;
+	
+	/**
+	 * The int id of last entry
+	 * @var int
+	 */
+	private $lastEntryIntId = null;
+	
+	/**
+	 * The critria used currently
+	 * @var KalturaCriteria
+	 */
+	private $currentCriteria = null;
+	
+	/**
+	 * Set to true when executed, filters shouldn't be touched
+	 * @var bool
+	 */
+	private $executed = false;
 	
 	/**
 	 * @var KalturaCriteria
 	 */
-	private $allEntriesCriteria = null;
-	
-	private static $micro_times = array();
-	
-	public $feedTotalEntryCount;
+	private $baseCriteria = null;
 	
 	/**
-	 * ignoreFlavorFilter - if true will list without filter, if false will list with filter
+	 * @var string
 	 */
-	private $_ignoreFlavorFilter = false;
+	private $mimeType = null;
 	
-	public function attachCriteriaHandler(Criteria &$c)
-	{
-		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
-		$entryFilter->addSearchMatchToCriteria( $c , null  , entry::getSearchableColumnName() );
-
-		if($this->_ignoreFlavorFilter === null)
-		{
-			$c->addAnd(entryPeer::SEARCH_TEXT_DISCRETE, '%_FLAVOR_'.$this->syndicationFeed->flavorParamId.'%', Criteria::NOT_LIKE);
-		}
-	}
-	
-	public function getEntries()
-	{
-		return $this->entries;
-	}
-	
-	public function setIgnoreFlavor($value)
-	{
-		$this->_ignoreFlavorFilter = $value;
-	}
-
-	public function __construct($feedId, $ignoreFlavorFilter = false)
+	public function __construct($feedId)
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-		$this->setIgnoreFlavor($ignoreFlavorFilter);
-		
-		self::$micro_times['init'] = microtime(true);
+		$microTimeStart = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- initialize ");
 		
 		// initialize the database for all services
 		DbManager::setConfig(kConf::getDB());
 		DbManager::initialize();
 		
-		if ( ! $this->syndicationFeed )
-		{
-			$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
-			if( !$syndicationFeedDB )
-			{
-				throw new Exception("Feed Id not found");
-			}
-			$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
-			$tmpSyndicationFeed->fromObject($syndicationFeedDB);
-			$this->syndicationFeed = $tmpSyndicationFeed;
-		}
-		
-		if ( ! $this->flavor )
-		{
-			$flavorId = $this->syndicationFeed->flavorParamId;
-			$flavor = flavorParamsPeer::retrieveByPK($flavorId);
-			if(!$flavor)
-			{
-				throw new Exception("flavor id not found with ID $flavorId");
-			}
-			$this->flavor = $flavor;
-		}
-		
-		if( ! $this->allEntriesCriteria && ! $this->syndicationFeed->playlistId )
-		{
-			$c = KalturaCriteria::create("entry");
-
-			// allow entry type 1
-			$criterion_clip = $c->getNewCriterion( entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP ) ;
-			// or entry type 2
-			$criterion_show = $c->getNewCriterion( entryPeer::TYPE, entry::ENTRY_TYPE_SHOW );
-			$criterion_clip->addOr ( $criterion_show ) ;
-			$c->addAnd ( $criterion_clip );
-			$c->addAnd(entryPeer::STATUS, entry::ENTRY_STATUS_READY);
-			$c->addAnd(entryPeer::MODERATION_STATUS, entry::ENTRY_MODERATION_STATUS_REJECTED, Criteria::NOT_EQUAL);
-			$c->addAnd(entryPeer::PARTNER_ID, $this->syndicationFeed->partnerId);
-			$c->addAnd(entryPeer::LENGTH_IN_MSECS, 0, Criteria::GREATER_THAN);
+		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
+		if( !$syndicationFeedDB )
+			throw new Exception("Feed Id not found");
 			
-			$this->addSchedulingToCriteria($c);
+		$tmpSyndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
+		$tmpSyndicationFeed->fromObject($syndicationFeedDB);
+		$this->syndicationFeed = $tmpSyndicationFeed;
+		
+		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 
-			if($this->_ignoreFlavorFilter === false)
-			{
-				$entryFilter = new entryFilter();
-				$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
-				$entryFilter->set ( "_matchand_flavor_params_ids" , $this->syndicationFeed->flavorParamId );
-				$entryFilter->attachToCriteria( $c );			
-			}
+		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
+		$startDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::START_DATE, null));
+		$this->baseCriteria->addAnd($startDateCriterion);
 		
-			$this->attachCriteriaHandler($c);
-			$this->allEntriesCriteria = $c;
-		}
+		$endDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::END_DATE, time(), Criteria::GREATER_EQUAL);
+		$endDateCriterion->addOr($this->baseCriteria->getNewCriterion(entryPeer::END_DATE, null));
+		$this->baseCriteria->addAnd($endDateCriterion);
 		
-		self::$micro_times['initdone'] = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- initialization done [".(self::$micro_times['initdone']-self::$micro_times['init'])."]");		
-	}
-	
-	public function fetchEntriesForFeed($count_only = false)
-	{
+		$entryFilter = new entryFilter();
+		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
+		$entryFilter->setStatusEquel(entry::ENTRY_STATUS_READY);
+		$entryFilter->setTypeIn(array(entry::ENTRY_TYPE_MEDIACLIP, entry::ENTRY_TYPE_SHOW));
+		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
+		$entryFilter->setDurationGreaterThan(0);
+			
+		$entryFilter->attachToCriteria($this->baseCriteria);
+			
 		if($this->syndicationFeed->playlistId)
 		{
-			$this->fetchEntriesByPlaylist();
-			$this->feedTotalEntryCount = count($this->entries);
+			$this->entryFilters = myPlaylistUtils::getPlaylistFiltersById($this->syndicationFeed->playlistId);
 		}
 		else
 		{
-			$this->fetchAllEntries($count_only);
+			$this->entryFilters = array();
 		}
+			
+		$microTimeEnd = microtime(true);
+		KalturaLog::info("syndicationFeedRenderer- initialization done [".($microTimeEnd - $microTimeStart)."]");		
+	}
+	
+	public function addFlavorParamsAttachedFilter()
+	{
+		if($this->executed)
+			return;
+			
+		if(!$this->syndicationFeed->flavorParamId)
+			return;
+			
+		$entryFilter = new entryFilter();
+		$entryFilter->setFlavorParamsMatchOr($this->syndicationFeed->flavorParamId);
+		$entryFilter->attachToCriteria($this->baseCriteria);
+	}
+	
+	public function addFlavorParamsMissingFilter()
+	{
+		if($this->executed)
+			return;
+		
+		if(!$this->syndicationFeed->flavorParamId)
+		{
+			$this->baseCriteria->add(entryPeer::ID, false); // return no results
+			return;
+		}
+			
+		$entryFilter = new entryFilter();
+		$entryFilter->setFlavorParamsNotLike($this->syndicationFeed->flavorParamId);
+		$entryFilter->attachToCriteria($this->baseCriteria);
+	}
+	
+	public function getEntriesCount()
+	{
+		if($this->executed)
+			return null;
+		
+		if(!count($this->entryFilters))
+		{
+			$c = clone $this->baseCriteria;
+			$c->applyFilters();
+			return $c->getRecordsCount();
+		}
+		
+		$count = 0;
+		foreach($this->entryFilters as $entryFilter)
+		{
+			$c = clone $this->baseCriteria;
+			$entryFilter->attachToCriteria($c);
+			$c->applyFilters();
+			$count += $c->getRecordsCount();
+		}
+		return $count;
+	}
+	
+	public function getNextEntry()
+	{
+		if(!$this->executed)
+			$this->entriesCurrentPage = array();
+			
+		$this->lastEntryIntId = null;
+		
+		$entry = current($this->entriesCurrentPage);
+		if($entry)
+		{
+			$this->lastEntryIntId = $entry->getIntId();
+			return $entry;
+		}
+			
+		$this->fetchNextPage();
+		if(!$this->entriesCurrentPage)
+			return false;
+	
+		$entry = current($this->entriesCurrentPage);
+		if($entry)
+			$this->lastEntryIntId = $entry->getIntId();
+			
+		return $entry;
+	}
+	
+	private function fetchNextPage()
+	{
+		$this->entriesCurrentPage = null;
+		
+		if($this->currentCriteria)
+		{
+			if($this->lastEntryIntId)
+				$this->currentCriteria->add(entryPeer::INT_ID, $this->lastEntryIntId, Criteria::GREATER_THAN);
+		}
+		else
+		{
+			$this->currentCriteria = $this->getNextCriteria();
+			
+			if(!$this->currentCriteria)
+				return;
+		}
+			
+		$nextPage = entryPeer::doSelect($this->currentCriteria);
+		if(!count($nextPage)) // move to the next criteria
+		{
+			$this->currentCriteria = $this->getNextCriteria();
+			if(!$this->currentCriteria)
+				return;
+			
+			$nextPage = entryPeer::doSelect($this->currentCriteria);
+		}
+		
+		if(!count($nextPage)) // finished all criterias and pages
+			return;
+		
+		$this->entriesCurrentPage = $nextPage;
+	}
+	
+	private function getNextCriteria()
+	{
+		if(!$this->executed && count($this->entryFilters))
+			reset($this->entryFilters);
+			
+		$this->executed = true;
+		
+		$c = clone $this->baseCriteria;
+		$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+		
+		if(!count($this->entryFilters))
+		{
+			if($this->currentCriteria) // already executed the base criteria
+				return null;
+				
+			return $c; // return the base criteria
+		}
+			
+		$filter = current($this->entryFilters);
+		if(!$filter) // no more filters found
+			return null;
+			
+		$filter->attachToCriteria($c);
+		return $c;
 	}
 	
 	public function execute()
 	{
-		$this->fetchEntriesForFeed();
-		
-		self::$micro_times['startRender'] = microtime(true);
+		if($this->executed)
+			return;
+			
+		$microTimeStart = microtime(true);
 		
 		switch($this->syndicationFeed->type)
 		{
@@ -160,70 +259,8 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 				break;
 		}
 		
-		self::$micro_times['startRenderDone'] = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is ".
-				 (self::$micro_times['startRenderDone']-self::$micro_times['startRender']));
-	}
-	
-	private function fetchAllEntries($count_only = false)
-	{
-		self::$micro_times['fecthEntries'] = microtime(true);
-		
-		ini_set('memory_limit', '128M');
-		$peerSelectLimit = self::ENTRY_PEER_LIMIT_QUERY;
-		
-		$entryCount = entryPeer::doCount($this->allEntriesCriteria);
-		$feedCountLimit = ($entryCount > self::MAX_ENTRIES_PER_FEED)? self::MAX_ENTRIES_PER_FEED: $entryCount;
-		
-		$this->feedTotalEntryCount = $feedCountLimit;
-		if($count_only)
-		{
-			return;
-		}
-
-		$iterator = 0;
-		$entries = array();
-		while(count($this->entries) < $feedCountLimit)
-		{
-			$this->allEntriesCriteria->setOffset($iterator);
-			$this->allEntriesCriteria->setLimit($peerSelectLimit);
-			
-			$entries = entryPeer::doSelect($this->allEntriesCriteria);
-			if(!count($entries) || !$entries)
-			{
-				break;
-			}
-			$this->entries = array_merge($this->entries, $entries);
-			$entries = array();
-			$iterator += $peerSelectLimit;
-		}
-		
-		self::$micro_times['fecthEntriesDone'] = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- fetched entries [".(self::$micro_times['fecthEntriesDone']-self::$micro_times['fecthEntries'])."]");
-	}
-	
-	private function fetchEntriesByPlaylist($detailed = false)
-	{
-		self::$micro_times['executePlaylist'] = microtime(true);
-		
-		$extraFilters = array();
-		
-		// partner scope is always relevant because the executePlaylistById uses the entryFilter
-		// from the exterlaFilters it gets
-		$entryFilter = new entryFilter();
-		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
-		if($this->_ignoreFlavorFilter === false)
-		{
-			$entryFilter->set ( "_matchor_flavor_params_ids" , $this->syndicationFeed->flavorParamId );
-		}
-		$extraFilters[1] = $entryFilter;
-
-		myPlaylistUtils::setAttachCriteriaHandler($this);
-
-		$this->entries = myPlaylistUtils::executePlaylistById( $this->syndicationFeed->partnerId , $this->syndicationFeed->playlistId , $extraFilters , $detailed );
-		if(!$this->entries) $this->entries = array();
-		self::$micro_times['executePlaylistDone'] = microtime(true);
-		KalturaLog::info("syndicationFeedRenderer- playlist executed [".(self::$micro_times['executePlaylistDone']-self::$micro_times['executePlaylist'])."]");
+		$microTimeEnd = microtime(true);
+		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is " . ($microTimeEnd - $microTimeStart));
 	}
 	
 	private function stringToSafeXml($string, $now = false)
@@ -265,7 +302,8 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		$yahooFeed[] = $this->generateFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
 		$yahooFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
 		$yahooFeed[] = $this->generateFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
-		foreach($this->entries as $entry)
+		
+		while($entry = $feedRenderer->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -338,7 +376,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		if(!$partner)
 			return null;
 	
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($kalturaEntry->id,$this->flavor->getId());
+		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($kalturaEntry->id,$this->syndicationFeed->flavorParamId);
 		if(!$flavorAsset)
 			return null;
 					
@@ -398,7 +436,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		header ("content-type: text/xml; charset=utf-8");
 		$tubeMoguleFeed[] = $this->generateOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
 		$tubeMoguleFeed[] = $this->generateOpenXmlNode('channel',1);
-		foreach($this->entries as $entry)
+		while($entry = $feedRenderer->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -429,6 +467,28 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 
 	private function renderITunesFeed()
 	{
+		if(is_null($this->mimeType))
+		{
+			$flavor = flavorParamsPeer::retrieveByPK($this->syndicationFeed->flavorParamId);
+			if(!$flavor)
+				throw new Exception("flavor not found for id " . $this->syndicationFeed->flavorParamId);
+		
+			switch($flavor->getFormat())
+			{
+				case 'mp4':
+					$this->mimeType = 'video/mp4';
+					break;
+				case 'm4v':
+					$this->mimeType = 'video/x-m4v';
+					break;
+				case 'mov':
+					$this->mimeType = 'video/quicktime';
+					break;
+				default:
+					$this->mimeType = 'video/mp4';
+			}
+		}
+		
 		$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
 		header ("content-type: text/xml; charset=utf-8");
 		$itunesFeed[] = '<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;
@@ -484,7 +544,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 			$itunesFeed[] = $this->generateClosingXmlNode('itunes:category', 2);
 		}
 		
-		foreach($this->entries as $entry)
+		while($entry = $feedRenderer->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
@@ -496,25 +556,11 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 			$itunesFeed[] = $this->generateFullXmlNode('guid', $url, 3);
 			$itunesFeed[] = $this->generateFullXmlNode('pubDate', date('r',$e->createdAt), 3);
 			$itunesFeed[] = $this->generateFullXmlNode('description', $this->stringToSafeXml($e->description), 3);
-			
-			switch($this->flavor->getFormat())
-			{
-				case 'mp4':
-					$mime = 'video/mp4';
-					break;
-				case 'm4v':
-					$mime = 'video/x-m4v';
-					break;
-				case 'mov':
-					$mime = 'video/quicktime';
-					break;
-				default:
-					$mime = 'video/mp4';
-			}
+
 			$enclosure_attr = array(
 				'url'=> $url,
 				//'length'=>$entry->getLengthInMsecs(), removed by Noa, 25/08/10: we'll need to place here file size (of flavor asset).
-				'type'=> $mime,
+				'type'=> $this->mimeType,
 			);
 			$itunesFeed[] = $this->generateFullXmlNode('enclosure', '', 3, $enclosure_attr);
 			
@@ -547,7 +593,7 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		
 		$googleFeed[] = $this->generateOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
 		'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1" ));
-		foreach($this->entries as $entry)
+		while($entry = $feedRenderer->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);			
@@ -587,17 +633,4 @@ class KalturaSyndicationFeedRenderer implements IKalturaPlaylistUtils
 		$googleFeed[] = $this->generateClosingXmlNode('urlset');
 		echo implode('', $googleFeed);
 	}
-	
-	private function addSchedulingToCriteria(Criteria $c)
-	{
-		$startDateCriterion = $c->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
-		$startDateCriterion->addOr($c->getNewCriterion(entryPeer::START_DATE, null));
-		
-		$endDateCriterion = $c->getNewCriterion(entryPeer::END_DATE, time(), Criteria::GREATER_EQUAL);
-		$endDateCriterion->addOr($c->getNewCriterion(entryPeer::END_DATE, null));
-		
-		$c->addAnd($startDateCriterion);
-		$c->addAnd($endDateCriterion);
-	}	
-	
 }
