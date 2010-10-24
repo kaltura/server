@@ -31,6 +31,7 @@ abstract class baseObjectFilter extends myBaseObject
 	const GTE_OR_NULL = "gteornull";
 	const EQ = "eq";
 	const LIKE = "like";
+	const NOT_LIKE = "notlike";
 	const XLIKE = "xlike";
 	const LIKEX = "likex";
 	const IN = "in";
