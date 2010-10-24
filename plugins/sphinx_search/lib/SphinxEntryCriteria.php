@@ -426,7 +426,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					$sphinxFieldNames[] = $sphinxField;
 				}
 				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
-				$vals = array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
+				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
 			}
 			elseif(!self::hasMatchableField($fieldName))
@@ -446,7 +446,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
 				case baseObjectFilter::MATCH_OR:
-					$vals = explode(',', $val);
+					$vals = is_array($val) ? $val : explode(',', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
@@ -464,11 +464,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					break;
 				
 				case baseObjectFilter::NOT_IN:
-					$vals = array();
-					if(is_string($val))
-						$vals = explode(',', $val);
-					elseif(is_array($val))
-						$vals = $val;
+					$vals = is_array($val) ? $val : explode(',', $val);
 						
 					foreach($vals as $valIndex => $valValue)
 					{
@@ -488,11 +484,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					break;
 				
 				case baseObjectFilter::IN:
-					$vals = array();
-					if(is_string($val))
-						$vals = explode(',', $val);
-					elseif(is_array($val))
-						$vals = $val;
+					$vals = is_array($val) ? $val : explode(',', $val);
 						
 					foreach($vals as $valIndex => $valValue)
 					{
@@ -524,7 +516,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 				case baseObjectFilter::MULTI_LIKE_AND:
 				case baseObjectFilter::MATCH_AND:
 				case baseObjectFilter::LIKE:
-					$vals = explode(' ', $val);
+					$vals = is_array($val) ? $val : explode(' ', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
@@ -542,7 +534,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					break;
 					
 				case baseObjectFilter::NOT_LIKE:
-					$vals = explode(' ', $val);
+					$vals = is_array($val) ? $val : explode(' ', $val);
 					foreach($vals as $valIndex => $valValue)
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)

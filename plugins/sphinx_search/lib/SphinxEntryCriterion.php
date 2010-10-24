@@ -114,11 +114,7 @@ class SphinxEntryCriterion extends Criterion
 					break;
 					
 				case Criteria::NOT_IN:
-					$vals = array();
-					if(is_string($value))
-						$vals = explode(',', $val);
-					elseif(is_array($value))
-						$vals = $value;
+					$vals = is_array($value) ? $value : explode(',', $value);
 						
 					foreach($vals as $valIndex => $valValue)
 					{
@@ -137,11 +133,7 @@ class SphinxEntryCriterion extends Criterion
 					break;
 				
 				case Criteria::IN:
-					$vals = array();
-					if(is_string($value))
-						$vals = explode(',', $value);
-					elseif(is_array($value))
-						$vals = $value;
+					$vals = is_array($value) ? $value : explode(',', $value);
 						
 					foreach($vals as $valIndex => $valValue)
 					{
@@ -170,8 +162,7 @@ class SphinxEntryCriterion extends Criterion
 		switch($comparison)
 		{
 			case Criteria::IN:
-				if(!is_array($value))
-					$value = explode(',', $value);
+				$value = is_array($value) ? $value : explode(',', $value);
 					
 				sort($value); // importent, solves sphinx IN bug
 				foreach($value as $valIndex => $valValue)
@@ -183,8 +174,7 @@ class SphinxEntryCriterion extends Criterion
 				break;
 				
 			case Criteria::NOT_IN:
-				if(!is_array($value))
-					$value = explode(',', $value);
+				$value = is_array($value) ? $value : explode(',', $value);
 					
 				foreach($value as $val)
 					$whereClause[] = "$sphinxField != $val";
