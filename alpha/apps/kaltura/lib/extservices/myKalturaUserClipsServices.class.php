@@ -73,7 +73,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 		
 		if ( $should_serach )
 		{
-			$c = KalturaCriteria::create("entry");
+			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$c->add ( entryPeer::KUSER_ID , $kuser_id );
 			$c->add ( entryPeer::MEDIA_TYPE , $media_type );
 			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
