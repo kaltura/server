@@ -31,7 +31,6 @@ abstract class baseObjectFilter extends myBaseObject
 	const GTE_OR_NULL = "gteornull";
 	const EQ = "eq";
 	const LIKE = "like";
-	const NOT_LIKE = "notlike";
 	const XLIKE = "xlike";
 	const LIKEX = "likex";
 	const IN = "in";
@@ -797,7 +796,8 @@ abstract class baseObjectFilter extends myBaseObject
 			$new_value = $colname . " & " . $value;
 			$crit = Criteria::CUSTOM;
 		}
-		elseif ( $operator_str == self::MULTI_LIKE_OR || $operator_str == self::MULTI_LIKE_AND || $operator_str == self::NOT_LIKE )
+		elseif ( $operator_str == self::MULTI_LIKE_OR || 
+		 	$operator_str == self::MULTI_LIKE_AND )
 		{
 			$value = trim(str_replace(array('_','%'),array('\_','\%'), $value));
 			// use every single value (separated by ' ') with %val% 
