@@ -545,7 +545,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 							
 					if(count($vals))
 					{
-						$val = '!' . implode(' & !', $vals);
+						// TODO remove the zero when single NOT will be supported
+						$val = '0 !' . implode(' & !', $vals);
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
 					}
