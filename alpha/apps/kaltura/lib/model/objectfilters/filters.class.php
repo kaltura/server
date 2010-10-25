@@ -797,8 +797,7 @@ abstract class baseObjectFilter extends myBaseObject
 			$new_value = $colname . " & " . $value;
 			$crit = Criteria::CUSTOM;
 		}
-		elseif ( $operator_str == self::MULTI_LIKE_OR || 
-		 	$operator_str == self::MULTI_LIKE_AND )
+		elseif ( $operator_str == self::MULTI_LIKE_OR || $operator_str == self::MULTI_LIKE_AND || $operator_str == self::NOT_LIKE )
 		{
 			$value = trim(str_replace(array('_','%'),array('\_','\%'), $value));
 			// use every single value (separated by ' ') with %val% 
