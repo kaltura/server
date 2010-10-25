@@ -241,13 +241,17 @@ class myFileConverter
 			ini_set("memory_limit","256M");
 		}
 		
-		if ( ! file_exists ($source_file))
+		if(!file_exists($source_file))
 		{
 			KalturaLog::log( "file not found [$source_file]" ) ;
 			return null;	
 		}
 		
-		if($source_file == '/web') return;
+		if(!is_file($source_file))
+		{
+			KalturaLog::log( "path is not file [$source_file]" ) ;
+			return null;	
+		}
 		
 		list($sourcewidth, $sourceheight, $type, $attr) = getimagesize($source_file);
 
