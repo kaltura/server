@@ -169,9 +169,7 @@ class SyndicationFeedService extends KalturaBaseService
 		$feedRenderer->addFlavorParamsAttachedFilter();
 		$feedCount->actualEntryCount = $feedRenderer->getEntriesCount();
 		
-		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
-		$feedRenderer->addFlavorParamsMissingFilter();
-		$feedCount->requireTranscodingCount = $feedRenderer->getEntriesCount();
+		$feedCount->requireTranscodingCount = $feedCount->totalEntryCount - $feedCount->actualEntryCount;
 		
 		return $feedCount;
 	}
@@ -187,14 +185,24 @@ class SyndicationFeedService extends KalturaBaseService
 	public function requestConversionAction($feedId)
 	{
 		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId()); // the flavor params can be from partner 0 too
-		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId, null);
-		$feedRenderer->addFlavorParamsMissingFilter();
+		
+		// find entry ids that already converted to the flavor
+		$feedRendererWithTheFlavor = new KalturaSyndicationFeedRenderer($feedId);
+		$feedRendererWithTheFlavor->addFlavorParamsAttachedFilter();
+		$entriesWithTheFlavor = $feedRendererWithTheFlavor->getEntriesIds();
+		
+		// create filter of the entries that not converted
+		$entryFilter = new entryFilter();
+		$entryFilter->setIdNotIn($entriesWithTheFlavor);
+		
+		// create feed with the new filter
+		$feedRendererToConvert = new KalturaSyndicationFeedRenderer($feedId);
+		$feedRendererToConvert->addFilter($entryFilter);
 		
 		$createdJobsIds = array();
+		$flavorParamsId = $feedRendererToConvert->syndicationFeed->flavorParamId;
 		
-		$flavorParamsId = $feedRenderer->syndicationFeed->flavorParamId;
-		
-		while($entry = $feedRenderer->getNextEntry())
+		while($entry = $feedRendererToConvert->getNextEntry())
 		{
 			$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
 			if (!is_null($originalFlavorAsset))
