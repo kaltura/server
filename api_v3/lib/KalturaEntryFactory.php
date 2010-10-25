@@ -1,6 +1,11 @@
 <?php
 class KalturaEntryFactory
 {
+	/**
+	 * @param int $type
+	 * @param bool $isAdmin
+	 * @return KalturaBaseEntry
+	 */
 	static function getInstanceByType ($type, $isAdmin = false)
 	{
 		switch ($type) 
