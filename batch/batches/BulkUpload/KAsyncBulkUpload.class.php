@@ -606,7 +606,7 @@ class KAsyncBulkUpload extends KBatchBase
 			
 			$bulkUploadResultChunk[] = $bulkUploadResult;
 			
-			$this->kClient->media->addFromBulk($mediaEntry, $bulkUploadResult->url, $job->id, $bulkUploadResult->pluginsData);
+			$this->kClient->media->addFromBulk($mediaEntry, $bulkUploadResult->url, $job->id);
 			$multiRequestCounter ++;
 		}
 		

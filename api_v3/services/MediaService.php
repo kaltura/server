@@ -18,24 +18,14 @@ class MediaService extends KalturaEntryService
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata  
 	 * @param string $url An HTTP or FTP URL
 	 * @param int $bulkUploadId The id of the bulk upload job
-	 * @param KalturaBulkUploadPluginDataArray $pluginDataArray additional data that handled by the plugins
 	 * @return KalturaMediaEntry The new media entry
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 */
-	function addFromBulkAction(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId, KalturaBulkUploadPluginDataArray $pluginDataArray = null)
+	function addFromBulkAction(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
 	{
-		$entry = $this->addDbFromUrl($mediaEntry, $url, $bulkUploadId);
-		
-		if($pluginDataArray && $pluginDataArray->count)
-		{
-			$pluginValues = $pluginDataArray->toValuesArray();
-			if(count($pluginValues))
-				KalturaPluginManager::handleBulkUploadData($entry->id, $pluginValues);
-		}
-		
-		return $entry;
+		return $this->addDbFromUrl($mediaEntry, $url, $bulkUploadId);
 	}
 	
 	/**
