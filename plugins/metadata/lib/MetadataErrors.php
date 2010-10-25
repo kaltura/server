@@ -3,8 +3,6 @@ class MetadataErrors extends KalturaErrors
 {
 	const INVALID_METADATA_PROFILE = "INVALID_METADATA_PROFILE,invalid metadata profile [%s]";
 	
-	const INVALID_METADATA_OBJECT_TYPE = "INVALID_METADATA_OBJECT_TYPE,invalid metadata object type [%s]";
-	
 	const INVALID_METADATA_OBJECT = "INVALID_METADATA_OBJECT,invalid metadata object [%s]";
 	
 	const INVALID_METADATA_DATA = "INVALID_METADATA_DATA,invalid metadata data: %s";
