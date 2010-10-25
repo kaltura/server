@@ -72,7 +72,7 @@ class KAsyncTransformMetadata extends KBatchBase
 			return $job;
 		}
 		
-		if($transformList->lowerVersionCount) // another retry will be needed later
+		if($transformList->lowerVersionCount || $transformList->totalCount) // another retry will be needed later
 		{
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 		}
@@ -92,6 +92,7 @@ class KAsyncTransformMetadata extends KBatchBase
 		}
 		
 		$this->closeJob($job, null, null, "Metadata objects [" . count($transformList->objects) . "] transformed", KalturaBatchJobStatus::RETRY);
+		
 		return $job;
 	}
 	
