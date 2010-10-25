@@ -212,7 +212,7 @@ class kwidgetAction extends sfAction
 		if ( $entry_id == -1 ) $entry_id = null;
 
 		$kdp3 = false;
-		$base_wrapper_swf = myContentStorage::getFSFlashRootPath ()."/kdpwrapper/v11.0/kdpwrapper.swf";
+		$base_wrapper_swf = myContentStorage::getFSFlashRootPath ()."/kdpwrapper/".kConf::get('kdp_wrapper_version')."/kdpwrapper.swf";
 		$widgetIdStr = "widget_id=$widget_id";
 		$partnerIdStr = "partner_id=$partner_id&subp_id=$subp_id";
 		
