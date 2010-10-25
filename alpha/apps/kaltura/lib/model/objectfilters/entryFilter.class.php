@@ -23,6 +23,7 @@ class entryFilter extends baseObjectFilter
 		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_in_id" , 
+			"_notin_id" , 
 			"_eq_id" , 
 			"_eq_user_id" ,  // is in fact the kuser_id - see aliases
 			"_eq_kshow_id" ,
@@ -283,6 +284,11 @@ class entryFilter extends baseObjectFilter
 	public function setIdIn(array $arr)
 	{
 		$this->set('_in_id', $arr);
+	}
+	
+	public function setIdNotIn(array $arr)
+	{
+		$this->set('_notin_id', $arr);
 	}
 	
 	public function setStatusEquel($v)
