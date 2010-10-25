@@ -28,21 +28,17 @@ class kMetadataManager
 	/**
 	 * @param Metadata $object
 	 * 
-	 * @return object returns the object referenced by the peer
+	 * @return BaseObject returns the object referenced by the peer
 	 */
 	public static function getObjectFromPeer($object)
 	{
 		$objectType = $object->getObjectType();
 		$peer = self::getObjectPeer($objectType);
 		if(!$peer)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT_TYPE, $objectType);
+			return null;
 			
 		$objectId = $object->getObjectId();
-		$result = $peer->retrieveByPK($objectId);
-		if(!$result)
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
-
-		return $result;
+		return $peer->retrieveByPK($objectId);
 	}
 	
 	/**
