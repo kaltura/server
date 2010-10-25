@@ -28,6 +28,7 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 			'metadata' => 'MetadataService',
 			'metadataProfile' => 'MetadataProfileService',
 			'metadataBatch' => 'MetadataBatchService',
+			'entryMetadata' => 'EntryMetadataService',
 		);
 		return $map;
 	}
@@ -238,7 +239,9 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
 		{
-			KalturaLog::info("Metadata profile [$metadataProfileId] not found");
+			$errorMessage = "Metadata profile [$metadataProfileId] not found";
+			KalturaLog::err($errorMessage);
+			self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
 			return;
 		}
 		
@@ -250,7 +253,9 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 			}
 			catch(Exception $e)
 			{
-				KalturaLog::err("Download metadata[" . $data[self::BULK_UPLOAD_COLUMN_URL] . "] error: " . $e->getMessage());
+				$errorMessage = "Download metadata[" . $data[self::BULK_UPLOAD_COLUMN_URL] . "] error: " . $e->getMessage();
+				KalturaLog::err($errorMessage);
+				self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
 				$xmlData = null;
 			}
 		}
@@ -283,23 +288,34 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 				$key = $matches[1];
 				if(!isset($metadataProfileFields[$key]))
 				{
-					KalturaLog::debug("No field found for key[$key]");
+					$errorMessage = "No field found for key[$key]";
+					KalturaLog::debug($errorMessage);
+					self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
 					continue;
 				}
 				
 				$metadataProfileField = $metadataProfileFields[$key];
 				KalturaLog::debug("Found field [" . $metadataProfileField->getXpath() . "] for value [$value]");
 				
-				if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($value))
-				{
-					$value = self::parseFormatedDate($value);
-					if(!$value || !strlen($value))
-						continue;
-				}
-
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
 				foreach($fieldValues as $fieldValue)
+				{
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($value))
+					{
+						$value = self::parseFormatedDate($fieldValue);
+						if(!$value || !strlen($value))
+						{
+							$errorMessage = "Could not parse date format [$fieldValue] for field [$key]";
+							KalturaLog::debug($errorMessage);
+							self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
+							continue;
+						}
+							
+						$fieldValue = $value;
+					}
+						
 					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
+				}
 					
 				$dataFound = true;
 			}
@@ -337,19 +353,27 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 		}
 		else
 		{
-			$bulkUploadResult = BulkUploadResultPeer::retrieveByEntryId($entryId, $entry->getBulkUploadId());
-			if($bulkUploadResult)
-			{
-				$msg = $bulkUploadResult->getDescription();
-				if($msg)
-					$msg .= "\n";
-				
-				$msg .= $errorMessage;
-					
-				$bulkUploadResult->setDescription($msg);
-				$bulkUploadResult->save();
-			}
+			self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
 		}
+	}
+	
+	protected static function addBulkUploadResultDescription($entryId, $bulkUploadId, $description)
+	{
+		$bulkUploadResult = BulkUploadResultPeer::retrieveByEntryId($entryId, $bulkUploadId);
+		if(!$bulkUploadResult)
+		{
+			KalturaLog::err("Bulk upload results not found for entry [$entryId]");
+			return;
+		}
+		
+		$msg = $bulkUploadResult->getDescription();
+		if($msg)
+			$msg .= "\n";
+		
+		$msg .= $description;
+			
+		$bulkUploadResult->setDescription($msg);
+		$bulkUploadResult->save();
 	}
 	
 	protected static function addXpath(DOMDocument &$xml, $xPath, $value)
