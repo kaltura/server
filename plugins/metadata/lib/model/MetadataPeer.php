@@ -66,4 +66,21 @@ class MetadataPeer extends BaseMetadataPeer {
 		return MetadataPeer::doSelect($criteria, $con);
 	}
 	
+	/**
+	 * Retrieve all metadta objects of object ids and type.
+	 *
+	 * @param      int $objectType
+	 * @param      array $objectIds
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<Metadata>
+	 */
+	public static function retrieveAllByObjectIds($objectType, array $objectIds, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MetadataPeer::OBJECT_TYPE, $objectType);
+		$criteria->add(MetadataPeer::OBJECT_ID, $objectIds, Criteria::IN);
+
+		return MetadataPeer::doSelect($criteria, $con);
+	}
+	
 } // MetadataPeer
