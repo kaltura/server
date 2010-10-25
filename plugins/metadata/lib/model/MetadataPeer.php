@@ -50,6 +50,32 @@ class MetadataPeer extends BaseMetadataPeer {
 	}
 	
 	/**
+	 * Retrieve all metadta object by profile.
+	 *
+	 * @param      int $metadataProfileId
+	 * @param      int $metadataProfileVersion
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<Metadata>
+	 */
+	public static function retrieveByProfile($metadataProfileId, $metadataProfileVersion = null, PropelPDO $con = null)
+	{
+		if(is_null($metadataProfileVersion))
+		{
+			$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId, $con);
+			if(!$metadataProfile)
+				return null;
+				
+			$metadataProfileVersion = $metadataProfile->getVersion();
+		}
+		
+		$criteria = new Criteria();
+		$criteria->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
+		$criteria->add(MetadataPeer::METADATA_PROFILE_VERSION, $metadataProfileVersion);
+
+		return MetadataPeer::doSelect($criteria, $con);
+	}
+	
+	/**
 	 * Retrieve a single metadta object by object id and type.
 	 *
 	 * @param      int $objectType
