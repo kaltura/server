@@ -43,7 +43,7 @@ class kSphinxSearchManager implements
 		if($object->getObjectType() == Metadata::TYPE_ENTRY)
 		{
 			$entry = kMetadataManager::getObjectFromPeer($object);
-			if ($entry instanceOf entry)
+			if ($entry && $entry instanceOf entry)
 				$this->saveToSphinx($entry, false, true);
 		}
 	}
