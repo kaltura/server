@@ -848,6 +848,12 @@ class kFlowHelper
 			KalturaLog::debug("Saving thumbnail from: " . $data->getThumbPath());
 			// creats thumbnail the file sync
 			$entry = $dbBatchJob->getEntry();
+			if(!$entry)
+			{
+				KalturaLog::err("Entry not found [" . $dbBatchJob->getEntryId() . "]");
+				return;
+			}
+			
 			KalturaLog::debug("Entry duration: " . $entry->getLengthInMsecs());
 			if(!$entry->getLengthInMsecs())
 			{
