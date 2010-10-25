@@ -1,6 +1,13 @@
 <?php
-class SystemUserPlugin extends KalturaPlugin
+class SystemUserPlugin extends KalturaPlugin implements KalturaServicesPlugin
 {
+	const PLUGIN_NAME = 'systemUser';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	public static function getServicesMap()
 	{
 		$map = array(
@@ -14,12 +21,6 @@ class SystemUserPlugin extends KalturaPlugin
 		return realpath(dirname(__FILE__).'/../config/system_user.ct');
 	}
 
-	public static function getDatabaseConfig()
-	{
-//		$config = new Zend_Config_Ini(dirname(__FILE__).'/../config/database.ini');
-//		return $config->toArray();
-	}
-	
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -28,4 +29,3 @@ class SystemUserPlugin extends KalturaPlugin
 		return false;
 	}
 }
-?>

@@ -1,8 +1,14 @@
 <?php
 
-class DocumentPlugin extends KalturaPlugin
+class DocumentPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaObjectLoaderPlugin, KalturaEventConsumersPlugin
 {
+	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
@@ -93,7 +99,7 @@ class DocumentPlugin extends KalturaPlugin
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue
-	 * @return object
+	 * @return string
 	 */
 	public static function getObjectClass($objectType, $enumValue)
 	{

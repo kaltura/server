@@ -1,6 +1,13 @@
 <?php
-class StorageProfilePlugin extends KalturaPlugin
+class StorageProfilePlugin extends KalturaPlugin implements KalturaServicesPlugin
 {
+	const PLUGIN_NAME = 'storageProfile';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	public static function getServicesMap()
 	{
 		$map = array(
@@ -14,12 +21,6 @@ class StorageProfilePlugin extends KalturaPlugin
 		return realpath(dirname(__FILE__).'/../config/storage_profile.ct');
 	}
 
-	public static function getDatabaseConfig()
-	{
-//		$config = new Zend_Config_Ini(dirname(__FILE__).'/../config/database.ini');
-//		return $config->toArray();
-	}
-	
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -28,4 +29,3 @@ class StorageProfilePlugin extends KalturaPlugin
 		return false;
 	}
 }
-?>

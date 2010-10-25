@@ -1,7 +1,14 @@
 <?php
 
-class FastStartPlugin extends KalturaPlugin
+class FastStartPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
 {
+	const PLUGIN_NAME = 'fastStart';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue
@@ -23,6 +30,22 @@ class FastStartPlugin extends KalturaPlugin
 		{
 			return new KDLOperatorQTFastStart($enumValue);
 		}
+		
+		return null;
+	}
+
+	/**
+	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($objectType, $enumValue)
+	{
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_FAST_START)
+			return 'KOperationEngineFastStart';
+	
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_FAST_START)
+			return 'KDLOperatorQTFastStart';
 		
 		return null;
 	}

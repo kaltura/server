@@ -1,9 +1,12 @@
 <?php
-class KalturaInternalToolsPlugin extends KalturaPlugin
+class KalturaInternalToolsPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaAdminConsolePagesPlugin
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';
-	//const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
-	//const METADATA_COPY_HANDLER_CLASS = 'kMetadataObjectCopiedHandler';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass

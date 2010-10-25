@@ -1,5 +1,5 @@
 <?php
-class MetadataPlugin extends KalturaPlugin
+class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaEventConsumersPlugin, KalturaObjectLoaderPlugin, KalturaBulkUploadHandlerPlugin
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -13,6 +13,11 @@ class MetadataPlugin extends KalturaPlugin
 	const BULK_UPLOAD_MULTI_VALUES_DELIMITER = '|,|';
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass
@@ -76,6 +81,27 @@ class MetadataPlugin extends KalturaPlugin
 				$object = MetadataProfilePeer::retrieveByPK( $objectId );
 				MetadataProfilePeer::setUseCriteriaFilter ( true );
 				return $object;
+		}
+		return null;
+	}
+	
+	/**
+	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($objectType, $enumValue)
+	{
+		if($objectType != KalturaPluginManager::OBJECT_TYPE_SYNCABLE)
+			return null;
+			
+		switch($enumValue)
+		{
+			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				return 'Metadata';
+				
+			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				return 'MetadataProfile';
 		}
 		return null;
 	}

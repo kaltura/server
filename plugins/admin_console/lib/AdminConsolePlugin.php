@@ -1,6 +1,13 @@
 <?php
-class AdminConsolePlugin extends KalturaPlugin
+class AdminConsolePlugin extends KalturaPlugin implements KalturaServicesPlugin
 {
+	const PLUGIN_NAME = 'adminConsole';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	public static function getServicesMap()
 	{
 		$map = array(
@@ -16,12 +23,6 @@ class AdminConsolePlugin extends KalturaPlugin
 		return realpath(dirname(__FILE__).'/../config/admin_console.ct');
 	}
 
-	public static function getDatabaseConfig()
-	{
-//		$config = new Zend_Config_Ini(dirname(__FILE__).'/../config/database.ini');
-//		return $config->toArray();
-	}
-	
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -30,4 +31,3 @@ class AdminConsolePlugin extends KalturaPlugin
 		return false;
 	}
 }
-?>

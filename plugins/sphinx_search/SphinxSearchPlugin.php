@@ -1,8 +1,13 @@
 <?php
-class SphinxSearchPlugin extends KalturaPlugin
+class SphinxSearchPlugin extends KalturaPlugin implements KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'sphinx_search';
 	const SPHINX_SEARCH_MANAGER = 'kSphinxSearchManager';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @return array

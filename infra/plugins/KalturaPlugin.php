@@ -1,53 +1,10 @@
 <?php
-class KalturaPlugin
+abstract class KalturaPlugin
 {
 	/**
-	 * @return array<string,string> in the form array[serviceName] = serviceClass
+	 * @return string the name of the plugin
 	 */
-	public static function getServicesMap()
-	{
-		return array();
-	}
-	
-	/**
-	 * @return array
-	 */
-	public static function getEventConsumers()
-	{
-		return array();
-	}
-	
-	/**
-	 * @return array
-	 */
-	public static function getAdminConsolePages()
-	{
-		return array();
-	}
-	
-	/**
-	 * @param string $entryId the new created entry
-	 * @param array $data key => value pairs
-	 */
-	public static function handleBulkUploadData($entryId, array $data)
-	{
-	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return null;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public static function getDatabaseConfig()
-	{
-		return null;
-	}
+	abstract public static function getPluginName();
 	
 	/**
 	 * @param int $partnerId
@@ -57,27 +14,4 @@ class KalturaPlugin
 	{
 		return true;
 	}
-	
-	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
-	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
-	{
-		return null;
-	}
-	
-	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
-	 * @param string $enumValue
-	 * @return object
-	 */
-	public static function getObjectClass($objectType, $enumValue)
-	{
-		return null;
-	}
-	
-	
 }

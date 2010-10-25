@@ -1,8 +1,13 @@
 <?php
-class AuditPlugin extends KalturaPlugin
+class AuditPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'audit';
 	const AUDIT_TRAIL_MANAGER = 'kAuditTrailManager';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass
@@ -31,16 +36,5 @@ class AuditPlugin extends KalturaPlugin
 		return array(
 			self::AUDIT_TRAIL_MANAGER,
 		);
-	}
-	
-	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
-	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
-	{
-		// TODO - load data parsers
 	}
 }

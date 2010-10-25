@@ -1,7 +1,14 @@
 <?php
 
-class ExpressionEncoderPlugin extends KalturaPlugin
+class ExpressionEncoderPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
 {
+	const PLUGIN_NAME = 'expressionEncoder';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue
@@ -23,6 +30,22 @@ class ExpressionEncoderPlugin extends KalturaPlugin
 		{
 			return new KDLOperatorExpressionEncoder($enumValue);
 		}
+		
+		return null;
+	}
+
+	/**
+	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($objectType, $enumValue)
+	{
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+			return 'KOperationExpressionEncoder';
+			
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+			return 'KDLOperatorExpressionEncoder';
 		
 		return null;
 	}

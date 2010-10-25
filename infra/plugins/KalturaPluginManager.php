@@ -72,8 +72,16 @@ class KalturaPluginManager
 		list($servicePlugin, $serviceName) = explode('_', $serviceId);
 		
 		$pluginInstances = self::getPluginInstances();
-		if(isset($pluginInstances[$servicePlugin]) && isset($pluginInstances[$servicePlugin][$serviceName]))
-			return $pluginInstances[$servicePlugin][$serviceName];
+		if(!isset($pluginInstances[$servicePlugin]))
+			return null;
+			
+		$pluginInstance = $pluginInstances[$servicePlugin];
+		if(!($pluginInstance instanceof KalturaServicesPlugin))
+			return null;
+			
+		$servicesMap = $pluginInstance->getServicesMap();
+		if(isset($servicesMap[$serviceName]))
+			return $servicesMap[$serviceName];
 			
 		return null;
 	}
@@ -87,7 +95,11 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaServicesPlugin))
+				continue;
+
 //			KalturaLog::debug("Checking plugin [$pluginName] for API services");
+			
 			$pluginServices = $pluginInstance->getServicesMap();
 			foreach($pluginServices as $serviceName => $serviceClass)
 			{
@@ -112,6 +124,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaServicesPlugin))
+				continue;
+				
 //			KalturaLog::debug("Checking plugin [$pluginName] for service config files");
 			$serviceConfig = $pluginInstance->getServiceConfig();
 			if($serviceConfig)
@@ -134,6 +149,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaDatabaseConfigPlugin))
+				continue;
+				
 //			KalturaLog::debug("Checking plugin [$pluginName] for DB configurations");
 			$dbConfig = $pluginInstance->getDatabaseConfig();
 			if($dbConfig && is_array($dbConfig))
@@ -154,6 +172,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaObjectLoaderPlugin))
+				continue;
+				
 //			KalturaLog::debug("Checking plugin [$pluginName] for object loaders");
 			$obj = $pluginInstance->loadObject($objectType, $enumValue, $constructorArgs);
 			if($obj)
@@ -173,6 +194,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaObjectLoaderPlugin))
+				continue;
+		
 //			KalturaLog::debug("Checking plugin [$pluginName] for class getters");
 			$cls = $pluginInstance->getObjectClass($objectType, $enumValue);
 			if($cls)
@@ -194,6 +218,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaEventConsumersPlugin))
+				continue;
+		
 //			KalturaLog::debug("Checking plugin [$pluginName] for event consumers");
 			$pluginEventConsumers = $pluginInstance->getEventConsumers();
 			if(!$pluginEventConsumers || !count($pluginEventConsumers))
@@ -215,6 +242,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaAdminConsolePagesPlugin))
+				continue;
+		
 //			KalturaLog::debug("Checking plugin [$pluginName] for admin console pages");
 			$pluginAdminConsolePages = $pluginInstance->getAdminConsolePages();
 			if(!$pluginAdminConsolePages || !count($pluginAdminConsolePages))
@@ -292,6 +322,9 @@ class KalturaPluginManager
 		$pluginInstances = self::getPluginInstances();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			if(!($pluginInstance instanceof KalturaBulkUploadHandlerPlugin))
+				continue;
+		
 //			KalturaLog::debug("Checking plugin [$pluginName] for bulk upload handlers");
 			$pluginInstance->handleBulkUploadData($entryId, $data);
 		}

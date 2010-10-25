@@ -1,8 +1,13 @@
 <?php
-class SolrSearchPlugin extends KalturaPlugin
+class SolrSearchPlugin extends KalturaPlugin implements KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'solr_search';
 	const SOLR_SEARCH_MANAGER = 'kSolrSearchManager';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
 	
 	/**
 	 * @return array
@@ -22,7 +27,7 @@ class SolrSearchPlugin extends KalturaPlugin
 	 */
 	public static function getKalturaCriteria($objectType)
 	{
-		if ($objectType == "entry")
+		if ($objectType == entryPeer::OM_CLASS)
 			return new SolrEntryCriteria();
 			
 		return null;

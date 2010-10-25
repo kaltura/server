@@ -1,8 +1,15 @@
 <?php
-class MultiCentersPlugin extends KalturaPlugin
+class MultiCentersPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaEventConsumersPlugin
 {
+	const PLUGIN_NAME = 'multiCenters';
 	const MULTI_CENTERS_SYNCER_CLASS = 'kMultiCentersSynchronizer';
 	const MUTLI_CENTERS_FLOW_MANAGER_CLASS = 'kMultiCentersFlowManager';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	
 	/**
 	 * @return array
@@ -24,5 +31,13 @@ class MultiCentersPlugin extends KalturaPlugin
 			'fileSyncImportBatch' => 'FileSyncImportBatchService',
 		);
 		return $map;
+	}
+	
+	/**
+	 * @return string - the path to services.ct
+	 */
+	public static function getServiceConfig()
+	{
+		return null;
 	}
 }

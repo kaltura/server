@@ -1,7 +1,14 @@
 <?php
 
-class QuickTimeToolsPlugin extends KalturaPlugin
+class QuickTimeToolsPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
 {
+	const PLUGIN_NAME = 'quickTimeTools';
+	
+	public static function getPluginName()
+	{
+		return self::PLUGIN_NAME;
+	}
+	
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue
@@ -25,5 +32,21 @@ class QuickTimeToolsPlugin extends KalturaPlugin
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($objectType, $enumValue)
+	{
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
+			return 'KOperationEngineQtTools';
+			
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
+			return 'KDLTranscoderQTPTools';
+		
+		return null;	
 	}
 }
