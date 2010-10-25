@@ -1,0 +1,29 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Asset Overlay</name>
+	<restrictions>
+
+	<restriction type="number" default="0">
+		<id>xPosition</id></restriction>
+	<restriction default="0" type="number">
+		<id>yPosition</id>
+	</restriction>
+	<restriction default="0" type="number">
+		<id>rotation</id></restriction>
+	<restriction default="1" type="number">
+		<id>xScale</id></restriction>
+	<restriction default="1" type="number">
+		<id>yScale</id>
+	</restriction>
+	<restriction default="0" type="number">
+		<id>xSkew</id>
+	</restriction>
+	<restriction default="0" type="number">
+		<id>ySkew</id>
+	</restriction>
+	<restriction default="neo.flv" type="string">
+		<id>assetUrl</id>
+	</restriction>
+	</restrictions>
+</definition>

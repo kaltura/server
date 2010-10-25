@@ -1,0 +1,15 @@
+<definition>
+	<name>move</name>
+	<version>1.00</version>
+	<restrictions>	
+
+		<restriction type="string" default="left">
+			<id>direction</id>
+			<enums>
+				<enum value="left" />
+				<enum value="right" />
+			</enums>
+		</restriction>
+
+	</restrictions>
+</definition>

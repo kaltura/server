@@ -1,0 +1,40 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Asset Overlay</name>
+
+	<restrictions>	
+		<restriction type="number" default="0">
+			<id>assetXPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>assetYPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>assetRotation</id>
+		</restriction>
+		
+		<restriction type="number" default="1">
+			<id>assetScaleX</id>
+		</restriction>
+		
+		<restriction type="number" default="1">
+			<id>assetScaleY</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>AssetDuration</id>
+		</restriction>
+		
+		<restriction type="string" default="">
+			<id>AssetURL</id>
+		</restriction>
+		
+		<restriction type="string" default="">
+			<id>AssetType</id>
+		</restriction>
+
+	</restrictions>
+</definition>

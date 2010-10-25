@@ -1,0 +1,29 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Simple text overlay</name>
+	<UI>
+		<version>1.00</version>
+		<type>xml</type>
+		<InfoPanel>
+			<UIComponents> 
+				<UIComponent type="Label">
+						<mxAttributes text="Enter text here:"/>
+				</UIComponent>
+				<UIComponents> <InfoPanel>
+					<UIComponent type="TextInput" id="text"/>
+				</UIComponents> </InfoPanel>
+		
+				<UIComponent type="Label">
+						<mxAttributes text="Font size"/>
+				</UIComponent>
+				<UIComponent type="VSlider" id="fontSize"/>
+				
+				<UIComponent type="Label">
+						<mxAttributes text="Font color"/>
+				</UIComponent>
+				<UIComponent type="ColorPicker" id="fontColor"/>
+			</UIComponents>
+		</InfoPanel>
+	</UI>
+</definition>
