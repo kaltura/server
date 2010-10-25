@@ -106,6 +106,7 @@ class kJobsManager
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $dbBatchJob->getId());
 			
+		$dbBatchJob->setAbort(false);
 		$dbBatchJob->setExecutionAttempts(0);
 		
 		// if not currently locked
