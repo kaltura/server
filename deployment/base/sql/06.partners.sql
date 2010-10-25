@@ -94,3 +94,5 @@ insert into flavor_params_conversion_profile( conversion_profile_id, flavor_para
 values(1, 11, 2, null, now(), now());
 insert into flavor_params_conversion_profile( conversion_profile_id, flavor_params_id, ready_behavior, force_none_complied, created_at, updated_at)
 values(1, 12, 2, null, now(), now());
+
+COMMIT;

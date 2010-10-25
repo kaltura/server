@@ -219,3 +219,5 @@ BEGIN
     END$$
 
 DELIMITER ;
+
+COMMIT;

@@ -69,3 +69,5 @@ CREATE TABLE `unique_visitors_ip` (
   `date` date DEFAULT NULL,
   UNIQUE KEY `date_ip` (`date`,`ip`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+COMMIT;

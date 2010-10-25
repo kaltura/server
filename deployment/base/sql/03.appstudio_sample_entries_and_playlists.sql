@@ -60,4 +60,4 @@ VALUES
 ('_KMCSPL1',NULL,1,'PlaylistDemo1',5,3,'100000.txt','demo 1 for app studio',2,-1,0,now(),now(),0,2,0,1,2,0,now(),'2008-01-26 00:00:00'),
 ('_KMCSPL2',NULL,1,'PlaylistDemo2',5,3,'100000.txt','demo 2 for app studio',2,-1,0,now(),now(),0,2,0,1,2,0,now(),'2008-01-26 00:00:00');
 
-
+COMMIT;

@@ -77,3 +77,5 @@ VALUES
 (0,2,'1000008','1',2,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/templates/uiconf/kdp3/WatermarkPlayer.features.xml',12585),
 (0,2,'1000009','1',1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/templates/uiconf/kdp3/MultiPlaylists.xml',15150),
 (0,2,'1000009','1',2,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/templates/uiconf/kdp3/MultiPlaylists.features.xml',15919);
+
+COMMIT;

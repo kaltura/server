@@ -1748,3 +1748,5 @@ CREATE TABLE `work_group` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+COMMIT;

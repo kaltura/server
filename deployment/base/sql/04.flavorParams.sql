@@ -40,3 +40,5 @@ insert into `flavor_params` (`id`, `version`, `partner_id`, `name`, `tags`, `des
 values (14,'0','0','Mobile (3GP)','mobile,mpeg4','Nokia/Blackberry','0',NOW(),NOW(),null,'1','3gp','mpeg4','800','aac','64','0','0','0','640','0','0','300','0','2,99,3','',null,'0','1');
 insert into `flavor_params` (`id`, `version`, `partner_id`, `name`, `tags`, `description`, `ready_behavior`, `created_at`, `updated_at`, `deleted_at`, `is_default`, `format`, `video_codec`, `video_bitrate`, `audio_codec`, `audio_bitrate`, `audio_channels`, `audio_sample_rate`, `audio_resolution`, `width`, `height`, `frame_rate`, `gop_size`, `two_pass`, `conversion_engines`, `conversion_engines_extra_params`, `custom_data`, `view_order`, `creation_mode`) 
 values (15,'0','0','Mobile (H264)','mobile,iphone,h264,web','iPhone,android','0',NOW(),NOW(),null,'1','mp4','h264b','800','aac','96','2','22050','0','640','0','25','300','0','2,99,3','',null,'0','1');
+
+COMMIT;

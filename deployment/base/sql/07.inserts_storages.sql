@@ -4,4 +4,5 @@ VALUES(1,NOW(),NOW(),'0','@DC_NAME@ ','@DC_DESCRIPTION@','3','0',NULL,'@STORAGE_
 
 UPDATE storage_profile SET id = 0 WHERE id = 1;
 
+COMMIT;
 

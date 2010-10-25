@@ -100,3 +100,4 @@ INSERT INTO file_sync
 ('0', '2', '543', NULL, '1', '0', '1', NOW(), NOW(), NULL, NULL, '2', '1', NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/wordpress/wordpress_2.5/kcw_admin.xml', '5865'), 
 ('0', '2', '544', NULL, '1', '0', '1', NOW(), NOW(), NULL, NULL, '2', '1', NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/wordpress/wordpress_2.5/kcw_comments.xml', '3925');
 
+COMMIT;
