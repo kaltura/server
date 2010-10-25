@@ -84,7 +84,6 @@ class entryFilter extends baseObjectFilter
 			"_matchor_categories_ids", // see alias
 			"_matchand_flavor_params_ids",
 			"_matchor_flavor_params_ids",
-			"_notlike_flavor_params_ids",
 			"_matchor_duration_type", // see alias
 			"_eq_document_type", // for document listing in api_v3
 			"_in_document_type", // for document listing in api_v3
@@ -389,11 +388,6 @@ class entryFilter extends baseObjectFilter
 	public function setPartnerIdEquel($v)
 	{
 		$this->set('_eq_partner_id', $v);
-	}
-	
-	public function setFlavorParamsNotLike($v)
-	{
-		$this->set('_notlike_flavor_params_ids', $v);
 	}
 	
 	public function setFlavorParamsMatchOr($v)
