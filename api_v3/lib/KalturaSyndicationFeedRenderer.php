@@ -113,19 +113,11 @@ class KalturaSyndicationFeedRenderer
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
-	public function addFlavorParamsMissingFilter()
+	public function addFilter(entryFilter $entryFilter)
 	{
 		if($this->executed)
 			return;
-		
-		if(!$this->syndicationFeed->flavorParamId)
-		{
-			$this->baseCriteria->add(entryPeer::ID, false); // return no results
-			return;
-		}
 			
-		$entryFilter = new entryFilter();
-		$entryFilter->setFlavorParamsNotLike($this->syndicationFeed->flavorParamId);
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
@@ -150,6 +142,38 @@ class KalturaSyndicationFeedRenderer
 			$count += $c->getRecordsCount();
 		}
 		return $count;
+	}
+	
+	public function getEntriesIds()
+	{
+		if($this->executed)
+			return array();
+		
+		if(!count($this->entryFilters))
+		{
+			$c = clone $this->baseCriteria;
+			$c->applyFilters();
+			$c->clearSelectColumns();
+			$c->addSelectColumn(entryPeer::ID);
+			
+			$rs = entryPeer::doSelectStmt($c);
+			return $rs->fetchAll(PDO::FETCH_COLUMN);
+		}
+		
+		$entries = array();
+		foreach($this->entryFilters as $entryFilter)
+		{
+			$c = clone $this->baseCriteria;
+			$entryFilter->attachToCriteria($c);
+			$c->applyFilters();
+			$c->clearSelectColumns();
+			$c->addSelectColumn(entryPeer::ID);
+			
+			$rs = entryPeer::doSelectStmt($c);
+			$moreEntries = $rs->fetchAll(PDO::FETCH_COLUMN);
+			$entries += $moreEntries;
+		}
+		return $entries;
 	}
 	
 	public function getNextEntry()
