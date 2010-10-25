@@ -58,7 +58,6 @@ class MetadataService extends KalturaBaseService
 	 * @return Metadata
 	 * @throws MetadataErrors::METADATA_ALREADY_EXISTS
 	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
-	 * @throws MetadataErrors::INVALID_METADATA_OBJECT_TYPE
 	 * @throws MetadataErrors::INVALID_METADATA_OBJECT
 	 */
 	protected function addMetadata($metadataProfileId, $objectType, $objectId)
@@ -81,8 +80,9 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setStatus(KalturaMetadataStatus::INVALID);
 
 		// validate object exists
-		kMetadataManager::getObjectFromPeer($dbMetadata);
-			
+		$object = kMetadataManager::getObjectFromPeer($dbMetadata);
+		if(!$object)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_OBJECT, $objectId);
 		
 		$dbMetadata->save();
 		
