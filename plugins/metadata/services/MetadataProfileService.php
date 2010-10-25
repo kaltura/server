@@ -146,6 +146,32 @@ class MetadataProfileService extends KalturaBaseService
 	
 	
 	/**
+	 * Delete an existing views file of metadata profile
+	 * 
+	 * @action deleteViews
+	 * @param int $id
+	 * @return KalturaMetadataProfile
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */		
+	function deleteViewsAction($id)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		// increment the views version into none-existing file sync version
+		$dbMetadataProfile->incrementViewsVersion();
+		$dbMetadataProfile->save();
+		
+		$metadataProfile = new KalturaMetadataProfile();
+		$metadataProfile->fromObject($dbMetadataProfile);
+		
+		return $metadataProfile;
+	}
+	
+	
+	/**
 	 * Delete an existing metadata profile
 	 * 
 	 * @action delete
@@ -277,6 +303,69 @@ class MetadataProfileService extends KalturaBaseService
 		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
 		
 		$metadataProfile->fromObject($dbMetadataProfile);
+		return $metadataProfile;
+	}	
+	
+	
+	/**
+	 * Update an existing metadata object definition file
+	 * 
+	 * @action updateDefinitionFromFile
+	 * @param int $id 
+	 * @param file $xsdFile XSD metadata definition
+	 * @return KalturaMetadataProfile
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
+	 * @throws MetadataErrors::METADATA_UNABLE_TO_TRANSFORM
+	 */	
+	function revertAction($id, $toVersion)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+	
+		$oldKey = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $toVersion);
+		if(!kFileSyncUtils::fileSync_exists($oldKey))
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $oldKey);
+		
+		$dbMetadataProfile->incrementVersion();
+		$dbMetadataProfile->save();
+		
+		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+		kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
+		
+		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		
+		MetadataPeer::setUseCriteriaFilter(false);
+		$metadatas = MetadataPeer::retrieveByProfile($id, $toVersion);
+		foreach($metadatas as $metadata)
+		{
+			// validate object exists
+			$object = kMetadataManager::getObjectFromPeer($metadata);
+			if(!$object)
+				continue;
+				
+			$oldKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $toVersion);
+			if(!kFileSyncUtils::fileSync_exists($oldKey))
+				continue;
+			
+			$metadata->incrementVersion();
+			$metadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
+			$metadata->save();
+			
+			$key = $metadata->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+			$fileSync = kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey, false);
+			if(!$fileSync)
+				continue;
+			
+			$errorMessage = '';
+			kMetadataManager::validateMetadata($metadata, $errorMessage);
+		}
+		
+		$metadataProfile = new KalturaMetadataProfile();
+		$metadataProfile->fromObject($dbMetadataProfile);
+		
 		return $metadataProfile;
 	}	
 	
