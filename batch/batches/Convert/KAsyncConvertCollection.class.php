@@ -85,7 +85,12 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		else
 		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Source file not found [$data->actualSrcFileSyncLocalPath]", KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file not found [$data->actualSrcFileSyncLocalPath]", KalturaBatchJobStatus::RETRY);
+		}
+		
+		if(!is_file($data->actualSrcFileSyncLocalPath))
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file [$data->actualSrcFileSyncLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
 		}
 		
 		$data->destDirLocalPath = $this->localTempPath;
@@ -112,6 +117,11 @@ class KAsyncConvertCollection extends KAsyncConvert
 		else
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "XML Configuration file not found [$data->inputXmlLocalPath]", KalturaBatchJobStatus::RETRY);
+		}
+		
+		if(!is_file($data->inputXmlLocalPath))
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "XML Configuration file [$data->inputXmlLocalPath] is not a file", KalturaBatchJobStatus::FAILED);
 		}
 		
 		$logFilePath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $data->destFileName . '.log';

@@ -204,6 +204,12 @@ class KAsyncConvert extends KBatchBase
 			}
 		}
 		
+		if(!file_exists($data->actualSrcFileSyncLocalPath))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath does not exist", KalturaBatchJobStatus::RETRY);
+		
+		if(!is_file($data->actualSrcFileSyncLocalPath))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $data->actualSrcFileSyncLocalPath is not a file", KalturaBatchJobStatus::FAILED);
+		
 		$data->logFileSyncLocalPath = "{$data->destFileSyncLocalPath}.log";
 		$monitorFiles = array(
 			$data->logFileSyncLocalPath

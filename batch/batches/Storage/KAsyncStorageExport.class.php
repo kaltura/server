@@ -92,6 +92,13 @@ class KAsyncStorageExport extends KBatchBase
 		KalturaLog::debug("export($job->id)");
 		
 		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
+		
+		if(!file_exists($srcFile))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile does not exist", KalturaBatchJobStatus::RETRY);
+		
+		if(!is_file($srcFile))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $srcFile is not a file", KalturaBatchJobStatus::FAILED);
+			
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
 		$this->updateJob($job, "Exporting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
 
@@ -103,7 +110,7 @@ class KAsyncStorageExport extends KBatchBase
 		}
 		catch(kFileTransferMgrException $ke)
 		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $ke->getCode(), $ke->getMessage(), KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ke->getCode(), $ke->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		catch(Exception $e)
 		{
