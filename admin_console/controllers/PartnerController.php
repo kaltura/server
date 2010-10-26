@@ -222,9 +222,25 @@ class PartnerController extends Zend_Controller_Action
 		
 		
 		$moduls = Zend_Registry::get('config')->moduls;
-		if ($moduls && $moduls->silverLight != 1)
+		if ($moduls)
 		{
-			$form->getElement('enable_silver_light')->setAttrib('disabled',true);
+			if (!$moduls->silverLight)
+				$form->getElement('enable_silver_light')->setAttrib('disabled',true);
+				
+			if (!$moduls->liveStream)
+				$form->getElement('live_stream_enabled')->setAttrib('disabled',true);
+				
+			if (!$moduls->vast)
+				$form->getElement('enable_vast')->setAttrib('disabled',true);
+				
+			if (!$moduls->players508)
+				$form->getElement('enable_508_players')->setAttrib('disabled',true);
+				
+			if (!$moduls->metadata)
+				$form->getElement('enable_metadata')->setAttrib('disabled',true);
+				
+			if (!$moduls->auditTrail)
+				$form->getElement('enable_audit_trail')->setAttrib('disabled',true);
 		}
 		
 		$request = $this->getRequest();

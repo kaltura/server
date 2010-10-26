@@ -54,8 +54,33 @@ class Form_PartnerConfiguration extends Kaltura_Form
 		));
 		
 		$this->addElement('checkbox', 'enable_silver_light', array(
-			'label'	  => 'SilverLight',
+			'label'	  => 'Silverlight',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_silver_light'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_vast', array(
+			'label'	  => 'Vast',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_vast'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_508_players', array(
+			'label'	  => '508 players',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_508_players'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_metadata', array(
+			'label'	  => 'Metadata',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_metadata'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_audit_trail', array(
+			'label'	  => 'Audit trail',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_audit_trail'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_analytics_tab', array(
+			'label'	  => 'Analytics tab',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_analytics_tab'))),
 		));
 		
 		$this->addElement('checkbox', 'moderate_content', array(

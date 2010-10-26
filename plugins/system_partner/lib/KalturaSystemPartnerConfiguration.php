@@ -62,6 +62,26 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $enableSilverLight;
 	
+	/**
+	 * @var bool
+	 */
+	public $enableVast;
+	
+	/**
+	 * @var bool
+	 */
+	public $enable508Players;
+	
+	/**
+	 * @var bool
+	 */
+	public $enableMetadata;
+	
+	/**
+	 * @var bool
+	 */
+	public $enableAuditTrail;
+	
 	private static $map_between_objects = array
 	(
 		"host",
@@ -75,7 +95,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"storageServePriority",
 		"kmcVersion",
 		"enableAnalyticsTab",
-		"enableSilverLight"
+		"enableSilverLight",
+		"enableVast",
+		"enable508Players",
+		"enableMetadata",
+		"enableAuditTrail",
 	);
 
 	public function getMapBetweenObjects()
