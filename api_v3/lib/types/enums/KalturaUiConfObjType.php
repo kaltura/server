@@ -15,4 +15,9 @@ class KalturaUiConfObjType extends KalturaEnum
 	const PLAYER_V3 = 8;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
+	const KMC_GENERAL = 16;
+	const KMC_CONTENT = 17;
+	const KMC_SETTINGS = 18;
+	const KMC_ANALYTICS = 19;
+	const KMC_DASHBOARD = 20;
 }
