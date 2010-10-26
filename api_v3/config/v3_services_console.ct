@@ -63,4 +63,11 @@ emailingestionprofile.delete	       	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-
 emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 
+storageprofile.listbypartner		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+storageprofile.updatestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+
+
 ---------------------------------------------------------------------------------------------------

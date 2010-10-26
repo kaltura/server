@@ -17,11 +17,12 @@ kn = 	kaltura network
 mip =	match ip - enables the ip match mecahnism for better in-site only security
 tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
 ------------------------------------------------------------------------------------------------
-name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip|tags 
 ------------------------------------------------------------------------------------------------
 
-storageprofile.listbypartner		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.updatestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+storageprofile.listbypartner		|			|2		|1	|0		|0		|1		|rw	|	|	|   |admin-console
+storageprofile.updatestatus			|			|2		|1	|0		|0		|1		|rw	|	|	|   |admin-console
+storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|	|	|   |admin-console
+storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|	|	|   |admin-console
+storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|	|	|   |admin-console
+
