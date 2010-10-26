@@ -847,7 +847,7 @@ class kFlowHelper
 		{
 			KalturaLog::debug("Saving thumbnail from: " . $data->getThumbPath());
 			// creats thumbnail the file sync
-			$entry = $dbBatchJob->getEntry();
+			$entry = $dbBatchJob->getEntry(false, false);
 			if(!$entry)
 			{
 				KalturaLog::err("Entry not found [" . $dbBatchJob->getEntryId() . "]");
@@ -888,7 +888,19 @@ class kFlowHelper
 			return $dbBatchJob;
 		
 		if($data->getCreateThumb())
-			self::createThumbnail($dbBatchJob, $data);
+		{
+			try 
+			{
+				self::createThumbnail($dbBatchJob, $data);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				
+				// retry
+				self::createThumbnail($dbBatchJob, $data);
+			}
+		}
 		
 		$currentFlavorAsset = kBusinessPostConvertDL::handleFlavorReady($dbBatchJob, $data->getFlavorAssetId());
 				

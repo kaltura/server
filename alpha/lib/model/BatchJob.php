@@ -242,7 +242,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	 */
 	public function getEntry($getDeleted = false, $enableCache = true)
 	{
-		if ( ($this->aEntry == null || !$enableCache) && $this->getEntryId() )
+		if(!$enableCache)
+		{
+			$this->aEntry = null;
+			entryPeer::clearInstancePool();
+		}
+		
+		if ( $this->aEntry == null && $this->getEntryId() )
 		{
 			if($getDeleted)
 				$this->aEntry = entryPeer::retrieveByPKNoFilter( $this->getEntryId()  );
