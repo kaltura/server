@@ -190,13 +190,15 @@ class PartnerController extends Zend_Controller_Action
 
 				KalturaLog::log('Storage: ' . print_r($storage, true));
 				
+				Kaltura_ClientHelper::impersonate($storage->partnerId);
+				$storage->partnerId = null;
+				
 				if (!$editMode)
 				{
 					$client->storageProfile->add($storage);
 				}
 				else
 				{
-					$storage->partnerId = null;
 					$client->storageProfile->update($storageId, $storage);
 				}
 			}
