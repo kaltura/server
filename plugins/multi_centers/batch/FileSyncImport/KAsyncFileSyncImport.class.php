@@ -238,7 +238,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			if(!file_exists($destFile))
 			{
 				KalturaLog::err("Error: file [$destFile] doesn't exist");
-				$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: file [$destFile] doesn't exist", KalturaBatchJobStatus::FAILED);
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: file [$destFile] doesn't exist", KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
 
@@ -248,7 +248,7 @@ class KAsyncFileSyncImport extends KBatchBase
 				if(filesize($destFile) != $fileSize)
 				{
 					KalturaLog::err("Error: file [$destFile] has a wrong size");
-					$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
 					return $job;
 				}
 			}
