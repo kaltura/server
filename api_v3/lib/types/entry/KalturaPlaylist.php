@@ -115,7 +115,6 @@ class KalturaPlaylist extends KalturaBaseEntry
 		$playlistXml = new SimpleXMLElement("<playlist/>");
 		$playlistXml->addChild("total_results", $this->totalResults);
 		$filtersXml = $playlistXml->addChild("filters");
-		$xml = new SimpleXMLElement(); 
 		if ($this->filters instanceof KalturaMediaEntryFilterForPlaylistArray)
 		{
 			foreach($this->filters as $filter)
