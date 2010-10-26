@@ -1,11 +1,16 @@
 <?php
-class KalturaInternalToolsPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaAdminConsolePagesPlugin
+class KalturaInternalToolsPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaAdminConsolePagesPlugin
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

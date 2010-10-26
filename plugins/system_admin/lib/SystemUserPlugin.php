@@ -1,5 +1,5 @@
 <?php
-class SystemUserPlugin extends KalturaPlugin implements KalturaServicesPlugin
+class SystemUserPlugin implements KalturaPlugin, KalturaServicesPlugin
 {
 	const PLUGIN_NAME = 'systemUser';
 	

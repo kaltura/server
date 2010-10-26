@@ -1,12 +1,17 @@
 <?php
 
-class QuickTimeToolsPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
+class QuickTimeToolsPlugin implements KalturaPlugin, KalturaObjectLoaderPlugin
 {
 	const PLUGIN_NAME = 'quickTimeTools';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 <?php
-class FileSyncPlugin extends KalturaPlugin implements KalturaServicesPlugin
+class FileSyncPlugin implements KalturaPlugin, KalturaServicesPlugin
 {
 	const PLUGIN_NAME = 'fileSync';
 	

@@ -1,5 +1,5 @@
 <?php
-class AuditPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaEventConsumersPlugin
+class AuditPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'audit';
 	const AUDIT_TRAIL_MANAGER = 'kAuditTrailManager';
@@ -7,6 +7,12 @@ class AuditPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kaltur
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
 	/**

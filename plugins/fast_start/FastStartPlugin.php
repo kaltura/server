@@ -1,12 +1,17 @@
 <?php
 
-class FastStartPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
+class FastStartPlugin implements KalturaPlugin, KalturaObjectLoaderPlugin
 {
 	const PLUGIN_NAME = 'fastStart';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 <?php
 
-class DocumentPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaObjectLoaderPlugin, KalturaEventConsumersPlugin
+class DocumentPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaObjectLoaderPlugin, KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -8,6 +8,11 @@ class DocumentPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

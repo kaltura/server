@@ -1,5 +1,5 @@
 <?php
-class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, KalturaEventConsumersPlugin, KalturaObjectLoaderPlugin, KalturaBulkUploadHandlerPlugin
+class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEventConsumersPlugin, KalturaObjectLoaderPlugin, KalturaBulkUploadHandlerPlugin
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -17,6 +17,12 @@ class MetadataPlugin extends KalturaPlugin implements KalturaServicesPlugin, Kal
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
 	/**

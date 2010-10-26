@@ -1,17 +1,14 @@
 <?php
-abstract class KalturaPlugin
+interface KalturaPlugin
 {
 	/**
 	 * @return string the name of the plugin
 	 */
-	abstract public static function getPluginName();
+	public static function getPluginName();
 	
 	/**
 	 * @param int $partnerId
 	 * @return bool
 	 */
-	public static function isAllowedPartner($partnerId)
-	{
-		return true;
-	}
+	public static function isAllowedPartner($partnerId);
 }

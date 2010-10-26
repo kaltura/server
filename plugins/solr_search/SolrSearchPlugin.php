@@ -1,5 +1,5 @@
 <?php
-class SolrSearchPlugin extends KalturaPlugin implements KalturaEventConsumersPlugin
+class SolrSearchPlugin implements KalturaPlugin, KalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'solr_search';
 	const SOLR_SEARCH_MANAGER = 'kSolrSearchManager';
@@ -7,6 +7,11 @@ class SolrSearchPlugin extends KalturaPlugin implements KalturaEventConsumersPlu
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

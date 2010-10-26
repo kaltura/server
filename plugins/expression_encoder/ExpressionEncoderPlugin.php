@@ -1,12 +1,17 @@
 <?php
 
-class ExpressionEncoderPlugin extends KalturaPlugin implements KalturaObjectLoaderPlugin
+class ExpressionEncoderPlugin implements KalturaPlugin, KalturaObjectLoaderPlugin
 {
 	const PLUGIN_NAME = 'expressionEncoder';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function isAllowedPartner($partnerId)
+	{
+		return true;
 	}
 	
 	/**

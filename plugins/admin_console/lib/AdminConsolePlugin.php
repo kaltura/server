@@ -1,5 +1,5 @@
 <?php
-class AdminConsolePlugin extends KalturaPlugin implements KalturaServicesPlugin
+class AdminConsolePlugin implements KalturaPlugin, KalturaServicesPlugin
 {
 	const PLUGIN_NAME = 'adminConsole';
 	

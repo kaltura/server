@@ -1,5 +1,5 @@
 <?php
-class StorageProfilePlugin extends KalturaPlugin implements KalturaServicesPlugin
+class StorageProfilePlugin implements KalturaPlugin, KalturaServicesPlugin
 {
 	const PLUGIN_NAME = 'storageProfile';
 	
