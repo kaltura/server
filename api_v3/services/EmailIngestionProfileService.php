@@ -34,12 +34,12 @@ class EmailIngestionProfileService extends KalturaEntryService
 			throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_EMAIL_EXISTS, $EmailIP->emailAddress);
 		}
 
-		$dbEIP = $EmailIP->toEmailIngestionProfile();
+		$dbEIP = $EmailIP->toInsertableObject();
 		$dbEIP->setPartnerId ( $this->getPartnerId() );
 		$dbEIP->save();
 
 		$savedEIP = new KalturaEmailIngestionProfile(); // start from blank
-		$savedEIP->fromEmailIngestionProfile( $dbEIP );
+		$savedEIP->fromObject( $dbEIP );
 
 		return $savedEIP;
 	}
@@ -60,7 +60,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $emailAddress);
 
 		$emailIP = new KalturaEmailIngestionProfile();
-		$emailIP->fromEmailIngestionProfile($existingEIP);
+		$emailIP->fromObject($existingEIP);
 
 		return $emailIP;
 	}
@@ -81,7 +81,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
 			
 		$emailIP = new KalturaEmailIngestionProfile();
-		$emailIP->fromEmailIngestionProfile($existingEIP);
+		$emailIP->fromObject($existingEIP);
 
 		return $emailIP;
 	}
@@ -101,16 +101,13 @@ class EmailIngestionProfileService extends KalturaEntryService
 		$dbEIP = EmailIngestionProfilePeer::retrieveByPK( $id );
 
 		if ( ! $dbEIP )
-		throw new KalturaAPIException ( APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
+			throw new KalturaAPIException ( APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND , $id );
 
 		$EmailIP->emailAddress = $dbEIP->getEmailAddress();
-		$updateEIP = $EmailIP->toEmailIngestionProfile();
-
-		$allowEmpty = true ; // TODO - what is the policy  ?
-		baseObjectUtils::autoFillObjectFromObject ( $updateEIP , $dbEIP , $allowEmpty );
+		$updateEIP = $EmailIP->toUpdatableObject($dbEIP);
 
 		$dbEIP->save();
-		$updateEIP->fromEmailIngestionProfile( $dbEIP );
+		$updateEIP->fromObject( $dbEIP );
 
 		return $updateEIP;
 	}
@@ -166,7 +163,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			throw new APIException(APIErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND, $id);
 	
 			$emailIP = new KalturaEmailIngestionProfile();
-			$emailIP->fromEmailIngestionProfile($existingEIP);
+			$emailIP->fromObject($existingEIP);
 	
 	
 			// handle defaults for media entry metadata

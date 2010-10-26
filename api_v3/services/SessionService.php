@@ -77,18 +77,9 @@ class SessionService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		// verify partner is allowed to start session for another partner
-		$partners = explode(',', $this->partnerGroup());
-		if(!in_array($impersonatedPartnerId, $partners) || !isset($impersonatedPartnerId) || is_null($impersonatedPartnerId))
+		if (!myPartnerUtils::allowPartnerAccessPartner($partnerId, $this->partnerGroup(), $impersonatedPartnerId))
 		{
-			if($partnerId != $impersonatedPartnerId)
-			{
-				throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
-			}
-			else
-			{
-				// if partner A tries to impersonate as himself - let him 
-				$impersonatedPartnerId = $partnerId;
-			}
+			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
 		}
 		
 		// get impersonated partner

@@ -98,23 +98,18 @@ class KalturaEmailIngestionProfile extends KalturaObject
 		"maxAttachmentSizeKbytes" , "maxAttachmentsPerMail"
 	);
 	
-	public function getMapBetweenObjects ( )
+	public function getMapBetweenObjects( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-	}	
-	
-	public function fromEmailIngestionProfile(EmailIngestionProfile $eip)
-	{
-		parent::fromObject($eip);
-		return $this;
 	}
+		
 	
-	public function toEmailIngestionProfile()
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		$eip = new EmailIngestionProfile();
-		return parent::toObject( $eip );
+		if(is_null($object_to_fill))
+			$object_to_fill = new EmailIngestionProfile();
+
+		return parent::toObject( $object_to_fill , $props_to_skip);
 	}
+		
 }
-
-
-
