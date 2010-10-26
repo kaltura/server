@@ -52,6 +52,7 @@ class EntryMetadataService extends KalturaEntryService
 	 * 
 	 * @action get
 	 * @param string $entryId Entry id
+	 * @param int $version entry version
 	 * @return KalturaEntryMetadata The requested entry with its metadata objects
 	 */
 	function getAction($entryId, $version = -1)
