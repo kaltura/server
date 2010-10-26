@@ -186,7 +186,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 				if (!$email_profiles) {
 					// error validating partner
 					KalturaLog::err('Partner validation failed for ['.$curMail->header->msgid."] on [$user@$host] from [".$curMail->header->fromadd.'] with subject ['.$curMail->header->subject.']');
-					if (!$mailChecker->moveMsg($curId, self::PARTNER_INVALID_INVALID)) {
+					if (!$mailChecker->moveMsg($curId, self::PARTNER_INVALID)) {
 						KalturaLog::err('Failed moving msg ['.$curMail->header->msgid.'] to the ['.self::PARTNER_INVALID.'] folder - '.imap_last_error());
 					}
 					continue; // skip current mail - partner invalid
