@@ -898,7 +898,9 @@ class kFlowHelper
 				KalturaLog::err($e->getMessage());
 				
 				// retry
-				self::createThumbnail($dbBatchJob, $data);
+				kJobsManager::retryJob($dbBatchJob->getId(), $dbBatchJob->getJobType());
+				$dbBatchJob->reload();
+				return $dbBatchJob;
 			}
 		}
 		
