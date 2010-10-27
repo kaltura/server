@@ -401,7 +401,7 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 			}
 				
 			$currentXPath .= "/$xPath";
-			if($currentXPath != $xPath)
+			if($index + 1 < count($xPaths))
 			{
 				$domXPath = new DOMXPath($xml);
 				$nodeList = $domXPath->query($currentXPath);
