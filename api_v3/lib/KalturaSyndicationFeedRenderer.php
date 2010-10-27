@@ -188,7 +188,7 @@ class KalturaSyndicationFeedRenderer
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = max($this->lastEntryIntId, $entry->getIntId());
+			$this->lastEntryIntId = $entry->getIntId();
 			return $entry;
 		}
 			
@@ -203,7 +203,7 @@ class KalturaSyndicationFeedRenderer
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = max($this->lastEntryIntId, $entry->getIntId());
+			$this->lastEntryIntId = $entry->getIntId();
 		}
 		else
 		{
@@ -222,7 +222,7 @@ class KalturaSyndicationFeedRenderer
 		if($this->currentCriteria)
 		{
 			if($this->lastEntryIntId)
-				$this->currentCriteria->add(entryPeer::INT_ID, $this->lastEntryIntId, Criteria::GREATER_THAN);
+				$this->currentCriteria->add(entryPeer::INT_ID, $this->lastEntryIntId, Criteria::LESS_THAN);
 		}
 		else
 		{
@@ -257,6 +257,8 @@ class KalturaSyndicationFeedRenderer
 		
 		$c = clone $this->baseCriteria;
 		$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
+		$c->clearOrderByColumns();
+		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
 		
 		if(!count($this->entryFilters))
 		{
