@@ -1,6 +1,9 @@
 <?php
 class criteriaFilter
 {
+	/**
+	 * @var Criteria
+	 */
 	private $criteria;
 	private $enable = true;
 	
@@ -19,6 +22,9 @@ class criteriaFilter
 		$this->criteria = $c;
 	}
 	
+	/**
+	 * @return Criteria
+	 */
 	public function & getFilter ()
 	{
 		return $this->criteria;
