@@ -149,32 +149,6 @@ class MetadataProfileService extends KalturaBaseService
 	
 	
 	/**
-	 * Delete an existing views file of metadata profile
-	 * 
-	 * @action deleteViews
-	 * @param int $id
-	 * @return KalturaMetadataProfile
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 */		
-	function deleteViewsAction($id)
-	{
-		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
-		
-		if(!$dbMetadataProfile)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		
-		// increment the views version into none-existing file sync version
-		$dbMetadataProfile->incrementViewsVersion();
-		$dbMetadataProfile->save();
-		
-		$metadataProfile = new KalturaMetadataProfile();
-		$metadataProfile->fromObject($dbMetadataProfile);
-		
-		return $metadataProfile;
-	}
-	
-	
-	/**
 	 * Delete an existing metadata profile
 	 * 
 	 * @action delete
@@ -270,7 +244,7 @@ class MetadataProfileService extends KalturaBaseService
 			$dbMetadataProfile->incrementVersion();
 		}
 			
-		if($viewsData)
+		if(!is_null($viewsData))
 		{
 			$viewsData = html_entity_decode($viewsData);
 			$dbMetadataProfile->incrementViewsVersion();
@@ -278,7 +252,7 @@ class MetadataProfileService extends KalturaBaseService
 			
 		$dbMetadataProfile->save();
 	
-		if($viewsData)
+		if(!is_null($viewsData) && $viewsData != '')
 		{
 			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 			kFileSyncUtils::file_put_contents($key, $viewsData);
@@ -454,8 +428,11 @@ class MetadataProfileService extends KalturaBaseService
 		$dbMetadataProfile->incrementViewsVersion();
 		$dbMetadataProfile->save();
 		
-		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
-		kFileSyncUtils::moveFromFile($filePath, $key);
+		if(trim(file_get_contents($filePath)) != '')
+		{
+			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
+			kFileSyncUtils::moveFromFile($filePath, $key);
+		}
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile);
