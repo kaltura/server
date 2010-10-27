@@ -242,7 +242,9 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 		if(!$entry)
 			return;
 			
-		myPartnerUtils::addPartnerToCriteria(new FileSyncPeer(), $entry->getPartnerId());
+		$criteriaFilter = FileSyncPeer::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		$criteria->add(FileSyncPeer::PARTNER_ID, $entry->getPartnerId());
 		
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
