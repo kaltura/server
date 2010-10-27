@@ -1,7 +1,7 @@
 <?php
 class KalturaSyndicationFeedRenderer
 {
-	const ENTRY_PEER_LIMIT_QUERY = 100;
+	const ENTRY_PEER_LIMIT_QUERY = 500;
 	const LEVEL_INDENTATION = '  ';
 	
 	/**
@@ -216,6 +216,8 @@ class KalturaSyndicationFeedRenderer
 	private function fetchNextPage()
 	{
 		$this->entriesCurrentPage = null;
+		entryPeer::clearInstancePool();
+		flavorAssetPeer::clearInstancePool();
 		
 		if($this->currentCriteria)
 		{
