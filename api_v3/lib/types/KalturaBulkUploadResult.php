@@ -205,7 +205,7 @@ class KalturaBulkUploadResult extends KalturaObject
 		{
 			foreach($this->pluginsData as $data)
 			{
-				KalturaLog::debug("Plugins data item is " . get_class($data));
+//				KalturaLog::debug("Plugins data item is " . get_class($data));
 				if($data instanceof KalturaBulkUploadPluginData)
 					$pluginsData[$data->field] = $data->value;
 			}
