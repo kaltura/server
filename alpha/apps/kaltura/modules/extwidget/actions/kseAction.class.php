@@ -47,7 +47,7 @@ class kseAction extends sfAction
 			"&cdnHost=". str_replace("http://", "", str_replace("https://", "", myPartnerUtils::getCdnHost($partner_id))).
 			"&uiConfId=" . $ui_conf_id . "&disableurlhashing=".kConf::get('disable_url_hashing');
 		
-		$wrapper_swf = myContentStorage::getFSFlashRootPath ()."/flexwrapper/".kConf::get('flex_wrapper_version')."/FlexWrapper.swf";
+		$wrapper_swf = myContentStorage::getFSFlashRootPath ()."/flexwrapper/".kConf::get('editors_flex_wrapper_version')."/FlexWrapper.swf";
 		$this->redirect(  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
 	}
 }
