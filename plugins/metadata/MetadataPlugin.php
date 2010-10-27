@@ -401,14 +401,17 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 			}
 				
 			$currentXPath .= "/$xPath";
-			$domXPath = new DOMXPath($xml);
-			$nodeList = $domXPath->query($currentXPath);
-			
-			if($nodeList && $nodeList->length)
+			if($currentXPath != $xPath)
 			{
-				$currentNode = $nodeList->item(0);
-				KalturaLog::debug("xPath [$xPath] already exists");
-				continue;
+				$domXPath = new DOMXPath($xml);
+				$nodeList = $domXPath->query($currentXPath);
+				
+				if($nodeList && $nodeList->length)
+				{
+					$currentNode = $nodeList->item(0);
+					KalturaLog::debug("xPath [$xPath] already exists");
+					continue;
+				}
 			}
 			
 			if(!preg_match('/\*\[\s*local-name\(\)\s*=\s*\'([^\']+)\'\s*\]/', $xPath, $matches))
