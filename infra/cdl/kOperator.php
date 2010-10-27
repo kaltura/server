@@ -15,4 +15,9 @@ class kOperator
 	 * @var string
 	 */
 	public $command;
+	
+	/**
+	 * @var string
+	 */
+	public $config;
 }
