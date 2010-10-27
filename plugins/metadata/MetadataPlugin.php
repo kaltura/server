@@ -376,13 +376,13 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 			return;
 		}
 		
-		$msg = $bulkUploadResult->getDescription();
+		$msg = $bulkUploadResult->getErrorDescription();
 		if($msg)
 			$msg .= "\n";
 		
 		$msg .= $description;
 			
-		$bulkUploadResult->setDescription($msg);
+		$bulkUploadResult->setErrorDescription($msg);
 		$bulkUploadResult->save();
 	}
 	
