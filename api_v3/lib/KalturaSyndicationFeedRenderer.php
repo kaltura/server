@@ -257,14 +257,15 @@ class KalturaSyndicationFeedRenderer
 		
 		$c = clone $this->baseCriteria;
 		$c->setLimit(self::ENTRY_PEER_LIMIT_QUERY);
-		$c->clearOrderByColumns();
-		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
 		
 		if(!count($this->entryFilters))
 		{
 			if($this->currentCriteria) // already executed the base criteria
 				return null;
 				
+			$c->clearOrderByColumns();
+			$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+			
 			return $c; // return the base criteria
 		}
 			
@@ -275,6 +276,10 @@ class KalturaSyndicationFeedRenderer
 		next($this->entryFilters);
 			
 		$filter->attachToCriteria($c);
+		
+		$c->clearOrderByColumns();
+		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+		
 		return $c;
 	}
 	
