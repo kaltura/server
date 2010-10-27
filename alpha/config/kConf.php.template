@@ -129,7 +129,7 @@ class kConf
 				"kmc_dashboard_version" => 'v1.0.13',
 				"kmc_login_version" => 'v1.1.11',
 				"kcw_flex_wrapper_version" => 'v1.2',
-				"editors_flex_wrapper_version" => 'v1.0.1',
+				"editors_flex_wrapper_version" => 'v1.01',
 				"kdp_wrapper_version" => 'v11.0',
 				"kmc_secured_login" => false,
 				
