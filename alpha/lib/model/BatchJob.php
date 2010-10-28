@@ -149,19 +149,19 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	public static function createDeleteEntryJob ( entry $entry )
 	{
-		if ( $entry == null ) return;
-		
-		KalturaLog::log("BatchJob::create Delete Entry Job Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
-		
-//		if ( ! myPartnerUtils::shouldModerate( $entry->getPartnerId() ) ) return;
-		$batch_job = new BatchJob();
-		$currentDc = kDataCenterMgr::getCurrentDc();
-		$batch_job->setDc($currentDc["name"]);
-		$batch_job->setPartnerId($entry->getPartnerId());
-		$batch_job->setJobType( BatchJob::BATCHJOB_TYPE_DELETE );
-		$batch_job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
-		$batch_job->setEntryId( $entry->getId() );
-		$batch_job->save();
+//		if ( $entry == null ) return;
+//		
+//		KalturaLog::log("BatchJob::create Delete Entry Job Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
+//		
+////		if ( ! myPartnerUtils::shouldModerate( $entry->getPartnerId() ) ) return;
+//		$batch_job = new BatchJob();
+//		$currentDc = kDataCenterMgr::getCurrentDc();
+//		$batch_job->setDc($currentDc["name"]);
+//		$batch_job->setPartnerId($entry->getPartnerId());
+//		$batch_job->setJobType( BatchJob::BATCHJOB_TYPE_DELETE );
+//		$batch_job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
+//		$batch_job->setEntryId( $entry->getId() );
+//		$batch_job->save();
 	}
 	
 	public function save(PropelPDO $con = null)

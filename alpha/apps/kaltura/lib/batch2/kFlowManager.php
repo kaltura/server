@@ -1117,7 +1117,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 					break;
 					
 				case BatchJob::BATCHJOB_TYPE_DELETE:
-					$dbBatchJob = $this->updatedDelete($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
+//					$dbBatchJob = $this->updatedDelete($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
 				case BatchJob::BATCHJOB_TYPE_FLATTEN:
