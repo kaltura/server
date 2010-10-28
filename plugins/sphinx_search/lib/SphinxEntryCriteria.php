@@ -451,6 +451,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue))
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
@@ -470,6 +472,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue))
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
@@ -490,6 +494,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue))
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
@@ -521,6 +527,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 					{
 						if(!is_numeric($valValue) && strlen($valValue) <= 1)
 							unset($vals[$valIndex]);
+						elseif(preg_match('/[\s\t]/', $valValue))
+							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
 						else
 							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
