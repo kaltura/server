@@ -25,7 +25,6 @@ class kSphinxSearchManager implements
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		KalturaLog::debug(get_class($object) . ' consumed');
 		if(!($object instanceof entry))
 			return;
 
