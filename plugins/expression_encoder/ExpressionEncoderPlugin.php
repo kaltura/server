@@ -25,7 +25,7 @@ class ExpressionEncoderPlugin implements IKalturaObjectLoaderPlugin
 	 */
 	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::EXPRESSION_ENCODER)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;

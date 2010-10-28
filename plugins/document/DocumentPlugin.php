@@ -69,7 +69,7 @@ class DocumentPlugin implements IKalturaServicesPlugin, IKalturaObjectLoaderPlug
 		
 		// OPERATION ENGINES
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF_CREATOR)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -78,7 +78,7 @@ class DocumentPlugin implements IKalturaServicesPlugin, IKalturaObjectLoaderPlug
 		}
 
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF2SWF)
+		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF2SWF)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
