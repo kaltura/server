@@ -129,7 +129,6 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id);
 			
 		$categoryDb->setDeletedAt(time());
-		$categoryDb->save();
 	} 
 	
 	/**
