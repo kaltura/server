@@ -26,13 +26,21 @@ INSERT IGNORE INTO `ui_conf` (id,obj_type,partner_id,subp_id,conf_file_path,name
 (610,2,0,0,'content/uiconf/kaltura/drupal/cw_drupal_comments.xml','drupal cw','680','480',NULL,'/flash/kcw/v1.5.4CE/ContributionWizard.swf',NULL,NULL,NULL,1,NULL,NULL,2,NULL,2,1),
 (530,1,0,0,'content/uiconf/kaltura/wordpress/kdp_2.0.12/kdp_wordpress_v2_blue.xml','wordpress v2.3','410','364',NULL,'/flash/kdp/v2.0.12/kdp.swf','2009-05-17 15:30:00','2009-05-17 15:30:00',NULL,1,NULL,NULL,2,NULL,2,1),
 (531,1,0,0,'content/uiconf/kaltura/wordpress/kdp_2.0.12/kdp_wordpress_v2_dark.xml','wordpress v2.3','410','364',NULL,'/flash/kdp/v2.0.12/kdp.swf','2009-05-17 15:30:00','2009-05-17 15:30:00',NULL,1,NULL,NULL,2,NULL,2,1),
-(532,1,0,0,'content/uiconf/kaltura/wordpress/kdp_2.0.12/kdp_wordpress_v2_light.xml','wordpress v2.3','410','364',NULL,'/flash/kdp/v2.0.12/kdp.swf','2009-05-17 15:30:00','2009-05-17 15:30:00',NULL,1,NULL,NULL,2,NULL,2,1);
+(532,1,0,0,'content/uiconf/kaltura/wordpress/kdp_2.0.12/kdp_wordpress_v2_light.xml','wordpress v2.3','410','364',NULL,'/flash/kdp/v2.0.12/kdp.swf','2009-05-17 15:30:00','2009-05-17 15:30:00',NULL,1,NULL,NULL,2,NULL,2,1),
+(48304,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_white_400_600.xml','Vertical Light','400','600','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:43:43','2009-07-15 18:43:43',NULL,1,'playlist',NULL,2,NULL,2,1),
+(48305,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_dark_400_600.xml','Vertical Dark','400','600','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:09','2009-07-15 18:44:09',NULL,1,'playlist',NULL,2,NULL,2,1),
+(48306,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_white_740_335.xml','Horizontal Light','740','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:37','2009-07-15 18:44:37',NULL,1,'playlist',NULL,2,NULL,2,1),
+(48307,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_dark_740_335.xml','Horizontal Dark','740','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:46','2009-07-15 18:44:46',NULL,1,'playlist',NULL,2,NULL,2,1);
 
 INSERT IGNORE INTO `file_sync` (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
 VALUES
 (0,2,'199',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/generic/kdp/kdp_regular.xml',14603),
 (0,2,'200',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/embedplayers/player_dark_400_335.xml',11638),
 (0,2,'47400',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/generic/kae_1.0.10/kae_generic_generic.xml',4405),
+(0,2,'48304',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_white_400_600.xml',14503),
+(0,2,'48305',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_dark_400_600.xml',14502),
+(0,2,'48306',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_white_740_335.xml',14516),
+(0,2,'48307',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_dark_740_335.xml',14502),
 (0,2,'501',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/wordpress/cw_wordpress.xml',4606),
 (0,2,'502',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/wordpress/se_wordpress.xml',482),
 (0,2,'503',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/wordpress/cw_wordpress_comments.xml',3822),
@@ -55,6 +63,16 @@ VALUES
 (0,2,'608',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_whiteblue_remix.xml',4884),
 (0,2,'609',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_whiteblue_view.xml',4610),
 (0,2,'610',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/cw_drupal_comments.xml',996);
+
+INSERT INTO ui_conf (id,obj_type,partner_id,subp_id,conf_file_path,name,width,height,html_params,swf_url,created_at,updated_at, conf_vars, use_cdn,tags,display_in_search) 
+VALUES(48501,1,0,0,'content/uiconf/kaltura/kmc/content/kdp_kmc_content_light.xml','KDP3 light player', 400,335,'','/flash/kdp3/v3.3.9.2/kdp3.swf',NOW(),NOW(), NULL, 1, 'player', 2);
+INSERT INTO ui_conf (id,obj_type,partner_id,subp_id,conf_file_path,name,width,height,html_params,swf_url,created_at,updated_at, conf_vars, use_cdn,tags,display_in_search) 
+VALUES(48502,1,0,0,'content/uiconf/kaltura/kmc/content/kdp_kmc_content_dark.xml','KDP3 dark player', 400,335,'','/flash/kdp3/v3.3.9.2/kdp3.swf',NOW(),NOW(), NULL, 1, 'player', 2);
+
+INSERT IGNORE INTO `file_sync` (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
+VALUES
+(0,2,'48501',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/content/kdp_kmc_content_light.xml',6173),
+(0,2,'48502',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/content/kdp_kmc_content_dark.xml',10611);
 
 INSERT INTO `ui_conf` ()
 VALUES
