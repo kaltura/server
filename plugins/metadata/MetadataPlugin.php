@@ -34,7 +34,6 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 			'metadata' => 'MetadataService',
 			'metadataProfile' => 'MetadataProfileService',
 			'metadataBatch' => 'MetadataBatchService',
-			'entryMetadata' => 'EntryMetadataService',
 		);
 		return $map;
 	}
@@ -242,9 +241,9 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 		if(!$entry)
 			return;
 			
-		$criteriaFilter = FileSyncPeer::getCriteriaFilter();
-		$criteria = $criteriaFilter->getFilter();
-		$criteria->add(FileSyncPeer::PARTNER_ID, $entry->getPartnerId());
+//		$criteriaFilter = FileSyncPeer::getCriteriaFilter();
+//		$criteria = $criteriaFilter->getFilter();
+//		$criteria->add(FileSyncPeer::PARTNER_ID, $entry->getPartnerId());
 		
 		$metadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 		if(!$metadataProfile)
