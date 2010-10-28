@@ -1,5 +1,5 @@
 <?php
-class MultiCentersPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEventConsumersPlugin
+class MultiCentersPlugin implements IKalturaServicesPlugin, IKalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'multiCenters';
 	const MULTI_CENTERS_SYNCER_CLASS = 'kMultiCentersSynchronizer';
@@ -9,12 +9,15 @@ class MultiCentersPlugin implements KalturaPlugin, KalturaServicesPlugin, Kaltur
 	{
 		return self::PLUGIN_NAME;
 	}
-
-	public static function isAllowedPartner($partnerId)
+	
+	public function getInstances($intrface)
 	{
-		return true;
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
 	}
-		
+
 	/**
 	 * @return array
 	 */

@@ -1,6 +1,6 @@
 <?php
 
-class DocumentPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaObjectLoaderPlugin, KalturaEventConsumersPlugin
+class DocumentPlugin implements IKalturaServicesPlugin, IKalturaObjectLoaderPlugin, IKalturaEventConsumersPlugin
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -9,12 +9,15 @@ class DocumentPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaObj
 	{
 		return self::PLUGIN_NAME;
 	}
-
-	public static function isAllowedPartner($partnerId)
-	{
-		return true;
-	}
 	
+	public function getInstances($intrface)
+	{
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
+	}
+
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue

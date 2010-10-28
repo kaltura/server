@@ -1,5 +1,5 @@
 <?php
-class KalturaInternalToolsPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaAdminConsolePagesPlugin
+class KalturaInternalToolsPlugin implements IKalturaServicesPlugin, IKalturaAdminConsolePagesPlugin
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';
 	
@@ -7,12 +7,15 @@ class KalturaInternalToolsPlugin implements KalturaPlugin, KalturaServicesPlugin
 	{
 		return self::PLUGIN_NAME;
 	}
-
-	public static function isAllowedPartner($partnerId)
-	{
-		return true;
-	}
 	
+	public function getInstances($intrface)
+	{
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
+	}
+
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass
 	 */

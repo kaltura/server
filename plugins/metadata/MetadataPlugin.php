@@ -1,5 +1,5 @@
 <?php
-class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEventConsumersPlugin, KalturaObjectLoaderPlugin, KalturaBulkUploadHandlerPlugin
+class MetadataPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin, IKalturaEventConsumersPlugin, IKalturaObjectLoaderPlugin, IKalturaBulkUploadHandlerPlugin
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -17,6 +17,14 @@ class MetadataPlugin implements KalturaPlugin, KalturaServicesPlugin, KalturaEve
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	public function getInstances($intrface)
+	{
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
 	}
 
 	public static function isAllowedPartner($partnerId)

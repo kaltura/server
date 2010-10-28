@@ -1,5 +1,5 @@
 <?php
-interface KalturaServicesPlugin
+interface IKalturaServicesPlugin extends IKalturaPlugin
 {
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass

@@ -1,5 +1,5 @@
 <?php
-interface KalturaAdminConsolePagesPlugin
+interface IKalturaAdminConsolePagesPlugin extends IKalturaPlugin
 {
 	/**
 	 * @return array

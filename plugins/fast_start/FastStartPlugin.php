@@ -1,6 +1,6 @@
 <?php
 
-class FastStartPlugin implements KalturaPlugin, KalturaObjectLoaderPlugin
+class FastStartPlugin implements IKalturaObjectLoaderPlugin
 {
 	const PLUGIN_NAME = 'fastStart';
 	
@@ -8,12 +8,15 @@ class FastStartPlugin implements KalturaPlugin, KalturaObjectLoaderPlugin
 	{
 		return self::PLUGIN_NAME;
 	}
-
-	public static function isAllowedPartner($partnerId)
-	{
-		return true;
-	}
 	
+	public function getInstances($intrface)
+	{
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
+	}
+
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue

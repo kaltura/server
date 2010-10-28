@@ -1,11 +1,19 @@
 <?php
-class AdminConsolePlugin implements KalturaPlugin, KalturaServicesPlugin
+class AdminConsolePlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin
 {
 	const PLUGIN_NAME = 'adminConsole';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	public function getInstances($intrface)
+	{
+		if($this instanceof $intrface)
+			return array($this);
+			
+		return array();
 	}
 	
 	public static function getServicesMap()
