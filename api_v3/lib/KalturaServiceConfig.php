@@ -5,7 +5,11 @@ class KalturaServiceConfig extends myServiceConfig
 	{
 	    KalturaServiceConfig::setStrictMode(false);
 	    
-	    $serviceConfigs = KalturaPluginManager::getServiceConfigs();
+		$serviceConfigs = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServicesPlugin');
+		foreach($pluginInstances as $pluginInstance)
+			$serviceConfigs += $pluginInstance->getServiceConfig();
+		
 	    foreach($serviceConfigs as $serviceConfig)
 	    	KalturaServiceConfig::addSecondaryConfigTables($serviceConfig);
 	    

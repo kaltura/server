@@ -58,12 +58,19 @@ class KalturaServicesMap
 			$checkedClasses[] = $class;
 		}
 		
-		$pluginServices = KalturaPluginManager::getApiServices();
-	    foreach($pluginServices as $serviceId => $class)
-	    {
-			$serviceId = strtolower($serviceId);
-			$serviceMap[$serviceId] = $class;
-	    }
+		$pluginServices = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServicesPlugin');
+		foreach($pluginInstances as $pluginName => $pluginInstance)
+		{
+			$pluginServices = $pluginInstance->getServicesMap();
+			foreach($pluginServices as $serviceName => $serviceClass)
+			{
+				$serviceName = strtolower($serviceName);
+				$serviceId = "{$pluginName}_{$serviceName}";
+				$pluginServices[$serviceId] = $serviceClass;
+				$serviceMap[$serviceId] = $serviceClass;
+			}
+		}
 		
 		$cachedFile = '';
 		$cachedFile .= ('<?php' . PHP_EOL);

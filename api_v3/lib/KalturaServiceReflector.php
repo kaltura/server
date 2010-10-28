@@ -95,14 +95,26 @@ class KalturaServiceReflector
 		if(array_key_exists($serviceId, $this->_servicesMap))
 			return true;
 			
-		if(KalturaPluginManager::isServiceExists($serviceId))
+		if(strpos($serviceId, '_') <= 0)
+			return false;
+
+		$serviceId = strtolower($serviceId);
+		list($servicePlugin, $serviceName) = explode('_', $serviceId);
+		
+		$pluginInstances = self::getPluginInstances('IKalturaServicesPlugin');
+		if(!isset($pluginInstances[$servicePlugin]))
+			return false;
+			
+		$pluginInstance = $pluginInstances[$servicePlugin];
+		$servicesMap = $pluginInstance->getServicesMap();
+		if(isset($servicesMap[$serviceName]))
 		{
-			$class = KalturaPluginManager::getApiServiceClass($serviceId);
+			$class = $servicesMap[$serviceName];
 			KalturaServicesMap::addService($serviceId, $class);
 			$this->_servicesMap = KalturaServicesMap::getMap();
 			return true;
 		}
-		
+			
 		return false;
 	}
 	

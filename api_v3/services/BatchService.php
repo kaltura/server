@@ -182,7 +182,11 @@ class BatchService extends KalturaBaseService
 		{
 			$pluginValues = $pluginDataArray->toValuesArray();
 			if(count($pluginValues))
-				KalturaPluginManager::handleBulkUploadData($bulkUploadResult->entryId, $pluginValues);
+			{
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadHandlerPlugin');
+				foreach($pluginInstances as $pluginInstance)
+					$pluginInstance->handleBulkUploadData($bulkUploadResult->entryId, $pluginValues);
+			}
 		}
 		
 		$bulkUploadResult->fromObject($dbBulkUploadResult);

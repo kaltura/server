@@ -9,9 +9,11 @@ class kEventsManager
 	protected static function loadConsumers()
 	{
 		$coreConsumers = kConf::get('event_consumers');
-//		KalturaLog::debug("Found [" . count($coreConsumers) . "] core consumers");
-		$pluginConsumers = KalturaPluginManager::getEventConsumers();
-//		KalturaLog::debug("Found [" . count($pluginConsumers) . "] plugin consumers");
+		
+		$pluginConsumers = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEventConsumersPlugin');
+		foreach($pluginInstances as $pluginInstance)
+			$pluginConsumers += $pluginInstance->getEventConsumers();
 		
 		$consumers = array_merge($coreConsumers, $pluginConsumers);
 		foreach($consumers as $consumer)

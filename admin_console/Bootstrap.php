@@ -51,7 +51,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$subMenuPage = $navigation->findOneBy('label', $subMenu->label);
 		$subMenuPage->setParent($menuPage);
 		
-		$pluginAdminConsolePages = KalturaPluginManager::getAdminConsolePages();
+		
+		$pluginAdminConsolePages = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePagesPlugin');
+		foreach($pluginInstances as $pluginInstance)
+			$pluginAdminConsolePages += $pluginInstance->getAdminConsolePages();
+		
 		foreach($pluginAdminConsolePages as $pluginAdminConsolePage)
 		{
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
