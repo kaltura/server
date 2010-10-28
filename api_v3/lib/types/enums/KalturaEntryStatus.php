@@ -11,10 +11,6 @@ class KalturaEntryStatus extends KalturaEnum
 	const PRECONVERT = 1;
 	const READY = 2;
 	const DELETED = 3;
-	
-	/**
-	 * @deprecated This status is deprecated and will be removed in the future, entry {@link ?object=kalturaEntryModerationStatus moderationStatus} should be used instead 
-	 */
 	const PENDING = 4;
 	
 	/**

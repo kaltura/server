@@ -95,7 +95,7 @@ class entry extends Baseentry implements ISyncableFile
 	const ENTRY_STATUS_PRECONVERT = 1;
 	const ENTRY_STATUS_READY = 2;
 	const ENTRY_STATUS_DELETED = 3;
-	const ENTRY_STATUS_PENDING = 4;  // 2009-10-06 - Obsolete, moderation is using moderation_status field //  NOT is use !
+	const ENTRY_STATUS_PENDING = 4;
 	const ENTRY_STATUS_MODERATE = 5; // 2009-10-06 - Obsolete, moderation is using moderation_status field // entry waiting in the moderation queue
 	const ENTRY_STATUS_BLOCKED = 6;  // 2009-10-06 - Obsolete, moderation is using moderation_status field
 	
