@@ -76,7 +76,7 @@ class KalturaPluginManager
 	/**
 	 * @return array<KalturaPlugin>
 	 */
-	public static function getPluginInstances($interface)
+	public static function getPluginInstances($interface = null)
 	{
 		if(!count(self::$pluginInstances))
 		{
@@ -87,6 +87,9 @@ class KalturaPluginManager
 				if($pluginClass && class_exists($pluginClass))
 					self::$pluginInstances[$pluginName] = new $pluginClass();
 		}
+		
+		if(is_null($interface))
+			return self::$pluginInstances;
 		
 		$instances = array();
 		foreach(self::$pluginInstances as $pluginInstance)
