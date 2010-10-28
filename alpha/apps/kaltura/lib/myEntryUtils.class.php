@@ -394,7 +394,8 @@ class myEntryUtils
 		// use the batch_job mechanism to indicate there is a deleted entry to handle
 		if ( $need_to_fix_roughcut )
 		{
-			BatchJob::createDeleteEntryJob ( $entry );
+//			Should use a different job type
+//			BatchJob::createDeleteEntryJob ( $entry );
 		}
 
 		$entry->putInCustomData( "deleted_original_data" , $entry->getData() ) ;
