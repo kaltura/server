@@ -95,7 +95,8 @@ class KalturaPluginManager
 		foreach(self::$pluginInstances as $pluginInstance)
 		{
 			$moreInstances = $pluginInstance->getInstances($interface);
-			$instances += $moreInstances;
+			foreach($moreInstances as $instance)
+				$instances[] = $instance;
 		}
 		return $instances;
 	}
