@@ -721,19 +721,30 @@ class myEntryUtils
 		while($count--)
 		{
 			if (
-				($vid_sec != -1 || $vid_slices != -1) && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO
+				// need to create a thumb if either:
+				// 1. entry is a video and a specific second was requested OR a slices were requested
+				// 3. the actual thumbnail doesnt exist on disk
+				($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO && ($vid_sec != -1 || $vid_slices != -1))
 				||
 				(!file_exists($orig_image_path))
 				)
 			{
 				if ($vid_sec != -1) // a specific second was requested
+				{
 					$calc_vid_sec = min($vid_sec, floor($entry->getLengthInMsecs() / 1000));
-				else if ($vid_slice != -1) // default thumbnail wasnt created yet
-					$calc_vid_sec = $entry->getBestThumbOffset();
-				else if ($entry->getStatus() != entry::ENTRY_STATUS_READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
-					$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : 3;
-				else // need to create a thumbnail at a specific slice
+				}
+				else if ($vid_slices != -1) // need to create a thumbnail at a specific slice
+				{
 					$calc_vid_sec = floor($entry->getLengthInMsecs() / $vid_slices * min($vid_slice, $vid_slices) / 1000);
+				}
+				else if ($entry->getStatus() != entry::ENTRY_STATUS_READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
+				{
+					$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : 3;
+				}
+				else // default thumbnail wasnt created yet
+				{
+					$calc_vid_sec = $entry->getBestThumbOffset();
+				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
