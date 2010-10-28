@@ -107,11 +107,12 @@ class KalturaServiceReflector
 			
 		$pluginInstance = $pluginInstances[$servicePlugin];
 		$servicesMap = $pluginInstance->getServicesMap();
+		KalturaLog::debug(print_r($servicesMap, true));
 		foreach($servicesMap as $name => $class)
 		{
 			if(strtolower($name) == $serviceName)
 			{
-				$class = $servicesMap[$serviceName];
+				$class = $servicesMap[$name];
 				KalturaServicesMap::addService($serviceId, $class);
 				$this->_servicesMap = KalturaServicesMap::getMap();
 				return true;
