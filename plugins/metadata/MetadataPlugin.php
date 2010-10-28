@@ -317,7 +317,7 @@ class MetadataPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugi
 				$fieldValues = explode(self::BULK_UPLOAD_MULTI_VALUES_DELIMITER, $value);
 				foreach($fieldValues as $fieldValue)
 				{
-					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($value))
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE && !is_numeric($fieldValue))
 					{
 						$value = self::parseFormatedDate($fieldValue);
 						if(!$value || !strlen($value))
