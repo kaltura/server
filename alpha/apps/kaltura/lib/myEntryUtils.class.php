@@ -637,8 +637,7 @@ class myEntryUtils
 			$media_type == entry::ENTRY_MEDIA_TYPE_SHOW) // not time offset - copying existing thumb
 		{
 			$thumbBigFullKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			if($media_type == entry::ENTRY_MEDIA_TYPE_SHOW &&
-			   !kFileSyncUtils::getLocalFileSyncForKey($thumbBigFullKey, false))
+			if(!kFileSyncUtils::fileSync_exists($thumbBigFullKey))
 			{
 				return false;
 			}
