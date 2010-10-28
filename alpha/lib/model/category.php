@@ -224,6 +224,7 @@ class category extends Basecategory
 		}
 		
 		parent::setDeletedAt($v);
+		$this->save();
 	}
 	
 	public function delete(PropelPDO $con = null)
