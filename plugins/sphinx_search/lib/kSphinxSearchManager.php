@@ -362,6 +362,7 @@ class kSphinxSearchManager implements
 	 */
 	public function saveToSphinx(entry $entry, $isInsert = false, $force = false)
 	{
+		KalturaLog::debug('Updating sphinx for entry [' . $entry->getId() . ']');
 		$sql = $this->getSphinxSaveSql($entry, $isInsert, $force);
 		if(!$sql)
 			return true;
