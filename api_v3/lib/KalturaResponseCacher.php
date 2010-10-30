@@ -124,9 +124,6 @@ class KalturaResponseCacher
 		
 	public function end()
 	{
-		if (!self::$_useCache)
-			return;
-			
 		if (!$this->shouldCache())
 			return;
 	
@@ -151,6 +148,9 @@ class KalturaResponseCacher
 	
 	public function storeCache($response, $contentType = null)
 	{
+		if (!$this->shouldCache())
+			return;
+	
 		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
 		file_put_contents($this->_cacheDataFilePath, $response);
 		if(!is_null($contentType)) {
@@ -180,20 +180,20 @@ class KalturaResponseCacher
 	
 	private function shouldCache()
 	{
-		$ksData = $this->getKsData();
+		if (!self::$_useCache)
+			return false;
+			
+		$ks = kSessionUtils::crackKs($this->_ks);
+		if(!$ks)
+			return true;
 		
-		$uid = null;
-		$validUntil = 0;
-		if ($ksData)
-		{
-			$uid = $ksData["userId"];
-			$validUntil = $ksData["validUntil"];
-		}
-		
-		if ($validUntil && $validUntil < time()) // if ks has expired dont cache response
+		if ($ks->isAdmin())
 			return false;
 	
-		if ($uid === "0" || $uid === null) // $uid will be null when no session
+		if ($ks->valid_until && $ks->valid_until < time()) // if ks has expired dont cache response
+			return false;
+	
+		if ($ks->user === "0" || $ks->user === null) // $uid will be null when no session
 			return true;
 			
 		return false;
