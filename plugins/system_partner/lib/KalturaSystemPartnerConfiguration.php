@@ -4,6 +4,26 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $partnerName;
+	
+	/**
+	 * @var string
+	 */
+	public $description;
+	
+	/**
+	 * @var string
+	 */
+	public $adminName;
+	
+	/**
+	 * @var string
+	 */
+	public $adminEmail;
+	
+	/**
+	 * @var string
+	 */
 	public $host;
 	
 	/**
@@ -20,6 +40,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $partnerPackage;
+	
+	/**
+	 * @var int
+	 */
+	public $monitorUsage;
 	
 	/**
 	 * @var bool
@@ -82,12 +107,22 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $enableAuditTrail;
 	
+	/**
+	 * @var bool
+	 */
+	public $defThumbOffset;
+	
 	private static $map_between_objects = array
 	(
+		"partnerName",
+		"description",
+		"adminName",
+		"adminEmail",
 		"host",
 		"cdnHost",
 		"maxBulkSize",
 		"partnerPackage",
+		"monitorUsage",
 		"liveStreamEnabled",
 		"moderateContent",
 		"rtmpUrl",
@@ -98,8 +133,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"enableSilverLight",
 		"enableVast",
 		"enable508Players",
-		"enableMetadata",
-		"enableAuditTrail",
+		"defThumbOffset",
 	);
 
 	public function getMapBetweenObjects()

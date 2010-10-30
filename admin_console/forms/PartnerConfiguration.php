@@ -10,9 +10,29 @@ class Form_PartnerConfiguration extends Kaltura_Form
 		$this->loadDefaultDecorators();
 		$this->addDecorator('Description', array('placement' => 'prepend'));
 
-		$this->addElement('text', 'account_name', array(
-			'label' => 'Publisher Name:',
-			'decorators' 	=> array('Label', 'Description')
+//		$this->addElement('text', 'account_name', array(
+//			'label' => 'Publisher Name:',
+//			'decorators' 	=> array('Label', 'Description')
+//		));
+		 
+		$this->addElement('text', 'partner_name', array(
+			'label'			=> 'Publisher Name:',
+			'filters'		=> array('StringTrim'),
+		));
+		 
+		$this->addElement('text', 'description', array(
+			'label'			=> 'Description:',
+			'filters'		=> array('StringTrim'),
+		));
+		 
+		$this->addElement('text', 'admin_name', array(
+			'label'			=> 'Administrator Name:',
+			'filters'		=> array('StringTrim'),
+		));
+		 
+		$this->addElement('text', 'admin_email', array(
+			'label'			=> 'Administrator E-Mail:',
+			'filters'		=> array('StringTrim'),
 		));
 		 
 		$this->addElement('text', 'host', array(
@@ -34,12 +54,16 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'label'			=> 'Usage Package:',
 			'filters'		=> array('StringTrim'),
 		));
+				
+		$this->addElement('checkbox', 'monitor_usage', array(
+			'label'	  => 'Monitor Usage',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
+		));
 		
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-
 		
 		$element = new Zend_Form_Element_Hidden('setPublisherFunctionality');
 		$element->setLabel('Set Publisher Functionality');
@@ -63,7 +87,7 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_vast'))),
 		));
 		
-		$this->addElement('checkbox', 'enable_508_players', array(
+		$this->addElement('checkbox', 'enable508_players', array(
 			'label'	  => '508 players',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_508_players'))),
 		));
