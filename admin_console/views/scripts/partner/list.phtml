@@ -39,14 +39,16 @@
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
-							<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-							<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
-							<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
-								<option value="block"><?php echo $this->translate('Block'); ?></option>
-							<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
-								<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+							<?php if (Kaltura_AclHelper::getCurrentRole() == Kaltura_AclHelper::ROLE_ADMINISTRATOR): ?>
+								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+								<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
+									<option value="block"><?php echo $this->translate('Block'); ?></option>
+								<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
+									<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+								<?php endif; ?>
+								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 							<?php endif; ?>
-							<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 						<?php endif; ?>
 					</select>
 				</td>
