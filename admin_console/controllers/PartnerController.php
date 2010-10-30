@@ -260,7 +260,7 @@ class PartnerController extends Zend_Controller_Action
 			$partner = $result[0];
 			$config = $result[1];
 			$form->populateFromObject($config);
-			$form->getElement('account_name')->setDescription($partner->name);
+//			$form->getElement('account_name')->setDescription($partner->name);
 			
 		}
 		
