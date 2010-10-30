@@ -55,7 +55,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$pluginAdminConsolePages = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePagesPlugin');
 		foreach($pluginInstances as $pluginInstance)
-			$pluginAdminConsolePages += $pluginInstance->getAdminConsolePages();
+			foreach($pluginInstance->getAdminConsolePages() as $pluginAdminConsolePage)
+				$pluginAdminConsolePages[] = $pluginAdminConsolePage;
 		
 		foreach($pluginAdminConsolePages as $pluginAdminConsolePage)
 		{
@@ -65,14 +66,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				continue;				
 				
 			$navigation->addPage(array(
-				    'label' => $pluginAdminConsolePage->label,
+				    'label' => $pluginAdminConsolePage->getNavigationActionLabel(),
 				    'controller' => 'plugin',
 					'action' => get_class($pluginAdminConsolePage)));
 			
-			if($pluginAdminConsolePage->rootLabel)
+			if($pluginAdminConsolePage->getNavigationRootLabel())
 			{
-				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->label);
-				$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->rootLabel);
+				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
+				$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationRootLabel());
 				if($menuPage)
 					$subMenuPage->setParent($menuPage);
 			}
@@ -93,7 +94,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		));
 		$moduleAutoloader->addResourceType('kaltura', 'lib/Kaltura', 'Kaltura');
 		$autoloader->pushAutoloader($moduleAutoloader);
-
 		$autoloader->pushAutoloader(new Kaltura_ClientLoader());
 		$autoloader->pushAutoloader(new Kaltura_InfraLoader());
 	}
