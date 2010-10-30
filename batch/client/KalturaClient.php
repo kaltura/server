@@ -25,6 +25,8 @@ class KalturaBaseEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -162,8 +164,8 @@ class KalturaCategoryOrderBy
 
 class KalturaCommercialUseType
 {
-	const COMMERCIAL_USE = "commercial_use";
-	const NON_COMMERCIAL_USE = "non-commercial_use";
+	const COMMERCIAL_USE = 1;
+	const NON_COMMERCIAL_USE = 0;
 }
 
 class KalturaContainerFormat
@@ -249,6 +251,8 @@ class KalturaDataEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -409,6 +413,8 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -431,6 +437,8 @@ class KalturaLiveStreamEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -509,6 +517,8 @@ class KalturaMediaEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -564,6 +574,8 @@ class KalturaMixEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -663,6 +675,8 @@ class KalturaPlayableEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -675,6 +689,8 @@ class KalturaPlaylistOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -768,6 +784,11 @@ class KalturaUiConfObjType
 	const PLAYER_V3 = 8;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
+	const KMC_GENERAL = 16;
+	const KMC_CONTENT = 17;
+	const KMC_SETTINGS = 18;
+	const KMC_ANALYTICS = 19;
+	const KMC_DASHBOARD = 20;
 }
 
 class KalturaUiConfOrderBy
@@ -1689,6 +1710,27 @@ class KalturaProvisionJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $mediaType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
 
 
 }
@@ -4132,6 +4174,7 @@ class KalturaEmailIngestionProfile extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
 	public $partnerId = null;
 
@@ -4326,6 +4369,15 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $createdAt = null;
+
+	/**
+	 * Entry update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
 
 	/**
 	 * Calculated rank
@@ -5577,6 +5629,20 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 *
 	 * @var int
 	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
 	public $groupIdEqual = null;
 
 	/**
@@ -6484,6 +6550,27 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 * @var array of KalturaLiveStreamBitrate
 	 */
 	public $bitrates;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
 
 
 }
@@ -8923,17 +9010,12 @@ class KalturaMediaService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId, array $pluginDataArray = null)
+	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
 		$this->client->addParam($kparams, "url", $url);
 		$this->client->addParam($kparams, "bulkUploadId", $bulkUploadId);
-		if ($pluginDataArray !== null)
-			foreach($pluginDataArray as $index => $obj)
-			{
-				$this->client->addParam($kparams, "pluginDataArray:$index", $obj->toParams());
-			}
 		$this->client->queueServiceActionCall("media", "addFromBulk", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;

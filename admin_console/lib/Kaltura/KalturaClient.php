@@ -25,6 +25,8 @@ class KalturaBaseEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -162,8 +164,8 @@ class KalturaCategoryOrderBy
 
 class KalturaCommercialUseType
 {
-	const COMMERCIAL_USE = "commercial_use";
-	const NON_COMMERCIAL_USE = "non-commercial_use";
+	const COMMERCIAL_USE = 1;
+	const NON_COMMERCIAL_USE = 0;
 }
 
 class KalturaContainerFormat
@@ -249,6 +251,8 @@ class KalturaDataEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -426,6 +430,8 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -448,6 +454,8 @@ class KalturaLiveStreamEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -526,6 +534,8 @@ class KalturaMediaEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -608,6 +618,8 @@ class KalturaMixEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -714,6 +726,8 @@ class KalturaPlayableEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -726,6 +740,8 @@ class KalturaPlaylistOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -863,6 +879,11 @@ class KalturaUiConfObjType
 	const PLAYER_V3 = 8;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
+	const KMC_GENERAL = 16;
+	const KMC_CONTENT = 17;
+	const KMC_SETTINGS = 18;
+	const KMC_ANALYTICS = 19;
+	const KMC_DASHBOARD = 20;
 }
 
 class KalturaUiConfOrderBy
@@ -1048,6 +1069,15 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $createdAt = null;
+
+	/**
+	 * Entry update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
 
 	/**
 	 * Calculated rank
@@ -2921,6 +2951,20 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 *
 	 * @var int
 	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
 	public $groupIdEqual = null;
 
 	/**
@@ -3359,6 +3403,27 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $bitrates;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
+
 
 }
 
@@ -3440,6 +3505,91 @@ class KalturaPdfFlavorParams extends KalturaFlavorParams
 
 class KalturaSwfFlavorParams extends KalturaFlavorParams
 {
+
+}
+
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
 
 }
 
@@ -4976,79 +5126,6 @@ class KalturaSystemUserListResponse extends KalturaObjectBase
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
 class KalturaSystemPartnerUsageFilter extends KalturaFilter
 {
 	/**
@@ -5250,6 +5327,34 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 *
 	 * @var string
 	 */
+	public $partnerName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminEmail = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $host = null;
 
 	/**
@@ -5272,6 +5377,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 * @var int
 	 */
 	public $partnerPackage = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $monitorUsage = null;
 
 	/**
 	 * 
@@ -5328,6 +5440,41 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 * @var bool
 	 */
 	public $enableSilverLight = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableVast = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enable508Players = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableMetadata = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableAuditTrail = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $defThumbOffset = null;
 
 
 }
@@ -7321,6 +7468,27 @@ class KalturaProvisionJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $mediaType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
 
 
 }
