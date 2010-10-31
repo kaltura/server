@@ -19,6 +19,9 @@ class partnerFilter extends baseObjectFilter
 			"_lte_created_at",
 			"_like_partner_name-description-website-admin_name-admin_email",
 			"_eq_commercial_use",
+			"_eq_partner_package",
+			"_gte_partner_package",
+			"_lte_partner_package",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at", "id", "name", "website", "admin_name", "admin_email", "status");
