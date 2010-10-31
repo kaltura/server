@@ -108,7 +108,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $enableAuditTrail;
 	
 	/**
-	 * @var bool
+	 * @var int
 	 */
 	public $defThumbOffset;
 	
