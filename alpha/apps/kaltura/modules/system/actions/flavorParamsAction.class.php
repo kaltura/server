@@ -6,16 +6,14 @@ class flavorParamsAction extends kalturaSystemAction
 	{
 		$this->forceSystemAuthentication();
 		$this->pid = $this->getRequestParameter("pid", 0);
-		if ($this->getRequestParameter("advanced")) {
-			$this->getResponse()->setCookie('flavor-params-advanced', 'yes');
-			$this->advanced = true;
+		if (!is_null($this->getRequestParameter("advanced"))) 
+		{
+			$this->getResponse()->setCookie('flavor-params-advanced', $this->getRequestParameter("advanced"));
+			$this->advanced = (int)$this->getRequestParameter("advanced");
 		}
 		else
 		{
-			if ($this->getRequest()->getCookie('flavor-params-advanced') === 'yes')
-				$this->advanced = true;
-			else
-				$this->advanced = false;
+			$this->advanced = (int)$this->getRequest()->getCookie('flavor-params-advanced');
 		}
 		
 		myDbHelper::$use_alternative_con = null;
@@ -57,28 +55,32 @@ class flavorParamsAction extends kalturaSystemAction
 						if ($partnerId != 0)
 							$this->editFlavorParam->setPartnerId($partnerId);
 					}
-					$this->editFlavorParam->setName($this->getRequestParameter("name"));
-					$this->editFlavorParam->setDescription($this->getRequestParameter("description"));
-					$this->editFlavorParam->setIsDefault($this->getRequestParameter("is-default", false));
-					$this->editFlavorParam->setReadyBehavior($this->getRequestParameter("ready-behavior"));
-					$this->editFlavorParam->setTags($this->getRequestParameter("tags"));
-					$this->editFlavorParam->setFormat($this->getRequestParameter("format"));
-					$this->editFlavorParam->setTwoPass($this->getRequestParameter("two-pass", false));
-					$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
-					$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
-					$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
-					$this->editFlavorParam->setVideoBitrate($this->getRequestParameter("video-bitrate"));
-					$this->editFlavorParam->setFrameRate($this->getRequestParameter("frame-rate"));
-					$this->editFlavorParam->setGopSize($this->getRequestParameter("gop-size"));
-					$this->editFlavorParam->setAudioCodec($this->getRequestParameter("audio-codec"));
-					$this->editFlavorParam->setAudioBitrate($this->getRequestParameter("audio-bitrate"));
-					$this->editFlavorParam->setAudioChannels($this->getRequestParameter("audio-channels"));
-					$this->editFlavorParam->setAudioSampleRate($this->getRequestParameter("audio-sample-rate"));
-					$this->editFlavorParam->setAudioResolution($this->getRequestParameter("audio-resolution"));
-					$this->editFlavorParam->setConversionEngines($this->getRequestParameter("conversion-engines"));
-					$this->editFlavorParam->setConversionEnginesExtraParams($this->getRequestParameter("conversion-engines-extra-params"));
-					$this->editFlavorParam->setOperators($this->getRequestParameter("operators"));
-					$this->editFlavorParam->setEngineVersion($this->getRequestParameter("engine-version"));
+					
+					if ($this->advanced >= 1) 
+					{
+						$this->editFlavorParam->setName($this->getRequestParameter("name"));
+						$this->editFlavorParam->setDescription($this->getRequestParameter("description"));
+						$this->editFlavorParam->setIsDefault($this->getRequestParameter("is-default", false));
+						$this->editFlavorParam->setReadyBehavior($this->getRequestParameter("ready-behavior"));
+						$this->editFlavorParam->setTags($this->getRequestParameter("tags"));
+						$this->editFlavorParam->setFormat($this->getRequestParameter("format"));
+						$this->editFlavorParam->setTwoPass($this->getRequestParameter("two-pass", false));
+						$this->editFlavorParam->setWidth($this->getRequestParameter("width")); 
+						$this->editFlavorParam->setHeight($this->getRequestParameter("height"));
+						$this->editFlavorParam->setVideoCodec($this->getRequestParameter("video-codec"));
+						$this->editFlavorParam->setVideoBitrate($this->getRequestParameter("video-bitrate"));
+						$this->editFlavorParam->setFrameRate($this->getRequestParameter("frame-rate"));
+						$this->editFlavorParam->setGopSize($this->getRequestParameter("gop-size"));
+						$this->editFlavorParam->setAudioCodec($this->getRequestParameter("audio-codec"));
+						$this->editFlavorParam->setAudioBitrate($this->getRequestParameter("audio-bitrate"));
+						$this->editFlavorParam->setAudioChannels($this->getRequestParameter("audio-channels"));
+						$this->editFlavorParam->setAudioSampleRate($this->getRequestParameter("audio-sample-rate"));
+						$this->editFlavorParam->setAudioResolution($this->getRequestParameter("audio-resolution"));
+						$this->editFlavorParam->setConversionEngines($this->getRequestParameter("conversion-engines"));
+						$this->editFlavorParam->setConversionEnginesExtraParams($this->getRequestParameter("conversion-engines-extra-params"));
+						$this->editFlavorParam->setOperators($this->getRequestParameter("operators"));
+						$this->editFlavorParam->setEngineVersion($this->getRequestParameter("engine-version"));
+					}
 					
 					$this->editFlavorParam->save();
 				}
