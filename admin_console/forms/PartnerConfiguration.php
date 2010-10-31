@@ -55,6 +55,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'filters'		=> array('StringTrim'),
 		));
 				
+		$this->addElement('checkbox', 'def_thumb_offset', array(
+			'label'	  => 'Default Thumbnail Offset',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
+		));
+				
 		$this->addElement('checkbox', 'monitor_usage', array(
 			'label'	  => 'Monitor Usage',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
