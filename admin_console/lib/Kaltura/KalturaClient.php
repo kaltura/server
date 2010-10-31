@@ -3590,6 +3590,27 @@ class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
 	 */
 	public $commercialUseEqual = null;
 
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
 
 }
 
@@ -5472,7 +5493,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var int
 	 */
 	public $defThumbOffset = null;
 
