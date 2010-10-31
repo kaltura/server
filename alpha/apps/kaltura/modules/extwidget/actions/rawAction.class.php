@@ -213,7 +213,7 @@ class rawAction extends sfAction
 				$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $format, false);
 			}
 			
-			if(!$file_sync || !file_exists($file_sync->getFullPath()))
+			if(!isset($file_sync) || !$file_sync || !file_exists($file_sync->getFullPath()))
 			{
 				foreach($try_formats as $ext)
 				{
