@@ -19,7 +19,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getFlashVersion()
 	{
-		parent::getFromCustomData('flashVersion');
+		return parent::getFromCustomData('flashVersion');
 	}
 	
 	/**
@@ -36,7 +36,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getZoom()
 	{
-		parent::getFromCustomData('zoom');
+		return parent::getFromCustomData('zoom');
 	}
 	
 	/**
@@ -53,7 +53,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getZlib()
 	{
-		parent::getFromCustomData('zlib');
+		return parent::getFromCustomData('zlib');
 	}
 	
 	/**
@@ -70,7 +70,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getJpegQuality()
 	{
-		parent::getFromCustomData('jpegQuality');
+		return parent::getFromCustomData('jpegQuality');
 	}
 	
 	/**
@@ -87,7 +87,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getSameWindow()
 	{
-		parent::getFromCustomData('sameWindow');
+		return parent::getFromCustomData('sameWindow');
 	}
 	
 	/**
@@ -104,7 +104,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getInsertStop()
 	{
-		parent::getFromCustomData('insertStop');
+		return parent::getFromCustomData('insertStop');
 	}
 	
 	
@@ -122,7 +122,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getUseShapes()
 	{
-		parent::getFromCustomData('useShapes');
+		return parent::getFromCustomData('useShapes');
 	}
 	
 	/**
@@ -139,7 +139,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getStoreFonts()
 	{
-		parent::getFromCustomData('storeFonts');
+		return parent::getFromCustomData('storeFonts');
 	}
 	
 	/**
@@ -156,7 +156,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	 */
 	public function getFlatten()
 	{
-		parent::getFromCustomData('flatten');
+		return parent::getFromCustomData('flatten');
 	}
 	
 	
