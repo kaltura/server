@@ -1,5 +1,5 @@
 <?php
-class SphinxSearchPlugin implements IKalturaEventConsumersPlugin
+class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
 {
 	const PLUGIN_NAME = 'sphinx_search';
 	const SPHINX_SEARCH_MANAGER = 'kSphinxSearchManager';
@@ -9,14 +9,6 @@ class SphinxSearchPlugin implements IKalturaEventConsumersPlugin
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	/**
 	 * @return array
 	 */

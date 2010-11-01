@@ -59,7 +59,7 @@ class KalturaServicesMap
 		}
 		
 		$pluginServices = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServicesPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$pluginServices = $pluginInstance->getServicesMap();

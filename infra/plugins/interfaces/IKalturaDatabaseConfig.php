@@ -1,5 +1,5 @@
 <?php
-interface IKalturaDatabaseConfigPlugin extends IKalturaPlugin
+interface IKalturaDatabaseConfig extends IKalturaBase
 {
 	/**
 	 * @return array

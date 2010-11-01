@@ -53,7 +53,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		
 		$pluginAdminConsolePages = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePagesPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePages');
 		foreach($pluginInstances as $pluginInstance)
 			foreach($pluginInstance->getAdminConsolePages() as $pluginAdminConsolePage)
 				$pluginAdminConsolePages[] = $pluginAdminConsolePage;

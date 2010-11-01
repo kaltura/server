@@ -39,6 +39,13 @@ class KalturaCriteria extends Criteria
 		
 		$searchPlugin = KalturaPluginManager::getPluginInstance($searchPluginName);
 			
-		return $searchPlugin->getKalturaCriteria($objectType);
+		$criteriaFactory = $searchPlugin->getInstance('IKalturaCriteriaFactory');
+		if (!$criteriaFactory)
+		{
+			KalturaLog::err("KalturaCriteria IKalturaCriteriaFactory not found for [$searchPluginName] plugin");
+			die;
+		}
+			
+		return $criteriaFactory->getKalturaCriteria($objectType);
 	}
 }

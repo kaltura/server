@@ -1,19 +1,11 @@
 <?php
-class SystemUserPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin
+class SystemUserPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'systemUser';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
-	}
-	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
 	}
 	
 	public static function getServicesMap()

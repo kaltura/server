@@ -1,19 +1,11 @@
 <?php
-class FileSyncPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin
+class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'fileSync';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
-	}
-	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
 	}
 	
 	public static function getServicesMap()

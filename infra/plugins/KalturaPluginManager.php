@@ -41,7 +41,7 @@ class KalturaPluginManager
 	 */
 	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
 	{
-		$pluginInstances = self::getPluginInstances('IKalturaObjectLoaderPlugin');
+		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$obj = $pluginInstance->loadObject($objectType, $enumValue, $constructorArgs);
@@ -59,7 +59,7 @@ class KalturaPluginManager
 	 */
 	public static function getObjectClass($objectType, $enumValue)
 	{
-		$pluginInstances = self::getPluginInstances('IKalturaObjectLoaderPlugin');
+		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
 			$cls = $pluginInstance->getObjectClass($objectType, $enumValue);
@@ -94,9 +94,8 @@ class KalturaPluginManager
 		$instances = array();
 		foreach(self::$pluginInstances as $pluginInstance)
 		{
-			$moreInstances = $pluginInstance->getInstances($interface);
-			foreach($moreInstances as $instance)
-				$instances[strtolower($instance->getPluginName())] = $instance;
+			$instance = $pluginInstance->getInstance($interface);
+			$instances[strtolower($instance->getPluginName())] = $instance;
 		}
 		return $instances;
 	}

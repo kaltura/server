@@ -1,5 +1,5 @@
 <?php
-interface IKalturaPermissionsPlugin extends IKalturaPlugin
+interface IKalturaPermissions extends IKalturaBase
 {
 	/**
 	 * @param int $partnerId

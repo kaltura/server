@@ -1,19 +1,11 @@
 <?php
-class SystemPartnerPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin
+class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'systemPartner';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
-	}
-	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
 	}
 	
 	public static function getServicesMap()

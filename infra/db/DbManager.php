@@ -36,7 +36,7 @@ class DbManager
 	public static function initialize() 
 	{
 		$dbConfigs = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDatabaseConfigPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDatabaseConfig');
 		foreach($pluginInstances as $pluginInstance)
 			$dbConfigs[] = $pluginInstance->getDatabaseConfig();
 		

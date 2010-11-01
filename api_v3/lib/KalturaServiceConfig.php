@@ -6,7 +6,7 @@ class KalturaServiceConfig extends myServiceConfig
 	    KalturaServiceConfig::setStrictMode(false);
 	    
 		$serviceConfigs = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServicesPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
 		foreach($pluginInstances as $pluginInstance)
 			$serviceConfigs[] = $pluginInstance->getServiceConfig();
 		

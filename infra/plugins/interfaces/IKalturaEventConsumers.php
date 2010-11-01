@@ -1,5 +1,5 @@
 <?php
-interface IKalturaEventConsumersPlugin extends IKalturaPlugin
+interface IKalturaEventConsumers extends IKalturaBase
 {
 	/**
 	 * @return array

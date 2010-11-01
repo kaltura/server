@@ -1,5 +1,5 @@
 <?php
-class AdminConsolePlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin
+class AdminConsolePlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'adminConsole';
 	
@@ -8,14 +8,14 @@ class AdminConsolePlugin implements IKalturaPermissionsPlugin, IKalturaServicesP
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
+	public function getInstance($interface)
 	{
-		if($this instanceof $intrface)
-			return array($this);
+		if($this instanceof $interface)
+			return $this;
 			
-		return array();
+		return null;
 	}
-	
+		
 	public static function getServicesMap()
 	{
 		$map = array(

@@ -1,5 +1,5 @@
 <?php
-interface IKalturaBulkUploadHandlerPlugin extends IKalturaPlugin
+interface IKalturaBulkUploadHandler extends IKalturaBase
 {
 	/**
 	 * @param string $entryId the new created entry

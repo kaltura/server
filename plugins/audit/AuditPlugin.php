@@ -1,5 +1,5 @@
 <?php
-class AuditPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin, IKalturaEventConsumersPlugin
+class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'audit';
 	const AUDIT_TRAIL_MANAGER = 'kAuditTrailManager';
@@ -9,14 +9,6 @@ class AuditPlugin implements IKalturaPermissionsPlugin, IKalturaServicesPlugin, 
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	public static function isAllowedPartner($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);

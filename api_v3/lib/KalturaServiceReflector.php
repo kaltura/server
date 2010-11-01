@@ -101,7 +101,7 @@ class KalturaServiceReflector
 		$serviceId = strtolower($serviceId);
 		list($servicePlugin, $serviceName) = explode('_', $serviceId);
 		
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServicesPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
 		if(!isset($pluginInstances[$servicePlugin]))
 			return false;
 			

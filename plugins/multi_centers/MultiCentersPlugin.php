@@ -1,5 +1,5 @@
 <?php
-class MultiCentersPlugin implements IKalturaServicesPlugin, IKalturaEventConsumersPlugin
+class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'multiCenters';
 	const MULTI_CENTERS_SYNCER_CLASS = 'kMultiCentersSynchronizer';
@@ -10,14 +10,6 @@ class MultiCentersPlugin implements IKalturaServicesPlugin, IKalturaEventConsume
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	/**
 	 * @return array
 	 */

@@ -11,7 +11,7 @@ class kEventsManager
 		$coreConsumers = kConf::get('event_consumers');
 		
 		$pluginConsumers = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEventConsumersPlugin');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEventConsumers');
 		foreach($pluginInstances as $pluginInstance)
 			foreach($pluginInstance->getEventConsumers() as $pluginConsumer)
 			$pluginConsumers[] = $pluginConsumer;

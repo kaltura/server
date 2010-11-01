@@ -1,6 +1,6 @@
 <?php
 
-class ExpressionEncoderPlugin implements IKalturaObjectLoaderPlugin
+class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'expressionEncoder';
 	
@@ -9,14 +9,6 @@ class ExpressionEncoderPlugin implements IKalturaObjectLoaderPlugin
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue

@@ -1,5 +1,5 @@
 <?php
-class KalturaInternalToolsPlugin implements IKalturaServicesPlugin, IKalturaAdminConsolePagesPlugin
+class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';
 	
@@ -8,14 +8,6 @@ class KalturaInternalToolsPlugin implements IKalturaServicesPlugin, IKalturaAdmi
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	/**
 	 * @return array<string,string> in the form array[serviceName] = serviceClass
 	 */

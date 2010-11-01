@@ -1,6 +1,6 @@
 <?php
 
-class DocumentPlugin implements IKalturaServicesPlugin, IKalturaObjectLoaderPlugin, IKalturaEventConsumersPlugin
+class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -10,12 +10,12 @@ class DocumentPlugin implements IKalturaServicesPlugin, IKalturaObjectLoaderPlug
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
+	public function getInstance($interface)
 	{
-		if($this instanceof $intrface)
-			return array($this);
+		if($this instanceof $interface)
+			return $this;
 			
-		return array();
+		return null;
 	}
 
 	/**

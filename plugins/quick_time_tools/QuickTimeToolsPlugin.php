@@ -1,6 +1,6 @@
 <?php
 
-class QuickTimeToolsPlugin implements IKalturaObjectLoaderPlugin
+class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'quickTimeTools';
 	
@@ -9,14 +9,6 @@ class QuickTimeToolsPlugin implements IKalturaObjectLoaderPlugin
 		return self::PLUGIN_NAME;
 	}
 	
-	public function getInstances($intrface)
-	{
-		if($this instanceof $intrface)
-			return array($this);
-			
-		return array();
-	}
-
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
 	 * @param string $enumValue

@@ -1,5 +1,5 @@
 <?php
-interface IKalturaObjectLoaderPlugin extends IKalturaPlugin
+interface IKalturaObjectLoader extends IKalturaBase
 {
 	/**
 	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
