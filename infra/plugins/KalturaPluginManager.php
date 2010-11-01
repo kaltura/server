@@ -94,8 +94,12 @@ class KalturaPluginManager
 		$instances = array();
 		foreach(self::$pluginInstances as $pluginInstance)
 		{
-			$instance = $pluginInstance->getInstance($interface);
-			$instances[strtolower($instance->getPluginName())] = $instance;
+			if ($pluginInstance instanceof IKalturaPlugin)
+			{
+				$instance = $pluginInstance->getInstance($interface);
+				if ($instance)
+					$instances[strtolower($pluginInstance->getPluginName())] = $instance;
+			}
 		}
 		return $instances;
 	}
