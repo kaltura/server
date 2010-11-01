@@ -19,7 +19,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getFlashVersion()
 	{
-		parent::getFromCustomData('flashVersion');
+		return parent::getFromCustomData('flashVersion');
 	}
 	
 	/**
@@ -36,7 +36,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getZoom()
 	{
-		parent::getFromCustomData('zoom');
+		return parent::getFromCustomData('zoom');
 	}
 	
 	/**
@@ -53,7 +53,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getZlib()
 	{
-		parent::getFromCustomData('zlib');
+		return parent::getFromCustomData('zlib');
 	}
 	
 
@@ -71,7 +71,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getJpegQuality()
 	{
-		parent::getFromCustomData('jpegQuality');
+		return parent::getFromCustomData('jpegQuality');
 	}
 	
 	/**
@@ -88,7 +88,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getSameWindow()
 	{
-		parent::getFromCustomData('sameWindow');
+		return parent::getFromCustomData('sameWindow');
 	}
 	
 	/**
@@ -105,7 +105,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getInsertStop()
 	{
-		parent::getFromCustomData('insertStop');
+		return parent::getFromCustomData('insertStop');
 	}
 			
 	/**
@@ -122,7 +122,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getUseShapes()
 	{
-		parent::getFromCustomData('useShapes');
+		return parent::getFromCustomData('useShapes');
 	}
 	
 	/**
@@ -139,7 +139,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getStoreFonts()
 	{
-		parent::getFromCustomData('storeFonts');
+		return parent::getFromCustomData('storeFonts');
 	}
 	
 	/**
@@ -156,7 +156,7 @@ class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParam
 	 */
 	public function getFlatten()
 	{
-		parent::getFromCustomData('flatten');
+		return parent::getFromCustomData('flatten');
 	}
 		
 	

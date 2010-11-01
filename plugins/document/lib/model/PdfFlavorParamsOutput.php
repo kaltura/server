@@ -14,7 +14,7 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	
 	public function getResolution()
 	{
-		parent::getFromCustomData('resolution');
+		return parent::getFromCustomData('resolution');
 	}
 	
 	
@@ -27,7 +27,7 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	
 	public function getPaperHeight()
 	{
-		parent::getFromCustomData('paperHeight');
+		return parent::getFromCustomData('paperHeight');
 	}
 	
 	public function setPaperWidth($width)
@@ -37,6 +37,6 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	
 	public function getPaperWidth()
 	{
-		parent::getFromCustomData('paperWidth');
+		return parent::getFromCustomData('paperWidth');
 	}
 }
