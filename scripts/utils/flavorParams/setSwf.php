@@ -11,7 +11,7 @@ $isDefault = false;
 $width = 0;
 $height = 0;
 
-$flashVersion = null;
+$flashVersion = 10;
 $zoom = null;
 $zlib = null;
 $quality = null;
