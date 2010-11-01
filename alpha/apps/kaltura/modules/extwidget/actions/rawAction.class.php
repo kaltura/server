@@ -12,6 +12,7 @@ class rawAction extends sfAction
 		$entry_id = $this->getRequestParameter( "entry_id" );
 		$type = $this->getRequestParameter( "type" );
 		$ks = $this->getRequestParameter( "ks" );
+		$file_sync = null;
 		$ret_file_name = "name";
 		$referrer = $this->getRequestParameter("referrer");
 		$referrer = base64_decode($referrer);
