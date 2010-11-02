@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
 // check cache before loading anything
 require_once("../lib/KalturaResponseCacher.php");
 $cache = new KalturaResponseCacher();
-$cache->checkOrStart(false);
+$cache->checkOrStart();
 
 require_once("../bootstrap.php");
 
