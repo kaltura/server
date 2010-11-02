@@ -96,7 +96,7 @@ class KalturaResponseCacher
 	}
 	
 		
-	public function checkOrStart()
+	public function checkOrStart($outBufferOff = true)
 	{
 		if (!self::$_useCache)
 			return;
@@ -115,7 +115,7 @@ class KalturaResponseCacher
 			echo $response;
 			die;
 		}
-		else
+		elseif($outBufferOff)
 		{
 			ob_start();
 		}
@@ -142,7 +142,8 @@ class KalturaResponseCacher
 		
 		$this->storeCache($response, $contentType);
 		
-		ob_end_flush();
+		if(ob_get_length())
+			ob_end_flush();
 	}
 	
 	

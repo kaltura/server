@@ -377,8 +377,6 @@ class KalturaSyndicationFeedRenderer
 			$this->writeFullXmlNode('media:rating',$this->syndicationFeed->adultContent, 4, array( 'scheme' => "urn:simple"));
 			$this->writeClosingXmlNode('media:content',3);
 			$this->writeClosingXmlNode('item',2); // close ITEM
-			
-			ob_flush();
 		}
 		$this->writeClosingXmlNode('channel',1); // close CHANNEL
 		$this->writeClosingXmlNode('rss'); // close RSS
@@ -518,8 +516,6 @@ class KalturaSyndicationFeedRenderer
 			
 			$this->writeFullXmlNode('media:content', '', 3, array('url'=> $this->getFlavorAssetUrl($e)));
 			$this->writeClosingXmlNode('item',1);
-			
-			ob_flush();
 		}
 		$this->writeClosingXmlNode('channel',1);
 		$this->writeClosingXmlNode('rss');
@@ -640,8 +636,6 @@ class KalturaSyndicationFeedRenderer
 			if($e->tags)
 				$this->writeFullXmlNode('itunes:keywords', $this->stringToSafeXml($e->tags), 3);
 			$this->writeClosingXmlNode('item',2);
-			
-			ob_flush();
 		}
 		
 		$this->writeClosingXmlNode('channel', 1);
@@ -691,8 +685,6 @@ class KalturaSyndicationFeedRenderer
 			$this->writeFullXmlNode('video:duration', $e->duration, 3);
 			$this->writeClosingXmlNode('video:video', 2);
 			$this->writeClosingXmlNode('url', 1);
-			
-			ob_flush();
 		}
 		$this->writeClosingXmlNode('urlset');
 	}
