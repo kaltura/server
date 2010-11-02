@@ -120,7 +120,7 @@ class flavorParamsOutputPeer extends BaseflavorParamsOutputPeer
 			$flavorParamsOutputFormat= $row[$colnum + 15]; // format
 			if(isset(self::$class_types_cache[$flavorParamsOutputFormat]))
 				return self::$class_types_cache[$flavorParamsOutputFormat];
-			$extendedCls = KalturaPluginManager::getObjectClass(KalturaPluginManager::OBJECT_TYPE_FLAVOR_PARAMS_OUTPUT, $flavorParamsOutputFormat);
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $flavorParamsOutputFormat);
 			if($extendedCls)
 			{
 				self::$class_types_cache[$flavorParamsOutputFormat] = $extendedCls;

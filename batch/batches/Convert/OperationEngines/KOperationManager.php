@@ -63,7 +63,7 @@ class KOperationManager
 				return $engine;
 		}
 		
-		$engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE, $type, array('params' => $taskConfig->params, 'outFilePath' => $data->destFileSyncLocalPath));
+		$engine = KalturaPluginManager::loadObject('KOperationEngine', $type, array('params' => $taskConfig->params, 'outFilePath' => $data->destFileSyncLocalPath));
 		
 		return $engine;
 	}

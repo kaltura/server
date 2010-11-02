@@ -10,14 +10,14 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
 	 * @return object
 	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS)
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -26,7 +26,7 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 			return new KOperationEngineQtTools($params->qtToolsCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
 		{
 			return new KDLTranscoderQTPTools($enumValue);
 		}
@@ -35,16 +35,16 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return string
 	 */
-	public static function getObjectClass($objectType, $enumValue)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS)
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS)
 			return 'KOperationEngineQtTools';
 			
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS)
 			return 'KDLTranscoderQTPTools';
 		
 		return null;	

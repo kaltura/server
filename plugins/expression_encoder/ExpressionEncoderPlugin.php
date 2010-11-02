@@ -10,14 +10,14 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
 	 * @return object
 	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::EXPRESSION_ENCODER)
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::EXPRESSION_ENCODER)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -26,7 +26,7 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 			return new KOperationExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
 		{
 			return new KDLOperatorExpressionEncoder($enumValue);
 		}
@@ -35,16 +35,16 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 	}
 
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return string
 	 */
-	public static function getObjectClass($objectType, $enumValue)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+		if($baseClass == 'KOperationEngine' && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
 			return 'KOperationExpressionEncoder';
 			
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER)
 			return 'KDLOperatorExpressionEncoder';
 		
 		return null;

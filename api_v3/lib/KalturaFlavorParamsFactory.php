@@ -21,7 +21,7 @@ class KalturaFlavorParamsFactory
 				return new KalturaFlavorParamsOutput();
 				
 			default:
-				$obj = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KALTURA_FLAVOR_PARAMS_OUTPUT, $format);
+				$obj = KalturaPluginManager::loadObject('KalturaFlavorParamsOutput', $format);
 				if($obj)
 					return $obj;
 					
@@ -49,7 +49,7 @@ class KalturaFlavorParamsFactory
 				return new KalturaFlavorParams();
 				
 			default:
-				$obj = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KALTURA_FLAVOR_PARAMS, $format);
+				$obj = KalturaPluginManager::loadObject('KalturaFlavorParams', $format);
 				if($obj)
 					return $obj;
 					

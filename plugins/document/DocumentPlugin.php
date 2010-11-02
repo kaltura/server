@@ -19,16 +19,16 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 	}
 
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
 	 * @return object
 	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 
 		// ENTRY
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_ENTRY && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
+		if($baseClass == entryPeer::OM_CLASS && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
 		{
 			return new DocumentEntry();
 		}
@@ -36,7 +36,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		
 		// KALTURA FLAVOR PARAMS
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KALTURA_FLAVOR_PARAMS)
+		if($baseClass == 'KalturaFlavorParams')
 		{
 			switch($enumValue)
 			{
@@ -51,7 +51,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 			}
 		}
 	
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KALTURA_FLAVOR_PARAMS_OUTPUT)
+		if($baseClass == 'KalturaFlavorParamsOutput')
 		{
 			switch($enumValue)
 			{
@@ -69,7 +69,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		
 		// OPERATION ENGINES
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF_CREATOR)
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::PDF_CREATOR)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -78,7 +78,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		}
 
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_OPERATION_ENGINE && $enumValue == KalturaConversionEngineType::PDF2SWF)
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::PDF2SWF)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -89,12 +89,12 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		
 		// KDL ENGINES
 		
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR)
 		{
 			return new KDLTranscoderPdfCreator($enumValue);
 		}
 				
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF2SWF)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF2SWF)
 		{
 			return new KDLTranscoderPdf2Swf($enumValue);
 		}
@@ -105,20 +105,20 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return string
 	 */
-	public static function getObjectClass($objectType, $enumValue)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// DOCUMENT ENTRY
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_ENTRY && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
+		if($baseClass == entryPeer::OM_CLASS && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
 		{
 			return 'DocumentEntry';
 		}
 		
 		// FLAVOR PARAMS
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_FLAVOR_PARAMS)
+		if($baseClass == flavorParamsPeer::OM_CLASS)
 		{
 			switch($enumValue)
 			{
@@ -133,7 +133,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 			}
 		}
 	
-		if($objectType == KalturaPluginManager::OBJECT_TYPE_FLAVOR_PARAMS_OUTPUT)
+		if($baseClass == flavorParamsOutputPeer::OM_CLASS)
 		{
 			switch($enumValue)
 			{

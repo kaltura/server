@@ -401,7 +401,7 @@ class entryPeer extends BaseentryPeer
 			if(isset(self::$class_types_cache[$entryType]))
 				return self::$class_types_cache[$entryType];
 				
-			$extendedCls = KalturaPluginManager::getObjectClass(KalturaPluginManager::OBJECT_TYPE_ENTRY, $entryType);
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $entryType);
 			if($extendedCls)
 			{
 				KalturaLog::debug("Found class[$extendedCls]");

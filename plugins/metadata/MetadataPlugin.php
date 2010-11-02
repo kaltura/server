@@ -59,14 +59,14 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
 	 * @return object
 	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($objectType != KalturaPluginManager::OBJECT_TYPE_SYNCABLE)
+		if($baseClass != 'ISyncableFile')
 			return null;
 			
 		if(!isset($constructorArgs['objectId']))
@@ -92,13 +92,13 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return string
 	 */
-	public static function getObjectClass($objectType, $enumValue)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($objectType != KalturaPluginManager::OBJECT_TYPE_SYNCABLE)
+		if($baseClass != 'ISyncableFile')
 			return null;
 			
 		switch($enumValue)

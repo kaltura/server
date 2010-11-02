@@ -37,7 +37,7 @@ class kFileSyncObjectManager
 		}
 		
 		if ( $object == null )
-			$object = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_SYNCABLE, $objectType, array('objectId' => $objectId));
+			$object = KalturaPluginManager::loadObject('ISyncableFile', $objectType, array('objectId' => $objectId));
 		
 		if ( $object == null )
 		{

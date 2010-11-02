@@ -594,19 +594,19 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 	$id = $oprObj->_id;
 kLog::log(__METHOD__.":operators id=$id :");
 	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS);
 	}
 	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER);
 	}
 	else if($id==KDLTranscoders::QT_FASTSTART) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_FAST_START);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_FAST_START);
 	}
 	else if($id==KDLTranscoders::PDF_CREATOR) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR);
 	}
 	else if($id==KDLTranscoders::PDF2SWF) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_PDF2SWF);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_PDF2SWF);
 	}
 	else {
 		$oprObj->_engine = new KDLOperatorWrapper($id);

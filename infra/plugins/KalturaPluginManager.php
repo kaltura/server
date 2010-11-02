@@ -5,19 +5,6 @@ require_once realpath(dirname(__FILE__) . '/../../') . '/alpha/config/kConf.php'
 
 class KalturaPluginManager
 {
-	const OBJECT_TYPE_SYNCABLE = 2;
-	const OBJECT_TYPE_MEDIA_SOURCE = 3;
-	const OBJECT_TYPE_OPERATION_ENGINE = 4;
-	const OBJECT_TYPE_KDL_ENGINE = 5;
-	
-	const OBJECT_TYPE_ENTRY = 101;
-	const OBJECT_TYPE_FLAVOR_PARAMS = 102;
-	const OBJECT_TYPE_FLAVOR_PARAMS_OUTPUT = 103;
-
-	const OBJECT_TYPE_KALTURA_ENTRY = 201;
-	const OBJECT_TYPE_KALTURA_FLAVOR_PARAMS = 202;
-	const OBJECT_TYPE_KALTURA_FLAVOR_PARAMS_OUTPUT = 203;
-		
 	/**
 	 * @var array<string, string> in the form array[pluginName] = pluginClass
 	 */
@@ -34,17 +21,17 @@ class KalturaPluginManager
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
 	 * @return object
 	 */
-	public static function loadObject($objectType, $enumValue, array $constructorArgs = null)
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
-			$obj = $pluginInstance->loadObject($objectType, $enumValue, $constructorArgs);
+			$obj = $pluginInstance->loadObject($baseClass, $enumValue, $constructorArgs);
 			if($obj)
 				return $obj;
 		}
@@ -53,16 +40,16 @@ class KalturaPluginManager
 	}
 	
 	/**
-	 * @param KalturaPluginManager::OBJECT_TYPE $objectType
+	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return object
 	 */
-	public static function getObjectClass($objectType, $enumValue)
+	public static function getObjectClass($baseClass, $enumValue)
 	{
 		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader');
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
-			$cls = $pluginInstance->getObjectClass($objectType, $enumValue);
+			$cls = $pluginInstance->getObjectClass($baseClass, $enumValue);
 			if($cls)
 			{
 //				KalturaLog::debug("Found class[$cls] in plugin[$pluginName] for object type[$objectType] and enum value[$enumValue]");
