@@ -453,54 +453,43 @@ KalturaLog::log ( "Will append to xml\n{$newVidasset}" );
   		return $xml_doc->saveXML();
 	}
 
+	/*
+	 * create a new version with the entries from pending
+	 */
+      public static function updateAllMetadataVersionsRelevantForEntry ( $entry )
+      {
+            // TODO - null entry
+            $kshow = $entry->getKshow();
+            
+            if ( ! $kshow ) return null;
+            
+            // TODO - null kshow
+            $show_entry = $kshow->getShowEntry();
+            
+            if ( ! $show_entry ) return null;
+            
+            $show_entry->decInCustomData ( "pending_entries" );
+            $show_entry->save();
 
-	public static function updateAllMetadataVersionsRelevantForEntry ( $entry , $version_to_update )
-	{
-		// TODO - null entry
-		$kshow = $entry->getKshow();
-		
-		if ( ! $kshow ) return null;
-		
-		// TODO - null kshow
-		$show_entry = $kshow->getShowEntry();
-		
-		if ( ! $show_entry ) return null;
-		
-		$show_entry->decInCustomData ( "pending_entries" );
-		$show_entry->save();
+            // entries can be os status ENTRY_STATUS_READY or ENTRY_STATUS_ERROR_CONVERTING
+            $status= $entry->getStatus();
 
-		// entries can be os status ENTRY_STATUS_READY or ENTRY_STATUS_ERROR_CONVERTING
-		$status= $entry->getStatus();
-
-		// TODO - null entry
-		$versions = $show_entry->getAllVersions();
-
-		// LIMIT the metadata files we update to 5 
-		$versions = array_slice ( $versions , -5 );
-		
-		$versions_updated = array();
-
-		KalturaLog::log ( "updateAllMetadataVersionsRelevantForEntry [" . $entry->getId() . "] version_to_update [$version_to_update] status [$status]");
-		foreach ( $versions as $version_arr )
-		{
-			list ( $file_name , $size  , $timestamp , $version  ) = $version_arr;
-			if ( $version >= $version_to_update )
-			{
-				$metadata_for_version = $show_entry->getMetadata ( $version );
-				if ( $metadata_for_version )
-				{
-					$new_metadata = myMetadataUtils::addEntryToMetadata ( $metadata_for_version , $entry  );
-					if ($new_metadata)
-						$show_entry->setMetadata ( null , $new_metadata , true , null , $version );
-					$versions_updated[]=$version;
-				}
-			}
-		}
-
-		KalturaLog::log ( "updateAllMetadataVersionsRelevantForEntry [" . $entry->getId() . "] updated " . implode ("," , $versions_updated ) );
-		return $versions_updated;
-	}
-
+            KalturaLog::log ( "updateAllMetadataVersionsRelevantForEntry [" . $entry->getId() . "] with status [" . $status . "]");
+            $metadata = $show_entry->getMetadata ();
+            if ( $metadata )
+            {
+                  $new_metadata = myMetadataUtils::addEntryToMetadata ( $metadata , $entry  );
+                  if ($new_metadata)
+                  {
+                        $show_entry->setDataContent($new_metadata); 
+                        $show_entry->save();
+                        myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
+                  }
+            }
+            KalturaLog::log ( "updateAllMetadataVersionsRelevantForEntry [" . $entry->getId() . "]  created a new version" );
+            
+            return true;
+      }
 
 	// get the pedning entries from the XML metadata
 	public static function getPending ( DOMDocument $xml_doc )
