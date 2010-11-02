@@ -301,7 +301,7 @@ class entry extends Baseentry implements ISyncableFile
 			if ( $version_to_update )
 			{
 				try{
-					myMetadataUtils::updateAllMetadataVersionsRelevantForEntry ( $this , $version_to_update );
+					myMetadataUtils::updateAllMetadataVersionsRelevantForEntry ( $this);
 					$this->resetUpdateWhenReady();
 					$res = parent::save( $con );
 				}
