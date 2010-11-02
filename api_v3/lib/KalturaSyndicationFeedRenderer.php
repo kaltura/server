@@ -344,43 +344,44 @@ class KalturaSyndicationFeedRenderer
 	private function renderYahooFeed()
 	{
 		header ("content-type: text/xml; charset=utf-8");
-		$yahooFeed[] = $this->generateOpenXmlNode('rss', 0, array('version' => "2.0",  'xmlns:media' => "http://search.yahoo.com/mrss/", 'xmlns:dcterms' => "http://purl.org/dc/terms/"));
-		$yahooFeed[] = $this->generateOpenXmlNode('channel',1);
-		$yahooFeed[] = $this->generateFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
-		$yahooFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
-		$yahooFeed[] = $this->generateFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
+		$this->writeOpenXmlNode('rss', 0, array('version' => "2.0",  'xmlns:media' => "http://search.yahoo.com/mrss/", 'xmlns:dcterms' => "http://purl.org/dc/terms/"));
+		$this->writeOpenXmlNode('channel',1);
+		$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
+		$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
+		$this->writeFullXmlNode('description', $this->stringToSafeXml($this->syndicationFeed->feedDescription), 2);
 		
 		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
-			$yahooFeed[] = $this->generateOpenXmlNode('item',2); // open ITEM
-			$yahooFeed[] = $this->generateFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
-			$yahooFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
-			$yahooFeed[] = $this->generateOpenXmlNode('media:content', 3, array( 'url' => $this->getFlavorAssetUrl($e)));
-			$yahooFeed[] = $this->generateFullXmlNode('media:title', $this->stringToSafeXml($e->name), 4);
-			$yahooFeed[] = $this->generateFullXmlNode('media:description', $this->stringToSafeXml($e->description), 4);
-			$yahooFeed[] = $this->generateFullXmlNode('media:keywords', $this->stringToSafeXml($e->tags), 4);
-			$yahooFeed[] = $this->generateFullXmlNode('media:thumbnail', '', 4, array('url'=>$e->thumbnailUrl));
+			$this->writeOpenXmlNode('item',2); // open ITEM
+			$this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
+			$this->writeFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
+			$this->writeOpenXmlNode('media:content', 3, array( 'url' => $this->getFlavorAssetUrl($e)));
+			$this->writeFullXmlNode('media:title', $this->stringToSafeXml($e->name), 4);
+			$this->writeFullXmlNode('media:description', $this->stringToSafeXml($e->description), 4);
+			$this->writeFullXmlNode('media:keywords', $this->stringToSafeXml($e->tags), 4);
+			$this->writeFullXmlNode('media:thumbnail', '', 4, array('url'=>$e->thumbnailUrl));
 			$categories = explode(',', $this->syndicationFeed->categories);
 			foreach($categories as $category)
 			{
 				if(!$category) continue;
-				$yahooFeed[] = $this->generateFullXmlNode('media:category',$category,4, array('scheme'=>"http://search.yahoo.com/mrss/category_schema"));
+				$this->writeFullXmlNode('media:category',$category,4, array('scheme'=>"http://search.yahoo.com/mrss/category_schema"));
 			}
 			if($this->syndicationFeed->allowEmbed)
 			{
-				$yahooFeed[] = $this->generateFullXmlNode('media:player', null, 4, array('url'=>$this->getPlayerUrl($e->id)));
+				$this->writeFullXmlNode('media:player', null, 4, array('url'=>$this->getPlayerUrl($e->id)));
 			}
 			// TODO - add restirction on entry ???? media:restriction
 			// TODO - consider adding media:community
-			$yahooFeed[] = $this->generateFullXmlNode('media:rating',$this->syndicationFeed->adultContent, 4, array( 'scheme' => "urn:simple"));
-			$yahooFeed[] = $this->generateClosingXmlNode('media:content',3);
-			$yahooFeed[] = $this->generateClosingXmlNode('item',2); // close ITEM
+			$this->writeFullXmlNode('media:rating',$this->syndicationFeed->adultContent, 4, array( 'scheme' => "urn:simple"));
+			$this->writeClosingXmlNode('media:content',3);
+			$this->writeClosingXmlNode('item',2); // close ITEM
+			
+			ob_flush();
 		}
-		$yahooFeed[] = $this->generateClosingXmlNode('channel',1); // close CHANNEL
-		$yahooFeed[] = $this->generateClosingXmlNode('rss'); // close RSS
-		echo implode('', $yahooFeed);
+		$this->writeClosingXmlNode('channel',1); // close CHANNEL
+		$this->writeClosingXmlNode('rss'); // close RSS
 	}
 	
 	private function getPlayerUrl($entryId)
@@ -453,11 +454,13 @@ class KalturaSyndicationFeedRenderer
 		for($i=0;$i<$level;$i++) $spaces .= self::LEVEL_INDENTATION;
 		return $spaces;
 	}
-	private function generateClosingXmlNode($nodeName, $level = 0)
+	
+	private function writeClosingXmlNode($nodeName, $level = 0)
 	{
-		return $this->getSpacesForLevel($level)."</$nodeName>".PHP_EOL;
+		echo $this->getSpacesForLevel($level)."</$nodeName>".PHP_EOL;
 	}
-	private function generateOpenXmlNode($nodeName, $level, $attributes = array())
+	
+	private function writeOpenXmlNode($nodeName, $level, $attributes = array(), $eol = true)
 	{
 		$tag = $this->getSpacesForLevel($level)."<$nodeName";
 		if(count($attributes))
@@ -467,49 +470,59 @@ class KalturaSyndicationFeedRenderer
 				$tag .= ' '.$key.'="'.$val.'"';
 			}
 		}
-		$tag .= ">".PHP_EOL;
-		return $tag;
+		$tag .= ">";
+		
+		if($eol)
+			$tag .= PHP_EOL;
+		
+		echo $tag;
 		
 	}
-	private function generateFullXmlNode($nodeName, $value, $level, $attributes = array())
+	
+	private function writeFullXmlNode($nodeName, $value, $level, $attributes = array())
 	{
-		$tag = $this->generateOpenXmlNode($nodeName, $level, $attributes);
-		$tag = str_replace(PHP_EOL, '', $tag);
-		$tag .= "$value".$this->generateClosingXmlNode($nodeName, 0);
-		return $tag;
+		$this->writeOpenXmlNode($nodeName, $level, $attributes, false);
+		echo "$value";
+		$this->writeClosingXmlNode($nodeName, 0);
 	}
+	
 	private function renderTubeMogulFeed()
 	{
 		header ("content-type: text/xml; charset=utf-8");
-		$tubeMoguleFeed[] = $this->generateOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
-		$tubeMoguleFeed[] = $this->generateOpenXmlNode('channel',1);
+		$this->writeOpenXmlNode('rss', 0, array('version'=>"2.0", 'xmlns:media'=>"http://search.yahoo.com/mrss/", 'xmlns:tm'=>"http://www.tubemogul.com/mrss"));
+		$this->writeOpenXmlNode('channel',1);
 		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
 			$entryDescription = $this->stringToSafeXml($e->description);
-			if(!$entryDescription) $entryDescription = $this->stringToSafeXml($e->name);
+			if(!$entryDescription) 
+				$entryDescription = $this->stringToSafeXml($e->name);
 			$entryTags = $this->stringToSafeXml($e->tags);
-			if(!$entryTags) $entryTags = $this->stringToSafeXml(str_replace(' ', ', ', $e->name));
+			if(!$entryTags) 
+				$entryTags = $this->stringToSafeXml(str_replace(' ', ', ', $e->name));
 			
-			$tubeMoguleFeed[] = $this->generateOpenXmlNode('item',2);
-			$tubeMoguleFeed[] = $this->generateFullXmlNode('pubDate',date('Y-m-d',$e->createdAt).'T'.date('H:i:sO',$e->createdAt),3);
-			$tubeMoguleFeed[] = $this->generateFullXmlNode('media:title', $this->stringToSafeXml($e->name), 3);
-			$tubeMoguleFeed[] = $this->generateFullXmlNode('media:description', $entryDescription,3);
-			$tubeMoguleFeed[] = $this->generateFullXmlNode('media:keywords', $entryTags, 3);
+			$this->writeOpenXmlNode('item',2);
+			$this->writeFullXmlNode('pubDate',date('Y-m-d',$e->createdAt).'T'.date('H:i:sO',$e->createdAt),3);
+			$this->writeFullXmlNode('media:title', $this->stringToSafeXml($e->name), 3);
+			$this->writeFullXmlNode('media:description', $entryDescription,3);
+			$this->writeFullXmlNode('media:keywords', $entryTags, 3);
+			
 			$categories = explode(',', $this->syndicationFeed->categories);
 			foreach($categories as $category)
 			{
 				$categoryId = KalturaTubeMogulSyndicationFeed::getCategoryId($category);
-				$tubeMoguleFeed[] = $this->generateFullXmlNode('media:category', $categoryId, 3, array( 'scheme'=>"http://www.tubemogul.com"));
+				$this->writeFullXmlNode('media:category', $categoryId, 3, array( 'scheme'=>"http://www.tubemogul.com"));
 				break;
 			}
-			$tubeMoguleFeed[] = $this->generateFullXmlNode('media:content', '', 3, array('url'=> $this->getFlavorAssetUrl($e)));
-			$tubeMoguleFeed[] = $this->generateClosingXmlNode('item',1);
+			
+			$this->writeFullXmlNode('media:content', '', 3, array('url'=> $this->getFlavorAssetUrl($e)));
+			$this->writeClosingXmlNode('item',1);
+			
+			ob_flush();
 		}
-		$tubeMoguleFeed[] = $this->generateClosingXmlNode('channel',1);
-		$tubeMoguleFeed[] = $this->generateClosingXmlNode('rss');
-		echo implode('', $tubeMoguleFeed);
+		$this->writeClosingXmlNode('channel',1);
+		$this->writeClosingXmlNode('rss');
 	}
 
 	private function renderITunesFeed()
@@ -538,30 +551,30 @@ class KalturaSyndicationFeedRenderer
 		
 		$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
 		header ("content-type: text/xml; charset=utf-8");
-		$itunesFeed[] = '<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;
-		$itunesFeed[] = $this->generateOpenXmlNode('rss', 0, array('xmlns:itunes'=>"http://www.itunes.com/dtds/podcast-1.0.dtd",  'version'=>"2.0"));
-		$itunesFeed[] = $this->generateOpenXmlNode('channel', 1);
-		$itunesFeed[] = $this->generateFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
-		$itunesFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
-		$itunesFeed[] = $this->generateFullXmlNode('language', $this->syndicationFeed->language, 2);
-		$itunesFeed[] = $this->generateFullXmlNode('copyright', $partner->getName(), 2);
-		$itunesFeed[] = $this->generateFullXmlNode('itunes:subtitle', $this->syndicationFeed->name, 2);
-		$itunesFeed[] = $this->generateFullXmlNode('itunes:author', $this->syndicationFeed->feedAuthor, 2);
-		$itunesFeed[] = $this->generateFullXmlNode('itunes:summary', $this->syndicationFeed->feedDescription, 2);
-		$itunesFeed[] = $this->generateFullXmlNode('description', $this->syndicationFeed->feedDescription, 2);
-		$itunesFeed[] = $this->generateOpenXmlNode('itunes:owner', 2);
-		$itunesFeed[] = $this->generateFullXmlNode('itunes:name', $this->syndicationFeed->ownerName, 3);
-		$itunesFeed[] = $this->generateFullXmlNode('itunes:email', $this->syndicationFeed->ownerEmail, 3);
-		$itunesFeed[] = $this->generateClosingXmlNode('itunes:owner', 2);
+		'<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL;
+		$this->writeOpenXmlNode('rss', 0, array('xmlns:itunes'=>"http://www.itunes.com/dtds/podcast-1.0.dtd",  'version'=>"2.0"));
+		$this->writeOpenXmlNode('channel', 1);
+		$this->writeFullXmlNode('title', $this->stringToSafeXml($this->syndicationFeed->name), 2);
+		$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage, 2);
+		$this->writeFullXmlNode('language', $this->syndicationFeed->language, 2);
+		$this->writeFullXmlNode('copyright', $partner->getName(), 2);
+		$this->writeFullXmlNode('itunes:subtitle', $this->syndicationFeed->name, 2);
+		$this->writeFullXmlNode('itunes:author', $this->syndicationFeed->feedAuthor, 2);
+		$this->writeFullXmlNode('itunes:summary', $this->syndicationFeed->feedDescription, 2);
+		$this->writeFullXmlNode('description', $this->syndicationFeed->feedDescription, 2);
+		$this->writeOpenXmlNode('itunes:owner', 2);
+		$this->writeFullXmlNode('itunes:name', $this->syndicationFeed->ownerName, 3);
+		$this->writeFullXmlNode('itunes:email', $this->syndicationFeed->ownerEmail, 3);
+		$this->writeClosingXmlNode('itunes:owner', 2);
 
 		if($this->syndicationFeed->feedImageUrl)
 		{
-			$itunesFeed[] = $this->generateOpenXmlNode('image', 2);
-			$itunesFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->feedLandingPage,3);
-			$itunesFeed[] = $this->generateFullXmlNode('url', $this->syndicationFeed->feedLandingPage, 3);
-			$itunesFeed[] = $this->generateFullXmlNode('title', $this->syndicationFeed->name, 3);
-			$itunesFeed[] = $this->generateClosingXmlNode('image', 2);
-			$itunesFeed[] = $this->generateFullXmlNode('itunes:image', '', 2, array( 'href'=> $this->syndicationFeed->feedImageUrl));
+			$this->writeOpenXmlNode('image', 2);
+			$this->writeFullXmlNode('link', $this->syndicationFeed->feedLandingPage,3);
+			$this->writeFullXmlNode('url', $this->syndicationFeed->feedLandingPage, 3);
+			$this->writeFullXmlNode('title', $this->syndicationFeed->name, 3);
+			$this->writeClosingXmlNode('image', 2);
+			$this->writeFullXmlNode('itunes:image', '', 2, array( 'href'=> $this->syndicationFeed->feedImageUrl));
 		}
 
 		$categories = explode(',', $this->syndicationFeed->categories);
@@ -576,19 +589,20 @@ class KalturaSyndicationFeedRenderer
 			}
 			else
 			{
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:category', '', 2, array( 'text'=> $category ));
+				$this->writeFullXmlNode('itunes:category', '', 2, array( 'text'=> $category ));
 			}
 		}
+		
 		foreach($catTree as $topCat => $subCats)
 		{
 			if(!$topCat) continue;
-			$itunesFeed[] = $this->generateOpenXmlNode('itunes:category', 2, array( 'text' => $topCat ));
+			$this->writeOpenXmlNode('itunes:category', 2, array( 'text' => $topCat ));
 			foreach($subCats as $cat)
 			{
 				if(!$cat) continue;
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:category', '', 3, array( 'text'=> $cat ));
+				$this->writeFullXmlNode('itunes:category', '', 3, array( 'text'=> $cat ));
 			}
-			$itunesFeed[] = $this->generateClosingXmlNode('itunes:category', 2);
+			$this->writeClosingXmlNode('itunes:category', 2);
 		}
 		
 		while($entry = $this->getNextEntry())
@@ -597,40 +611,41 @@ class KalturaSyndicationFeedRenderer
 			$e->fromObject($entry);
 						
 			$url = $this->getFlavorAssetUrl($e);
-			$itunesFeed[] = $this->generateOpenXmlNode('item',2);
-			$itunesFeed[] = $this->generateFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
-			$itunesFeed[] = $this->generateFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
-			$itunesFeed[] = $this->generateFullXmlNode('guid', $url, 3);
-			$itunesFeed[] = $this->generateFullXmlNode('pubDate', date('r',$e->createdAt), 3);
-			$itunesFeed[] = $this->generateFullXmlNode('description', $this->stringToSafeXml($e->description), 3);
+			$this->writeOpenXmlNode('item',2);
+			$this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
+			$this->writeFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
+			$this->writeFullXmlNode('guid', $url, 3);
+			$this->writeFullXmlNode('pubDate', date('r',$e->createdAt), 3);
+			$this->writeFullXmlNode('description', $this->stringToSafeXml($e->description), 3);
 
 			$enclosure_attr = array(
 				'url'=> $url,
 				//'length'=>$entry->getLengthInMsecs(), removed by Noa, 25/08/10: we'll need to place here file size (of flavor asset).
 				'type'=> $this->mimeType,
 			);
-			$itunesFeed[] = $this->generateFullXmlNode('enclosure', '', 3, $enclosure_attr);
+			$this->writeFullXmlNode('enclosure', '', 3, $enclosure_attr);
 			
 			$kuser = $entry->getkuser();
 			if($kuser && $kuser->getScreenName())
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
+				$this->writeFullXmlNode('itunes:author', $this->stringToSafeXml($kuser->getScreenName()), 3);
 				
 			if($e->description)
 			{
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:subtitle', $this->stringToSafeXml($e->description), 3);
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:summary', $this->stringToSafeXml($e->description), 3);
+				$this->writeFullXmlNode('itunes:subtitle', $this->stringToSafeXml($e->description), 3);
+				$this->writeFullXmlNode('itunes:summary', $this->stringToSafeXml($e->description), 3);
 			}
-			$itunesFeed[] = $this->generateFullXmlNode('itunes:duration', $this->secondsToWords($e->duration), 3);
-			$itunesFeed[] = $this->generateFullXmlNode('itunes:explicit', $this->syndicationFeed->adultContent, 3);
-			$itunesFeed[] = $this->generateFullXmlNode('itunes:image', '', 3, array( 'href' => $e->thumbnailUrl.'/width/600/height/600/ext.jpg'));
+			$this->writeFullXmlNode('itunes:duration', $this->secondsToWords($e->duration), 3);
+			$this->writeFullXmlNode('itunes:explicit', $this->syndicationFeed->adultContent, 3);
+			$this->writeFullXmlNode('itunes:image', '', 3, array( 'href' => $e->thumbnailUrl.'/width/600/height/600/ext.jpg'));
 			if($e->tags)
-				$itunesFeed[] = $this->generateFullXmlNode('itunes:keywords', $this->stringToSafeXml($e->tags), 3);
-			$itunesFeed[] = $this->generateClosingXmlNode('item',2);
+				$this->writeFullXmlNode('itunes:keywords', $this->stringToSafeXml($e->tags), 3);
+			$this->writeClosingXmlNode('item',2);
+			
+			ob_flush();
 		}
 		
-		$itunesFeed[] = $this->generateClosingXmlNode('channel', 1);
-		$itunesFeed[] = $this->generateClosingXmlNode('rss');
-		echo implode('', $itunesFeed);
+		$this->writeClosingXmlNode('channel', 1);
+		$this->writeClosingXmlNode('rss');
 	}
 	
 	private function renderGoogleVideoFeed()
@@ -638,32 +653,32 @@ class KalturaSyndicationFeedRenderer
 		header ("content-type: text/xml; charset=utf-8");
 		$uiconfId = ($this->syndicationFeed->playerUiconfId)? '/ui_conf_id/'.$this->syndicationFeed->playerUiconfId: '';
 		
-		$googleFeed[] = $this->generateOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
+		$this->writeOpenXmlNode('urlset', 0, array( 'xmlns' => "http://www.sitemaps.org/schemas/sitemap/0.9", 
 		'xmlns:video' => "http://www.google.com/schemas/sitemap-video/1.1" ));
 		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);			
-			$googleFeed[] = $this->generateOpenXmlNode('url',1);
-			$googleFeed[] = $this->generateFullXmlNode('loc', $this->syndicationFeed->landingPage.$e->id, 2);
-			$googleFeed[] = $this->generateOpenXmlNode('video:video', 2);
-			$googleFeed[] = $this->generateFullXmlNode('video:content_loc', $this->getFlavorAssetUrl($e), 3);
+			$this->writeOpenXmlNode('url',1);
+			$this->writeFullXmlNode('loc', $this->syndicationFeed->landingPage.$e->id, 2);
+			$this->writeOpenXmlNode('video:video', 2);
+			$this->writeFullXmlNode('video:content_loc', $this->getFlavorAssetUrl($e), 3);
 			if($this->syndicationFeed->allowEmbed)
 			{
-				$googleFeed[] = $this->generateFullXmlNode('video:player_loc', $this->getPlayerUrl($e->id), 3, array('allow_embed' => 'yes'));
+				$this->writeFullXmlNode('video:player_loc', $this->getPlayerUrl($e->id), 3, array('allow_embed' => 'yes'));
 			}
-			$googleFeed[] = $this->generateFullXmlNode('video:thumbnail_loc', $e->thumbnailUrl . '/width/480', 3);
-			$googleFeed[] = $this->generateFullXmlNode('video:title', $this->stringToSafeXml($e->name), 3);
-			$googleFeed[] = $this->generateFullXmlNode('video:description', $this->stringToSafeXml($e->description), 3);
-			$googleFeed[] = $this->generateFullXmlNode('video:view_count', $e->views, 3);
-			$googleFeed[] = $this->generateFullXmlNode('video:publication_date', date('Y-m-d',$e->createdAt).'T'.date('H:i:sP',$e->createdAt), 3);
+			$this->writeFullXmlNode('video:thumbnail_loc', $e->thumbnailUrl . '/width/480', 3);
+			$this->writeFullXmlNode('video:title', $this->stringToSafeXml($e->name), 3);
+			$this->writeFullXmlNode('video:description', $this->stringToSafeXml($e->description), 3);
+			$this->writeFullXmlNode('video:view_count', $e->views, 3);
+			$this->writeFullXmlNode('video:publication_date', date('Y-m-d',$e->createdAt).'T'.date('H:i:sP',$e->createdAt), 3);
 			$tags = explode(',', $e->tags);
 			foreach($tags as $tag)
 			{
 				if(!$tag) continue;
-				$googleFeed[] = $this->generateFullXmlNode('video:tag', rtrim(ltrim($this->stringToSafeXml($tag))), 3);
+				$this->writeFullXmlNode('video:tag', rtrim(ltrim($this->stringToSafeXml($tag))), 3);
 			}
-			$googleFeed[] = $this->generateFullXmlNode('video:category', $this->stringToSafeXml($e->categories), 3);
+			$this->writeFullXmlNode('video:category', $this->stringToSafeXml($e->categories), 3);
 			if($this->syndicationFeed->adultContent == KalturaGoogleSyndicationFeedAdultValues::NO)
 			{
 				$familyFriendly = KalturaGoogleSyndicationFeedAdultValues::YES;
@@ -672,12 +687,13 @@ class KalturaSyndicationFeedRenderer
 			{
 				$familyFriendly = KalturaGoogleSyndicationFeedAdultValues::NO;
 			}
-			$googleFeed[] = $this->generateFullXmlNode('video:family_friendly', $familyFriendly, 3);
-			$googleFeed[] = $this->generateFullXmlNode('video:duration', $e->duration, 3);
-			$googleFeed[] = $this->generateClosingXmlNode('video:video', 2);
-			$googleFeed[] = $this->generateClosingXmlNode('url', 1);
+			$this->writeFullXmlNode('video:family_friendly', $familyFriendly, 3);
+			$this->writeFullXmlNode('video:duration', $e->duration, 3);
+			$this->writeClosingXmlNode('video:video', 2);
+			$this->writeClosingXmlNode('url', 1);
+			
+			ob_flush();
 		}
-		$googleFeed[] = $this->generateClosingXmlNode('urlset');
-		echo implode('', $googleFeed);
+		$this->writeClosingXmlNode('urlset');
 	}
 }
