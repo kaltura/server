@@ -1,5 +1,6 @@
 <?php
 $start = microtime(true);
+set_time_limit(0);
 require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
 
 // check cache before loading anything
