@@ -32,7 +32,7 @@ class KalturaResponseCacher
 		{
 			$clientTag = $params['clientTag'];
 			$matches = null;
-			if (preg_match("/cache_st:(\d+)/", $clientTag, $matches))
+			if (preg_match("/cache_st:(\\d+)/", $clientTag, $matches))
 			{
 				if ($matches[1] > time())
 				{
@@ -49,12 +49,19 @@ class KalturaResponseCacher
 			return;
 		}
 		
-		$this->_ks = isset($params['ks']) ? $params['ks'] : ''; 
+		$ks = isset($params['ks']) ? $params['ks'] : ''; 
 		unset($params['ks']);
 		unset($params['kalsig']);
 		unset($params['clientTag']);
 		
 		$this->_params = $params;
+		$this->setKS($ks);
+	}
+	
+	public function setKS($ks)
+	{
+		$this->_ks = $ks;
+		
 		$ksData = $this->getKsData();
 		$this->_params["___cache___partnerId"] = $ksData["partnerId"];
 		$this->_params["___cache___userId"] = $ksData["userId"];
@@ -67,11 +74,6 @@ class KalturaResponseCacher
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
 		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
-	}
-	
-	public function setKS($ks)
-	{
-		$this->_ks = $ks;
 	}
 	
 	public static function disableCache()
