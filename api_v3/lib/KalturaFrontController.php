@@ -186,6 +186,7 @@ class KalturaFrontController
 	        	unset($currentParams['format']);
 	        	
 	        	$cache = new KalturaResponseCacher($currentParams);
+	        	$cache->setKS(kCurrentContext::$ks);
 				$cachedResult = $cache->checkCache();
 				if ($cachedResult)
 				{

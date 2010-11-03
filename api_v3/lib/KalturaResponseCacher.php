@@ -69,6 +69,11 @@ class KalturaResponseCacher
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
 	}
 	
+	public function setKS($ks)
+	{
+		$this->_ks = $ks;
+	}
+	
 	public static function disableCache()
 	{
 		self::$_useCache = false;
