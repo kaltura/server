@@ -87,7 +87,7 @@ class myContentStorage
 		return 0 + substr( $version, 1 );
 	}
 
-	public static function getAllVersions ( $entityName, $int_id, $id, $fileName)
+	public static function getAllVersions_deprecated ( $entityName, $int_id, $id, $fileName)
 	{
 		$c = strstr($fileName, '^') ?  '^' : '&';
 		$parts = explode($c, $fileName);
@@ -101,10 +101,10 @@ class myContentStorage
 		}
 		else
 		{
-/*			$dir = '/content/'.$entityName.'/'.
-					(intval($id / 1048576)).'/'.
-					(intval($id / 1024) % 1024).'/';
-*/
+//			$dir = '/content/'.$entityName.'/'.
+//					(intval($id / 1048576)).'/'.
+//					(intval($id / 1024) % 1024).'/';
+//
 			$dir = '/content/'.$entityName.'/'. self::dirForId ( $int_id, $id , "" ); 
 	
 		$file_base = $id.'_'; //.$fileName;
