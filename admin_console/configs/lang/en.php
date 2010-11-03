@@ -33,6 +33,8 @@ return array(
 	'KalturaBatchJobType::DB_CLEANUP' => 'DB Cleanup',
 	'KalturaBatchJobType::METADATA_IMPORT' => 'MetaData Import',
 	'KalturaBatchJobType::METADATA_TRANSFORM' => 'MetaData Transform',
+	'KalturaBatchJobType::FILESYNC_IMPORT' => 'Filesync Import',
+
 
 	'KalturaConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'KalturaConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -45,6 +47,8 @@ return array(
 	'KalturaConversionEngineType::EXPRESSION_ENCODER' => 'Expression Encoder',
 	'KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS' => 'QuickTime player tools',
 	'KalturaConversionEngineType::FAST_START' => 'Convert - Fast start',
+	'KalturaConversionEngineType::PDF2SWF' => 'Convert - PDF to SWF',
+	'KalturaConversionEngineType::PDF_CREATOR' => 'Convert - PDF Creator',
 
 	'KalturaBatchJobStatus::PENDING' => 'Pending',
 	'KalturaBatchJobStatus::QUEUED' => 'Started',
