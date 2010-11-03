@@ -557,7 +557,7 @@ class myInsertEntryHelper
 						
 						// call mediaInfo for file
 						$mediaInfo = new mediaInfo();
-						$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath);
+						$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, kConf::get('bin_path_mediainfo'));
 						$KalturaMediaInfo = new KalturaMediaInfo();
 						$KalturaMediaInfo = $mediaInfoParser->getMediaInfo();
 						$mediaInfo = $KalturaMediaInfo->toInsertableObject($mediaInfo);
