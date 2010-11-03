@@ -410,13 +410,44 @@ class entry extends Baseentry implements ISyncableFile
 	// will return an array of tuples of the file's version:
 	// file name
 	// file size
-	// file date
+	// file data
 	// file version
 	public function getAllVersions ()
 	{
-		$res = myContentStorage::getAllVersions("entry/data", $this->getIntId(), $this->getId(), $this->getData());
-//		print_r ( $res );
-		return $res;
+		$current_version = $this->getData();
+		$c = strstr($current_version, '^') ?  '^' : '&';
+		$parts = explode($c, $current_version);
+		
+		if (count($parts) == 2 && strlen($parts[1]))
+		{ 
+			// a template has no versions
+			$dir = '/content/templates/entry/data/';
+			$file_base = ""; //$parts[1];
+			return $dir . $file_base;
+		}
+		
+		// create an array to hold versions list
+		$results = array();
+		for ($version = 100000; $version <= $current_version; $version++ )
+		{
+			$version_sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version);
+			$local_file_sync = kFileSyncUtils::getLocalFileSyncForKey($version_sync_key);
+			if ($local_file_sync)
+			{
+				$result = array();
+				// first - name (with the full path)
+				$result[] = $local_file_sync->getFilePath();
+				// second - size 
+				$result[] = $local_file_sync->getFileSize();
+				// third - time
+				$result[] = filemtime ( $local_file_sync->getFullPath());
+				// forth - content (only if requested
+				$result[] = kFileSyncUtils::file_get_contents($version_sync_key);			
+				$results[] = $result;
+			}
+		}
+
+		return $results;
 	}
 
 
