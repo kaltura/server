@@ -37,8 +37,20 @@ class BulkUploadService extends KalturaBaseService
 		$job->setPartnerId($this->getPartnerId());
 		$job->save();
 		
+		
+		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
+		try{
+			kFileSyncUtils::moveFromFile($csvFileData["tmp_name"], $syncKey, true);
+		}
+		catch(Exception $e)
+		{
+			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+		}
+		$csvPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		
 		$data = new KalturaBulkUploadJobData();
-		$data->csvFilePath = $csvFileData["tmp_name"];
+		$data->csvFilePath = $csvPath;
 		$data->userId = $this->getKuser()->getPuserId();
 		$data->uploadedBy = $this->getKuser()->getScreenName();
 		if ($conversionProfileId === -1)
