@@ -15,7 +15,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		entryPeer::ADMIN_TAGS => 'admin_tags',
 		'plugins_data',
 		'entry.DURATION_TYPE' => 'duration_type',
-		'entry.SEARCH_TEXT' => '(name,tags,description)',
+		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id)',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
@@ -77,7 +77,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		'group_id' => 'string',
 		'metadata' => 'string',
 		'duration_type' => 'string',
-		'(name,tags,description)' => 'string',
+		'(name,tags,description,entry_id)' => 'string',
 		
 		'int_entry_id' => 'int',
 		'kuser_id' => 'int',
@@ -356,7 +356,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 				$freeText = str_replace('"', '', $freeTexts);
 				$freeText = SphinxUtils::escapeString($freeText);
 				$freeText = "^$freeText$";
-				$additionalConditions[] = "@(name,tags,description) $freeText";
+				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
 			}
 			else
 			{
@@ -375,7 +375,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 							
 					foreach($freeTextsArr as $freeText)
 					{
-						$additionalConditions[] = "(@(name,tags,description) $freeText)";
+						$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText)";
 					}
 				}
 				else
@@ -390,7 +390,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					}
 							
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "(@(name,tags,description) $freeTextExpr)";
+					$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr)";
 				}
 			}
 			if(count($additionalConditions))
