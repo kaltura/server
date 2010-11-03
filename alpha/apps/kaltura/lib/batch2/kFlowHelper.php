@@ -973,16 +973,17 @@ class kFlowHelper
 	 */
 	public static function handleBulkUploadPending(BatchJob $dbBatchJob, kBulkUploadJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
+		// moved to BulkUploadService
 		// create file sunc
-		$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
-		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($data->getCsvFilePath()));
-
-		// sets the pointer to the csv file
-		$data->setCsvFilePath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		
-		// save the data to the db
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
+//		$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($data->getCsvFilePath()));
+//
+//		// sets the pointer to the csv file
+//		$data->setCsvFilePath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+//		
+//		// save the data to the db
+//		$dbBatchJob->setData($data);
+//		$dbBatchJob->save();
 		
 		return $dbBatchJob; 	
 	}
