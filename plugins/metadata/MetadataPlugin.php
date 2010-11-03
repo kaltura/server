@@ -297,7 +297,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 				$key = $matches[1];
 				if(!isset($metadataProfileFields[$key]))
 				{
-					$errorMessage = "No field found for key[$key]";
+					$errorMessage = "Field [$key] does not exist";
 					KalturaLog::debug($errorMessage);
 					self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
 					continue;
