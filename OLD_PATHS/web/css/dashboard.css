@@ -1,0 +1,88 @@
+@CHARSET "UTF-8";
+body, html{ height: 100%; }
+
+
+body{
+	margin:0; 
+	padding:0;
+	color: #111;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+
+/*-------------------------------- 
+	Footer at bottom technique 
+---------------------------------*/
+#wrap{ width:100%; height:100%; min-width:700px; margin:0 auto; }
+
+
+/*-------------------------------- 
+	customize 
+---------------------------------*/
+* { margin:0; padding: 0; }
+a{ color:#3b748b; border:dotted #3b748b; border-width:0 0 1px 0; cursor:pointer; text-decoration: none; }
+a:hover{ border-bottom:solid 1px white; color: #fff; background-color: #3b748b; }
+table{ border: none; width: 100%; }
+ul { list-style:none; }
+	.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }	/* Controlsthe BR tag, which makes the WRAPPER float stretch for GECKO */
+	.clearfix {display: inline-block; }
+	/* Hides from IE-mac \*/
+		* html .clearfix { height: 1%; }
+		.clearfix { display: block; }
+	/* End hide from IE-mac */
+:focus { -moz-outline-style: none; outline:none; }
+*::-moz-selection { background:#97c850; color:#fff; }
+img{ border:none; }
+.sunkenList li, .sunkenItem{ border-bottom:1px solid #555; border-right:1px solid #606060; border-left:1px solid #222; border-top:1px solid #222; }
+.bold{ font-weight:bold; }
+.floatl{ float: left; }
+.floatr{ float: right; }
+.floatn{ float: none; }
+.preloader{ visibility:hidden; float:right; width:55px; padding-top:33px; margin-top:-3px; background:url(/images/wizard/animated_big_logo.gif) center top no-repeat; }
+
+/* widths */
+.width30{ width:30%; }
+.width40{ width:40%; }
+.width50{ width:50%; }
+.width60{ width:60%; }
+.width70{ width:70%; }
+.width80{ width:80%; }
+.width90{ width:90%; }
+.width100{ width:100%; }
+
+/*-------------------------------- 
+	Main Menu 
+---------------------------------*/
+#menu{ background-color:#3B748B; padding:10px 0; list-style:none; text-align: center; width: 100%; margin:0 auto; position:absolute; top:0; opacity:0.8; }
+	#menu li{ display:inline; margin:0 8px; line-height:1.8em; }
+		#menu li a{ color:white; text-decoration: underline; border:none; }
+		#menu li a:hover{ text-decoration:none; }
+
+/*-------------------------------- 
+	Headlines 
+---------------------------------*/
+#header{ margin:35px 0 50px 0; color: #fff; padding: 5px 10px 5px 10px; font-weight: bolder; background-color: #3b748b; }
+	#header .top{ height: 40px; }
+		#header .top a{ color: #dcf2fb; border:none; float: right; }
+		#header .top a:hover{ color: #97c850; border:none; }
+	#header h1{ font-size:30px; float: left; }
+	#header span{ font-size: 12px; float: right; clear: right; padding-top: 18px; }
+h2{ color: #97c850; }
+
+
+/*-------------------------------- 
+	Tables 
+---------------------------------*/
+table{ margin-bottom: 40px; }
+table tr.even{ background-color: #dcf2fb; }
+table tr.odd2{ background-color: #dcf2cb; }
+table tr.even2{ background-color: #dce5b9; }
+table thead tr{ background-color: #5198b4; color: white; }
+	table thead tr td{ padding: 5px; font-weight: bold; }
+table tr td.image a{ display: block; width:55px; padding: 2px; border: 2px solid #3b748b; }
+table tr td.image a:hover{ border-color: #97c850; background:none; }
+table tr td.image a img{ width: 100%; }
+table tr td.country img { border: 0; }
+table tbody tr:hover{  }
+	table tbody tr td{ padding: 5px; }
