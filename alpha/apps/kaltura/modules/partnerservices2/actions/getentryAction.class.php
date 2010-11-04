@@ -71,6 +71,10 @@ class getentryAction extends defPartnerservices2Action
 		}
 		else
 		{
+			if ( $entry->getStatus() == entry::ENTRY_STATUS_IMPORT || $entry->getStatus() == entry::ENTRY_STATUS_PRECONVERT )
+			{
+				defPartnerservices2baseAction::disableCache();
+			}
 			if ( $version ) $entry->setDesiredVersion ( $version );
 			
 			$extra_fields = $this->getExtraFields ();
