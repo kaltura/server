@@ -407,11 +407,9 @@ class entry extends Baseentry implements ISyncableFile
 		return $res;
 	}
 
-	// will return an array of tuples of the file's version:
-	// file name
-	// file size
-	// file data
-	// file version
+	/*
+	 *  return an array of tuples of the file's version: [name, size, data, version]
+	 */
 	public function getAllVersions ()
 	{
 		$current_version = $this->getData();
