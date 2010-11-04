@@ -30,7 +30,11 @@ INSERT IGNORE INTO `ui_conf` (id,obj_type,partner_id,subp_id,conf_file_path,name
 (48304,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_white_400_600.xml','Vertical Light','400','600','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:43:43','2009-07-15 18:43:43',NULL,1,'playlist',NULL,2,NULL,2,1),
 (48305,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_vertical_dark_400_600.xml','Vertical Dark','400','600','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:09','2009-07-15 18:44:09',NULL,1,'playlist',NULL,2,NULL,2,1),
 (48306,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_white_740_335.xml','Horizontal Light','740','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:37','2009-07-15 18:44:37',NULL,1,'playlist',NULL,2,NULL,2,1),
-(48307,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_dark_740_335.xml','Horizontal Dark','740','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:46','2009-07-15 18:44:46',NULL,1,'playlist',NULL,2,NULL,2,1);
+(48307,1,0,0,'content/uiconf/kaltura/kmc/embedplayers/playlist_horizontal_dark_740_335.xml','Horizontal Dark','740','335','','/flash/kdp/v2.7.0/kdp.swf','2009-07-15 18:44:46','2009-07-15 18:44:46',NULL,1,'playlist',NULL,2,NULL,2,1),
+(48506,1,0,0,'content/uiconf/kaltura/kmc/content/kdp_kmc_content_moderation.xml', 'KDP For KMC Moderation', '0', '0', '', '/flash/kdp3/v3.1.6/kdp3.swf', '12/01/2010 06:33:42', '03/02/2010 03:48:14', NULL, '1', NULL, NULL, '2', NULL, '2', '1'),
+(31008,8,0,0,'content/uiconf/kaltura/kmc/appstudio/kdp3/player_30_ui.xml', 'Player template kdp3 appstudio 2', '400', '360', NULL, '/flash/kdp3/v3.1.6/kdp3.swf', now(), now(), NULL, '1', NULL, NULL, '2', NULL, '2', '1'),
+(31009,8,0,0,'content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_ui.xml', 'Playlist template appstudio 2', '720', '360', NULL, '/flash/kdp3/v3.1.6/kdp3.swf', now(), now(), NULL, '1', NULL, NULL, '2', NULL, '2', '1');
+
 
 INSERT IGNORE INTO `file_sync` (partner_id, object_type, object_id, version, object_sub_type, dc, original, created_at, updated_at, ready_at, sync_time, status, file_type, linked_id, link_count, file_root, file_path, file_size)
 VALUES
@@ -62,7 +66,12 @@ VALUES
 (0,2,'607',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_gray_view.xml',4605),
 (0,2,'608',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_whiteblue_remix.xml',4884),
 (0,2,'609',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/kdp_1.1.11/kdp_drupal_v2.1_whiteblue_view.xml',4610),
-(0,2,'610',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/cw_drupal_comments.xml',996);
+(0,2,'610',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/drupal/cw_drupal_comments.xml',996),
+(0,2,'48506',NULL,1,'0',1,now(),now(),now(),NULL,2,1,NULL,NULL,'@WEB_DIR@/','content/uiconf/kaltura/kmc/content/kdp_kmc_content_moderation.xml','5403'),
+(0,2,'31008',NULL,1,'0',1, now(), now(), now(), NULL,2,1, NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/kmc/appstudio/kdp3/player_30_ui.xml', '37374'), 
+(0,2,'31008',NULL,2,'0',1, now(), now(), now(), NULL,2,1, NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/kmc/appstudio/kdp3/player_30_ui.features.xml', '63329'),
+(0,2,'31009',NULL,1,'0',1, now(), now(), now(), NULL,2,1, NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_ui.xml', '37368'), 
+(0,2,'31009',NULL,2,'0',1, now(), now(), now(), NULL,2,1, NULL, NULL, '@WEB_DIR@/', 'content/uiconf/kaltura/kmc/appstudio/kdp3/playlist_30_ui.features.xml', '66924');
 
 INSERT INTO ui_conf (id,obj_type,partner_id,subp_id,conf_file_path,name,width,height,html_params,swf_url,created_at,updated_at, conf_vars, use_cdn,tags,display_in_search) 
 VALUES(48501,1,0,0,'content/uiconf/kaltura/kmc/content/kdp_kmc_content_light.xml','KDP3 light player', 400,335,'','/flash/kdp3/v3.3.9.2/kdp3.swf',NOW(),NOW(), NULL, 1, 'player', 2);
