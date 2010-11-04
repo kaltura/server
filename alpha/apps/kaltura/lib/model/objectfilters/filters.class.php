@@ -86,6 +86,11 @@ abstract class baseObjectFilter extends myBaseObject
 	{
 		return $this->set( self::LIMIT , $lim );
 	}
+
+	public function clearLimit()
+	{
+		return $this->unsetByName(self::LIMIT);
+	}
 	
 	public function getAllowedOrderFields ()
 	{
@@ -722,6 +727,12 @@ abstract class baseObjectFilter extends myBaseObject
 		}
 		
 		return $criterion;
+	}
+	
+	
+	public function clearOrder()
+	{
+		$this->unsetByName(self::ORDER);
 	}
 	
 	
