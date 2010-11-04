@@ -275,6 +275,8 @@ class KalturaSyndicationFeedRenderer
 			
 		next($this->entryFilters);
 			
+		$filter->clearLimit();
+		$filter->clearOrder();
 		$filter->attachToCriteria($c);
 		
 		$c->clearOrderByColumns();
