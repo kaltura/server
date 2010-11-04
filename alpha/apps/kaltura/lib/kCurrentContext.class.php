@@ -1,6 +1,6 @@
 <?php
 /**
- * Will hold the curernt context of the API call / current running batch.
+ * Will hold the current context of the API call / current running batch.
  * The inforamtion is static per call and can be used from anywhare in the code. 
  */
 class kCurrentContext
