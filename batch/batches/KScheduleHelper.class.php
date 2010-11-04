@@ -42,6 +42,20 @@ class KScheduleHelper extends KBatchBase
 	{
 		KalturaLog::info("Schedule helper batch is running");
 		
+		try
+		{
+			$systemReady = $this->kClient->system->ping();
+			if (!$systemReady) {
+				KalturaLog::err("System is not yet ready - ping failed");
+				return;
+			}
+		}
+		catch (KalturaClientException $e)
+		{
+			KalturaLog::err("System is not yet ready - ping failed");
+			return;
+		}
+		
 		$scheduler = new KalturaScheduler();
 		$scheduler->configuredId = $this->getSchedulerId();
 		$scheduler->name = $this->getSchedulerName();

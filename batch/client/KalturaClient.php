@@ -234,7 +234,6 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = 99;
 	const PDF2SWF = 201;
 	const PDF_CREATOR = 202;
-	const OPENOFFICE_UCONV = 203;
 }
 
 class KalturaConversionProfileOrderBy
@@ -9094,6 +9093,26 @@ class KalturaSessionService extends KalturaServiceBase
 	}
 }
 
+class KalturaSystemService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function ping()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("system", "ping", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$resultObject = (bool) $resultObject;
+		return $resultObject;
+	}
+}
+
 class KalturaFileSyncService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -11579,6 +11598,13 @@ class KalturaClient extends KalturaClientBase
 	public $session = null;
 
 	/**
+	 * System service is used for internal system helpers & to retrieve system level information
+	 *
+	 * @var KalturaSystemService
+	 */
+	public $system = null;
+
+	/**
 	 * System user service
 	 *
 	 * @var KalturaFileSyncService
@@ -11616,6 +11642,7 @@ class KalturaClient extends KalturaClientBase
 		$this->jobs = new KalturaJobsService($this);
 		$this->media = new KalturaMediaService($this);
 		$this->session = new KalturaSessionService($this);
+		$this->system = new KalturaSystemService($this);
 		$this->fileSync = new KalturaFileSyncService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataBatch = new KalturaMetadataBatchService($this);
