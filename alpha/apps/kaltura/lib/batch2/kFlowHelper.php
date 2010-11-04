@@ -685,7 +685,7 @@ class kFlowHelper
 		
 			// creating post convert job (without thumb)
 			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
-			kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId());
+			kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $flavor->getDestFileSyncLocalPath(), $flavor->getFlavorAssetId(), $flavor->getFlavorParamsOutputId(), file_exists($thumbPath), $offset);
 			
 			$finalFlavors[] = $flavor;
 			$addedFlavorParamsOutputsIds[] = $flavor->getFlavorParamsOutputId();
@@ -723,17 +723,9 @@ class kFlowHelper
 		if(file_exists($logPath))
 			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG, $ismVersion));
 		
-		if(file_exists($thumbPath))
-		{
-			$entry->setThumbnail(".jpg");
-			$entry->save();
-			kFileSyncUtils::moveFromFile($thumbPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB));
-		}
-		else 
-		{
-			// saving entry changes
-			$entry->save();
-		}
+		// saving entry changes
+		$entry->save();
+
 		
 		// save the data changes to the db
 		$data->setFlavors($finalFlavors);
