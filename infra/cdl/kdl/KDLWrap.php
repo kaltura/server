@@ -27,7 +27,6 @@ class KDLWrap
 		kConvertJobData::CONVERSION_ENGINE_FAST_START=>KDLTranscoders::QT_FASTSTART,
 		kConvertJobData::CONVERSION_ENGINE_PDF2SWF=>KDLTranscoders::PDF2SWF,
 		kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
-		kConvertJobData::CONVERSION_ENGINE_OPENOFFICE_UCONV=>KDLTranscoders::OPENOFFICE_UCONV,
 	);
 	
 	/* ------------------------------

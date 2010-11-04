@@ -26,8 +26,6 @@ class kConvertJobData extends kConvartableJobData
 	// document conversion engines
 	const CONVERSION_ENGINE_PDF2SWF = 201;
 	const CONVERSION_ENGINE_PDF_CREATOR = 202;
-	const CONVERSION_ENGINE_OPENOFFICE_UCONV = 203;
-	
 	
 	/**
 	 * @var string

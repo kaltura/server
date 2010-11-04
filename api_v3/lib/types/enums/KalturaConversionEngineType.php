@@ -21,7 +21,6 @@ class KalturaConversionEngineType extends KalturaEnum
 	// document conversion engines
 	const PDF2SWF = 201;
 	const PDF_CREATOR = 202;
-	const OPENOFFICE_UCONV = 203;
 	
 }
 ?>

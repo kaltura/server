@@ -113,7 +113,6 @@
 		const QT_FASTSTART  = "qt-faststart";
 		const PDF2SWF = "pdf2swf";
 		const PDF_CREATOR = "pdf_creator";
-		const OPENOFFICE_UCONV = "openoffice_uconv";
 	};
 
 
