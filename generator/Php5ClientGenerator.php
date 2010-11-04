@@ -242,7 +242,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		if ($resultType == 'int')
 			$resultType = "integer";
 			
-		$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+		if ($resultType == 'bool')
+			$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+		else
+			$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+			
 		$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
 	}
