@@ -38,3 +38,4 @@ button { background-color: #A0A0A0; border-color: #DEDEDE #202020 #202020 #DEDED
 #kmcSubMenu li.active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
 #kmcSubMenu li.active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
 
+#kmcSubMenu li.code-menu-toggle a, #kmcSubMenu li.code-menu-toggle a:visited, #kmcSubMenu li.code-menu-toggle a:active {color:#ff0000;}

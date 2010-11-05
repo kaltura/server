@@ -499,9 +499,9 @@ KTestMe.prototype = {
 	
 	calculateDimensions: function() {
 		this.height = jQuery("body").innerHeight() - jQuery("#kmcSubMenu").outerHeight() - 50;
-		this.testmeHeight = this.height - 180;
-
-		jQuery(".code").css("height", 179);
+		
+		this.testmeHeight = this.height - (codeHeight+1);
+		jQuery(".code").css("height", codeHeight);
 		
 		var leftBoxWidth = jQuery(".left").outerWidth();
 		
@@ -532,6 +532,8 @@ KTestMe.prototype = {
 };
 
 var kTestMe;
+var codeHeight = 179;
+
 jQuery(function() {
 	kTestMe = new KTestMe();
 });

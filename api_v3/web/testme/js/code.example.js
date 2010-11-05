@@ -619,5 +619,20 @@ function switchToPHP(){
 }
 
 function switchToJava(){
-	switchToCodeGenerator('php', new KCodeExampleJava(jQuery("#example")));
+	switchToCodeGenerator('java', new KCodeExampleJava(jQuery("#example")));
+}
+
+function toggleCode(){
+	$('#codeExample').toggle();
+	if($('#codeToggle').html() == 'Hide Code Example'){
+		$('#codeToggle').html('Show Code Example');
+		codeHeight = 14;
+	}
+	else{
+		$('#codeToggle').html('Hide Code Example');
+		codeHeight = 179;
+	}
+
+        kTestMe.calculateDimensions(1);
+        kTestMe.jqWindow.resize();
 }

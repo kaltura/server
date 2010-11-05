@@ -4,8 +4,9 @@
 #codeSubMenu li { float:left; display:inline; list-style:none inside none; padding-left:9px; height:19px;}
 #codeSubMenu li a, #codeSubMenu li a:active, #codeSubMenu li a:visited { height:19px; padding: 1px 12px 0 4px; display:block; font: bold 12px arial,sans-serif; color:#666; text-decoration:none;}
 #codeSubMenu li a:hover { color:#000;}
-#codeSubMenu li active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
-#codeSubMenu li active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
+#codeSubMenu li a.code-menu-toggle, #codeSubMenu li a.code-menu-toggle:visited, #codeSubMenu li a.code-menu-toggle:active {padding-left:0px; color:#ff0000; display:inline; font-size:10px; }
+#codeSubMenu li.active { margin-top:1px; background:url(../images/jellybean.png) 0 0 no-repeat;}
+#codeSubMenu li.active a { font-weights:normal; color:#fff; background:url(../images/jellybean.png) right 0 no-repeat;}
 
 
 .code {}
