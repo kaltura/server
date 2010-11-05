@@ -91,15 +91,15 @@
 	</div>
 	</div>
 	<ul id="codeSubMenu">
- 		<li class="code-menu">
-			<a class="code-menu-toggle" href="#" onclick="toggleCode()" id="codeToggle">Hide Code Example</a>
-		</li>
  		<li class="code-menu code-menu-php active">
  			<a href="#" onclick="switchToPHP()">PHP</a>
  		</li>
  		<li class="code-menu code-menu-java">
  			<a href="#" onclick="switchToJava()">Java</a>
  		</li>
+ 		<li class="code-menu">
+			<a class="code-menu-toggle" href="#" onclick="toggleCode()" id="codeToggle">Hide Code Example</a>
+		</li>
 	</ul>	
 	<div class="code" id="codeExample">
    		<div id="example"></div>
