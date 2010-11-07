@@ -147,7 +147,7 @@ class myKalturaServices extends myBaseMediaSource implements IMediaSource
 				"url" => $entry->getDataUrl() , 
 				"tags" => $entry->getTags() ,
 				"title" => $entry->getName() , 
-				"description" => $entry->getTags() ,
+				"description" => $entry->getDescription() ,
 				"flash_playback_type" => $entry->getMediaTypeName() ,
 //				"partnerId" => $entry->getPartnerId() 
 			);
