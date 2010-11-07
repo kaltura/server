@@ -581,7 +581,9 @@ $(function(){
 			else {
 				embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 				preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
+				preview_player = preview_player.replace('{FLASHVARS}','kalturaMix.disableUrlHashing=' + kmc.vars.disableurlhashing);
 				embed_code = embed_code.replace('{FLAVOR}','');
+				embed_code = embed_code.replace('{FLASHVARS}','');
 			}
 			var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							 '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#contentSection118"></a>' + id_type +
@@ -748,7 +750,7 @@ $(function(){
 			}
 			if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 				embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
-				embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars);
+				embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars + "{FLASHVARS}");
 //				console.log(uiconf_details.swf_version); alert("uiconf_details.swf_version logged");
 				if(uiconf_details.swf_version.indexOf("v3") == -1) { // not kdp3
 					embed_code = embed_code.replace("playlistAPI.autoContinue","k_pl_autoContinue");
@@ -760,7 +762,8 @@ $(function(){
 			else {											// player and multitab playlist
 				embed_code = embed_code.replace("{SEO}", (is_playlist ? "" : kmc.preview_embed.embed_code_template.media_seo_info));
 				embed_code = embed_code.replace(/{ENTRY_ID}/g, (is_playlist ? "" : "/entry_id/" + id));
-				embed_code = embed_code.replace("{FLASHVARS}", "");
+// 7-nov-2010				
+//				embed_code = embed_code.replace("{FLASHVARS}", "");
 			}
 			
 			embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
