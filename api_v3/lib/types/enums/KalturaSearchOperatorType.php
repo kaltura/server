@@ -8,4 +8,3 @@ class KalturaSearchOperatorType extends KalturaEnum
 	const SEARCH_AND = 1;
 	const SEARCH_OR = 2;
 }
-?>
