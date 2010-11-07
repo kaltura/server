@@ -62,11 +62,21 @@ LOGDATE=${LOGDATE//:/-}
 
 echo $LOGDATE
 
+# update bandwidth
+zcat @LOG_DIR@//kaltura_apache_access.log-$WHEN.gz |php @APP_DIR@/scripts/billing_summary_www.php  >www_res
+
+php @APP_DIR@/scripts/billing_summary_insert.php www $WHEN www_res > www_res.sql
+mysql -h@DB1_HOST@ @DB1_NAME@ -u@DB1_USER@ -p@DB1_PASS@ < www_res.sql
+
+rm -f www_res
+rm -f www_res.sql
+
+
 # make a backup 
-mysql -h@DB1_HOST@ @DB1_NAME@ -u@DB1_USER@ -p@DB1_PASS@ "select id,views,plays from entry" >all_entries-$LOGDATE
+mysql -h@DB1_HOST@ @DB1_NAME@ -u@DB1_USER@ -p@DB1_PASS@ -e "select id,views,plays from entry" >all_entries-$LOGDATE
 
 mysql -h@DB_STATS_HOST@ @DB_STATS_NAME@ -u@DB_STATS_USER@ -p@DB_STATS_PASS@ -ss -e "select entry_id,sum(command='view'),sum(command='play') from collect_stats where date>'$SQLDATE' and entry_id<>'' group by entry_id;" > inc_entry-$LOGDATE
 
-cat inc_entry-$LOGDATE| awk 'BEGIN {print "#!/bin/bash"} {print "mysql -h@DB1_HOST@ kaltura -proot -e \x27update entry set views=views+\""$2"\",plays=plays+\""$3"\" where id=\""$1"\";\x27"}'>inc-$LOGDATE.sh
+cat inc_entry-$LOGDATE| awk 'BEGIN {print "#!/bin/bash"} {print "mysql -h@DB1_HOST@ kaltura -u@DB1_USER@ -p@DB1_PASS@ -e \x27update entry set views=views+\""$2"\",plays=plays+\""$3"\" where id=\""$1"\";\x27"}'>inc-$LOGDATE.sh
 chmod +x inc-$LOGDATE.sh
 ./inc-$LOGDATE.sh
