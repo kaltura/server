@@ -71,9 +71,9 @@ class BaseEntryService extends KalturaEntryService
 	    
 	    $dbEntry->setPartnerId($this->getPartnerId());
 	    $dbEntry->setSubpId($this->getPartnerId() * 100);
-	    $dbEntry->setStatusReady();
 	    $dbEntry->setSourceId( $uploadTokenId );
 	    $dbEntry->setSourceLink( $entryFullPath );
+	    $dbEntry->setDefaultModerationStatus();
 	    $dbEntry->save();
 	    
 	    $kshow = $this->createDummyKShow();

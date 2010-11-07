@@ -519,9 +519,10 @@ class DocumentsService extends KalturaEntryService
 		}
 		else 
 		{
-			$dbEntry->setStatusReady();
+			$dbEntry->setStatus(entry::ENTRY_STATUS_READY);
 		}
 			
+		$dbEntry->setDefaultModerationStatus();
 		$dbEntry->save();
 		
 		return $dbEntry;

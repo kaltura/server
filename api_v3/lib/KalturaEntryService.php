@@ -29,7 +29,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
-		$dbEntry->setStatusReady();
+		$dbEntry->setDefaultModerationStatus();
 				
 		return $dbEntry;
 	}

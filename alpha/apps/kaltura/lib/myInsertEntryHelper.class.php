@@ -504,10 +504,6 @@ class myInsertEntryHelper
 		}
 		else if ($entry->getStatus() == entry::ENTRY_STATUS_READY)
 		{
-			// instead of changing the flow of this funciton - I modified the ready status here only
-			// TODO - check if logical
-			$entry->setStatusReady();
-			 
 			$entry->setData($entry_fullPath);
 			$entry->save();
 						

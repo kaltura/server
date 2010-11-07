@@ -166,6 +166,19 @@ class entry extends Baseentry implements ISyncableFile
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_REAL_MEDIA => 'LIVE_STREAM_REAL_MEDIA',
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_QUICKTIME => 'LIVE_STREAM_QUICKTIME',
 	);
+
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->status = self::ENTRY_STATUS_PENDING;
+		$this->moderation_status = self::ENTRY_MODERATION_STATUS_AUTO_APPROVED;
+	}
 	
 	// the columns names is a list of all fields that will participate in the search_text
 	// TODO - add the admin_tags to the column names
@@ -344,40 +357,33 @@ class entry extends Baseentry implements ISyncableFile
 
 	/**
 	 * will handle the flow in case of need to moderate.
-	 * if force == false, will consider the moderate flag on the entry or for the partner
-	 *
 	 */
 	public function setStatusReady ( $force = false )
 	{
+		$this->setStatus( self::ENTRY_STATUS_READY );
+		$this->setDefaultModerationStatus();
+		
+		return $this->getStatus();
+	}
+
+	public function setDefaultModerationStatus()
+	{
 		$should_moderate = false;
-		if ( $force )
+		// in this case no configuration really matters
+		if ( $this->getModerate() )
 		{
-			$this->setStatus( self::ENTRY_STATUS_READY );
+			$should_moderate = true;
 		}
 		else
 		{
-			// in this case no configuration really matters
-			if ( $this->getModerate() )
-			{
-				$should_moderate = true;
-			}
-			else
-			{
-				$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId() );
-			}
+			$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId() );
 		}
 
 		if( $should_moderate )
 		{
 			if ( ! $this->getId() )
-			{
 			 	$this->save(); // save to DB so we'll have the id for the moderation list
-			}
 
-			// no need to set the status of the entry to moderate because we are using moderation_status field
-			// set it to ready instead
-			// $this->setStatus( self::ENTRY_STATUS_MODERATE ); 
-			$this->setStatus( self::ENTRY_STATUS_READY );
 			$this->setModerationStatus( self::ENTRY_MODERATION_STATUS_PENDING_MODERATION );
 			if ( !$this->m_added_moderation )
 			{
@@ -387,10 +393,8 @@ class entry extends Baseentry implements ISyncableFile
 		}
 		else
 		{
-			$this->setStatus( self::ENTRY_STATUS_READY );
 			$this->setModerationStatus( self::ENTRY_MODERATION_STATUS_AUTO_APPROVED );
 		}
-		return $this->getStatus();
 	}
 
 	public function isReady()

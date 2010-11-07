@@ -318,12 +318,11 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
                 $entry->setSubpId ( $subp_id );
                 $entry->setKuserId( $kuser_id );
                 $entry->setKshowId ( $kshow_id );
-                //$entry->setStatus ( entry::ENTRY_STATUS_READY );
                 $entry->setSiteUrl ( $site_url );
                 $entry->setScreenName( $screen_name );
-                $entry->setStatusReady ( );
                 if ( $this->getGroup() ) $entry->setGroupId ( $this->getGroup() );
                 if ( $entry->getPermissions () === null ) $entry->setPermissions( $permissions ); // inherited from the enclosing kshow
+                $entry->setDefaultModerationStatus ( );
                 $entry->save();
 
                 $entry_modified = true;

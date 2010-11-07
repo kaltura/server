@@ -499,7 +499,7 @@ class myEntryUtils
 			// error
 		}
 		
-		$entry->setStatusReady( true );
+		$entry->setStatusReady();
 	}
 
 
