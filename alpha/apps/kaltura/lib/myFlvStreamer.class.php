@@ -654,6 +654,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
   			}
 
   			$file_name = null;
+  			//TODO: need to work on only an FLV asset
 			$flavor_asset_play = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
 			if(!$flavor_asset_play)
 			{
