@@ -211,6 +211,15 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $fileDiscSize;
+
+
+	
+	/**
+	 * 
+	 * @var bool
+	 * @readonly
+	 */
+	public $isCurrentDc;
 	
 	private static $map_between_objects = array
 	(
@@ -263,14 +272,22 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		
 		$this->fileUrl = $source_object->getExternalUrl();
 		$this->readyAt = $source_object->getReadyAt(null);
+		$this->isCurrentDc = ($source_object->getDc() == kDataCenterMgr::getCurrentDcId());
 		
-		if($source_object->getDc() == kDataCenterMgr::getCurrentDcId())
+		if($this->isCurrentDc)
 		{
 			if($source_object->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET && $source_object->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG)
 			{
 				$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
 			}
 			$this->fileDiscSize = filesize($this->fileRoot . $this->filePath);
+		}
+		
+		if($this->fileType == KalturaFileSyncType::LINK)
+		{
+			$fileSync = kFileSyncUtils::resolve($source_object);
+			$this->fileRoot = $fileSync->getFileRoot();
+			$this->filePath = $fileSync->getFilePath();
 		}
 	}
 }
