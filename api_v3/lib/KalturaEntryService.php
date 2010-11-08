@@ -115,7 +115,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $job->getId();
 	}
 	
-	protected function addEntryFromFlavorAsset(KalturaBaseEntry $newEntry, entry $srcEntry, flavorAsset $srcFlavorAsset, $shouldConvert = true)
+	protected function addEntryFromFlavorAsset(KalturaBaseEntry $newEntry, entry $srcEntry, flavorAsset $srcFlavorAsset)
 	{
       	$newEntry->type = $srcEntry->getType();
       		
@@ -159,18 +159,8 @@ class KalturaEntryService extends KalturaBaseService
         $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
 
-        if($shouldConvert)
-        {
-	        $newFilePath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
-			$job = kJobsManager::addConvertProfileJob(null, $dbEntry, $flavorAsset->getId(), $newFilePath);
-        }
-        else
-        {
-			$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-			$flavorAsset->save();
-        }
-		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
+				
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
 		$newEntry->fromObject($dbEntry);

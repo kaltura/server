@@ -6,7 +6,7 @@
  * @subpackage Batch
  *
  */
-class kFlowHelper
+class kFlowHelper implements kObjectAddedEventConsumer
 {
 	protected static $thumbUnSupportVideoCodecs = array(
 		flavorParams::VIDEO_CODEC_VP8,
@@ -44,15 +44,16 @@ class kFlowHelper
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
 		
-		// 2010-10-17 - Hotfix by Dor - source document asset with no conversion profile should be in status READY
-		if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
-		{
-			if (is_null($entry->conversionProfileId))
-			{
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-			}
-		}
-		// ----- hotfix end
+//		// 2010-11-08 - Solved by Tan-Tan in DocumentCreatedHandler::objectAdded 
+//		// 2010-10-17 - Hotfix by Dor - source document asset with no conversion profile should be in status READY
+//		if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+//		{
+//			if (is_null($entry->conversionProfileId))
+//			{
+//				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+//			}
+//		}
+//		// ----- hotfix end
 		
 		$flavorAsset->save();
 		
@@ -134,7 +135,7 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 		
-		kJobsManager::addConvertProfileJob($dbBatchJob, $dbBatchJob->getEntry(), $flavorAsset->getId(), $data->getDestFileLocalPath());
+		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 		
 		return $dbBatchJob;
 	}
@@ -1272,4 +1273,26 @@ class kFlowHelper
 		
 		return $dbBatchJob;
 	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if($object instanceof flavorAsset && $object->getIsOriginal())
+		{
+			$entry = $object->getentry();
+			if($entry->getType() == entry::ENTRY_TYPE_MEDIACLIP)
+			{
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			
+				kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+			}
+		}
+		
+		return true;
+	}
+
 }

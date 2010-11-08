@@ -472,8 +472,7 @@ class myInsertEntryHelper
 						throw $e;
 					}
 					
-					$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-					kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath);
+					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 				}
 				else
 				{
@@ -567,9 +566,7 @@ class myInsertEntryHelper
 						$flavorAsset->save();
 					}
 					
-					// creating full conversion
-					$inputFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-					kJobsManager::addConvertProfileJob(null, $entry, $flavorAsset->getId(), $inputFileSyncLocalPath);
+					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 				}
 				else
 				{
@@ -606,6 +603,8 @@ class myInsertEntryHelper
 						$flavorAsset->save();												
 						throw $e;
 					}
+					
+					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 				}					 
 			}
 			else

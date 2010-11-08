@@ -1,5 +1,5 @@
 <?php
-class DocumentCreatedHandler implements kObjectCreatedEventConsumer
+class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAddedEventConsumer
 {
 	protected static $fileExtensions = array(
 		entry::ENTRY_MEDIA_TYPE_DOCUMENT => array(
@@ -87,6 +87,37 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer
 		if($object instanceof entry)
 			return $this->entryCreated($object);
 			
+		return true;
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if($object instanceof flavorAsset && $object->getIsOriginal())
+		{
+			$entry = $object->getentry();
+			if($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+			{
+				if($entry->getConversionQuality() > 0)
+				{
+					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				
+					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+				}
+				else
+				{
+					// only for documents entry, make the source ready since no conversion profile will be executed by default
+					$object->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+					$object->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+					$object->save();
+				}
+			}
+		}
+		
 		return true;
 	}
 }
