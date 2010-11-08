@@ -580,7 +580,6 @@ $(function(){
 			}
 			else {
 				embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
-				embed_code = embed_code.replace('{FLASHVARS}','kalturaMix.disableUrlHashing=' + kmc.vars.disableurlhashing);
 				preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
 				embed_code = embed_code.replace('{FLAVOR}','');
 			}
@@ -749,7 +748,7 @@ $(function(){
 			}
 			if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 				embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
-				embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars + "{FLASHVARS}");
+				embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars);
 //				console.log(uiconf_details.swf_version); alert("uiconf_details.swf_version logged");
 				if(uiconf_details.swf_version.indexOf("v3") == -1) { // not kdp3
 					embed_code = embed_code.replace("playlistAPI.autoContinue","k_pl_autoContinue");
@@ -761,8 +760,7 @@ $(function(){
 			else {											// player and multitab playlist
 				embed_code = embed_code.replace("{SEO}", (is_playlist ? "" : kmc.preview_embed.embed_code_template.media_seo_info));
 				embed_code = embed_code.replace(/{ENTRY_ID}/g, (is_playlist ? "" : "/entry_id/" + id));
-// 7-nov-2010				
-//				embed_code = embed_code.replace("{FLASHVARS}", "");
+				embed_code = embed_code.replace("{FLASHVARS}", "");
 			}
 			
 			embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
