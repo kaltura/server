@@ -1082,7 +1082,7 @@ class kFlowHelper
 		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
 			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-			$originalFlavorAsset->setDeletedAt(time());
+			$originalflavorAsset->setDeletedAt(time());
 			$originalflavorAsset->save();
 		}
 		
