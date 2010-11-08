@@ -412,7 +412,7 @@ class entry extends Baseentry implements ISyncableFile
 	}
 
 	/*
-	 *  return an array of tuples of the file's version: [name, size, data, version]
+	 *  return an array of tuples of the file's version: [name, size, time, version]
 	 */
 	public function getAllVersions ()
 	{
@@ -422,10 +422,7 @@ class entry extends Baseentry implements ISyncableFile
 		
 		if (count($parts) == 2 && strlen($parts[1]))
 		{ 
-			// a template has no versions
-			$dir = '/content/templates/entry/data/';
-			$file_base = ""; //$parts[1];
-			return $dir . $file_base;
+			return null;
 		}
 		
 		// create an array to hold versions list
@@ -433,18 +430,18 @@ class entry extends Baseentry implements ISyncableFile
 		for ($version = 100000; $version <= $current_version; $version++ )
 		{
 			$version_sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version);
-			$local_file_sync = kFileSyncUtils::getLocalFileSyncForKey($version_sync_key);
+			$local_file_sync = kFileSyncUtils::getLocalFileSyncForKey($version_sync_key, false);
 			if ($local_file_sync)
 			{
 				$result = array();
-				// first - name (with the full path)
+				// first - file name (with the full path)
 				$result[] = $local_file_sync->getFilePath();
 				// second - size 
 				$result[] = $local_file_sync->getFileSize();
 				// third - time
 				$result[] = filemtime ( $local_file_sync->getFullPath());
-				// forth - content (only if requested
-				$result[] = kFileSyncUtils::file_get_contents($version_sync_key);			
+				// forth - version
+				$result[] = substr( kFile::getFileNameNoExtension ( $local_file_sync->getFilePath() ) , strlen ($this->getId().'_') );			
 				$results[] = $result;
 			}
 		}
@@ -462,7 +459,8 @@ class entry extends Baseentry implements ISyncableFile
 		
 		foreach ( $res as $version_info )
 		{
-			$formatted []= array ( "version" => $version_info[3] ,
+			$formatted []= array ( 
+				"version" => $version_info[3] ,
 				"rawData" =>  $version_info[2] ,
 				"date" => strftime( "%d/%m/%y %H:%M:%S" , $version_info[2] ) );
 		}
