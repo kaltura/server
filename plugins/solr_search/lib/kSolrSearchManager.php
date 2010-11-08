@@ -5,39 +5,48 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 {
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
 		if(!($object instanceof entry))
-			return;
+			return true;
 
 		$document = $this->createEntryDocument($object);
 		$this->addDocument($document);
+		
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectDeleted(BaseObject $object) 
 	{
 		if(!($object instanceof entry))
-			return;
+			return true;
 
 		$solr = self::createSolrService();
 		$solr->deleteById($object->getIntId());
+		
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $object
 	 * @param array $modifiedColumns
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
 		if(!($object instanceof entry))
-			return;
+			return true;
 			
 		$document = $this->createEntryDocument($object);
 		$this->addDocument($document);
+		
+		return true;
 	}
 
 	public function writeSolrLog($entry)

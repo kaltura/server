@@ -266,6 +266,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
@@ -274,48 +275,54 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_CREATED);
 		if(!$auditTrail)
-			return;
+			return true;
 			
 		$auditTrail->save();
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $fromObject
 	 * @param BaseObject $toObject
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject) 
 	{
 		$auditTrail = self::createAuditTrail($toObject, AuditTrail::AUDIT_TRAIL_ACTION_COPIED);
 		if(!$auditTrail)
-			return;
+			return true;
 			
 		$auditTrail->save();
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectDeleted(BaseObject $object) 
 	{
 		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_DELETED);
 		if(!$auditTrail)
-			return;
+			return true;
 			
 		$auditTrail->save();
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $object
 	 * @param array $modifiedColumns
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
 		$auditTrail = self::createAuditTrail($object, AuditTrail::AUDIT_TRAIL_ACTION_CHANGED);
 		if(!$auditTrail)
-			return;
+			return true;
 			
 		if(!method_exists($object, 'getColumnsOldValues') || !method_exists($object, 'getByName'))
-			return;
+			return true;
 			
 		$columnsOldValues = $object->getColumnsOldValues();
 		$customDataOldValues = array();
@@ -325,7 +332,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		
 		$auditTrailConfig = self::getAuditTrailConfig($auditTrail->getPartnerId(), $auditTrail->getObjectType());
 		if(!$auditTrailConfig)
-			return;
+			return true;
 			
 		$supportedDescriptors = explode(',', $auditTrailConfig->getDescriptors());
 //		KalturaLog::debug("Audit trail supported descriptors: " . print_r($supportedDescriptors, true));
@@ -386,13 +393,15 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			}
 		}
 		if(!count($changedItems))
-			return;
+			return true;
 			
 		$data = new kAuditTrailChangeInfo();
 		$data->setChangedItems($changedItems);
 		
 		$auditTrail->setData($data);
 		$auditTrail->save();
+		
+		return true;
 	}
 
 }

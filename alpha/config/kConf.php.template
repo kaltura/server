@@ -197,6 +197,9 @@ class kConf
                     "kObjectCopyHandler",
                     "kObjectDeleteHandler",
                 ),
+                "event_consumers_default_priority" => 5,
+				"event_consumers_priorities" => array(
+				),
                 
 				"cache_root_path" => "@BASE_DIR@/cache/content/",
                 

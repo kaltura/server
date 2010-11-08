@@ -5,6 +5,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	/**
 	 * @param BaseObject $object
 	 * @param array $modifiedColumns
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
@@ -41,6 +42,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -167,12 +169,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param BatchJob $dbBatchJob
 	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
-	 * @return BatchJob
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-			return;
+			return true;
 			
 		// convert profile finished - export source flavor
 		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
@@ -224,5 +226,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				}
 			}
 		}
+		return true;
 	}
 }

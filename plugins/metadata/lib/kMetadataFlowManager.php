@@ -5,7 +5,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $dbBatchJob
 	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
-	 * @return BatchJob
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
 	{
@@ -23,7 +23,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 				break;
 		}
 		
-		return $dbBatchJob;
+		return true;
 	}
 	
 		

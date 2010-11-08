@@ -277,6 +277,8 @@ class kBatchManager
 		
 		$event = new kBatchJobStatusEvent($dbBatchJob, $entryStatus);
 		kEventsManager::raiseEvent($event);
+		
+		$dbBatchJob->reload();
 		return $dbBatchJob;
 	}
 	

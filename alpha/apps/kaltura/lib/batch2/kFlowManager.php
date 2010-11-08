@@ -1050,7 +1050,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $dbBatchJob
 	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
-	 * @return BatchJob
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
 	{
@@ -1193,7 +1193,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err( "Error:" . $ex->getMessage() );
 		}
 			
-		return $dbBatchJob;
+		return true;
 	}	
 	
 	// creates a mail job with the exception data

@@ -4,6 +4,7 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
 	/**
 	 * @param BaseObject $fromObject
 	 * @param BaseObject $toObject
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
@@ -15,6 +16,8 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
 		
 		if($fromObject instanceof MetadataProfile)
 			kObjectCopyHandler::mapIds('MetadataProfile', $fromObject->getId(), $toObject->getId());
+			
+		return true;
 	}
 	
 	/**

@@ -28,6 +28,10 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer
 		}
 	}
 	
+	/**
+	 * @param entry $object
+	 * @return bool true if should continue to the next consumer
+	 */
 	public function entryCreated(entry $object)
 	{
 		$mediaType = null;
@@ -49,7 +53,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer
 		if($object->getType() != entry::ENTRY_TYPE_DOCUMENT)
 		{
 			KalturaLog::debug("entry id [" . $object->getId() . "] type [" . $object->getType() . "]");
-			return;
+			return true;
 		}
 	
 		if(is_null($mediaType) || $mediaType == entry::ENTRY_MEDIA_TYPE_ANY || $mediaType == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
@@ -60,7 +64,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer
 		if($object instanceof DocumentEntry)
 		{
 			KalturaLog::debug("entry id [" . $object->getId() . "] already handled");
-			return;
+			return true;
 		}
 	
 		KalturaLog::debug("Handling object [" . get_class($object) . "] type [" . $object->getType() . "] id [" . $object->getId() . "] status [" . $object->getStatus() . "]");
@@ -71,14 +75,18 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer
 			$object->save();
 		}
 
+		return true;
 	}
 		
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object)
 	{
 		if($object instanceof entry)
 			return $this->entryCreated($object);
+			
+		return true;
 	}
 }

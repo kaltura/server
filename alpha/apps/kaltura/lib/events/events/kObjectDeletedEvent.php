@@ -1,6 +1,6 @@
 <?php
 
-class kObjectDeletedEvent extends KalturaEvent
+class kObjectDeletedEvent extends KalturaEvent implements IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kObjectDeletedEventConsumer';
 	
@@ -24,10 +24,11 @@ class kObjectDeletedEvent extends KalturaEvent
 	
 	/**
 	 * @param kObjectDeletedEventConsumer $consumer
+	 * @return bool true if should continue to the next consumer
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		$consumer->objectDeleted($this->object);
+		return $consumer->objectDeleted($this->object);
 	}
 
 }

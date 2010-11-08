@@ -340,6 +340,12 @@ class kBatchExclusiveLock
 		return $jobs;
 	}
 	
+	/**
+	 * @param int $id
+	 * @param kExclusiveLockKey $lockKey
+	 * @param BatchJob $object
+	 * @return BatchJob
+	 */
 	public static function updateExclusive($id, kExclusiveLockKey $lockKey, BatchJob $object)
 	{
 		$c = new Criteria();

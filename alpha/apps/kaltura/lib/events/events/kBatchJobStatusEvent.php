@@ -1,6 +1,6 @@
 <?php
 
-class kBatchJobStatusEvent extends KalturaEvent
+class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kBatchJobStatusEventConsumer';
 	
@@ -38,10 +38,11 @@ class kBatchJobStatusEvent extends KalturaEvent
 	
 	/**
 	 * @param kBatchJobStatusEventConsumer $consumer
+	 * @return bool true if should continue to the next consumer
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		$consumer->updatedJob($this->dbBatchJob, $this->entryStatus, $this->twinJob);
+		return $consumer->updatedJob($this->dbBatchJob, $this->entryStatus, $this->twinJob);
 	}
 
 }

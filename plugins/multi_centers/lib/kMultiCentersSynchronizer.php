@@ -25,11 +25,12 @@ class kMultiCentersSynchronizer implements kObjectCreatedEventConsumer
 	
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object)
 	{
 		if(!($object instanceof FileSync) || $object->getStatus() != FileSync::FILE_SYNC_STATUS_PENDING || $object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
-			return;
+			return true;
 
 		$c = new Criteria();
 		$c->addAnd(FileSyncPeer::OBJECT_ID, $object->getObjectId());
@@ -40,17 +41,19 @@ class kMultiCentersSynchronizer implements kObjectCreatedEventConsumer
 		$original_filesync = FileSyncPeer::doSelectOne($c);
 		if (!$original_filesync) {
 			KalturaLog::err('Original filesync not found for object_id['.$object->getObjectId().'] version['.$object->getVersion().'] type['.$object->getObjectType().'] subtype['.$object->getObjectSubType().']');
-			return;
+			return true;
 		}
 		$sourceFileUrl = $original_filesync->getExternalUrl();
 		if (!$sourceFileUrl) {
 			KalturaLog::err('External URL not found for filesync id [' . $object->getId() . ']');
-			return;
+			return true;
 		}				
 		
 		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object->getPartnerId(), $object->getId(), $sourceFileUrl);
 		
 		$job->setDc($object->getDc());
 		$job->save();
+		
+		return true;
 	}
 }

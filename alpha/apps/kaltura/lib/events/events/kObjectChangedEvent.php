@@ -1,6 +1,6 @@
 <?php
 
-class kObjectChangedEvent extends KalturaEvent
+class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 {
 	const EVENT_CONSUMER = 'kObjectChangedEventConsumer';
 	
@@ -30,10 +30,11 @@ class kObjectChangedEvent extends KalturaEvent
 	
 	/**
 	 * @param kObjectChangedEventConsumer $consumer
+	 * @return bool true if should continue to the next consumer
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		$consumer->objectChanged($this->object, $this->modifiedColumns);
+		return $consumer->objectChanged($this->object, $this->modifiedColumns);
 	}
 
 }

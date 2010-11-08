@@ -1,8 +1,8 @@
 <?php
 
-class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
+class kObjectAddedEvent extends KalturaEvent implements IKalturaContinualEvent
 {
-	const EVENT_CONSUMER = 'kObjectCreatedEventConsumer';
+	const EVENT_CONSUMER = 'kObjectAddedEventConsumer';
 	
 	/**
 	 * @var BaseObject
@@ -23,12 +23,12 @@ class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	}
 	
 	/**
-	 * @param kObjectCreatedEventConsumer $consumer
+	 * @param kObjectAddedEventConsumer $consumer
 	 * @return bool true if should continue to the next consumer
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		return $consumer->objectCreated($this->object);
+		return $consumer->objectAdded($this->object);
 	}
 
 }

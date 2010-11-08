@@ -23,6 +23,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	/**
 	 * @param BaseObject $fromObject
 	 * @param BaseObject $toObject
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
@@ -35,5 +36,6 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			if($flavorParamsId)
 				$toObject->setFlavorParamsId($flavorParamsId);
 		}
+		return true;
 	}
 }

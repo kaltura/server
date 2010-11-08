@@ -10,35 +10,41 @@ class kSphinxSearchManager implements
 	
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
 		if(!($object instanceof entry))
-			return;
+			return true;
 
 		$this->saveToSphinx($object, true);
+		return true;
 	}
 
 	/**
 	 * @param BaseObject $object
 	 * @param array $modifiedColumns
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
 		if(!($object instanceof entry))
-			return;
+			return true;
 
 		if($object->isModified())
 			$this->saveToSphinx($object);
+			
+		return true;
 	}
 	
 	/**
 	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectDataChanged(BaseObject $object) 
 	{
 		if(!class_exists('Metadata') || !($object instanceof Metadata))
-			return;
+			return true;
 
 		if($object->getObjectType() == Metadata::TYPE_ENTRY)
 		{
@@ -46,6 +52,8 @@ class kSphinxSearchManager implements
 			if ($entry && $entry instanceOf entry)
 				$this->saveToSphinx($entry, false, true);
 		}
+		
+		return true;
 	}
 	
 	public function array2sphinxData(array $arr, $pluginName)
