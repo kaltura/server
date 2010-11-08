@@ -580,10 +580,9 @@ $(function(){
 			}
 			else {
 				embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
+				embed_code = embed_code.replace('{FLASHVARS}','kalturaMix.disableUrlHashing=' + kmc.vars.disableurlhashing);
 				preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
-				preview_player = preview_player.replace('{FLASHVARS}','kalturaMix.disableUrlHashing=' + kmc.vars.disableurlhashing);
 				embed_code = embed_code.replace('{FLAVOR}','');
-				embed_code = embed_code.replace('{FLASHVARS}','');
 			}
 			var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							 '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#contentSection118"></a>' + id_type +
