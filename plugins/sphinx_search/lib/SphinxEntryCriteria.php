@@ -128,25 +128,12 @@ class SphinxEntryCriteria extends KalturaCriteria
 	 * @var array
 	 */
 	protected $entryIds = array();
-		
-	/**
-	 * The count of total returned items
-	 * @var int
-	 */
-	private static $recordsCount = 0;
 	
 	/**
 	 * Counts how many criterions couldn't be handled
 	 * @var int
 	 */
 	private $criteriasLeft;
-	
-	/**
-	 * @return int $recordsCount
-	 */
-	public function getRecordsCount() {
-		return self::$recordsCount;
-	}
 
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
@@ -287,8 +274,11 @@ class SphinxEntryCriteria extends KalturaCriteria
 		
 		$this->addAnd(entryPeer::ID, $ids, Criteria::IN);
 		
-		self::$recordsCount = 0;
+		$this->recordsCount = 0;
 		
+		if(!$this->doCount)
+			return;
+			
 		if($setLimit)
 		{
 			$this->setOffset(0);
@@ -302,7 +292,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 				{
 					KalturaLog::debug("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
 					if($metaItem['Variable_name'] == 'total_found')
-						self::$recordsCount = (int)$metaItem['Value'];
+						$this->recordsCount = (int)$metaItem['Value'];
 				}
 			}
 		}
@@ -311,7 +301,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 			$c = clone $this;
 			$c->setLimit(null);
 			$c->setOffset(null);
-			self::$recordsCount = entryPeer::doCount($c);
+			$this->recordsCount = entryPeer::doCount($c);
 		}
 	}
 	

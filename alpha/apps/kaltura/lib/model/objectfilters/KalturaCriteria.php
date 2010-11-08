@@ -3,9 +3,34 @@
 class KalturaCriteria extends Criteria
 {
 	/**
+	 * The count of total returned items
+	 * @var int
+	 */
+	protected $recordsCount = 0;
+	
+	/**
 	 * @var array<baseObjectFilter>
 	 */
 	protected $filters = array();
+		
+	/**
+	 * Execute count query after apply filters 
+	 * @var bool
+	 */
+	protected $doCount = true;
+	
+	/**
+	 * @return int $recordsCount
+	 */
+	public function getRecordsCount() 
+	{
+		return $this->recordsCount;
+	}
+	
+	public function dontCount() 
+	{
+		$this->doCount = false;
+	}
 	
 	/**
 	 * Store the filter as is

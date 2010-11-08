@@ -248,6 +248,9 @@ class KalturaSyndicationFeedRenderer
 		$this->entriesCurrentPage = $nextPage;
 	}
 	
+	/**
+	 * @return KalturaCriteria
+	 */
 	private function getNextCriteria()
 	{
 		if(!$this->executed && count($this->entryFilters))
@@ -265,6 +268,7 @@ class KalturaSyndicationFeedRenderer
 				
 			$c->clearOrderByColumns();
 			$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+			$c->dontCount();
 			
 			return $c; // return the base criteria
 		}
@@ -281,6 +285,7 @@ class KalturaSyndicationFeedRenderer
 		
 		$c->clearOrderByColumns();
 		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+		$c->dontCount();
 		
 		return $c;
 	}
