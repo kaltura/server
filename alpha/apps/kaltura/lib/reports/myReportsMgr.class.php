@@ -653,12 +653,16 @@ class myReportsMgr
 			$order_by_str = "1=1";
 		}
 
-// TODO - remove when timezone is correct on the client's side
-date_default_timezone_set ('UTC' );
-		
 		$obj_ids_str = $obj_ids_clause ? $obj_ids_clause : "1=1";
 		
-// TODO - remove ! nasty hack until client will suply rounded dates that don't depend on the timezone  
+		// the diff between user and server timezones 
+		$user_hour = $input_filter->from_date % 86400 / 3600;
+		$server_hour = time() % 86400 / 3600;
+		$time_shift = $server_hour - $user_hour;
+		
+		date_default_timezone_set('UTC');
+				
+		// removing hours, minutes and seconds from the date  
 		$delta_in_seconds = $input_filter->to_date - $input_filter->from_date;
 		$input_filter->from_date = floor($input_filter->from_date/86400)*86400;  // round down the from_date to the beginning of the day
 		$input_filter->to_date = $input_filter->from_date + $delta_in_seconds;	 // add the delta to the to_date
@@ -678,7 +682,10 @@ date_default_timezone_set ('UTC' );
 				"{PAGINATION_FIRST}" ,
 				"{PAGINATION_SIZE}" ,
 				"{OBJ_ID_CLAUSE}" , 
-				"{CATEGORIES_MATCH}" , );
+				"{CATEGORIES_MATCH}" , 
+				"{TIME_SHIFT}" , 
+			);
+			
 		$values = 
 			array (
 				$partner_id ,
@@ -694,7 +701,9 @@ date_default_timezone_set ('UTC' );
 				$pagination_first ,
 				$page_size ,
 				$obj_ids_str , 
-				$categories_match_clause);
+				$categories_match_clause,
+				$time_shift,
+			);
 				
 		if ( $input_filter->extra_map )
 		{
