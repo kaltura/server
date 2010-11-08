@@ -1235,9 +1235,14 @@ class FlvMetadataVideo extends FlvInfo
 
 		// if there are more than 1 keyframe per second and file size < 100MB its probably and edit flavor and we should maintain all KF
 		// we serve the file from our server and not the cdn anyway because the cdn cant clip the file
-		$lastKF = isset($this->keyframeTimes[$kf_cnt - 1]) ? $this->keyframeTimes[$kf_cnt - 1] / 1000 : 0;
-		$lastKFPos = $this->keyframeBytes[$kf_cnt - 1] / (1000 * 1000);
-		if ($kf_cnt > $lastKF && $lastKFPos < 100)
+		$lastKF = $lastKFPos = 0;
+		if ($kf_cnt) // if the file is audio only it wont have any keyframes in the video metadata helper 
+		{
+			$lastKF = $this->keyframeTimes[$kf_cnt - 1] / 1000;
+			$lastKFPos = $this->keyframeBytes[$kf_cnt - 1] / (1000 * 1000);
+		}
+		
+		if ($kf_cnt > $lastKF && ($lastKFPos < 100 && !($this instanceof FlvMetadataAudio)))
 			$new_kf_step = 1;
 		else
 	        $new_kf_step = max(1, $kf_cnt / 850);		
