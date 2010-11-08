@@ -252,10 +252,9 @@ class kwidgetAction extends sfAction
 					$widgetIdStr.
 					"&host=" . str_replace("http://", "", str_replace("https://", "", $partner_host)).
 					"&cdnHost=" . str_replace("http://", "", str_replace("https://", "", $partner_cdnHost)).
-					(kConf::get("disable_url_hashing") ? "&kalturaMix.disableUrlHashing=true" : "").
 					$uiconf_id_str  . // will be empty if nothing to add
 					$conf_vars;
-					
+
 				$url = "$swf_url?$dynamic_date";
 			}
 			else
