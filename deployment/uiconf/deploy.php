@@ -21,6 +21,7 @@ $arguments = array();
 $arguments['include-code'] = false;
 $arguments['no-create'] = false;
 $arguments['ini']     = '';
+$arguments['disableUrlHashing'] = false;
 
 /** get inputs from arguments **/
 foreach($argv as $num => $value)
@@ -76,7 +77,7 @@ foreach($sections as $section)
 		echo "{$sectionName}{$num} , $baseSwfUrl , $swfName , $objType".PHP_EOL;
 		$configObj = $confObj->$sectionName->$sectionBase->{$sectionName.$num};
 		$tags_search[$configObj->usage] = $configObj->usage;
-		$uiconf = uiConfDeployment::populateUiconfFromConfig($configObj, $baseSwfUrl, $swfName, $objType);
+		$uiconf = uiConfDeployment::populateUiconfFromConfig($configObj, $baseSwfUrl, $swfName, $objType, $arguments['disableUrlHashing']);
 		if($uiconf)
 		{
 			$uiconf_id = uiConfDeployment::addUiConf($kclient, $uiconf);
@@ -200,11 +201,16 @@ class uiConfDeployment
 		return $pe_conf->getId();
 	}
 	
-	public static function populateUiconfFromConfig($confConfigObj, $baseSwfUrl, $swfName, $objType)
+	public static function populateUiconfFromConfig($confConfigObj, $baseSwfUrl, $swfName, $objType, $disableUrlHashing)
 	{
 		global $defaultTags, $baseTag, $confObj, $kcw_for_editors, $kdp_for_studio;
 		$uiconf = new uiConf();
-		$uiconf->setConfFile(uiConfDeployment::readConfFileFromPath($confConfigObj->conf_file));
+		$confFileContents = uiConfDeployment::readConfFileFromPath($confConfigObj->conf_file);
+		if ($disableUrlHashing)
+		{
+			$confFileContents = str_replace('<Plugin id="kalturaMix"','<Plugin id="kalturaMix" disableUrlHashing="true" ',$confFileContents);
+		}
+		$uiconf->setConfFile($confFileContents);
 		if($uiconf->getConfFile() === FALSE)
 		{
 			return FALSE; // conf file is a must, features is not.
@@ -248,7 +254,7 @@ class uiConfDeployment
 		$uiconf->setConfVars(@$confConfigObj->conf_vars);
 		
 		$uiconf->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
-		
+			
 		return $uiconf;
 	}
 	
