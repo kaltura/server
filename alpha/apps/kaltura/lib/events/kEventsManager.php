@@ -50,7 +50,7 @@ class kEventsManager
 		
 		foreach($consumersLists as $interfaceName => $interfaceConsumersArray)
 		{
-			usort($interfaceConsumersArray, array(self, 'compareConsumers'));
+			usort($interfaceConsumersArray, array('kEventsManager', 'compareConsumers'));
 			self::$consumers[$interfaceName] = $interfaceConsumersArray;
 		}
 	
