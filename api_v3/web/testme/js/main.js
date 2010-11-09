@@ -138,8 +138,8 @@ KTestMe.prototype = {
 		}
 
 		if(this.codeGenerator){
-			var service = this.jqServices.val();
-			var action = this.jqActions.val();
+			var service = this.jqServices.find("option:selected").text();
+			var action = this.jqActions.find("option:selected").text();
 			
 			this.codeGenerator.setAction(service, action, data.actionParams);
 		}
@@ -247,8 +247,12 @@ KTestMe.prototype = {
 		var jqObject = jQuery("<div class=\"object\">");
 		jqObject.attr("id", "object-" + param.name);
 		var jqObjectTitle = jQuery("<div>");
-		var jqObjectName = jQuery("<span class=\"object-name\">").html(param.name + " ");
+		var jqObjectName = jQuery("<span class=\"object-name\">temp</span>"); // temp required by IE
+		jqObjectName.html(param.name + " ");
+		var jqEdit = jQuery("<button class=\"edit-button\">Edit</button>");
+		
 		jqObjectTitle.append(jqObjectName);
+		jqObjectTitle.append(jqEdit);
 		jqObjectTitle.append(jqObjectType);
 		
 		this.jqObjectsContainer.append(jqObjectProperties);
@@ -296,6 +300,8 @@ KTestMe.prototype = {
 		};
 		
 		jqObjectName.click(delegate(this, propsPoper.click));
+		jqEdit.click(delegate(this, propsPoper.click));
+		
 		jqObjectType.change(delegate(this, propsPoper.change));
 
 		if(inArray)
@@ -402,7 +408,8 @@ KTestMe.prototype = {
 	addArrayField: function(/*jQuery*/ container, param) {
 		var jqArray = jQuery("<div class=\"array\">");
 		var objectTypeId = "object-type-" + param.name.replace(/:/g, "_");
-		var jqArrayName = jQuery("<div class=\"array-name\">").html(param.name + " (<span id=\"" + objectTypeId + "\" class=\"array-type\">array</span>)");
+		var jqArrayName = jQuery("<div class=\"array-name\">temp</div>");  // temp required by IE
+		jqArrayName.html(param.name + " (<span id=\"" + objectTypeId + "\" class=\"array-type\">array</span>)");
 		jqArray.append(jqArrayName);
 		
 		var jqAdd = jQuery("<button class=\"array-button\">Add</button>");
@@ -521,9 +528,9 @@ KTestMe.prototype = {
 
 		if(!this.actionInfo)
 			return;
-		
-		var service = this.jqServices.val();
-		var action = this.jqActions.val();
+
+		var service = this.jqServices.find("option:selected").text();
+		var action = this.jqActions.find("option:selected").text();
 		
 		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams);
 		this.codeGenerator.setChangeEvent();
