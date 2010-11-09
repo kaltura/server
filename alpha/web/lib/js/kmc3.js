@@ -1008,7 +1008,7 @@ $(function(){
 			switch(editor_type) {
 				case "1" :	// KSE
 				case 1	 :
-					var width = "888";  // 910
+					var width = "868";  // 910
 					var height = "544";
 					var editor_uiconf = kmc.vars.kse_uiconf;
 					kmc.editors.flashvars.entry_id = entry_id;
@@ -1017,7 +1017,7 @@ $(function(){
 				case "2" :	// KAE
 				case 2	 :
 					var width = "825";
-					var height = "672";
+					var height = "604";
 					var editor_uiconf = kmc.vars.kae_uiconf;
 					kmc.editors.params.movie = kmc.vars.service_url + "/kse/ui_conf_id/" + kmc.vars.kae_uiconf;
 					kmc.editors.flashvars.entry_id = entry_id;
