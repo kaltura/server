@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="lib.model">
+	<table skipSql="false" abstract="false" name="virus_scan_profile">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="31" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="engine_type" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="entry_filter" type="longvarchar" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="action_if_infected" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="varchar" size="1024" />
+		<index name="partner_id">
+			<index-column name="partner_id" />
+		</index>
+	</table>
+</database>
