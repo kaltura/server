@@ -173,7 +173,7 @@ class VirusScanProfileService extends KalturaBaseService
 		$syncKey = $dbFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		if(!$srcFilePath)
-			throw new KalturaAPIException(KalturaErrors::INVALID_FILE_SYNC_ID, $virusScanProfileId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_FILE_SYNC_ID, $syncKey);
 			
 		$job = kVirusScanJobsManager::addVirusScanJob(null, $dbFlavorAsset->getPartnerId(), $dbFlavorAsset->getEntryId(), $dbFlavorAsset->getId(), $srcFilePath, $dbVirusScanProfile->getEngineType());
 		return $job->getId();
