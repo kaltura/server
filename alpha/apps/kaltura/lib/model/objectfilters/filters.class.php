@@ -944,6 +944,30 @@ abstract class baseObjectFilter extends myBaseObject
 		$this->advancedSearch->addToXml($advancedXmlElement);
 	}
 
+	/**
+	 * @param SimpleXMLElement $xml
+	 * @return SimpleXMLElement
+	 */
+	public function toXml(SimpleXMLElement $xml = null)
+	{
+		if(is_null($xml))
+			$xml = new SimpleXMLElement("<playlist/>");
+			
+		foreach($this->fields as $field => $value)
+		{
+			$field = substr($field, 1);
+			if ($value != null)
+				$xml->addChild($field, htmlspecialchars($value));
+		}
+		
+		$this->addAdvancedSearchToXml($xml);
+		
+		return $xml;
+	}
+
+	/* (non-PHPdoc)
+	 * @see apps/kaltura/lib/myBaseObject#fillObjectFromXml()
+	 */
 	public function fillObjectFromXml ( SimpleXMLElement $simple_xml_node , $prefix_to_add , $exclude_params=null )
 	{
 		if(!is_array($exclude_params))
