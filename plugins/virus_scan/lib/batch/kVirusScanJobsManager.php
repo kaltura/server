@@ -7,7 +7,7 @@ class kVirusScanJobsManager extends kJobsManager
 	 * @param string $entryId
 	 * @param string $flavorAssetId
 	 * @param string $srcFilePath
-	 * @param KalturaVirusScanEngine $virusScanEngine
+	 * @param KalturaVirusScanEngineType $virusScanEngine
 	 * @return BatchJob
 	 */
 	public static function addVirusScanJob(BatchJob $parentJob = null, $partnerId, $entryId, $flavorAssetId, $srcFilePath, $virusScanEngine)

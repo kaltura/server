@@ -41,7 +41,7 @@ class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 	public $status;
 
 	/**
-	 * @var KalturaVirusScanEngine
+	 * @var KalturaVirusScanEngineType
 	 * @filter eq,in
 	 */
 	public $engineType;

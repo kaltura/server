@@ -113,7 +113,7 @@ class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaVirusScanEngine
+	 * @var KalturaVirusScanEngineType
 	 */
 	public $engineTypeEqual;
 
