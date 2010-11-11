@@ -235,7 +235,7 @@ class kFile
 		if(file_exists(dirname($path))) 
 			return true;
 			
-		return mkdir(dirname($path), $rights, true);
+		return @mkdir(dirname($path), $rights, true);
 
 //		Remarked by Tan-Tan Feb 2010
 //
