@@ -228,6 +228,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 			
 		if($setLimit && $this->getLimit())
 		{
+			$maxMatches += $this->getOffset();
 			$limit = $this->getLimit();
 			if($this->getOffset())
 				$limit = $this->getOffset() . ", $limit";
