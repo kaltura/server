@@ -28,6 +28,12 @@ class KalturaSyndicationFeedRenderer
 	private $lastEntryIntId = null;
 	
 	/**
+	 * The created at of last entry
+	 * @var int
+	 */
+	private $lastEntryCreatedAt = null;
+	
+	/**
 	 * The critria used currently
 	 * @var KalturaCriteria
 	 */
@@ -182,6 +188,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			$this->entriesCurrentPage = array();
 			$this->lastEntryIntId = 0;
+			$this->lastEntryCreatedAt = 0;
 		}
 		
 		$entry = current($this->entriesCurrentPage);
@@ -189,6 +196,7 @@ class KalturaSyndicationFeedRenderer
 		{
 			next($this->entriesCurrentPage);
 			$this->lastEntryIntId = $entry->getIntId();
+			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
 			return $entry;
 		}
 			
@@ -196,6 +204,7 @@ class KalturaSyndicationFeedRenderer
 		if(!$this->entriesCurrentPage)
 		{
 			$this->lastEntryIntId = null;
+			$this->lastEntryCreatedAt = null;
 			return false;
 		}
 	
@@ -204,25 +213,43 @@ class KalturaSyndicationFeedRenderer
 		{
 			next($this->entriesCurrentPage);
 			$this->lastEntryIntId = $entry->getIntId();
+			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
 		}
 		else
 		{
 			$this->lastEntryIntId = null;
+			$this->lastEntryCreatedAt = null;
 		}
 			
 		return $entry;
 	}
 	
+	private function clearMemory()
+	{
+		entryPeer::clearInstancePool();
+		flavorAssetPeer::clearInstancePool();
+		FileSyncPeer::clearInstancePool();
+		categoryPeer::clearInstancePool();
+		
+		if(class_exists('MetadataPeer'))
+		{
+			MetadataPeer::clearInstancePool();
+			MetadataProfilePeer::clearInstancePool();
+		}
+	}
+	
 	private function fetchNextPage()
 	{
 		$this->entriesCurrentPage = null;
-		entryPeer::clearInstancePool();
-		flavorAssetPeer::clearInstancePool();
+		$this->clearMemory();
 		
 		if($this->currentCriteria)
 		{
-			if($this->lastEntryIntId)
+			if($this->lastEntryIntId && $this->lastEntryCreatedAt)
+			{
 				$this->currentCriteria->add(entryPeer::INT_ID, $this->lastEntryIntId, Criteria::LESS_THAN);
+				$this->currentCriteria->add(entryPeer::CREATED_AT, $this->lastEntryCreatedAt, Criteria::LESS_EQUAL);
+			}
 		}
 		else
 		{
