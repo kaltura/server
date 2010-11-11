@@ -431,10 +431,15 @@ class entryPeer extends BaseentryPeer
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		if($criteria instanceof KalturaCriteria)
-			$criteria->applyFilters();
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
 			
-		return parent::doSelect($criteria, $con);
+		return parent::doSelect($c, $con);
 	}
 	
 	public static function getDurationType($duration)

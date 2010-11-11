@@ -27,6 +27,14 @@ class KalturaCriteria extends Criteria
 		return $this->recordsCount;
 	}
 	
+	/**
+	 * @param int $recordsCount
+	 */
+	public function setRecordsCount($recordsCount) 
+	{
+		$this->recordsCount = $recordsCount;
+	}
+	
 	public function dontCount() 
 	{
 		$this->doCount = false;
