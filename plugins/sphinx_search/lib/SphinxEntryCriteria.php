@@ -147,7 +147,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		foreach($this->filters as $index => $filter)
 		{
 			KalturaLog::debug("Applies filter $index");
-			$this->applyFilter($filter);
+			$this->applyFilter(clone $filter);
 		}
 		
 		// attach all default criteria from peer
