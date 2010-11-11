@@ -45,7 +45,7 @@ class VirusScanProfileTableMap extends TableMap {
 		$this->addColumn('ENGINE_TYPE', 'EngineType', 'INTEGER', false, null, null);
 		$this->addColumn('ENTRY_FILTER', 'EntryFilter', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('ACTION_IF_INFECTED', 'ActionIfInfected', 'INTEGER', false, null, null);
-		$this->addColumn('CUSTOM_DATA', 'CustomData', 'VARCHAR', false, 1024, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

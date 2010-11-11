@@ -21,7 +21,7 @@ CREATE TABLE `virus_scan_profile`
 	`engine_type` INTEGER,
 	`entry_filter` TEXT,
 	`action_if_infected` INTEGER,
-	`custom_data` VARCHAR(1024),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`)
 )Type=MyISAM;
