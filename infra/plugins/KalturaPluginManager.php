@@ -61,6 +61,59 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * @param string $pluginClass 
+	 * @param array $validatedPlugins list of plugins that already validated
+	 * @return bool false if a required dependency is missing.
+	 */
+	protected static function isValid($pluginClass, array $validatedPlugins = null)
+	{
+		$pluginClassReplection = new ReflectionClass($pluginClass);
+		if(!$pluginClassReplection->implementsInterface('IKalturaPending'))
+			return true;
+			
+		$pendingPlugins = $pluginClass::dependsOn();
+		if(!$pendingPlugins || !count($pendingPlugins))
+			return true;
+			
+		$availablePlugins = self::getPlugins();
+		foreach($pendingPlugins as $pendingPlugin)
+		{
+			$pendingPluginName = $pendingPlugin->getPluginName();
+			
+			// check if the required plugin is configured to be loaded
+			if(!isset($availablePlugins[$pendingPluginName]))
+				return false;
+				
+			$pendingPluginClass = $availablePlugins[$pendingPluginName];
+			$pendingPluginReplection = new ReflectionClass($pendingPluginClass);
+				
+			// check if the required plugin already validated
+			if(in_array($pendingPluginName, $validatedPlugins))
+				continue;
+			
+			// check if the version compatible
+			$pendingPluginMinVersion = $pendingPlugin->getMinimumVersion();
+			if($pendingPluginMinVersion && $pendingPluginReplection->implementsInterface('IKalturaVersion'))
+			{
+				$pendingPluginVersion = $pendingPluginClass::getVersion();
+				if(!$pendingPluginVersion->isCompatible($pendingPluginMinVersion))
+					return false;
+			}
+			
+			// adds tested plugin name to the list of validated in order to avoid endless recursion
+			$tempValidatedPlugins = $validatedPlugins;
+			$tempValidatedPlugins[] = $pluginClass::getPluginName();
+			if(!self::isValid($pendingPluginClass, $tempValidatedPlugins))
+				return false;
+				
+			// adds the last tested dependency plugin to the valid list
+			$validatedPlugins[] = $pendingPluginName;
+		}
+		
+		return true;
+	}
+	
+	/**
 	 * @return array<KalturaPlugin>
 	 */
 	public static function getPluginInstances($interface = null)
@@ -71,8 +124,15 @@ class KalturaPluginManager
 			$plugins = self::getPlugins();
 			
 			foreach($plugins as $pluginName => $pluginClass)
-				if($pluginClass && class_exists($pluginClass))
-					self::$pluginInstances[$pluginName] = new $pluginClass();
+			{
+				if(!$pluginClass || !class_exists($pluginClass))
+					continue;
+
+				if(!self::isValid($pluginClass, array_keys(self::$pluginInstances)))
+					continue;
+					
+				self::$pluginInstances[$pluginName] = new $pluginClass();
+			}
 		}
 		
 		if(is_null($interface))
@@ -100,7 +160,7 @@ class KalturaPluginManager
 		//TODO - do we need to get all the instances? maybe create just the required plugin.
 		// unless they are all created at bootstrap anyway for event handling purposes
 		$plugins = self::getPluginInstances();
-		return @$plugins[str_replace('plugin', '', strtolower($pluginName))];
+		return @$plugins[$pluginName];
 	}
 	
 	/**
@@ -121,7 +181,7 @@ class KalturaPluginManager
 		self::$plugins = array();
 		foreach($plugins as $pluginClass)	
 		{
-			$pluginName = str_replace('plugin', '', strtolower($pluginClass));
+			$pluginName = $pluginClass::getPluginName();
 			self::$plugins[$pluginName] = $pluginClass;
 		}
 			
