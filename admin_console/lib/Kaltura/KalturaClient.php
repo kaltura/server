@@ -136,6 +136,7 @@ class KalturaBatchJobType
 	const METADATA_IMPORT = 27;
 	const METADATA_TRANSFORM = 28;
 	const FILESYNC_IMPORT = 29;
+	const VIRUS_SCAN = 30;
 	const PROJECT = 1000;
 }
 
@@ -234,7 +235,6 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = 99;
 	const PDF2SWF = 201;
 	const PDF_CREATOR = 202;
-	const OPENOFFICE_UCONV = 203;
 }
 
 class KalturaConversionProfileOrderBy
@@ -302,13 +302,23 @@ class KalturaEntryStatus
 
 class KalturaEntryType
 {
-	const AUTOMATIC = -1;
-	const MEDIA_CLIP = 1;
-	const MIX = 2;
-	const PLAYLIST = 5;
-	const DATA = 6;
-	const LIVE_STREAM = 7;
-	const DOCUMENT = 10;
+	const AUTOMATIC = "-1";
+	const MEDIA_CLIP = "1";
+	const MIX = "2";
+	const BUBBLES = "4";
+	const PLAYLIST = "5";
+	const DATA = "6";
+	const LIVE_STREAM = "7";
+	const DOCUMENT = "10";
+	const PluginA = "PLUGIN_A";
+	const -1 = "AUTOMATIC";
+	const 1 = "MEDIA_CLIP";
+	const 2 = "MIX";
+	const 4 = "BUBBLES";
+	const 5 = "PLAYLIST";
+	const 6 = "DATA";
+	const 7 = "LIVE_STREAM";
+	const 10 = "DOCUMENT";
 }
 
 class KalturaFileSyncObjectType
@@ -764,6 +774,15 @@ class KalturaSchedulerStatusType
 	const RUNNING_BATCHES_IS_RUNNING = 7;
 }
 
+class KalturaSearchConditionComparison
+{
+	const EQUEL = 1;
+	const GREATER_THAN = 2;
+	const GREATER_THAN_OR_EQUEL = 3;
+	const LESS_THAN = 4;
+	const LESS_THAN_OR_EQUEL = 5;
+}
+
 class KalturaSearchOperatorType
 {
 	const SEARCH_AND = 1;
@@ -951,6 +970,11 @@ class KalturaYahooSyndicationFeedOrderBy
 	const TYPE_DESC = "-type";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaDynamicEnum extends KalturaObjectBase
+{
+
 }
 
 class KalturaBaseEntry extends KalturaObjectBase
@@ -1367,6 +1391,14 @@ class KalturaFileSync extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $fileDiscSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isCurrentDc = null;
 
 
 }
@@ -7649,6 +7681,18 @@ class KalturaSearchCondition extends KalturaSearchItem
 	 * @var string
 	 */
 	public $value = null;
+
+
+}
+
+class KalturaSearchComparableCondition extends KalturaSearchCondition
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaSearchConditionComparison
+	 */
+	public $comparison = null;
 
 
 }

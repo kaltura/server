@@ -136,6 +136,7 @@ class KalturaBatchJobType
 	const METADATA_IMPORT = 27;
 	const METADATA_TRANSFORM = 28;
 	const FILESYNC_IMPORT = 29;
+	const VIRUS_SCAN = 30;
 	const PROJECT = 1000;
 }
 
@@ -221,19 +222,19 @@ class KalturaControlPanelCommandType
 
 class KalturaConversionEngineType
 {
-	const KALTURA_COM = 0;
-	const ON2 = 1;
-	const FFMPEG = 2;
-	const MENCODER = 3;
-	const ENCODING_COM = 4;
-	const EXPRESSION_ENCODER3 = 5;
-	const EXPRESSION_ENCODER = 55;
-	const QUICK_TIME_PLAYER_TOOLS = 6;
-	const FAST_START = 7;
-	const FFMPEG_VP8 = 98;
-	const FFMPEG_AUX = 99;
-	const PDF2SWF = 201;
-	const PDF_CREATOR = 202;
+	const KALTURA_COM = "0";
+	const ON2 = "1";
+	const FFMPEG = "2";
+	const MENCODER = "3";
+	const ENCODING_COM = "4";
+	const EXPRESSION_ENCODER3 = "5";
+	const FFMPEG_VP8 = "98";
+	const FFMPEG_AUX = "99";
+	const PDF2SWF = "201";
+	const PDF_CREATOR = "202";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const FAST_START = "fastStart.FastStart";
+	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 }
 
 class KalturaConversionProfileOrderBy
@@ -300,13 +301,14 @@ class KalturaEntryStatus
 
 class KalturaEntryType
 {
-	const AUTOMATIC = -1;
-	const MEDIA_CLIP = 1;
-	const MIX = 2;
-	const PLAYLIST = 5;
-	const DATA = 6;
-	const LIVE_STREAM = 7;
-	const DOCUMENT = 10;
+	const AUTOMATIC = "-1";
+	const MEDIA_CLIP = "1";
+	const MIX = "2";
+	const BUBBLES = "4";
+	const PLAYLIST = "5";
+	const DATA = "6";
+	const LIVE_STREAM = "7";
+	const DOCUMENT = "10";
 }
 
 class KalturaExportProtocol
@@ -712,6 +714,15 @@ class KalturaSchedulerStatusType
 	const RUNNING_BATCHES_IS_RUNNING = 7;
 }
 
+class KalturaSearchConditionComparison
+{
+	const EQUEL = 1;
+	const GREATER_THAN = 2;
+	const GREATER_THAN_OR_EQUEL = 3;
+	const LESS_THAN = 4;
+	const LESS_THAN_OR_EQUEL = 5;
+}
+
 class KalturaSearchOperatorType
 {
 	const SEARCH_AND = 1;
@@ -855,6 +866,11 @@ class KalturaYahooSyndicationFeedOrderBy
 	const TYPE_DESC = "-type";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaDynamicEnum extends KalturaObjectBase
+{
+
 }
 
 class KalturaJobData extends KalturaObjectBase
@@ -4875,6 +4891,14 @@ class KalturaFileSync extends KalturaObjectBase
 	 */
 	public $fileDiscSize = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isCurrentDc = null;
+
 
 }
 
@@ -5178,6 +5202,18 @@ class KalturaSearchCondition extends KalturaSearchItem
 	 * @var string
 	 */
 	public $value = null;
+
+
+}
+
+class KalturaSearchComparableCondition extends KalturaSearchCondition
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaSearchConditionComparison
+	 */
+	public $comparison = null;
 
 
 }
