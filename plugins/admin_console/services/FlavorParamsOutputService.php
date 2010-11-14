@@ -14,7 +14,7 @@ class FlavorParamsOutputService extends KalturaBaseService
 
 		// since plugin might be using KS impersonation, we need to validate the requesting
 		// partnerId from the KS and not with the $_POST one
-		if(!SystemPartnerPlugin::isAllowedPartner(kCurrentContext::$ks_partner_id))
+		if(!AdminConsolePlugin::isAllowedPartner(kCurrentContext::$ks_partner_id))
 			throw new KalturaAPIException(SystemUserErrors::SERVICE_FORBIDDEN);
 	}
 	
