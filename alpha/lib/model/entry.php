@@ -26,18 +26,6 @@ class entry extends Baseentry implements ISyncableFile
 	const ENTRY_SORT_KUSER_SCREEN_NAME = 7;
 
 	// NOTE - CHANGES MUST BE MADE TO LAYOUT.PHP JS PART AS WELL
-	const ENTRY_TYPE_AUTOMATIC = -1;
-	const ENTRY_TYPE_BACKGROUND = 0;
-	const ENTRY_TYPE_MEDIACLIP = 1;
-	const ENTRY_TYPE_SHOW = 2;
-	const ENTRY_TYPE_BUBBLES = 4;
-	const ENTRY_TYPE_PLAYLIST = 5;
-	const ENTRY_TYPE_DATA = 6;
-	const ENTRY_TYPE_LIVE_STREAM = 7;
-	const ENTRY_TYPE_DOCUMENT = 10;
-	const ENTRY_TYPE_DVD = 300;	
-	
-	// NOTE - CHANGES MUST BE MADE TO LAYOUT.PHP JS PART AS WELL
 	const ENTRY_MEDIA_TYPE_AUTOMATIC = -1;
 	const ENTRY_MEDIA_TYPE_ANY = 0;
 	const ENTRY_MEDIA_TYPE_VIDEO = 1;
@@ -89,16 +77,6 @@ class entry extends Baseentry implements ISyncableFile
 	const ENTRY_MEDIA_SOURCE_AKAMAI_LIVE = 29;
 	const ENTRY_MEDIA_SOURCE_PARTNER_SPECIFIC = 100;
 		
-	const ENTRY_STATUS_ERROR_IMPORTING = -2;
-	const ENTRY_STATUS_ERROR_CONVERTING = -1;
-	const ENTRY_STATUS_IMPORT = 0;
-	const ENTRY_STATUS_PRECONVERT = 1;
-	const ENTRY_STATUS_READY = 2;
-	const ENTRY_STATUS_DELETED = 3;
-	const ENTRY_STATUS_PENDING = 4;
-	const ENTRY_STATUS_MODERATE = 5; // 2009-10-06 - Obsolete, moderation is using moderation_status field // entry waiting in the moderation queue
-	const ENTRY_STATUS_BLOCKED = 6;  // 2009-10-06 - Obsolete, moderation is using moderation_status field
-	
 	const ENTRY_MODERATION_STATUS_PENDING_MODERATION = 1; 
 	const ENTRY_MODERATION_STATUS_APPROVED = 2;   
 	const ENTRY_MODERATION_STATUS_REJECTED = 3;   
@@ -176,7 +154,7 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function applyDefaultValues()
 	{
-		$this->status = self::ENTRY_STATUS_PENDING;
+		$this->status = entryStatus::PENDING;
 		$this->moderation_status = self::ENTRY_MODERATION_STATUS_AUTO_APPROVED;
 	}
 	
@@ -223,7 +201,7 @@ class entry extends Baseentry implements ISyncableFile
 					$this->setAccessControlId($partner->getDefaultAccessControlId());
 			}
 			// only media clips should increments - not roughcuts or backgrounds
-			if ( $this->type == self::ENTRY_TYPE_MEDIACLIP )
+			if ( $this->type == entryType::MEDIA_CLIP )
 				myStatisticsMgr::addEntry( $this );
 
 			$is_new = true;
@@ -237,8 +215,8 @@ class entry extends Baseentry implements ISyncableFile
 			$track_entry->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY );
 			$track_entry->setChangedProperties( "status [{$this->previous_status}]->[{$this->getStatus()}]" );
 			
-			if ( $this->previous_status != self::ENTRY_STATUS_DELETED &&
-				 $this->getStatus() == self::ENTRY_STATUS_DELETED )
+			if ( $this->previous_status != entryStatus::DELETED &&
+				 $this->getStatus() == entryStatus::DELETED )
 			{
 				myStatisticsMgr::deleteEntry( $this );
 				$track_entry->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETED_ENTRY );
@@ -247,7 +225,7 @@ class entry extends Baseentry implements ISyncableFile
 			TrackEntry::addTrackEntry( $track_entry );
 		}
 
-		if ( $this->type == self::ENTRY_TYPE_SHOW )
+		if ( $this->type == entryType::MIX )
 		{
 			// some of the properties should be copied to the kshow
 			$kshow = $this->getkshow();
@@ -275,7 +253,7 @@ class entry extends Baseentry implements ISyncableFile
 
 		myPartnerUtils::setPartnerIdForObj( $this );
 
-		if ( $this->getType() != self::ENTRY_TYPE_PLAYLIST ) 
+		if ( $this->getType() != entryType::PLAYLIST ) 
 			mySearchUtils::setDisplayInSearch( $this );
 
 		mySearchUtils::setSearchTextDiscreteForEntry($this);
@@ -306,7 +284,7 @@ class entry extends Baseentry implements ISyncableFile
 		}
 		
 		// the fix should be done whether the status is READY or ERROR_CONVERTING
-		if ( $this->getStatus() == entry::ENTRY_STATUS_READY || $this->getStatus() == entry::ENTRY_STATUS_ERROR_CONVERTING )
+		if ( $this->getStatus() == entryStatus::READY || $this->getStatus() == entryStatus::ERROR_CONVERTING )
 		{
 			// fire some stuff due to the new status
 			$version_to_update = $this->getUpdateWhenReady();
@@ -360,7 +338,7 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function setStatusReady ( $force = false )
 	{
-		$this->setStatus( self::ENTRY_STATUS_READY );
+		$this->setStatus( entryStatus::READY );
 		$this->setDefaultModerationStatus();
 		
 		return $this->getStatus();
@@ -399,7 +377,7 @@ class entry extends Baseentry implements ISyncableFile
 
 	public function isReady()
 	{
-		return ( $this->getStatus() == self::ENTRY_STATUS_READY ) ;
+		return ( $this->getStatus() == entryStatus::READY ) ;
 	}
 
 	public function getNormalizedRank ()
@@ -553,7 +531,7 @@ class entry extends Baseentry implements ISyncableFile
 		if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA )
 		{
 			$data = $this->getData();
-			if($this->getType() == self::ENTRY_TYPE_SHOW && (!$this->getData() || !strpos($this->getData(), 'xml')))
+			if($this->getType() == entryType::MIX && (!$this->getData() || !strpos($this->getData(), 'xml')))
 			{
 				$data .= ".xml";
 			}
@@ -750,7 +728,7 @@ class entry extends Baseentry implements ISyncableFile
 
 	public function getDataUrl( $version = NULL )
 	{
-		if( $this->getType() == self::ENTRY_TYPE_PLAYLIST )
+		if( $this->getType() == entryType::PLAYLIST )
 		{
 			return myPlaylistUtils::getExecutionUrl( $this );
 		}
@@ -791,7 +769,7 @@ class entry extends Baseentry implements ISyncableFile
 	{
 		$sync_key = null;
 		
-		if ( $this->getType() == self::ENTRY_TYPE_MEDIACLIP)
+		if ( $this->getType() == entryType::MEDIA_CLIP)
 		{
 			if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_VIDEO || $this->getMediaType() == self::ENTRY_MEDIA_TYPE_AUDIO)
 			{
@@ -804,7 +782,7 @@ class entry extends Baseentry implements ISyncableFile
 				$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
 			}
 		}
-		elseif ( $this->getType() == self::ENTRY_TYPE_SHOW )
+		elseif ( $this->getType() == entryType::MIX )
 		{
 			// if roughcut - the version should be used 
 			$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version );
@@ -900,10 +878,9 @@ class entry extends Baseentry implements ISyncableFile
 	// will work only for types that the data can be served as an a response to the service	
 	public function getDataContent ( $from_cache = false )
 	{
-		if ( $this->getType() == self::ENTRY_TYPE_SHOW || 
-			$this->getType() == self::ENTRY_TYPE_DATA ||
-			$this->getType() == self::ENTRY_TYPE_BUBBLES || 
-			$this->getType() == self::ENTRY_TYPE_PLAYLIST ||
+		if ( $this->getType() == entryType::MIX || 
+			$this->getType() == entryType::DATA ||
+			$this->getType() == entryType::PLAYLIST ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT || 
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 ) 
@@ -919,7 +896,7 @@ class entry extends Baseentry implements ISyncableFile
 			if ( $content )
 			{
 				// patch for fixing old AE roughcuts without cross="0"
-				if ($this->getType() == self::ENTRY_TYPE_SHOW)
+				if ($this->getType() == entryType::MIX)
 				{
 					$data2 = str_replace('<EndTransition type', '<EndTransition cross="0" type', $content);
 					return $data2;
@@ -937,10 +914,9 @@ class entry extends Baseentry implements ISyncableFile
 //		if ( $v === null ) return ;
 		// DON'T do this for ENTRY_TYPE_SHOW unless $allow_type_roughcut is true
 		// - the metadata is handling is complex and is done in other places in the code 
-		if ( ($allow_type_roughcut && $this->getType() == self::ENTRY_TYPE_SHOW) ||
-			$this->getType() == self::ENTRY_TYPE_DATA || 
-			$this->getType() == self::ENTRY_TYPE_BUBBLES || 
-			$this->getType() == self::ENTRY_TYPE_PLAYLIST ||
+		if ( ($allow_type_roughcut && $this->getType() == entryType::MIX) ||
+			$this->getType() == entryType::DATA || 
+			$this->getType() == entryType::PLAYLIST ||
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML || 
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW || 
 			$this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT ||
@@ -981,9 +957,7 @@ class entry extends Baseentry implements ISyncableFile
 	// return the default file suffix according to the entry type 
 	private function getFileSuffix ( )
 	{
-		if ( $this->getType() == self::ENTRY_TYPE_BUBBLES ||
-			 $this->getType() == self::ENTRY_TYPE_DVD ||
-			 $this->getType() == self::ENTRY_TYPE_SHOW || 
+		if ( $this->getType() == entryType::MIX || 
 			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_SHOW || 
 			 $this->getMediaType() == self::ENTRY_MEDIA_TYPE_XML ) 
 		{
@@ -1437,7 +1411,7 @@ class entry extends Baseentry implements ISyncableFile
 	// if has status self::ENTRY_S
 	public function getImportInfo ()
 	{
-		 if ( $this->getStatus() == self::ENTRY_STATUS_IMPORT )
+		 if ( $this->getStatus() == entryStatus::IMPORT )
 		 {
 		 	$c = new Criteria();
 		 	$c->add ( BatchJobPeer::ENTRY_ID , $this->getId() );
@@ -1482,7 +1456,7 @@ class entry extends Baseentry implements ISyncableFile
 				myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_BLOCK , $this->getid());
 				break;
 			case moderation::MODERATION_STATUS_PENDING:
-//				$this->setStatus(self::ENTRY_STATUS_MODERATE);
+//				$this->setStatus(entryStatus::MODERATE);
 //				throw new Exception($error_msg);
 				break;
 			case moderation::MODERATION_STATUS_REVIEW:
@@ -1508,7 +1482,7 @@ class entry extends Baseentry implements ISyncableFile
 
 	public function getEditorType (  )
 	{
-		if ( $this->getType() != self::ENTRY_TYPE_SHOW ) return null;
+		if ( $this->getType() != entryType::MIX ) return null;
 		$res = $this->getFromCustomData( "editor_type" );
 		if ( $res == null ) return "Keditor"; // no value means Keditor == advanced
 		return $res;
@@ -2145,7 +2119,7 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
-		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == self::ENTRY_STATUS_DELETED)
+		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
 		return parent::preUpdate($con);
@@ -2161,7 +2135,7 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function hasDownloadAsset($flavorParamsId)
 	{
-		if($this->getType() == entry::ENTRY_TYPE_SHOW)
+		if($this->getType() == entryType::MIX)
 			return false; // always create new flattening job
 			
 		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($this->getId(), $flavorParamsId);
@@ -2184,7 +2158,7 @@ class entry extends Baseentry implements ISyncableFile
 	public function createDownloadAsset(BatchJob $parentJob = null, $flavorParamsId, $puserId = null)
 	{
 		$job = null;
-		if ($this->getType() == entry::ENTRY_TYPE_SHOW)
+		if ($this->getType() == entryType::MIX)
 		{
 			// if flavor params == SOURCE, or no format defined for flavor params, default to 'flv'
 			$flattenFormat = null;

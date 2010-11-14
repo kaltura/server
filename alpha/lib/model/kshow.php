@@ -176,7 +176,7 @@ class kshow extends Basekshow
 		if ( $this->roughcut_count == -1 )
 		{
 			$c = new Criteria();
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_SHOW );
+			$c->add ( entryPeer::TYPE , entryType::MIX );
 			$c->add ( entryPeer::KSHOW_ID , $this->getId() );
 			$this->roughcut_count = entryPeer::doCount( $c );
 		}
@@ -459,7 +459,7 @@ class kshow extends Basekshow
 			$entry->setPartnerId( $this->getPartnerId() ); // inherit partner_id from kshow
 		if ( $this->getSubpId() !== null )
 			$entry->setSubpId( $this->getSubpId() ); // inherit subp_id from kshow
-		$entry->setStatus(entry::ENTRY_STATUS_READY);
+		$entry->setStatus(entryStatus::READY);
 
 		if ( $entry_name )
 		{
@@ -471,7 +471,7 @@ class kshow extends Basekshow
 		}
 		//$entry->setData ( "&kal_show.flv");
 		$entry->setThumbnail ( $thumbnail ? $thumbnail : "&kal_show.jpg");
-		$entry->setType( entry::ENTRY_TYPE_SHOW );
+		$entry->setType( entryType::MIX );
 		$entry->setMediaType( entry::ENTRY_MEDIA_TYPE_SHOW );
 		$entry->setEditorType ( myMetadataUtils::METADATA_EDITOR_SIMPLE );
 

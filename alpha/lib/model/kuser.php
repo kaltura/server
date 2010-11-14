@@ -82,7 +82,7 @@ class kuser extends Basekuser
 		if ( $this->roughcut_count == -1  )
 		{
 			$c = new Criteria();
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_SHOW );
+			$c->add ( entryPeer::TYPE , entryType::MIX );
 			$c->add ( entryPeer::KUSER_ID , $this->getId() );
 			$this->roughcut_count = entryPeer::doCount( $c );
 		}

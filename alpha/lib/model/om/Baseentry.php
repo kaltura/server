@@ -464,16 +464,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	private $lastflavorAssetCriteria = null;
 
 	/**
-	 * @var        array SphinxLog[] Collection to store aggregation of SphinxLog objects.
-	 */
-	protected $collSphinxLogs;
-
-	/**
-	 * @var        Criteria The criteria used to select the current contents of collSphinxLogs.
-	 */
-	private $lastSphinxLogCriteria = null;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -2978,9 +2968,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->collflavorAssets = null;
 			$this->lastflavorAssetCriteria = null;
 
-			$this->collSphinxLogs = null;
-			$this->lastSphinxLogCriteria = null;
-
 		} // if (deep)
 	}
 
@@ -3205,14 +3192,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 			if ($this->collflavorAssets !== null) {
 				foreach ($this->collflavorAssets as $referrerFK) {
-					if (!$referrerFK->isDeleted()) {
-						$affectedRows += $referrerFK->save($con);
-					}
-				}
-			}
-
-			if ($this->collSphinxLogs !== null) {
-				foreach ($this->collSphinxLogs as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -3453,14 +3432,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 				if ($this->collflavorAssets !== null) {
 					foreach ($this->collflavorAssets as $referrerFK) {
-						if (!$referrerFK->validate($columns)) {
-							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-						}
-					}
-				}
-
-				if ($this->collSphinxLogs !== null) {
-					foreach ($this->collSphinxLogs as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -4290,12 +4261,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			foreach ($this->getflavorAssets() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addflavorAsset($relObj->copy($deepCopy));
-				}
-			}
-
-			foreach ($this->getSphinxLogs() as $relObj) {
-				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addSphinxLog($relObj->copy($deepCopy));
 				}
 			}
 
@@ -6464,207 +6429,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Clears out the collSphinxLogs collection (array).
-	 *
-	 * This does not modify the database; however, it will remove any associated objects, causing
-	 * them to be refetched by subsequent calls to accessor method.
-	 *
-	 * @return     void
-	 * @see        addSphinxLogs()
-	 */
-	public function clearSphinxLogs()
-	{
-		$this->collSphinxLogs = null; // important to set this to NULL since that means it is uninitialized
-	}
-
-	/**
-	 * Initializes the collSphinxLogs collection (array).
-	 *
-	 * By default this just sets the collSphinxLogs collection to an empty array (like clearcollSphinxLogs());
-	 * however, you may wish to override this method in your stub class to provide setting appropriate
-	 * to your application -- for example, setting the initial array to the values stored in database.
-	 *
-	 * @return     void
-	 */
-	public function initSphinxLogs()
-	{
-		$this->collSphinxLogs = array();
-	}
-
-	/**
-	 * Gets an array of SphinxLog objects which contain a foreign key that references this object.
-	 *
-	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
-	 * Otherwise if this entry has previously been saved, it will retrieve
-	 * related SphinxLogs from storage. If this entry is new, it will return
-	 * an empty collection or the current collection, the criteria is ignored on a new object.
-	 *
-	 * @param      PropelPDO $con
-	 * @param      Criteria $criteria
-	 * @return     array SphinxLog[]
-	 * @throws     PropelException
-	 */
-	public function getSphinxLogs($criteria = null, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collSphinxLogs === null) {
-			if ($this->isNew()) {
-			   $this->collSphinxLogs = array();
-			} else {
-
-				$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-				SphinxLogPeer::addSelectColumns($criteria);
-				$this->collSphinxLogs = SphinxLogPeer::doSelect($criteria, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return the collection.
-
-
-				$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-				SphinxLogPeer::addSelectColumns($criteria);
-				if (!isset($this->lastSphinxLogCriteria) || !$this->lastSphinxLogCriteria->equals($criteria)) {
-					$this->collSphinxLogs = SphinxLogPeer::doSelect($criteria, $con);
-				}
-			}
-		}
-		$this->lastSphinxLogCriteria = $criteria;
-		return $this->collSphinxLogs;
-	}
-
-	/**
-	 * Returns the number of related SphinxLog objects.
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct
-	 * @param      PropelPDO $con
-	 * @return     int Count of related SphinxLog objects.
-	 * @throws     PropelException
-	 */
-	public function countSphinxLogs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		} else {
-			$criteria = clone $criteria;
-		}
-
-		if ($distinct) {
-			$criteria->setDistinct();
-		}
-
-		$count = null;
-
-		if ($this->collSphinxLogs === null) {
-			if ($this->isNew()) {
-				$count = 0;
-			} else {
-
-				$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-				$count = SphinxLogPeer::doCount($criteria, false, $con);
-			}
-		} else {
-			// criteria has no effect for a new object
-			if (!$this->isNew()) {
-				// the following code is to determine if a new query is
-				// called for.  If the criteria is the same as the last
-				// one, just return count of the collection.
-
-
-				$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-				if (!isset($this->lastSphinxLogCriteria) || !$this->lastSphinxLogCriteria->equals($criteria)) {
-					$count = SphinxLogPeer::doCount($criteria, false, $con);
-				} else {
-					$count = count($this->collSphinxLogs);
-				}
-			} else {
-				$count = count($this->collSphinxLogs);
-			}
-		}
-		return $count;
-	}
-
-	/**
-	 * Method called to associate a SphinxLog object to this object
-	 * through the SphinxLog foreign key attribute.
-	 *
-	 * @param      SphinxLog $l SphinxLog
-	 * @return     void
-	 * @throws     PropelException
-	 */
-	public function addSphinxLog(SphinxLog $l)
-	{
-		if ($this->collSphinxLogs === null) {
-			$this->initSphinxLogs();
-		}
-		if (!in_array($l, $this->collSphinxLogs, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collSphinxLogs, $l);
-			$l->setentry($this);
-		}
-	}
-
-
-	/**
-	 * If this collection has already been initialized with
-	 * an identical criteria, it returns the collection.
-	 * Otherwise if this entry is new, it will return
-	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related SphinxLogs from storage.
-	 *
-	 * This method is protected by default in order to keep the public
-	 * api reasonable.  You can provide public methods for those you
-	 * actually need in entry.
-	 */
-	public function getSphinxLogsJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		if ($criteria === null) {
-			$criteria = new Criteria(entryPeer::DATABASE_NAME);
-		}
-		elseif ($criteria instanceof Criteria)
-		{
-			$criteria = clone $criteria;
-		}
-
-		if ($this->collSphinxLogs === null) {
-			if ($this->isNew()) {
-				$this->collSphinxLogs = array();
-			} else {
-
-				$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-				$this->collSphinxLogs = SphinxLogPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
-			}
-		} else {
-			// the following code is to determine if a new query is
-			// called for.  If the criteria is the same as the last
-			// one, just return the collection.
-
-			$criteria->add(SphinxLogPeer::ENTRY_ID, $this->id);
-
-			if (!isset($this->lastSphinxLogCriteria) || !$this->lastSphinxLogCriteria->equals($criteria)) {
-				$this->collSphinxLogs = SphinxLogPeer::doSelectJoinPartner($criteria, $con, $join_behavior);
-			}
-		}
-		$this->lastSphinxLogCriteria = $criteria;
-
-		return $this->collSphinxLogs;
-	}
-
-	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -6721,11 +6485,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collSphinxLogs) {
-				foreach ((array) $this->collSphinxLogs as $o) {
-					$o->clearAllReferences($deep);
-				}
-			}
 		} // if ($deep)
 
 		$this->collkvotes = null;
@@ -6737,7 +6496,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collwidgets = null;
 		$this->collflavorParamsOutputs = null;
 		$this->collflavorAssets = null;
-		$this->collSphinxLogs = null;
 			$this->akshow = null;
 			$this->akuser = null;
 			$this->aaccessControl = null;

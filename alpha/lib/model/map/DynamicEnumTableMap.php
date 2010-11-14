@@ -2,7 +2,7 @@
 
 
 /**
- * This class defines the structure of the 'invalid_session' table.
+ * This class defines the structure of the 'dynamic_enum' table.
  *
  *
  *
@@ -13,12 +13,12 @@
  *
  * @package    lib.model.map
  */
-class invalidSessionTableMap extends TableMap {
+class DynamicEnumTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.invalidSessionTableMap';
+	const CLASS_NAME = 'lib.model.map.DynamicEnumTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -30,16 +30,17 @@ class invalidSessionTableMap extends TableMap {
 	public function initialize()
 	{
 	  // attributes
-		$this->setName('invalid_session');
-		$this->setPhpName('invalidSession');
-		$this->setClassname('invalidSession');
+		$this->setName('dynamic_enum');
+		$this->setPhpName('DynamicEnum');
+		$this->setClassname('DynamicEnum');
 		$this->setPackage('lib.model');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('KS', 'Ks', 'VARCHAR', false, 300, null);
-		$this->addColumn('KS_VALID_UNTIL', 'KsValidUntil', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('VALUE', 'Value', 'INTEGER', true, null, null);
+		$this->addColumn('ENUM_NAME', 'EnumName', 'VARCHAR', true, 255, null);
+		$this->addColumn('VALUE_NAME', 'ValueName', 'VARCHAR', true, 255, null);
+		$this->addColumn('PLUGIN_NAME', 'PluginName', 'VARCHAR', false, 255, null);
 		// validators
 	} // initialize()
 
@@ -50,4 +51,4 @@ class invalidSessionTableMap extends TableMap {
 	{
 	} // buildRelations()
 
-} // invalidSessionTableMap
+} // DynamicEnumTableMap

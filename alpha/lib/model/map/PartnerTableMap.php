@@ -87,7 +87,6 @@ class PartnerTableMap extends TableMap {
 	{
     $this->addRelation('kuser', 'kuser', RelationMap::MANY_TO_ONE, array('anonymous_kuser_id' => 'id', ), null, null);
     $this->addRelation('adminKuser', 'adminKuser', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null);
-    $this->addRelation('SphinxLog', 'SphinxLog', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null);
 	} // buildRelations()
 
 } // PartnerTableMap

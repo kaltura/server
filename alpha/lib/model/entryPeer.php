@@ -68,7 +68,7 @@ class entryPeer extends BaseentryPeer
 	{
 		$c = new Criteria();
 		$c->add(entryPeer::KSHOW_ID, $kshowId);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 		
 		if ($introId)
 			$c->add(entryPeer::ID, $introId, Criteria::NOT_EQUAL);
@@ -101,7 +101,7 @@ class entryPeer extends BaseentryPeer
 	{
 		$c = new Criteria();
 		$c->add(entryPeer::KSHOW_ID, $kshowId);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 		
 		if ($firstEntries)
 			foreach($firstEntries as $firstEntryId)
@@ -140,7 +140,7 @@ class entryPeer extends BaseentryPeer
 		
 		$c = new Criteria();
 		$c->add(entryPeer::KUSER_ID, $userid);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 			
 		entryPeer::setOrder($c, $order);
 		$c->addJoin(entryPeer::KUSER_ID, kuserPeer::ID, Criteria::INNER_JOIN);
@@ -201,7 +201,7 @@ class entryPeer extends BaseentryPeer
 		$c = new Criteria();
 		$c->addJoin(entryPeer::KUSER_ID, kuserPeer::ID, Criteria::INNER_JOIN);
 		$c->add(entryPeer::KUSER_ID, $kuserId);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 		$c->addAscendingOrderByColumn(entryPeer::CREATED_AT);
 		
 	    $pager = new sfPropelPager('entry', $pageSize);
@@ -239,7 +239,7 @@ class entryPeer extends BaseentryPeer
 	public static function blockDeletedInCriteriaFilter()
 	{
 		$ecf = entryPeer::getCriteriaFilter();
-		$ecf->getFilter()->addAnd ( entryPeer::STATUS, entry::ENTRY_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$ecf->getFilter()->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 	}	
 	
 /* -------------------- Critera filter functions -------------------- */	
@@ -267,7 +267,7 @@ class entryPeer extends BaseentryPeer
 		self::setUseCriteriaFilter ( false );
 		$c= new Criteria();
 		$c->add ( entryPeer::ID , $pks , Criteria::IN );
-		$c->add ( entryPeer::STATUS , array ( entry::ENTRY_STATUS_READY , entry::ENTRY_STATUS_ERROR_CONVERTING ) , Criteria::NOT_IN );
+		$c->add ( entryPeer::STATUS , array ( entryStatus::READY , entryStatus::ERROR_CONVERTING ) , Criteria::NOT_IN );
 		$res = self::doSelect( $c );
 		self::setUseCriteriaFilter ( true );
 		return $res;
@@ -281,7 +281,7 @@ class entryPeer extends BaseentryPeer
 		}
 		
 		$c = new myCriteria(); 
-		$c->addAnd ( entryPeer::STATUS, entry::ENTRY_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
@@ -358,14 +358,14 @@ class entryPeer extends BaseentryPeer
 /* -------------------- Critera filter functions -------------------- */
 	
 
-	// this function sets the status of an entry to entry::ENTRY_STATUS_DELETED
+	// this function sets the status of an entry to entryStatus::DELETED
 	// users can only delete their own entries
 	public static function setStatusDeletedForEntry( $entry_id, $kuser_id  )
 	{
 		// 
 		$entry = self::retrieveByPK( $entry_id );
 		if( $entry == null ) return false;
-		if( $entry->getKuserId() == $kuser_id ) $entry->setStatus( entry::ENTRY_STATUS_DELETED ); else return false;
+		if( $entry->getKuserId() == $kuser_id ) $entry->setStatus( entryStatus::DELETED ); else return false;
 		$entry->save();
 		return true;
 	}
@@ -420,7 +420,10 @@ class entryPeer extends BaseentryPeer
 		$c = clone $criteria;
 		
 		if($c instanceof KalturaCriteria)
+		{
 			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
 			
 		return parent::doSelectJoinkuser($c, $con, $join_behavior);
 	}

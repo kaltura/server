@@ -111,7 +111,6 @@ class entryTableMap extends TableMap {
     $this->addRelation('widget', 'widget', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('flavorParamsOutput', 'flavorParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('flavorAsset', 'flavorAsset', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
-    $this->addRelation('SphinxLog', 'SphinxLog', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
 	} // buildRelations()
 
 } // entryTableMap
