@@ -22,7 +22,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 			if(in_array($ext, $extensions))
 			{
 				$object->setMediaType($documentType);
-				$object->setType(entry::ENTRY_TYPE_DOCUMENT);
+				$object->setType(entryType::DOCUMENT);
 				break;
 			}
 		}
@@ -35,14 +35,14 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 	public function entryCreated(entry $object)
 	{
 		$mediaType = null;
-		if($object->getType() == entry::ENTRY_TYPE_AUTOMATIC)
+		if($object->getType() == entryType::AUTOMATIC)
 		{
 			KalturaLog::debug("entry id [" . $object->getId() . "] type [" . $object->getType() . "] source link [" . $object->getSourceLink() . "]");
 			
 			$mediaType = $object->getMediaType();
 			if(isset(self::$fileExtensions[$mediaType]))
 			{
-				$object->setType(entry::ENTRY_TYPE_DOCUMENT);
+				$object->setType(entryType::DOCUMENT);
 			}
 			elseif(is_null($mediaType) || $mediaType == entry::ENTRY_MEDIA_TYPE_ANY || $mediaType == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
 			{
@@ -50,7 +50,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 			}
 		}
 		
-		if($object->getType() != entry::ENTRY_TYPE_DOCUMENT)
+		if($object->getType() != entryType::DOCUMENT)
 		{
 			KalturaLog::debug("entry id [" . $object->getId() . "] type [" . $object->getType() . "]");
 			return true;
@@ -71,7 +71,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 
 		if ($object->getConversionProfileId())
 		{
-			$object->setStatus(entry::ENTRY_STATUS_PRECONVERT);
+			$object->setStatus(entryStatus::PRECONVERT);
 			$object->save();
 		}
 
@@ -99,7 +99,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
 			$entry = $object->getentry();
-			if($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+			if($entry->getType() == entryType::DOCUMENT)
 			{
 				if($entry->getConversionQuality() > 0)
 				{

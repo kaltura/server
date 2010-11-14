@@ -67,7 +67,7 @@ class DocumentsService extends KalturaEntryService
 		{
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
 			
-			$dbEntry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 		}
 		else
@@ -110,7 +110,7 @@ class DocumentsService extends KalturaEntryService
 	{
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_DOCUMENT)
+		if (!$srcEntry || $srcEntry->getType() != entryType::DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		$srcFlavorAsset = null;
@@ -162,7 +162,7 @@ class DocumentsService extends KalturaEntryService
 		$sourceEntryId = $srcFlavorAsset->getEntryId();
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_DOCUMENT)
+		if (!$srcEntry || $srcEntry->getType() != entryType::DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		if ($documentEntry === null)
@@ -373,7 +373,7 @@ class DocumentsService extends KalturaEntryService
 		entryPeer::setDefaultCriteriaFilter();
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
-		if (!$dbEntry || ($dbEntry->getType() != entry::ENTRY_TYPE_DOCUMENT))
+		if (!$dbEntry || ($dbEntry->getType() != entryType::DOCUMENT))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$ksObj = $this->getKs();
@@ -422,7 +422,7 @@ class DocumentsService extends KalturaEntryService
 		entryPeer::setDefaultCriteriaFilter();
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
-		if (!$dbEntry || ($dbEntry->getType() != entry::ENTRY_TYPE_DOCUMENT))
+		if (!$dbEntry || ($dbEntry->getType() != entryType::DOCUMENT))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 					
 		$ksObj = $this->getKs();
@@ -504,11 +504,11 @@ class DocumentsService extends KalturaEntryService
 	
 		if ($entry->conversionProfileId) 
 		{
-			$dbEntry->setStatus(entry::ENTRY_STATUS_PRECONVERT);
+			$dbEntry->setStatus(entryStatus::PRECONVERT);
 		}
 		else 
 		{
-			$dbEntry->setStatus(entry::ENTRY_STATUS_READY);
+			$dbEntry->setStatus(entryStatus::READY);
 		}
 			
 		$dbEntry->setDefaultModerationStatus();

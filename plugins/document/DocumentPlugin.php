@@ -28,7 +28,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 	{
 
 		// ENTRY
-		if($baseClass == entryPeer::OM_CLASS && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
+		if($baseClass == entryPeer::OM_CLASS && $enumValue == entryType::DOCUMENT)
 		{
 			return new DocumentEntry();
 		}
@@ -89,12 +89,12 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		
 		// KDL ENGINES
 		
-		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == conversionEngineType::PDF_CREATOR)
 		{
 			return new KDLTranscoderPdfCreator($enumValue);
 		}
 				
-		if($baseClass == 'KDLOperatorBase' && $enumValue == kConvertJobData::CONVERSION_ENGINE_PDF2SWF)
+		if($baseClass == 'KDLOperatorBase' && $enumValue == conversionEngineType::PDF2SWF)
 		{
 			return new KDLTranscoderPdf2Swf($enumValue);
 		}
@@ -112,7 +112,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// DOCUMENT ENTRY
-		if($baseClass == entryPeer::OM_CLASS && $enumValue == entry::ENTRY_TYPE_DOCUMENT)
+		if($baseClass == entryPeer::OM_CLASS && $enumValue == entryType::DOCUMENT)
 		{
 			return 'DocumentEntry';
 		}

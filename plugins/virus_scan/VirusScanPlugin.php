@@ -1,5 +1,5 @@
 <?php
-class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers
+class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'virusScan';
 	
@@ -40,5 +40,16 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	{
 		return array(
 		);
+	}
+	
+	/**
+	 * @return array<string> list of enum classes names that extend the base enum name
+	 */
+	public static function getEnums($baseEnumName)
+	{
+		if($baseEnumName == 'entryStatus')
+			return array('VirusScanEntryStatus');
+			
+		return array();
 	}
 }
