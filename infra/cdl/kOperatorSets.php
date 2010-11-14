@@ -66,6 +66,7 @@ class kOperatorSets
 				$operator->id = $decodedOperator->id;
 				$operator->extra = isset($decodedOperator->extra) ? $decodedOperator->extra : null;
 				$operator->command = isset($decodedOperator->command) ? $decodedOperator->command : null;
+				$operator->config = isset($decodedOperator->config) ? $decodedOperator->config : null;
 				
 				$set[] = $operator;
 			}
