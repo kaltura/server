@@ -321,6 +321,7 @@ class kBatchExclusiveLock
 		
 		$c = new Criteria();
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_FATAL, Criteria::NOT_EQUAL);
+		$c->add(BatchJobPeer::DC, kDataCenterMgr::getCurrentDcId()); // each DC should clean its own jobs
 //		$c->add(BatchJobPeer::PROCESSOR_EXPIRATION, time(), Criteria::LESS_THAN);
 //		$c->add(BatchJobPeer::SCHEDULER_ID, 0, Criteria::GREATER_THAN);
 //		$c->add(BatchJobPeer::WORKER_ID, 0, Criteria::GREATER_THAN);
