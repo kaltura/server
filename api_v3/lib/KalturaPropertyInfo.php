@@ -15,6 +15,7 @@ class KalturaPropertyInfo
 	private $_writeOnly = false;
 	private $_description;
 	private $_filters = array();
+	private $_dynamicType = null;
 	
 	public function KalturaPropertyInfo($type, $name = '')
 	{
@@ -131,6 +132,16 @@ class KalturaPropertyInfo
 			return $this->_typeReflector->getArrayType();
 		else
 			return false;
+	}
+	
+	public function setDynamicType($value)
+	{
+		$this->_dynamicType = $value;
+	}
+	
+	public function getDynamicType()
+	{
+		return $this->_dynamicType;
 	}
 	
 	public function setReadOnly($value)

@@ -236,14 +236,16 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 
 	/**
 	 * This filter should be in use for retrieving only entries, at few specific {@link ?object=KalturaEntryStatus KalturaEntryStatus} (comma separated).
-	 * 
+	 *
+	 * @dynamicType KalturaEntryType 
 	 * @var string
 	 */
 	public $statusIn;
 
 	/**
 	 * This filter should be in use for retrieving only entries, not at few specific {@link ?object=KalturaEntryStatus KalturaEntryStatus} (comma separated).
-	 * 
+	 *
+	 * @dynamicType KalturaEntryType 
 	 * @var KalturaEntryStatus
 	 */
 	public $statusNotIn;
@@ -286,6 +288,7 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	/**
 	 * This filter should be in use for retrieving entries of few {@link ?object=KalturaEntryType KalturaEntryType} (string should include a comma separated list of {@link ?object=KalturaEntryType KalturaEntryType} enumerated parameters).
 	 * 
+	 * @dynamicType KalturaEntryType
 	 * @var string
 	 */
 	public $typeIn;

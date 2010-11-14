@@ -34,6 +34,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_SERVER_ONLY = "/\\@serverOnly/i";
     
+    const DOCCOMMENT_DYNAMIC_TYPE = "/\\@dynamicType (\\w*)/i";
+    
     /**
      * @var bool
      */
@@ -130,6 +132,11 @@ class KalturaDocCommentParser
     public $errors;
     
     /**
+     * @var string
+     */
+    public $dynamicType;
+    
+    /**
      * Parse a docComment
      *
      * @param string $comment
@@ -196,6 +203,10 @@ class KalturaDocCommentParser
         if (preg_match(self::DOCCOMMENT_FILTER, $comment, $result))
         	$this->filter = $result[1];
         	
+        $result = null;
+        if (preg_match(self::DOCCOMMENT_DYNAMIC_TYPE, $comment, $result))
+            $this->dynamicType = $result[1];
+            
         $result = null;
         $error_array = array();
         if (preg_match_all(self::DOCCOMMENT_ACTION_ERRORS, $comment, $result))

@@ -81,12 +81,31 @@ class KalturaFilter extends KalturaObject
 		
 		$this->orderBy = $newOrderBy;
 		
+		$typeReflector = KalturaTypeReflectorCacher::get(get_class($this));
+		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
-		 	if ( is_numeric( $this_prop) ) $this_prop = $object_prop;
+		 	if ( is_numeric( $this_prop) ) 
+		 		$this_prop = $object_prop;
+		 		
+			$value = $this->$this_prop;
+			$propertyInfo = $typeReflector->getProperty($this_prop);
+			if($propertyInfo->isDynamicEnum())
+			{
+				$value = $this->toDynamicEnumValue($propertyInfo->getType(), $value);
+			}
+			elseif($propertyInfo->getDynamicType())
+			{
+				$values = explode(',', $value);
+				$finalValues = array();
+				foreach($values as $val)
+					$finalValues[] = $this->toDynamicEnumValue($propertyInfo->getDynamicType(), $val);
+				$value = implode(',', $finalValues);
+			}
+			
 		 	// convert the v3 prop name to the naming convension of the core filter
 		 	$filter_prop_name = self::translatePropNames ( $object_prop );
-		 	call_user_func_array( array ( $object_to_fill ,"set"  ) , array ($filter_prop_name , $this->$this_prop ) );
+		 	$object_to_fill->set($filter_prop_name, $value);
 		 }		
 		 		
 		if(is_object($this->advancedSearch) && $this->advancedSearch instanceof KalturaSearchItem)
@@ -100,15 +119,36 @@ class KalturaFilter extends KalturaObject
 	
 	public function fromObject ( $source_object )
 	{
+		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		
 		foreach ($this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
 			if ( is_numeric( $this_prop) ) 
 			    $this_prop = $object_prop;
 			    
 		    if (array_key_exists($object_prop, $source_object->fields))
-		    	$this->$this_prop = $source_object->fields[$object_prop];
+		    {
+		    	$value = $source_object->get($object_prop);
+		    	$property = $reflector->getProperty($this_prop);
+                if($property->isDynamicEnum())
+                {
+                	$value = $this->fromDynamicEnumValue($property->getType(), $value);
+                }
+                elseif($property->getDynamicType())
+                {
+                	$values = explode(',', $value);
+                	$finalValues = array();
+                	foreach($values as $val)
+                		$finalValues[] = $this->fromDynamicEnumValue($property->getDynamicType(), $val);
+                	$value = implode(',', $finalValues);
+                }
+                	
+		    	$this->$this_prop = $value;
+		    }
 		    else
+		    {
 		    	KalturaLog::alert("field [$object_prop] was not found on filter object class [" . get_class($source_object) . "]");
+		    }
 		}
 		
 		$newOrderBy = "";

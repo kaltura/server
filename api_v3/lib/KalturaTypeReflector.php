@@ -172,6 +172,9 @@ class KalturaTypeReflector
 								
 								if ($parsedDocComment->writeOnly)
 									$prop->setWriteOnly(true);
+								
+								if ($parsedDocComment->dynamicType)
+									$prop->setDynamicType($parsedDocComment->dynamicType);
 									
 								$this->_properties[$name] = $prop;
 								
