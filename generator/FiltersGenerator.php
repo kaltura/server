@@ -220,16 +220,26 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 				{
 					$filterProp = $this->formatFilterPropertyName($filter, $prop->getName());
 					$filterPropType = $prop->getType();
-					if (in_array($filter, array(baseObjectFilter::IN, baseObjectFilter::MATCH_OR, baseObjectFilter::MATCH_AND)))
+					$filterDynamicType = null;
+					if (in_array($filter, array(baseObjectFilter::IN, baseObjectFilter::NOT_IN, baseObjectFilter::MATCH_OR, baseObjectFilter::MATCH_AND)))
+					{
+						if($prop->isDynamicEnum())
+							$filterDynamicType = $filterPropType;
+							
 						$filterPropType = "string";
+					}
 						
 					$this->appendLine();
 					$this->appendLine("	/**");
 					$this->appendLine("	 * " . $this->getDocForFilter($type->getInstance(), $filterProp));
 					$this->appendLine("	 * ");
-					$this->appendLine("	 * @var ".$filterPropType);
+					
+					if($filterDynamicType)
+						$this->appendLine("	 * @dynamicType $filterDynamicType");
+						
+					$this->appendLine("	 * @var $filterPropType");
 					$this->appendLine("	 */");
-					$this->appendLine("	public \$".$filterProp.";");
+					$this->appendLine("	public \$$filterProp;");
 				}
 			}
 		}

@@ -110,9 +110,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		if ($typeReflector->isDynamicEnum())
 		{
+			$type = $typeReflector->getType();
 			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func("$typeReflector::getEnumClass");
-//			$baseEnumName = $typeReflector::getEnumClass();
+			$baseEnumName = call_user_func("$type::getEnumClass");
+//			$baseEnumName = $type::getEnumClass();
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 			foreach($pluginInstances as $pluginInstance)
 			{
