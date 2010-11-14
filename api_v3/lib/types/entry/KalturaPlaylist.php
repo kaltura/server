@@ -78,9 +78,9 @@ class KalturaPlaylist extends KalturaBaseEntry
 			$this->filtersToPlaylistContentXml();
 			
 		$playlist = new entry();
-		$playlist->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$playlist->setType ( entryType::PLAYLIST );
 		parent::toUpdatableObject( $playlist )	;
-		$playlist->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$playlist->setType ( entryType::PLAYLIST );
 		$playlist->setDataContent( $this->playlistContent );
 		return $playlist;
 	}
@@ -92,9 +92,9 @@ class KalturaPlaylist extends KalturaBaseEntry
 			$this->filtersToPlaylistContentXml();
 		
 		$playlist = new entry();
-		$playlist->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$playlist->setType ( entryType::PLAYLIST );
 		parent::toObject( $playlist )	;
-		$playlist->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$playlist->setType ( entryType::PLAYLIST );
 		$playlist->setDataContent( $this->playlistContent );
 		
 		return $playlist;

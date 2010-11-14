@@ -3,13 +3,10 @@
  * @package api
  * @subpackage enum
  */
-class KalturaEntryType extends KalturaEnum
+class KalturaEntryType extends KalturaDynamicEnum implements entryType
 {
-	const AUTOMATIC = -1;
-	const MEDIA_CLIP = 1;
-	const MIX = 2;
-	const PLAYLIST = 5;
-	const DATA = 6;
-	const LIVE_STREAM = 7;
-	const DOCUMENT = 10;
+	public static function getEnumClass()
+	{
+		return 'entryType';
+	}
 }
