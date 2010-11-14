@@ -25,16 +25,13 @@ abstract class BaseDynamicEnumPeer {
 	const TM_CLASS = 'DynamicEnumTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 4;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
 	const ID = 'dynamic_enum.ID';
-
-	/** the column name for the VALUE field */
-	const VALUE = 'dynamic_enum.VALUE';
 
 	/** the column name for the ENUM_NAME field */
 	const ENUM_NAME = 'dynamic_enum.ENUM_NAME';
@@ -61,11 +58,11 @@ abstract class BaseDynamicEnumPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Value', 'EnumName', 'ValueName', 'PluginName', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'value', 'enumName', 'valueName', 'pluginName', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::VALUE, self::ENUM_NAME, self::VALUE_NAME, self::PLUGIN_NAME, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'value', 'enum_name', 'value_name', 'plugin_name', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'EnumName', 'ValueName', 'PluginName', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'enumName', 'valueName', 'pluginName', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::ENUM_NAME, self::VALUE_NAME, self::PLUGIN_NAME, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'enum_name', 'value_name', 'plugin_name', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
 	);
 
 	/**
@@ -75,11 +72,11 @@ abstract class BaseDynamicEnumPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Value' => 1, 'EnumName' => 2, 'ValueName' => 3, 'PluginName' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'value' => 1, 'enumName' => 2, 'valueName' => 3, 'pluginName' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::VALUE => 1, self::ENUM_NAME => 2, self::VALUE_NAME => 3, self::PLUGIN_NAME => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'value' => 1, 'enum_name' => 2, 'value_name' => 3, 'plugin_name' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'EnumName' => 1, 'ValueName' => 2, 'PluginName' => 3, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'enumName' => 1, 'valueName' => 2, 'pluginName' => 3, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::ENUM_NAME => 1, self::VALUE_NAME => 2, self::PLUGIN_NAME => 3, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'enum_name' => 1, 'value_name' => 2, 'plugin_name' => 3, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
 	);
 
 	/**
@@ -150,7 +147,6 @@ abstract class BaseDynamicEnumPeer {
 	public static function addSelectColumns(Criteria $criteria)
 	{
 		$criteria->addSelectColumn(DynamicEnumPeer::ID);
-		$criteria->addSelectColumn(DynamicEnumPeer::VALUE);
 		$criteria->addSelectColumn(DynamicEnumPeer::ENUM_NAME);
 		$criteria->addSelectColumn(DynamicEnumPeer::VALUE_NAME);
 		$criteria->addSelectColumn(DynamicEnumPeer::PLUGIN_NAME);

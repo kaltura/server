@@ -22,18 +22,18 @@ abstract class KalturaPluginEnum implements IKalturaPluginEnum
 			$dynamicEnum->save();
 		}
 		
-		return $dynamicEnum->getValue();
+		return $dynamicEnum->getId();
 	}
 
 	/**
-	 * @param int $value
+	 * @param int $id
 	 * @return string
 	 */
-	public function coreToApi($value)
+	public function coreToApi($id)
 	{
 		$enumName = $this->getEnumClass();
 		$pluginName = $this->getPluginName();
-		$dynamicEnum = DynamicEnumPeer::retrieveByPluginValue($enumName, $value, $pluginName);
+		$dynamicEnum = DynamicEnumPeer::retrieveByPluginValue($enumName, $id, $pluginName);
 		if($dynamicEnum)
 			return $this->apiValue($dynamicEnum->getValueName());
 			

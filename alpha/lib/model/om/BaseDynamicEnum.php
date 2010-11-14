@@ -25,12 +25,6 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the value field.
-	 * @var        int
-	 */
-	protected $value;
-
-	/**
 	 * The value for the enum_name field.
 	 * @var        string
 	 */
@@ -87,16 +81,6 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [value] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
 	 * Get the [enum_name] column value.
 	 * 
 	 * @return     string
@@ -148,29 +132,6 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setId()
-
-	/**
-	 * Set the value of [value] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     DynamicEnum The current object (for fluent API support)
-	 */
-	public function setValue($v)
-	{
-		if(!isset($this->oldColumnsValues[DynamicEnumPeer::VALUE]))
-			$this->oldColumnsValues[DynamicEnumPeer::VALUE] = $this->value;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->value !== $v) {
-			$this->value = $v;
-			$this->modifiedColumns[] = DynamicEnumPeer::VALUE;
-		}
-
-		return $this;
-	} // setValue()
 
 	/**
 	 * Set the value of [enum_name] column.
@@ -274,10 +235,9 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->value = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-			$this->enum_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->value_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->plugin_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->enum_name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->value_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->plugin_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -287,7 +247,7 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 5; // 5 = DynamicEnumPeer::NUM_COLUMNS - DynamicEnumPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 4; // 4 = DynamicEnumPeer::NUM_COLUMNS - DynamicEnumPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DynamicEnum object", $e);
@@ -646,15 +606,12 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getValue();
-				break;
-			case 2:
 				return $this->getEnumName();
 				break;
-			case 3:
+			case 2:
 				return $this->getValueName();
 				break;
-			case 4:
+			case 3:
 				return $this->getPluginName();
 				break;
 			default:
@@ -679,10 +636,9 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 		$keys = DynamicEnumPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getValue(),
-			$keys[2] => $this->getEnumName(),
-			$keys[3] => $this->getValueName(),
-			$keys[4] => $this->getPluginName(),
+			$keys[1] => $this->getEnumName(),
+			$keys[2] => $this->getValueName(),
+			$keys[3] => $this->getPluginName(),
 		);
 		return $result;
 	}
@@ -718,15 +674,12 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setValue($value);
-				break;
-			case 2:
 				$this->setEnumName($value);
 				break;
-			case 3:
+			case 2:
 				$this->setValueName($value);
 				break;
-			case 4:
+			case 3:
 				$this->setPluginName($value);
 				break;
 		} // switch()
@@ -754,10 +707,9 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 		$keys = DynamicEnumPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setValue($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setEnumName($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setValueName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setPluginName($arr[$keys[4]]);
+		if (array_key_exists($keys[1], $arr)) $this->setEnumName($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setValueName($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setPluginName($arr[$keys[3]]);
 	}
 
 	/**
@@ -770,7 +722,6 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 		$criteria = new Criteria(DynamicEnumPeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(DynamicEnumPeer::ID)) $criteria->add(DynamicEnumPeer::ID, $this->id);
-		if ($this->isColumnModified(DynamicEnumPeer::VALUE)) $criteria->add(DynamicEnumPeer::VALUE, $this->value);
 		if ($this->isColumnModified(DynamicEnumPeer::ENUM_NAME)) $criteria->add(DynamicEnumPeer::ENUM_NAME, $this->enum_name);
 		if ($this->isColumnModified(DynamicEnumPeer::VALUE_NAME)) $criteria->add(DynamicEnumPeer::VALUE_NAME, $this->value_name);
 		if ($this->isColumnModified(DynamicEnumPeer::PLUGIN_NAME)) $criteria->add(DynamicEnumPeer::PLUGIN_NAME, $this->plugin_name);
@@ -838,8 +789,6 @@ abstract class BaseDynamicEnum extends BaseObject  implements Persistent {
 		$copyObj->setNew(true);
 
 		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
-
-		$copyObj->setValue(NULL); // this is a auto-increment column, so set to default value
 
 	}
 

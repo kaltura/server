@@ -37,7 +37,6 @@ class DynamicEnumTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addColumn('VALUE', 'Value', 'INTEGER', true, null, null);
 		$this->addColumn('ENUM_NAME', 'EnumName', 'VARCHAR', true, 255, null);
 		$this->addColumn('VALUE_NAME', 'ValueName', 'VARCHAR', true, 255, null);
 		$this->addColumn('PLUGIN_NAME', 'PluginName', 'VARCHAR', false, 255, null);

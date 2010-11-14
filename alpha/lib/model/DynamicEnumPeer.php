@@ -48,16 +48,16 @@ class DynamicEnumPeer extends BaseDynamicEnumPeer {
 	 * Retrieve a single object by its value.
 	 *
 	 * @param      string $enumName the name of the enum class
-	 * @param      int $value the name of the constant
+	 * @param      int $id the id of the constant
 	 * @param      string $pluginName the name of the plugin
 	 * @param      PropelPDO $con the connection to use
 	 * @return     DynamicEnum
 	 */
-	public static function retrieveByPluginValue($enumName, $value, $pluginName, $con = null)
+	public static function retrieveByPluginValue($enumName, $id, $pluginName, $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(DynamicEnumPeer::ENUM_NAME, $enumName);
-		$criteria->add(DynamicEnumPeer::VALUE, $value);
+		$criteria->add(DynamicEnumPeer::ID, $id);
 		$criteria->add(DynamicEnumPeer::PLUGIN_NAME, $pluginName);
 
 		return DynamicEnumPeer::doSelectOne($criteria, $con);

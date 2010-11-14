@@ -1798,55 +1798,6 @@ CREATE TABLE `upload_token`
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------
-#-- sphinx_log
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `sphinx_log`;
-
-
-CREATE TABLE `sphinx_log`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`entry_id` VARCHAR(20),
-	`partner_id` INTEGER default 0,
-	`dc` INTEGER,
-	`sql` LONGTEXT,
-	`created_at` DATETIME,
-	PRIMARY KEY (`id`),
-	KEY `entry_id`(`entry_id`),
-	KEY `creatd_at`(`created_at`),
-	INDEX `sphinx_log_FI_1` (`partner_id`),
-	CONSTRAINT `sphinx_log_FK_1`
-		FOREIGN KEY (`partner_id`)
-		REFERENCES `partner` (`id`),
-	CONSTRAINT `sphinx_log_FK_2`
-		FOREIGN KEY (`entry_id`)
-		REFERENCES `entry` (`id`)
-)Type=MyISAM;
-
-#-----------------------------------------------------------------------------
-#-- sphinx_log_server
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `sphinx_log_server`;
-
-
-CREATE TABLE `sphinx_log_server`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`server` VARCHAR(63),
-	`dc` INTEGER,
-	`last_log_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	PRIMARY KEY (`id`),
-	INDEX `sphinx_log_server_FI_1` (`last_log_id`),
-	CONSTRAINT `sphinx_log_server_FK_1`
-		FOREIGN KEY (`last_log_id`)
-		REFERENCES `sphinx_log` (`id`)
-)Type=MyISAM;
-
-#-----------------------------------------------------------------------------
 #-- invalid_session
 #-----------------------------------------------------------------------------
 
@@ -1856,11 +1807,27 @@ DROP TABLE IF EXISTS `invalid_session`;
 CREATE TABLE `invalid_session`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`ks` VARCHAR(40),
+	`ks` VARCHAR(300),
 	`ks_valid_until` DATETIME,
 	`created_at` DATETIME,
 	PRIMARY KEY (`id`),
 	KEY `ks_index`(`ks`)
+)Type=MyISAM;
+
+#-----------------------------------------------------------------------------
+#-- dynamic_enum
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dynamic_enum`;
+
+
+CREATE TABLE `dynamic_enum`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`enum_name` VARCHAR(255)  NOT NULL,
+	`value_name` VARCHAR(255)  NOT NULL,
+	`plugin_name` VARCHAR(255),
+	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier
