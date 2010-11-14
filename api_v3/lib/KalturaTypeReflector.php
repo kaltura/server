@@ -49,6 +49,11 @@ class KalturaTypeReflector
 	/**
 	 * @var bool
 	 */
+	private $_isDynamicEnum;
+	
+	/**
+	 * @var bool
+	 */
 	private $_isArray;
 	
 	/**
@@ -78,7 +83,6 @@ class KalturaTypeReflector
 			throw new KalturaReflectionException("Type \"".$type."\" not found");
 			
 		$this->_type = $type;
-		$this->_instance = new $type;
 		
 	    $reflectClass = new ReflectionClass($this->_type);
 	    $comments = $reflectClass->getDocComment();
@@ -88,6 +92,9 @@ class KalturaTypeReflector
 	    	$this->_deprecated = $commentsParser->deprecated;
 	    	$this->_abstract = $commentsParser->abstract;
 	    }
+	    
+	    if(!$reflectClass->isAbstract())
+			$this->_instance = new $type;
 	}
 	
 	/**
@@ -309,7 +316,7 @@ class KalturaTypeReflector
 	}
 	
 	/**
-	 * Returns true when the type is (for what we know) an enum
+	 * Returns true when the type is a string enum
 	 *
 	 * @return boolean
 	 */
@@ -324,6 +331,24 @@ class KalturaTypeReflector
 		}
 			
 		return $this->_isStringEnum; 
+	}
+	
+	/**
+	 * Returns true when the type is a dynamic enum
+	 *
+	 * @return boolean
+	 */
+	public function isDynamicEnum()
+	{
+		if ($this->_isDynamicEnum === null)
+		{
+			if ($this->_instance instanceof KalturaDynamicEnum)
+				$this->_isDynamicEnum = true;
+			else
+				$this->_isDynamicEnum = false;
+		}
+			
+		return $this->_isDynamicEnum; 
 	}
 	
 	
@@ -447,7 +472,7 @@ class KalturaTypeReflector
 		if ($this->_constants === null)
 			$this->getConstants();
 			
-		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_isEnum", "_isStringEnum", "_isArray", "_description");
+		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_isEnum", "_isStringEnum", "_isDynamicEnum", "_isArray", "_description");
 	}
 
 

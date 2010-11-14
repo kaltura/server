@@ -106,6 +106,15 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	public function isDynamicEnum()
+	{
+		$this->getTypeReflector();
+		if ($this->_typeReflector)
+			return $this->_typeReflector->isDynamicEnum();
+		else
+			return false;
+	}
+	
 	public function isArray()
 	{
 		$this->getTypeReflector();
