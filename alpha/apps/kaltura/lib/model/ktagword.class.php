@@ -214,7 +214,7 @@ class ktagword {
 			// the partner id is implicitly set - but can do it explicitly too
 			$c->addAnd ( entryPeer::PARTNER_ID , $partner_id );
 			// TODO - should add only ready entries ??
-			$c->addAnd ( entryPeer::STATUS, entry::ENTRY_STATUS_READY ); 
+			$c->addAnd ( entryPeer::STATUS, entryStatus::READY ); 
 			$c->addSelectColumn( entryPeer::ADMIN_TAGS );
 			// TODO - should we group by ? - if so - need to add index in DB 
 //			$c->addGroupByColumn( entryPeer::ADMIN_TAGS );

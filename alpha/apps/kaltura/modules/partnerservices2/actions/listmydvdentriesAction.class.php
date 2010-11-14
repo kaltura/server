@@ -38,7 +38,7 @@ class listmydvdentriesAction extends listmyentriesAction
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
 		$fields_set->set( "_eq_user_id" , $this->puser_id );
-		$fields_set->set( "_eq_type" , entry::ENTRY_TYPE_DVD );
+		$fields_set->set( "_eq_type" , entryType::DVD );
 	}
 	
 	protected function getObjectPrefix () { return "dvdEntries"; }

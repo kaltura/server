@@ -217,17 +217,17 @@ class kmc3Action extends kalturaAction
 		/** appstudio: default entry and playlists **/
 		$this->appStudioExampleEntry = $partner->getAppStudioExampleEntry();
 		$appStudioExampleEntry = entryPeer::retrieveByPK($this->appStudioExampleEntry);
-		if (!($appStudioExampleEntry && $appStudioExampleEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK && $appStudioExampleEntry->getStatus()== entry::ENTRY_STATUS_READY &&	$appStudioExampleEntry->getType() == entry::ENTRY_TYPE_MEDIACLIP ))
+		if (!($appStudioExampleEntry && $appStudioExampleEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK && $appStudioExampleEntry->getStatus()== entryStatus::READY &&	$appStudioExampleEntry->getType() == entryType::MEDIA_CLIP ))
 			$this->appStudioExampleEntry = "_KMCLOGO1";
 		
 		$this->appStudioExamplePlayList0 = $partner->getAppStudioExamplePlayList0();
 		$appStudioExamplePlayList0 = entryPeer::retrieveByPK($this->appStudioExamplePlayList0);		
-		if (!($appStudioExamplePlayList0 && $appStudioExamplePlayList0->getStatus()== entry::ENTRY_STATUS_READY && $appStudioExamplePlayList0->getType() == entry::ENTRY_TYPE_PLAYLIST ))
+		if (!($appStudioExamplePlayList0 && $appStudioExamplePlayList0->getStatus()== entryStatus::READY && $appStudioExamplePlayList0->getType() == entryType::PLAYLIST ))
 			$this->appStudioExamplePlayList0 = "_KMCSPL1";
 		
 		$this->appStudioExamplePlayList1 = $partner->getAppStudioExamplePlayList1();
 		$appStudioExamplePlayList1 = entryPeer::retrieveByPK($this->appStudioExamplePlayList1);
-		if (!($appStudioExamplePlayList1 && $appStudioExamplePlayList1->getStatus()== entry::ENTRY_STATUS_READY && $appStudioExamplePlayList1->getType() == entry::ENTRY_TYPE_PLAYLIST ))
+		if (!($appStudioExamplePlayList1 && $appStudioExamplePlayList1->getStatus()== entryStatus::READY && $appStudioExamplePlayList1->getType() == entryType::PLAYLIST ))
 			$this->appStudioExamplePlayList1 = "_KMCSPL2";
 		/** END - appstudio: default entry and playlists **/
 		

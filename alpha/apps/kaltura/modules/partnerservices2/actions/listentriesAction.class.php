@@ -77,7 +77,7 @@ class listentriesAction extends defPartnerservices2Action
 		$display_deleted = $this->getP ( "display_deleted" , false ); 	
 		if ( $display_deleted == "false" ) $display_deleted = false;	
 		
-		$pos = strpos ( $desired_status , entry::ENTRY_STATUS_DELETED );
+		$pos = strpos ( $desired_status , entryStatus::DELETED );
 		if ( $display_deleted || $pos !== false   )
 		{
 			entryPeer::allowDeletedInCriteriaFilter();	 
@@ -178,15 +178,15 @@ class listentriesAction extends defPartnerservices2Action
 			$statuses[] = $filter->get ( "_eq_status" );
 		
 		// we are fixing the old moderate status 
-		if (in_array((string)entry::ENTRY_STATUS_MODERATE, $statuses))
+		if (in_array((string)entryStatus::MODERATE, $statuses))
 		{
 			$filter->set("_eq_status", ""); 
 			$filter->set("_in_status", "");
 			
-			$i = array_search((string)entry::ENTRY_STATUS_MODERATE, $statuses);
+			$i = array_search((string)entryStatus::MODERATE, $statuses);
 			unset($statuses[$i]); // remove the moderate status
 			
-			$statuses[] = (string)entry::ENTRY_STATUS_READY; // add the ready status
+			$statuses[] = (string)entryStatus::READY; // add the ready status
 			
 			$filter->set("_in_status", implode(",", $statuses)); // set back to the filter
 			

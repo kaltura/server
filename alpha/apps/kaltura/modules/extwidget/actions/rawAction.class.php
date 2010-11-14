@@ -39,7 +39,7 @@ class rawAction extends sfAction
 
 //		Rmoved by Tan-Tan - asked by Eran
 //		// allow access only via cdn unless these are documents (due to the current implementation of convert ppt2swf)
-//		if ($entry->getType() != entry::ENTRY_TYPE_DOCUMENT && $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+//		if ($entry->getType() != entryType::DOCUMENT && $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
 //		{
 //			requestUtils::enforceCdnDelivery($entry->getPartnerId());
 //		}
@@ -77,7 +77,7 @@ class rawAction extends sfAction
 		}
 		$format = $this->getRequestParameter( "format" );
 		
-		if ( $type == "download" && $format && $entry->getType() != entry::ENTRY_TYPE_DOCUMENT) // mediaType is not relevant when requesting download with format
+		if ( $type == "download" && $format && $entry->getType() != entryType::DOCUMENT) // mediaType is not relevant when requesting download with format
 		{
 			// this is a video for a specifc extension - use the proper flavorAsset
 			$flavor_asset = flavorAssetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
@@ -99,7 +99,7 @@ class rawAction extends sfAction
 		}
 		
 		// TODO - move to a different action - document should be plugin
-		if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+		if ($entry->getType() == entryType::DOCUMENT)
 		{
 			// use the fileSync from the entry
 			if($type == "download" && $format)

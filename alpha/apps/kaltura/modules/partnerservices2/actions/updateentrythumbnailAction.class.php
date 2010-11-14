@@ -66,7 +66,7 @@ class updateentrythumbnailAction extends defPartnerservices2Action
 			return;
 		}
 		
-		if ($entry->getType() == entry::ENTRY_TYPE_SHOW)
+		if ($entry->getType() == entryType::MIX)
 		{
 /*			
 			$roughcutPath = myContentStorage::getFSContentRootPath() . $entry->getDataPath(); // replaced__getDataPath

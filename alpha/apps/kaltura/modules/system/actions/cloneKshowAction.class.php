@@ -51,8 +51,8 @@ class cloneKshowAction extends kalturaSystemAction
 			
 			$c = new Criteria();
 			$c->add ( entryPeer::KSHOW_ID , $source_kshow_id );
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
-			$c->add ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
+			$c->add ( entryPeer::STATUS , entryStatus::READY );
 			$entries = entryPeer::doSelectJoinAll( $c );
 			
 			$entry_kusers = array();

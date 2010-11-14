@@ -213,7 +213,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
             $entry_source = $entry->getSource() ;
             
             if (!$entry->getType()) // this is the default for backward compatiblity
-	            $entry->setType(entry::ENTRY_TYPE_MEDIACLIP);
+	            $entry->setType(entryType::MEDIA_CLIP);
 	            
 			$token = $this->getKsUniqueString();
             
@@ -236,7 +236,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
 //            Remarked by Tan-Tan
 //            
 //            // when we reached this point the type and media type must be set
-//            if ($entry->getType() == entry::ENTRY_TYPE_AUTOMATIC || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
+//            if ($entry->getType() == entryType::AUTOMATIC || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
 //            {
 //				sfLogger::getInstance()->err ( "unknown TYPE [".$entry->getType()."] or MEDIA_TYPE [".$entry->getMediaType()."] for file [$entry_full_path]");
 //				$this->addError ( APIErrors::CANNOT_USE_ENTRY_TYPE_AUTO_IN_IMPORT );
@@ -400,7 +400,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
                     if ( myEntryUtils::copyData( $source_entry_id , $entry ) )
                     {
                         // copy worked ok - no need to use insertEntryHelper
-                        //$entry->setStatus ( entry::ENTRY_STATUS_READY );
+                        //$entry->setStatus ( entryStatus::READY );
                         // force the data to be ready even if the policy is to moderate - this is kaltura's content and was already approved
                         // (roman) true argument removed, so kaltura's content will be moderated according to partner's moderation settings
                         $entry->setStatusReady ();

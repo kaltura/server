@@ -66,7 +66,7 @@ class redirectWidgetCmdAction extends kalturaAction
 				}
 				else if ($cmd == "edit")
 				{
-					if ($entry->getType() != entry::ENTRY_TYPE_SHOW)
+					if ($entry->getType() != entryType::MIX)
 					{
 						$kshow = kshowPeer::retrieveByPK($kshow_id);
 						if (!$kshow)

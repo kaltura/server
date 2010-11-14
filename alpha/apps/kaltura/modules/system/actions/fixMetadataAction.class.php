@@ -62,7 +62,7 @@ class fixMetadataAction extends kalturaSystemAction
 
 			foreach ( $entries as $entry )
 			{
-				if ( $entry->getType() != entry::ENTRY_TYPE_SHOW )
+				if ( $entry->getType() != entryType::MIX )
 				{
 					continue;
 				}
@@ -77,7 +77,7 @@ class fixMetadataAction extends kalturaSystemAction
 		{
 			$fix_data = new fixData();
 			$fix_data->show_entry = $show_entry;
-			if ( $show_entry->getType() != entry::ENTRY_TYPE_SHOW )
+			if ( $show_entry->getType() != entryType::MIX )
 			{
 				$fix_data->error = "Entry is not a roughcut";
 			}

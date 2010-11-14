@@ -35,7 +35,7 @@ class adddvdentryAction extends defPartnerservices2Action
 
 	protected function getTypeAndMediaType ( $entry ) 
 	{
-		$entry->setType ( entry::ENTRY_TYPE_DVD );
+		$entry->setType ( entryType::DVD );
 //		$entry->setMediaType( entry::ENTRY_MEDIA_TYPE_DVD_PROJECT );		 
 	} 
 	
@@ -85,7 +85,7 @@ class adddvdentryAction extends defPartnerservices2Action
 			// force the type and media type
 			// TODO - set the kshow to some default kshow of the partner - maybe extract it from the custom_data of this specific partner
 			$dvd_entry->setKshowId ( $kshow_id );
-			$dvd_entry->setStatus( entry::ENTRY_STATUS_READY );
+			$dvd_entry->setStatus( entryStatus::READY );
 			$dvd_entry->setPartnerId( $partner_id );
 			$dvd_entry->setSubpId( $subp_id );
 			$dvd_entry->setKuserId($puser_kuser->getKuserId() );

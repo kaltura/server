@@ -251,7 +251,7 @@ class kConversionClient extends kConversionClientBase
 		else
 		{
 			TRACE ( "Problem converting file [$file_before_conversion]" );
-			$entry->setStatus ( entry::ENTRY_STATUS_ERROR_CONVERTING );
+			$entry->setStatus ( entryStatus::ERROR_CONVERTING );
 		}	
 
 		$this->updateConversionInDb( $entry , $conv_res );

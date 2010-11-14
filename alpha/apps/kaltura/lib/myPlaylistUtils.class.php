@@ -117,7 +117,7 @@ class myPlaylistUtils
 			throw new Exception( "Invalid entry id [$playlist_id]" ) ; 
 		}
 		
-		if ( $playlist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
 			throw new Exception( "Invalid entry id [$playlist_id]" ) ;
 		}
@@ -171,7 +171,7 @@ class myPlaylistUtils
 			throw new Exception( "Invalid entry id [$playlist_id]" ) ; 
 		}
 		
-		if ( $playlist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
 			throw new Exception( "Invalid entry id [$playlist_id]" ) ;
 		}
@@ -260,8 +260,8 @@ class myPlaylistUtils
 			}
 			
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entry::ENTRY_TYPE_MEDIACLIP , entry::ENTRY_TYPE_SHOW ) , Criteria::IN ); // search only for clips or roughcuts
-			$c->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY ); // search only for READY entries 
+			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX ) , Criteria::IN ); // search only for clips or roughcuts
+			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 
 			if ( $display_in_search >= 2 )
 			{
@@ -294,7 +294,7 @@ class myPlaylistUtils
 			{
 				// allow only ready entries
 				$current_entry = @$id_list[$entry_id];
-				if ( $current_entry && $current_entry->getStatus() == entry::ENTRY_STATUS_READY )
+				if ( $current_entry && $current_entry->getStatus() == entryStatus::READY )
 				{
 					// add to the entry_list only when the entry_id is not empty 
 					$entry_list[] = $current_entry;
@@ -443,8 +443,8 @@ class myPlaylistUtils
 			}
 			
 			// add some hard-coded criteria
-			$c->addAnd ( entryPeer::TYPE , array ( entry::ENTRY_TYPE_MEDIACLIP , entry::ENTRY_TYPE_SHOW , entry::ENTRY_TYPE_LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
-			$c->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY ); // search only for READY entries 
+			$c->addAnd ( entryPeer::TYPE , array ( entryType::MEDIA_CLIP , entryType::MIX , entryType::LIVE_STREAM ) , Criteria::IN ); // search only for clips or roughcuts
+			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
 
 			if ( $display_in_search >= 2 )
 			{

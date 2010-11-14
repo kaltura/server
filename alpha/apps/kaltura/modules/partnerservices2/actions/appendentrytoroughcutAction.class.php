@@ -42,7 +42,7 @@ class appendentrytoroughcutAction extends defPartnerservices2Action
 		
 		// Make sure the request is for a ready roughcut
 		$c = entryPeer::getCriteriaFilter()->getFilter();
-		$c->addAnd ( entryPeer::STATUS, entry::ENTRY_STATUS_READY , Criteria::EQUAL);
+		$c->addAnd ( entryPeer::STATUS, entryStatus::READY , Criteria::EQUAL);
 				
 		list ( $kshow , $show_entry , $error , $error_obj ) = myKshowUtils::getKshowAndEntry( $kshow_id  , $show_entry_id );
 

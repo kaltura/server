@@ -82,7 +82,7 @@ class myKalturaServices extends myBaseMediaSource implements IMediaSource
 		$criteria->remove (entryPeer::PARTNER_ID  );
 		
 		// filter: allow only entries of status READY !
-		$criteria->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
+		$criteria->addAnd ( entryPeer::STATUS , entryStatus::READY );
 		
 		
 		$act = new AJAX_getEntriesAction();

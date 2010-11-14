@@ -5,7 +5,7 @@ class assetsUtils
 	{
 		foreach ( $list as $entry )
 		{
-			$is_ready = $entry->getStatus() == entry::ENTRY_STATUS_READY;
+			$is_ready = $entry->getStatus() == entryStatus::READY;
 			$data = $entry->getDataPath();
 
 			// this should not happen !

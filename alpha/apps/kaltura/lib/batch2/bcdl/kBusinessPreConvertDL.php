@@ -430,7 +430,7 @@ class kBusinessPreConvertDL
 		{
 			$errDescription = "Conversion profile for entryId [$entryId] not found";
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			KalturaLog::err("No flavors created: $errDescription");
 			return false;
 		}
@@ -441,7 +441,7 @@ class kBusinessPreConvertDL
 			$errDescription = 'Original flavor asset not found';
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		
@@ -454,7 +454,7 @@ class kBusinessPreConvertDL
 			$errDescription = "No flavors match the profile id [{$profile->getId()}]";
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->setDeletedAt(time());
@@ -566,7 +566,7 @@ class kBusinessPreConvertDL
 						$errDescription = "Source flavor could not be converted";
 						KalturaLog::err($errDescription);
 						$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-						kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+						kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 						
 						return false;
 					}
@@ -631,7 +631,7 @@ class kBusinessPreConvertDL
 		{
 			$errDescription = "Conversion profile for entryId [$entryId] not found";
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			KalturaLog::err("No flavors created: $errDescription");
 			throw new Exception($errDescription);
 		}
@@ -642,7 +642,7 @@ class kBusinessPreConvertDL
 			$errDescription = 'Original flavor asset not found';
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			throw new Exception($errDescription);
 		}
 		
@@ -653,7 +653,7 @@ class kBusinessPreConvertDL
 			$errDescription = "No flavors match the profile id [{$profile->getId()}]";
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			
 			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->setDeletedAt(time());
@@ -711,7 +711,7 @@ class kBusinessPreConvertDL
 			$errDescription = 'Original flavor asset not found';
 			KalturaLog::err($errDescription);
 			$convertProfileJob = kJobsManager::failBatchJob($convertProfileJob, $errDescription, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
-			kBatchManager::updateEntry($convertProfileJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($convertProfileJob, entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		

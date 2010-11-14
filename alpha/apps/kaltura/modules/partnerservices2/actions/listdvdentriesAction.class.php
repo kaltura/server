@@ -45,7 +45,7 @@ class listdvdentriesAction extends listentriesAction
 	// kshows for the current user only 
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
-		$fields_set->set( "_eq_type" , entry::ENTRY_TYPE_DVD );
+		$fields_set->set( "_eq_type" , entryType::DVD );
 		$this->setP ( "use_filter_puser_id" , "false" ); // don't mind filtering according to the puser/kuser
 	}
 	

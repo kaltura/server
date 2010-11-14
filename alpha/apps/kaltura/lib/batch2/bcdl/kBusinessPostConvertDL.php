@@ -188,7 +188,7 @@ class kBusinessPostConvertDL
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
-			kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_READY);
+			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		}
 		
 		// no need to finished the root job
@@ -325,7 +325,7 @@ class kBusinessPostConvertDL
 		if(is_null($flavorParamsOutputId))
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Job " . $dbBatchJob->getId() . " failed");
-			kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		
@@ -333,7 +333,7 @@ class kBusinessPostConvertDL
 		if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Job " . $dbBatchJob->getId() . " failed");
-			kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		
@@ -361,7 +361,7 @@ class kBusinessPostConvertDL
 				
 		// all conversions failed, should fail the root job
 		kJobsManager::failBatchJob($rootBatchJob, "All conversions failed");
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 		return false;
 	}
 	

@@ -62,7 +62,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 	
 	protected function updatedImportFailed(BatchJob $dbBatchJob, kImportJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_IMPORTING);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_IMPORTING);
 		return $dbBatchJob;
 	}
 	

@@ -634,7 +634,7 @@ class kJobsManager
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (filesize($inputFileSyncLocalPath) == 0)
 		{
-			$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
 			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
@@ -646,14 +646,14 @@ class kJobsManager
 		
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
-			$entry->setStatus(entry::ENTRY_STATUS_PENDING);
+			$entry->setStatus(entryStatus::PENDING);
 			$entry->save();
 			
 			KalturaLog::notice('Entry should not be converted');
 			return null;
 		}
 		
-		$entry->setStatus(entry::ENTRY_STATUS_PRECONVERT);
+		$entry->setStatus(entryStatus::PRECONVERT);
 		$entry->save();
 	
 		$jobData = new kConvertProfileJobData();
@@ -661,7 +661,7 @@ class kJobsManager
 		$jobData->setInputFileSyncLocalPath($inputFileSyncLocalPath);
 		$jobData->setExtractMedia(true);
 		
-		if($entry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if($entry->getType() != entryType::MEDIA_CLIP)
 		{
 			$jobData->setExtractMedia(false);
 			$jobData->setCreateThumb(false);

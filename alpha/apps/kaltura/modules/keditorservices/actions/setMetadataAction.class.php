@@ -101,7 +101,7 @@ class setMetadataAction extends defKeditorservicesAction
 			$c->add(entryPeer::KSHOW_ID, $kshow_id);
 			$c->add(entryPeer::KUSER_ID, $likuser_id, Criteria::NOT_EQUAL ); // the current user knows they just edited
 			$c->addAnd(entryPeer::KUSER_ID, $kshow->getProducerId(), Criteria::NOT_EQUAL ); // the producer knows they just edited
-			$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+			$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 			$c->addGroupByColumn(entryPeer::KUSER_ID);
 			$entries = entryPeer::doSelect( $c );
 			$already_received_alert_array = array();

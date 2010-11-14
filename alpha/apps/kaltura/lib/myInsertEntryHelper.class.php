@@ -97,7 +97,7 @@ class myInsertEntryHelper
 		
 		$entry_status = $entry->getStatus();
 		if(is_null($entry_status))
-			$entry_status = entry::ENTRY_STATUS_READY;
+			$entry_status = entryStatus::READY;
 		
 		// by the end of this block of code $entry_fullPath will point to the location of the entry
 		// the entry status will be set (IMPORT / PRECONVERT / READY)
@@ -122,7 +122,7 @@ class myInsertEntryHelper
 			
 			if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO) // video and audio require conversion
 			{
-				$entry_status = entry::ENTRY_STATUS_PRECONVERT;
+				$entry_status = entryStatus::PRECONVERT;
 			}
 		
 			$te->setParam3Str( $entry_fullPath );
@@ -137,7 +137,7 @@ class myInsertEntryHelper
 			$entry_fullPath = $webcam_basePath.'.flv';
 			
 			// webcam should be preconvert until REALLY ready
-			$entry_status = entry::ENTRY_STATUS_READY;
+			$entry_status = entryStatus::READY;
 			$ext = "flv";
 			
 			//echo "myInsertEtryHelper:: [$entry_fullPath]";
@@ -186,7 +186,7 @@ class myInsertEntryHelper
 					if (!kFile::downloadUrlToFile($entry_url, $entry_fullPath))
 					{
 						KalturaLog::debug("Failed downloading file[$entry_url]");
-						$entry_status = entry::ENTRY_STATUS_ERROR_IMPORTING;
+						$entry_status = entryStatus::ERROR_IMPORTING;
 					}
 				}
 				
@@ -202,7 +202,7 @@ class myInsertEntryHelper
 				else
 					$ext = "mp3";
 					
- 				$entry_status = entry::ENTRY_STATUS_IMPORT;
+ 				$entry_status = entryStatus::IMPORT;
  				
 				// track images 
 				$te->setParam3Str( $ext );
@@ -223,7 +223,7 @@ class myInsertEntryHelper
 //		We don't want to reject entries based on file extentions anumore
 //		Remarked by Tan-Tan
 //
-//		if ($entry_status == entry::ENTRY_STATUS_PRECONVERT && !myContentStorage::fileExtNeedConversion($ext))
+//		if ($entry_status == entryStatus::PRECONVERT && !myContentStorage::fileExtNeedConversion($ext))
 //		{
 //			
 //			$this->errorMsg = "insertEntryAction Error - PRECONVERT file type not acceptable ($ext)";
@@ -234,7 +234,7 @@ class myInsertEntryHelper
 //			}
 //			if($entry)
 //			{
-//				$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+//				$entry->setStatus(entryStatus::ERROR_CONVERTING);
 //				$entry->save();
 //			}
 //			return false;
@@ -246,7 +246,7 @@ class myInsertEntryHelper
 //		Remarked by Tan-Tan
 //
 //		// if entry is ready, validate file type (webcam is an exception since we control the file type - flv)
-//		if ($entry_status == entry::ENTRY_STATUS_READY &&
+//		if ($entry_status == entryStatus::READY &&
 //			$media_source != entry::ENTRY_MEDIA_SOURCE_WEBCAM && !myContentStorage::fileExtAccepted($ext))
 //		{
 //			$this->errorMsg = "insertEntryAction Error - READY file type not acceptable ($ext)";
@@ -257,13 +257,13 @@ class myInsertEntryHelper
 //			}
 //			if($entry)
 //			{
-//				$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+//				$entry->setStatus(entryStatus::ERROR_CONVERTING);
 //				$entry->save();
 //			}
 //			return false;
 //		}
 		
-		if ($entry_status == entry::ENTRY_STATUS_ERROR_IMPORTING)
+		if ($entry_status == entryStatus::ERROR_IMPORTING)
 		{
 			$need_thumb = false; // we wont be needing a thumb for an errornous entry
 			KalturaLog::debug("handleEntry: error importing, thumb not needed");
@@ -280,7 +280,7 @@ class myInsertEntryHelper
 			$thumbTempPrefix = $uploads.$entry_data_prefix.'_thumbnail_';
 			$thumbBigFullPath = null;
 			
-			$need_thumb = ($type == entry::ENTRY_TYPE_MEDIACLIP);
+			$need_thumb = ($type == entryType::MEDIA_CLIP);
 			KalturaLog::debug("handleEntry: handling media $media_type");
 			if ($media_type == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			{
@@ -313,7 +313,7 @@ class myInsertEntryHelper
 			}
 			else if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO)
 			{
-				if ($entry_status == entry::ENTRY_STATUS_IMPORT || $media_source == entry::ENTRY_MEDIA_SOURCE_URL)
+				if ($entry_status == entryStatus::IMPORT || $media_source == entry::ENTRY_MEDIA_SOURCE_URL)
 				{
 					// import thumb and convert to our size
 					$thumbFullPath = $thumbTempPrefix.'1.jpg';
@@ -421,7 +421,7 @@ class myInsertEntryHelper
 					}
 				}
 				catch (Exception $e) {
-					$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+					$entry->setStatus(entryStatus::ERROR_CONVERTING);
 					$entry->save();											
 					throw $e;
 				}
@@ -432,7 +432,7 @@ class myInsertEntryHelper
 		
 		KalturaLog::debug("handleEntry: current status [" . $entry->getStatus() . "]");
 		// if needed a job will be submitted for importing external media sources
-		if ($entry->getStatus() == entry::ENTRY_STATUS_IMPORT)
+		if ($entry->getStatus() == entryStatus::IMPORT)
  		{
  			KalturaLog::debug("handleEntry: creating import job");
  			// changed by Tan-Tan, Nov 09 to support the new batch mechanism
@@ -446,7 +446,7 @@ class myInsertEntryHelper
 //			$batchClient = new myBatchUrlImportClient();
 // 			$batchClient->addJob($this->entry_id, $entry_url, $entry_fullPath);
  		}
-		else if ($entry->getStatus() == entry::ENTRY_STATUS_PRECONVERT )
+		else if ($entry->getStatus() == entryStatus::PRECONVERT )
 		{
 			if ( ! $skip_conversion )
 			{
@@ -465,7 +465,7 @@ class myInsertEntryHelper
 						kFileSyncUtils::moveFromFile($entry_fullPath, $syncKey);
 					}
 					catch (Exception $e) {
-						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
 						$flavorAsset->save();												
@@ -476,7 +476,7 @@ class myInsertEntryHelper
 				}
 				else
 				{
-					$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+					$entry->setStatus(entryStatus::ERROR_CONVERTING);
 				}
 	 			
 //				Remarked by Tan-Tan
@@ -501,7 +501,7 @@ class myInsertEntryHelper
 //				}
 			}
 		}
-		else if ($entry->getStatus() == entry::ENTRY_STATUS_READY)
+		else if ($entry->getStatus() == entryStatus::READY)
 		{
 			$entry->setData($entry_fullPath);
 			$entry->save();
@@ -529,7 +529,7 @@ class myInsertEntryHelper
 						}
 					}
 					catch (Exception $e) {
-						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
 						$flavorAsset->save();												
@@ -570,10 +570,10 @@ class myInsertEntryHelper
 				}
 				else
 				{
-					$entry->setStatus(entry::ENTRY_STATUS_ERROR_IMPORTING);
+					$entry->setStatus(entryStatus::ERROR_IMPORTING);
 				}
 			}
-			else if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+			else if ($entry->getType() == entryType::DOCUMENT)
 			{
 				 //TODO: document should be handled by the plugin manager)
 				KalturaLog::debug("handleEntry: creating original flavor asset for ready entry");
@@ -597,7 +597,7 @@ class myInsertEntryHelper
 						}
 					}
 					catch (Exception $e) {
-						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 						$entry->save();
 						$flavorAsset->save();												
@@ -625,7 +625,7 @@ class myInsertEntryHelper
 						}
 					}
 					catch (Exception $e) {
-						$entry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+						$entry->setStatus(entryStatus::ERROR_CONVERTING);
 						$entry->save();											
 						throw $e;
 					}
@@ -646,7 +646,7 @@ class myInsertEntryHelper
 //			}
 		}
 		
-		if ($entry->getStatus() == entry::ENTRY_STATUS_READY)
+		if ($entry->getStatus() == entryStatus::READY)
 			$entry->updateDimensions();
 		
 		$entry->save();

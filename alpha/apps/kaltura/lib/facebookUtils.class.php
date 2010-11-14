@@ -89,8 +89,8 @@ class facebookUtils
 	static public function getMakeoverEntries($subp_id, $puser_id, $puser_ids)
 	{
 		$c = new Criteria();
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
-		$c->add(entryPeer::STATUS, entry::ENTRY_STATUS_READY);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
+		$c->add(entryPeer::STATUS, entryStatus::READY);
 		$c->addSelectColumn("MAX(".entryPeer::ID.")");
 		$c->addSelectColumn(PuserRolePeer::PUSER_ID);
 		$c->addGroupByColumn(PuserRolePeer::KSHOW_ID);
@@ -137,7 +137,7 @@ class facebookUtils
 		// fetch the roughcut which is not the default roughcut
 		$c = new Criteria();
 		$c->add(entryPeer::KSHOW_ID, $kshow_id);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_SHOW);
+		$c->add(entryPeer::TYPE, entryType::MIX);
 		$c->add(entryPeer::ID, $kshow->getShowEntryId(), Criteria::NOT_EQUAL);
 		
 		$roughcut_entry = entryPeer::doSelectOne($c);
@@ -162,9 +162,9 @@ class facebookUtils
 			$roughcut_entry->setKuserId($kshow->getProducerId());
 			$roughcut_entry->setPartnerId($kshow->getPartnerId() );
 			$roughcut_entry->setSubpId( $kshow->getSubpId() );
-			$roughcut_entry->setStatus(entry::ENTRY_STATUS_READY);
+			$roughcut_entry->setStatus(entryStatus::READY);
 			$roughcut_entry->setThumbnail( "&kal_show.jpg");
-			$roughcut_entry->setType(entry::ENTRY_TYPE_SHOW);
+			$roughcut_entry->setType(entryType::MIX);
 			$roughcut_entry->setMediaType(entry::ENTRY_MEDIA_TYPE_SHOW);
 			$roughcut_entry->setName("Kaltura Video");
 			$roughcut_entry->setTags("");
@@ -193,8 +193,8 @@ class facebookUtils
 	{
 		$c = new Criteria();
 		$c->add(entryPeer::KSHOW_ID, $kshow_id);
-		$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
-		$c->add(entryPeer::STATUS, entry::ENTRY_STATUS_READY);
+		$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
+		$c->add(entryPeer::STATUS, entryStatus::READY);
 		
 		$entries = entryPeer::doSelect($c);
 		

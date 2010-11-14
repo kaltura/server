@@ -25,8 +25,8 @@ class getPartnerReportAction extends kalturaSystemAction
 			echo "<HTML><BODY>\n";
 			echo "<form>\n";
 			echo "Partner Id: <input name='partner_id' value='$partner_id'>&nbsp\n";
-			echo "<input name='entry_type' type='radio' value='".entry::ENTRY_TYPE_MEDIACLIP."' ".($entry_type == entry::ENTRY_TYPE_MEDIACLIP ? "checked" : "").">clips&nbsp;";
-			echo "<input name='entry_type' type='radio' value='".entry::ENTRY_TYPE_SHOW."' ".($entry_type == entry::ENTRY_TYPE_SHOW ? "checked" : "").">roughcuts&nbsp;";
+			echo "<input name='entry_type' type='radio' value='".entryType::MEDIA_CLIP."' ".($entry_type == entryType::MEDIA_CLIP ? "checked" : "").">clips&nbsp;";
+			echo "<input name='entry_type' type='radio' value='".entryType::MIX."' ".($entry_type == entryType::MIX ? "checked" : "").">roughcuts&nbsp;";
 			echo "<input type='submit' style='color:black' name='go' value='Go'>\n";
 			echo "</form>\n";
 			

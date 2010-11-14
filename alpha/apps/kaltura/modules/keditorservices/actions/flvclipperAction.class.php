@@ -53,7 +53,7 @@ class flvclipperAction extends kalturaAction
 		// set the execution time to be able to serve big files in a single chunk
 		ini_set ( "max_execution_time" , 240 );
 		
-		if ( $entry->getType() == entry::ENTRY_TYPE_SHOW && $entry->getStatus() == entry::ENTRY_STATUS_DELETED )
+		if ( $entry->getType() == entryType::MIX && $entry->getStatus() == entryStatus::DELETED )
 		{
 			// because the fiter was turned off - a manual check for deleted entries must be done.
 			die;

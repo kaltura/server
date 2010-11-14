@@ -65,7 +65,7 @@ class updateentrythumbnailjpegAction extends defPartnerservices2Action
 		kFileSyncUtils::file_put_contents($fileSyncKey, $thumb_data );
 		
 		// update the metadata in case of a roughcut
-		if ($entry->getType() == entry::ENTRY_TYPE_SHOW)
+		if ($entry->getType() == entryType::MIX)
 		{
 			$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
 			$xml_doc = new DOMDocument();

@@ -146,7 +146,7 @@ class myKshowUtils
 			$media_type = $entry->getMediaType();
 
 			// if the entry is one of the kshow roughcuts we want to share the latest roughcut
-			if ($entry->getType() == entry::ENTRY_TYPE_SHOW)
+			if ($entry->getType() == entryType::MIX)
 			$entry_id = -1;
 		}
 
@@ -465,7 +465,7 @@ return array($genericWidget, $myspaceWidget);
 			// first entries willcome up first
 			$c = new Criteria();
 			$c->add ( entryPeer::KSHOW_ID , $kshow_id );
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP, Criteria::EQUAL );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP, Criteria::EQUAL );
 			//$c->add ( entryPeer::PICTURE, null, Criteria::NOT_EQUAL );
 			$c->setLimit( 16 ); // we'll need 16 images of contributers
 			$c->addGroupByColumn(entryPeer::KUSER_ID);
@@ -568,7 +568,7 @@ return array($genericWidget, $myspaceWidget);
 			// first entries will come up first
 			$c = new Criteria();
 			$c->add ( entryPeer::KSHOW_ID , $kshow_id );
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP, Criteria::EQUAL );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP, Criteria::EQUAL );
 			//$c->add ( entryPeer::PICTURE, null, Criteria::NOT_EQUAL );
 			$c->setLimit( 14 ); // we'll need 14 images of contributers
 			$c->addGroupByColumn(entryPeer::KUSER_ID);
@@ -1098,7 +1098,7 @@ return array($genericWidget, $myspaceWidget);
 			$c->add(entryPeer::KSHOW_ID, $kshow_id);
 			$c->add(entryPeer::KUSER_ID, $likuser_id, Criteria::NOT_EQUAL ); // the current user knows they just edited
 			$c->addAnd(entryPeer::KUSER_ID, $kshow->getProducerId(), Criteria::NOT_EQUAL ); // the producer knows they just edited
-			$c->add(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+			$c->add(entryPeer::TYPE, entryType::MEDIA_CLIP);
 			$c->addGroupByColumn(entryPeer::KUSER_ID);
 			$entries = entryPeer::doSelect( $c );
 			$already_received_alert_array = array();

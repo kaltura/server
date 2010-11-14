@@ -117,7 +117,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 		$crit = new Criteria();
 		$crit->setOffset( $offset );
 		$crit->setLimit( $limit );
-		$crit->add ( entryPeer::TYPE ,  entry::ENTRY_TYPE_MEDIACLIP );
+		$crit->add ( entryPeer::TYPE ,  entryType::MEDIA_CLIP );
 		$crit->add ( entryPeer::MEDIA_TYPE , $media_type );
 		if( $search_mechanism == self::KALTURA_SERVICE_CRITERIA_FROM_KSHOW )
 		{

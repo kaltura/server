@@ -34,7 +34,7 @@ class deleteplaylistAction extends deleteentryAction
 	protected function getCriteria (  ) 
 	{ 
 		$c = new Criteria();
-		$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_PLAYLIST );
+		$c->addAnd ( entryPeer::TYPE , entryType::PLAYLIST );
 		return $c; 
 	}
 

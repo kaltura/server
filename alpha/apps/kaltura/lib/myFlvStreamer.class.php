@@ -645,7 +645,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
 				$was_modified = true;
   				continue;
   			}
-  			elseif ( $entry->getStatus() == entry::ENTRY_STATUS_DELETED )
+  			elseif ( $entry->getStatus() == entryStatus::DELETED )
   			{
   				// set an error on the asset element
   				$asset->setAttribute ( "fix_status" , "error in k_id [$asset_id] - asset was deleted" );

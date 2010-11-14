@@ -95,17 +95,17 @@ class investigate
 		$str = "($val) ";
 		switch ( $val )
 		{
-			case entry::ENTRY_STATUS_ERROR_CONVERTING:
+			case entryStatus::ERROR_CONVERTING:
 				$str .= "ERROR_CONVERTING"; break;
-			case entry::ENTRY_STATUS_IMPORT:
+			case entryStatus::IMPORT:
 				$str .= "import"; break;
-			case entry::ENTRY_STATUS_PRECONVERT:
+			case entryStatus::PRECONVERT:
 				$str .= "PRECONVERT"; break;
 			case entry:: ENTRY_STATUS_READY:
 				$str .= "READY"; break;
-			case entry::ENTRY_STATUS_DELETED:
+			case entryStatus::DELETED:
 				$str .= "DELETED"; break;
-//			case entry::ENTRY_STATUS_MODETATE:
+//			case entryStatus::MODETATE:
 //				$str .= "MODERATE"; break;
 				
 		}
@@ -116,12 +116,12 @@ class investigate
 	{
 		$NL = "\n";
 		$str = 
-			entry::ENTRY_STATUS_ERROR_CONVERTING . "=ERROR_CONVERTING" . $NL .
-			entry::ENTRY_STATUS_IMPORT . "=IMPORT" . $NL .
-			entry::ENTRY_STATUS_PRECONVERT . "=PRECONVERT" . $NL .
-			entry::ENTRY_STATUS_READY . "=READY" . $NL . 
-			entry::ENTRY_STATUS_DELETED . "=DELETED" . $NL ;
-//			entry::ENTRY_STATUS_MODETATE . "=MODERATE" . $NL ;
+			entryStatus::ERROR_CONVERTING . "=ERROR_CONVERTING" . $NL .
+			entryStatus::IMPORT . "=IMPORT" . $NL .
+			entryStatus::PRECONVERT . "=PRECONVERT" . $NL .
+			entryStatus::READY . "=READY" . $NL . 
+			entryStatus::DELETED . "=DELETED" . $NL ;
+//			entryStatus::MODETATE . "=MODERATE" . $NL ;
 	
 		return $str;
 	}
@@ -131,17 +131,17 @@ class investigate
 		$str = "";
 		switch ( $val )
 		{
-			case entry::ENTRY_STATUS_ERROR_CONVERTING:
+			case entryStatus::ERROR_CONVERTING:
 				$str .= "red"; break;
-			case entry::ENTRY_STATUS_IMPORT:
+			case entryStatus::IMPORT:
 				$str .= "yellow"; break;
-			case entry::ENTRY_STATUS_PRECONVERT:
+			case entryStatus::PRECONVERT:
 				$str .= "#66CCFF"; break;
 			case entry:: ENTRY_STATUS_READY:
 				$str .= "lime"; break;
-			case entry::ENTRY_STATUS_DELETED:
+			case entryStatus::DELETED:
 				$str .= "#CCCCCC"; break;
-			case entry::ENTRY_STATUS_MODERATE:
+			case entryStatus::MODERATE:
 				$str .= "orange"; break;
 				
 		}

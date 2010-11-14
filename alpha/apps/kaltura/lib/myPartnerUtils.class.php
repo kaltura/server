@@ -1165,8 +1165,8 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
- 		self::copyEntriesByType($fromPartner, $toPartner, entry::ENTRY_TYPE_MEDIACLIP);
- 		self::copyEntriesByType($fromPartner, $toPartner, entry::ENTRY_TYPE_PLAYLIST);
+ 		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP);
+ 		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST);
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
@@ -1179,7 +1179,7 @@ class myPartnerUtils
  		$c = new Criteria();
  		$c->addAnd(entryPeer::PARTNER_ID, $fromPartner->getId());
  		$c->addAnd(entryPeer::TYPE, $entryType);
- 		$c->addAnd(entryPeer::STATUS, entry::ENTRY_STATUS_READY);
+ 		$c->addAnd(entryPeer::STATUS, entryStatus::READY);
  		$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
  		$entries = entryPeer::doSelect($c);
  		entryPeer::setUseCriteriaFilter ( true );

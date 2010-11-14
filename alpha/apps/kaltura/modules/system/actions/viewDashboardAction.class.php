@@ -126,7 +126,7 @@ class viewDashBoardAction extends kalturaSystemAction
 		$c->setLimit( $limit );
 		//$c->hints = array(entryPeer::TABLE_NAME => "created_at_index");
 		$c->addDescendingOrderByColumn( entryPeer::CREATED_AT );
-		$c->add( entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP ); // we don't want entries that
+		$c->add( entryPeer::TYPE, entryType::MEDIA_CLIP ); // we don't want entries that
 //		$c->addJoin(entryPeer::KUSER_ID, kuserPeer::ID, Criteria::INNER_JOIN);
 //	    $c->addJoin(entryPeer::KSHOW_ID, kshowPeer::ID, Criteria::INNER_JOIN);
 	    $this->entries = entryPeer::doSelectJoinAll($c);

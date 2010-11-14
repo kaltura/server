@@ -257,14 +257,14 @@ class statusAction extends kalturaSystemAction
 		$date_filter = " ADDDATE(NOW(), INTERVAL -$amount $interval) ";
 
 	    $entry_statuses = array(
-			entry::ENTRY_STATUS_ERROR_CONVERTING => "ERROR",
-			entry::ENTRY_STATUS_IMPORT => "IMPORT",
-			entry::ENTRY_STATUS_PRECONVERT => "PRECONVERT",
-			entry::ENTRY_STATUS_READY => "READY",
-			entry::ENTRY_STATUS_DELETED => "DELETED",
-			entry::ENTRY_STATUS_PENDING => "PENDING",
-			entry::ENTRY_STATUS_MODERATE => "MODERATE",
-			entry::ENTRY_STATUS_BLOCKED => "BLOCKED"
+			entryStatus::ERROR_CONVERTING => "ERROR",
+			entryStatus::IMPORT => "IMPORT",
+			entryStatus::PRECONVERT => "PRECONVERT",
+			entryStatus::READY => "READY",
+			entryStatus::DELETED => "DELETED",
+			entryStatus::PENDING => "PENDING",
+			entryStatus::MODERATE => "MODERATE",
+			entryStatus::BLOCKED => "BLOCKED"
 		);
 		
 		$query = "select status,count(1) as count,max(created_at) as date,timediff(now(),max(created_at)) as diff from entry where type=1 and created_at>$date_filter $partner_where group by status order by status";

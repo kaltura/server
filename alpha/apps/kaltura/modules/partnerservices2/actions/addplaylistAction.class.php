@@ -36,7 +36,7 @@ class addplaylistAction extends addentrybaseAction
 
 	protected function setTypeAndMediaType ( $entry ) 
 	{
-		$entry->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$entry->setType ( entryType::PLAYLIST );
 		// media_type can be either ENTRY_MEDIA_TYPE_XML or ??
 	}
 	

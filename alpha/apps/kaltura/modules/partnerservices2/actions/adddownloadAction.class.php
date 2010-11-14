@@ -110,7 +110,7 @@ class adddownloadAction extends defPartnerservices2Action
 			return; 
 		}
 		
-		if ( $entry->getType() == entry::ENTRY_TYPE_SHOW  )
+		if ( $entry->getType() == entryType::MIX  )
 		{
 			// TODO - should return the job ??
 			// the original flavor should be considered as flv in case this is a roughcut
@@ -131,7 +131,7 @@ class adddownloadAction extends defPartnerservices2Action
 				$file_format = "flv";
 				
 			// Backward compatebility
-			if ( !$file_format && $entry->getType() == entry::ENTRY_TYPE_DOCUMENT )
+			if ( !$file_format && $entry->getType() == entryType::DOCUMENT )
 				$file_format = "swf";
 				
 			$flavorParams = myConversionProfileUtils::getFlavorParamsFromFileFormat ( $partner_id , $file_format );

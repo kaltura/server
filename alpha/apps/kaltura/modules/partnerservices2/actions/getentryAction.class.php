@@ -71,7 +71,7 @@ class getentryAction extends defPartnerservices2Action
 		}
 		else
 		{
-			if ( $entry->getStatus() == entry::ENTRY_STATUS_IMPORT || $entry->getStatus() == entry::ENTRY_STATUS_PRECONVERT )
+			if ( $entry->getStatus() == entryStatus::IMPORT || $entry->getStatus() == entryStatus::PRECONVERT )
 			{
 				defPartnerservices2baseAction::disableCache();
 			}
@@ -80,7 +80,7 @@ class getentryAction extends defPartnerservices2Action
 			$extra_fields = $this->getExtraFields ();
 			
 			$level = ( $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR );
-			if ( $entry->getType() == entry::ENTRY_TYPE_SHOW || $entry->getType() == entry::ENTRY_TYPE_DVD )
+			if ( $entry->getType() == entryType::MIX || $entry->getType() == entryType::DVD )
 				$extra_fields = array ( "allVersionsFormatted" );
 			
 			if ( $extra_fields )

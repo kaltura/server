@@ -202,7 +202,7 @@ class mySearchUtils
 				elseif ( $obj instanceof entry )
 				{
 					// status=READY , type=MEDIACLIP, view permissions of kshow 
-					self::setRes ( $res , $obj->getStatus() == entry::ENTRY_STATUS_READY );
+					self::setRes ( $res , $obj->getStatus() == entryStatus::READY );
 				}
 				else
 				{
@@ -242,7 +242,7 @@ class mySearchUtils
 				$extra_invisible_data = "_MEDIA_TYPE_" . $obj->getMediaType(); 
 				$type = $obj->getType();
 				// add the SEARCH_ENTRY_TYPE_RC to the words
-				if ( $type == entry::ENTRY_TYPE_SHOW )	$extra_invisible_data .= " " . self::SEARCH_ENTRY_TYPE_RC ;
+				if ( $type == entryType::MIX )	$extra_invisible_data .= " " . self::SEARCH_ENTRY_TYPE_RC ;
 			}			
 			$prepared_text = self::prepareSearchText ( $words );
 			

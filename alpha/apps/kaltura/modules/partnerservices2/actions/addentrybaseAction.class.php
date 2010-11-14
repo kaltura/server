@@ -97,7 +97,7 @@ abstract class addentrybaseAction extends defPartnerservices2Action
 			// force the type and media type
 			// TODO - set the kshow to some default kshow of the partner - maybe extract it from the custom_data of this specific partner
 			$entry->setKshowId ( $kshow_id );
-			$entry->setStatus( entry::ENTRY_STATUS_READY );
+			$entry->setStatus( entryStatus::READY );
 			$entry->setPartnerId( $partner_id );
 			$entry->setSubpId( $subp_id );
 			$entry->setKuserId($puser_kuser->getKuserId() );

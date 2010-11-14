@@ -53,9 +53,9 @@ class getallentriesAction extends defPartnerservices2Action
 		// if the entry_type was sent by the client - make sure it's of type  ENTRY_TYPE_SHOW.
 		// this is to prevent this service as part of a bad multirequest
 		$entry_type = $this->getP ( "entry_type" , null );
-		if ( ! empty ( $entry_type ) && $entry_type != entry::ENTRY_TYPE_SHOW )
+		if ( ! empty ( $entry_type ) && $entry_type != entryType::MIX )
 		{
-			$this->addDebug ( "entry" , "not of type " . entry::ENTRY_TYPE_SHOW );
+			$this->addDebug ( "entry" , "not of type " . entryType::MIX );
 			return; 
 		}
 		
@@ -92,7 +92,7 @@ $this->benchmarkStart( "list_type_kshow" );
 		if ( $list_type & self::LIST_TYPE_KSHOW )
 		{
 			$c = new Criteria();
-			$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+			$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 //			$c->addAnd ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 			$c->addAnd ( entryPeer::KSHOW_ID , $kshow_id );
 			$this->addIgnoreIdList ($c , $aggrigate_id_list);
@@ -118,7 +118,7 @@ $this->benchmarkStart( "list_type_kuser" );
 			if ( ($puser_kuser && $puser_kuser->getKuserId()) || $apiv3Kuser )
 			{
 				$c = new Criteria();
-				$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+				$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 //				$c->addAnd ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 				$kuserIds = array();
 				if($puser_kuser && $puser_kuser->getKuserId())
@@ -178,7 +178,7 @@ $this->benchmarkStart( "list_type_kuser" );
 					  $fixed_entry_list[] = trim($entryId);
 					}
 					$c = new Criteria();
-					$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+					$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 					$c->addAnd ( entryPeer::ID , $fixed_entry_list, Criteria::IN );
 					if ( $merge_entry_lists )
 					{
@@ -216,7 +216,7 @@ $this->benchmarkStart( "list_type_episode" );
 				// episode_id will point to the "parent" kshow
 				// fetch the entries of the parent kshow
 				$c = new Criteria();
-				$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+				$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 //				$c->addAnd ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 				$c->addAnd ( entryPeer::KSHOW_ID , $kshow->getEpisodeId() );
 				$this->addIgnoreIdList ($c , $aggrigate_id_list);
@@ -239,7 +239,7 @@ $this->benchmarkStart( "list_type_roughcut" );
 		$entry_data_from_roughcut_map = array(); // will hold an associative array where the id is the key
 		if ( $list_type & self::LIST_TYPE_ROUGHCUT )
 		{
-			if ( $entry->getType() == entry::ENTRY_TYPE_SHOW ) //&& $kshow->getHasRoughcut() )
+			if ( $entry->getType() == entryType::MIX ) //&& $kshow->getHasRoughcut() )
 			{
 				$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
 				$roughcut_file_name = kFileSyncUtils::getReadyLocalFilePathForKey ( $sync_key );
@@ -272,7 +272,7 @@ $this->benchmarkStart( "list_type_roughcut" );
 					
 					$c = new Criteria();
 					$c->addAnd ( entryPeer::ID , $final_id_list , Criteria::IN );
-                	$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );					
+                	$c->addAnd ( entryPeer::TYPE , entryType::MEDIA_CLIP );					
 					$this->addIgnoreIdList ($c , $aggrigate_id_list);
 	//				$this->addOffsetAndLimit ( $c );
 					

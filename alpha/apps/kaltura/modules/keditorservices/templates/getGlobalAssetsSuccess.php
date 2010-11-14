@@ -7,7 +7,7 @@ if ( $debug ) { echo "Result<br><textarea cols=100 rows=50>"; }
 <?php
 foreach ( $entry_list as $entry )
 {
-	$is_ready = $entry->getStatus() == entry::ENTRY_STATUS_READY;
+	$is_ready = $entry->getStatus() == entryStatus::READY;
 	$data = $entry->getDataPath();
 
 	echo "\t" .  baseObjectUtils::objToXml ( $entry , array ( 'id' , 'name' , 'type' => 'media_type'  ) , 

@@ -76,7 +76,7 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 			$c->add ( entryPeer::KUSER_ID , $kuser_id );
 			$c->add ( entryPeer::MEDIA_TYPE , $media_type );
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 	
 //			$keywords_array = mySearchUtils::getKeywordsFromStr ( $searchText );
 			$filter = new entryFilter();

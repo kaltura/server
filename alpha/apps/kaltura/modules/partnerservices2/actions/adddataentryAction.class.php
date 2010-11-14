@@ -35,7 +35,7 @@ class adddataentryAction extends addentrybaseAction
 
 	protected function setTypeAndMediaType ( $entry ) 
 	{
-		$entry->setType ( entry::ENTRY_TYPE_DATA );
+		$entry->setType ( entryType::DATA );
 		// media_type can be either ENTRY_MEDIA_TYPE_XML or ??
 	}
 	

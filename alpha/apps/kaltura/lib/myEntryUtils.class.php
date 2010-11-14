@@ -348,7 +348,7 @@ class myEntryUtils
 	// 4. move the file so none of it's versions can be accessed via the web (there is usually only one version for a media_clip)
 	public static function deleteEntry ( entry $entry , $partner_id = null )
 	{
-		if ( $entry->getStatus() == entry::ENTRY_STATUS_DELETED || $entry->getStatus() == entry::ENTRY_STATUS_BLOCKED  )
+		if ( $entry->getStatus() == entryStatus::DELETED || $entry->getStatus() == entryStatus::BLOCKED  )
 			return ; // don't do this twice !
 
 		KalturaLog::log("myEntryUtils::delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
@@ -425,7 +425,7 @@ class myEntryUtils
 //		$deleted_content is always null anyway
 //		$entry->putInCustomData( "deleted_file_path" , $deleted_content ? $deleted_content : serialize($currentDataKey) ) ;
 		
-		$entry->setStatus ( entry::ENTRY_STATUS_DELETED ); 
+		$entry->setStatus ( entryStatus::DELETED ); 
 		
 		$entry->setCategories("");
 		
@@ -444,7 +444,7 @@ class myEntryUtils
 	// 4. move the file so none of it's versions can be accessed via the web (there is usually only one version for a media_clip)
 	public static function undeleteEntry ( entry $entry , $partner_id = null )
 	{
-		if ( $entry->getStatus() != entry::ENTRY_STATUS_DELETED )
+		if ( $entry->getStatus() != entryStatus::DELETED )
 		{
 			return;
 		}
@@ -677,7 +677,7 @@ class myEntryUtils
 		$tempThumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 		
 		$entryThumbFilename = ($entry->getThumbnail() ? $entry->getThumbnail() : "0.jpg");
-		if ($entry->getStatus() != entry::ENTRY_STATUS_READY || @$entryThumbFilename[0] == '&')
+		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
 			$tempThumbName .= "_NOCACHE_";
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
@@ -737,7 +737,7 @@ class myEntryUtils
 				{
 					$calc_vid_sec = floor($entry->getLengthInMsecs() / $vid_slices * min($vid_slice, $vid_slices) / 1000);
 				}
-				else if ($entry->getStatus() != entry::ENTRY_STATUS_READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
+				else if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 				{
 					$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : 3;
 				}
@@ -826,7 +826,7 @@ class myEntryUtils
 	//
 	// sets the type and media_type of an entry according to the file extension
 	// in case the media_type is entry::ENTRY_MEDIA_TYPE_AUTOMATIC we find the media_type from the extension
-	// in case the type is entry::ENTRY_TYPE_AUTOMATIC we set the type according to the media_type found before
+	// in case the type is entryType::AUTOMATIC we set the type according to the media_type found before
 	//
 	// two use cases:
 	// 1. TYPE set to DOCUMENT and MEDIA_TYPE to AUTOMATIC : the media_type will be set to DOCUMENT no matter what the file ext. is
@@ -845,11 +845,11 @@ class myEntryUtils
 		}
 		
 		// we'll set the type according to the media_type - either a media_clip or a document
-		if ($entry->getType() == entry::ENTRY_TYPE_AUTOMATIC)
+		if ($entry->getType() == entryType::AUTOMATIC)
 		{
 			if ($media_type == entry::ENTRY_MEDIA_TYPE_IMAGE ||	$media_type == entry::ENTRY_MEDIA_TYPE_VIDEO ||
 				$media_type == entry::ENTRY_MEDIA_TYPE_AUDIO)
-				$entry->setType(entry::ENTRY_TYPE_MEDIACLIP);
+				$entry->setType(entryType::MEDIA_CLIP);
 		}
 	}
 	
@@ -920,7 +920,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	//
 	public static function calcStorageSize(entry $entry)
 	{
-		if ($entry->getStatus() == entry::ENTRY_STATUS_DELETED)
+		if ($entry->getStatus() == entryStatus::DELETED)
 			return 0;
 		
 		$size = 0;
@@ -1036,10 +1036,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 		
 		// for any type that does not require assets:
-		$shouldCopyDataForNonClip = ($entry->getType() != entry::ENTRY_TYPE_MEDIACLIP);
+		$shouldCopyDataForNonClip = ($entry->getType() != entryType::MEDIA_CLIP);
 		$shouldCopyDataForClip = false;
 		// only images get their data copied
-		if($entry->getType() == entry::ENTRY_TYPE_MEDIACLIP)
+		if($entry->getType() == entryType::MEDIA_CLIP)
 		{
 			if($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO &&
 			   $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_AUDIO)
@@ -1077,7 +1077,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// if entry is image - data is thumbnail, and it was copied
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE) $considerCopyThumb = false;
 		// if entry is not clip, and there is no file in both DCs - nothing to copy
-		if($entry->getType() != entry::ENTRY_TYPE_MEDIACLIP && !kFileSyncUtils::file_exists($from, true)) $considerCopyThumb = false;
+		if($entry->getType() != entryType::MEDIA_CLIP && !kFileSyncUtils::file_exists($from, true)) $considerCopyThumb = false;
 		if ( $considerCopyThumb ) 
 		{
 			$skipThumb = false;

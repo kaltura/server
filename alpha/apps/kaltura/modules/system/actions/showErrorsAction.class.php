@@ -15,7 +15,7 @@ class showErrorsAction extends kalturaSystemAction
 		
 		// find entries with status error
 		$c = new Criteria();
-		$c->add ( entryPeer::STATUS , entry::ENTRY_STATUS_ERROR_CONVERTING );
+		$c->add ( entryPeer::STATUS , entryStatus::ERROR_CONVERTING );
 		$this->error_converting = entryPeer::doSelect( $c );
 		
 		$date_format = 'Y-m-d H:i:s';
@@ -23,7 +23,7 @@ class showErrorsAction extends kalturaSystemAction
 		$start_date = date( $date_format , $this->several_minutes_ago );
 				
 		$c = new Criteria();
-		$c->add ( entryPeer::STATUS , array ( entry::ENTRY_STATUS_IMPORT , entry::ENTRY_STATUS_PRECONVERT ) , Criteria::IN ) ;
+		$c->add ( entryPeer::STATUS , array ( entryStatus::IMPORT , entryStatus::PRECONVERT ) , Criteria::IN ) ;
 		$c->add ( entryPeer::UPDATED_AT , $start_date , Criteria::LESS_THAN  );
 		$this->error_waiting_too_long = entryPeer::doSelect( $c );
 		

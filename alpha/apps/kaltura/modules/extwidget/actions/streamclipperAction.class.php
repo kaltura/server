@@ -13,7 +13,7 @@ class streamclipperAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		if ( $entry->getType() != entry::ENTRY_TYPE_LIVE_STREAM || $entry->getStatus() == entry::ENTRY_STATUS_DELETED )
+		if ( $entry->getType() != entryType::LIVE_STREAM || $entry->getStatus() == entryStatus::DELETED )
 		{
 			// because the fiter was turned off - a manual check for deleted entries must be done.
 			die;

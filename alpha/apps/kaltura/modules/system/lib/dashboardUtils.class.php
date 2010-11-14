@@ -10,7 +10,7 @@ class dashboardUtils
 		$c->addSelectColumn( entryPeer::KSHOW_ID );
 		$c->addAsColumn( 'cnt' , 'COUNT('.entryPeer::KSHOW_ID.')' );
 		$c->addAnd ( kshowPeer::PARTNER_ID , 5 , ( $bands_only ? Criteria::EQUAL : Criteria::NOT_EQUAL ) );
-		$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+		$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 		// only band that have new entries (newer then 60 seconds from the time the kshow was created)
 		$crit = $c->getNewCriterion( entryPeer::CREATED_AT ,
 		"UNIX_TIMESTAMP(" . entryPeer::CREATED_AT .")>UNIX_TIMESTAMP(" .kshowPeer::CREATED_AT .")+60" ,
@@ -57,7 +57,7 @@ class dashboardUtils
 	public static function getKusersRoughcutCount ( array $kuser_id_list )
 	{
 		$c = new Criteria();
-		$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_SHOW );
+		$c->add ( entryPeer::TYPE , entryType::MIX );
 		$c->add ( entryPeer::KUSER_ID , $kuser_id_list , Criteria::IN );
 		$c->addSelectColumn( entryPeer::KUSER_ID );
 		$c->addAsColumn( 'cnt' , 'COUNT('.entryPeer::KUSER_ID.')' );
@@ -103,7 +103,7 @@ class dashboardUtils
 	public  static  function getKshowRoughcutCount ( array $kuser_id_list )
 	{
 		$c = new Criteria();
-		$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_SHOW );
+		$c->add ( entryPeer::TYPE , entryType::MIX );
 		$c->add ( entryPeer::KSHOW_ID , $kuser_id_list , Criteria::IN );
 		$c->addSelectColumn( entryPeer::KSHOW_ID );
 		$c->addAsColumn( 'cnt' , 'COUNT('.entryPeer::KSHOW_ID.')' );

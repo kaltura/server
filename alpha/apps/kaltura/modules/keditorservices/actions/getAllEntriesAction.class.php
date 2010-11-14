@@ -18,7 +18,7 @@ class getAllEntriesAction extends defKeditorservicesAction
 		if ( $list_type & self::LIST_TYPE_KSHOW )
 		{
 			$c = new Criteria();
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 			$c->add ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 			$c->add ( entryPeer::KSHOW_ID , $this->kshow_id );
 			$kshow_entry_list = entryPeer::doSelectJoinkuser( $c );
@@ -27,7 +27,7 @@ class getAllEntriesAction extends defKeditorservicesAction
 		if ( $list_type & self::LIST_TYPE_KUSER )
 		{
 			$c = new Criteria();
-			$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+			$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 			$c->add ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 			$c->add ( entryPeer::KUSER_ID , $this->getLoggedInUserIds(), Criteria::IN  );
 			$kuser_entry_list = entryPeer::doSelectJoinkuser( $c );
@@ -40,7 +40,7 @@ class getAllEntriesAction extends defKeditorservicesAction
 				// episode_id will point to the "parent" kshow
 				// fetch the entries of the parent kshow
 				$c = new Criteria();
-				$c->add ( entryPeer::TYPE , entry::ENTRY_TYPE_MEDIACLIP );
+				$c->add ( entryPeer::TYPE , entryType::MEDIA_CLIP );
 				$c->add ( entryPeer::MEDIA_TYPE , entry::ENTRY_MEDIA_TYPE_SHOW , Criteria::NOT_EQUAL );
 				$c->add ( entryPeer::KSHOW_ID , $kshow->getEpisodeId() );
 				$parent_kshow_entries = entryPeer::doSelectJoinkuser( $c );

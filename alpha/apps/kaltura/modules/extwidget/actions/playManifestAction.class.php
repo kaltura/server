@@ -253,12 +253,12 @@ class playManifestAction extends kalturaAction
 	
 	private function serveHttp()
 	{
-		if($this->entry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 
 		switch($this->entry->getType())
 		{
-			case entry::ENTRY_TYPE_MEDIACLIP:
+			case entryType::MEDIA_CLIP:
 				switch($this->entry->getMediaType())
 				{
 					case entry::ENTRY_MEDIA_TYPE_IMAGE:
@@ -284,7 +284,7 @@ class playManifestAction extends kalturaAction
 	{
 		switch($this->entry->getType())
 		{
-			case entry::ENTRY_TYPE_MEDIACLIP:
+			case entryType::MEDIA_CLIP:
 				
 				$duration = $this->entry->getDurationInt();
 				$flavorAssets = array();
@@ -447,7 +447,7 @@ class playManifestAction extends kalturaAction
 					
 				return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration, $baseUrl);
 
-			case entry::ENTRY_TYPE_LIVE_STREAM:
+			case entryType::LIVE_STREAM:
 				
 				$streamId = $this->entry->getStreamRemoteId();
 				$streamUsername = $this->entry->getStreamUsername();
@@ -585,7 +585,7 @@ class playManifestAction extends kalturaAction
 		if ($this->seekFrom <= 0)
 			$this->seekFrom = -1;
 		
-		if ( $this->entry->getStatus() == entry::ENTRY_STATUS_DELETED )
+		if ( $this->entry->getStatus() == entryStatus::DELETED )
 		{
 			// because the fiter was turned off - a manual check for deleted entries must be done.
 			die;

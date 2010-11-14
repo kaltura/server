@@ -43,7 +43,7 @@ class listpartnerentriesAction extends listentriesAction
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
 		$fields_set->set( "_eq_group_id" , myPartnerUtils::PARTNER_GROUP );
-		$fields_set->set( "_in_type" , entry::ENTRY_TYPE_MEDIACLIP . "," . entry::ENTRY_TYPE_SHOW );
+		$fields_set->set( "_in_type" , entryType::MEDIA_CLIP . "," . entryType::MIX );
 	}
 }
 ?>

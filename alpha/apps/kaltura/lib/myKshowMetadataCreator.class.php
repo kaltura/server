@@ -65,7 +65,7 @@ class myKshowMetadataCreator
 //		$c->addDescendingOrderByColumn('(' . entryPeer::ID . '=' . $intro_id . ')');
 		$c->addAscendingOrderByColumn( entryPeer::ID );
 
-//		$c->add ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
+//		$c->add ( entryPeer::STATUS , entryStatus::READY );
 //		$c->addAscendingOrderByColumn( entryPeer::CREATED_AT );
 		$entry_list = entryPeer::doSelect( $c );
 		
@@ -162,7 +162,7 @@ class myKshowMetadataCreator
 		$length = $len_time - $start_time;
 		$asset .= self::createEntryComment( $entry );
 		
-		$is_ready = $entry->getStatus() == entry::ENTRY_STATUS_READY;
+		$is_ready = $entry->getStatus() == entryStatus::READY;
 		// if the entry is not ready - comment out the whole element and DON"T increment the $this->m_seq_play_time !!
 		if ( ! $is_ready )
 		{

@@ -213,11 +213,11 @@ class myConversionProfileUtils
 			if ( $old_conversion_profile->getCommercialTranscoder() ) // this should be done according to the profile AND NOT the params
 			{
 				// first comes ON2...
-				$new_flavor_params->setConversionEngines( kConvertJobData::CONVERSION_ENGINE_ON2 . "," 
-					. kConvertJobData::CONVERSION_ENGINE_ENCODING_COM . "," 
-					. kConvertJobData::CONVERSION_ENGINE_FFMPEG . "," 
-					. kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX . "," 
-					. kConvertJobData::CONVERSION_ENGINE_MENCODER ); //
+				$new_flavor_params->setConversionEngines( conversionEngineType::ON2 . "," 
+					. conversionEngineType::ENCODING_COM . "," 
+					. conversionEngineType::FFMPEG . "," 
+					. conversionEngineType::FFMPEG_AUX . "," 
+					. conversionEngineType::MENCODER ); //
 				$new_flavor_params->setConversionEnginesExtraParams( $old_conversion_params->flix_params . "|" 
 					. $old_conversion_params->flix_params . "|" 
 					. $old_conversion_params->ffmpeg_params . "|" 
@@ -227,11 +227,11 @@ class myConversionProfileUtils
 			else
 			{
 				// first comes ffmpeg ... 
-				 $new_flavor_params->setConversionEngines( kConvertJobData::CONVERSION_ENGINE_FFMPEG . "," 
-				 	. kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX . "," 
-				 	. kConvertJobData::CONVERSION_ENGINE_MENCODER . "," 
-				 	. kConvertJobData::CONVERSION_ENGINE_ON2 . "," 
-				 	. kConvertJobData::CONVERSION_ENGINE_ENCODING_COM, "," ); //
+				 $new_flavor_params->setConversionEngines( conversionEngineType::FFMPEG . "," 
+				 	. conversionEngineType::FFMPEG_AUX . "," 
+				 	. conversionEngineType::MENCODER . "," 
+				 	. conversionEngineType::ON2 . "," 
+				 	. conversionEngineType::ENCODING_COM, "," ); //
 				 $new_flavor_params->setConversionEnginesExtraParams( $old_conversion_params->ffmpeg_params . "|"
 				 	. $old_conversion_params->ffmpeg_params . "|"  
 				 	. $old_conversion_params->mencoder_params . "|" 

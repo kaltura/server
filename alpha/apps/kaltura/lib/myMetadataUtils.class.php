@@ -315,7 +315,7 @@ class myMetadataUtils
 		$entry_id = $entry->getId();
 
 		// if the entry has an error - remove the pending
-		if ( $entry->getStatus() == entry::ENTRY_STATUS_ERROR_CONVERTING )
+		if ( $entry->getStatus() == entryStatus::ERROR_CONVERTING )
 		{
 			// return the XML - new if modified and the original if not
 			if ( $current_kshow_version != null)
@@ -330,7 +330,7 @@ class myMetadataUtils
 		}
 
 
-		if ( $entry->getStatus() != entry::ENTRY_STATUS_READY )
+		if ( $entry->getStatus() != entryStatus::READY )
 		{
 			// return the XML - new if modified and the original if not
 			if ( $current_kshow_version != null)

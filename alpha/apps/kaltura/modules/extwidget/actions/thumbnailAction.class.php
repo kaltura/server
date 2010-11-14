@@ -161,19 +161,19 @@ class thumbnailAction extends sfAction
 		// we need to distinguish between calls from the kdp and calls from a browser: <img src=...> 
 		// that can't handle swf input
 		if (($width == 640 && $height == 480 || $width == 0 && $height == 0) &&
-			($entry_status == entry::ENTRY_STATUS_PRECONVERT || $entry_status == entry::ENTRY_STATUS_IMPORT ||
-			$entry_status == entry::ENTRY_STATUS_ERROR_CONVERTING || $entry_status == entry::ENTRY_STATUS_DELETED))
+			($entry_status == entryStatus::PRECONVERT || $entry_status == entryStatus::IMPORT ||
+			$entry_status == entryStatus::ERROR_CONVERTING || $entry_status == entryStatus::DELETED))
 		{
 			$contentPath = myContentStorage::getFSContentRootPath();
 			$msgPath = $contentPath."content/templates/entry/bigthumbnail/";
-			if ($entry_status == entry::ENTRY_STATUS_DELETED)
+			if ($entry_status == entryStatus::DELETED)
 			{
 				$msgPath .= $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK ?
 							"entry_blocked.swf" : "entry_deleted.swf";
 			}
 			else
 			{
-				$msgPath .= $entry_status == entry::ENTRY_STATUS_ERROR_CONVERTING ?
+				$msgPath .= $entry_status == entryStatus::ERROR_CONVERTING ?
 							"entry_error.swf" : "entry_converting.swf";
 			}
 						
@@ -185,7 +185,7 @@ class thumbnailAction extends sfAction
 			// if entry type is audio - serve generic thumb:
 			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO)
 			{
-				if($entry->getStatus() == entry::ENTRY_STATUS_DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
+				if($entry->getStatus() == entryStatus::DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
 				{
 					KalturaLog::log("rejected audio entry - not serving thumbnail");
 					KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
@@ -195,9 +195,9 @@ class thumbnailAction extends sfAction
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
-			elseif($entry->getType() == entry::ENTRY_TYPE_LIVE_STREAM)
+			elseif($entry->getType() == entryType::LIVE_STREAM)
 			{
-				if($entry->getStatus() == entry::ENTRY_STATUS_DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
+				if($entry->getStatus() == entryStatus::DELETED && $entry->getModerationStatus() == moderation::MODERATION_STATUS_BLOCK)
 				{
 					KalturaLog::log("rejected live stream entry - not serving thumbnail");
 					KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
@@ -213,8 +213,8 @@ class thumbnailAction extends sfAction
 				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
-			//elseif($entry->getType() == entry::ENTRY_TYPE_MEDIACLIP && ($entry->getStatus() == entry::ENTRY_STATUS_PRECONVERT || $entry->getStatus() == entry::ENTRY_STATUS_IMPORT))
-			elseif($entry->getType() == entry::ENTRY_TYPE_MEDIACLIP)
+			//elseif($entry->getType() == entryType::MEDIA_CLIP && ($entry->getStatus() == entryStatus::PRECONVERT || $entry->getStatus() == entryStatus::IMPORT))
+			elseif($entry->getType() == entryType::MEDIA_CLIP)
 			{
 				// commenting out the new behavior, in this case the thumbnail will be created in resizeEntryImage
 				//$contentPath = myContentStorage::getFSContentRootPath();
@@ -271,7 +271,7 @@ class thumbnailAction extends sfAction
 		}
 		
 		// if we didnt return a template for the player die and dont return the original deleted thumb
-		if ($entry_status == entry::ENTRY_STATUS_DELETED)
+		if ($entry_status == entryStatus::DELETED)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}

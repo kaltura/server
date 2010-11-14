@@ -40,8 +40,8 @@ class listplaylistsAction extends listentriesAction
 	// kshows for the current user only 
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
-		$fields_set->set( "_eq_type" , entry::ENTRY_TYPE_PLAYLIST );		
-		$fields_set->set( "_eq_status" , entry::ENTRY_STATUS_READY );  		// make sure will display only 
+		$fields_set->set( "_eq_type" , entryType::PLAYLIST );		
+		$fields_set->set( "_eq_status" , entryStatus::READY );  		// make sure will display only 
 		$this->setP ( "use_filter_puser_id" , "false" ); // don't mind filtering according to the puser/kuser
 		
 	}

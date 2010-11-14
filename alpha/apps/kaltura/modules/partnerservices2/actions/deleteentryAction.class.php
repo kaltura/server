@@ -84,7 +84,7 @@ class deleteentryAction extends defPartnerservices2Action
 		/*
 			All move into myEntryUtils::deleteEntry
 		
-			$entry_to_delete->setStatus ( entry::ENTRY_STATUS_DELETED );
+			$entry_to_delete->setStatus ( entryStatus::DELETED );
 			
 			// make sure the moderation_status is set to moderation::MODERATION_STATUS_DELETE
 			$entry_to_delete->setModerationStatus ( moderation::MODERATION_STATUS_DELETE ); 

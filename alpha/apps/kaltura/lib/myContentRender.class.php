@@ -23,15 +23,15 @@ class myContentRender
 		
 		$kmediaType = entry::ENTRY_MEDIA_TYPE_TEXT;
 		
-		if ($status == entry::ENTRY_STATUS_IMPORT)
+		if ($status == entryStatus::IMPORT)
 		{
 			$kmediaData = 'The clip is currently being imported. This may take a couple of minutes. You can continue browsing this Kaltura';
 		}
-		else if ($status == entry::ENTRY_STATUS_PRECONVERT)
+		else if ($status == entryStatus::PRECONVERT)
 		{
 			$kmediaData = 'Clip is being converted. This might take a couple of minutes. You can continue browsing the Kaltura.' ;// 'Entry is being converted';
 		}
-		else if ($status == entry::ENTRY_STATUS_ERROR_CONVERTING)
+		else if ($status == entryStatus::ERROR_CONVERTING)
 		{
 			$kmediaData = 'Error converting entry';
 		}

@@ -37,7 +37,7 @@ class updatedataentryAction extends updateentryAction
 
 	protected function validateInputEntry ( $entry ) 
 	{
-		if ( $entry->getType() != entry::ENTRY_TYPE_DATA )
+		if ( $entry->getType() != entryType::DATA )
 		{
 			throw new APIException ( APIErrors::INVALID_ENTRY_TYPE , "ENTRY_TYPE_DATA" );
 		}

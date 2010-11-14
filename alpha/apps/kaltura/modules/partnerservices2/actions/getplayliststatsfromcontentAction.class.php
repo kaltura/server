@@ -63,7 +63,7 @@ class getplayliststatsfromcontentAction extends defPartnerservices2Action
 		
 		// fill the playlist (infact only the mediaType and contentData are important
 		$playlist = new entry();
-		$playlist->setType ( entry::ENTRY_TYPE_PLAYLIST ); // prepare the playlist type before filling from request
+		$playlist->setType ( entryType::PLAYLIST ); // prepare the playlist type before filling from request
 		$obj_wrapper = objectWrapperBase::getWrapperClass( $playlist , 0 );
 		
 		$playlist->setMediaType ( $this->getP ( "playlist_mediaType" ) );

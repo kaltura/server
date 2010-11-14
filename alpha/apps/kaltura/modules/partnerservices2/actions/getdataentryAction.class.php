@@ -31,7 +31,7 @@ class getdataentryAction extends getentryAction
 	protected function getCriteria (  ) 
 	{ 
 		$c = new Criteria();
-		$c->addAnd ( entryPeer::TYPE , entry::ENTRY_TYPE_DATA );
+		$c->addAnd ( entryPeer::TYPE , entryType::DATA );
 		return $c; 
 	}
 }

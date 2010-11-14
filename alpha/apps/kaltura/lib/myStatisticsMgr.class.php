@@ -275,7 +275,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 			$entry->setViews( $v );
 		}
 		
-		if ( $entry->getType() == entry::ENTRY_TYPE_SHOW )
+		if ( $entry->getType() == entryType::MIX )
 		{
 			$enclosing_kshow = $entry->getKshow();
 			if ( $enclosing_kshow  )
@@ -299,7 +299,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 			$entry->setPlays( $v );
 		}
 		
-		if ( $entry->getType() == entry::ENTRY_TYPE_SHOW )
+		if ( $entry->getType() == entryType::MIX )
 		{
 			$enclosing_kshow = $entry->getKshow();
 			if ( $enclosing_kshow  )
@@ -341,7 +341,7 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 			$rank = $entry->setRank ( ( $total_rank / $votes ) * 1000 );
 				
 			// if rouhcut - update the kshow's rank too
-			if ( $entry->getType() == entry::ENTRY_TYPE_SHOW )
+			if ( $entry->getType() == entryType::MIX )
 			{
 				$enclosing_kshow = $entry->getKshow();
 				if ( $enclosing_kshow  )

@@ -200,7 +200,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 			
 		// convert collection finished - export ism and ismc files
-		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3)
+		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 		{
 			$entry = $dbBatchJob->getEntry();
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());

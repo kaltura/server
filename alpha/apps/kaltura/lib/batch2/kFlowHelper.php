@@ -46,7 +46,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		
 //		// 2010-11-08 - Solved by Tan-Tan in DocumentCreatedHandler::objectAdded 
 //		// 2010-10-17 - Hotfix by Dor - source document asset with no conversion profile should be in status READY
-//		if ($entry->getType() == entry::ENTRY_TYPE_DOCUMENT)
+//		if ($entry->getType() == entryType::DOCUMENT)
 //		{
 //			if (is_null($entry->conversionProfileId))
 //			{
@@ -93,7 +93,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		if(!$flavorAsset)
 		{
 			KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
-			kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 			$dbBatchJob->setMessage($msg);
 			$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
 			return $dbBatchJob;
@@ -181,8 +181,8 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = $dbBatchJob->getEntry();
-			if($entry->getStatus() < entry::ENTRY_STATUS_READY)
-				kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_PRECONVERT);
+			if($entry->getStatus() < entryStatus::READY)
+				kBatchManager::updateEntry($dbBatchJob, entryStatus::PRECONVERT);
 		}
 				
 		switch($dbBatchJob->getJobSubType())
@@ -344,7 +344,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		$createThumb = true;
 		$extractMedia = true;
 		
-		if($entry->getType() != entry::ENTRY_TYPE_MEDIACLIP) // e.g. document
+		if($entry->getType() != entryType::MEDIA_CLIP) // e.g. document
 			$extractMedia = false;
 			
 		$rootBatchJob = $dbBatchJob->getRootJob();
@@ -910,7 +910,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 			catch(Exception $e)
 			{
 				KalturaLog::err($e->getMessage());
-				kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+				kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 				return $dbBatchJob;
 			}
 		}
@@ -1062,7 +1062,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 	{
 		KalturaLog::debug("Convert Profile failed");
 		
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 		
 		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
 		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
@@ -1087,7 +1087,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 			$originalflavorAsset->save();
 		}
 		
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_READY);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		
 		return $dbBatchJob; 	
 	}
@@ -1209,13 +1209,13 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		$entry->setSecondaryBroadcastingUrl($data->getSecondaryBroadcastingUrl());	
 		$entry->setStreamName($data->getStreamName());
 	
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_READY);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		return $dbBatchJob; 	
 	}
 	
 	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
-		kBatchManager::updateEntry($dbBatchJob, entry::ENTRY_STATUS_ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 		return $dbBatchJob; 	
 	}
 	
@@ -1283,7 +1283,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
 			$entry = $object->getentry();
-			if($entry->getType() == entry::ENTRY_TYPE_MEDIACLIP)
+			if($entry->getType() == entryType::MEDIA_CLIP)
 			{
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);

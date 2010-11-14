@@ -32,7 +32,7 @@ class mrssAction extends defPartnerservices2Action
 
 	protected function setExtraFilters ( entryFilter &$fields_set )	
 	{
-		$fields_set->set( "_in_type" , entry::ENTRY_TYPE_MEDIACLIP ) ;//. "," . entry::ENTRY_TYPE_SHOW );		
+		$fields_set->set( "_in_type" , entryType::MEDIA_CLIP ) ;//. "," . entryType::MIX );		
 		if ( ! $fields_set->get( "_order_by" ) )
 		{
 			$fields_set->set( "_order_by" , "-created_at" );
@@ -85,7 +85,7 @@ class mrssAction extends defPartnerservices2Action
 		$partner_list = array ( 593, 2460 );
 		 
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$c->addAnd ( entryPeer::STATUS , entry::ENTRY_STATUS_READY );
+		$c->addAnd ( entryPeer::STATUS , entryStatus::READY );
 		
 		// for now display only entries that are part of the kaltura network
 //		$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK );

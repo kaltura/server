@@ -43,7 +43,7 @@ class listmyentriesAction extends listentriesAction
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
 		$fields_set->set( "_eq_user_id" , $this->puser_id );
-		$fields_set->set( "_in_type" , entry::ENTRY_TYPE_MEDIACLIP . "," . entry::ENTRY_TYPE_SHOW );
+		$fields_set->set( "_in_type" , entryType::MEDIA_CLIP . "," . entryType::MIX );
 	}
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )

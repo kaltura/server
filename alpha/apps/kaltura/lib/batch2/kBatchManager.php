@@ -362,11 +362,11 @@ class kBatchManager
 		// backward compatibility 
 		// if entry has kshow, and this is the first entry in the mix, 
 		// the thumbnail of the entry should be copied into the mix entry  
-		if ($status == entry::ENTRY_STATUS_READY)
+		if ($status == entryStatus::READY)
 			myEntryUtils::createRoughcutThumbnailFromEntry($entry, false);
 			
 		// entry status is ready and above, not changing status through batch job
-		if($entry->getStatus() >= entry::ENTRY_STATUS_READY)
+		if($entry->getStatus() >= entryStatus::READY)
 			return $entry;
 		
 		$entry->setStatus($status);
