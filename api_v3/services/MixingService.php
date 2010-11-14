@@ -235,7 +235,7 @@ class MixingService extends KalturaEntryService
 		}
 		
 		// FIXME: temp hack  - when kshow doesn't have a roughcut, and the media entry is not ready, it cannob be queued for append upon import/conversion completion 
-		if ($dbMediaEntry->getStatus() != entry::ENTRY_STATUS_READY)
+		if ($dbMediaEntry->getStatus() != entryStatus::READY)
 		{
 			$kshow->setShowEntryId($mixEntryId);
 			$kshow->save();
@@ -357,7 +357,7 @@ class MixingService extends KalturaEntryService
 
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$c->addAnd(entryPeer::ID, $ids, Criteria::IN);
-		$c->addAnd(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);					
+		$c->addAnd(entryPeer::TYPE, entryType::MEDIA_CLIP);					
 		
 		$dbEntries = entryPeer::doSelect($c);
 

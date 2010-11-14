@@ -216,7 +216,7 @@ class BatchService extends KalturaBaseService
 	
 	protected function updateEntryThumbnail(BulkUploadResult $bulkUploadResult)
 	{
-		if(		$bulkUploadResult->getEntryStatus() != entry::ENTRY_STATUS_READY 
+		if(		$bulkUploadResult->getEntryStatus() != entryStatus::READY 
 			||	!strlen($bulkUploadResult->getThumbnailUrl()) 
 			||	$bulkUploadResult->getThumbnailSaved()
 		)

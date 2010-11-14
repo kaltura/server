@@ -149,7 +149,7 @@ class KalturaEntryService extends KalturaBaseService
         {
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
 			
-			$dbEntry->setStatus(entry::ENTRY_STATUS_ERROR_CONVERTING);
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
@@ -519,7 +519,7 @@ class KalturaEntryService extends KalturaBaseService
 		/*
 			All move into myEntryUtils::deleteEntry
 		
-			$entryToDelete->setStatus(entry::ENTRY_STATUS_DELETED); 
+			$entryToDelete->setStatus(entryStatus::DELETED); 
 			KalturaLog::log("KalturaEntryService::delete Entry [$entryId] Partner [" . $entryToDelete->getPartnerId() . "]");
 			
 			// make sure the moderation_status is set to moderation::MODERATION_STATUS_DELETE

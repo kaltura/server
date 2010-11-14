@@ -117,9 +117,9 @@ class FlavorAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
 				
 		$validStatuses = array(
-			entry::ENTRY_STATUS_ERROR_CONVERTING,
-			entry::ENTRY_STATUS_PRECONVERT,
-			entry::ENTRY_STATUS_READY,
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::PRECONVERT,
+			entryStatus::READY,
 		);
 		
 		if (!in_array($dbEntry->getStatus(), $validStatuses))

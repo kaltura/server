@@ -35,9 +35,9 @@ class PlaylistService extends KalturaEntryService
 		$this->validateEntryScheduleDates($playlist);
 		
 		$dbPlaylist->setPartnerId ( $this->getPartnerId() );
-		$dbPlaylist->setStatus ( entry::ENTRY_STATUS_READY );
+		$dbPlaylist->setStatus ( entryStatus::READY );
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
-		$dbPlaylist->setType ( entry::ENTRY_TYPE_PLAYLIST );
+		$dbPlaylist->setType ( entryType::PLAYLIST );
 		
 		myPlaylistUtils::validatePlaylist( $dbPlaylist );
 		
@@ -71,7 +71,7 @@ class PlaylistService extends KalturaEntryService
 		
 		if ( ! $dbPlaylist )
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
-		if ( $dbPlaylist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		if ( $dbPlaylist->getType() != entryType::PLAYLIST )
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 			
 		if ($version !== -1)
@@ -102,7 +102,7 @@ class PlaylistService extends KalturaEntryService
 		
 		if ( ! $dbPlaylist )
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
-		if ( $dbPlaylist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		if ( $dbPlaylist->getType() != entryType::PLAYLIST )
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 		
 		$playlist->playlistType = $dbPlaylist->getMediaType();
@@ -175,7 +175,7 @@ class PlaylistService extends KalturaEntryService
 		if ( !$dbPlaylist )
 			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
 			
-		if ( $dbPlaylist->getType() != entry::ENTRY_TYPE_PLAYLIST )
+		if ( $dbPlaylist->getType() != entryType::PLAYLIST )
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 			
 		if ($newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
@@ -320,7 +320,7 @@ class PlaylistService extends KalturaEntryService
 	    
 		$dbPlaylist = new entry();
 		$dbPlaylist->setId( -1 ); // set with some dummy number so the getDataContent will later work properly 
-		$dbPlaylist->setType ( entry::ENTRY_TYPE_PLAYLIST ); // prepare the playlist type before filling from request
+		$dbPlaylist->setType ( entryType::PLAYLIST ); // prepare the playlist type before filling from request
 		$dbPlaylist->setMediaType ( $playlistType );
 		$dbPlaylist->setDataContent( $playlistContent );
 				

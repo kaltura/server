@@ -309,7 +309,7 @@ class MediaService extends KalturaEntryService
 	{
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if (!$srcEntry || $srcEntry->getType() != entryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		$srcFlavorAsset = null;
@@ -361,7 +361,7 @@ class MediaService extends KalturaEntryService
 		$sourceEntryId = $srcFlavorAsset->getEntryId();
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
-		if (!$srcEntry || $srcEntry->getType() != entry::ENTRY_TYPE_MEDIACLIP)
+		if (!$srcEntry || $srcEntry->getType() != entryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		if ($mediaEntry === null)
