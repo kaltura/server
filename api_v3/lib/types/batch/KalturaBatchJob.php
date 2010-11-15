@@ -196,7 +196,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	private static $map_between_objects = array
 	(
 		"entryId" ,
-		"jobType", "jobSubType" , 
+		"jobSubType" , 
 	 	"status" , "abort" , "checkAgainTimeout" , "progress" ,
 		"message", "description" , "updatesCount" , "parentJobId" ,
 		"rootJobId", "bulkJobId" , "twinJobId" , "priority" ,
@@ -305,7 +305,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				break;
 				
 			default:
-				$this->data = new KalturaObject();
+				$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
 			
 		$this->data->fromObject($dbData);
@@ -322,6 +322,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			
 		$dbData = $dbBatchJob->getData();
 		$this->fromData($dbData);
+		$this->jobSubType = $this->data->fromSubType($dbBatchJob->getJobSubType());
 		
 		return $this;
 	}
@@ -430,13 +431,15 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				break;
 				
 			default:
-				$dbData = null;
+				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
+				if(is_null($this->data))
+					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
 		
 		if(is_null($dbBatchJob->getData()))
 			$dbBatchJob->setData($dbData);
 	
-		if($this->data instanceof KalturaObject)
+		if($this->data instanceof KalturaJobData)
 		{
 			$dbData = $this->data->toObject($dbBatchJob->getData());
 			$dbBatchJob->setData($dbData);
@@ -452,6 +455,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			
 		$dbBatchJob = parent::toObject($dbBatchJob);
 		$dbData = $this->toData($dbBatchJob);
+		$dbBatchJob->setJobSubType($this->data->toSubType($this->jobSubType));
 		
 		return $dbBatchJob;
 	}   

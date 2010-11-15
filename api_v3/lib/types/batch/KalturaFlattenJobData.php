@@ -22,5 +22,3 @@ class KalturaFlattenJobData extends KalturaJobData
 		return parent::toObject($dbData);
 	}
 }
-
-?>

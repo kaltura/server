@@ -103,6 +103,24 @@ class KalturaProvisionJobData extends KalturaJobData
 			
 		return parent::toObject($dbData, $props_to_skip);
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		// TODO - change to pluginable enum to support more providers
+		return $subType;
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		// TODO - change to pluginable enum to support more providers
+		return $subType;
+	}
 }
-
-?>

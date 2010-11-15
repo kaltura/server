@@ -83,6 +83,22 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 		
 		return $dbData;
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return $this->toDynamicEnumValue('KalturaConversionEngineType', $subType);
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return $this->fromDynamicEnumValue('KalturaConversionEngineType', $subType);
+	}
 }
-
-?>

@@ -25,6 +25,25 @@ class KalturaStorageDeleteJobData extends KalturaStorageJobData
 			
 		return parent::toObject($dbData);
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		// TODO - change to pluginable enum to support more file export protocols
+		return $subType;
+	}
 }
 
-?>

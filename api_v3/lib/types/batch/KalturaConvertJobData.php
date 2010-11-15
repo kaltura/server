@@ -56,6 +56,22 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 			
 		return parent::toObject($dbData, $props_to_skip);
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return $this->toDynamicEnumValue('KalturaConversionEngineType', $subType);
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return $this->fromDynamicEnumValue('KalturaConversionEngineType', $subType);
+	}
 }
-
-?>
