@@ -19,15 +19,23 @@
 		require_once("../../bootstrap.php");
 		ActKeyUtils::checkCurrent();
 		KalturaLog::setContext("TESTME");
-		$serviceMap = KalturaServicesMap::getMap();
-		$serviceIds = array_keys($serviceMap);
-		sort($serviceIds);
-		$services = array();
-		foreach($serviceIds as $serviceId)
+		
+		$config = new Zend_Config_Ini("../../config/testme.ini");
+		$indexConfig = $config->get('testme');
+		
+		$include = $indexConfig->get("include");
+		$exclude = $indexConfig->get("exclude");
+		
+		$clientGenerator = new DummyForDocsClientGenerator();
+		$clientGenerator->setIncludeOrExcludeList($include, $exclude);
+		$clientGenerator->load();
+		
+		$list = array();
+		$services = $clientGenerator->getServices();
+		foreach($services as $serviceName => $serviceReflector)
 		{
-			$serviceReflector = new KalturaServiceReflector($serviceId);
-			if(!$serviceReflector->isDeprecated() && !$serviceReflector->isServerOnly())
-				$services[$serviceId] = $serviceReflector->getServiceName();
+			if($serviceReflector->isDeprecated() || $serviceReflector->isServerOnly())
+				unset($services[$serviceName]);
 		}
 	?>
 <ul id="kmcSubMenu">
@@ -60,8 +68,8 @@
 			<div class="param">
 				<label for="service">Select service:</label>
 				<select name="service">
-					<?php foreach($services as $id => $name): ?>
-					<option value="<?php echo $id;?>"><?php echo $name; ?></option>
+					<?php foreach($services as $serviceReflector): ?>
+					<option value="<?php echo $serviceReflector->getServiceId();?>"><?php echo $serviceReflector->getServiceName(); ?></option>
 					<?php endforeach; ?>
 				</select>
 			</div>

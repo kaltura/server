@@ -2,14 +2,11 @@
 	require_once("../../bootstrap.php"); 
 
 	$config = new Zend_Config_Ini("../../config/testme.ini");
-	$indexConfig = $config->get('index');
+	$indexConfig = $config->get('testmedoc');
 	
 	$include = $indexConfig->get("include");
 	$exclude = $indexConfig->get("exclude");
 	$additional = $indexConfig->get("additional");
-	
-	$serviceMap = KalturaServicesMap::getMap();
-	$services = array_keys($serviceMap);
 	
 	$currentService = @$_GET["service"];
 	$currentAction = @$_GET["action"];
@@ -90,8 +87,9 @@
 			<div id="services">
 				<h2>Services</h2>
 				<ul class="services">
-				<?php foreach($services as $serviceId => $serviceReflector): ?>
+				<?php foreach($services as $serviceReflector): ?>
 					<?php 
+						$serviceId = $serviceReflector->getServiceId();
 						$actions = $serviceReflector->getActions();
 					?>
 					<li class="service<?php echo($currentService == $serviceId) ? " expended": ""?>">
