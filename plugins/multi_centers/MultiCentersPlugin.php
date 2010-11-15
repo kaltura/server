@@ -1,5 +1,5 @@
 <?php
-class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers
+class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'multiCenters';
 	const MULTI_CENTERS_SYNCER_CLASS = 'kMultiCentersSynchronizer';
@@ -37,6 +37,63 @@ class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKal
 	 */
 	public static function getServiceConfig()
 	{
+		return null;
+	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @param array $constructorArgs
+	 * @return object
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'kJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::FILESYNC_IMPORT:
+					return new kFileSyncImportJobData();
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::FILESYNC_IMPORT:
+					return new KalturaFileSyncImportJobData();
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'kJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::FILESYNC_IMPORT:
+					return 'kFileSyncImportJobData';
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::FILESYNC_IMPORT:
+					return 'KalturaFileSyncImportJobData';
+			}
+		}
+		
 		return null;
 	}
 }

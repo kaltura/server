@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kFileSyncImportJobData
+class kFileSyncImportJobData extends kJobData
 {
 	
 	/** MEMBER VARIABLES **/

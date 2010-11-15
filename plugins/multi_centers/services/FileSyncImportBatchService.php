@@ -22,11 +22,11 @@ class FileSyncImportBatchService extends BatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaFileSyncImportBatchJobArray 
+	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveFileSyncImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobs = $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_FILESYNC_IMPORT );
+		$jobs = $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::FILESYNC_IMPORT );
 		
 		if($jobs)
 		{
@@ -83,7 +83,7 @@ class FileSyncImportBatchService extends BatchService
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
 	 * @param KalturaBatchJob $job
 	 * @param KalturaEntryStatus $entryStatus Optional parameter if the entry of the batch should change 
-	 * @return KalturaFileSyncImportBatchJob 
+	 * @return KalturaBatchJob 
 	 */
 	function updateExclusiveFileSyncImportJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
@@ -95,7 +95,7 @@ class FileSyncImportBatchService extends BatchService
 	
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
-		$batchJob = new KalturaFileSyncImportBatchJob(); // start from blank
+		$batchJob = new KalturaBatchJob(); // start from blank
 		return $batchJob->fromObject($dbBatchJob);
 	}
 	
@@ -122,53 +122,13 @@ class FileSyncImportBatchService extends BatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaFileSyncImportBatchJobArray 
+	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveAlmostDoneFileSyncImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_FILESYNC_IMPORT);
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::FILESYNC_IMPORT);
 	}
 	
-	
-	/**
-	 * batch getExclusiveJobsAction action allows to get a BatchJob 
-	 * 
-	 * @action getExclusiveJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
-	 * @return KalturaFileSyncImportBatchJobArray 
-	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
-		return KalturaFileSyncImportBatchJobArray::fromBatchJobArray($jobs);
-	}
-
-	
-	
-	/**
-	 * batch getExclusiveAlmostDone action allows to get a BatchJob that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDone
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
-	 * @return KalturaFileSyncImportBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
-	{
-		$jobsFilter = new BatchJobFilter();
-		if (!$filter)
-			$jobsFilter = $filter->toObject($jobsFilter);
-		
-		$jobs = kBatchManager::getExclusiveAlmostDoneJobs($lockKey->toObject(), $maxExecutionTime, $numberOfJobs, $jobType, $jobsFilter);
-		return KalturaFileSyncImportBatchJobArray::fromBatchJobArray($jobs);
-	}
 	
 // --------------------------------- End of FileSyncImportJob functions 	------------------------ //
 
