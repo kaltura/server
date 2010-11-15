@@ -44,7 +44,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_IMPORT );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::IMPORT );
 	}
 
 	
@@ -105,7 +105,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveBulkUploadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_BULKUPLOAD );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKUPLOAD );
 	}
 	
 	/**
@@ -120,7 +120,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneBulkUploadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_BULKUPLOAD);
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKUPLOAD);
 	}
 
 	
@@ -295,7 +295,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneRemoteConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::REMOTE_CONVERT );
 	}
 	
 	/**
@@ -349,7 +349,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneConvertCollectionJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_COLLECTION );
 	}	
 	
 	/**
@@ -364,7 +364,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneConvertProfileJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_PROFILE );
 	}
 	
 	/**
@@ -463,7 +463,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveConvertCollectionJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION);
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_COLLECTION);
 		
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
@@ -481,7 +481,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_CONVERT);
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT);
 		
 		if($jobs)
 		{
@@ -509,7 +509,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_CONVERT );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT );
 	}
 	
 	
@@ -602,7 +602,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusivePostConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_POSTCONVERT );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::POSTCONVERT );
 	}
 
 	
@@ -665,7 +665,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusivePullJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_PULL );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PULL );
 	}
 
 	
@@ -727,7 +727,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveExtractMediaJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::EXTRACT_MEDIA );
 	}
 
 	
@@ -828,7 +828,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveStorageExportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::STORAGE_EXPORT );
 	}
 
 	
@@ -889,7 +889,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveStorageDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_STORAGE_DELETE );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::STORAGE_DELETE );
 	}
 
 	
@@ -949,7 +949,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveNotificationJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_NOTIFICATION);
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::NOTIFICATION);
 		
 		// Because the notifications need the partner's url and policy of mulriNotifications - we'll send the partner list
 		$dbPartners = array();
@@ -1028,7 +1028,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveMailJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_MAIL );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::MAIL );
 	}
 
 	
@@ -1088,7 +1088,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveBulkDownloadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD);
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKDOWNLOAD);
 	}
 	
 	/**
@@ -1103,7 +1103,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneBulkDownloadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKDOWNLOAD );
 	}
 
 	/**
@@ -1161,7 +1161,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveProvisionProvideJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_PROVISION_PROVIDE);
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_PROVIDE);
 	}
 	
 	/**
@@ -1176,7 +1176,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneProvisionProvideJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_PROVISION_PROVIDE );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_PROVIDE );
 	}
 
 	/**
@@ -1232,7 +1232,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveProvisionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_PROVISION_DELETE);
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_DELETE);
 	}
 	
 	/**
@@ -1247,7 +1247,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneProvisionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_PROVISION_DELETE );
+		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_DELETE );
 	}
 
 	/**

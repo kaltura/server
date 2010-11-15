@@ -47,7 +47,7 @@ class KalturaBulkUpload extends KalturaObject
 	
 	public function fromObject($batchJob)
 	{
-		if($batchJob->getJobType() != BatchJob::BATCHJOB_TYPE_BULKUPLOAD)
+		if($batchJob->getJobType() != BatchJobType::BULKUPLOAD)
 			throw new Exception("Bulk upload object can be initialized from bulk upload job only");
 		
 		$this->id = $batchJob->getId();

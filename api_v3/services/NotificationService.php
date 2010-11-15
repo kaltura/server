@@ -26,7 +26,7 @@ class NotificationService extends KalturaBaseService
             throw new KalturaAPIException(KalturaErrors::NOTIFICATION_FOR_ENTRY_NOT_FOUND, $entryId);
 		}
 		
-		$notifications = BatchJobPeer::retrieveByEntryIdAndType($entryId, BatchJob::BATCHJOB_TYPE_NOTIFICATION, $type);
+		$notifications = BatchJobPeer::retrieveByEntryIdAndType($entryId, BatchJobType::NOTIFICATION, $type);
 		
 		// FIXME: throw error if not found		
 		if (count($notifications) == 0)

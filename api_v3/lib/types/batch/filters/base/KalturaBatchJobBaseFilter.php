@@ -65,6 +65,7 @@ class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 * 
+	 * @dynamicType KalturaBatchJobType
 	 * @var string
 	 */
 	public $jobTypeIn;
@@ -72,7 +73,8 @@ class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaBatchJobType
+	 * @dynamicType KalturaBatchJobType
+	 * @var string
 	 */
 	public $jobTypeNotIn;
 

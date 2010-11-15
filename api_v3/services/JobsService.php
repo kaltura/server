@@ -947,7 +947,7 @@ class JobsService extends KalturaBaseService
 		
 		$mailJobDataDb = $mailJobData->toObject(new kMailJobData());
 			
-		kJobsManager::addJob($batchJob, $mailJobDataDb, BatchJob::BATCHJOB_TYPE_MAIL, $mailJobDataDb->getMailType());
+		kJobsManager::addJob($batchJob, $mailJobDataDb, BatchJobType::MAIL, $mailJobDataDb->getMailType());
 	}
 	
 // --------------------------------- MailJob functions 	--------------------------------- //
