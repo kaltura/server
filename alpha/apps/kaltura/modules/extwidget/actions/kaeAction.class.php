@@ -45,7 +45,7 @@ class kaeAction extends sfAction
 			"&uiConfId=" . $ui_conf_id . "&disableurlhashing=".kConf::get('disable_url_hashing');
 		
 		$wrapper_swf = myContentStorage::getFSFlashRootPath ()."/flexwrapper/".kConf::get('editors_flex_wrapper_version')."/FlexWrapper.swf";
-		$this->redirect(  $cdn_host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
+		$this->redirect(  $host . myPartnerUtils::getUrlForPartner( $partner_id , $subp_id ) . "$wrapper_swf?$params");
 	}
 }
 ?>
