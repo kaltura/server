@@ -17,11 +17,11 @@ class MetadataBatchService extends BatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaMetadataBatchJobArray 
+	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveImportMetadataJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_METADATA_IMPORT );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_IMPORT );
 	}
 
 	
@@ -31,10 +31,10 @@ class MetadataBatchService extends BatchService
 	 * @action updateExclusiveImportMetadataJob
 	 * @param int $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaMetadataBatchJob $job
-	 * @return KalturaMetadataBatchJob 
+	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob 
 	 */
-	function updateExclusiveImportMetadataJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaMetadataBatchJob $job)
+	function updateExclusiveImportMetadataJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
@@ -44,7 +44,7 @@ class MetadataBatchService extends BatchService
 	
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
-		$batchJob = new KalturaMetadataBatchJob(); // start from blank
+		$batchJob = new KalturaBatchJob(); // start from blank
 		return $batchJob->fromObject($dbBatchJob);
 	}
 
@@ -75,11 +75,11 @@ class MetadataBatchService extends BatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaMetadataBatchJobArray 
+	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveTransformMetadataJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM );
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_TRANSFORM );
 	}
 
 	
@@ -89,10 +89,10 @@ class MetadataBatchService extends BatchService
 	 * @action updateExclusiveTransformMetadataJob
 	 * @param int $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaMetadataBatchJob $job
-	 * @return KalturaMetadataBatchJob 
+	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob 
 	 */
-	function updateExclusiveTransformMetadataJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaMetadataBatchJob $job)
+	function updateExclusiveTransformMetadataJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
@@ -102,7 +102,7 @@ class MetadataBatchService extends BatchService
 	
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
-		$batchJob = new KalturaMetadataBatchJob(); // start from blank
+		$batchJob = new KalturaBatchJob(); // start from blank
 		return $batchJob->fromObject($dbBatchJob);
 	}
 
@@ -191,25 +191,5 @@ class MetadataBatchService extends BatchService
 		return $response;
 	}
 // --------------------------------- TransformMetadataJob functions 	--------------------------------- //
-
 	
-	
-
-	/**
-	 * batch getExclusiveJobsAction action allows to get a BatchJob 
-	 * 
-	 * @action getExclusiveJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
-	 * @return KalturaMetadataBatchJobArray 
-	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
-		return KalturaMetadataBatchJobArray::fromBatchJobArray($jobs);
-	}	
 }
-?>
