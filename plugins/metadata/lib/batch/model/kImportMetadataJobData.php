@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kImportMetadataJobData
+class kImportMetadataJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -72,5 +72,3 @@ class kImportMetadataJobData
 	}
 
 }
-
-?>

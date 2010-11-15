@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kTransformMetadataJobData
+class kTransformMetadataJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -112,5 +112,3 @@ class kTransformMetadataJobData
 		$this->destXsdPath = $destXsdPath;
 	}
 }
-
-?>

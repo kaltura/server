@@ -66,28 +66,50 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass != 'ISyncableFile')
-			return null;
-			
-		if(!isset($constructorArgs['objectId']))
-			return null;
-			
-		$objectId = $constructorArgs['objectId'];
-		
-		switch($enumValue)
+		if($baseClass == 'ISyncableFile' && isset($constructorArgs['objectId']))
 		{
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
-				MetadataPeer::setUseCriteriaFilter ( false );
-				$object = MetadataPeer::retrieveByPK( $objectId );
-				MetadataPeer::setUseCriteriaFilter ( true );
-				return $object;
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
-				MetadataProfilePeer::setUseCriteriaFilter ( false );
-				$object = MetadataProfilePeer::retrieveByPK( $objectId );
-				MetadataProfilePeer::setUseCriteriaFilter ( true );
-				return $object;
+			$objectId = $constructorArgs['objectId'];
+			
+			switch($enumValue)
+			{
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+					MetadataPeer::setUseCriteriaFilter ( false );
+					$object = MetadataPeer::retrieveByPK( $objectId );
+					MetadataPeer::setUseCriteriaFilter ( true );
+					return $object;
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+					MetadataProfilePeer::setUseCriteriaFilter ( false );
+					$object = MetadataProfilePeer::retrieveByPK( $objectId );
+					MetadataProfilePeer::setUseCriteriaFilter ( true );
+					return $object;
+			}
 		}
+		
+		if($baseClass == 'kJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::METADATA_IMPORT:
+					return new kImportJobData();
+					
+				case KalturaBatchJobType::METADATA_TRANSFORM:
+					return new kTransformMetadataJobData();
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::METADATA_IMPORT:
+					return new KalturaImportJobData();
+					
+				case KalturaBatchJobType::METADATA_TRANSFORM:
+					return new KalturaTransformMetadataJobData();
+			}
+		}
+		
 		return null;
 	}
 	
@@ -98,17 +120,42 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass != 'ISyncableFile')
-			return null;
-			
-		switch($enumValue)
+		if($baseClass == 'ISyncableFile')
 		{
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
-				return 'Metadata';
-				
-			case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
-				return 'MetadataProfile';
+			switch($enumValue)
+			{
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+					return 'Metadata';
+					
+				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+					return 'MetadataProfile';
+			}
 		}
+		
+		if($baseClass == 'kJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::METADATA_IMPORT:
+					return 'kImportJobData';
+					
+				case KalturaBatchJobType::METADATA_TRANSFORM:
+					return 'kTransformMetadataJobData';
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			switch($enumValue)
+			{
+				case KalturaBatchJobType::METADATA_IMPORT:
+					return 'KalturaImportJobData';
+					
+				case KalturaBatchJobType::METADATA_TRANSFORM:
+					return 'KalturaTransformMetadataJobData';
+			}
+		}
+		
 		return null;
 	}
 
