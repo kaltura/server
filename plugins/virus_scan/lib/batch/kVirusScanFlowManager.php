@@ -9,7 +9,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
 	{
-		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM)
+		if($dbBatchJob->getJobType() == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 		
 		return true;
