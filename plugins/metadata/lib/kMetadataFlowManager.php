@@ -11,11 +11,11 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 	{
 		switch($dbBatchJob->getJobType())
 		{
-			case BatchJob::BATCHJOB_TYPE_METADATA_IMPORT:
+			case BatchJobType::METADATA_IMPORT:
 				$dbBatchJob = $this->updatedImportMetadata($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 				break;
 		
-			case BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM:
+			case BatchJobType::METADATA_TRANSFORM:
 				$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 				break;
 	
