@@ -398,7 +398,7 @@ class kMetadataManager
 		$data->setMetadataId($metadataId);
 		$data->setSrcFileUrl($url);
 		
-		return kJobsManager::addJob($job, $data, BatchJob::BATCHJOB_TYPE_METADATA_IMPORT);
+		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_IMPORT);
 	}
 	
 	/**
@@ -439,6 +439,6 @@ class kMetadataManager
 		$data->setSrcVersion($srcVersion);
 		$data->setDestVersion($destVersion);
 		
-		return kJobsManager::addJob($job, $data, BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM);
+		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_TRANSFORM);
 	}
 }
