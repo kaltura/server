@@ -92,5 +92,3 @@ class kConvertJobData extends kConvartableJobData
 		$this->flavorAssetId = $flavorAssetId;
 	}
 }
-
-?>

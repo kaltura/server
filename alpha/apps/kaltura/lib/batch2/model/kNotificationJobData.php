@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kNotificationJobData
+class kNotificationJobData extends kJobData
 {
 	const NOTIFICATION_MGR_NO_SEND = 0;
 	const NOTIFICATION_MGR_SEND_ASYNCH = 1;
@@ -320,5 +320,3 @@ class kNotificationJobData
 
     
 }
-
-?>

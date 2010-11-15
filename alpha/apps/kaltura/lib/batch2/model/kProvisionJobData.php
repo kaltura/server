@@ -5,7 +5,7 @@
  * @subpackage Batch
  *
  */
-class kProvisionJobData
+class kProvisionJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -282,5 +282,3 @@ class kProvisionJobData
 	}	
 	
 }
-
-?>

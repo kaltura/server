@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kMailJobData
+class kMailJobData extends kJobData
 {
 	const MAIL_STATUS_PENDING = 1;
 	const MAIL_STATUS_SENT = 2;
@@ -355,5 +355,3 @@ class kMailJobData
 		$this->isHtml = $isHtml;
 	}
 }
-
-?>

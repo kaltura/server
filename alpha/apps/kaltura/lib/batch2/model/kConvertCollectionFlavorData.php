@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kConvertCollectionFlavorData
+class kConvertCollectionFlavorData extends kJobData
 {
 	/**
 	 * @var string
@@ -153,5 +153,3 @@ class kConvertCollectionFlavorData
 		$this->audioBitrate = $audioBitrate;
 	}
 }
-
-?>

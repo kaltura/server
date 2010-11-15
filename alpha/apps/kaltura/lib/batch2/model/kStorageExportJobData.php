@@ -51,5 +51,3 @@ class kStorageExportJobData extends kStorageJobData
 	}
 
 }
-
-?>

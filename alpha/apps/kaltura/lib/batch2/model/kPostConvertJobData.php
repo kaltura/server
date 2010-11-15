@@ -161,5 +161,3 @@ class kPostConvertJobData extends kConvartableJobData
 	}
 
 }
-
-?>

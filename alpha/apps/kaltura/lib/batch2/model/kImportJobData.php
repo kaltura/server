@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kImportJobData
+class kImportJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -71,5 +71,3 @@ class kImportJobData
 		$this->destFileLocalPath = $destFileLocalPath;
 	}
 }
-
-?>

@@ -30,5 +30,3 @@ class kExtractMediaJobData extends kConvartableJobData
 
 	
 }
-
-?>

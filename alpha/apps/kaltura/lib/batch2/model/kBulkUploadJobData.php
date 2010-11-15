@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kBulkUploadJobData
+class kBulkUploadJobData extends kJobData
 {
 	const BULK_UPLOAD_CSV_VERSION_V1 = 1; // 5 values in a row
 	const BULK_UPLOAD_CSV_VERSION_V2 = 2; // 12 values in a row
@@ -201,5 +201,3 @@ class kBulkUploadJobData
 	}
 	
 }
-
-?>

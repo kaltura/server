@@ -170,5 +170,3 @@ class kConvertCollectionJobData extends kConvartableJobData
 
 
 }
-
-?>

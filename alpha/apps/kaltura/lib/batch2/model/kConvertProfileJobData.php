@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kConvertProfileJobData
+class kConvertProfileJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -137,5 +137,3 @@ class kConvertProfileJobData
 		$this->inputFileSyncLocalPath = $inputFileSyncLocalPath;
 	}
 }
-
-?>

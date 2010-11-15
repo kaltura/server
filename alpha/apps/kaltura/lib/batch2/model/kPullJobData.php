@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kPullJobData
+class kPullJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -53,5 +53,3 @@ class kPullJobData
 	
 	
 }
-
-?>

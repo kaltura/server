@@ -55,5 +55,3 @@ class kRemoteConvertJobData extends kConvartableJobData
 
 
 }
-
-?>

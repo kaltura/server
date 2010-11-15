@@ -5,7 +5,7 @@
  * @subpackage Batch
  *
  */
-class kStorageJobData
+class kStorageJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -134,5 +134,3 @@ class kStorageJobData
 		$this->srcFileSyncId = $srcFileSyncId;
 	}
 }
-
-?>

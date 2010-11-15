@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kBulkDownloadJobData
+class kBulkDownloadJobData extends kJobData
 {
 	/**
 	 * Comma separated list of entry ids
@@ -63,5 +63,3 @@ class kBulkDownloadJobData
 		$this->flavorParamsId = $flavorParamsId;
 	}
 }
-
-?>

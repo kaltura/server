@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kConvartableJobData
+class kConvartableJobData extends kJobData
 {
 	/**
 	 * @var string
