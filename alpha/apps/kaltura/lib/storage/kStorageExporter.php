@@ -177,7 +177,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 			
 		// convert profile finished - export source flavor
-		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());
 			foreach($externalStorages as $externalStorage)
@@ -200,7 +200,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 			
 		// convert collection finished - export ism and ismc files
-		if($dbBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
+		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
 		{
 			$entry = $dbBatchJob->getEntry();
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($dbBatchJob->getPartnerId());

@@ -42,7 +42,7 @@ class listdownloadsAction extends defPartnerservices2Action
 		$offset = ($page-1)* $limit;
 
 		$c = new Criteria();
-		$download_types = array ( BatchJob::BATCHJOB_TYPE_FLATTEN , BatchJob::BATCHJOB_TYPE_DOWNLOAD );
+		$download_types = array ( BatchJobType::FLATTEN , BatchJobType::DOWNLOAD );
 		
 		$c->add ( BatchJobPeer::JOB_TYPE , $download_types , Criteria::IN );
 		

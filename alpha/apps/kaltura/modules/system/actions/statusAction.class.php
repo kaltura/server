@@ -41,7 +41,7 @@ class statusAction extends kalturaSystemAction
 				{
 					$source = $entry->getSource();
 					
-					$batchjob_query = "SELECT description FROM batch_job WHERE job_type=".BatchJob::BATCHJOB_TYPE_IMPORT." and entry_id='$entry_id'";
+					$batchjob_query = "SELECT description FROM batch_job WHERE job_type=".BatchJobType::IMPORT." and entry_id='$entry_id'";
 					$batchjob_statement = $this->connection->prepareStatement($batchjob_query);
 				    $batchjob_resultset = $batchjob_statement->executeQuery();
 				    $batchjob_description = "NO BATCHJOB";
@@ -120,7 +120,7 @@ class statusAction extends kalturaSystemAction
 				
 				if ($entry)
 				{
-					$batchjob_query = "SELECT description FROM batch_job WHERE job_type=".BatchJob::BATCHJOB_TYPE_IMPORT." and entry_id='$entry_id'";
+					$batchjob_query = "SELECT description FROM batch_job WHERE job_type=".BatchJobType::IMPORT." and entry_id='$entry_id'";
 					$batchjob_statement = $this->connection->prepareStatement($batchjob_query);
 				    $batchjob_resultset = $batchjob_statement->executeQuery();
 				    $batchjob_description = "NO BATCHJOB";
@@ -311,11 +311,11 @@ class statusAction extends kalturaSystemAction
 		);
 		
 	    $jobs = array(
-	   		BatchJob::BATCHJOB_TYPE_IMPORT => "Import",
-	   		BatchJob::BATCHJOB_TYPE_DELETE => "Delete",
-	   		BatchJob::BATCHJOB_TYPE_FLATTEN => "Flatten",
-	   		BatchJob::BATCHJOB_TYPE_BULKUPLOAD => "Bulk Upload",
-	   		BatchJob::BATCHJOB_TYPE_OOCONVERT => "OOConvert"
+	   		BatchJobType::IMPORT => "Import",
+	   		BatchJobType::DELETE => "Delete",
+	   		BatchJobType::FLATTEN => "Flatten",
+	   		BatchJobType::BULKUPLOAD => "Bulk Upload",
+	   		BatchJobType::OOCONVERT => "OOConvert"
 	   		);
 	   		
 	   	foreach($jobs as $job_type => $job_name)
@@ -324,7 +324,7 @@ class statusAction extends kalturaSystemAction
 		    
 		    $this->dumpQuery($query, $job_name, $job_statuses);
 		    
-			if ($job_type == BatchJob::BATCHJOB_TYPE_OOCONVERT)
+			if ($job_type == BatchJobType::OOCONVERT)
 			    $this->dumpOOConvertErrors("select partner_id,id,entry_id,created_at as date,timediff(now(),created_at) as diff from batch_job where job_type=$job_type and created_at>$date_filter $partner_where AND status=".BatchJob::BATCHJOB_STATUS_FAILED);
 	   	}
 	    

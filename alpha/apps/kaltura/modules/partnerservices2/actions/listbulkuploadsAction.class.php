@@ -48,7 +48,7 @@ class listbulkuploadsAction extends defPartnerservices2Action
 
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::PARTNER_ID, $partner_id);
-		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJob::BATCHJOB_TYPE_BULKUPLOAD);
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$c->addDescendingOrderByColumn(BatchJobPeer::ID);
 		
 		$count = BatchJobPeer::doCount($c);

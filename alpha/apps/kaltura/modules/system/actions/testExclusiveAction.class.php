@@ -11,7 +11,7 @@ class testExclusiveAction extends kalturaSystemAction
 	{
 		$mode = $this->getP ( "mode" , "get" );
 		$c = new Criteria();
-//		$c->add ( BatchJobPeer::JOB_TYPE , BatchJob::BATCHJOB_TYPE_DELETE );
+//		$c->add ( BatchJobPeer::JOB_TYPE , BatchJobType::DELETE );
 		$peer = new BatchJobPeer();
 		$location_id = "loc1";
 		$server_id = "ser1";

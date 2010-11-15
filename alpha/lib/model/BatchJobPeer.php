@@ -78,29 +78,29 @@ class BatchJobPeer extends BaseBatchJobPeer
 	{
 		switch($jobType)
 		{
-			case BatchJob::BATCHJOB_TYPE_IMPORT:
+			case BatchJobType::IMPORT:
 				if($data instanceof kImportJobData)
 					return sha1($data->getSrcFileUrl());
 				return null;
 				
-			case BatchJob::BATCHJOB_TYPE_PULL:
+			case BatchJobType::PULL:
 				if($data instanceof kPullJobData)
 					return sha1($data->getSrcFileUrl());
 				return null;
 				
-			case BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA:
+			case BatchJobType::EXTRACT_MEDIA:
 				if($data instanceof kExtractMediaJobData)
 					return sha1($data->getSrcFileSyncLocalPath());
 				return null;
 				
-			case BatchJob::BATCHJOB_TYPE_CONVERT:
-			case BatchJob::BATCHJOB_TYPE_DELETE:
-			case BatchJob::BATCHJOB_TYPE_FLATTEN:
-			case BatchJob::BATCHJOB_TYPE_BULKUPLOAD:
-			case BatchJob::BATCHJOB_TYPE_DOWNLOAD:
-			case BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE:
-			case BatchJob::BATCHJOB_TYPE_POSTCONVERT:
-			case BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT:
+			case BatchJobType::CONVERT:
+			case BatchJobType::DELETE:
+			case BatchJobType::FLATTEN:
+			case BatchJobType::BULKUPLOAD:
+			case BatchJobType::DOWNLOAD:
+			case BatchJobType::CONVERT_PROFILE:
+			case BatchJobType::POSTCONVERT:
+			case BatchJobType::REMOTE_CONVERT:
 			default:
 				return null;
 		}
@@ -124,7 +124,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 			
 		switch($jobType)
 		{
-			case BatchJob::BATCHJOB_TYPE_IMPORT:
+			case BatchJobType::IMPORT:
 				foreach($duplicatedJobs as $index => $duplicatedJob)
 				{
 					$duplicatedData = $duplicatedJob->getData();
@@ -133,7 +133,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 				}
 				return $duplicatedJobs;
 				
-			case BatchJob::BATCHJOB_TYPE_PULL:
+			case BatchJobType::PULL:
 				foreach($duplicatedJobs as $index => $duplicatedJob)
 				{
 					$duplicatedData = $duplicatedJob->getData();
@@ -142,7 +142,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 				}
 				return $duplicatedJobs;
 				
-			case BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA:
+			case BatchJobType::EXTRACT_MEDIA:
 				foreach($duplicatedJobs as $index => $duplicatedJob)
 				{
 					$duplicatedData = $duplicatedJob->getData();
@@ -151,14 +151,14 @@ class BatchJobPeer extends BaseBatchJobPeer
 				}
 				return $duplicatedJobs;
 				
-			case BatchJob::BATCHJOB_TYPE_CONVERT:
-			case BatchJob::BATCHJOB_TYPE_DELETE:
-			case BatchJob::BATCHJOB_TYPE_FLATTEN:
-			case BatchJob::BATCHJOB_TYPE_BULKUPLOAD:
-			case BatchJob::BATCHJOB_TYPE_DOWNLOAD:
-			case BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE:
-			case BatchJob::BATCHJOB_TYPE_POSTCONVERT:
-			case BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT:
+			case BatchJobType::CONVERT:
+			case BatchJobType::DELETE:
+			case BatchJobType::FLATTEN:
+			case BatchJobType::BULKUPLOAD:
+			case BatchJobType::DOWNLOAD:
+			case BatchJobType::CONVERT_PROFILE:
+			case BatchJobType::POSTCONVERT:
+			case BatchJobType::REMOTE_CONVERT:
 			default:
 				return null;
 		}

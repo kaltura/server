@@ -149,8 +149,8 @@ class investigate
 	}
 
 	/*
-	 constBatchJob::BATCHJOB_TYPE_CONVERT = 0;
-	 constBatchJob::BATCHJOB_TYPE_IMPORT = 1;
+	 constBatchJobType::CONVERT = 0;
+	 constBatchJobType::IMPORT = 1;
 
 	 const BATCHJOB_SUB_TYPE_YOUTUBE = 0;
 	 const BATCHJOB_SUB_TYPE_MYSPACE = 1;
@@ -169,25 +169,25 @@ class investigate
 	 */
 
 	private static $job_type_map = array (
-		BatchJob::BATCHJOB_TYPE_CONVERT => "BATCHJOB_TYPE_CONVERT",
-		BatchJob::BATCHJOB_TYPE_IMPORT => "BATCHJOB_TYPE_IMPORT",
-		BatchJob::BATCHJOB_TYPE_DELETE => "BATCHJOB_TYPE_DELETE",
-		BatchJob::BATCHJOB_TYPE_FLATTEN => "BATCHJOB_TYPE_FLATTEN",
-		BatchJob::BATCHJOB_TYPE_BULKUPLOAD => "BATCHJOB_TYPE_BULKUPLOAD", 
-		BatchJob::BATCHJOB_TYPE_DVDCREATOR => "BATCHJOB_TYPE_DVDCREATOR",
-		BatchJob::BATCHJOB_TYPE_DOWNLOAD => "BATCHJOB_TYPE_DOWNLOAD",
-		BatchJob::BATCHJOB_TYPE_OOCONVERT => "BATCHJOB_TYPE_OOCONVERT",
-		BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE => "BATCHJOB_TYPE_CONVERT_PROFILE",
-		BatchJob::BATCHJOB_TYPE_POSTCONVERT => "BATCHJOB_TYPE_POSTCONVERT",
-		BatchJob::BATCHJOB_TYPE_PULL => "BATCHJOB_TYPE_PULL",
-		BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT => "BATCHJOB_TYPE_REMOTE_CONVERT",
-		BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA => "BATCHJOB_TYPE_EXTRACT_MEDIA",
-		BatchJob::BATCHJOB_TYPE_MAIL => "BATCHJOB_TYPE_MAIL",
-		BatchJob::BATCHJOB_TYPE_NOTIFICATION => "BATCHJOB_TYPE_NOTIFICATION",
-		BatchJob::BATCHJOB_TYPE_CLEANUP => "BATCHJOB_TYPE_CLEANUP",
-		BatchJob::BATCHJOB_TYPE_SCHEDULER_HELPER => "BATCHJOB_TYPE_SCHEDULER_HELPER",
-		BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD => "BATCHJOB_TYPE_BULKDOWNLOAD",
-		BatchJob::BATCHJOB_TYPE_DB_CLEANUP => "BATCHJOB_TYPE_DB_CLEANUP",
+		BatchJobType::CONVERT => "BATCHJOB_TYPE_CONVERT",
+		BatchJobType::IMPORT => "BATCHJOB_TYPE_IMPORT",
+		BatchJobType::DELETE => "BATCHJOB_TYPE_DELETE",
+		BatchJobType::FLATTEN => "BATCHJOB_TYPE_FLATTEN",
+		BatchJobType::BULKUPLOAD => "BATCHJOB_TYPE_BULKUPLOAD", 
+		BatchJobType::DVDCREATOR => "BATCHJOB_TYPE_DVDCREATOR",
+		BatchJobType::DOWNLOAD => "BATCHJOB_TYPE_DOWNLOAD",
+		BatchJobType::OOCONVERT => "BATCHJOB_TYPE_OOCONVERT",
+		BatchJobType::CONVERT_PROFILE => "BATCHJOB_TYPE_CONVERT_PROFILE",
+		BatchJobType::POSTCONVERT => "BATCHJOB_TYPE_POSTCONVERT",
+		BatchJobType::PULL => "BATCHJOB_TYPE_PULL",
+		BatchJobType::REMOTE_CONVERT => "BATCHJOB_TYPE_REMOTE_CONVERT",
+		BatchJobType::EXTRACT_MEDIA => "BATCHJOB_TYPE_EXTRACT_MEDIA",
+		BatchJobType::MAIL => "BATCHJOB_TYPE_MAIL",
+		BatchJobType::NOTIFICATION => "BATCHJOB_TYPE_NOTIFICATION",
+		BatchJobType::CLEANUP => "BATCHJOB_TYPE_CLEANUP",
+		BatchJobType::SCHEDULER_HELPER => "BATCHJOB_TYPE_SCHEDULER_HELPER",
+		BatchJobType::BULKDOWNLOAD => "BATCHJOB_TYPE_BULKDOWNLOAD",
+		BatchJobType::DB_CLEANUP => "BATCHJOB_TYPE_DB_CLEANUP",
 	);
 	public static function formatBatchJobType ( $type )
 	{
@@ -820,7 +820,7 @@ file_sizeint(11)
 	
 		$data_div_id= "batch_job_data_tr_$bj->id";
 		
-		$resubmit_import_job = $bj->jobType == BatchJob::BATCHJOB_TYPE_IMPORT ?
+		$resubmit_import_job = $bj->jobType == BatchJobType::IMPORT ?
 			("<br/><a href='javascript:restartJob(\"" . url_for ( "/system" ) . "/restartJob?batchjob_id={$bj->id}&entry_id={$entry_id}\")'>restart</a>") : "";
 		
 		$job_type_desc = self::formatBatchJobType(  $bj->jobType );			
@@ -897,7 +897,7 @@ file_sizeint(11)
 		
 		$entry_id = $dbJob->getData()->getObjectId();
 
-		if ( $dbJob instanceof BatchJob &&  $dbJob->getJobType() == BatchJob::BATCHJOB_TYPE_NOTIFICATION  )
+		if ( $dbJob instanceof BatchJob &&  $dbJob->getJobType() == BatchJobType::NOTIFICATION  )
 			$job = new genericObjectWrapper ( $dbJob  , true );
 		else
 			return "";

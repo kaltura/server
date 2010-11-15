@@ -91,7 +91,7 @@ class addbulkuploadAction extends defPartnerservices2Action
 		$data->setUploadedBy($puser_kuser->getPuserName());
 		$data->setConversionProfileId($profileId);
 			
-		kJobsManager::addJob($job, $data, BatchJob::BATCHJOB_TYPE_BULKUPLOAD);
+		kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD);
 		
 		$this->addMsg("status", "ok");
 	}

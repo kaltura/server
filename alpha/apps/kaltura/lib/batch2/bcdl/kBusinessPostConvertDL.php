@@ -103,25 +103,25 @@ class kBusinessPostConvertDL
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		
 		// update the root job end exit
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT)
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
 		{
 			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			return $dbBatchJob;
 		}
 		
 		// update the root job end exit
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$siblingJobs = $rootBatchJob->getChildJobs();
 			foreach($siblingJobs as $siblingJob)
 			{
 				// checking only conversion child jobs
 				if(
-					$siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT
+					$siblingJob->getJobType() != BatchJobType::CONVERT
 					&&
-					$siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION
+					$siblingJob->getJobType() != BatchJobType::CONVERT_COLLECTION
 					&&
-					$siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_POSTCONVERT
+					$siblingJob->getJobType() != BatchJobType::POSTCONVERT
 					)
 					continue;
 					
@@ -199,7 +199,7 @@ class kBusinessPostConvertDL
 		}
 			
 		// only bulk-download and convert-profile are pending on the conversions to close them, otherwise, return
-		if($rootBatchJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 		{
 			KalturaLog::debug('Convert Finished - root job type [' . $rootBatchJob->getJobType() . ']');
 			return $dbBatchJob;
@@ -263,7 +263,7 @@ class kBusinessPostConvertDL
 		if(!$rootBatchJob)
 			return false;
 			
-		if($rootBatchJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 			return false;
 			
 		if($shouldFailProfile || !$hasIncomplete)
@@ -309,14 +309,14 @@ class kBusinessPostConvertDL
 			return false;
 
 		// failing a remote root job 
-		if($rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT)
+		if($rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Convert job " . $dbBatchJob->getId() . " failed");
 			return false;
 		}
 			
 		// bulk download root job no need to handle 
-		if($rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+		if($rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Convert job " . $dbBatchJob->getId() . " failed");
 			return false;
@@ -338,14 +338,14 @@ class kBusinessPostConvertDL
 		}
 		
 		// failing the root profile job if all child jobs failed 
-		if($rootBatchJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 			return false;
 		
 		$siblingJobs = $rootBatchJob->getChildJobs();
 		foreach($siblingJobs as $siblingJob)
 		{
 			// not conversion job and should be ignored
-			if($siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT && $siblingJob->getJobType() != BatchJob::BATCHJOB_TYPE_POSTCONVERT)
+			if($siblingJob->getJobType() != BatchJobType::CONVERT && $siblingJob->getJobType() != BatchJobType::POSTCONVERT)
 				continue;
 					
 			// found child flavor asset that hasn't failed, no need to fail the root job

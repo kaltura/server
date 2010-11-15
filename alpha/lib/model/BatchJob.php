@@ -10,36 +10,6 @@ require_once( 'myFileIndicator.class.php');
  */ 
 class BatchJob extends BaseBatchJob implements ISyncableFile
 {
-	const BATCHJOB_TYPE_CONVERT = 0;
-	const BATCHJOB_TYPE_IMPORT = 1;
-	const BATCHJOB_TYPE_DELETE = 2;
-	const BATCHJOB_TYPE_FLATTEN = 3;
-	const BATCHJOB_TYPE_BULKUPLOAD = 4;
-	const BATCHJOB_TYPE_DVDCREATOR = 5;
-	const BATCHJOB_TYPE_DOWNLOAD = 6;
-	const BATCHJOB_TYPE_OOCONVERT = 7;
-	const BATCHJOB_TYPE_CONVERT_PROFILE = 10;
-	const BATCHJOB_TYPE_POSTCONVERT = 11;
-	const BATCHJOB_TYPE_PULL = 12;
-	const BATCHJOB_TYPE_REMOTE_CONVERT = 13;
-	const BATCHJOB_TYPE_EXTRACT_MEDIA = 14;
-	const BATCHJOB_TYPE_MAIL = 15;
-	const BATCHJOB_TYPE_NOTIFICATION = 16;
-	const BATCHJOB_TYPE_CLEANUP = 17;
-	const BATCHJOB_TYPE_SCHEDULER_HELPER = 18;
-	const BATCHJOB_TYPE_BULKDOWNLOAD = 19;
-	const BATCHJOB_TYPE_DB_CLEANUP = 20;
-	const BATCHJOB_TYPE_PROVISION_PROVIDE = 21;
-	const BATCHJOB_TYPE_CONVERT_COLLECTION = 22;
-	const BATCHJOB_TYPE_STORAGE_EXPORT = 23;
-	const BATCHJOB_TYPE_PROVISION_DELETE = 24;
-	const BATCHJOB_TYPE_STORAGE_DELETE = 25;
-	const BATCHJOB_TYPE_EMAIL_INGESTION = 26;
-	const BATCHJOB_TYPE_METADATA_IMPORT = 27;
-	const BATCHJOB_TYPE_METADATA_TRANSFORM = 28;
-	const BATCHJOB_TYPE_FILESYNC_IMPORT = 29;
-	const BATCHJOB_TYPE_VIRUS_SCAN = 30;
-	
 	const BATCHJOB_TYPE_PROJECT = 1000;
 		
 	const BATCHJOB_SUB_TYPE_YOUTUBE = 0;
@@ -77,37 +47,37 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	private $aRootJob = null;
 	
 	private static $BATCHJOB_TYPE_NAMES = array(
-		self::BATCHJOB_TYPE_CONVERT => 'Convert',
-		self::BATCHJOB_TYPE_IMPORT => 'Import',
-		self::BATCHJOB_TYPE_DELETE => 'Delete',
-		self::BATCHJOB_TYPE_FLATTEN => 'Flatten',
-		self::BATCHJOB_TYPE_BULKUPLOAD => 'Bulk Upload',
-		self::BATCHJOB_TYPE_DVDCREATOR => 'DVD Creator',
-		self::BATCHJOB_TYPE_DOWNLOAD => 'Download',
-		self::BATCHJOB_TYPE_OOCONVERT => 'OO Convert',
-		self::BATCHJOB_TYPE_CONVERT_PROFILE => 'Convert Profile',
-		self::BATCHJOB_TYPE_POSTCONVERT => 'Post Convert',
-		self::BATCHJOB_TYPE_PULL => 'Pull',
-		self::BATCHJOB_TYPE_REMOTE_CONVERT => 'Remote Convert',
-		self::BATCHJOB_TYPE_EXTRACT_MEDIA => 'Extract Media',
-		self::BATCHJOB_TYPE_MAIL => 'Mail',
-		self::BATCHJOB_TYPE_NOTIFICATION => 'Notification',
-		self::BATCHJOB_TYPE_CLEANUP => 'Cleanup',
-		self::BATCHJOB_TYPE_SCHEDULER_HELPER => 'Schedule Helper',
-		self::BATCHJOB_TYPE_BULKDOWNLOAD => 'Bulk Download',
-		self::BATCHJOB_TYPE_DB_CLEANUP => 'DB Cleanup',
-		self::BATCHJOB_TYPE_PROJECT => 'Project',
+		BatchJobType::CONVERT => 'Convert',
+		BatchJobType::IMPORT => 'Import',
+		BatchJobType::DELETE => 'Delete',
+		BatchJobType::FLATTEN => 'Flatten',
+		BatchJobType::BULKUPLOAD => 'Bulk Upload',
+		BatchJobType::DVDCREATOR => 'DVD Creator',
+		BatchJobType::DOWNLOAD => 'Download',
+		BatchJobType::OOCONVERT => 'OO Convert',
+		BatchJobType::CONVERT_PROFILE => 'Convert Profile',
+		BatchJobType::POSTCONVERT => 'Post Convert',
+		BatchJobType::PULL => 'Pull',
+		BatchJobType::REMOTE_CONVERT => 'Remote Convert',
+		BatchJobType::EXTRACT_MEDIA => 'Extract Media',
+		BatchJobType::MAIL => 'Mail',
+		BatchJobType::NOTIFICATION => 'Notification',
+		BatchJobType::CLEANUP => 'Cleanup',
+		BatchJobType::SCHEDULER_HELPER => 'Schedule Helper',
+		BatchJobType::BULKDOWNLOAD => 'Bulk Download',
+		BatchJobType::DB_CLEANUP => 'DB Cleanup',
+		BatchJobType::PROJECT => 'Project',
 		
 		
-		self::BATCHJOB_TYPE_PROVISION_PROVIDE => 'Provision Provide',
-		self::BATCHJOB_TYPE_CONVERT_COLLECTION => 'Convert Collection',
-		self::BATCHJOB_TYPE_STORAGE_EXPORT => 'Storage Export',
-		self::BATCHJOB_TYPE_PROVISION_DELETE => 'Provision Delete',
-		self::BATCHJOB_TYPE_STORAGE_DELETE => 'Storage Delete',
-		self::BATCHJOB_TYPE_EMAIL_INGESTION => 'Email Ingestion',
+		BatchJobType::PROVISION_PROVIDE => 'Provision Provide',
+		BatchJobType::CONVERT_COLLECTION => 'Convert Collection',
+		BatchJobType::STORAGE_EXPORT => 'Storage Export',
+		BatchJobType::PROVISION_DELETE => 'Provision Delete',
+		BatchJobType::STORAGE_DELETE => 'Storage Delete',
+		BatchJobType::EMAIL_INGESTION => 'Email Ingestion',
 		
-		self::BATCHJOB_TYPE_METADATA_IMPORT => 'Metadata Import',
-		self::BATCHJOB_TYPE_METADATA_TRANSFORM => 'Metadata Transform',
+		BatchJobType::METADATA_IMPORT => 'Metadata Import',
+		BatchJobType::METADATA_TRANSFORM => 'Metadata Transform',
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(
@@ -154,7 +124,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 //		$currentDc = kDataCenterMgr::getCurrentDc();
 //		$batch_job->setDc($currentDc["name"]);
 //		$batch_job->setPartnerId($entry->getPartnerId());
-//		$batch_job->setJobType( BatchJob::BATCHJOB_TYPE_DELETE );
+//		$batch_job->setJobType( BatchJobType::DELETE );
 //		$batch_job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 //		$batch_job->setEntryId( $entry->getId() );
 //		$batch_job->save();
@@ -277,12 +247,12 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return dateUtils::formatKalturaDate( $this , 'getUpdatedAt' , $format );
 	}
 	
-	public static function isIndicatorSet ( $type = self::BATCHJOB_TYPE_IMPORT )
+	public static function isIndicatorSet ( $type = BatchJobType::IMPORT )
 	{
 		return self::getIndicator( $type )->isIndicatorSet();
 	}
 	
-	public static function addIndicator ( $id , $type = self::BATCHJOB_TYPE_IMPORT)
+	public static function addIndicator ( $id , $type = BatchJobType::IMPORT)
 	{
 		// TODO - remove the double indicator !
 		self::getIndicator( $type )->addIndicator( $id );
@@ -290,12 +260,12 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	}
 	
 	
-	public static function removeIndicator ( $type = self::BATCHJOB_TYPE_IMPORT )
+	public static function removeIndicator ( $type = BatchJobType::IMPORT )
 	{
 		self::getIndicator( $type )->removeIndicator();
 	}
 	
-	private static function getIndicator( $type = self::BATCHJOB_TYPE_IMPORT )
+	private static function getIndicator( $type = BatchJobType::IMPORT )
 	{
 		if ( ! self::$indicator ) self::$indicator = array();
 		

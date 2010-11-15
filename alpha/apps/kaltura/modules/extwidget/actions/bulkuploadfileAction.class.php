@@ -11,7 +11,7 @@ class bulkuploadfileAction extends sfAction
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $jobId);
 		$c->addAnd(BatchJobPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJob::BATCHJOB_TYPE_BULKUPLOAD);
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$batchJob = BatchJobPeer::doSelectOne($c);
 		if (!$batchJob)
 			die("File not found");

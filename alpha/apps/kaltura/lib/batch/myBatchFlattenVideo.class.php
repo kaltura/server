@@ -36,7 +36,7 @@ class myBatchFlattenClient
 		));
 		
 		$job = new BatchJob();
-		$job->setJobType(BatchJob::BATCHJOB_TYPE_FLATTEN);
+		$job->setJobType(BatchJobType::FLATTEN);
 		$job->setData($data, true);
 		$job->setStatus(BatchJob::BATCHJOB_STATUS_PENDING);
 		$job->setCheckAgainTimeout(time() + 10);
@@ -62,9 +62,9 @@ class myBatchFlattenServer extends myBatchBase
 	{	
 		$batch_status = new batchStatus();
 		$batch_status->batch_name = $args[0];
-		$stats = $batch_status->getDbStats( $batch_status->batch_name , BatchJob::BATCHJOB_TYPE_FLATTEN );
-		$batch_status->addToPending( "DB:batch_job, type=" . BatchJob::BATCHJOB_TYPE_FLATTEN . " status=" . BatchJob::BATCHJOB_STATUS_PENDING , @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_PENDING]["count"]);
-		$batch_status->addToInProc( "DB:batch_job, type=" . BatchJob::BATCHJOB_TYPE_FLATTEN . " status=" . BatchJob::BATCHJOB_STATUS_PROCESSING , @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_PROCESSING]["count"] );
+		$stats = $batch_status->getDbStats( $batch_status->batch_name , BatchJobType::FLATTEN );
+		$batch_status->addToPending( "DB:batch_job, type=" . BatchJobType::FLATTEN . " status=" . BatchJob::BATCHJOB_STATUS_PENDING , @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_PENDING]["count"]);
+		$batch_status->addToInProc( "DB:batch_job, type=" . BatchJobType::FLATTEN . " status=" . BatchJob::BATCHJOB_STATUS_PROCESSING , @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_PROCESSING]["count"] );
 		
 		$batch_status->succeedded_in_period = @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_FINISHED]["count"];
 		$batch_status->failed_in_period = @$stats["full_stats"][BatchJob::BATCHJOB_STATUS_FAILED]["count"];
@@ -93,7 +93,7 @@ class myBatchFlattenServer extends myBatchBase
 		$c = new Criteria();
 		$currentDc = kDataCenterMgr::getCurrentDc();
 		$c->add(BatchJobPeer::DC, kDataCenterMgr::getCurrentDcId() );
-		$c->add(BatchJobPeer::JOB_TYPE, BatchJob::BATCHJOB_TYPE_FLATTEN);
+		$c->add(BatchJobPeer::JOB_TYPE, BatchJobType::FLATTEN);
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_PROCESSED);
 
 		$temp_count = 0;

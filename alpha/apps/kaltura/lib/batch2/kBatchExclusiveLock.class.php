@@ -86,7 +86,7 @@ class kBatchExclusiveLock
 		$c = new Criteria();
 		
 		// added to support nfs delay
-		if($jobType == BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA || $jobType == BatchJob::BATCHJOB_TYPE_POSTCONVERT || $jobType == BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT)
+		if($jobType == BatchJobType::EXTRACT_MEDIA || $jobType == BatchJobType::POSTCONVERT || $jobType == BatchJobType::STORAGE_EXPORT)
 			$c->add ( BatchJobPeer::CREATED_AT, (time() - 30), Criteria::LESS_THAN);
 		
 		$c->add ( BatchJobPeer::JOB_TYPE, $jobType );
@@ -301,22 +301,22 @@ class kBatchExclusiveLock
 	public static function getExpiredJobs()
 	{
 		$jobTypes = array(
-			BatchJob::BATCHJOB_TYPE_CONVERT,
-			BatchJob::BATCHJOB_TYPE_IMPORT,
-			BatchJob::BATCHJOB_TYPE_DELETE,
-			BatchJob::BATCHJOB_TYPE_FLATTEN,
-			BatchJob::BATCHJOB_TYPE_BULKUPLOAD,
-			BatchJob::BATCHJOB_TYPE_DVDCREATOR,
-			BatchJob::BATCHJOB_TYPE_DOWNLOAD,
-			BatchJob::BATCHJOB_TYPE_OOCONVERT,
-			BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE,
-			BatchJob::BATCHJOB_TYPE_POSTCONVERT,
-			BatchJob::BATCHJOB_TYPE_PULL,
-			BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT,
-			BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA,
-			BatchJob::BATCHJOB_TYPE_MAIL,
-			BatchJob::BATCHJOB_TYPE_NOTIFICATION,
-			BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD,
+			BatchJobType::CONVERT,
+			BatchJobType::IMPORT,
+			BatchJobType::DELETE,
+			BatchJobType::FLATTEN,
+			BatchJobType::BULKUPLOAD,
+			BatchJobType::DVDCREATOR,
+			BatchJobType::DOWNLOAD,
+			BatchJobType::OOCONVERT,
+			BatchJobType::CONVERT_PROFILE,
+			BatchJobType::POSTCONVERT,
+			BatchJobType::PULL,
+			BatchJobType::REMOTE_CONVERT,
+			BatchJobType::EXTRACT_MEDIA,
+			BatchJobType::MAIL,
+			BatchJobType::NOTIFICATION,
+			BatchJobType::BULKDOWNLOAD,
 		);
 		
 		$c = new Criteria();

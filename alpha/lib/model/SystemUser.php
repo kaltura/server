@@ -74,6 +74,6 @@ class SystemUser extends BaseSystemUser
 		$jobData->setRecipientEmail($this->getEmail());
 		$jobData->setSubjectParamsArray(array());
 		
-		kJobsManager::addJob($batchJob, $jobData, BatchJob::BATCHJOB_TYPE_MAIL, $jobData->getMailType());
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::MAIL, $jobData->getMailType());
 	}
 }

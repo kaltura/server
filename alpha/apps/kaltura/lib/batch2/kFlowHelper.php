@@ -189,7 +189,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		{
 			case mediaInfo::ASSET_TYPE_ENTRY_INPUT:
 				
-				if($rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+				if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				{
 					$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 					
@@ -204,7 +204,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 				break;
 				
 			case mediaInfo::ASSET_TYPE_FLAVOR_INPUT:
-				if($rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT)
+				if($rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
 				{
 					$remoteConvertData = $rootBatchJob->getData();
 					$errDescription = null;
@@ -354,7 +354,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		}
 		else
 		{
-			if($rootBatchJob->getJobType() != BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+			if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 			{
 				$createThumb = false;
 			}
@@ -415,7 +415,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		}
 		
 		// this logic decide when a thumbnail should be created
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			$downloadUrl = $flavorAsset->getDownloadUrl();
@@ -453,7 +453,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
-				"job_type" => BatchJob::BATCHJOB_TYPE_DOWNLOAD,
+				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
 				"progress" => 100,
 				"debug" => __LINE__,
@@ -475,7 +475,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 	public static function handleConvertQueued(BatchJob $dbBatchJob, kConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
 		$rootBatchJob = $dbBatchJob->getRootJob();
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$entry = $dbBatchJob->getEntry();
 			
@@ -503,7 +503,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
-				"job_type" => BatchJob::BATCHJOB_TYPE_DOWNLOAD,
+				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_QUEUED,
 				"progress" => 0,
 				"debug" => __LINE__,
@@ -547,7 +547,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		if(!$fallbackCreated)
 		{
 			$rootBatchJob = $dbBatchJob->getRootJob();
-			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 			{
 				$entryId = $dbBatchJob->getEntryId();
 				$flavorParamsId = $data->getFlavorParamsOutputId();
@@ -581,7 +581,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 					"message" => $dbBatchJob->getMessage(),
 					"description" => $dbBatchJob->getDescription(),
 					"updates_count" => $dbBatchJob->getUpdatesCount(),
-					"job_type" => BatchJob::BATCHJOB_TYPE_DOWNLOAD,
+					"job_type" => BatchJobType::DOWNLOAD,
 					"conversion_error" => "Error while converting [$entryId] [$fileFormat]",
 					"status" => BatchJob::BATCHJOB_STATUS_FAILED,
 					"progress" => 0,
@@ -735,7 +735,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		
 		// send notification if needed
 		$rootBatchJob = $dbBatchJob->getRootJob();
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD)
+		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			$downloadUrl = $flavorAsset->getDownloadUrl();
@@ -773,7 +773,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 				"message" => $dbBatchJob->getMessage(),
 				"description" => $dbBatchJob->getDescription(),
 				"updates_count" => $dbBatchJob->getUpdatesCount(),
-				"job_type" => BatchJob::BATCHJOB_TYPE_DOWNLOAD,
+				"job_type" => BatchJobType::DOWNLOAD,
 				"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
 				"progress" => 100,
 				"debug" => __LINE__,
@@ -813,7 +813,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		
 		// this logic decide when this thumbnail should be used
 		$rootBatchJob = $dbBatchJob->getRootJob();
-		if($rootBatchJob->getJobType() == BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE)
+		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{ 
 			$thisFlavorHeight = $data->getThumbHeight();
 			$thisFlavorBitrate = $data->getThumbBitrate();
@@ -952,7 +952,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		// creates a child extract meida job
 		$extractMediaData = new kExtractMediaJobData();
 		$extractMediaData->setSrcFileSyncLocalPath($data->getDestFileLocalPath());
-		kJobsManager::addJob($dbBatchJob->createChild(), $extractMediaData, BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA, mediaInfo::ASSET_TYPE_FLAVOR_INPUT);		
+		kJobsManager::addJob($dbBatchJob->createChild(), $extractMediaData, BatchJobType::EXTRACT_MEDIA, mediaInfo::ASSET_TYPE_FLAVOR_INPUT);		
 		
 		return $dbBatchJob; 	
 	}
@@ -1097,7 +1097,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		// creates pull job
 		$pullData = new kPullJobData();
 		$pullData->setSrcFileUrl($data->getSrcFileUrl()); 
-		kJobsManager::addJob($dbBatchJob->createChild(false), $pullData, BatchJob::BATCHJOB_TYPE_PULL);
+		kJobsManager::addJob($dbBatchJob->createChild(false), $pullData, BatchJobType::PULL);
 		
 		// mark the job as almost done
 		$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
@@ -1166,7 +1166,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 							"message" => $dbBatchJob->getMessage(),
 							"description" => $dbBatchJob->getDescription(),
 							"updates_count" => $dbBatchJob->getUpdatesCount(),
-							"job_type" => BatchJob::BATCHJOB_TYPE_DOWNLOAD,
+							"job_type" => BatchJobType::DOWNLOAD,
 							"status" => BatchJob::BATCHJOB_STATUS_FINISHED,
 							"progress" => 100,
 							"debug" => __LINE__,
@@ -1269,7 +1269,7 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		$jobData->setRecipientEmail($partner->getAdminEmail());
 		$jobData->setSubjectParamsArray(array());
 		
-		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJob::BATCHJOB_TYPE_MAIL, $jobData->getMailType());
+		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());
 		
 		return $dbBatchJob;
 	}

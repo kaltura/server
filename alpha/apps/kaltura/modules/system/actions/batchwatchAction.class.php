@@ -55,9 +55,9 @@ class batchwatchAction extends kalturaSystemAction
 		$content = myContentStorage::getFSContentRootPath();
 		// saerch on disk in varios directories
 		
-		$this->import = $this->getDbStats ( "batchImportServer" , $db_job_stats , BatchJob::BATCHJOB_TYPE_IMPORT );
-		$this->flatten = $this->getDbStats ( "batchFlattenServer" , $db_job_stats , BatchJob::BATCHJOB_TYPE_FLATTEN );
-		$this->bulk = $this->getDbStats ( "batchBulkUpload" , $db_job_stats , BatchJob::BATCHJOB_TYPE_BULKUPLOAD );
+		$this->import = $this->getDbStats ( "batchImportServer" , $db_job_stats , BatchJobType::IMPORT );
+		$this->flatten = $this->getDbStats ( "batchFlattenServer" , $db_job_stats , BatchJobType::FLATTEN );
+		$this->bulk = $this->getDbStats ( "batchBulkUpload" , $db_job_stats , BatchJobType::BULKUPLOAD );
 		
 		$db_convert_stats = $this->getConversionStats ( $hours_back );
 
@@ -66,7 +66,7 @@ class batchwatchAction extends kalturaSystemAction
 			$this->old_convert_client_in = $this->getDiskStats ( "batchConvertClient" , $content . "/content/preconvert/files" );
 			$this->old_convert_client_out = $this->getDiskStats ( "batchConvertClient" , $content . "/conversions/postconvert/files" );
 			$this->old_convert_client_out_db = $this->getDbStats ( "batchConvertClient" , $db_convert_stats , 
-				BatchJob::BATCHJOB_TYPE_CONVERT  );
+				BatchJobType::CONVERT  );
 			
 			$this->old_convert_client_out["full_stats"] = $this->old_convert_client_out_db["full_stats"];
 			$this->old_convert_client_out["successful_stats"] = $this->old_convert_client_out_db["successful_stats"];
@@ -87,7 +87,7 @@ class batchwatchAction extends kalturaSystemAction
 		$this->new_convert_server = $this->getDiskStats ( "newBatchConvertServer" , $content . "/conversions/preconvert_cmd" , "*.in*" ) ; //dicator" );
 		$this->new_commercial_convert_server = $this->getDiskStats ( "newBatchCommercialConvertServer" , $content . "/conversions/preconvert_commercial_cmd" , "*.in*" ) ; //dicator" );
 		
-		$this->download_video_in = $this->getDbStats ( null , $db_job_stats , BatchJob::BATCHJOB_TYPE_DOWNLOAD );
+		$this->download_video_in = $this->getDbStats ( null , $db_job_stats , BatchJobType::DOWNLOAD );
 		$this->download_video_out = $this->getDiskStats ( "batchDownloadVideoServer" , $content . "/conversions/download_res" , "*.in*" ) ; //dicator" );
 		
 		
@@ -265,7 +265,7 @@ class batchwatchAction extends kalturaSystemAction
 		$db_convert_stats = array();
 		while ($resultset->next())
 	    {
-	    	$job_type = BatchJob::BATCHJOB_TYPE_CONVERT;
+	    	$job_type = BatchJobType::CONVERT;
 	    	$status = $resultset->getInt('status');
 			$oldest = $resultset->getInt('oldest');
 	    	$newest = $resultset->getInt('newest');

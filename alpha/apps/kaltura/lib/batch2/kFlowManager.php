@@ -1096,71 +1096,71 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 			
 			switch($jobType)
 			{
-				case BatchJob::BATCHJOB_TYPE_IMPORT:
+				case BatchJobType::IMPORT:
 					$dbBatchJob = $this->updatedImport($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 			
-				case BatchJob::BATCHJOB_TYPE_EXTRACT_MEDIA:
+				case BatchJobType::EXTRACT_MEDIA:
 					$dbBatchJob = $this->updatedExtractMedia($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 			
-				case BatchJob::BATCHJOB_TYPE_CONVERT:
+				case BatchJobType::CONVERT:
 					$dbBatchJob = $this->updatedConvert($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 			
-				case BatchJob::BATCHJOB_TYPE_POSTCONVERT:
+				case BatchJobType::POSTCONVERT:
 					$dbBatchJob = $this->updatedPostConvert($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 			
-				case BatchJob::BATCHJOB_TYPE_PULL:
+				case BatchJobType::PULL:
 					$dbBatchJob = $this->updatedPull($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_DELETE:
+				case BatchJobType::DELETE:
 //					$dbBatchJob = $this->updatedDelete($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_FLATTEN:
+				case BatchJobType::FLATTEN:
 					$dbBatchJob = $this->updatedFlatten($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_BULKUPLOAD:
+				case BatchJobType::BULKUPLOAD:
 					$dbBatchJob = $this->updatedBulkUpload($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_DOWNLOAD:
+				case BatchJobType::DOWNLOAD:
 					$dbBatchJob = $this->updatedDownload($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE:
+				case BatchJobType::CONVERT_PROFILE:
 					$dbBatchJob = $this->updatedConvertProfile($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_REMOTE_CONVERT:
+				case BatchJobType::REMOTE_CONVERT:
 					$dbBatchJob = $this->updatedRemoteConvert($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_BULKDOWNLOAD:
+				case BatchJobType::BULKDOWNLOAD:
 					$dbBatchJob = $this->updatedBulkDownload($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_PROVISION_PROVIDE:
+				case BatchJobType::PROVISION_PROVIDE:
 					$dbBatchJob = $this->updatedProvisionProvide($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_PROVISION_DELETE:
+				case BatchJobType::PROVISION_DELETE:
 					$dbBatchJob = $this->updatedProvisionDelete($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_CONVERT_COLLECTION:
+				case BatchJobType::CONVERT_COLLECTION:
 					$dbBatchJob = $this->updatedConvertCollection($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT:
+				case BatchJobType::STORAGE_EXPORT:
 					$dbBatchJob = $this->updatedStorageExport($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 					
-				case BatchJob::BATCHJOB_TYPE_STORAGE_DELETE:
+				case BatchJobType::STORAGE_DELETE:
 					$dbBatchJob = $this->updatedStorageDelete($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 					break;
 		
@@ -1213,6 +1213,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 		$jobData->setRecipientEmail(kConf::get("batch_alert_email")); 
 		$jobData->setSubjectParamsArray( array() );
 		
-		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJob::BATCHJOB_TYPE_MAIL, $jobData->getMailType());	
+		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());	
 	}
 }

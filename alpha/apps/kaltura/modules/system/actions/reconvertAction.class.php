@@ -85,7 +85,7 @@ class reconvertAction extends kalturaSystemAction
 		$convertProfileData = new kConvertProfileJobData();
 		$convertProfileData->setFlavorAssetId($flavorAsset->getId());
 		$convertProfileData->setInputFileSyncLocalPath($filePath);
-		kJobsManager::addJob($dbBatchJob, $convertProfileData, BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE);
+		kJobsManager::addJob($dbBatchJob, $convertProfileData, BatchJobType::CONVERT_PROFILE);
 		// save again afget the addJob
 		$dbBatchJob->save();
 
