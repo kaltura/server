@@ -262,7 +262,7 @@ abstract class KBatchBase extends KRunableClass
 		$puserId = 'batchUser';
 		$privileges = '';
 		$adminSecret = $this->taskConfig->getSecret();
-		$expiry = 60 * 60 * 24 * 2; // 2 days
+		$expiry = 60 * 60 * 24 * 30; // 30 days
 		
 		
 		$rand = rand(0, 32000);
