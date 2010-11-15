@@ -1,7 +1,7 @@
 <?php
 require_once("bootstrap.php");
 /**
- * Will transform virus scan on specified  
+ * Will scan for viruses on specified file  
  *
  * @package Scheduler
  * @subpackage VirusScan
