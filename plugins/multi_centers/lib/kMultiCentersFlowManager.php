@@ -13,7 +13,7 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 	{
 		switch($dbBatchJob->getJobType())
 		{
-			case BatchJob::BATCHJOB_TYPE_FILESYNC_IMPORT:
+			case BatchJobType::FILESYNC_IMPORT:
 				$dbBatchJob = $this->updatedFileSyncImport($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
 				break;
 			

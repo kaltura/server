@@ -26,7 +26,7 @@ class kMultiCentersManager
 		
 		
 		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId"); 
-		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJob::BATCHJOB_TYPE_FILESYNC_IMPORT);
+		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJobType::FILESYNC_IMPORT);
 	}
 	
 }
