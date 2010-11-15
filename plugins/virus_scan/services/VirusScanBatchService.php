@@ -18,11 +18,12 @@ class VirusScanBatchService extends BatchService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaVirusScanBatchJobArray 
+	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveVirusScanJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJob::BATCHJOB_TYPE_VIRUS_SCAN );
+		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
 	
@@ -32,20 +33,21 @@ class VirusScanBatchService extends BatchService
 	 * @action updateExclusiveVirusScanJob
 	 * @param int $id The id of the job to free
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaVirusScanBatchJob $job
-	 * @return KalturaVirusScanBatchJob 
+	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob 
 	 */
-	function updateExclusiveVirusScanJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaVirusScanBatchJob $job)
+	function updateExclusiveVirusScanJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::VIRUS_SCAN)
+		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
 		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
 				
-		$batchJob = new KalturaVirusScanBatchJob(); // start from blank
+		$batchJob = new KalturaBatchJob(); // start from blank
 		return $batchJob->fromObject($dbBatchJob);
 	}
 
@@ -61,28 +63,10 @@ class VirusScanBatchService extends BatchService
 	 */
 	function freeExclusiveVirusScanJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::VIRUS_SCAN, $resetExecutionAttempts);
+		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	
 // --------------------------------- VirusScanJob functions 	--------------------------------- //
 
-	
-	
-
-	/**
-	 * batch getExclusiveJobsAction action allows to get a BatchJob 
-	 * 
-	 * @action getExclusiveJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
-	 * @return KalturaVirusScanBatchJobArray 
-	 */
-	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
-		return KalturaVirusScanBatchJobArray::fromBatchJobArray($jobs);
-	}	
 }

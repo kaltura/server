@@ -35,4 +35,22 @@ class KalturaVirusScanJobData extends KalturaJobData
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return $subType;
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return $subType;
+	}
 }

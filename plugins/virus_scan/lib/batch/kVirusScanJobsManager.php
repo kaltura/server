@@ -27,6 +27,8 @@ class kVirusScanJobsManager extends kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-		return self::addJob($batchJob, $jobData, BatchJob::BATCHJOB_TYPE_VIRUS_SCAN, $virusScanEngine);
+		
+		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		return self::addJob($batchJob, $jobData, $jobType, $virusScanEngine);
 	}
 }

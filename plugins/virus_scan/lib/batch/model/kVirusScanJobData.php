@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage Batch
  */
-class kVirusScanJobData
+class kVirusScanJobData extends kJobData
 {
 	/**
 	 * @var string
@@ -69,4 +69,3 @@ class kVirusScanJobData
 		$this->infected = $infected;
 	}
 }
-

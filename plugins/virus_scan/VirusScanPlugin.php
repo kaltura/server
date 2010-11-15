@@ -1,5 +1,5 @@
 <?php
-class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator
+class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'virusScan';
 	
@@ -50,6 +50,62 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		if($baseEnumName == 'entryStatus')
 			return array('VirusScanEntryStatus');
 			
+		if($baseEnumName == 'BatchJobType')
+			return array('VirusScanBatchJobType');
+			
 		return array();
+	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @param array $constructorArgs
+	 * @return object
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if($baseClass == 'kJobData')
+		{
+			if($enumValue == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
+			{
+				return new kVirusScanJobData();
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			if($enumValue == VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN))
+			{
+				return new KalturaVirusScanJobData();
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if($baseClass == 'kJobData')
+		{
+			if($enumValue == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
+			{
+				return 'kVirusScanJobData';
+			}
+		}
+	
+		if($baseClass == 'KalturaJobData')
+		{
+			if($enumValue == VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN))
+			{
+				return 'KalturaVirusScanJobData';
+			}
+		}
+		
+		return null;
 	}
 }
