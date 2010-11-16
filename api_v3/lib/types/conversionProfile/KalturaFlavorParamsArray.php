@@ -9,7 +9,7 @@ class KalturaFlavorParamsArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$nObj = KalturaFlavorParamsFactory::getFlavorParamsInstanceByFormat($obj->getFormat());
+			$nObj = KalturaFlavorParamsFactory::getFlavorParamsInstance($obj->getType());
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}

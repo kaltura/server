@@ -259,7 +259,7 @@ class FlavorAssetService extends KalturaBaseService
 			if (isset($flavorParamsArray[$flavorParamsId]))
 			{
 				$flavorParamsDb = $flavorParamsArray[$flavorParamsId];
-				$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstanceByFormat($flavorParamsDb->getFormat());
+				$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
 				$flavorParams->fromObject($flavorParamsDb);
 				$flavorAssetWithParams->flavorParams = $flavorParams;
 
@@ -287,7 +287,7 @@ class FlavorAssetService extends KalturaBaseService
 				// to list it one more time
 				continue;
 			}
-			$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstanceByFormat($flavorParamsDb->getFormat());
+			$flavorParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($flavorParamsDb->getType());
 			$flavorParams->fromObject($flavorParamsDb);
 			
 			$flavorAssetWithParams = new KalturaFlavorAssetWithParams();

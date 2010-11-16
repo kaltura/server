@@ -1,27 +1,18 @@
 <?php
 class KalturaFlavorParamsFactory
 {
-	static function getFlavorParamsOutputInstanceByFormat($format)
+	static function getFlavorParamsOutputInstance($type)
 	{
-		switch ($format) 
+		switch ($type) 
 		{
-			case KalturaContainerFormat::_3GP:
-			case KalturaContainerFormat::FLV:
-			case KalturaContainerFormat::MP4:
-			case KalturaContainerFormat::AVI:
-			case KalturaContainerFormat::MOV:
-			case KalturaContainerFormat::MP3:
-			case KalturaContainerFormat::_3GP:
-			case KalturaContainerFormat::OGG:
-			case KalturaContainerFormat::WMV:
-			case KalturaContainerFormat::WMA:
-			case KalturaContainerFormat::ISMV:
-			case KalturaContainerFormat::MKV:
-			case KalturaContainerFormat::WEBM:
+			case KalturaAssetType::FLAVOR:
+				return new KalturaFlavorParamsOutput();
+				
+			case KalturaAssetType::THUMBNAIL:
 				return new KalturaFlavorParamsOutput();
 				
 			default:
-				$obj = KalturaPluginManager::loadObject('KalturaFlavorParamsOutput', $format);
+				$obj = KalturaPluginManager::loadObject('KalturaFlavorParamsOutput', $type);
 				if($obj)
 					return $obj;
 					
@@ -29,27 +20,18 @@ class KalturaFlavorParamsFactory
 		}
 	}
 	
-	static function getFlavorParamsInstanceByFormat($format)
+	static function getFlavorParamsInstance($type)
 	{
-		switch ($format) 
+		switch ($type) 
 		{
-			case KalturaContainerFormat::_3GP:
-			case KalturaContainerFormat::FLV:
-			case KalturaContainerFormat::MP4:
-			case KalturaContainerFormat::AVI:
-			case KalturaContainerFormat::MOV:
-			case KalturaContainerFormat::MP3:
-			case KalturaContainerFormat::_3GP:
-			case KalturaContainerFormat::OGG:
-			case KalturaContainerFormat::WMV:
-			case KalturaContainerFormat::WMA:
-			case KalturaContainerFormat::ISMV:
-			case KalturaContainerFormat::MKV:
-			case KalturaContainerFormat::WEBM:
+			case KalturaAssetType::FLAVOR:
+				return new KalturaFlavorParams();
+				
+			case KalturaAssetType::THUMBNAIL:
 				return new KalturaFlavorParams();
 				
 			default:
-				$obj = KalturaPluginManager::loadObject('KalturaFlavorParams', $format);
+				$obj = KalturaPluginManager::loadObject('KalturaFlavorParams', $type);
 				if($obj)
 					return $obj;
 					
@@ -57,4 +39,3 @@ class KalturaFlavorParamsFactory
 		}
 	}
 }
-?>

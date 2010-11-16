@@ -83,7 +83,7 @@ class KalturaConvartableJobData extends KalturaJobData
 		$dbFlavorParams = $dbConvartableJobData->getFlavorParamsOutput();
 		if($dbFlavorParams)
 		{
-			$this->flavorParamsOutput = KalturaFlavorParamsFactory::getFlavorParamsOutputInstanceByFormat($dbFlavorParams->getFormat());
+			$this->flavorParamsOutput = KalturaFlavorParamsFactory::getFlavorParamsOutputInstance($dbFlavorParams->getType());
 			$this->flavorParamsOutput->fromObject($dbFlavorParams);
 		}
 		
