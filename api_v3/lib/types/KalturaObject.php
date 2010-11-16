@@ -90,7 +90,7 @@ class KalturaObject
 	
 	protected function toDynamicEnumValue($type, $value)
 	{
-		$split = explode(KalturaPluginEnum::PLUGIN_VALUE_DELIMITER, $value, 2);
+		$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value, 2);
 		if(count($split) == 1)
 			return $value;
 			
