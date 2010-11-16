@@ -7,6 +7,12 @@ class KalturaAccessControlOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+class KalturaAssetType
+{
+	const FLAVOR = "1";
+	const THUMBNAIL = "2";
+}
+
 class KalturaAudioCodec
 {
 	const NONE = "";
