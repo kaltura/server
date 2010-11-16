@@ -24,16 +24,16 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $typesToDelete = array(
-//	entry::ENTRY_TYPE_AUTOMATIC,
-//	entry::ENTRY_TYPE_BACKGROUND,
-//	entry::ENTRY_TYPE_MEDIACLIP,
-//	entry::ENTRY_TYPE_SHOW,
-//	entry::ENTRY_TYPE_BUBBLES,
-//	entry::ENTRY_TYPE_PLAYLIST,
-	entry::ENTRY_TYPE_DATA,
-//	entry::ENTRY_TYPE_LIVE_STREAM,
-	entry::ENTRY_TYPE_DOCUMENT,
-//	entry::ENTRY_TYPE_DVD,
+//	entryType::AUTOMATIC,
+//	entryType::BACKGROUND,
+//	entryType::MEDIACLIP,
+//	entryType::SHOW,
+//	entryType::BUBBLES,
+//	entryType::PLAYLIST,
+	entryType::DATA,
+//	entryType::LIVE_STREAM,
+	entryType::DOCUMENT,
+//	entryType::DVD,
 	);
 
 $dbConf = kConf::getDB();

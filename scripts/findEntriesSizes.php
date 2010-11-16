@@ -47,7 +47,7 @@ while(1)
 	$c->setOffset( $i );
 	$c->add(entryPeer::MODIFIED_AT, $requested_day, Criteria::GREATER_EQUAL);
 	$c->addAnd(entryPeer::MODIFIED_AT, $next_day, Criteria::LESS_THAN);
-	$c->addAnd(entryPeer::TYPE, entry::ENTRY_TYPE_MEDIACLIP);
+	$c->addAnd(entryPeer::TYPE, entryType::MEDIACLIP);
 	$c->addAnd(entryPeer::PARTNER_ID, 100, Criteria::NOT_EQUAL);
 	/**
 	 * Allow selecting deleted entries as well, so we will actually deduct storage for partners
