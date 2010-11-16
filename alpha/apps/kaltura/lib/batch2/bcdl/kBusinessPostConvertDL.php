@@ -2,6 +2,32 @@
 
 class kBusinessPostConvertDL
 {
+	public static function getReadyBehavior(flavorAsset $flavorAsset)
+	{
+		if($flavorAsset->getIsOriginal())
+		{
+			try{
+				$profile = myPartnerUtils::getConversionProfile2ForEntry($flavorAsset->getEntryId());
+				if($profile)
+				{
+					$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $profile->getId());
+					if($flavorParamsConversionProfile)
+						return $flavorParamsConversionProfile->getReadyBehavior();
+				}
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err(__METHOD__ . ': getConversionProfile2ForEntry Error: ' . $e->getMessage());
+			}
+		}
+		
+		$targetFlavor = flavorParamsOutputPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+		if($targetFlavor)
+			return $targetFlavor->getReadyBehavior();
+			
+		return flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS;
+	}
+	
 	public static function handleFlavorReady(BatchJob $dbBatchJob, $flavorAssetId)
 	{
 		// verifies that flavor asset created
@@ -76,29 +102,7 @@ class kBusinessPostConvertDL
 	 */
 	public static function handleConvertFinished(BatchJob $dbBatchJob, flavorAsset $currentFlavorAsset)
 	{
-		$currentReadyBehavior = null;
-		if($currentFlavorAsset->getIsOriginal())
-		{
-			try{
-				$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
-				if($profile)
-				{
-					$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($currentFlavorAsset->getFlavorParamsId(), $profile->getId());
-					if($flavorParamsConversionProfile)
-						$currentReadyBehavior = $flavorParamsConversionProfile->getReadyBehavior();
-				}
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::err(__METHOD__ . ': getConversionProfile2ForEntry Error: ' . $e->getMessage());
-			}
-		}
-		else 
-		{
-			$targetFlavor = flavorParamsOutputPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
-			if($targetFlavor)
-				$currentReadyBehavior = $targetFlavor->getReadyBehavior();
-		}
+		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset);
 		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		
@@ -147,29 +151,7 @@ class kBusinessPostConvertDL
 			if($siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				continue;
 				
-			$readyBehavior = null;
-			if($siblingFlavorAsset->getIsOriginal())
-			{
-				try{
-					$profile = myPartnerUtils::getConversionProfile2ForEntry($dbBatchJob->getEntryId());
-					if($profile)
-					{
-						$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($siblingFlavorAsset->getFlavorParamsId(), $profile->getId());
-						if($flavorParamsConversionProfile)
-							$readyBehavior = $flavorParamsConversionProfile->getReadyBehavior();
-					}
-				}
-				catch(Exception $e)
-				{
-					KalturaLog::err(__METHOD__ . ': getConversionProfile2ForEntry Error: ' . $e->getMessage());
-				}
-			}
-			else
-			{
-				$siblingFlavorParamsOutput = flavorParamsOutputPeer::retrieveByFlavorAssetId($siblingFlavorAsset->getId());
-				if($siblingFlavorParamsOutput)
-					$readyBehavior = $siblingFlavorParamsOutput->getReadyBehavior();
-			}
+			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset);
 			
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 				continue;
