@@ -17,9 +17,14 @@ class kVirusScanJobData extends kJobData
 	private $flavorAssetId;
 	
 	/**
-	 * @var bool
+	 * @var KalturaVirusScanJobResult
 	 */
-	private $infected;
+	private $scanResult;
+	
+	/**
+	 * @var KalturaVirusFoundAction
+	 */
+	private $virusFoundAction;
 	
 	/**
 	 * @return the $srcFilePath
@@ -38,11 +43,19 @@ class kVirusScanJobData extends kJobData
 	}
 
 	/**
-	 * @return the $infected
+	 * @return the $scanResult
 	 */
-	public function getInfected()
+	public function getScanResult()
 	{
-		return $this->infected;
+		return $this->scanResult;
+	}
+	
+	/**
+	 * @return the $virusFoundAction
+	 */
+	public function getVirusFoundAction()
+	{
+		return $this->virusFoundAction;
 	}
 
 	/**
@@ -62,10 +75,18 @@ class kVirusScanJobData extends kJobData
 	}
 
 	/**
-	 * @param $infected the $infected to set
+	 * @param $scanReulst the $scanReulst to set
 	 */
-	public function setInfected($infected)
+	public function setScanResult($scanResult)
 	{
-		$this->infected = $infected;
+		$this->scanResult = $scanResult;
+	}
+	
+	/**
+	 * @param $virusFoundAction the $virusFoundAction to set
+	 */
+	public function setVirusFoundAction($virusFoundAction)
+	{
+		$this->virusFoundAction = $virusFoundAction;
 	}
 }

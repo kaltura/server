@@ -41,18 +41,67 @@ class KAsyncVirusScan extends KBatchBase
 		}
 		
 		foreach($jobs as &$job)
+		{
 			$job = $this->scan($job, $job->data);
-			
+		}	
 		return $jobs;
 	}
 	
-	protected function scan(KalturaVirusScanBatchJob $job, KalturaVirusScanJobData $data)
+	protected function scan(KalturaBatchJob $job, KalturaVirusScanJobData $data)
 	{
 		KalturaLog::debug("scan($job->id)");
 		
 		try
 		{
-			// TODO
+			$engine = VirusScanEngine::getEngine($job->jobSubType);
+			if (!$engine)
+			{
+				KalturaLog::err('Cannot create VirusScanEngine of type ['.$job->jobSubType.']');
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot create VirusScanEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
+				return $job;
+			}
+						
+			// configure engine
+			if (!$engine->config($this->taskConfig->params))
+			{
+				KalturaLog::err('Cannot configure VirusScanEngine of type ['.$job->jobSubType.']');
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot configure VirusScanEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
+				return $job;
+			}
+			
+			$cleanIfInfected = $data->virusFoundAction == KalturaVirusFoundAction::CLEAN_NONE || $data->virusFoundAction == KalturaVirusFoundAction::CLEAN_DELETE;
+			$errorDescription = null;
+			$output = null;
+			
+			// execute scan
+			$startTime = microtime(true);
+			$data->scanResult = $engine->execute($data->srcFilePath, $cleanIfInfected, $output, $errorDescription);
+			$endTime = microtime(true);
+
+			//TODO: keep output in a log file and add filesync for it
+			//TODO: add duration to job data
+
+			// check scan results
+			switch ($data->scanResult)
+			{
+				case KalturaVirusScanJobResult::SCAN_ERROR:
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::FAILED);
+					break;
+				
+				case KalturaVirusScanJobResult::FILE_IS_CLEAN:
+					$this->closeJob($job, null, null, "Scan finished - file was found to be clean", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					break;
+				
+				case KalturaVirusScanJobResult::FILE_WAS_CLEANED:
+					$this->closeJob($job, null, null, "Scan finished - file was infected but scan has managed to clean it", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					break;
+					
+				case KalturaVirusScanJobResult::FILE_INFECTED:
+				
+					$this->closeJob($job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					break;
+			}
+			
 		}
 		catch(Exception $ex)
 		{
@@ -61,13 +110,6 @@ class KAsyncVirusScan extends KBatchBase
 		return $job;
 	}
 	
-	/**
-	 * @return KalturaBatchJob
-	 */
-	protected function newEmptyJob()
-	{
-		return new KalturaVirusScanBatchJob();
-	}
 	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{

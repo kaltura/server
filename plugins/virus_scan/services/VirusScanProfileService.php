@@ -160,22 +160,29 @@ class VirusScanProfileService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_FLAVOR_ASSET_ID
 	 * @throws KalturaErrors::INVALID_FILE_SYNC_ID
 	 */		
-	function scanAction($virusScanProfileId, $flavorAssetId)
+	function scanAction($flavorAssetId, $virusScanProfileId = null)
 	{
-		$dbVirusScanProfile = VirusScanProfilePeer::retrieveByPK($virusScanProfileId);
-		if (!$dbVirusScanProfile)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $virusScanProfileId);
-	
 		$dbFlavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
 		if (!$dbFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
 		
+		if ($virusScanProfileId)
+		{
+			$dbVirusScanProfile = VirusScanProfilePeer::retrieveByPK($virusScanProfileId);
+		}
+		else
+		{
+			$dbVirusScanProfile = VirusScanProfilePeer::getSuitableProfile($dbFlavorAsset->getEntryId());
+		}
+		if (!$dbVirusScanProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $virusScanProfileId);
+			
 		$syncKey = $dbFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		if(!$srcFilePath)
 			throw new KalturaAPIException(KalturaErrors::INVALID_FILE_SYNC_ID, $syncKey);
 			
-		$job = kVirusScanJobsManager::addVirusScanJob(null, $dbFlavorAsset->getPartnerId(), $dbFlavorAsset->getEntryId(), $dbFlavorAsset->getId(), $srcFilePath, $dbVirusScanProfile->getEngineType());
+		$job = kVirusScanJobsManager::addVirusScanJob(null, $dbFlavorAsset->getPartnerId(), $dbFlavorAsset->getEntryId(), $dbFlavorAsset->getId(), $srcFilePath, $dbVirusScanProfile->getEngineType(), $dbVirusScanProfile->getActionIfInfected());
 		return $job->getId();
 	}
 }

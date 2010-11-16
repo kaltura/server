@@ -1,6 +1,32 @@
 <?php
-class kVirusScanFlowManager implements kBatchJobStatusEventConsumer
+class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
 {
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		
+		if($object instanceof flavorAsset && $object->getIsOriginal())
+		{			
+			$profile = VirusScanProfilePeer::getSuitableProfile($object->getEntryId());
+			
+			if ($profile)
+			{
+				// suitable virus scan profile found - create scan job
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				kVirusScanJobsManager::addVirusScanJob(null, $object->getPartnerId(), $object->getEntryId(), $object->getId(), $srcFilePath, $profile->getEngineType(), $profile->getActionIfInfected());
+				return false; // pause other event consumers until virus scan job is finished
+			}
+		}
+		
+		return true; // no scan jobs to do, object added event consumption may continue normally
+	}
+	
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param unknown_type $entryStatus
@@ -58,13 +84,70 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer
 	
 	protected function updatedVirusScanFinished(BatchJob $dbBatchJob, kVirusScanJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
-		// TODO		
+		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		if (!$flavorAsset)
+		{
+			KalturaLog::err('Flavor asset not found with id ['.$data->getFlavorAssetId().']');
+			//TODO: throw different type of exception ?
+			throw new Exception('Flavor asset not found with id ['.$data->getFlavorAssetId().']');
+		}
+				
+		switch ($data->getScanResult())
+		{
+			case KalturaVirusScanJobResult::FILE_WAS_CLEANED:
+				// delete old filsync + create new + assign new version to flavor asset
+				$oldSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$oldFilePath = kFileSyncUtils::getLocalFilePathForKey($oldSyncKey);
+				$flavorAsset->incrementVersion();
+				$flavorAsset->save();				
+				$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);	
+				kFileSyncUtils::moveFromFile($oldFilePath, $syncKey);
+				// resume flavor asset added event consumption
+				kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+				break;
+											
+			case KalturaVirusScanJobResult::FILE_IS_CLEAN:
+				// resume flavor asset added event consumption
+				kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+				break;
+				
+			case KalturaVirusScanJobResult::FILE_INFECTED:
+				// delete flavor asset if defined in virus scan profile
+				if ( $data->getVirusFoundAction() == KalturaVirusFoundAction::CLEAN_DELETE ||
+					 $data->getVirusFoundAction() == KalturaVirusFoundAction::DELETE          )
+				{
+					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+					KalturaLog::debug('FlavorAsset ['.$flavorAsset->getId().'] marked as deleted');
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+					$flavorAsset->setDeletedAt(time());
+					$flavorAsset->save();
+					KalturaLog::debug('Physically deleting file ['.$filePath.']');
+					unlink($filePath);
+				}
+				//TODO: send notification
+				$entry->setStatus(VirusScanEntryStatus::get()->apiValue(VirusScanEntryStatus::INFECTED));
+				// do not resume flavor asset added event consumption
+				break;
+		}		
+		
 		return $dbBatchJob;
 	}
 	
 	protected function updatedVirusScanFailed(BatchJob $dbBatchJob, kVirusScanJobData $data, $entryStatus, BatchJob $twinJob = null)
 	{
-		// TODO
+		$entry = entryPeer::retrieveByPK($dbBatchJob->getEntryId());
+		if ($entry)
+		{
+			$entry->setStatus(VirusScanEntryStatus::get()->apiValue(VirusScanEntryStatus::INFECTED));
+		}
+		else
+		{
+			KalturaLog::err('Entry not found with id ['.$entry->getId().']');
+			//TODO: throw different type of exception ?
+			throw new Exception('Entry not found with id ['.$entry->getId().']');
+		}
+		// do not resume flavor asset added event consumption
 		return $dbBatchJob;
 	}
 	

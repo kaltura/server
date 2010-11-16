@@ -2,6 +2,7 @@
 class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'virusScan';
+	const VIRUS_SCAN_FLOW_MANAGER_CLASS = 'kVirusScanFlowManager';
 	
 	public static function getPluginName()
 	{
@@ -21,6 +22,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	{
 		$map = array(
 			'virusScanProfile' => 'VirusScanProfileService',
+			'virusScanBatch' => 'VirusScanBatchService',
 		);
 		return $map;
 	}
@@ -39,6 +41,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	public static function getEventConsumers()
 	{
 		return array(
+			self::VIRUS_SCAN_FLOW_MANAGER_CLASS
 		);
 	}
 	

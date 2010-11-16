@@ -19,15 +19,22 @@ class KalturaVirusScanJobData extends KalturaJobData
 	public $flavorAssetId;
 	
 	/**
-	 * @var bool
+	 * @var KalturaVirusScanJobResult
 	 */
-	public $infected;
+	public $scanResult;
+	
+	/**
+	 * @var KalturaVirusFoundAction
+	 */
+	public $virusFoundAction;
+	
 	
 	private static $map_between_objects = array
 	(
 		"srcFilePath" ,
 		"flavorAssetId" ,
-		"infected" ,
+		"scanResult" ,
+		"virusFoundAction",
 	);
 
 
