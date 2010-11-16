@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-class flavorAssetPeer extends BaseflavorAssetPeer
+class thumbAssetPeer extends BaseflavorAssetPeer
 {
 	/** the related Propel class for this table */
 	const OM_CLASS = 'thumbAsset';
