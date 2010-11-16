@@ -40,11 +40,14 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		{
 			switch($enumValue)
 			{
-				case flavorParams::CONTAINER_FORMAT_PDF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
 					return new KalturaPdfFlavorParams();
 					
-				case flavorParams::CONTAINER_FORMAT_SWF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
 					return new KalturaSwfFlavorParams();
+					
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+					return new KalturaDocumentFlavorParams();
 				
 				default:
 					return null;	
@@ -55,11 +58,14 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		{
 			switch($enumValue)
 			{
-				case flavorParams::CONTAINER_FORMAT_PDF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
 					return new KalturaPdfFlavorParamsOutput();
 					
-				case flavorParams::CONTAINER_FORMAT_SWF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
 					return new KalturaSwfFlavorParamsOutput();
+					
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+					return new KalturaDocumentFlavorParamsOutput();
 				
 				default:
 					return null;	
@@ -122,11 +128,14 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		{
 			switch($enumValue)
 			{
-				case flavorParams::CONTAINER_FORMAT_PDF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
 					return 'PdfFlavorParams';
 					
-				case flavorParams::CONTAINER_FORMAT_SWF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
 					return 'SwfFlavorParams';
+					
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+					return 'DocumentFlavorParams';
 				
 				default:
 					return null;	
@@ -137,11 +146,14 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		{
 			switch($enumValue)
 			{
-				case flavorParams::CONTAINER_FORMAT_PDF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
 					return 'PdfFlavorParamsOutput';
 					
-				case flavorParams::CONTAINER_FORMAT_SWF:
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
 					return 'SwfFlavorParamsOutput';
+					
+				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+					return 'DocumentFlavorParamsOutput';
 				
 				default:
 					return null;	
