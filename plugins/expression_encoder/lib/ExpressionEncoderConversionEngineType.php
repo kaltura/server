@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class ExpressionEncoderConversionEngineType extends KalturaPluginEnum implements conversionEngineType
+class ExpressionEncoderConversionEngineType extends KalturaConversionEngineType
 {
 	const EXPRESSION_ENCODER = 'ExpressionEncoder';
 	
@@ -11,8 +11,6 @@ class ExpressionEncoderConversionEngineType extends KalturaPluginEnum implements
 	 * @var ExpressionEncoderConversionEngineType
 	 */
 	protected static $instance;
-
-	private function __construct(){}
 	
 	/**
 	 * @return ExpressionEncoderConversionEngineType
@@ -30,11 +28,6 @@ class ExpressionEncoderConversionEngineType extends KalturaPluginEnum implements
 		return array(
 			'EXPRESSION_ENCODER' => self::EXPRESSION_ENCODER
 		);
-	}
-	
-	public function getEnumClass()
-	{
-		return 'conversionEngineType';
 	}
 	
 	public function getPluginName()

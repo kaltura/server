@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class VirusScanEntryStatus extends KalturaPluginEnum implements entryStatus
+class VirusScanEntryStatus extends KalturaEntryStatus
 {
 	const INFECTED = 'Infected';
 	
@@ -12,8 +12,6 @@ class VirusScanEntryStatus extends KalturaPluginEnum implements entryStatus
 	 */
 	protected static $instance;
 
-	private function __construct(){}
-	
 	/**
 	 * @return VirusScanEntryStatus
 	 */
@@ -30,11 +28,6 @@ class VirusScanEntryStatus extends KalturaPluginEnum implements entryStatus
 		return array(
 			'INFECTED' => self::INFECTED
 		);
-	}
-	
-	public function getEnumClass()
-	{
-		return 'entryStatus';
 	}
 	
 	public function getPluginName()

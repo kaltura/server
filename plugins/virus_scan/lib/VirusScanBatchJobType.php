@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class VirusScanBatchJobType extends KalturaPluginEnum implements BatchJobType
+class VirusScanBatchJobType extends KalturaBatchJobType
 {
 	const VIRUS_SCAN = 'VirusScan';
 	
@@ -12,8 +12,6 @@ class VirusScanBatchJobType extends KalturaPluginEnum implements BatchJobType
 	 */
 	protected static $instance;
 
-	private function __construct(){}
-	
 	/**
 	 * @return VirusScanBatchJobType
 	 */
@@ -30,11 +28,6 @@ class VirusScanBatchJobType extends KalturaPluginEnum implements BatchJobType
 		return array(
 			'VIRUS_SCAN' => self::VIRUS_SCAN
 		);
-	}
-	
-	public function getEnumClass()
-	{
-		return 'BatchJobType';
 	}
 	
 	public function getPluginName()

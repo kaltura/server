@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class FastStartConversionEngineType extends KalturaPluginEnum implements conversionEngineType
+class FastStartConversionEngineType extends KalturaConversionEngineType
 {
 	const FAST_START = 'FastStart';
 	
@@ -12,8 +12,6 @@ class FastStartConversionEngineType extends KalturaPluginEnum implements convers
 	 */
 	protected static $instance;
 
-	private function __construct(){}
-	
 	/**
 	 * @return FastStartConversionEngineType
 	 */
@@ -30,11 +28,6 @@ class FastStartConversionEngineType extends KalturaPluginEnum implements convers
 		return array(
 			'FAST_START' => self::FAST_START
 		);
-	}
-	
-	public function getEnumClass()
-	{
-		return 'conversionEngineType';
 	}
 	
 	public function getPluginName()

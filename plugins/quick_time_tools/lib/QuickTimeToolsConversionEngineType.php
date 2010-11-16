@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class QuickTimeToolsConversionEngineType extends KalturaPluginEnum implements conversionEngineType
+class QuickTimeToolsConversionEngineType extends KalturaConversionEngineType
 {
 	const QUICK_TIME_PLAYER_TOOLS = 'QuickTimeTools';
 	
@@ -12,8 +12,6 @@ class QuickTimeToolsConversionEngineType extends KalturaPluginEnum implements co
 	 */
 	protected static $instance;
 
-	private function __construct(){}
-	
 	/**
 	 * @return QuickTimeToolsConversionEngineType
 	 */
@@ -30,11 +28,6 @@ class QuickTimeToolsConversionEngineType extends KalturaPluginEnum implements co
 		return array(
 			'QUICK_TIME_PLAYER_TOOLS' => self::QUICK_TIME_PLAYER_TOOLS
 		);
-	}
-	
-	public function getEnumClass()
-	{
-		return 'conversionEngineType';
 	}
 	
 	public function getPluginName()
