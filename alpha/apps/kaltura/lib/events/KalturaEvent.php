@@ -21,10 +21,12 @@ abstract class KalturaEvent
 	 */
 	public final function consume(KalturaEventConsumer $consumer)
 	{
-		$consumerType = $this->getConsumerInterface();
+		$consumerType = $this->getConsumerInterface();	
 		if($consumer instanceof $consumerType)
+		{
+			KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer));
 			return $this->doConsume($consumer);
-			
+		}	
 		return true;
 	}
 }
