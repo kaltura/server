@@ -115,24 +115,42 @@ class kEventsManager
 		if(!($event instanceof IKalturaContinualEvent))
 		{
 			KalturaLog::debug("Event [" . get_class($event) . "] is not continual event");
-			return;			
+			return;
 		}
 		
 		$consumerInterface = $event->getConsumerInterface();
 		KalturaLog::debug("Event [" . get_class($event) . "] raised looking for consumers [$consumerInterface]");
 
 		$consumers = self::getConsumers($consumerInterface);
-		$continue = false;
+		
+		$lastConsumerFound = false;		
 		foreach($consumers as $consumerClass)
 		{
-			if(!$continue && $consumerClass != $lastConsumerClass)
+			if(!$lastConsumerFound && $consumerClass != $lastConsumerClass)
+			{
 				continue;
+			}
+				
+			if ($consumerClass == $lastConsumerClass)
+			{
+				$lastConsumerFound = true;
+				continue;
+			}
 			
 //			KalturaLog::debug("Event consumer [$consumerClass] called");
 			$continue = $event->consume(new $consumerClass());
 			
-			if(!$continue && $event instanceof IKalturaCancelableEvent)
-				break;
+			if(!$continue)
+			{
+				if($event instanceof IKalturaCancelableEvent)
+				{
+					break;
+				}
+				else
+				{
+					KalturaLog::debug("Event [" . get_class($event) . "] is not cancelable event");
+				}
+			}
 		}
 	}
 }
