@@ -1,7 +1,7 @@
 <?php
 class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
 {
-	const PLUGIN_NAME = 'SphinxSearchPlugin';
+	const PLUGIN_NAME = 'sphinxSearch';
 	const SPHINX_SEARCH_MANAGER = 'kSphinxSearchManager';
 	
 	public static function getPluginName()
