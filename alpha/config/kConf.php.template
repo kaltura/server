@@ -189,7 +189,7 @@ class kConf
                     "AuditPlugin", // Should be enabled only if audit trail support required
 				),
 
-                "search_plugin"	=> "SphinxSearchPlugin",
+                "search_plugin"	=> "sphinxSearch",
 											
 				"event_consumers" => array(
                 	"kFlowManager",
