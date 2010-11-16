@@ -64,8 +64,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::SCHEDULER_HELPER => 'Schedule Helper',
 		BatchJobType::BULKDOWNLOAD => 'Bulk Download',
 		BatchJobType::DB_CLEANUP => 'DB Cleanup',
-		BatchJobType::PROJECT => 'Project',
-		
 		
 		BatchJobType::PROVISION_PROVIDE => 'Provision Provide',
 		BatchJobType::CONVERT_COLLECTION => 'Convert Collection',
