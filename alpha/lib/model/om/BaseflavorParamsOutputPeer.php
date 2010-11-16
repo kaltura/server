@@ -25,7 +25,7 @@ abstract class BaseflavorParamsOutputPeer {
 	const TM_CLASS = 'flavorParamsOutputTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 37;
+	const NUM_COLUMNS = 38;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -141,6 +141,9 @@ abstract class BaseflavorParamsOutputPeer {
 	/** the column name for the ENGINE_VERSION field */
 	const ENGINE_VERSION = 'flavor_params_output.ENGINE_VERSION';
 
+	/** the column name for the TYPE field */
+	const TYPE = 'flavor_params_output.TYPE';
+
 	/**
 	 * An identiy map to hold any loaded instances of flavorParamsOutput objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -157,11 +160,11 @@ abstract class BaseflavorParamsOutputPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'FlavorParamsId', 'FlavorParamsVersion', 'PartnerId', 'EntryId', 'FlavorAssetId', 'FlavorAssetVersion', 'Name', 'Tags', 'Description', 'ReadyBehavior', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'IsDefault', 'Format', 'VideoCodec', 'VideoBitrate', 'AudioCodec', 'AudioBitrate', 'AudioChannels', 'AudioSampleRate', 'AudioResolution', 'Width', 'Height', 'FrameRate', 'GopSize', 'TwoPass', 'ConversionEngines', 'ConversionEnginesExtraParams', 'CustomData', 'CommandLines', 'FileExt', 'Deinterlice', 'Rotate', 'Operators', 'EngineVersion', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'flavorParamsId', 'flavorParamsVersion', 'partnerId', 'entryId', 'flavorAssetId', 'flavorAssetVersion', 'name', 'tags', 'description', 'readyBehavior', 'createdAt', 'updatedAt', 'deletedAt', 'isDefault', 'format', 'videoCodec', 'videoBitrate', 'audioCodec', 'audioBitrate', 'audioChannels', 'audioSampleRate', 'audioResolution', 'width', 'height', 'frameRate', 'gopSize', 'twoPass', 'conversionEngines', 'conversionEnginesExtraParams', 'customData', 'commandLines', 'fileExt', 'deinterlice', 'rotate', 'operators', 'engineVersion', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::FLAVOR_PARAMS_ID, self::FLAVOR_PARAMS_VERSION, self::PARTNER_ID, self::ENTRY_ID, self::FLAVOR_ASSET_ID, self::FLAVOR_ASSET_VERSION, self::NAME, self::TAGS, self::DESCRIPTION, self::READY_BEHAVIOR, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::IS_DEFAULT, self::FORMAT, self::VIDEO_CODEC, self::VIDEO_BITRATE, self::AUDIO_CODEC, self::AUDIO_BITRATE, self::AUDIO_CHANNELS, self::AUDIO_SAMPLE_RATE, self::AUDIO_RESOLUTION, self::WIDTH, self::HEIGHT, self::FRAME_RATE, self::GOP_SIZE, self::TWO_PASS, self::CONVERSION_ENGINES, self::CONVERSION_ENGINES_EXTRA_PARAMS, self::CUSTOM_DATA, self::COMMAND_LINES, self::FILE_EXT, self::DEINTERLICE, self::ROTATE, self::OPERATORS, self::ENGINE_VERSION, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'flavor_params_id', 'flavor_params_version', 'partner_id', 'entry_id', 'flavor_asset_id', 'flavor_asset_version', 'name', 'tags', 'description', 'ready_behavior', 'created_at', 'updated_at', 'deleted_at', 'is_default', 'format', 'video_codec', 'video_bitrate', 'audio_codec', 'audio_bitrate', 'audio_channels', 'audio_sample_rate', 'audio_resolution', 'width', 'height', 'frame_rate', 'gop_size', 'two_pass', 'conversion_engines', 'conversion_engines_extra_params', 'custom_data', 'command_lines', 'file_ext', 'deinterlice', 'rotate', 'operators', 'engine_version', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'FlavorParamsId', 'FlavorParamsVersion', 'PartnerId', 'EntryId', 'FlavorAssetId', 'FlavorAssetVersion', 'Name', 'Tags', 'Description', 'ReadyBehavior', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'IsDefault', 'Format', 'VideoCodec', 'VideoBitrate', 'AudioCodec', 'AudioBitrate', 'AudioChannels', 'AudioSampleRate', 'AudioResolution', 'Width', 'Height', 'FrameRate', 'GopSize', 'TwoPass', 'ConversionEngines', 'ConversionEnginesExtraParams', 'CustomData', 'CommandLines', 'FileExt', 'Deinterlice', 'Rotate', 'Operators', 'EngineVersion', 'Type', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'flavorParamsId', 'flavorParamsVersion', 'partnerId', 'entryId', 'flavorAssetId', 'flavorAssetVersion', 'name', 'tags', 'description', 'readyBehavior', 'createdAt', 'updatedAt', 'deletedAt', 'isDefault', 'format', 'videoCodec', 'videoBitrate', 'audioCodec', 'audioBitrate', 'audioChannels', 'audioSampleRate', 'audioResolution', 'width', 'height', 'frameRate', 'gopSize', 'twoPass', 'conversionEngines', 'conversionEnginesExtraParams', 'customData', 'commandLines', 'fileExt', 'deinterlice', 'rotate', 'operators', 'engineVersion', 'type', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::FLAVOR_PARAMS_ID, self::FLAVOR_PARAMS_VERSION, self::PARTNER_ID, self::ENTRY_ID, self::FLAVOR_ASSET_ID, self::FLAVOR_ASSET_VERSION, self::NAME, self::TAGS, self::DESCRIPTION, self::READY_BEHAVIOR, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::IS_DEFAULT, self::FORMAT, self::VIDEO_CODEC, self::VIDEO_BITRATE, self::AUDIO_CODEC, self::AUDIO_BITRATE, self::AUDIO_CHANNELS, self::AUDIO_SAMPLE_RATE, self::AUDIO_RESOLUTION, self::WIDTH, self::HEIGHT, self::FRAME_RATE, self::GOP_SIZE, self::TWO_PASS, self::CONVERSION_ENGINES, self::CONVERSION_ENGINES_EXTRA_PARAMS, self::CUSTOM_DATA, self::COMMAND_LINES, self::FILE_EXT, self::DEINTERLICE, self::ROTATE, self::OPERATORS, self::ENGINE_VERSION, self::TYPE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'flavor_params_id', 'flavor_params_version', 'partner_id', 'entry_id', 'flavor_asset_id', 'flavor_asset_version', 'name', 'tags', 'description', 'ready_behavior', 'created_at', 'updated_at', 'deleted_at', 'is_default', 'format', 'video_codec', 'video_bitrate', 'audio_codec', 'audio_bitrate', 'audio_channels', 'audio_sample_rate', 'audio_resolution', 'width', 'height', 'frame_rate', 'gop_size', 'two_pass', 'conversion_engines', 'conversion_engines_extra_params', 'custom_data', 'command_lines', 'file_ext', 'deinterlice', 'rotate', 'operators', 'engine_version', 'type', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, )
 	);
 
 	/**
@@ -171,11 +174,11 @@ abstract class BaseflavorParamsOutputPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FlavorParamsId' => 1, 'FlavorParamsVersion' => 2, 'PartnerId' => 3, 'EntryId' => 4, 'FlavorAssetId' => 5, 'FlavorAssetVersion' => 6, 'Name' => 7, 'Tags' => 8, 'Description' => 9, 'ReadyBehavior' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, 'DeletedAt' => 13, 'IsDefault' => 14, 'Format' => 15, 'VideoCodec' => 16, 'VideoBitrate' => 17, 'AudioCodec' => 18, 'AudioBitrate' => 19, 'AudioChannels' => 20, 'AudioSampleRate' => 21, 'AudioResolution' => 22, 'Width' => 23, 'Height' => 24, 'FrameRate' => 25, 'GopSize' => 26, 'TwoPass' => 27, 'ConversionEngines' => 28, 'ConversionEnginesExtraParams' => 29, 'CustomData' => 30, 'CommandLines' => 31, 'FileExt' => 32, 'Deinterlice' => 33, 'Rotate' => 34, 'Operators' => 35, 'EngineVersion' => 36, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'flavorParamsId' => 1, 'flavorParamsVersion' => 2, 'partnerId' => 3, 'entryId' => 4, 'flavorAssetId' => 5, 'flavorAssetVersion' => 6, 'name' => 7, 'tags' => 8, 'description' => 9, 'readyBehavior' => 10, 'createdAt' => 11, 'updatedAt' => 12, 'deletedAt' => 13, 'isDefault' => 14, 'format' => 15, 'videoCodec' => 16, 'videoBitrate' => 17, 'audioCodec' => 18, 'audioBitrate' => 19, 'audioChannels' => 20, 'audioSampleRate' => 21, 'audioResolution' => 22, 'width' => 23, 'height' => 24, 'frameRate' => 25, 'gopSize' => 26, 'twoPass' => 27, 'conversionEngines' => 28, 'conversionEnginesExtraParams' => 29, 'customData' => 30, 'commandLines' => 31, 'fileExt' => 32, 'deinterlice' => 33, 'rotate' => 34, 'operators' => 35, 'engineVersion' => 36, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FLAVOR_PARAMS_ID => 1, self::FLAVOR_PARAMS_VERSION => 2, self::PARTNER_ID => 3, self::ENTRY_ID => 4, self::FLAVOR_ASSET_ID => 5, self::FLAVOR_ASSET_VERSION => 6, self::NAME => 7, self::TAGS => 8, self::DESCRIPTION => 9, self::READY_BEHAVIOR => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, self::DELETED_AT => 13, self::IS_DEFAULT => 14, self::FORMAT => 15, self::VIDEO_CODEC => 16, self::VIDEO_BITRATE => 17, self::AUDIO_CODEC => 18, self::AUDIO_BITRATE => 19, self::AUDIO_CHANNELS => 20, self::AUDIO_SAMPLE_RATE => 21, self::AUDIO_RESOLUTION => 22, self::WIDTH => 23, self::HEIGHT => 24, self::FRAME_RATE => 25, self::GOP_SIZE => 26, self::TWO_PASS => 27, self::CONVERSION_ENGINES => 28, self::CONVERSION_ENGINES_EXTRA_PARAMS => 29, self::CUSTOM_DATA => 30, self::COMMAND_LINES => 31, self::FILE_EXT => 32, self::DEINTERLICE => 33, self::ROTATE => 34, self::OPERATORS => 35, self::ENGINE_VERSION => 36, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'flavor_params_id' => 1, 'flavor_params_version' => 2, 'partner_id' => 3, 'entry_id' => 4, 'flavor_asset_id' => 5, 'flavor_asset_version' => 6, 'name' => 7, 'tags' => 8, 'description' => 9, 'ready_behavior' => 10, 'created_at' => 11, 'updated_at' => 12, 'deleted_at' => 13, 'is_default' => 14, 'format' => 15, 'video_codec' => 16, 'video_bitrate' => 17, 'audio_codec' => 18, 'audio_bitrate' => 19, 'audio_channels' => 20, 'audio_sample_rate' => 21, 'audio_resolution' => 22, 'width' => 23, 'height' => 24, 'frame_rate' => 25, 'gop_size' => 26, 'two_pass' => 27, 'conversion_engines' => 28, 'conversion_engines_extra_params' => 29, 'custom_data' => 30, 'command_lines' => 31, 'file_ext' => 32, 'deinterlice' => 33, 'rotate' => 34, 'operators' => 35, 'engine_version' => 36, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FlavorParamsId' => 1, 'FlavorParamsVersion' => 2, 'PartnerId' => 3, 'EntryId' => 4, 'FlavorAssetId' => 5, 'FlavorAssetVersion' => 6, 'Name' => 7, 'Tags' => 8, 'Description' => 9, 'ReadyBehavior' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, 'DeletedAt' => 13, 'IsDefault' => 14, 'Format' => 15, 'VideoCodec' => 16, 'VideoBitrate' => 17, 'AudioCodec' => 18, 'AudioBitrate' => 19, 'AudioChannels' => 20, 'AudioSampleRate' => 21, 'AudioResolution' => 22, 'Width' => 23, 'Height' => 24, 'FrameRate' => 25, 'GopSize' => 26, 'TwoPass' => 27, 'ConversionEngines' => 28, 'ConversionEnginesExtraParams' => 29, 'CustomData' => 30, 'CommandLines' => 31, 'FileExt' => 32, 'Deinterlice' => 33, 'Rotate' => 34, 'Operators' => 35, 'EngineVersion' => 36, 'Type' => 37, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'flavorParamsId' => 1, 'flavorParamsVersion' => 2, 'partnerId' => 3, 'entryId' => 4, 'flavorAssetId' => 5, 'flavorAssetVersion' => 6, 'name' => 7, 'tags' => 8, 'description' => 9, 'readyBehavior' => 10, 'createdAt' => 11, 'updatedAt' => 12, 'deletedAt' => 13, 'isDefault' => 14, 'format' => 15, 'videoCodec' => 16, 'videoBitrate' => 17, 'audioCodec' => 18, 'audioBitrate' => 19, 'audioChannels' => 20, 'audioSampleRate' => 21, 'audioResolution' => 22, 'width' => 23, 'height' => 24, 'frameRate' => 25, 'gopSize' => 26, 'twoPass' => 27, 'conversionEngines' => 28, 'conversionEnginesExtraParams' => 29, 'customData' => 30, 'commandLines' => 31, 'fileExt' => 32, 'deinterlice' => 33, 'rotate' => 34, 'operators' => 35, 'engineVersion' => 36, 'type' => 37, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::FLAVOR_PARAMS_ID => 1, self::FLAVOR_PARAMS_VERSION => 2, self::PARTNER_ID => 3, self::ENTRY_ID => 4, self::FLAVOR_ASSET_ID => 5, self::FLAVOR_ASSET_VERSION => 6, self::NAME => 7, self::TAGS => 8, self::DESCRIPTION => 9, self::READY_BEHAVIOR => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, self::DELETED_AT => 13, self::IS_DEFAULT => 14, self::FORMAT => 15, self::VIDEO_CODEC => 16, self::VIDEO_BITRATE => 17, self::AUDIO_CODEC => 18, self::AUDIO_BITRATE => 19, self::AUDIO_CHANNELS => 20, self::AUDIO_SAMPLE_RATE => 21, self::AUDIO_RESOLUTION => 22, self::WIDTH => 23, self::HEIGHT => 24, self::FRAME_RATE => 25, self::GOP_SIZE => 26, self::TWO_PASS => 27, self::CONVERSION_ENGINES => 28, self::CONVERSION_ENGINES_EXTRA_PARAMS => 29, self::CUSTOM_DATA => 30, self::COMMAND_LINES => 31, self::FILE_EXT => 32, self::DEINTERLICE => 33, self::ROTATE => 34, self::OPERATORS => 35, self::ENGINE_VERSION => 36, self::TYPE => 37, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'flavor_params_id' => 1, 'flavor_params_version' => 2, 'partner_id' => 3, 'entry_id' => 4, 'flavor_asset_id' => 5, 'flavor_asset_version' => 6, 'name' => 7, 'tags' => 8, 'description' => 9, 'ready_behavior' => 10, 'created_at' => 11, 'updated_at' => 12, 'deleted_at' => 13, 'is_default' => 14, 'format' => 15, 'video_codec' => 16, 'video_bitrate' => 17, 'audio_codec' => 18, 'audio_bitrate' => 19, 'audio_channels' => 20, 'audio_sample_rate' => 21, 'audio_resolution' => 22, 'width' => 23, 'height' => 24, 'frame_rate' => 25, 'gop_size' => 26, 'two_pass' => 27, 'conversion_engines' => 28, 'conversion_engines_extra_params' => 29, 'custom_data' => 30, 'command_lines' => 31, 'file_ext' => 32, 'deinterlice' => 33, 'rotate' => 34, 'operators' => 35, 'engine_version' => 36, 'type' => 37, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, )
 	);
 
 	/**
@@ -282,6 +285,7 @@ abstract class BaseflavorParamsOutputPeer {
 		$criteria->addSelectColumn(flavorParamsOutputPeer::ROTATE);
 		$criteria->addSelectColumn(flavorParamsOutputPeer::OPERATORS);
 		$criteria->addSelectColumn(flavorParamsOutputPeer::ENGINE_VERSION);
+		$criteria->addSelectColumn(flavorParamsOutputPeer::TYPE);
 	}
 
 	/**
@@ -951,7 +955,8 @@ abstract class BaseflavorParamsOutputPeer {
 				$obj2 = flavorAssetPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$cls = flavorAssetPeer::getOMClass(false);
+					$omClass = flavorAssetPeer::getOMClass($row, $startcol);
+					$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
@@ -1120,7 +1125,8 @@ abstract class BaseflavorParamsOutputPeer {
 				$obj4 = flavorAssetPeer::getInstanceFromPool($key4);
 				if (!$obj4) {
 
-					$cls = flavorAssetPeer::getOMClass(false);
+					$omClass = flavorAssetPeer::getOMClass($row, $startcol4);
+          $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj4 = new $cls();
 					$obj4->hydrate($row, $startcol4);
@@ -1365,7 +1371,8 @@ abstract class BaseflavorParamsOutputPeer {
 					$obj3 = flavorAssetPeer::getInstanceFromPool($key3);
 					if (!$obj3) {
 	
-						$cls = flavorAssetPeer::getOMClass(false);
+						$omClass = flavorAssetPeer::getOMClass($row, $startcol3);
+            $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj3 = new $cls();
 					$obj3->hydrate($row, $startcol3);
@@ -1464,7 +1471,8 @@ abstract class BaseflavorParamsOutputPeer {
 					$obj3 = flavorAssetPeer::getInstanceFromPool($key3);
 					if (!$obj3) {
 	
-						$cls = flavorAssetPeer::getOMClass(false);
+						$omClass = flavorAssetPeer::getOMClass($row, $startcol3);
+            $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj3 = new $cls();
 					$obj3->hydrate($row, $startcol3);
@@ -1619,7 +1627,7 @@ abstract class BaseflavorParamsOutputPeer {
 	{
 		try {
 
-			$omClass = $row[$colnum + 15];
+			$omClass = $row[$colnum + 37];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {

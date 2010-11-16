@@ -151,6 +151,19 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	protected $video_codec_id;
 
 	/**
+	 * The value for the type field.
+	 * Note: this column has a database default value of: 1
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * @var        entry
 	 */
 	protected $aentry;
@@ -222,6 +235,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 		$this->frame_rate = 0;
 		$this->size = 0;
 		$this->is_original = false;
+		$this->type = 1;
 	}
 
 	/**
@@ -532,6 +546,26 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	public function getVideoCodecId()
 	{
 		return $this->video_codec_id;
+	}
+
+	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -1107,6 +1141,49 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	} // setVideoCodecId()
 
 	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     flavorAsset The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorAssetPeer::TYPE]))
+			$this->oldColumnsValues[flavorAssetPeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v || $this->isNew()) {
+			$this->type = $v;
+			$this->modifiedColumns[] = flavorAssetPeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
+
+	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     flavorAsset The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = flavorAssetPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1137,6 +1214,10 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			}
 
 			if ($this->is_original !== false) {
+				return false;
+			}
+
+			if ($this->type !== 1) {
 				return false;
 			}
 
@@ -1183,6 +1264,8 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			$this->file_ext = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->container_format = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->video_codec_id = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->type = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1192,7 +1275,7 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 21; // 21 = flavorAssetPeer::NUM_COLUMNS - flavorAssetPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = flavorAssetPeer::NUM_COLUMNS - flavorAssetPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating flavorAsset object", $e);
@@ -1446,6 +1529,8 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1455,7 +1540,9 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1697,6 +1784,12 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			case 20:
 				return $this->getVideoCodecId();
 				break;
+			case 21:
+				return $this->getType();
+				break;
+			case 22:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1739,6 +1832,8 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			$keys[18] => $this->getFileExt(),
 			$keys[19] => $this->getContainerFormat(),
 			$keys[20] => $this->getVideoCodecId(),
+			$keys[21] => $this->getType(),
+			$keys[22] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1833,6 +1928,12 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			case 20:
 				$this->setVideoCodecId($value);
 				break;
+			case 21:
+				$this->setType($value);
+				break;
+			case 22:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1878,6 +1979,8 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[18], $arr)) $this->setFileExt($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setContainerFormat($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setVideoCodecId($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setType($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
 	}
 
 	/**
@@ -1910,6 +2013,8 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(flavorAssetPeer::FILE_EXT)) $criteria->add(flavorAssetPeer::FILE_EXT, $this->file_ext);
 		if ($this->isColumnModified(flavorAssetPeer::CONTAINER_FORMAT)) $criteria->add(flavorAssetPeer::CONTAINER_FORMAT, $this->container_format);
 		if ($this->isColumnModified(flavorAssetPeer::VIDEO_CODEC_ID)) $criteria->add(flavorAssetPeer::VIDEO_CODEC_ID, $this->video_codec_id);
+		if ($this->isColumnModified(flavorAssetPeer::TYPE)) $criteria->add(flavorAssetPeer::TYPE, $this->type);
+		if ($this->isColumnModified(flavorAssetPeer::CUSTOM_DATA)) $criteria->add(flavorAssetPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -2003,6 +2108,10 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 		$copyObj->setContainerFormat($this->container_format);
 
 		$copyObj->setVideoCodecId($this->video_codec_id);
+
+		$copyObj->setType($this->type);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		if ($deepCopy) {
@@ -2617,4 +2726,121 @@ abstract class BaseflavorAsset extends BaseObject  implements Persistent {
 			$this->aflavorParams = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseflavorAsset

@@ -249,6 +249,13 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	protected $engine_version;
 
 	/**
+	 * The value for the type field.
+	 * Note: this column has a database default value of: 1
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
 	 * @var        flavorParams
 	 */
 	protected $aflavorParams;
@@ -307,6 +314,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 		$this->height = 0;
 		$this->gop_size = 0;
 		$this->two_pass = false;
+		$this->type = 1;
 	}
 
 	/**
@@ -777,6 +785,16 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	public function getEngineVersion()
 	{
 		return $this->engine_version;
+	}
+
+	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
 	}
 
 	/**
@@ -1721,6 +1739,29 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 	} // setEngineVersion()
 
 	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     flavorParamsOutput The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorParamsOutputPeer::TYPE]))
+			$this->oldColumnsValues[flavorParamsOutputPeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v || $this->isNew()) {
+			$this->type = $v;
+			$this->modifiedColumns[] = flavorParamsOutputPeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1759,6 +1800,10 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			}
 
 			if ($this->two_pass !== false) {
+				return false;
+			}
+
+			if ($this->type !== 1) {
 				return false;
 			}
 
@@ -1821,6 +1866,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			$this->rotate = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
 			$this->operators = ($row[$startcol + 35] !== null) ? (string) $row[$startcol + 35] : null;
 			$this->engine_version = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->type = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1830,7 +1876,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 37; // 37 = flavorParamsOutputPeer::NUM_COLUMNS - flavorParamsOutputPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 38; // 38 = flavorParamsOutputPeer::NUM_COLUMNS - flavorParamsOutputPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating flavorParamsOutput object", $e);
@@ -2366,6 +2412,9 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			case 36:
 				return $this->getEngineVersion();
 				break;
+			case 37:
+				return $this->getType();
+				break;
 			default:
 				return null;
 				break;
@@ -2424,6 +2473,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			$keys[34] => $this->getRotate(),
 			$keys[35] => $this->getOperators(),
 			$keys[36] => $this->getEngineVersion(),
+			$keys[37] => $this->getType(),
 		);
 		return $result;
 	}
@@ -2566,6 +2616,9 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 			case 36:
 				$this->setEngineVersion($value);
 				break;
+			case 37:
+				$this->setType($value);
+				break;
 		} // switch()
 	}
 
@@ -2627,6 +2680,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 		if (array_key_exists($keys[34], $arr)) $this->setRotate($arr[$keys[34]]);
 		if (array_key_exists($keys[35], $arr)) $this->setOperators($arr[$keys[35]]);
 		if (array_key_exists($keys[36], $arr)) $this->setEngineVersion($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setType($arr[$keys[37]]);
 	}
 
 	/**
@@ -2675,6 +2729,7 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 		if ($this->isColumnModified(flavorParamsOutputPeer::ROTATE)) $criteria->add(flavorParamsOutputPeer::ROTATE, $this->rotate);
 		if ($this->isColumnModified(flavorParamsOutputPeer::OPERATORS)) $criteria->add(flavorParamsOutputPeer::OPERATORS, $this->operators);
 		if ($this->isColumnModified(flavorParamsOutputPeer::ENGINE_VERSION)) $criteria->add(flavorParamsOutputPeer::ENGINE_VERSION, $this->engine_version);
+		if ($this->isColumnModified(flavorParamsOutputPeer::TYPE)) $criteria->add(flavorParamsOutputPeer::TYPE, $this->type);
 
 		return $criteria;
 	}
@@ -2800,6 +2855,8 @@ abstract class BaseflavorParamsOutput extends BaseObject  implements Persistent 
 		$copyObj->setOperators($this->operators);
 
 		$copyObj->setEngineVersion($this->engine_version);
+
+		$copyObj->setType($this->type);
 
 
 		$copyObj->setNew(true);

@@ -25,7 +25,7 @@ abstract class BaseflavorAssetPeer {
 	const TM_CLASS = 'flavorAssetTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 21;
+	const NUM_COLUMNS = 23;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -93,6 +93,12 @@ abstract class BaseflavorAssetPeer {
 	/** the column name for the VIDEO_CODEC_ID field */
 	const VIDEO_CODEC_ID = 'flavor_asset.VIDEO_CODEC_ID';
 
+	/** the column name for the TYPE field */
+	const TYPE = 'flavor_asset.TYPE';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'flavor_asset.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of flavorAsset objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -109,11 +115,11 @@ abstract class BaseflavorAssetPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'Tags', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'EntryId', 'FlavorParamsId', 'Status', 'Version', 'Description', 'Width', 'Height', 'Bitrate', 'FrameRate', 'Size', 'IsOriginal', 'FileExt', 'ContainerFormat', 'VideoCodecId', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'tags', 'createdAt', 'updatedAt', 'deletedAt', 'entryId', 'flavorParamsId', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frameRate', 'size', 'isOriginal', 'fileExt', 'containerFormat', 'videoCodecId', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::ENTRY_ID, self::FLAVOR_PARAMS_ID, self::STATUS, self::VERSION, self::DESCRIPTION, self::WIDTH, self::HEIGHT, self::BITRATE, self::FRAME_RATE, self::SIZE, self::IS_ORIGINAL, self::FILE_EXT, self::CONTAINER_FORMAT, self::VIDEO_CODEC_ID, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'tags', 'created_at', 'updated_at', 'deleted_at', 'entry_id', 'flavor_params_id', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frame_rate', 'size', 'is_original', 'file_ext', 'container_format', 'video_codec_id', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'Tags', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'EntryId', 'FlavorParamsId', 'Status', 'Version', 'Description', 'Width', 'Height', 'Bitrate', 'FrameRate', 'Size', 'IsOriginal', 'FileExt', 'ContainerFormat', 'VideoCodecId', 'Type', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'tags', 'createdAt', 'updatedAt', 'deletedAt', 'entryId', 'flavorParamsId', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frameRate', 'size', 'isOriginal', 'fileExt', 'containerFormat', 'videoCodecId', 'type', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::ENTRY_ID, self::FLAVOR_PARAMS_ID, self::STATUS, self::VERSION, self::DESCRIPTION, self::WIDTH, self::HEIGHT, self::BITRATE, self::FRAME_RATE, self::SIZE, self::IS_ORIGINAL, self::FILE_EXT, self::CONTAINER_FORMAT, self::VIDEO_CODEC_ID, self::TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'tags', 'created_at', 'updated_at', 'deleted_at', 'entry_id', 'flavor_params_id', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frame_rate', 'size', 'is_original', 'file_ext', 'container_format', 'video_codec_id', 'type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
 	/**
@@ -123,11 +129,11 @@ abstract class BaseflavorAssetPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'Tags' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'DeletedAt' => 6, 'EntryId' => 7, 'FlavorParamsId' => 8, 'Status' => 9, 'Version' => 10, 'Description' => 11, 'Width' => 12, 'Height' => 13, 'Bitrate' => 14, 'FrameRate' => 15, 'Size' => 16, 'IsOriginal' => 17, 'FileExt' => 18, 'ContainerFormat' => 19, 'VideoCodecId' => 20, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'tags' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'deletedAt' => 6, 'entryId' => 7, 'flavorParamsId' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frameRate' => 15, 'size' => 16, 'isOriginal' => 17, 'fileExt' => 18, 'containerFormat' => 19, 'videoCodecId' => 20, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::TAGS => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::DELETED_AT => 6, self::ENTRY_ID => 7, self::FLAVOR_PARAMS_ID => 8, self::STATUS => 9, self::VERSION => 10, self::DESCRIPTION => 11, self::WIDTH => 12, self::HEIGHT => 13, self::BITRATE => 14, self::FRAME_RATE => 15, self::SIZE => 16, self::IS_ORIGINAL => 17, self::FILE_EXT => 18, self::CONTAINER_FORMAT => 19, self::VIDEO_CODEC_ID => 20, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'tags' => 3, 'created_at' => 4, 'updated_at' => 5, 'deleted_at' => 6, 'entry_id' => 7, 'flavor_params_id' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frame_rate' => 15, 'size' => 16, 'is_original' => 17, 'file_ext' => 18, 'container_format' => 19, 'video_codec_id' => 20, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'Tags' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'DeletedAt' => 6, 'EntryId' => 7, 'FlavorParamsId' => 8, 'Status' => 9, 'Version' => 10, 'Description' => 11, 'Width' => 12, 'Height' => 13, 'Bitrate' => 14, 'FrameRate' => 15, 'Size' => 16, 'IsOriginal' => 17, 'FileExt' => 18, 'ContainerFormat' => 19, 'VideoCodecId' => 20, 'Type' => 21, 'CustomData' => 22, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'tags' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'deletedAt' => 6, 'entryId' => 7, 'flavorParamsId' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frameRate' => 15, 'size' => 16, 'isOriginal' => 17, 'fileExt' => 18, 'containerFormat' => 19, 'videoCodecId' => 20, 'type' => 21, 'customData' => 22, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::TAGS => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::DELETED_AT => 6, self::ENTRY_ID => 7, self::FLAVOR_PARAMS_ID => 8, self::STATUS => 9, self::VERSION => 10, self::DESCRIPTION => 11, self::WIDTH => 12, self::HEIGHT => 13, self::BITRATE => 14, self::FRAME_RATE => 15, self::SIZE => 16, self::IS_ORIGINAL => 17, self::FILE_EXT => 18, self::CONTAINER_FORMAT => 19, self::VIDEO_CODEC_ID => 20, self::TYPE => 21, self::CUSTOM_DATA => 22, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'tags' => 3, 'created_at' => 4, 'updated_at' => 5, 'deleted_at' => 6, 'entry_id' => 7, 'flavor_params_id' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frame_rate' => 15, 'size' => 16, 'is_original' => 17, 'file_ext' => 18, 'container_format' => 19, 'video_codec_id' => 20, 'type' => 21, 'custom_data' => 22, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
 	/**
@@ -218,6 +224,8 @@ abstract class BaseflavorAssetPeer {
 		$criteria->addSelectColumn(flavorAssetPeer::FILE_EXT);
 		$criteria->addSelectColumn(flavorAssetPeer::CONTAINER_FORMAT);
 		$criteria->addSelectColumn(flavorAssetPeer::VIDEO_CODEC_ID);
+		$criteria->addSelectColumn(flavorAssetPeer::TYPE);
+		$criteria->addSelectColumn(flavorAssetPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -540,8 +548,6 @@ abstract class BaseflavorAssetPeer {
 	{
 		$results = array();
 	
-		// set the class once to avoid overhead in the loop
-		$cls = flavorAssetPeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key = flavorAssetPeer::getPrimaryKeyHashFromRow($row, 0);
@@ -551,6 +557,9 @@ abstract class BaseflavorAssetPeer {
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
+				// class must be set each time from the record row
+				$cls = flavorAssetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
@@ -690,7 +699,8 @@ abstract class BaseflavorAssetPeer {
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 
-				$cls = flavorAssetPeer::getOMClass(false);
+				$omClass = flavorAssetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
@@ -757,7 +767,8 @@ abstract class BaseflavorAssetPeer {
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 
-				$cls = flavorAssetPeer::getOMClass(false);
+				$omClass = flavorAssetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
@@ -879,7 +890,8 @@ abstract class BaseflavorAssetPeer {
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = flavorAssetPeer::getOMClass(false);
+				$omClass = flavorAssetPeer::getOMClass($row, 0);
+        $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
@@ -1065,7 +1077,8 @@ abstract class BaseflavorAssetPeer {
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = flavorAssetPeer::getOMClass(false);
+				$omClass = flavorAssetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
@@ -1139,7 +1152,8 @@ abstract class BaseflavorAssetPeer {
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = flavorAssetPeer::getOMClass(false);
+				$omClass = flavorAssetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
@@ -1197,19 +1211,25 @@ abstract class BaseflavorAssetPeer {
 	}
 
 	/**
-	 * The class that the Peer will make instances of.
+	 * The returned Class will contain objects of the default type or
+	 * objects that inherit from the default.
 	 *
-	 * If $withPrefix is true, the returned path
-	 * uses a dot-path notation which is tranalted into a path
-	 * relative to a location on the PHP include_path.
-	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
-	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
-	 * @return     string path.to.ClassName
+	 * @param      array $row PropelPDO result row.
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($withPrefix = true)
+	public static function getOMClass($row, $colnum)
 	{
-		return $withPrefix ? flavorAssetPeer::CLASS_DEFAULT : flavorAssetPeer::OM_CLASS;
+		try {
+
+			$omClass = $row[$colnum + 21];
+			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
+
+		} catch (Exception $e) {
+			throw new PropelException('Unable to get OM class.', $e);
+		}
+		return $omClass;
 	}
 
 	/**

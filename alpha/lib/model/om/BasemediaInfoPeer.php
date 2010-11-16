@@ -711,7 +711,8 @@ abstract class BasemediaInfoPeer {
 				$obj2 = flavorAssetPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$cls = flavorAssetPeer::getOMClass(false);
+					$omClass = flavorAssetPeer::getOMClass($row, $startcol);
+					$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
@@ -827,7 +828,8 @@ abstract class BasemediaInfoPeer {
 				$obj2 = flavorAssetPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$cls = flavorAssetPeer::getOMClass(false);
+					$omClass = flavorAssetPeer::getOMClass($row, $startcol2);
+          $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
