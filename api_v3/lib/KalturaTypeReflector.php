@@ -79,6 +79,8 @@ class KalturaTypeReflector
 	 */
 	public function KalturaTypeReflector($type)
 	{
+//		KalturaLog::debug("Reflecting type [$type]");
+		
 		if (!class_exists($type))
 			throw new KalturaReflectionException("Type \"".$type."\" not found");
 			
@@ -94,7 +96,14 @@ class KalturaTypeReflector
 	    }
 	    
 	    if(!$reflectClass->isAbstract())
-			$this->_instance = new $type;
+	    {
+	    	$constructor = $reflectClass->getConstructor();
+	    	if(!$constructor || $constructor->isPublic())
+	    	{
+//				KalturaLog::debug("Instanciating type [$type]");
+				$this->_instance = new $type;
+	    	}
+	    }
 	}
 	
 	/**
