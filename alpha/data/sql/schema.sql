@@ -1423,6 +1423,7 @@ CREATE TABLE `flavor_params`
 	`rotate` INTEGER,
 	`operators` TEXT,
 	`engine_version` SMALLINT,
+	`type` INTEGER default 1 NOT NULL,
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
@@ -1472,6 +1473,7 @@ CREATE TABLE `flavor_params_output`
 	`rotate` INTEGER,
 	`operators` TEXT,
 	`engine_version` SMALLINT,
+	`type` INTEGER default 1 NOT NULL,
 	PRIMARY KEY (`id`),
 	INDEX `flavor_params_output_FI_1` (`flavor_params_id`),
 	CONSTRAINT `flavor_params_output_FK_1`
@@ -1517,6 +1519,8 @@ CREATE TABLE `flavor_asset`
 	`file_ext` VARCHAR(4),
 	`container_format` VARCHAR(127),
 	`video_codec_id` VARCHAR(127),
+	`type` INTEGER default 1 NOT NULL,
+	`custom_data` TEXT,
 	PRIMARY KEY (`int_id`),
 	INDEX `I_referenced_media_info_FK_1_1` (`id`),
 	INDEX `flavor_asset_FI_1` (`entry_id`),

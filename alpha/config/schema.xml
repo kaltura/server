@@ -1964,7 +1964,7 @@
 		<column primaryKey="false" lazyLoad="false"
 			name="is_default" type="tinyint" required="true" default="0" />
 		<column primaryKey="false" lazyLoad="false"
-			name="format" type="varchar" required="true" size="20" inheritance="single" />
+			name="format" type="varchar" required="true" size="20"/>
 		<column primaryKey="false" lazyLoad="false"
 			name="video_codec" type="varchar" required="true" size="20" />
 		<column primaryKey="false" lazyLoad="false"
@@ -2010,6 +2010,8 @@
 			lazyLoad="false" name="operators" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="engine_version" type="smallint" />
+		<column primaryKey="false" lazyLoad="false"
+			name="type" type="integer" required="true" inheritance="single" default="1" />
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_params_output"
 		phpName="flavorParamsOutput">
@@ -2044,7 +2046,7 @@
 		<column primaryKey="false" lazyLoad="false"
 			name="is_default" type="tinyint" required="true" default="0" />
 		<column primaryKey="false" lazyLoad="false"
-			name="format" type="varchar" required="true" size="20" inheritance="single" />
+			name="format" type="varchar" required="true" size="20"/>
 		<column primaryKey="false" lazyLoad="false"
 			name="video_codec" type="varchar" required="true" size="20" />
 		<column primaryKey="false" lazyLoad="false"
@@ -2091,6 +2093,8 @@
 			lazyLoad="false" name="operators" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="engine_version" type="smallint" />
+		<column primaryKey="false" lazyLoad="false"
+			name="type" type="integer" required="true" inheritance="single" default="1" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="flavor_params">
 			<reference local="flavor_params_id" foreign="id" />
 		</foreign-key>
@@ -2145,6 +2149,10 @@
 			lazyLoad="false" name="container_format" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
+		<column primaryKey="false" lazyLoad="false"
+			name="type" type="integer" required="true" inheritance="single" default="1" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />
 		</foreign-key>
