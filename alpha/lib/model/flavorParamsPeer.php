@@ -10,7 +10,10 @@
 class flavorParamsPeer extends BaseflavorParamsPeer
 {
 	// cache classes by their type
-	private static $class_types_cache = array();
+	private static $class_types_cache = array(
+		assetType::FLAVOR => flavorParamsPeer::OM_CLASS,
+		assetType::THUMBNAIL => thumbParamsPeer::OM_CLASS,
+	);
 	
 	public static function alternativeCon($con)
 	{
@@ -32,6 +35,7 @@ class flavorParamsPeer extends BaseflavorParamsPeer
 
 		$c = new Criteria();
 		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
+		$c->add ( self::TYPE, assetType::THUMBNAIL );
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
@@ -120,16 +124,17 @@ class flavorParamsPeer extends BaseflavorParamsPeer
 	{
 		if($row)
 		{
-			$flavorParamsFormat = $row[$colnum + 11]; // format
-			if(isset(self::$class_types_cache[$flavorParamsFormat]))
-				return self::$class_types_cache[$flavorParamsFormat];
-			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $flavorParamsFormat);
+			$assetType = $row[$colnum + 33]; // type column
+			if(isset(self::$class_types_cache[$assetType]))
+				return self::$class_types_cache[$assetType];
+				
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $assetType);
 			if($extendedCls)
 			{
-				self::$class_types_cache[$flavorParamsFormat] = $extendedCls;
+				self::$class_types_cache[$assetType] = $extendedCls;
 				return $extendedCls;
 			}
-			self::$class_types_cache[$flavorParamsFormat] = parent::OM_CLASS;
+			self::$class_types_cache[$assetType] = parent::OM_CLASS;
 		}
 			
 		return parent::OM_CLASS;

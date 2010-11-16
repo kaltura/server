@@ -58,6 +58,7 @@ class flavorParams extends BaseflavorParams
 	const TAG_EDIT = "edit";
 	const TAG_ISM = "ism";
 	const TAG_SLWEB = "slweb";
+	const TAG_THUMB_SOURCE = "thumb_source";
 	
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	

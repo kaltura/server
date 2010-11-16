@@ -10,7 +10,23 @@
 class flavorParamsOutputPeer extends BaseflavorParamsOutputPeer
 {
 	// cache classes by their type
-	private static $class_types_cache = array();
+	private static $class_types_cache = array(
+		assetType::FLAVOR => flavorParamsOutputPeer::OM_CLASS,
+		assetType::THUMBNAIL => thumbParamsOutputPeer::OM_CLASS,
+	);
+
+	public static function setDefaultCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+
+		$c = new Criteria();
+		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
+		$c->add ( self::TYPE, assetType::FLAVOR );
+		self::$s_criteria_filter->setFilter ( $c );
+	}
 	
 	/**
 	 * 
@@ -117,16 +133,17 @@ class flavorParamsOutputPeer extends BaseflavorParamsOutputPeer
 	{
 		if($row)
 		{
-			$flavorParamsOutputFormat= $row[$colnum + 15]; // format
-			if(isset(self::$class_types_cache[$flavorParamsOutputFormat]))
-				return self::$class_types_cache[$flavorParamsOutputFormat];
-			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $flavorParamsOutputFormat);
+			$assetType = $row[$colnum + 37]; // type column
+			if(isset(self::$class_types_cache[$assetType]))
+				return self::$class_types_cache[$assetType];
+				
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $assetType);
 			if($extendedCls)
 			{
-				self::$class_types_cache[$flavorParamsOutputFormat] = $extendedCls;
+				self::$class_types_cache[$assetType] = $extendedCls;
 				return $extendedCls;
 			}
-			self::$class_types_cache[$flavorParamsOutputFormat] = parent::OM_CLASS;
+			self::$class_types_cache[$assetType] = parent::OM_CLASS;
 		}
 			
 		return parent::OM_CLASS;

@@ -9,6 +9,8 @@
  */ 
 class thumbParams extends flavorParams
 {
+	const TAG_DEFAULT_THUMB = "default_thumb";
+	
 	const CUSTOM_DATA_FIELD_CROP_TYPE = "ThumbCropType";
 	const CUSTOM_DATA_FIELD_QUALITY = "ThumbQuality";
 	const CUSTOM_DATA_FIELD_CROP_X = "ThumbCropX";
