@@ -15,8 +15,8 @@ class KalturaAuditTrailBaseFilter extends KalturaFilter
 		"parsedAtLessThanOrEqual" => "_lte_parsed_at",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"objectTypeEqual" => "_eq_object_type",
-		"objectTypeIn" => "_in_object_type",
+		"auditObjectTypeEqual" => "_eq_audit_object_type",
+		"auditObjectTypeIn" => "_in_audit_object_type",
 		"objectIdEqual" => "_eq_object_id",
 		"objectIdIn" => "_in_object_id",
 		"relatedObjectIdEqual" => "_eq_related_object_id",
@@ -119,14 +119,14 @@ class KalturaAuditTrailBaseFilter extends KalturaFilter
 	 * 
 	 * @var KalturaAuditTrailObjectType
 	 */
-	public $objectTypeEqual;
+	public $auditObjectTypeEqual;
 
 	/**
 	 * 
 	 * 
 	 * @var string
 	 */
-	public $objectTypeIn;
+	public $auditObjectTypeIn;
 
 	/**
 	 * 
