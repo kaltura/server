@@ -29,7 +29,6 @@ class Form_Batch_TasksFailed extends Form_Base
 		
 		unset($jobTypes[KalturaBatchJobType::DVDCREATOR]);
 		unset($jobTypes[KalturaBatchJobType::OOCONVERT]);
-		unset($jobTypes[KalturaBatchJobType::PROJECT]);
 		unset($jobTypes[KalturaBatchJobType::CLEANUP]);
 		unset($jobTypes[KalturaBatchJobType::SCHEDULER_HELPER]);
 		unset($jobTypes[KalturaBatchJobType::PULL]);
