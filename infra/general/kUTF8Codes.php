@@ -1,4 +1,4 @@
-<?
+<?php
 $kUTF8Codes[0]=1;
 $kUTF8Codes[1]=2;
 $kUTF8Codes[2]=3;
