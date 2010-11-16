@@ -34,7 +34,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	 * @var KalturaAuditTrailObjectType
 	 * @filter eq,in
 	 */
-	public $objectType;
+	public $auditObjectType;
 
 	/**
 	 * @var string
@@ -162,7 +162,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 		"createdAt",
 		"parsedAt",
 		"status",
-		"objectType",
+		"auditObjectType" => "objectType",
 		"objectId",
 		"relatedObjectId",
 		"relatedObjectType",
