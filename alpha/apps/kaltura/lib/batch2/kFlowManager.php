@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
 {
 	public final function __construct()
 	{ 
@@ -1214,5 +1214,26 @@ class kFlowManager implements kBatchJobStatusEventConsumer
 		$jobData->setSubjectParamsArray( array() );
 		
 		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());	
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if($object instanceof flavorAsset && $object->getIsOriginal())
+		{
+			$entry = $object->getentry();
+			if($entry->getType() == entryType::MEDIA_CLIP)
+			{
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			
+				kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+			}
+		}
+		
+		return true;
 	}
 }

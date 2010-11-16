@@ -6,7 +6,7 @@
  * @subpackage Batch
  *
  */
-class kFlowHelper implements kObjectAddedEventConsumer
+class kFlowHelper
 {
 	protected static $thumbUnSupportVideoCodecs = array(
 		flavorParams::VIDEO_CODEC_VP8,
@@ -1274,25 +1274,4 @@ class kFlowHelper implements kObjectAddedEventConsumer
 		return $dbBatchJob;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
-	 */
-	public function objectAdded(BaseObject $object)
-	{
-		if($object instanceof flavorAsset && $object->getIsOriginal())
-		{
-			$entry = $object->getentry();
-			if($entry->getType() == entryType::MEDIA_CLIP)
-			{
-				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			
-				kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
-			}
-		}
-		
-		return true;
-	}
-
 }
