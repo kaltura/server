@@ -196,7 +196,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	private static $map_between_objects = array
 	(
 		"entryId" ,
-		"jobSubType" , 
+		"jobType", "jobSubType" , 
 	 	"status" , "abort" , "checkAgainTimeout" , "progress" ,
 		"message", "description" , "updatesCount" , "parentJobId" ,
 		"rootJobId", "bulkJobId" , "twinJobId" , "priority" ,
@@ -307,7 +307,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			default:
 				$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
-			
+		var_dump($this);
 		$this->data->fromObject($dbData);
 	}
 	    
