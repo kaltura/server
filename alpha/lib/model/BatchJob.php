@@ -10,8 +10,6 @@ require_once( 'myFileIndicator.class.php');
  */ 
 class BatchJob extends BaseBatchJob implements ISyncableFile
 {
-	const BATCHJOB_TYPE_PROJECT = 1000;
-		
 	const BATCHJOB_SUB_TYPE_YOUTUBE = 0;
 	const BATCHJOB_SUB_TYPE_MYSPACE = 1;
 	const BATCHJOB_SUB_TYPE_PHOTOBUCKET = 2;
