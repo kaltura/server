@@ -41,6 +41,9 @@ class partnersAction extends kalturaSystemAction
 			if(class_exists('AuditPlugin'))
 				$partner->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
 			
+			if(class_exists('VirusScanPlugin'))
+				$partner->setPluginEnabled(VirusScanPlugin::PLUGIN_NAME, $_REQUEST['partner_enableVirusScan']);
+			
 			if(!isset($_REQUEST['partner_partnerParentId']) || $_REQUEST['partner_partnerParentId'] == '' )
 			{
 				$partner->setPartnerParentId(null);

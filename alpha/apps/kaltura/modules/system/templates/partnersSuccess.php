@@ -387,6 +387,39 @@ $version_text = (version_compare($version, 2, "<"))? "Old KMC": "New KMC";
 			</tr>
 		<?php 
 	}
+	
+	if(class_exists('VirusScanPlugin'))
+	{
+		?>
+			<tr class='prop'>
+				<td>Enable Virus Scan</td>
+				<td>
+					<select id="partner_enableVirusScan" style="font-family:arial; font-size:12px;" name="partner_enableVirusScan" onkeyup="updateSelect( this )" onchange="updateSelect( this )">
+					<?php 
+						$list = array ( "" => "" , "1" => "true" , "0" => "false"  );
+					
+						$default_value = '0';
+						if($partner)
+							$default_value = $partner->getPluginEnabled(VirusScanPlugin::PLUGIN_NAME);
+							
+						$default_value_selected = "";
+						foreach ( $list as $value => $option  )
+						{
+							// not always the default value is found 
+							if ( $value == $default_value ) $default_value_selected = $default_value;
+							$selected = ($value == $default_value ) ? 'selected="selected"' : '' ;
+							echo "<option value=\"$value\" $selected>$option</option>\n";
+						}
+					?>
+					</select>
+					<span style="color:blue;" id="partner_enableVirusScan_current_value"><?php echo $default_value_selected; ?></span>
+				</td>
+				<td style="color:gray; font-size:11px; font-family:arial;">
+					Custom data enabled
+				</td>
+			</tr>
+		<?php 
+	}
 ?>
 </table>
 </div>
