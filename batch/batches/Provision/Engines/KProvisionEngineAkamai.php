@@ -77,9 +77,9 @@ class KProvisionEngineAkamai extends KProvisionEngine
 			
 		$data->rtmp = $flashLiveStreamInfo['connectUrl'];
 		$data->encoderUsername = $flashLiveStreamInfo['encoderUsername'];
-		$data->primaryBroadcastingUrl = 'rtmp://'.$flashLiveStreamInfo['primaryEntryPoint'];
-		$data->secondaryBroadcastingUrl = 'rtmp://'.$flashLiveStreamInfo['backupEntryPoint'];
-		$tempStreamName = explode($flashLiveStreamInfo['streamName'], '@');
+		$data->primaryBroadcastingUrl = 'rtmp://'.$flashLiveStreamInfo['primaryEntryPoint'].'/EntryPoint';
+		$data->secondaryBroadcastingUrl = 'rtmp://'.$flashLiveStreamInfo['backupEntryPoint'].'/EntryPoint';
+		$tempStreamName = explode('@', $flashLiveStreamInfo['streamName']);
 		if (count($tempStreamName) == 2) {
 			$data->streamName = $tempStreamName[0] . '_%i@' . $tempStreamName[1];
 		}
