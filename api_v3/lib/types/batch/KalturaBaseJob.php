@@ -58,7 +58,7 @@ class KalturaBaseJob extends KalturaObject implements IFilterable
 	public $executionAttempts;
 	
 	/**
-	 * @_var int
+	 * @var int
 	 * @readonly
 	 */	
 	public $lockVersion;
