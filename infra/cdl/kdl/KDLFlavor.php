@@ -158,7 +158,8 @@ class KDLFlavor extends KDLMediaDataSet {
 				$this->generateOperationSetCommandLines($target, $trPrmObj);
 			}
 			else{
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target, $trPrmObj->_extra);
+				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target);
+				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $target);
 			}
 		}
 	}
@@ -205,7 +206,8 @@ kLog::log(__METHOD__."==>\n");
 				}
 			}
 //			if(!is_null($trPrmObj->_engine))
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg, $trPrmObj->_extra);
+				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg);
+				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $auxTrg);
 			$i++;
 		}
 	}
