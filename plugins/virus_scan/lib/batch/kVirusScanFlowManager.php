@@ -1,6 +1,68 @@
 <?php
-class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
+class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer
 {
+	
+	private static $flavorAssetIdsToScan = array();
+	
+	
+	private function resumeEvents($flavorAsset, $fileSync)
+	{
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
+		if (!$fileSync)
+		{
+			KalturaLog::err('Cannot find filesync for flavor asset id ['.$flavorAsset->getId().']');
+		}
+		// resume file sync created event
+		kEventsManager::continueEvent(new kObjectCreatedEvent($fileSync), 'kVirusScanFlowManager');
+		// resume flavor asset added event consumption
+		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+	}
+	
+	
+	private function saveIfShouldScan($flavorAssetId)
+	{
+		if (isset(self::$flavorAssetIdsToScan[$flavorAssetId]))
+		{
+			return true;
+		}
+		
+		$profile = VirusScanProfilePeer::getSuitableProfile($flavorAssetId);
+		if ($profile)
+		{
+			self::$flavorAssetIdsToScan['$flavorAssetId'] = $profile;
+			return true;
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectCreated(BaseObject $object)
+	{
+		if(!($object instanceof FileSync) || $object->getStatus() != FileSync::FILE_SYNC_STATUS_PENDING || $object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
+			return true;
+			
+		if ($object->getObjectType() != filesync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET)
+			return true;
+		
+		$flavorAssetId = $object->getObjectId();
+		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		if (!$flavorAsset || !$flavorAsset->getIsOriginal())
+			return true;
+
+		if ($this->saveIfShouldScan($flavorAssetId))
+		{
+			// file sync belongs to a flavor asset in status pending and suits a virus scan profile
+			return false; // stop all remaining consumers
+		}			
+		
+		return true;		
+	}
+	
 	
 	/**
 	 * @param BaseObject $object
@@ -10,11 +72,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	{
 		
 		if($object instanceof flavorAsset && $object->getIsOriginal())
-		{			
-			$profile = VirusScanProfilePeer::getSuitableProfile($object->getEntryId());
-			
-			if ($profile)
+		{
+			if ($this->saveIfShouldScan($object->getEntryId()))
 			{
+				$profile = self::$flavorAssetIdsToScan[$object->getEntryId()];
+				
 				// suitable virus scan profile found - create scan job
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -101,13 +163,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 				$flavorAsset->save();				
 				$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);	
 				kFileSyncUtils::moveFromFile($oldFilePath, $syncKey);
-				// resume flavor asset added event consumption
-				kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+				$this->resumeEvents($flavorAsset);
 				break;
 											
 			case KalturaVirusScanJobResult::FILE_IS_CLEAN:
-				// resume flavor asset added event consumption
-				kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+				$this->resumeEvents($flavorAsset);
 				break;
 				
 			case KalturaVirusScanJobResult::FILE_INFECTED:
