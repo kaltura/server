@@ -76,5 +76,26 @@ batch/batches/Convert/KAsyncConvertCollection.class.php - reverted EXPRESSION_EN
 batch/batches/Convert/OperationEngines/KOperationManager.php - reverted
 batch\client\KalturaClient.php - reverted - EXPRESSION_ENCODER enum = 55, EXPRESSION_ENCODER3=5
 
-
-
+2010-11-17
+admin_console/configs/lang/en.php - avidemux
+- batch/batches/Convert/KAsyncConvert.class.php - avidemux and fix not used qt 
+- batch/batches/Convert/Engines/KConversionEngine.class.php - remove plugin-ed engines from 'old type' conv
+- batch/batches/Convert/Engines/KConversionExpEnc.class.php - delete
+- batch/batches/Convert/Engines/KConversionQTP.class.php - delete 
+- batch/batches/Convert/OperationEngines/KSingleOutputOperationEngine.php - config file support
+- batch/batches/client/KalturaClient.php -  
+     const EXPRESSION_ENCODER3 = "expressionEncoder.ExpressionEncoder3"; // 55
+     const AVIDEMUX = "avidemux"; // 8
+- infra/cdl/kdl/KDLcommon.php - avidemux
+- infra/cdl/kdl/KDLFlavor.php - config file support at generateCommandLines/generateOperationSetCommandLines
+- infra/cdl/kdl/KDLOperatorBase.php - config file support
+- infra/cdl/kdl/KDLProcessor - ProceessFlavorsForCollection- audio only crash fix
+- infra/cdl/kdl/KDLTranscoderCommand.php - remove 'extra' from cmd line
+- infra/cdl/kdl/KDLWrap.php - config & avidemux
+- plugins/fast_start/lib/KDLOperatorQTFastStart.php - remove 'extra' param from GenerateCommandLine
+- plugins/quick_time_tools/lib/KDLTranscoderQTPTools.php - remove 'extra' param from GenerateCommandLine, ctor fix
+- plugins/quick_time_tools/lib/KOperationEngineQtTools.php - 
+- plugins/exp_enc/lib/KDLOperatorExpressionEncoder.php - config/extra
+- plugins/exp_enc/lib/ismtempl.xml
+- plugins/exp_enc/lib/wmvtempl.xml
+- plugins/exp_enc/lib/KOperationEngineExpressionEncoder.php
