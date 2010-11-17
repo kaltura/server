@@ -4,7 +4,7 @@
   Version="3.0">
   <Job
     OutputDirectory="C:\Tmp\Prod"
-    DefaultMediaOutputFileName="{OriginalFilename}.{DefaultExtension}" />
+    DefaultMediaOutputFileName="__outFileName__" />
   <MediaFile
     VideoResizeMode="Letterbox">
     <OutputFormat>
