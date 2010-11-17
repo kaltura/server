@@ -8,7 +8,7 @@ class KDLOperatorExpressionEncoder extends KDLOperatorBase {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
     }
 
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
+    public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
 	{
 /*		
 $tryXML = "<StreamInfo
@@ -23,6 +23,7 @@ $tryXML = "<StreamInfo
 ";
 		$xml = new SimpleXMLElement($tryXML);
 */
+		$extra=$this->_extra;
 		if($target->_container) {
 			$cont = $target->_container;
 			$dir = dirname(__FILE__);
@@ -39,12 +40,26 @@ $tryXML = "<StreamInfo
 					break;
 			}
 			$xml = simplexml_load_file(realpath($xmlTemplate));
+			switch($cont->_id){
+				case KDLContainerTarget::MP4:
+					$xObj = simplexml_load_string($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->asXML());
+					$xml->MediaFile->OutputFormat->addChild("MP4OutputFormat");
+					KDLUtils::AddXMLElement($xml->MediaFile->OutputFormat->MP4OutputFormat, $xObj->AudioProfile);
+					KDLUtils::AddXMLElement($xml->MediaFile->OutputFormat->MP4OutputFormat, $xObj->VideoProfile);
+					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat);
+					$fileFormat = $xml->MediaFile->OutputFormat->MP4OutputFormat;
+					break;
+				case KDLContainerTarget::ISMV:
+				case KDLContainerTarget::WMV:
+				case KDLContainerTarget::WMA:
+				default:
+					$fileFormat = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat;
+					break;
+			}
 		}
 		
 		$xml->Job['OutputDirectory']=KDLCmdlinePlaceholders::OutDir;
-//		if($this->_inFileName){
-//			$xml->Job['DefaultMediaOutputFileName']=$this->_outFileName.".{DefaultExtension}";
-//		}
+
 		if($target->_video){
 			$vid = $target->_video;
 			$vidProfile=null;
@@ -53,15 +68,15 @@ $tryXML = "<StreamInfo
 				case KDLVideoTarget::WMV3:
 				case KDLVideoTarget::WVC1A:
 				default:
-					$vidProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->MainH264VideoProfile);					
+					$vidProfile = $fileFormat->VideoProfile->AdvancedVC1VideoProfile;
+					unset($fileFormat->VideoProfile->MainH264VideoProfile);					
 					break;
 				case KDLVideoTarget::H264:
 				case KDLVideoTarget::H264B:
 				case KDLVideoTarget::H264M:
 				case KDLVideoTarget::H264H:				
-					$vidProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->MainH264VideoProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile);					
+					$vidProfile = $fileFormat->VideoProfile->MainH264VideoProfile;
+					unset($fileFormat->VideoProfile->AdvancedVC1VideoProfile);					
 					break;
 			}
 			$vFr = 30;
@@ -97,7 +112,7 @@ $tryXML = "<StreamInfo
 			
 		}
 		else {
-			unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile);				
+			unset($fileFormat->VideoProfile);				
 		}
 
 		if($target->_audio){
@@ -106,12 +121,12 @@ $tryXML = "<StreamInfo
 			switch($aud->_id){
 				case KDLAudioTarget::WMA:
 				default:
-					$audProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->WmaAudioProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->AacAudioProfile);					
+					$audProfile = $fileFormat->AudioProfile->WmaAudioProfile;
+					unset($fileFormat->AudioProfile->AacAudioProfile);					
 					break;
 				case KDLAudioTarget::AAC:
-					$audProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->AacAudioProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->WmaAudioProfile);					
+					$audProfile = $fileFormat->AudioProfile->AacAudioProfile;
+					unset($fileFormat->AudioProfile->WmaAudioProfile);					
 					break;
 			}
 /*
@@ -130,17 +145,21 @@ $tryXML = "<StreamInfo
 */
 		}
 		else {
-			unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->WmaAudioProfile);					
-			unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->AacAudioProfile);					
-			unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile);					
-			
+			unset($fileFormat->AudioProfile->WmaAudioProfile);					
+			unset($fileFormat->AudioProfile->AacAudioProfile);					
+			unset($fileFormat->AudioProfile);							
 		}
 //$stream = clone $streams->StreamInfo;
 //		$streams[1] = $stream;
 		//		print_r($xml);
 		return $xml->asXML();
 	}
-	
+
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target)
+    {
+    	return KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName;
+    }
+    
 	/* ---------------------------
 	 * CheckConstraints
 	 */
