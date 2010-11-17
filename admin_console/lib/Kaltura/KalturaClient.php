@@ -237,9 +237,9 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = "99";
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const FAST_START = "fastStart.FastStart";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 }
 
 class KalturaConversionProfileOrderBy
@@ -1478,6 +1478,14 @@ class KalturaBaseJob extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $executionAttempts = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lockVersion = null;
 
 
 }
@@ -3537,112 +3545,6 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaCommercialUseType
-	 */
-	public $commercialUseEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageLessThanOrEqual = null;
-
-
-}
-
 class KalturaSchedulerStatus extends KalturaObjectBase
 {
 	/**
@@ -5058,6 +4960,485 @@ class KalturaPartner extends KalturaObjectBase
 
 }
 
+abstract class KalturaFileSyncBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncObjectType
+	 */
+	public $fileObjectTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fileObjectTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $versionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $versionIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $objectSubTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectSubTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $originalEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $syncTimeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $syncTimeLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncType
+	 */
+	public $fileTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fileTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkedIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkCountGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkCountLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $fileSizeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $fileSizeLessThanOrEqual = null;
+
+
+}
+
+class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
+{
+
+}
+
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaStorageProfile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $desciption = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaStorageProfileStatus
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaStorageProfileProtocol
+	 */
+	public $protocol = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageBaseDir = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageUsername = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storagePassword = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $storageFtpPassiveMode = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryHttpBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryRmpBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryIisBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $minFileSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $maxFileSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorParamsIds = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $maxConcurrentConnections = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $pathManagerClass = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $urlManagerClass = null;
+
+	/**
+	 * TODO - remove after events manager is implemented
+	 * No need to create enum for temp field
+	 * 
+	 *
+	 * @var int
+	 */
+	public $trigger = null;
+
+
+}
+
+class KalturaStorageProfileListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaStorageProfile
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
 class KalturaSystemUser extends KalturaObjectBase
 {
 	/**
@@ -5548,219 +5929,6 @@ class KalturaSystemPartnerPackage extends KalturaObjectBase
 
 }
 
-abstract class KalturaFileSyncBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncObjectType
-	 */
-	public $objectTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectIdIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $versionEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $versionIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $objectSubTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectSubTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $dcEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $dcIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $originalEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $readyAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $readyAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $syncTimeGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $syncTimeLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncStatus
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncType
-	 */
-	public $fileTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $fileTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkedIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkCountGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkCountLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $fileSizeGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $fileSizeLessThanOrEqual = null;
-
-
-}
-
-class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
-{
-
-}
-
 abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
 	/**
@@ -5813,199 +5981,6 @@ abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
 {
-
-}
-
-class KalturaStorageProfile extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $desciption = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaStorageProfileStatus
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaStorageProfileProtocol
-	 */
-	public $protocol = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageBaseDir = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageUsername = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storagePassword = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $storageFtpPassiveMode = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryHttpBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryRmpBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryIisBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $minFileSize = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $maxFileSize = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $flavorParamsIds = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $maxConcurrentConnections = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $pathManagerClass = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $urlManagerClass = null;
-
-	/**
-	 * TODO - remove after events manager is implemented
-	 * No need to create enum for temp field
-	 * 
-	 *
-	 * @var int
-	 */
-	public $trigger = null;
-
-
-}
-
-class KalturaStorageProfileListResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaStorageProfile
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
 
 }
 
@@ -9493,6 +9468,123 @@ class KalturaPartnerService extends KalturaServiceBase
 	}
 }
 
+class KalturaFileSyncService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaFileSyncFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("filesync_filesync", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileSyncListResponse");
+		return $resultObject;
+	}
+
+	function sync($fileSyncId, $fileData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileSync");
+		return $resultObject;
+	}
+}
+
+class KalturaStorageProfileService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "listByPartner", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfileListResponse");
+		return $resultObject;
+	}
+
+	function updateStatus($storageId, $status)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageId", $storageId);
+		$this->client->addParam($kparams, "status", $status);
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "updateStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function get($storageProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+
+	function update($storageProfileId, KalturaStorageProfile $storageProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
+		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+
+	function add(KalturaStorageProfile $storageProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+}
+
 class KalturaSystemUserService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -9744,45 +9836,6 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 	}
 }
 
-class KalturaFileSyncService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listAction(KalturaFileSyncFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("filesync_filesync", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSyncListResponse");
-		return $resultObject;
-	}
-
-	function sync($fileSyncId, $fileData)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSync");
-		return $resultObject;
-	}
-}
-
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -9849,84 +9902,6 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
-		return $resultObject;
-	}
-}
-
-class KalturaStorageProfileService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "listByPartner", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfileListResponse");
-		return $resultObject;
-	}
-
-	function updateStatus($storageId, $status)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageId", $storageId);
-		$this->client->addParam($kparams, "status", $status);
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "updateStatus", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function get($storageProfileId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
-		return $resultObject;
-	}
-
-	function update($storageProfileId, KalturaStorageProfile $storageProfile)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
-		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "update", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
-		return $resultObject;
-	}
-
-	function add(KalturaStorageProfile $storageProfile)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "add", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
 		return $resultObject;
 	}
 }
@@ -11430,6 +11405,20 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * System user service
 	 *
+	 * @var KalturaFileSyncService
+	 */
+	public $fileSync = null;
+
+	/**
+	 * Storage Profiles service
+	 *
+	 * @var KalturaStorageProfileService
+	 */
+	public $storageProfile = null;
+
+	/**
+	 * System user service
+	 *
 	 * @var KalturaSystemUserService
 	 */
 	public $systemUser = null;
@@ -11440,13 +11429,6 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaSystemPartnerService
 	 */
 	public $systemPartner = null;
-
-	/**
-	 * System user service
-	 *
-	 * @var KalturaFileSyncService
-	 */
-	public $fileSync = null;
 
 	/**
 	 * Flavor Params Output service
@@ -11468,13 +11450,6 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaEntryAdminService
 	 */
 	public $entryAdmin = null;
-
-	/**
-	 * Storage Profiles service
-	 *
-	 * @var KalturaStorageProfileService
-	 */
-	public $storageProfile = null;
 
 	/**
 	 * Metadata service
@@ -11506,13 +11481,13 @@ class KalturaClient extends KalturaClientBase
 		$this->flavorParams = new KalturaFlavorParamsService($this);
 		$this->jobs = new KalturaJobsService($this);
 		$this->partner = new KalturaPartnerService($this);
+		$this->fileSync = new KalturaFileSyncService($this);
+		$this->storageProfile = new KalturaStorageProfileService($this);
 		$this->systemUser = new KalturaSystemUserService($this);
 		$this->systemPartner = new KalturaSystemPartnerService($this);
-		$this->fileSync = new KalturaFileSyncService($this);
 		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($this);
 		$this->mediaInfo = new KalturaMediaInfoService($this);
 		$this->entryAdmin = new KalturaEntryAdminService($this);
-		$this->storageProfile = new KalturaStorageProfileService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataProfile = new KalturaMetadataProfileService($this);
 		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
