@@ -131,11 +131,14 @@ if(is_null($tr->_cmd))
 //					kLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_id."\n<--");
 //					kLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_cmd."\n<--");
 					$ee3 = new SimpleXMLElement($flavor->_transcoders[$ee3Id]->_cmd);
-					$ee3Streams = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile->Streams;
-					if($ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']!=$flavor->_video->_bitRate) {
+					$ee3Streams=null;
+					if(!is_null($ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile)) {
+						$ee3Streams = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile->Streams;
+						if($ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']!=$flavor->_video->_bitRate) {
 kLog::log(__METHOD__."-->xmlBR=".$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavor->_video->_bitRate);
-						$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']=$flavor->_video->_bitRate;
-						$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate']=round($flavor->_video->_bitRate*1.3);
+							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']=$flavor->_video->_bitRate;
+							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate']=round($flavor->_video->_bitRate*1.3);
+						}
 					}
 					if($rootFlavor==null) {
 						$rootFlavor = $ee3;
@@ -143,9 +146,11 @@ kLog::log(__METHOD__."-->xmlBR=".$ee3Streams->StreamInfo->Bitrate->VariableConst
 					}
 					else {
 						$dest = $rootStreams;
-						$src = $ee3Streams->StreamInfo[0];
-						if($dest && $src)
-							KDLUtils::AddXMLElement($dest, $src);
+						if($ee3Streams) {
+							$src = $ee3Streams->StreamInfo[0];
+							if($dest && $src)
+								KDLUtils::AddXMLElement($dest, $src);
+						}
 					} 
 				}
 			}
