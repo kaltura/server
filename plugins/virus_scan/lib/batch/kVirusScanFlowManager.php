@@ -30,7 +30,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		$profile = VirusScanProfilePeer::getSuitableProfile($flavorAssetId);
 		if ($profile)
 		{
-			self::$flavorAssetIdsToScan['$flavorAssetId'] = $profile;
+			self::$flavorAssetIdsToScan[$flavorAssetId] = $profile;
 			return true;
 		}
 		return false;
