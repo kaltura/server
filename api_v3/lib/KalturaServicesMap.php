@@ -32,6 +32,15 @@ class KalturaServicesMap
 		return self::$services + self::$extraServices;
 	}
 	
+	static function getService($serviceId)
+	{
+		$services = self::getMap();
+		if(isset($services[$serviceId]))
+			return $services[$serviceId];
+			
+		return null;
+	}
+	
 	static function cacheMap($servicePath, $cacheFilePath)
 	{
 		if (!is_dir($servicePath))

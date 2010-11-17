@@ -7,6 +7,10 @@
  */
 class KalturaTypeReflector
 {
+	static private $properyReservedWords = array(
+		'objectType',
+	);
+	
 	static private $_classMap = array();
 	static private $_classInheritMap = array();
 	static private $_classInheritMapLocation = "";
@@ -167,6 +171,9 @@ class KalturaTypeReflector
 						if ($property->getDeclaringClass() == $currentReflectClass) // only properties defined in the current class, ignore the inherited
 						{
 							$name = $property->name;
+							if(in_array($name, self::$properyReservedWords))
+								throw new Exception("Property name [$name] is a reserved word in type [$currentReflectClass]");
+								
 							$docComment = $property->getDocComment();
 							$parsedDocComment = new KalturaDocCommentParser( $docComment );
 							if ($parsedDocComment->varType)
