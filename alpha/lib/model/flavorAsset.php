@@ -125,7 +125,22 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
-		$key->version = (is_null($version) ? $this->getVersion() : $version);
+		if ($version)
+		{
+			$key->version = $version;
+		}
+		else
+		{
+			switch ($sub_type)
+			{
+				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET:
+					$key->version = $this->getVersion();
+					break;
+				case flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG:
+					$key->version = $this->getLogFileVersion();
+					break;
+			}
+		}
 		$key->partner_id = $this->getPartnerId();
 		
 		return $key;
@@ -293,5 +308,15 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 	public function getFlavorParamsOutput()
 	{
 		return flavorParamsOutputPeer::retrieveByFlavorAsset($this);
+	}
+	
+	public function getLogFileVersion()
+	{
+		return $this->getFromCustomData("logFileVersion", null, 0);
+	}
+	
+	public function incLogFileVersion()
+	{
+		$this->incInCustomData("logFileVersion", 1);
 	}
 }
