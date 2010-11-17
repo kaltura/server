@@ -200,6 +200,9 @@ function transcoderSetFuncTest($oprObj, $transDictionary, $param2)
 	else if($oprObj->_id==KDLTranscoders::QT_FASTSTART){
 		$engineClassName = "KDLOperatorQTFastStart";
 	}
+	else if($oprObj->_id==KDLTranscoders::AVIDEMUX){
+		$engineClassName = "KDLOperatorAvidemux";
+	}
 	else if($oprObj->_id==KDLTranscoders::EXPRESSION_ENCODER){
 		$engineClassName = "KDLOperatorExpressionEncoder";
 	}
