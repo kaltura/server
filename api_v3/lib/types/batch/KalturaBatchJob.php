@@ -463,7 +463,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		$dbBatchJob = parent::toObject($dbBatchJob);
 		
 		$this->toData($dbBatchJob);
-		if($this->data instanceof KalturaJobData)
+		if(!is_null($this->jobSubType) && $this->data instanceof KalturaJobData)
 			$dbBatchJob->setJobSubType($this->data->toSubType($this->jobSubType));
 		
 		return $dbBatchJob;
