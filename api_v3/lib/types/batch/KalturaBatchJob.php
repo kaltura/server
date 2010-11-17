@@ -331,6 +331,9 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	{
 		$dbData = null;
 		
+		if(is_null($this->jobType))
+			$this->jobType = $this->fromDynamicEnumValue('KalturaBatchJobType', $dbBatchJob->getJobType());
+		
 		switch($dbBatchJob->getJobType())
 		{
 			case KalturaBatchJobType::BULKUPLOAD:
@@ -432,8 +435,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
-				if(is_null($this->data))
+				//TODO: remove
+				KalturaLog::debug('DOR $this ='. print_r($this, true));
+				if(is_null($this->data)) {
 					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
+					KalturaLog::debug('DOR $this->data ='. print_r($this->data, true));
+				}
 		}
 		
 		if(is_null($dbBatchJob->getData()))
@@ -452,10 +459,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 	{
 		if(is_null($dbBatchJob))
 			$dbBatchJob = new BatchJob();
-			
+
 		$dbBatchJob = parent::toObject($dbBatchJob);
-		$dbData = $this->toData($dbBatchJob);
-		$dbBatchJob->setJobSubType($this->data->toSubType($this->jobSubType));
+		
+		$this->toData($dbBatchJob);
+		if($this->data instanceof KalturaJobData)
+			$dbBatchJob->setJobSubType($this->data->toSubType($this->jobSubType));
 		
 		return $dbBatchJob;
 	}   
