@@ -14,6 +14,14 @@ class KSingleOutputOperationEngine extends KOperationEngine
 	
 	protected function getCmdLine()
 	{
+		if(isset($this->configFilePath)){
+			$xml = file_get_contents($this->configFilePath);
+			$xml = str_replace(
+					array(KDLCmdlinePlaceholders::OutDir,KDLCmdlinePlaceholders::OutFileName), 
+					array($this->outDir,$this->outFilePath), 
+					$xml);
+			file_put_contents($this->configFilePath, $xml);
+		}
 		$exec_cmd = $this->cmd . " " . 
 			str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName), 
