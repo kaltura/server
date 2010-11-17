@@ -69,5 +69,12 @@ storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 
+virusscanprofile.add				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.delete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.get				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+
 session.impersonate                 |			|0		|1	|0		|0		|1		|r	|*		|	|	|admin-console
 ---------------------------------------------------------------------------------------------------
