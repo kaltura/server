@@ -31,6 +31,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 		
 		$cProfile = new Criteria();
 		$cProfile->addAnd(VirusScanProfilePeer::PARTNER_ID, $entry->getPartnerId());
+		$cProfile->addAnd(VirusScanProfilePeer::STATUS, KalturaVirusScanProfileStatus::DISABLED, Criteria::NOT_EQUAL);
 		$profiles = VirusScanProfilePeer::doSelect($cProfile);
 		
 		if (!$profiles)
