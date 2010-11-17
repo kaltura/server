@@ -68,7 +68,7 @@ class getallentriesAction extends defPartnerservices2Action
 			return ;
 		}
 
-sfLogger::getInstance()->log ( __METHOD__ . " kshow_id [$kshow_id] entry_id [$entry_id]" );
+		KalturaLog::log ( __METHOD__ . " kshow_id [$kshow_id] entry_id [$entry_id]" );
 
 
 		$list_type = $this->getP ( "list_type" , self::LIST_TYPE_ROUGHCUT );

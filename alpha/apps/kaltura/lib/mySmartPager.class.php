@@ -238,7 +238,6 @@ just under the require_once:
 			$cache_key =  md5($str);
 			
 			$this->m_cache_key = $cache_key;
-		//sfLogger::getInstance()->info ( "mySmartPager key [" . $this->m_criteria_class . "] [$cache_key] [$str]" );
 		}
 		return $this->m_cache_key;
 	}

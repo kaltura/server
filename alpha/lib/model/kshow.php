@@ -737,7 +737,7 @@ class kshow extends Basekshow
 			}
 
 			// this text should be placed in the partner-config
-			sfLogger::getInstance()->info ( "before modifyEntryMetadataWithText:\n$sample_text");
+			KalturaLog::info("before modifyEntryMetadataWithText:\n$sample_text");
 			myEntryUtils::modifyEntryMetadataWithText ( $show_entry , $sample_text , 0 , true  );  // override the current entry
 
 			$this->setHasRoughcut ( false );

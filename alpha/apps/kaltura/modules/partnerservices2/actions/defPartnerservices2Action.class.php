@@ -134,7 +134,6 @@ abstract class defPartnerservices2Action //extends kalturaBaseWebserviceAction
 	
 	public function logMessage($message, $priority = SF_LOG_INFO )
 	{
-//		sfLogger::getInstance()->log ( "ps2: " . $message , $priority );
 	}
 
 

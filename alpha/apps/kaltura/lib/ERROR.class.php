@@ -5,14 +5,14 @@ class ERROR
 	static public function fatal ( $error_code , $error_str )
 	{
 		return;
-		sfLogger::getInstance()->alert ( "Fatal error: [" . $error_code . "]: " . $error_str );	
+		KalturaLog::alert ( "Fatal error: [" . $error_code . "]: " . $error_str );	
 		// throw new Exception ( "Fatal error: [" . $error_code . "]: " . $error_str );		 
 	}
 	
 	static public function userFix ( $error_code , $error_str )
 	{
 		return;
-		sfLogger::getInstance()->alert  ( "Fatal error: [" . $error_code . "]: " . $error_str );	
+		KalturaLog::alert  ( "Fatal error: [" . $error_code . "]: " . $error_str );	
 	}
 }
 ?>

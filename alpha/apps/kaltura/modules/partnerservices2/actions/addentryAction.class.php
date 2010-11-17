@@ -164,7 +164,7 @@ class addentryAction extends defPartnerservices2Action
 		if ( $this->getP ( "quick_edit" ) == '0' ||  $this->getP ( "quick_edit" ) == "false"  ) $quick_edit = false 	;
         if ( $quick_edit == '0' || $quick_edit === "false" || !$quick_edit || $quick_edit == false  )
         {
-sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );        	
+			KalturaLog::err ( '$quick_edit: [' . $quick_edit . ']' );        	
             $quick_edit = false;
             
             //$quick_edit = true;
@@ -208,7 +208,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
             // check that mandatory fields were set
             // TODO
 
-            sfLogger::getInstance()->err ( "addentry: fields_modified: " . print_r ( $fields_modified , true ) );
+            KalturaLog::err ( "addentry: fields_modified: " . print_r ( $fields_modified , true ) );
 
             $entry_source = $entry->getSource() ;
             
@@ -225,7 +225,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
                 $file_extension = strtolower(pathinfo( $this->getP ( $prefix .  "realFilename" ) , PATHINFO_EXTENSION  ));
                 $entry_full_path = myUploadUtils::getUploadPath( $token , $file_alias , null , $file_extension );
             	if (!file_exists($entry_full_path)) {
-                	sfLogger::getInstance()->err ( "Invalid UPLOAD PATH [".$entry_full_path."] while trying to add entry for partner id [".$partner_id."] with token [".$token."] & original name [".$this->getP($prefix."name")."]");
+                	KalturaLog::err ( "Invalid UPLOAD PATH [".$entry_full_path."] while trying to add entry for partner id [".$partner_id."] with token [".$token."] & original name [".$this->getP($prefix."name")."]");
                 	$this->addError(APIErrors::INVALID_FILE_NAME);
                 	continue;
                 }
@@ -238,7 +238,6 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
 //            // when we reached this point the type and media type must be set
 //            if ($entry->getType() == entryType::AUTOMATIC || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
 //            {
-//				sfLogger::getInstance()->err ( "unknown TYPE [".$entry->getType()."] or MEDIA_TYPE [".$entry->getMediaType()."] for file [$entry_full_path]");
 //				$this->addError ( APIErrors::CANNOT_USE_ENTRY_TYPE_AUTO_IN_IMPORT );
 //            	continue;
 //            }
@@ -430,7 +429,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
 
                 if ( $insert )
                 {
-                    sfLogger::getInstance()->err ( "paramsArray" . print_r ( $paramsArray , true ) );
+                    KalturaLog::err ( "paramsArray" . print_r ( $paramsArray , true ) );
 
                     $insert_entry_helper = new myInsertEntryHelper($this , $kuser_id, $kshow_id, $paramsArray );
                     $insert_entry_helper->setPartnerId( $partner_id , $subp_id );
@@ -441,7 +440,7 @@ sfLogger::getInstance()->err ( '$quick_edit: [' . $quick_edit . ']' );
                 }
             } // create_entry = true
 
-sfLogger::getInstance()->err ( 'id: ' . $entry->getId() . ' $quick_edit:' . $quick_edit );
+			KalturaLog::err ( 'id: ' . $entry->getId() . ' $quick_edit:' . $quick_edit );
 
             if ( $quick_edit )
             {
@@ -460,7 +459,6 @@ sfLogger::getInstance()->err ( 'id: ' . $entry->getId() . ' $quick_edit:' . $qui
 	            	kLog::log("Having metadata");
 	            	
 	                $relevant_kshow_version = 1 + $kshow->getVersion(); // the next metadata will be the first relevant version for this new entry
-					//sfLogger::getInstance()->err ( 'id: ' . $entry->getId() . "[$relevant_kshow_version]" );
 	
 	                $version_info = array();
 					$version_info["KuserId"] = $puser_kuser->getKuserId();

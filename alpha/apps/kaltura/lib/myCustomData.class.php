@@ -24,7 +24,6 @@ class myCustomData
 			$this->data = @unserialize( $str );
 			if ( $this->data == null )
 			{
-//				sfLogger::getInstance()->warning ( __METHOD__ . ", cannot init from string [$str]");
 				$this->data = array();
 			}			
 		}

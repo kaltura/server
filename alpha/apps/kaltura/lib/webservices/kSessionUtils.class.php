@@ -370,7 +370,6 @@ class ks
 	// the privileges is a string with a separators and the required_privs is infact a substring
 	public function verifyPrivileges ( $required_priv_name , $required_priv_value = null )
 	{
-//sfLogger::getInstance()->log ( __METHOD__ . " verifyPrivileges privileges [{$this->privileges}]" );		
 		// need the general privilege not a specific value
 		if ( empty ( $required_priv_value ) )
 			return strpos ( $this->privileges,  $required_priv_name ) !== FALSE ;

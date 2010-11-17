@@ -66,8 +66,6 @@ class myObjectCache
 
 		$key = $obj_clazz . "_" . $id . "_arr_$field_name";
 		
-//		sfLogger::getInstance()->warning (  __CLASS__ . ":getArray: $key" );
-		
 //		echo "getArray:" . $key . "\n" ;
 		
 		$res = @ self::$s_memory_cache->get ( $key );

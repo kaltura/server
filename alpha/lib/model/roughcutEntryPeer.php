@@ -56,7 +56,7 @@ class roughcutEntryPeer extends BaseroughcutEntryPeer
 			if ( $entry_criteria == null ) $entry_criteria = new Critaria();
 			$debug = __METHOD__ . " " . print_r ( $roughcut_ids , true ) . "\n" . print_r ( $entry_ids , true );
 //print ($debug);			
-sfLogger::getInstance()->log ( $debug );
+KalturaLog::debug($debug);
 			$entry_criteria->add ( entryPeer::ID , $entry_ids , Criteria::IN );			
 			return entryPeer::doSelect( $entry_criteria );
 		}

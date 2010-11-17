@@ -302,8 +302,6 @@ abstract class objectWrapperBase implements Iterator
 
 		public function __get ( $field_name )
 		{
-			//		sfLogger::getInstance()->log ( "__get [" . get_class ( $this ) . "/$field_name]"  );
-
 			//		echo ("__get:$field_name<br>");
 			// before envoking the method - something that can cause a hit to the DB -
 			// check if object is in object cache
@@ -401,8 +399,6 @@ abstract class objectWrapperBase implements Iterator
 			}
 			else
 			{
-				//			sfLogger::getInstance()->log ( "Not supposed to search in cache [" . get_class ( $this ) . "/$field_name]"  );
-
 				return null;
 			}
 		}

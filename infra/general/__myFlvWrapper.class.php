@@ -160,7 +160,7 @@ class myFlvWrapper
 //		$flv_wrapper = new myFlvWrapper ( $flv_file_name , 0 , true );  // don't use the optimization for now !!
 		if ( !$flv_wrapper->getStatus () )
 		{
-			sfLogger::getInstance()->err ( __METHOD__ . " error in file [$flv_file_name]" );
+			KalturaLog::err("error in file [$flv_file_name]");
 			return self::STATUS_INIT_FAILED;
 		}
 
@@ -665,7 +665,7 @@ class myFlvWrapper
 			if ( !file_exists ( $flv_file_name) )
 			{
 				$this->init = false;
-				sfLogger::getInstance()->err ( __METHOD__ . " [$flv_file_name] file not found" );
+				KalturaLog::err("[$flv_file_name] file not found");
 				return;
 			}
 
@@ -707,7 +707,7 @@ class myFlvWrapper
 		catch ( Exception $ex )
 		{
 			$this->init = false;
-			sfLogger::getInstance()->err ( __METHOD__ . " [$flv_file_name] " . $ex->getMessage() );
+			KalturaLog::err(" [$flv_file_name] " . $ex->getMessage() );
 		}
 	}
 
@@ -1342,8 +1342,6 @@ class FlvInfo
 		$time_3 = $end_time_3 - $start_time_3;
 		$time_4 = $end_time_4 - $start_time_1;
 
-		//sfLogger::getInstance()->warning ( "FlvInfo: Creation time: ($time_1) ($time_2) ($time_3) " );
-
 		//		echo "Creation time: ($time_1) ($time_2) ($time_3) ($time_4)\n";
 			
 		$clip_from = $clip_from_milliseconds; // / 1000;
@@ -1639,8 +1637,6 @@ class FlvMetaData
 		
 		$content = file_get_contents( $this->file_name );
 
-		//		sfLogger::getInstance()->warning ( "getMetadata: " . $this->file_name );
-			
 		return $content;
 	}
 

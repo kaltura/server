@@ -412,7 +412,6 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 	
 	private static function log ( $str )
 	{
-		//sfLogger::getInstance()->log ( "stats: " . $str , "err ");
 	}
 }
 ?>

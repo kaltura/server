@@ -135,8 +135,6 @@ if ( $partner_id == -1 ) // can add code for specific partners whentrying to deb
 		$this->fixRequestContainer( $_GET );
 		$this->fixRequestContainer( $_COOKIE );
 		
-//		$logger = sfLogger::getInstance();
-		
 		$this->m_basic_security_time = ( microtime(true) - $start );
 		
 		if ( count ( $this->m_invalid_params ) > 0 )
