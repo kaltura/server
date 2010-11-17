@@ -34,18 +34,50 @@ class SymantecScanEngine extends VirusScanEngine
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
-		//TODO: remove
-		return KalturaVirusScanJobResult::FILE_IS_CLEAN;
-		
 		$scanMode = $cleanIfInfected ? '-mode scanrepair' : '-mode scan';
-		$cmd = $this->binFile . ' -verbose -details -timing ' . $scanMode . ' ' . $filePath;
+		$cmd = $this->binFile . ' -verbose ' . $scanMode . ' ' . $filePath;
 
 		$returnValue = null;
+		$scanTime = null;
+		$errorDescription = null;
 		$output = null;
 		
-		$output = system($cmd, $return_value);		
-
-		
+		exec($cmd, $output, $return_value);
+		$output = implode(PHP_EOL, $output);
+		if ($returnValue != 0)	// command line error
+		{	
+			$output =  "\" " . $this->binFile . "\" " ."file or directory does not existst";
+			$errorDescription = "\" " . $this->binFile . "\" " ."file or directory does not existst";
+			return KalturaVirusScanJobResult::SCAN_ERROR;
+		}
+		$firstLine = $output[0];
+		$lineArgs = preg_split('/\s+/', $firstLine);
+		$scanTime = $lineArgs[count($lineArgs) - 1];
+		$returnValue = $lineArgs[count($lineArgs) - 2];
+		switch ($returnValue)
+		{
+			case -2:
+				$errorDescription = "An error occurred within Symantec Scan Engine. The file was not scanned.";
+				return KalturaVirusScanJobResult::SCAN_ERROR;
+			case -1:
+				$errorDescription = "An error occurred within the command-line scanner. The file was not scanned.";
+				return KalturaVirusScanJobResult::SCAN_ERROR;
+			case 0:
+				$errorDescription = "The file was successfully scanned and is clean" . PHP_EOL .  
+									"This code can have any of the following meanings:" . PHP_EOL .   
+									"The file was not infected or" . PHP_EOL .  
+									"The file was infected and repaired.";
+				return KalturaVirusScanJobResult::FILE_IS_CLEAN;
+			case 1:
+				$errorDescription = "The file was successfully scanned, was not able to be repaired, and was not deleted";
+				return KalturaVirusScanJobResult::FILE_INFECTED;
+			case 2:
+				$errorDescription = "The file was successfully scanned, was not able to be repaired, and was deleted";
+				return KalturaVirusScanJobResult::FILE_INFECTED;
+			default:
+				$errorDescription = "Unknown returned value from virus scanner";
+				return KalturaVirusScanJobResult::SCAN_ERROR;			
+		}
 	}
 	
 }
