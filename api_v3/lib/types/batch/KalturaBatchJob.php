@@ -435,11 +435,8 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				
 			default:
 				$dbData = KalturaPluginManager::loadObject('kJobData', $dbBatchJob->getJobType());
-				//TODO: remove
-				KalturaLog::debug('DOR $this ='. print_r($this, true));
 				if(is_null($this->data)) {
 					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
-					KalturaLog::debug('DOR $this->data ='. print_r($this->data, true));
 				}
 		}
 		
