@@ -181,15 +181,19 @@ class BatchController extends Zend_Controller_Action
 				{
 					$inJobSubTypes = array();
 		        	foreach($jobSubTypes as $jobSubType)
-						if($request->getParam("job_{$jobType}_{$jobSubType}", false))
+		        	{
+	        			$fieldName = "job_{$jobType}_" . str_replace('.', '_', $jobSubType);
+						if($request->getParam($fieldName, false))
 							$inJobSubTypes[] = $jobSubType;
+		        	}
 							
 					if(count($inJobSubTypes))
 						$filter->addJobType($jobType, $inJobSubTypes);
 				}
 				else
 				{
-					if($request->getParam("job_$jobType", false))
+	        		$fieldName = 'job_' . str_replace('.', '_', $jobType);
+					if($request->getParam($fieldName, false))
 					{
 						$filter->addJobType($jobType);
 					}
@@ -377,15 +381,19 @@ class BatchController extends Zend_Controller_Action
 				{
 					$inJobSubTypes = array();
 		        	foreach($jobSubTypes as $jobSubType)
-						if($request->getParam("job_{$jobType}_{$jobSubType}", false))
+		        	{
+	        			$fieldName = 'job_' . str_replace('.', '_', $jobType) . '_' . str_replace('.', '_', $jobSubType);
+						if($request->getParam($fieldName, false))
 							$inJobSubTypes[] = $jobSubType;
+		        	}
 							
 					if(count($inJobSubTypes))
 						$filter->addJobType($jobType, $inJobSubTypes);
 				}
 				else
 				{
-					if($request->getParam("job_$jobType", false))
+	        		$fieldName = 'job_' . str_replace('.', '_', $jobType);
+					if($request->getParam($fieldName, false))
 					{
 						$filter->addJobType($jobType);
 					}

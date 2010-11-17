@@ -65,7 +65,7 @@
         	{
 	        	foreach($jobSubTypes as $jobSubType => $checked)
 	        	{
-	        		$fieldName = "job_{$jobType}_{$jobSubType}";
+	        		$fieldName = 'job_' . str_replace('.', '_', $jobType) . '_' . str_replace('.', '_', $jobSubType);
 	        		$label = $this->jobTypeTranslate($jobType, $jobSubType);
 		        	?>
 							<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
@@ -75,7 +75,7 @@
         	}
         	else
         	{
-	        	$fieldName = "job_{$jobType}";
+       			$fieldName = 'job_' . str_replace('.', '_', $jobType);
 	        	$label = $this->jobTypeTranslate($jobType);
 				
 	        	?>

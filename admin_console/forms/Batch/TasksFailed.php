@@ -85,12 +85,16 @@ class Form_Batch_TasksFailed extends Form_Base
         	if(is_array($jobSubTypes))
         	{
 				foreach($jobSubTypes as $jobSubType => $checked)
-			        $this->addElement('checkbox', "job_{$jobType}_{$jobSubType}", array('value' => $checked));
+				{
+	        		$fieldName = 'job_' . str_replace('.', '_', $jobType) . '_' . str_replace('.', '_', $jobSubType);
+					$this->addElement('checkbox', $fieldName, array('value' => $checked));
+				}
         	}
         	else
         	{
 				$checked = $jobSubTypes;
-				$this->addElement('checkbox', "job_$jobType", array('value' => $checked));
+	        	$fieldName = 'job_' . str_replace('.', '_', $jobType);
+				$this->addElement('checkbox', $fieldName, array('value' => $checked));
         	}
         }
         

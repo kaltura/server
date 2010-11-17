@@ -34,6 +34,7 @@ return array(
 	'KalturaBatchJobType::METADATA_IMPORT' => 'MetaData Import',
 	'KalturaBatchJobType::METADATA_TRANSFORM' => 'MetaData Transform',
 	'KalturaBatchJobType::FILESYNC_IMPORT' => 'Filesync Import',
+	'KalturaBatchJobType::VIRUS_SCAN' => 'Virus Scan',
 
 
 	'KalturaConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
@@ -470,7 +471,7 @@ return array(
 	'entry-investigate history end time tooltip' => 'The time this task ended its processing',
 	'entry-investigate history scheduler th' => 'Locking Scheduler ID',
 	'entry-investigate history worker th' => 'Locking Service ID',
-	'entry-investigate history batch th' => 'Locking Process Index',
+	'entry-investigate history batch index th' => 'Locking Process Index',
 	'entry-investigate history expire th' => 'Lock Expiration',
 	'entry-investigate history lock version th' => 'Lock Version',
 	'entry-investigate history attempts th' => 'Execution attempts',
