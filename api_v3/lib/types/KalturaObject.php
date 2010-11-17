@@ -134,8 +134,14 @@ class KalturaObject
 			
 			$value = $this->$this_prop;
 			$propertyInfo = $typeReflector->getProperty($this_prop);
-			if($propertyInfo->isDynamicEnum())
+			if (!$propertyInfo)
+			{
+	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+			}
+			else if ($propertyInfo->isDynamicEnum())
+			{
 				$value = $this->toDynamicEnumValue($propertyInfo->getType(), $value);
+			}
 			
 			if ($value !== null)
 			{
