@@ -85,7 +85,7 @@ class KalturaObject
 			}
 		}
 			
-		return null;
+		return $value;
 	}
 	
 	protected function toDynamicEnumValue($type, $value)
