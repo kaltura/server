@@ -15,12 +15,13 @@ class KOperationEngineQtTools  extends KSingleOutputOperationEngine
 		$this->tmpFolder = $taskConfig->params->localTempPath;
 	}
 	
-	public function operate(kOperator $operator = null, $inFilePath, $logFilePath, $configFilePath = null)
+	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		$qtInFilePath = "$this->tmpFolder/$inFilePath.stb";
+
 		if(symlink($inFilePath, $qtInFilePath))
 			$inFilePath = $qtInFilePath;
 		
-		parent::operate($operator, $inFilePath, $logFilePath, $configFilePath);
+		parent::operate($operator, $inFilePath, $configFilePath);
 	}
 }
