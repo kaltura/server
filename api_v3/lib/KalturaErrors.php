@@ -149,6 +149,13 @@ class KalturaErrors extends APIErrors
 	const NO_FLAVORS_FOUND = "NO_FLAVORS_FOUND,No flavors found";
 	
 	/**
+	 * ThumbAsset Service
+	 */
+	const THUMB_ASSET_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,Thumb asset id \"%s\" not found";
+	
+	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY,The flavor asset is not ready";
+	
+	/**
 	 * Category Service
 	 */
 	const CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND,Category id \"%s\" not found";
