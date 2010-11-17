@@ -74,18 +74,19 @@ class KAsyncVirusScan extends KBatchBase
 			$output = null;
 			
 			// execute scan
-			$startTime = microtime(true);
 			$data->scanResult = $engine->execute($data->srcFilePath, $cleanIfInfected, $output, $errorDescription);
-			$endTime = microtime(true);
-
-			//TODO: keep output in a log file and add filesync for it
-			//TODO: add duration to job data
+			
+			if (!$output) {
+				KalturaLog::notice('Virus scan engine ['.get_class($engine).'] did not return any log for file ['.$data->srcFilePath.']');
+				$output = 'Virus scan engine ['.get_class($engine).'] did not return any log';
+			}
+			$this->kClient->batch->logConversion($data->flavorAssetId, $output);
 
 			// check scan results
 			switch ($data->scanResult)
 			{
 				case KalturaVirusScanJobResult::SCAN_ERROR:
-					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::FAILED);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_IS_CLEAN:
@@ -105,7 +106,7 @@ class KAsyncVirusScan extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
 		}
 		return $job;
 	}
