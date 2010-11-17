@@ -180,4 +180,7 @@ filesyncimportbatch.freeexclusivefilesyncimportjob	|	|2		|1	|0		|0		|1		|rw	|*		
 filesyncimportbatch.getexclusivefilesyncimportjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 filesyncimportbatch.getexclusivealmostdonefilesyncimportjobs		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 
+virusscanbatch.updateexclusivevirusscanjob  |	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+virusscanbatch.freeexclusivevirusscanjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+virusscanbatch.getexclusivevirusscanjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 ---------------------------------------------------------------------------------------------------
