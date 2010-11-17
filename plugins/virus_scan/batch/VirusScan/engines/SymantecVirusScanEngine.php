@@ -21,7 +21,8 @@ class SymantecScanEngine extends VirusScanEngine
 	}
 	
 	/**
-	 * Will execute the virus scan for the given file path
+	 * Will execute the virus scan for the given file path and return the output from virus scanner program
+	 * and the error description
 	 * @param string $filePath
 	 * @param boolean $cleanIfInfected
 	 * @param string $errorDescription
