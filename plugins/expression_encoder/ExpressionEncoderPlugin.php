@@ -23,7 +23,7 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 				return null;
 				
 			$params = $constructorArgs['params'];
-			return new KOperationExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
+			return new KOperationEngineExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
 		}
 			
 		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
