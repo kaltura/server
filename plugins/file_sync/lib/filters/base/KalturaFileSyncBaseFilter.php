@@ -9,8 +9,8 @@ class KalturaFileSyncBaseFilter extends KalturaFilter
 	private $map_between_objects = array
 	(
 		"partnerIdEqual" => "_eq_partner_id",
-		"objectTypeEqual" => "_eq_object_type",
-		"objectTypeIn" => "_in_object_type",
+		"fileObjectTypeEqual" => "_eq_file_object_type",
+		"fileObjectTypeIn" => "_in_file_object_type",
 		"objectIdEqual" => "_eq_object_id",
 		"objectIdIn" => "_in_object_id",
 		"versionEqual" => "_eq_version",
@@ -75,14 +75,14 @@ class KalturaFileSyncBaseFilter extends KalturaFilter
 	 * 
 	 * @var KalturaFileSyncObjectType
 	 */
-	public $objectTypeEqual;
+	public $fileObjectTypeEqual;
 
 	/**
 	 * 
 	 * 
 	 * @var string
 	 */
-	public $objectTypeIn;
+	public $fileObjectTypeIn;
 
 	/**
 	 * 

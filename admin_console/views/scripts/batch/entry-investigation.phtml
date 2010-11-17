@@ -275,7 +275,7 @@
 									}
 								?>
 								<td><?php echo $file->version; ?></td>
-								<td><?php echo $this->fileSyncSubTypeTranslate($file->objectType, $file->objectSubType); ?></td>
+								<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
 								<td><?php echo $file->dc; ?></td>
 								<td><?php echo $file->original; ?></td>
 								<td><?php echo date($this->translate('date format'), $file->createdAt); ?></td>
@@ -638,7 +638,7 @@
 																}
 															?>
 															<td><?php echo $file->version; ?></td>
-															<td><?php echo $this->fileSyncSubTypeTranslate($file->objectType, $file->objectSubType); ?></td>
+															<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
 															<td><?php echo $file->dc; ?></td>
 															<td><?php echo $file->original; ?></td>
 															<td><?php echo date($this->translate('date format'), $file->createdAt); ?></td>

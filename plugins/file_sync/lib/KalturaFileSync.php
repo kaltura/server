@@ -25,7 +25,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 * @readonly
 	 */
-	public $objectType;
+	public $fileObjectType;
 
 
 	
@@ -225,7 +225,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	(
 		"id",
 		"partnerId",
-		"objectType",
+		"fileObjectType" =>  "objectType",
 		"objectId",
 		"version",
 		"objectSubType",

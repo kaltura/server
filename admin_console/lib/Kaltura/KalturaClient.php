@@ -1235,7 +1235,7 @@ class KalturaFileSync extends KalturaObjectBase
 	 * @var KalturaFileSyncObjectType
 	 * @readonly
 	 */
-	public $objectType = null;
+	public $fileObjectType = null;
 
 	/**
 	 * 
