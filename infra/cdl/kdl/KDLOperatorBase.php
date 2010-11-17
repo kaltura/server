@@ -10,7 +10,12 @@ abstract class KDLOperatorBase {
 	protected	$_targetBlacklist = array();
 	
 
-	abstract public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null);
+	abstract public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target);
+	
+	public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
+	{
+		return null;
+	}
 	
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
 		kLog::log("KDLOperatorBase::__construct: id($id), name($name), sourceBlacklist(".print_r($sourceBlacklist,true)."), targetBlacklist(".print_r($targetBlacklist,true).")");
@@ -149,14 +154,16 @@ abstract class KDLOperatorBase {
 	 * KDLOperationParams
 	 */
 class KDLOperationParams {
-	public function KDLOperationParams($id,$ex=null, $cmd=null){
+	public function KDLOperationParams($id,$ex=null, $cmd=null, $cfg=null){
 		$this->_id=$id;
 		$this->_extra=$ex;
 		$this->_cmd=$cmd;
+		$this->_cfg=$cfg;
 	}
 	public $_id=null;
 	public $_extra=null;
 	public $_cmd=null;
+	public $_cfg=null;
 	public $_engine=null;
 	
 		/* ---------------------------
@@ -173,6 +180,9 @@ class KDLOperationParams {
 		if(property_exists($this,"_cmd") && $this->_cmd)
 			$rvStr.=",cmd:".$this->_cmd;
 		
+		if(property_exists($this,"_cfg") && $this->_cfg)
+			$rvStr.=",cfg:".$this->_cfg;
+			
 		return $rvStr;
 	}
 	
