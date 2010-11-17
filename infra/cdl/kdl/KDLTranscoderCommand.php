@@ -18,16 +18,16 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		if(is_null($targetBlacklist) && array_key_exists($id, KDLConstants::$TranscodersTargetBlackList)) {
 			$trgBlacklist = KDLConstants::$TranscodersTargetBlackList[$id];
 		}
-    	parent::__construct($id,$name,$srcBlacklist,$trgtBlacklist);
+    	parent::__construct($id,$name,$srcBlacklist,$trgBlacklist);
     }
 
-	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target, $extra=null)
+	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target)
 	{
 		$cmdLineGenerator = $target->SetTranscoderCmdLineGenerator();
 
 		if($target->_video)
 			$cmdLineGenerator->_vidBr = $target->_video->_bitRate;
-		$params = new KDLOperationParams($this->_id, $extra);
+		$params = new KDLOperationParams($this->_id, $this->_extra);
 		return $cmdLineGenerator->Generate($params, $predesign->_video->_bitRate);
 	}
 	
