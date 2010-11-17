@@ -66,8 +66,8 @@ class SymantecScanEngine extends VirusScanEngine
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
-		$line = explode(' ', $line);
-		$returnValue = trim($line[count($line)-1]);
+		$found = explode(' ', $found);
+		$returnValue = trim(end($found));
 		
 		if ($returnValue == '0') {
 			return KalturaVirusScanJobResult::FILE_IS_CLEAN;
