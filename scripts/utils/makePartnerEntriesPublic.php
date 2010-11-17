@@ -1,5 +1,4 @@
 <?php
-
 ini_set("memory_limit","256M");
 
 define('SF_ROOT_DIR',    realpath(dirname(__FILE__).'/../../alpha/'));
@@ -16,34 +15,40 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "batch", "me
 KAutoloader::setClassMapFilePath('./logs/classMap.cache');
 KAutoloader::register();
 
-error_reporting(E_ALL);
+error_reporting ( E_ALL );
 
-$databaseManager = new sfDatabaseManager();
-$databaseManager->initialize();
+$dbConf = kConf::getDB ();
+DbManager::setConfig ( $dbConf );
+DbManager::initialize ();
+
 $partner_id = @$argv[1];
 
 $partner = PartnerPeer::retrieveByPK($partner_id);
 if(!$partner)
 {
-	die('no such partner.'.PHP_EOL);
+        die('no such partner.'.PHP_EOL);
 }
-$partner->setAppearInSearch(mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
+$partner->setAppearInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
 $partner->save();
 
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partner_id);
-$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
-$c->setLimit(20);
+$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
+$c->setLimit(200);
 
-$entries = entryPeer::doSelect($c);
+$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+$entries = entryPeer::doSelect($c, $con);
+echo "number of entries:".count($entries)."\n";
 while(count($entries))
 {
-	foreach($entries as $entry)
-	{
-		$entry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
-		$entry->save();	
-	}
-	$entries = entryPeer::doSelect($c);
+        foreach($entries as $entry)
+        {
+                echo "changed DISPLAY_IN_SEARCH for entry: ".$entry->getId()."\n";
+                $entry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+                $entry->save();
+        }
+        entryPeer::clearInstancePool();
+        $entries = entryPeer::doSelect($c, $con);
 }
 
 echo 'Done';
