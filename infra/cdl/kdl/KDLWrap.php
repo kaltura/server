@@ -25,6 +25,7 @@ class KDLWrap
 		kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER=>KDLTranscoders::EXPRESSION_ENCODER,
 		kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
 		kConvertJobData::CONVERSION_ENGINE_FAST_START=>KDLTranscoders::QT_FASTSTART,
+		kConvertJobData::CONVERSION_ENGINE_AVIDEMUX=>KDLTranscoders::AVIDEMUX,
 		kConvertJobData::CONVERSION_ENGINE_PDF2SWF=>KDLTranscoders::PDF2SWF,
 		kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
 	);
@@ -499,14 +500,14 @@ kLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
 			if(count($oprSet)==1) {
 				$opr = $oprSet[0];
 kLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
-				$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command);
+				$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
 				$transObjArr[] = $kdlOpr;
 			}
 			else {
 				$auxArr = array();
 				foreach ($oprSet as $opr) {
 kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
-					$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command);
+					$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
 					$auxArr[] = $kdlOpr;
 				}
 				$transObjArr[] = $auxArr;
@@ -533,6 +534,7 @@ kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 						$opr->id = $key;
 					$opr->extra = $tr->_extra;
 					$opr->command = $tr->_cmd;
+					$opr->config = $tr->_cfg;
 					$auxArr[] = $opr;
 				}
 			}
@@ -545,6 +547,7 @@ kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 					$opr->id = $key;
 				$opr->extra = $transObj->_extra;
 				$opr->command = $transObj->_cmd;
+				$opr->config = $transObj->_cfg;
 				$auxArr[] = $opr;
 			}
 			$cdlOprSets->addSet($auxArr);
@@ -600,6 +603,9 @@ kLog::log(__METHOD__.":operators id=$id :");
 	}
 	else if($id==KDLTranscoders::QT_FASTSTART) {
 		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_FAST_START);
+	}
+	else if($id==KDLTranscoders::AVIDEMUX) {
+		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_AVIDEMUX);
 	}
 	else if($id==KDLTranscoders::PDF_CREATOR) {
 		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR);
