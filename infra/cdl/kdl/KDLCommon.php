@@ -111,6 +111,7 @@
 		const FFMPEG_VP8 	= "ffmpeg-vp8";
 		const QUICK_TIME_PLAYER_TOOLS = "quick_time_player_tools";
 		const QT_FASTSTART  = "qt-faststart";
+		const AVIDEMUX  = "avidemux";
 		const PDF2SWF = "pdf2swf";
 		const PDF_CREATOR = "pdf_creator";
 	};
