@@ -1478,7 +1478,9 @@ class BatchService extends KalturaBaseService
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
-			
+	
+		$flavorAsset->incLogFileVersion();
+		$flavorAsset->save();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 		$log = kFileSyncUtils::file_get_contents($syncKey, true, false);
 		$log .= $data;
