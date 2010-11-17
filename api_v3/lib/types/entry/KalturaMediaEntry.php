@@ -114,22 +114,18 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	public function fromObject($entry)
 	{
 		parent::fromObject($entry);
-		
-		// this is a hack to reflect the old source type as 2 properties (source type and search provider type). 
-		// search provider type should be on a different enum.
-		// for easier backward compatibility, the old values are kept, but reflected in 2 different properties.
-		switch ($entry->getSource())
+
+		$reflect = new ReflectionClass('KalturaSourceType');
+		$constants = $reflect->getConstants();
+		if(!in_array($entry->getSource(), $constants) || $entry->getSource() == KalturaSourceType::SEARCH_PROVIDER)
 		{
-			case KalturaSourceType::FILE:
-			case KalturaSourceType::URL:
-			case KalturaSourceType::WEBCAM:
-				$this->sourceType = $entry->getSource();
-				$this->searchProviderType = null;
-				break;
-			default:
-				$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
-				$this->searchProviderType = $entry->getSource();
-				break;
+			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
+			$this->searchProviderType = $entry->getSource();
+		}
+		else
+		{
+			$this->sourceType = $entry->getSource();
+			$this->searchProviderType = null;
 		}
 	}
 	
