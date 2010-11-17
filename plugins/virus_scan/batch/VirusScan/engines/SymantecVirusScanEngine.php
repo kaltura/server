@@ -44,34 +44,49 @@ class SymantecScanEngine extends VirusScanEngine
 		
 		exec($cmd, $output, $return_value);
 		$output = implode(PHP_EOL, $output);
+		
 		if ($returnValue != 0)	// command line error
 		{	
-			$errorDescription = "Error executing command [$cmd]";
+			$errorDescription = "Error executing command [$cmd] - return value [$returnValue]";
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
-		$firstLine = $output[0];
-		$lineArgs = preg_split('/\s+/', $firstLine);
-		$returnValue = $lineArgs[count($lineArgs) - 2];
-		
-		switch ($returnValue)
+		$found = false;
+		foreach ($output as $line)
 		{
-			case -2:
-				$errorDescription = "An error occurred within Symantec Scan Engine. The file was not scanned.";
-				return KalturaVirusScanJobResult::SCAN_ERROR;
-			case -1:
-				$errorDescription = "An error occurred within the command-line scanner. The file was not scanned.";
-				return KalturaVirusScanJobResult::SCAN_ERROR;
-			case 0:
-				return KalturaVirusScanJobResult::FILE_IS_CLEAN;
-			case 1:
-			case 2:
-				$errorDescription = "The file was found infected, but was not repaired";
-				return KalturaVirusScanJobResult::FILE_INFECTED;
-			default:
-				$errorDescription = "Unknown returned value from virus scanner";
-				return KalturaVirusScanJobResult::SCAN_ERROR;			
+			if (strpos($line, $filePath) === 0) {
+				$found = $line;
+				break;
+			}
 		}
+		
+		if (!$found)
+		{
+			$errorDescription = 'Unknown error';
+			return KalturaVirusScanJobResult::SCAN_ERROR;
+		}
+		
+		$line = explode(' ', $line);
+		$returnValue = trim($line[count($line)-1]);
+		
+		if ($returnValue == '0') {
+			return KalturaVirusScanJobResult::FILE_IS_CLEAN;
+		}
+		else if ($returnValue == '1' || $returnValue == '2') {
+			$errorDescription = "The file was found infected, but was not repaired";
+			return KalturaVirusScanJobResult::FILE_INFECTED;
+		}
+		else if ($returnValue == '-2') {
+			$errorDescription = "An error occurred within Symantec Scan Engine. The file was not scanned.";
+		}
+		else if ($returnValue == '-1') {
+			$errorDescription = "An error occurred within the command-line scanner. The file was not scanned.";
+		}
+		else { 
+			$errorDescription = "Unknown returned value from virus scanner";
+		}
+
+		return KalturaVirusScanJobResult::SCAN_ERROR;
 	}
-	
+
 }
