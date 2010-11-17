@@ -12,7 +12,8 @@ class debugUtils
 	
 	public static  function log ( $str )
 	{
-		sfLogger::getInstance()->warning ( "kalt: " . $str );
+//		sfLogger::getInstance()->warning ( "kalt: " . $str );
+		KalturaLog::log($str);
 	}
 	
 	// stack trace
