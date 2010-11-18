@@ -137,7 +137,7 @@ class investigate
 				$str .= "yellow"; break;
 			case entryStatus::PRECONVERT:
 				$str .= "#66CCFF"; break;
-			case entry:: ENTRY_STATUS_READY:
+			case entryStatus::READY:
 				$str .= "lime"; break;
 			case entryStatus::DELETED:
 				$str .= "#CCCCCC"; break;
