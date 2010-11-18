@@ -113,6 +113,7 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 	public $context;
 
 	/**
+	 * The API service and action that called and caused this audit
 	 * @var string
 	 * @filter eq,in
 	 * @readonly
