@@ -14,7 +14,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			KalturaLog::err('Cannot find filesync for flavor asset id ['.$flavorAsset->getId().']');
 		}
 		// resume file sync created event
-		kEventsManager::continueEvent(new kObjectCreatedEvent($fileSync), 'kVirusScanFlowManager');
+		kEventsManager::continueEvent(new kObjectAddedEvent($fileSync), 'kVirusScanFlowManager');
 		// resume flavor asset added event consumption
 		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
 	}
