@@ -107,7 +107,9 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			$response = $this->addedFileSync($object);
 		}
 		
-		KalturaLog::debug('kVirusScanFlowManager stopping consumption of event ['.get_class($object).']');
+		if (!$response) {
+			KalturaLog::debug('kVirusScanFlowManager stopping consumption of event ['.get_class($object).']');
+		}
 		return $response;	
 	}
 	
