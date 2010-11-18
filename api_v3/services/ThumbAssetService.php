@@ -24,18 +24,18 @@ Serves image based on:
 •	Thumbnail params id, if not set, default thumbnail will be used.
 */
 	/**
-	 *  ServeByEntryIdAction
+	 * ServeByEntryIdAction
 	 *  
-	 *  @action serveByEntryId
-	 *  @param string $entryId
-	 *  @param string $paramId
-	 *  @return file
-	 *  
-	 *  @throws KalturaErrors::THUMB_IS_NOT_READY
-	 *  @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
-	 *  @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @action serveByEntryId
+	 * @serverOnly
+	 * @param string $entryId
+	 * @param string $paramId
+	 * 
+	 * @throws KalturaErrors::THUMB_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function serveByEntryIdAction($entryId, $paramId=null)
+	public function serveByEntryIdAction($entryId, $paramId = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -68,14 +68,14 @@ Serves image based on:
 	}
 
 	/**
-	 *  Serve Action
+	 * Serve Action
 	 *  
-	 *  @action serve
-	 *  @param string $assetId
-	 *  @return file
+	 * @action serve
+	 * @serverOnly
+	 * @param string $assetId
 	 *  
-	 *  @throws KalturaErrors::THUMB_IS_NOT_READY
-	 *  @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
 	public function serveAction($assetId)
 	{
@@ -102,10 +102,10 @@ The following attributes should be provided:
 •	Thumbnail asset id
 */
 	/**
-	 *  setAsDefault
+	 * setAsDefault
 	 *  
-	 *  @action setAsDefault
-	 *  @param string $assetId
+	 * @action setAsDefault
+	 * @param string $assetId
 	 */
 	public function setAsDefaultAction($assetId)
 	{
@@ -113,15 +113,15 @@ The following attributes should be provided:
 	}
 
 	/**
-	 *  updateByEntryId
-	 *  Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
-	 *  Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions
+	 * updateByEntryId
+	 * Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
+	 * Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions
 	 *  
-	 *  @action updateByEntryId
-	 *  @param string $entryId
-	 *  @param string $timeOffset
-	 *  @param string $srcParamsId
-	 *  @param string $dstParamsId 
+	 * @action updateByEntryId
+	 * @param string $entryId
+	 * @param string $timeOffset
+	 * @param string $srcParamsId
+	 * @param string $dstParamsId 
 	 */
 	public function updateByEntryIdAction($entryId, $timeOffset, $srcParamsId=null, $dstParamsId=null)
 	{
@@ -133,11 +133,11 @@ The following attributes should be provided:
 	 * serveDefaultThumb
 	 * 
 	 * @action serveThumbToFile
+	 * @serverOnly
 	 * @param fileSync $fileSync
 	 * @param string $local
 	 * @param string $fileName
 	 * @param bool $forceProxy
-	 * @return file
 	 * 
 	 * @throws KalturaErrors::THUMB_IS_NOT_READY
 	 */
