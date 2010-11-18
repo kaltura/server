@@ -975,14 +975,16 @@ class JobsService extends KalturaBaseService
 	 * 
 	 * @action getStatus
 	 * @param int $jobId the id of the job  
-	 * @param int $jobType the type of the job  
+	 * @param KalturaBatchJobType $jobType the type of the job  
 	 * @return KalturaBatchJobResponse 
 	 */
 	function getStatusAction($jobId, $jobType)
 	{
+		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
-		if($dbBatchJob->getJobType() != $jobType)
-			throw new KalturaAPIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $dbBatchJob->getId());
+		if($dbBatchJob->getJobType() != $dbJobType)
+			throw new KalturaAPIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 		
 		$job = new KalturaBatchJob();
 		$job->fromObject($dbBatchJob);
@@ -1003,12 +1005,13 @@ class JobsService extends KalturaBaseService
 	 * 
 	 * @action deleteJob
 	 * @param int $jobId the id of the job  
-	 * @param int $jobType the type of the job  
+	 * @param KalturaBatchJobType $jobType the type of the job  
 	 * @return KalturaBatchJobResponse 
 	 */
 	function deleteJobAction($jobId, $jobType)
 	{
-		kJobsManager::deleteJob($jobId, $jobType);
+		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		kJobsManager::deleteJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}
 
@@ -1019,12 +1022,13 @@ class JobsService extends KalturaBaseService
 	 * 
 	 * @action abortJob
 	 * @param int $jobId the id of the job  
-	 * @param int $jobType the type of the job  
+	 * @param KalturaBatchJobType $jobType the type of the job  
 	 * @return KalturaBatchJobResponse 
 	 */
 	function abortJobAction($jobId, $jobType)
 	{
-		kJobsManager::abortJob($jobId, $jobType);
+		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		kJobsManager::abortJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}
 
@@ -1035,12 +1039,13 @@ class JobsService extends KalturaBaseService
 	 * 
 	 * @action retryJob
 	 * @param int $jobId the id of the job  
-	 * @param int $jobType the type of the job  
+	 * @param KalturaBatchJobType $jobType the type of the job  
 	 * @return KalturaBatchJobResponse 
 	 */
 	function retryJobAction($jobId, $jobType)
 	{
-		kJobsManager::retryJob($jobId, $jobType);
+		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		kJobsManager::retryJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}
 	

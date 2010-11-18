@@ -1300,7 +1300,7 @@ class BatchService extends KalturaBaseService
 	 * @action resetJobExecutionAttempts
 	 * @param int $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param int $jobType The type of the job  
+	 * @param KalturaBatchJobType $jobType The type of the job  
 	 */
 	function resetJobExecutionAttemptsAction($id ,KalturaExclusiveLockKey $lockKey, $jobType)
 	{
@@ -1329,7 +1329,7 @@ class BatchService extends KalturaBaseService
 	 * @action freeExclusiveJob
 	 * @param int $id The id of the job
 	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param int $jobType The type of the job  
+	 * @param KalturaBatchJobType $jobType The type of the job  
 	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
 	 * @return KalturaFreeJobResponse 
 	 */
@@ -1393,7 +1393,7 @@ class BatchService extends KalturaBaseService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
+	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
 	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
@@ -1410,7 +1410,7 @@ class BatchService extends KalturaBaseService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @param int $jobType The type of the job - could be a custom extended type
+	 * @param KalturaBatchJobType $jobType The type of the job - could be a custom extended type
 	 * @return KalturaBatchJobArray 
 	 */
 	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
