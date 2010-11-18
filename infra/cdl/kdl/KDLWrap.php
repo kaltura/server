@@ -237,7 +237,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 					$str = $cdlTrnsId;
 					$commandLines[$cdlTrnsId]=$transObj->_cmd;
 				}
-				if($flavor->getFormat()=="mp4" && ($cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_FFMPEG || $cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX || $cdlTrnsId==kConvertJobData::CONVERSION_ENGINE_MENCODER)){
+				if($flavor->getFormat()=="mp4" && ($cdlTrnsId==conversionEngineType::FFMPEG || $cdlTrnsId==conversionEngineType::FFMPEG_AUX || $cdlTrnsId==conversionEngineType::MENCODER)){
 					$fsAddonStr = kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
 					$commandLines[$cdlTrnsId].=$fsAddonStr;
 				}
