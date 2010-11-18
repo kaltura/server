@@ -268,14 +268,6 @@ class flavorAsset extends BaseflavorAsset implements ISyncableFile
 		return $downloadUrl;
 	}
 	
-	public function moveAssetFile($newAbsolutePath, $delete_source = true, $overwrite = true)
-	{
-		$key = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$moveResult = kFileSyncUtils::moveToFile($key, $newAbsolutePath, $delete_source, $overwrite);
-		
-		return $moveResult;
-	}
-	
 	public function hasTag($v)
 	{
 		$tags = explode(',', $this->getTags());

@@ -2077,17 +2077,6 @@ class entry extends Baseentry implements ISyncableFile
 			parent::setAvailableFrom($date);
 	} 
 	
-// ----------- File Manipulations ----------------
-	public function moveEntryFile($entryFileSyncSubType, $newAbsolutePath, $delete_source = true, $overwrite = true)
-	{
-		$key = $this->getSyncKey($entryFileSyncSubType);
-		$moveResult = kFileSyncUtils::moveToFile($key, $newAbsolutePath, $delete_source, $overwrite);
-		
-		return $moveResult;
-	}
-// ----------- File Manipulations ----------------	
-
-	
 // ----------- Extra object connections ----------------	
 	public function getNotifications()
 	{
