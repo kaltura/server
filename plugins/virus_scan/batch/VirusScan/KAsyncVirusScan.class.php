@@ -99,7 +99,7 @@ class KAsyncVirusScan extends KBatchBase
 					
 				case KalturaVirusScanJobResult::FILE_INFECTED:
 				
-					$this->closeJob($job, null, null, "File is in final destination", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, null, $job->data);
 					break;
 			}
 			

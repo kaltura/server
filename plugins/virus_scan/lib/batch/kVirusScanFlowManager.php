@@ -206,7 +206,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					KalturaLog::debug('Physically deleting file ['.$filePath.']');
 					unlink($filePath);
 					if ($entry)	{
-						myEntryUtils::deleteEntry($entryToDelete);
+						myEntryUtils::deleteEntry($entry);
 					}
 				}
 				else {
