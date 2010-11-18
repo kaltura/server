@@ -50,6 +50,7 @@ class SymantecScanEngine extends VirusScanEngine
 		$errorDescription = null;
 		$output = null;
 		
+		KalturaLog::debug("Executing - [$cmd]");
 		exec($cmd, $output, $return_value);
 		
 		if ($returnValue != 0)	// command line error
