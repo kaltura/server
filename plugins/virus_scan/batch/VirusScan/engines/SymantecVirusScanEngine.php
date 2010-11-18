@@ -35,6 +35,14 @@ class SymantecScanEngine extends VirusScanEngine
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
+		if (!file_exists($filePath)) {
+			$errorDescriptiong = 'Source file does not exists ['.$filePath.']';
+			return KalturaVirusScanJobResult::SCAN_ERROR;
+		}
+		
+		clearstatcache();
+		$fileLastChanged = filemtime($filePath);
+		
 		$scanMode = $cleanIfInfected ? '-mode scanrepair' : '-mode scan';
 		$cmd = $this->binFile . ' -verbose ' . $scanMode . ' ' . $filePath;
 
@@ -69,8 +77,15 @@ class SymantecScanEngine extends VirusScanEngine
 		$found = explode(' ', $found);
 		$returnValue = trim(end($found));
 		
-		if ($returnValue == '0') {
-			return KalturaVirusScanJobResult::FILE_IS_CLEAN;
+		if ($returnValue == '0')
+		{
+			clearstatcache();
+			if ($fileLastChanged && $fileLastChanged != filemtime($filePath)) {
+				return KalturaVirusScanJobResult::FILE_WAS_CLEANED;
+			}
+			else {
+				return KalturaVirusScanJobResult::FILE_IS_CLEAN;
+			}
 		}
 		else if ($returnValue == '1' || $returnValue == '2') {
 			$errorDescription = "The file was found infected, but was not repaired";
