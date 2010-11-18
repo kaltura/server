@@ -12,22 +12,22 @@ class KDLWrap
 	public	$_errors = array();
 	public	$_warnings = array();
 	public  $_rv=true;
-	
+
 	static $TranscodersCdl2Kdl = array(
-		kConvertJobData::CONVERSION_ENGINE_KALTURA_COM=>KDLTranscoders::KALTURA,
-		kConvertJobData::CONVERSION_ENGINE_ON2=>KDLTranscoders::ON2,
-		kConvertJobData::CONVERSION_ENGINE_FFMPEG=>KDLTranscoders::FFMPEG,
-		kConvertJobData::CONVERSION_ENGINE_MENCODER=>KDLTranscoders::MENCODER,
-		kConvertJobData::CONVERSION_ENGINE_ENCODING_COM=>KDLTranscoders::ENCODING_COM,
-		kConvertJobData::CONVERSION_ENGINE_FFMPEG_AUX=>KDLTranscoders::FFMPEG_AUX,
-		kConvertJobData::CONVERSION_ENGINE_FFMPEG_VP8=>KDLTranscoders::FFMPEG_VP8,
-		kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
-		kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER=>KDLTranscoders::EXPRESSION_ENCODER,
-		kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
-		kConvertJobData::CONVERSION_ENGINE_FAST_START=>KDLTranscoders::QT_FASTSTART,
-		kConvertJobData::CONVERSION_ENGINE_AVIDEMUX=>KDLTranscoders::AVIDEMUX,
-		kConvertJobData::CONVERSION_ENGINE_PDF2SWF=>KDLTranscoders::PDF2SWF,
-		kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
+		conversionEngineType::KALTURA_COM=>KDLTranscoders::KALTURA,
+		conversionEngineType::ON2=>KDLTranscoders::ON2,
+		conversionEngineType::FFMPEG=>KDLTranscoders::FFMPEG,
+		conversionEngineType::MENCODER=>KDLTranscoders::MENCODER,
+		conversionEngineType::ENCODING_COM=>KDLTranscoders::ENCODING_COM,
+		conversionEngineType::FFMPEG_AUX=>KDLTranscoders::FFMPEG_AUX,
+		conversionEngineType::FFMPEG_VP8=>KDLTranscoders::FFMPEG_VP8,
+		conversionEngineType::EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
+		"expressionEncoder.ExpressionEncoder"=>KDLTranscoders::EXPRESSION_ENCODER,
+		"quickTimeTools.QuickTimeTools"=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
+		"fastStart.FastStart"=>KDLTranscoders::QT_FASTSTART,
+		"avidemux.Avidemux"=>KDLTranscoders::AVIDEMUX,
+		conversionEngineType::PDF2SWF=>KDLTranscoders::PDF2SWF,
+		conversionEngineType::PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
 	);
 	
 	/* ------------------------------
@@ -62,13 +62,13 @@ class KDLWrap
 		if($cdlMediaInfo!=null) {
 			self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		}
-		kLog::log( "...S-->".$mediaSet->ToString());
+		KalturaLog::log( "...S-->".$mediaSet->ToString());
 		
 		$profile = new KDLProfile();
 		foreach($cdlFlavorList as $cdlFlavor) {
 			$kdlFlavor = self::ConvertFlavorCdl2Kdl($cdlFlavor);
 			$profile->_flavors[] = $kdlFlavor;
-			kLog::log( "...F-->".$kdlFlavor->ToString());
+			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
 
 		$trgList = array();
@@ -85,7 +85,7 @@ class KDLWrap
 		}
 		
 		foreach ($trgList as $trg){
-			kLog::log("...T-->".$trg->ToString());
+			KalturaLog::log("...T-->".$trg->ToString());
 			$this->_targetList[] = self::ConvertFlavorKdl2Cdl($trg);
 		}
 		
@@ -123,7 +123,7 @@ class KDLWrap
 		}
 		
 		$xml=KDLProcessor::ProceessFlavorsForCollection($kdlFlavorList);
-		kLog::log(__METHOD__."-->".$xml."<--");
+		KalturaLog::log(__METHOD__."-->".$xml."<--");
 		return $xml;
 	}
 
@@ -132,10 +132,10 @@ class KDLWrap
 	 */
 	public static function CDLMediaInfo2Tags(mediaInfo $cdlMediaInfo, $tagList) 
 	{
-kLog::log(__METHOD__."==>\n");
+KalturaLog::log(__METHOD__."==>\n");
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
-		kLog::log( "...S-->".$mediaSet->ToString());
+		KalturaLog::log( "...S-->".$mediaSet->ToString());
 		$tagsOut = array();
 		$tagsOut = $mediaSet->ToTags($tagList);
 		return $tagsOut;
@@ -146,19 +146,19 @@ kLog::log(__METHOD__."==>\n");
 	 */
 	public static function CDLIsFLV(mediaInfo $cdlMediaInfo) 
 	{
-kLog::log(__METHOD__."==>\n");
+KalturaLog::log(__METHOD__."==>\n");
 		$tagList[] = "flv";
 		$mediaSet = new KDLMediaDataSet();
 		self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
-		kLog::log("...S-->".$mediaSet->ToString());
+		KalturaLog::log("...S-->".$mediaSet->ToString());
 		$tagsOut = array();
 		$tagsOut = $mediaSet->ToTags($tagList);
 		if(count($tagsOut)==1) {
-			kLog::log("... an FLV file");
+			KalturaLog::log("... an FLV file");
 			return true;
 		}
 		else {
-			kLog::log("... NOT an FLV file");
+			KalturaLog::log("... NOT an FLV file");
 			return false;
 		}
 	}
@@ -217,7 +217,7 @@ kLog::log(__METHOD__."==>\n");
 
 		$cdlOprSets = KDLWrap::convertOperatorsKdl2Cdl($target->_transcoders);
 		if($target->_engineVersion==1) {
-kLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
+KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			$flavor->setOperators($cdlOprSets->getSerialized());
 			$flavor->setEngineVersion(1);
 		}
@@ -263,7 +263,7 @@ kLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		
 //echo "flavor "; print_r($flavor);
 		
-kLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
+KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		return $flavor;
 	}
 	
@@ -331,7 +331,7 @@ kLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		
 $operators = $cdlFlavor->getOperators();
 $transObjArr = array();
-kLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
+KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
 		if(!empty($operators) || $cdlFlavor->getEngineVersion()==1) {
 			$transObjArr = KDLWrap::convertOperatorsCdl2Kdl($operators);
 			$kdlFlavor->_engineVersion = 1;
@@ -347,7 +347,7 @@ $cmdLines = $cdlFlavor->getCommandLines();
 					$transObj->_cmd = $cmdLines[$transObj->_id];
 				}
 			}
-kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
+KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 		}
 
 		KDLUtils::RecursiveScan($transObjArr, "transcoderSetFuncWrap", self::$TranscodersCdl2Kdl, "");
@@ -384,7 +384,7 @@ kLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
 		}
 		
-kLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
+KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 		return $kdlFlavor;
 	}
 	
@@ -393,7 +393,7 @@ kLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 	 */
 	public static function ConvertMediainfoCdl2Mediadataset(mediaInfo $cdlMediaInfo, KDLMediaDataSet &$medSet)
 	{
-//		kLog::log(__METHOD__."->".$cdlMediaInfo->getRawData());
+//		KalturaLog::log(__METHOD__."->".$cdlMediaInfo->getRawData());
 		$medSet->_container = new KDLContainerData();
 		$medSet->_streamsCollectionStr = $cdlMediaInfo->getMultiStreamInfo();
 		
@@ -446,8 +446,8 @@ kLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 	 */
 	public static function ConvertMediainfoCdl2FlavorAsset(mediaInfo $cdlMediaInfo, flavorAsset &$fla)
 	{
-kLog::log(__METHOD__."==>");
-kLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
+KalturaLog::log(__METHOD__."==>");
+KalturaLog::log("\nCDL mediaInfo==>\n".print_r($cdlMediaInfo,true));
 /*
 $flavorAsset->setWidth($mediaInfoDb->getVideoWidth());
 $flavorAsset->setHeight($mediaInfoDb->getVideoHeight());
@@ -459,7 +459,7 @@ $flavorAsset->setVideoCodecId($mediaInfoDb->getVideoCodecId());
 */
   	$medSet = new KDLMediaDataSet();
 	self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $medSet);
-kLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
+KalturaLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
 	
 //	$fla = new flavorAsset();
 		if(!is_null($medSet->_container)){
@@ -480,7 +480,7 @@ kLog::log("\nKDL mediaDataSet==>\n".print_r($medSet,true));
 		else
 			$fla->setBitrate($vidBr);
 
-kLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
+KalturaLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 		return $fla;
 	}
 
@@ -489,24 +489,24 @@ kLog::log("\nCDL fl.Asset==>\n".print_r($fla,true));
 	 */
 	public static function convertOperatorsCdl2Kdl($operators)
 	{
-kLog::log(__METHOD__."\ncdlOperators==>\n".print_r($operators,true));
+KalturaLog::log(__METHOD__."\ncdlOperators==>\n".print_r($operators,true));
 		$transObjArr = array();
 $oprSets = new kOperatorSets();
 //		$operators = stripslashes($operators);
-//kLog::log(__METHOD__."\ncdlOperators(stripslsh)==>\n".print_r($operators,true));
+//KalturaLog::log(__METHOD__."\ncdlOperators(stripslsh)==>\n".print_r($operators,true));
 		$oprSets->setSerialized($operators);
-kLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
+KalturaLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
 		foreach ($oprSets->getSets() as $oprSet) {
 			if(count($oprSet)==1) {
 				$opr = $oprSet[0];
-kLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
+KalturaLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
 				$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
 				$transObjArr[] = $kdlOpr;
 			}
 			else {
 				$auxArr = array();
 				foreach ($oprSet as $opr) {
-kLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
+KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 					$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
 					$auxArr[] = $kdlOpr;
 				}
@@ -594,7 +594,7 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 
 //	$oprObj->_engine = KDLWrap::GetEngineObject($oprObj->_id);
 	$id = $oprObj->_id;
-kLog::log(__METHOD__.":operators id=$id :");
+KalturaLog::log(__METHOD__.":operators id=$id :");
 	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
 		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS);
 	}
@@ -618,10 +618,10 @@ kLog::log(__METHOD__.":operators id=$id :");
 		return;
 	}
 	if(is_null($oprObj->_engine)) {
-		kLog::log(__METHOD__.":ERROR - plugin manager returned with null");
+		KalturaLog::log(__METHOD__.":ERROR - plugin manager returned with null");
 	}
 	else {
-		kLog::log(__METHOD__."Engine object from plugin mgr==>\n".print_r($oprObj->_engine,true));
+		KalturaLog::log(__METHOD__."Engine object from plugin mgr==>\n".print_r($oprObj->_engine,true));
 	}
 	return;
 }
