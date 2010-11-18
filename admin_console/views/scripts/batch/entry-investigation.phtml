@@ -793,7 +793,7 @@
 										if($enableActions)
 										{
 											?>
-												<button onclick="doRetry(<?php echo "$job->id, $job->jobType"; ?>);"><?php echo $this->translate('entry-investigate history retry'); ?></button>
+												<button onclick="doRetry(<?php echo $job->id; ?>, '<?php echo $job->jobType; ?>');"><?php echo $this->translate('entry-investigate history retry'); ?></button>
 												<br/>
 											<?php
 										}
