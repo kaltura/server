@@ -55,6 +55,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 			
 			if ($count > 0)
 			{
+				KalturaLog::debug('Returning profile with id ['.$profile->getId().']');
 				return $profile;
 			}
 		}
