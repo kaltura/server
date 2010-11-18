@@ -43,7 +43,6 @@ class SymantecScanEngine extends VirusScanEngine
 		$output = null;
 		
 		exec($cmd, $output, $return_value);
-		$output = implode(PHP_EOL, $output);
 		
 		if ($returnValue != 0)	// command line error
 		{	
@@ -59,6 +58,7 @@ class SymantecScanEngine extends VirusScanEngine
 				break;
 			}
 		}
+		$output = implode(PHP_EOL, $output);
 		
 		if (!$found)
 		{

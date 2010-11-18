@@ -1,5 +1,5 @@
 <?php
-class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectCreatedEventConsumer
+class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
 {
 	
 	private static $flavorAssetIdsToScan = array();
@@ -37,12 +37,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		return false;
 	}
 	
-	
 	/**
-	 * @param BaseObject $object
+	 * @param FileSync $object
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectCreated(BaseObject $object)
+	private function addedFileSync(FileSync $object)
 	{
 		if(!($object instanceof FileSync) || $object->getStatus() != FileSync::FILE_SYNC_STATUS_PENDING || $object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
 			return true;
@@ -61,17 +60,15 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			return false; // stop all remaining consumers
 		}			
 		
-		return true;		
+		return true;
 	}
 	
-	
 	/**
-	 * @param BaseObject $object
+	 * @param flavorAsset $object
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectAdded(BaseObject $object)
+	private function addedFlavorAsset(flavorAsset $object)
 	{
-		
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
 			if ($this->saveIfShouldScan($object))
@@ -87,6 +84,26 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		}
 		
 		return true; // no scan jobs to do, object added event consumption may continue normally
+	}
+	
+
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if($object instanceof flavorAsset)
+		{
+			return $this->addedFlavorAsset($object);
+		}
+		
+		if($object instanceof FileSync)
+		{
+			return $this->addedFileSync($object);
+		}
+		
+		return true;		
 	}
 	
 	
