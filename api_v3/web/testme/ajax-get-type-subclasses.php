@@ -17,7 +17,7 @@ try
 	if(!KalturaTypeReflector::hasClassInheritMapCache())
 	{
 		$config = new Zend_Config_Ini("../../config/testme.ini");
-		$indexConfig = $config->get('index');
+		$indexConfig = $config->get('testme');
 		
 		$include = $indexConfig->get("include");
 		$exclude = $indexConfig->get("exclude");
