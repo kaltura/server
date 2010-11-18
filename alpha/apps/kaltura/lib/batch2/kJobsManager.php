@@ -44,7 +44,7 @@ class kJobsManager
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $jobType)
-			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $dbBatchJob->getId());
+			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
 		return self::abortDbBatchJob($dbBatchJob);
 	}
@@ -53,7 +53,7 @@ class kJobsManager
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $jobType)
-			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $dbBatchJob->getId());
+			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
 		$dbBatchJob->setDeletedAt(time());
 		$dbBatchJob->save();
@@ -105,7 +105,7 @@ class kJobsManager
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $jobType)
-			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $dbBatchJob->getId());
+			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
 		$dbBatchJob->setAbort(false);
 		$dbBatchJob->setExecutionAttempts(0);
@@ -282,7 +282,7 @@ class kJobsManager
 			$convertCollectionData->addFlavor($convertCollectionFlavorData);
 		}
 		
-		$currentConversionEngine = kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3;
+		$currentConversionEngine = conversionEngineType::EXPRESSION_ENCODER3;
 		KalturaLog::log("Using conversion engine [$currentConversionEngine]");
 		
 		if(!$dbConvertCollectionJob)
@@ -315,7 +315,7 @@ class kJobsManager
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$commandLines = array(
-			kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER3 => KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName,
+			conversionEngineType::EXPRESSION_ENCODER3 => KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName,
 		);
 		$commandLinesStr = flavorParamsOutput::buildCommandLinesStr($commandLines);
 		
@@ -475,8 +475,8 @@ class kJobsManager
 		$dbConvertFlavorJob->setFileSize(filesize($convertData->getSrcFileSyncLocalPath()));
 		
 		// TODO remove after all old version flavors migrated
-		if(in_array(kConvertJobData::CONVERSION_ENGINE_ENCODING_COM, $conversionEngines))
-			$dbConvertFlavorJob->setOnStressDivertTo(kConvertJobData::CONVERSION_ENGINE_ENCODING_COM);
+		if(in_array(conversionEngineType::ENCODING_COM, $conversionEngines))
+			$dbConvertFlavorJob->setOnStressDivertTo(conversionEngineType::ENCODING_COM);
 		// remove until here
 		
 		/*
