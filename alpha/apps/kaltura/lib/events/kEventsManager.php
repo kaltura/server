@@ -119,7 +119,7 @@ class kEventsManager
 		}
 		
 		$consumerInterface = $event->getConsumerInterface();
-		KalturaLog::debug("Event [" . get_class($event) . "] continued looking for consumers [$consumerInterface]");
+		KalturaLog::debug("Event [" . get_class($event) . "] continued by [$lastConsumerClass] looking for consumers [$consumerInterface]");
 
 		$consumers = self::getConsumers($consumerInterface);
 		
