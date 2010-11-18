@@ -5,7 +5,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	private static $flavorAssetIdsToScan = array();
 	
 	
-	private function resumeEvents($flavorAsset, $fileSync)
+	private function resumeEvents($flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
