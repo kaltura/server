@@ -22,8 +22,9 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 	 */
 	public static function getSuitableProfile($entryId)
 	{
+		
 		$entry = entryPeer::retrieveByPK($entryId);
-		if (!$entryId)
+		if (!$entry)
 		{
 			KalturaLog::err('Cannot find entry with id ['.$entryId.']');
 			return null;
