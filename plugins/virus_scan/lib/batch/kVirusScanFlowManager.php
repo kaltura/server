@@ -75,7 +75,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		{
 			if ($this->saveIfShouldScan($object))
 			{
-				$profile = self::$flavorAssetIdsToScan[$object->getEntryId()];
+				$profile = self::$flavorAssetIdsToScan[$object->getId()];
 				
 				// suitable virus scan profile found - create scan job
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
