@@ -20,14 +20,14 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	}
 	
 	
-	private function saveIfShouldScan($flavorAssetId)
+	private function saveIfShouldScan($flavorAsset)
 	{
-		if (isset(self::$flavorAssetIdsToScan[$flavorAssetId]))
+		if (isset(self::$flavorAssetIdsToScan[$flavorAsset->getId()]))
 		{
 			return true;
 		}
 		
-		$profile = VirusScanProfilePeer::getSuitableProfile($flavorAssetId);
+		$profile = VirusScanProfilePeer::getSuitableProfile($flavorAsset->getEntryId());
 		if ($profile)
 		{
 			self::$flavorAssetIdsToScan[$flavorAssetId] = $profile;
@@ -54,7 +54,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		if (!$flavorAsset || !$flavorAsset->getIsOriginal())
 			return true;
 
-		if ($this->saveIfShouldScan($flavorAssetId))
+		if ($this->saveIfShouldScan($flavorAsset))
 		{
 			// file sync belongs to a flavor asset in status pending and suits a virus scan profile
 			return false; // stop all remaining consumers
@@ -73,7 +73,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
-			if ($this->saveIfShouldScan($object->getEntryId()))
+			if ($this->saveIfShouldScan($object))
 			{
 				$profile = self::$flavorAssetIdsToScan[$object->getEntryId()];
 				
