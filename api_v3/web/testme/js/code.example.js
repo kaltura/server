@@ -487,7 +487,7 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 	var jqConfigObject = this.codeVar("config");
 	
 	this.addCode(this.codeAssign(jqConfigObject.clone(), this.codeNewInstance("KalturaConfiguration")));
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString(location.hostname)));
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString("http://" + location.hostname)));
 	this.addCode(this.codeAssign(this.jqClientObject.clone(), this.codeNewInstance("KalturaClient", [jqConfigObject.clone()])));
 };
 
