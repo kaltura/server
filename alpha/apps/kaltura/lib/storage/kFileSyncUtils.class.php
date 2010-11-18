@@ -126,12 +126,6 @@ class kFileSyncUtils
 		self::createSyncFileForKey( $key , $strict , !is_null($res));
 	}
 	
-	public static function move ( FileSyncKey $source_key , FileSyncKey $target_key )
-	{
-		 // TODO - implement
-		 throw new Exception ( __METHOD__ . ": should be implemented");
-	}
-	
 	public static function moveToFile ( FileSyncKey $source_key , $target_file_path, $delete_source = true , $overwrite = true)
 	{
 		try
@@ -343,12 +337,6 @@ class kFileSyncUtils
 		self::createSyncFileLinkForKey( $target_key, $source_key );
 	}
 	
-	public static function copyToFile ( FileSyncKey $source_key , $target_file_path )
-	{
-		 // TODO - implement
-		 throw new Exception ( __METHOD__ . ": should be implemented");		 
-	}
-
 	/**
 	 * Get the FileSyncKey object by its file sync object
 	 * 
@@ -702,8 +690,11 @@ class kFileSyncUtils
 				$remote_dc_file_sync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
 				$remote_dc_file_sync->setOriginal ( 0 );
 				$remote_dc_file_sync->setPartnerID ( $key->partner_id );
-				$remote_dc_file_sync->save();			
+				$remote_dc_file_sync->save();
+				
+				kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));	
 			}
+			kEventsManager::raiseEvent(new kObjectAddedEvent($current_dc_file_sync));
 		}
 		
 		return $current_dc_file_sync;
@@ -744,6 +735,8 @@ class kFileSyncUtils
 			$fileSync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
 		}
 		$fileSync->save();
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
 		
 		return $fileSync;
 	}
@@ -817,7 +810,10 @@ class kFileSyncUtils
 			
 			// increment link_cont for remote DCs sources
 			self::incrementLinkCountForFileSync($source_file_syncs[$remote_dc["id"]]);
+			
+			kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));
 		}
+		kEventsManager::raiseEvent(new kObjectAddedEvent($current_dc_file_sync));
 	}
 	
 	/**
@@ -960,25 +956,22 @@ class kFileSyncUtils
 		return kFileSyncObjectManager::retrieveObject( $sync_key->object_type, $sync_key->object_id );
 	}
 	
-	/**
-	 * Marks the local FileSync object as ready so it could go for sync
-	 * 
-	 * @param FileSyncKey $key
-	 * @return void
-	 */
-	public static function markLocalFileSyncAsReady(FileSyncKey $key, $strict = true)
-	{
-		$fileSync = self::getLocalFileSyncForKey($key, $strict);
-		// added the option to work as non-strict, since some entries may not have all files, for example - EDIT flavor
-		if($fileSync)
-		{
-			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-			$fileSync->setReadyAt( time() );
-			$fileSync->save();
-		}
-	}
+//	/**
+//	 * Marks the local FileSync object as ready so it could go for sync
+//	 * 
+//	 * @param FileSyncKey $key
+//	 * @return void
+//	 * @deprecated
+//	 */
+//	public static function markLocalFileSyncAsReady(FileSyncKey $key, $strict = true)
+//	{
+//		$fileSync = self::getLocalFileSyncForKey($key, $strict);
+//		// added the option to work as non-strict, since some entries may not have all files, for example - EDIT flavor
+//		if($fileSync)
+//		{
+//			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+//			$fileSync->setReadyAt( time() );
+//			$fileSync->save();
+//		}
+//	}
 }
-
-
-
-?>
