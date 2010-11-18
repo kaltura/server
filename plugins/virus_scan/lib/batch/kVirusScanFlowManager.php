@@ -193,9 +193,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					$entry->save();
 				}
 				
-				// delete flavor asset and entry if defined in virus scan profile
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);		
-				
+				// delete flavor asset and entry if defined in virus scan profile	
 				if ( $data->getVirusFoundAction() == KalturaVirusFoundAction::CLEAN_DELETE ||
 					 $data->getVirusFoundAction() == KalturaVirusFoundAction::DELETE          )
 				{
@@ -203,14 +201,18 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 					KalturaLog::debug('FlavorAsset ['.$flavorAsset->getId().'] marked as deleted');
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-					$flavorAsset->setDeletedAt(time());					
+					$flavorAsset->setDeletedAt(time());
+					$flavorAsset->save();					
 					KalturaLog::debug('Physically deleting file ['.$filePath.']');
 					unlink($filePath);
 					if ($entry)	{
 						myEntryUtils::deleteEntry($entryToDelete);
 					}
 				}
-				$flavorAsset->save();
+				else {
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$flavorAsset->save();
+				}				
 				
 				myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 				// do not resume flavor asset added event consumption
