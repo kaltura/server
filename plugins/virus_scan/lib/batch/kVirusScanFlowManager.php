@@ -8,13 +8,16 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	private function resumeEvents($flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey);
-		if (!$fileSync)
+		
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
+		$fileSyncList = FileSyncPeer::doSelect( $c );
+				
+		foreach ($fileSyncList as $fileSync)
 		{
-			KalturaLog::err('Cannot find filesync for flavor asset id ['.$flavorAsset->getId().']');
+			// resume file sync added event
+			kEventsManager::continueEvent(new kObjectAddedEvent($fileSync), 'kVirusScanFlowManager');
 		}
-		// resume file sync created event
-		kEventsManager::continueEvent(new kObjectAddedEvent($fileSync), 'kVirusScanFlowManager');
+
 		// resume flavor asset added event consumption
 		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
 	}
@@ -175,17 +178,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 				
 		switch ($data->getScanResult())
 		{
-			case KalturaVirusScanJobResult::FILE_WAS_CLEANED:
-				// delete old filsync + create new + assign new version to flavor asset
-				$oldSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$oldFilePath = kFileSyncUtils::getLocalFilePathForKey($oldSyncKey);
-				$flavorAsset->incrementVersion();
-				$flavorAsset->save();				
-				$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);	
-				kFileSyncUtils::moveFromFile($oldFilePath, $syncKey);
-				$this->resumeEvents($flavorAsset);
-				break;
-											
+			case KalturaVirusScanJobResult::FILE_WAS_CLEANED:									
 			case KalturaVirusScanJobResult::FILE_IS_CLEAN:
 				$this->resumeEvents($flavorAsset);
 				break;
