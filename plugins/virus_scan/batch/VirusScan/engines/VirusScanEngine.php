@@ -9,12 +9,7 @@ abstract class VirusScanEngine
 	 */
 	public static function getEngine($type)
 	{
-		switch ($type)
-		{
-			case KalturaVirusScanEngineType::SYMANTEC_SCAN_ENGINE:
-				return new SymantecScanEngine();
-		}
-		return null;
+		return KalturaPluginManager::loadObject('VirusScanEngine', $type);
 	}
 	
 	
