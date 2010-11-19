@@ -34,7 +34,7 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 	public static function getAdminConsolePages()
 	{
 		$KalturaInternalTools = new KalturaInternalToolsPluginSystemHelperAction('KalturaInternalTools', 'KalturaInternalTools');
-		$KalturaInternalToolsSystemHelp = new KalturaInternalToolsPluginSystemHelperAction('System Hendler', 'systemhendler', 'KalturaInternalTools');
+		$KalturaInternalToolsSystemHelp = new KalturaInternalToolsPluginSystemHelperAction('System Handler', 'systemhandler', 'Developer');
 		return array($KalturaInternalTools, $KalturaInternalToolsSystemHelp);
 	}
 }
