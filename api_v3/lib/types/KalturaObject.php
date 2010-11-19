@@ -90,33 +90,7 @@ class KalturaObject
 	
 	protected function toDynamicEnumValue($type, $value)
 	{
-		$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value, 2);
-		if(count($split) == 1)
-			return $value;
-			
-		list($pluginName, $valueName) = $split;
-		
-		// TODO remove call_user_func after moving to php 5.3
-		$baseEnumName = call_user_func("$type::getEnumClass");
-//		$baseEnumName = $type::getEnumClass();
- 
-		$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
-		$enums = $pluginInstance->getEnums($baseEnumName);
-		
-		foreach($enums as $enum)
-		{		
-			// TODO remove call_user_func after moving to php 5.3
-			$enumConstans = call_user_func("$enum::getAdditionalValues");
-//			$enumConstans = $enum::getAdditionalValues();
-			if(in_array($valueName, $enumConstans))
-			{
-				// TODO remove call_user_func after moving to php 5.3
-				return call_user_func("$enum::get")->coreValue($value);
-//				return $enum::get()->coreValue($value);
-			}
-		}
-		
-		return null;
+		return KalturaDynamicEnum::getCoreValue($value, $type);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -133,23 +107,26 @@ class KalturaObject
 			if (in_array($this_prop, $props_to_skip)) continue;
 			
 			$value = $this->$this_prop;
-			$propertyInfo = $typeReflector->getProperty($this_prop);
-			if (!$propertyInfo)
-			{
-	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
-			}
-			else if ($propertyInfo->isDynamicEnum())
-			{
-				$value = $this->toDynamicEnumValue($propertyInfo->getType(), $value);
-			}
-			
 			if ($value !== null)
 			{
-				$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
-				if (is_callable($setter_callback))
-			 	    call_user_func_array( $setter_callback , array ($value ) );
-		 	    else 
-	            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+				$propertyInfo = $typeReflector->getProperty($this_prop);
+				if (!$propertyInfo)
+				{
+		            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+				}
+				else if ($propertyInfo->isDynamicEnum())
+				{
+					$value = $this->toDynamicEnumValue($propertyInfo->getType(), $value);
+				}
+				
+				if ($value !== null)
+				{
+					$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
+					if (is_callable($setter_callback))
+				 	    call_user_func_array( $setter_callback , array ($value ) );
+			 	    else 
+		            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+				}
 			}
 		}
 		return $object_to_fill;		
