@@ -120,6 +120,7 @@ class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
+	 * @dynamicType KalturaVirusScanEngineType
 	 * @var string
 	 */
 	public $engineTypeIn;
