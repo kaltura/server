@@ -28,7 +28,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 	{
 
 		// ENTRY
-		if($baseClass == entryPeer::OM_CLASS && $enumValue == entryType::DOCUMENT)
+		if($baseClass == 'entry' && $enumValue == entryType::DOCUMENT)
 		{
 			return new DocumentEntry();
 		}
@@ -118,7 +118,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// DOCUMENT ENTRY
-		if($baseClass == entryPeer::OM_CLASS && $enumValue == entryType::DOCUMENT)
+		if($baseClass == 'entry' && $enumValue == entryType::DOCUMENT)
 		{
 			return 'DocumentEntry';
 		}
