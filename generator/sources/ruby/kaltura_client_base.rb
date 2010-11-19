@@ -268,8 +268,10 @@ module Kaltura
 						object_class = xml_element.get_text('objectType').value
 						instance = Object.const_get(object_class).new
 						xml_element.elements.each do | element |
-							value = KalturaClassFactory.object_from_xml(element)
-							instance.send(self.underscore(element.name) + "=", value);
+							if Object.const_get(object_class).method_defined?(element.name)
+								value = KalturaClassFactory.object_from_xml(element)
+								instance.send(self.underscore(element.name) + "=", value);
+							end
 						end
 					end
 				end
