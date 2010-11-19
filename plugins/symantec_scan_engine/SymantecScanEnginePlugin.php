@@ -39,7 +39,7 @@ class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending,
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'VirusScanEngine' && $enumValue == SymantecScanEngineVirusScanEngineType::get()->apiValue(SymantecScanEngineVirusScanEngineType::SYMANTEC_SCAN_ENGINE))
+		if($baseClass == 'VirusScanEngine' && $enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_ENGINE)
 			return new SymantecScanEngine();
 
 		return null;
@@ -52,7 +52,7 @@ class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending,
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'VirusScanEngine' && $enumValue == SymantecScanEngineVirusScanEngineType::get()->apiValue(SymantecScanEngineVirusScanEngineType::SYMANTEC_SCAN_ENGINE))
+		if($baseClass == 'VirusScanEngine' && $enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_ENGINE)
 			return 'SymantecScanEngine';
 
 		return null;
