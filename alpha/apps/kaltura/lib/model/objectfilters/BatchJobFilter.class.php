@@ -78,6 +78,10 @@ class BatchJobFilter extends baseObjectFilter
 			foreach($arr as $jobTypeIn)
 			{
 				list($jobType, $jobSubTypes) = explode(self::JOB_TYPE_AND_SUB_TYPE_TYPE_DELIMITER, $jobTypeIn);
+				
+				if(class_exists('KalturaBatchJobType'))
+					$jobType = KalturaBatchJobType::getCoreValue($jobType);
+					
 				$finalTypesAndSubTypes[$jobType] = $jobSubTypes;
 			}
 			
