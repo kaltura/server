@@ -188,7 +188,7 @@
 		const UPDATE_EXCLUSIVE_JOB_WRONG_TYPE = "UPDATE_EXCLUSIVE_JOB_WRONG_TYPE,Attempting to update job of the wrong type with id [%s]\n key[%s]\njob[%s]";
 		
 		// %s - job id
-		const GET_EXCLUSIVE_JOB_WRONG_TYPE = "GET_EXCLUSIVE_JOB_WRONG_TYPE,Attempting to get job of the wrong type with id [%s]";
+		const GET_EXCLUSIVE_JOB_WRONG_TYPE = "GET_EXCLUSIVE_JOB_WRONG_TYPE,Attempting to get job of the wrong type [%s] with id [%s]";
 		
 		// %s - job id, %s - processorLocation , %s - processorName
 		const FREE_EXCLUSIVE_JOB_FAILED = "FREE_EXCLUSIVE_JOB_FAILED,Error while attempting to free job with id [%s] from processorLocation [%s] processorName [%s]";
