@@ -99,6 +99,23 @@ class KalturaRequestDeserializer
 						$found = true;
 					}
 				}
+				else if ($actionParam->isStringEnum()) // string enum or dynamic
+				{
+					if (array_key_exists($name, $this->paramsGrouped))
+					{
+						$enumValue = $this->paramsGrouped[$name];
+						if (!$actionParam->getTypeReflector()->checkStringEnumValue($enumValue))
+							throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
+						
+						$serviceArguments[] = $enumValue;
+						$found = true;
+					}
+					else if ($actionParam->isOptional())
+					{
+						$serviceArguments[] = $actionParam->getDefaultValue();
+						$found = true;
+					}
+				}
 				else if ($actionParam->isArray()) // array
 				{
 					$arrayObj = new $type();
