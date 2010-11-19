@@ -41,12 +41,12 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->startNewTextBlock();
 		foreach($serviceNodes as $serviceNode)
 		{
-		    $this->writeService($serviceNode);
+			$this->writeService($serviceNode);
 		}
 		
-	    $this->writeMainClient($serviceNodes);
-	     
-    	$this->writeCsproj();
+		$this->writeMainClient($serviceNodes);
+		 
+		$this->writeCsproj();
 	}
 	
 	function writeEnum(DOMElement $enumNode)
@@ -105,7 +105,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("using System.Collections.Generic;");
 		$this->appendLine();
 		$this->appendLine("namespace Kaltura");
-        $this->appendLine("{");
+		$this->appendLine("{");
 		$type = $classNode->getAttribute("name");
 		// class definition
 		if ($classNode->hasAttribute("base"))
@@ -154,25 +154,25 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 			$property["name"] = $dotNetPropName;
 			
 			if ($isEnum)
-			    $dotNetPropType = $propertyNode->getAttribute("enumType");
-		    else if ($propType == "array")
-		        $dotNetPropType = "IList<".$propertyNode->getAttribute("arrayType").">";
-	        else if ($propType == "bool")
+				$dotNetPropType = $propertyNode->getAttribute("enumType");
+			else if ($propType == "array")
+				$dotNetPropType = "IList<".$propertyNode->getAttribute("arrayType").">";
+			else if ($propType == "bool")
 				$dotNetPropType  = "bool?";
 			else
-	            $dotNetPropType = $propType;
-	            
-            $property["type"] = $dotNetPropType;
-            if ($isFilter && $dotNetPropName == "OrderBy")
-            	$property["isNew"] = true;
+				$dotNetPropType = $propType;
+				
+			$property["type"] = $dotNetPropType;
+			if ($isFilter && $dotNetPropName == "OrderBy")
+				$property["isNew"] = true;
 				
 			switch($propType)
 			{
 				case "int":
-				    if ($isEnum)
-				        $property["default"] = "($dotNetPropType)Int32.MinValue";
-			        else
-					    $property["default"] = "Int32.MinValue";
+					if ($isEnum)
+						$property["default"] = "($dotNetPropType)Int32.MinValue";
+					else
+						$property["default"] = "Int32.MinValue";
 					break;
 				case "string":
 					$property["default"] = "null";
@@ -237,7 +237,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("");
 		
 		// CTor For XmlElement
-	    if ($classNode->hasAttribute("base"))
+		if ($classNode->hasAttribute("base"))
 		{
 			$this->appendLine("		public $type(XmlElement node) : base(node)");
 		}
@@ -249,63 +249,63 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("		{");
 		if ($classNode->childNodes->length)
 		{
-    		$this->appendLine("			foreach (XmlElement propertyNode in node.ChildNodes)"); 
-    		$this->appendLine("			{");
-    		$this->appendLine("				string txt = propertyNode.InnerText;");
-    		$this->appendLine("				switch (propertyNode.Name)");
-    		$this->appendLine("				{");
-    		foreach($classNode->childNodes as $propertyNode)
-    		{
-    			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
-    				continue;
-    				
-    			$propType = $propertyNode->getAttribute("type");
-    			$propName = $propertyNode->getAttribute("name");
-    			$isEnum = $propertyNode->hasAttribute("enumType");
-    			$dotNetPropName = $this->upperCaseFirstLetter($propName);
-    			$this->appendLine("					case \"$propName\":");
-    			switch($propType)
-    			{
-    				case "int":
-    				    if ($isEnum)
-    				    {
-    				        $enumType = $propertyNode->getAttribute("enumType");
-    				        $this->appendLine("						this.$dotNetPropName = ($enumType)ParseEnum(typeof($enumType), txt);");
-    				    }
-    				    else
-    					    $this->appendLine("						this.$dotNetPropName = ParseInt(txt);");
-    					break;
-    				case "string":
-    					if ($isEnum)
-    					{
-    						$enumType = $propertyNode->getAttribute("enumType");
-    						$this->appendLine("						this.$dotNetPropName = ($enumType)KalturaStringEnum.Parse(typeof($enumType), txt);");
-    					}
-    					else
-    						$this->appendLine("						this.$dotNetPropName = txt;");
-    					break;
-    				case "bool":
-    					$this->appendLine("						this.$dotNetPropName = ParseBool(txt);");
-    					break;
-    				case "float":
-    					$this->appendLine("						this.$dotNetPropName = ParseFloat(txt);");
-    					break;
-    				case "array":
-    				    $arrayType = $propertyNode->getAttribute("arrayType");
-    					$this->appendLine("				        this.$dotNetPropName = new List<$arrayType>();");
-    				    $this->appendLine("						foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
-    				    $this->appendLine("						{");
-    				    $this->appendLine("					        this.$dotNetPropName.Add(($arrayType)KalturaObjectFactory.Create(arrayNode));");
-    				    $this->appendLine("						}");
-    					break;
-    				default: // sub object
-    				    $this->appendLine("				        this.$dotNetPropName = ($propType)KalturaObjectFactory.Create(propertyNode);");
-    				    break;
-    			}
-    			$this->appendLine("						continue;");
-    		}
-    		$this->appendLine("				}");
-		    $this->appendLine("			}");
+			$this->appendLine("			foreach (XmlElement propertyNode in node.ChildNodes)"); 
+			$this->appendLine("			{");
+			$this->appendLine("				string txt = propertyNode.InnerText;");
+			$this->appendLine("				switch (propertyNode.Name)");
+			$this->appendLine("				{");
+			foreach($classNode->childNodes as $propertyNode)
+			{
+				if ($propertyNode->nodeType != XML_ELEMENT_NODE)
+					continue;
+					
+				$propType = $propertyNode->getAttribute("type");
+				$propName = $propertyNode->getAttribute("name");
+				$isEnum = $propertyNode->hasAttribute("enumType");
+				$dotNetPropName = $this->upperCaseFirstLetter($propName);
+				$this->appendLine("					case \"$propName\":");
+				switch($propType)
+				{
+					case "int":
+						if ($isEnum)
+						{
+							$enumType = $propertyNode->getAttribute("enumType");
+							$this->appendLine("						this.$dotNetPropName = ($enumType)ParseEnum(typeof($enumType), txt);");
+						}
+						else
+							$this->appendLine("						this.$dotNetPropName = ParseInt(txt);");
+						break;
+					case "string":
+						if ($isEnum)
+						{
+							$enumType = $propertyNode->getAttribute("enumType");
+							$this->appendLine("						this.$dotNetPropName = ($enumType)KalturaStringEnum.Parse(typeof($enumType), txt);");
+						}
+						else
+							$this->appendLine("						this.$dotNetPropName = txt;");
+						break;
+					case "bool":
+						$this->appendLine("						this.$dotNetPropName = ParseBool(txt);");
+						break;
+					case "float":
+						$this->appendLine("						this.$dotNetPropName = ParseFloat(txt);");
+						break;
+					case "array":
+						$arrayType = $propertyNode->getAttribute("arrayType");
+						$this->appendLine("						this.$dotNetPropName = new List<$arrayType>();");
+						$this->appendLine("						foreach(XmlElement arrayNode in propertyNode.ChildNodes)");
+						$this->appendLine("						{");
+						$this->appendLine("							this.$dotNetPropName.Add(($arrayType)KalturaObjectFactory.Create(arrayNode));");
+						$this->appendLine("						}");
+						break;
+					default: // sub object
+						$this->appendLine("						this.$dotNetPropName = ($propType)KalturaObjectFactory.Create(propertyNode);");
+						break;
+				}
+				$this->appendLine("						continue;");
+			}
+			$this->appendLine("				}");
+			$this->appendLine("			}");
 		}
 		$this->appendLine("		}");
 		$this->appendLine("		#endregion");
@@ -329,10 +329,10 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 			switch($propType)
 			{
 				case "int":
-				    if ($isEnum)
-				        $this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
-				    else
-					    $this->appendLine("			kparams.AddIntIfNotNull(\"$propName\", this.$dotNetPropName);");
+					if ($isEnum)
+						$this->appendLine("			kparams.AddEnumIfNotNull(\"$propName\", this.$dotNetPropName);");
+					else
+						$this->appendLine("			kparams.AddIntIfNotNull(\"$propName\", this.$dotNetPropName);");
 					break;
 				case "string":
 					if ($isEnum)
@@ -352,16 +352,16 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 				case "array":
 					$arrayType = $propertyNode->getAttribute("arrayType");
 					$this->appendLine("			if (this.$dotNetPropName != null)");
-		            $this->appendLine("			{");
-	                $this->appendLine("				int i = 0;");
-	                $this->appendLine("				foreach ($arrayType item in this.$dotNetPropName)");
-                	$this->appendLine("				{");
-                    $this->appendLine("					kparams.Add(\"".$propName.":\" + i + \":objectType\", item.GetType().Name);");
-                    $this->appendLine("					kparams.Add(\"".$propName.":\" + i, item.ToParams());");
-                    $this->appendLine("					i++;");
-	                $this->appendLine("				}");
-		            $this->appendLine("			}");
-		            break;
+					$this->appendLine("			{");
+					$this->appendLine("				int i = 0;");
+					$this->appendLine("				foreach ($arrayType item in this.$dotNetPropName)");
+					$this->appendLine("				{");
+					$this->appendLine("					kparams.Add(\"".$propName.":\" + i + \":objectType\", item.GetType().Name);");
+					$this->appendLine("					kparams.Add(\"".$propName.":\" + i, item.ToParams());");
+					$this->appendLine("					i++;");
+					$this->appendLine("				}");
+					$this->appendLine("			}");
+					break;
 			}
 		}
 		$this->appendLine("			return kparams;");
@@ -380,39 +380,39 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 	
 	function writeObjectFactoryClass(DOMNodeList $classNodes)
 	{
-	    $this->startNewTextBlock();
-	    $this->appendLine("using System;");
-	    $this->appendLine("using System.Text;");
-	    $this->appendLine("using System.Xml;");
-	    $this->appendLine("using System.Runtime.Serialization;");
-	    $this->appendLine();
-        $this->appendLine("namespace Kaltura");
-        $this->appendLine("{");
-        $this->appendLine("	public static class KalturaObjectFactory");
-        $this->appendLine("	{");
-        $this->appendLine("		public static object Create(XmlElement xmlElement)");
-        $this->appendLine("		{");
-        $this->appendLine("			switch (xmlElement[\"objectType\"].InnerText)");
-        $this->appendLine("			{");
-        foreach($classNodes as $classNode)
-        {
-            $this->appendLine("				case \"".$classNode->getAttribute("name")."\":");
-            $this->appendLine("					return new ".$classNode->getAttribute("name")."(xmlElement);");    
-        }
-        $this->appendLine("			}");
-        $this->appendLine("			throw new SerializationException(\"Invalid object type\");");
-        $this->appendLine("		}");
-        $this->appendLine("	}");
-        $this->appendLine("}");
-        
-        $file = "KalturaObjectFactory.cs";
+		$this->startNewTextBlock();
+		$this->appendLine("using System;");
+		$this->appendLine("using System.Text;");
+		$this->appendLine("using System.Xml;");
+		$this->appendLine("using System.Runtime.Serialization;");
+		$this->appendLine();
+		$this->appendLine("namespace Kaltura");
+		$this->appendLine("{");
+		$this->appendLine("	public static class KalturaObjectFactory");
+		$this->appendLine("	{");
+		$this->appendLine("		public static object Create(XmlElement xmlElement)");
+		$this->appendLine("		{");
+		$this->appendLine("			switch (xmlElement[\"objectType\"].InnerText)");
+		$this->appendLine("			{");
+		foreach($classNodes as $classNode)
+		{
+			$this->appendLine("				case \"".$classNode->getAttribute("name")."\":");
+			$this->appendLine("					return new ".$classNode->getAttribute("name")."(xmlElement);");	
+		}
+		$this->appendLine("			}");
+		$this->appendLine("			throw new SerializationException(\"Invalid object type\");");
+		$this->appendLine("		}");
+		$this->appendLine("	}");
+		$this->appendLine("}");
+		
+		$file = "KalturaObjectFactory.cs";
 		$this->addFile("KalturaClient/".$file, $this->getTextBlock());
-        $this->_csprojIncludes[] = $file;
+		$this->_csprojIncludes[] = $file;
 	}
 	
 	function writeCsproj()
 	{
-	    $csprojDoc = new DOMDocument();
+		$csprojDoc = new DOMDocument();
 		$csprojDoc->formatOutput = true;
 		$csprojDoc->load($this->_sourcePath."/KalturaClient/KalturaClient.csproj");
 		$csprojXPath = new DOMXPath($csprojDoc);
@@ -422,32 +422,32 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		
 		foreach($this->_csprojIncludes as $include)
 		{
-		    $compileElement = $csprojDoc->createElement("Compile");
-		    $compileElement->setAttribute("Include", str_replace("/","\\", $include));
-		    $compileItemGroupElement->appendChild($compileElement);
+			$compileElement = $csprojDoc->createElement("Compile");
+			$compileElement->setAttribute("Include", str_replace("/","\\", $include));
+			$compileItemGroupElement->appendChild($compileElement);
 		}
 		$this->addFile("KalturaClient/KalturaClient.csproj", $csprojDoc->saveXML());
 	}
 	
 	function writeService(DOMElement $serviceNode)
 	{
-	    $this->startNewTextBlock();
-	    $this->appendLine("using System;");
+		$this->startNewTextBlock();
+		$this->appendLine("using System;");
 		$this->appendLine("using System.Xml;");
 		$this->appendLine("using System.Collections.Generic;");
 		$this->appendLine("using System.IO;");
 		$this->appendLine();
 		$this->appendLine("namespace Kaltura");
-        $this->appendLine("{");
+		$this->appendLine("{");
 		$serviceName = $serviceNode->getAttribute("name");
 		
 		$dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
 		$dotNetServiceType = "Kaltura" . $dotNetServiceName;
 		
 		$this->appendLine();
-		$this->appendLine("    public class $dotNetServiceType : KalturaServiceBase");
+		$this->appendLine("	public class $dotNetServiceType : KalturaServiceBase");
 		$this->appendLine("	{");
-		$this->appendLine("    public $dotNetServiceType(KalturaClient client)");
+		$this->appendLine("	public $dotNetServiceType(KalturaClient client)");
 		$this->appendLine("			: base(client)");
 		$this->appendLine("		{");
 		$this->appendLine("		}");	   
@@ -456,10 +456,10 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$actionNodes = $serviceNode->childNodes;
 		foreach($actionNodes as $actionNode)
 		{
-		    if ($actionNode->nodeType != XML_ELEMENT_NODE)
+			if ($actionNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 				
-		    $this->writeAction($serviceName, $actionNode);
+			$this->writeAction($serviceName, $actionNode);
 		}
 		$this->appendLine("	}");
 		$this->appendLine("}");
@@ -471,22 +471,22 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 	
 	function writeAction($serviceName, DOMElement $actionNode)
 	{
-	    $action = $actionNode->getAttribute("name");
-	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
-	    $resultType = $resultNode->getAttribute("type");
+		$action = $actionNode->getAttribute("name");
+		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
+		$resultType = $resultNode->getAttribute("type");
 		
 		switch($resultType)
 		{
-		    case null:
-		        $dotNetOutputType = "void";
-		        break;
-	        case "array":
-	            $arrayType = $resultNode->getAttribute("arrayType"); 
-	            $dotNetOutputType = "IList<".$arrayType.">";
-		        break;
-	        default:
-	            $dotNetOutputType = $resultType;
-	            break;
+			case null:
+				$dotNetOutputType = "void";
+				break;
+			case "array":
+				$arrayType = $resultNode->getAttribute("arrayType"); 
+				$dotNetOutputType = "IList<".$arrayType.">";
+				break;
+			default:
+				$dotNetOutputType = $resultType;
+				break;
 		}
 			
 		$signaturePrefix = "public $dotNetOutputType ".$this->upperCaseFirstLetter($action)."(";
@@ -563,49 +563,49 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		foreach($paramNodes as $paramNode)
 		{
 			$paramType = $paramNode->getAttribute("type");
-		    $paramName = $paramNode->getAttribute("name");
-		    $isEnum = $paramNode->hasAttribute("enumType");
-		    
-		    if ($haveFiles === false && $paramType === "file")
-		    {
-		        $haveFiles = true;
-		        $this->appendLine("			KalturaFiles kfiles = new KalturaFiles();");
-		    }     
+			$paramName = $paramNode->getAttribute("name");
+			$isEnum = $paramNode->hasAttribute("enumType");
+			
+			if ($haveFiles === false && $paramType === "file")
+			{
+				$haveFiles = true;
+				$this->appendLine("			KalturaFiles kfiles = new KalturaFiles();");
+			}	 
 
-	        switch ($paramType)
-	        {
-                case "string":
-                    if ($isEnum)
-                		$this->appendLine("			kparams.AddStringEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-                	else
-                		$this->appendLine("			kparams.AddStringIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-                    break;
-                case "float":
-                        $this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-                    break;
-               	case "int":
-	                if ($isEnum)
-				        $this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-			        else
-                        $this->appendLine("			kparams.AddIntIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-                    break;
-                case "bool":
-                    $this->appendLine("			kparams.AddBoolIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
-                    break;
-                case "array":
-                    $this->appendLine("			foreach(".$paramNode->getAttribute("arrayType")." obj in ".$this->fixParamName($paramName).")");
-                    $this->appendLine("			{");
-                    $this->appendLine("				kparams.Add(\"$paramName\", obj.ToParams());");
-                    $this->appendLine("			}");
-                    break;
-                case "file":
-                    $this->appendLine("			kfiles.Add(\"$paramName\", ".$this->fixParamName($paramName).");");
-                    break;
-                default: // for objects
-                	$this->appendLine("			if (".$this->fixParamName($paramName)." != null)");
-                    $this->appendLine("				kparams.Add(\"$paramName\", ".$this->fixParamName($paramName).".ToParams());");
-                    break;
-		    }
+			switch ($paramType)
+			{
+				case "string":
+					if ($isEnum)
+						$this->appendLine("			kparams.AddStringEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					else
+						$this->appendLine("			kparams.AddStringIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
+				case "float":
+						$this->appendLine("			kparams.AddFloatIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
+			   	case "int":
+					if ($isEnum)
+						$this->appendLine("			kparams.AddEnumIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					else
+						$this->appendLine("			kparams.AddIntIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
+				case "bool":
+					$this->appendLine("			kparams.AddBoolIfNotNull(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
+				case "array":
+					$this->appendLine("			foreach(".$paramNode->getAttribute("arrayType")." obj in ".$this->fixParamName($paramName).")");
+					$this->appendLine("			{");
+					$this->appendLine("				kparams.Add(\"$paramName\", obj.ToParams());");
+					$this->appendLine("			}");
+					break;
+				case "file":
+					$this->appendLine("			kfiles.Add(\"$paramName\", ".$this->fixParamName($paramName).");");
+					break;
+				default: // for objects
+					$this->appendLine("			if (".$this->fixParamName($paramName)." != null)");
+					$this->appendLine("				kparams.Add(\"$paramName\", ".$this->fixParamName($paramName).".ToParams());");
+					break;
+			}
 		}
 		
 		if ($haveFiles)
@@ -629,30 +629,30 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		{
 			switch ($resultType)
 			{
-			    case "array":
-    				$arrayType = $resultNode->getAttribute("arrayType");
-    				$this->appendLine("			IList<$arrayType> list = new List<$arrayType>();");
-    				$this->appendLine("			foreach(XmlElement node in result.ChildNodes)");
-    				$this->appendLine("			{");
-    				$this->appendLine("				list.Add(($arrayType)KalturaObjectFactory.Create(node));");
-    				$this->appendLine("			}");
-    				$this->appendLine("			return list;");
-				    break;
-			    case "int":
-            	    $this->appendLine("			return int.Parse(result.InnerText);");
-            	    break;
-			    case "float":
-            	    $this->appendLine("			return Single.Parse(result.InnerText);");
-            	    break;
-			    case "bool":
-            	    $this->appendLine("			return bool.Parse(result.InnerText);");
-            	    break;
-			    case "string":
-            	    $this->appendLine("			return result.InnerText;");
-            	    break;
-			    default:
-            	    $this->appendLine("			return ($resultType)KalturaObjectFactory.Create(result);");
-            	    break;
+				case "array":
+					$arrayType = $resultNode->getAttribute("arrayType");
+					$this->appendLine("			IList<$arrayType> list = new List<$arrayType>();");
+					$this->appendLine("			foreach(XmlElement node in result.ChildNodes)");
+					$this->appendLine("			{");
+					$this->appendLine("				list.Add(($arrayType)KalturaObjectFactory.Create(node));");
+					$this->appendLine("			}");
+					$this->appendLine("			return list;");
+					break;
+				case "int":
+					$this->appendLine("			return int.Parse(result.InnerText);");
+					break;
+				case "float":
+					$this->appendLine("			return Single.Parse(result.InnerText);");
+					break;
+				case "bool":
+					$this->appendLine("			return bool.Parse(result.InnerText);");
+					break;
+				case "string":
+					$this->appendLine("			return result.InnerText;");
+					break;
+				default:
+					$this->appendLine("			return ($resultType)KalturaObjectFactory.Create(result);");
+					break;
 			}
 		}
 		$this->appendLine("		}");
@@ -663,28 +663,28 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$signature = "";
 		foreach($paramNodes as $paramNode)
 		{
-		    $paramType = $paramNode->getAttribute("type");
-		    $paramName = $paramNode->getAttribute("name");
-		    $isEnum = $paramNode->hasAttribute("enumType");
-		    
-		    switch($paramType)
-		    {
-		        case "array":
-		            $dotNetType = "IList<".$paramNode->getAttribute("arrayType").">";
-		            break;
-		        case "file":
-		            $dotNetType = "FileStream";
-		            break;
-		        case "int":
-		            if ($isEnum)
-		                $dotNetType = $paramNode->getAttribute("enumType");
-	                else 
-                        $dotNetType = $paramType;	        
-                    break;            
-		        default:
-		            $dotNetType = $paramType;
-		            break;
-		    }
+			$paramType = $paramNode->getAttribute("type");
+			$paramName = $paramNode->getAttribute("name");
+			$isEnum = $paramNode->hasAttribute("enumType");
+			
+			switch($paramType)
+			{
+				case "array":
+					$dotNetType = "IList<".$paramNode->getAttribute("arrayType").">";
+					break;
+				case "file":
+					$dotNetType = "FileStream";
+					break;
+				case "int":
+					if ($isEnum)
+						$dotNetType = $paramNode->getAttribute("enumType");
+					else 
+						$dotNetType = $paramType;			
+					break;			
+				default:
+					$dotNetType = $paramType;
+					break;
+			}
 
 			$signature .= "$dotNetType ".$this->fixParamName($paramName).", ";
 		}
@@ -697,37 +697,41 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 	
 	function writeMainClient(DOMNodeList  $serviceNodes)
 	{
-	    $this->startNewTextBlock();
-	    
-	    $this->appendLine("using System;");
-	    $this->appendLine();
-	    
+		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+	
+		$this->startNewTextBlock();
+		
+		$this->appendLine("using System;");
+		$this->appendLine();
+		
 		$this->appendLine("namespace Kaltura");
 		$this->appendLine("{");
-	    $this->appendLine("    public class KalturaClient : KalturaClientBase");
-        $this->appendLine("    {");
-        $this->appendLine("        public KalturaClient(KalturaConfiguration config)");
-        $this->appendLine("            : base(config)");
-        $this->appendLine("        {");
-        $this->appendLine("        }");
-	    foreach($serviceNodes as $serviceNode)
+		$this->appendLine("	public class KalturaClient : KalturaClientBase");
+		$this->appendLine("	{");
+		$this->appendLine("		protected string _ApiVersion = \"$apiVersion\";");
+		$this->appendLine("		");
+		$this->appendLine("		public KalturaClient(KalturaConfiguration config)");
+		$this->appendLine("			: base(config)");
+		$this->appendLine("		{");
+		$this->appendLine("		}");
+		foreach($serviceNodes as $serviceNode)
 		{
-		    $serviceName = $serviceNode->getAttribute("name");
-		    $dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
-		    $dotNetServiceType = "Kaltura" . $dotNetServiceName;
-		    
-		    $this->appendLine();		
-		    $this->appendLine("		$dotNetServiceType _$dotNetServiceName;");
-    		$this->appendLine("		public $dotNetServiceType $dotNetServiceName");
-    		$this->appendLine("		{");
-    		$this->appendLine("			get");
-    		$this->appendLine("			{");
-    		$this->appendLine("				if (_$dotNetServiceName == null)");
-    		$this->appendLine("					_$dotNetServiceName = new $dotNetServiceType(this);");
-    		$this->appendLine("");
-    		$this->appendLine("				return _$dotNetServiceName;");
-    		$this->appendLine("			}");
-    		$this->appendLine("		}");
+			$serviceName = $serviceNode->getAttribute("name");
+			$dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
+			$dotNetServiceType = "Kaltura" . $dotNetServiceName;
+			
+			$this->appendLine();		
+			$this->appendLine("		$dotNetServiceType _$dotNetServiceName;");
+			$this->appendLine("		public $dotNetServiceType $dotNetServiceName");
+			$this->appendLine("		{");
+			$this->appendLine("			get");
+			$this->appendLine("			{");
+			$this->appendLine("				if (_$dotNetServiceName == null)");
+			$this->appendLine("					_$dotNetServiceName = new $dotNetServiceType(this);");
+			$this->appendLine("");
+			$this->appendLine("				return _$dotNetServiceName;");
+			$this->appendLine("			}");
+			$this->appendLine("		}");
 		}
 		$this->appendLine("	}");
 		$this->appendLine("}");
@@ -735,7 +739,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->addFile("KalturaClient/KalturaClient.cs", $this->getTextBlock());
 
 		// not needed because it is included in the sources
-	    //$this->_csprojIncludes[] = "KalturaClient.cs";
+		//$this->_csprojIncludes[] = "KalturaClient.cs";
 	}
 	
 	private function loadEnums(DOMNodeList $enums)

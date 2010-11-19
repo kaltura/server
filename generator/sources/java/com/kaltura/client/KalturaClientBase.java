@@ -36,6 +36,7 @@ import com.kaltura.client.utils.XmlUtils;
  */
 public class KalturaClientBase {
 
+    protected String apiVersion;
     protected KalturaConfiguration kalturaConfiguration;
     protected String sessionId;
     protected List<KalturaServiceActionCall> callsQueue;
@@ -100,7 +101,7 @@ public class KalturaClientBase {
         KalturaFiles kfiles = new KalturaFiles();
 
         // append the basic params
-        kparams.put("apiVersion", this.kalturaConfiguration.getApiVersion());
+        kparams.put("apiVersion", this.apiVersion);
         kparams.put("clientTag", this.kalturaConfiguration.getClientTag());
         kparams.addIntIfNotNull("format", this.kalturaConfiguration.getServiceFormat().getHashCode());
 

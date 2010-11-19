@@ -1,6 +1,9 @@
 <?php
 class Php5ClientGenerator extends ClientGeneratorFromXml
 {
+	/**
+	 * @var DOMDocument
+	 */
 	private $_doc = null;
 	
 	function Php5ClientGenerator($xmlPath)
@@ -303,8 +306,15 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeMainClient(DOMNodeList $serviceNodes)
 	{
+		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+		
 		$this->appendLine("class KalturaClient extends KalturaClientBase");
 		$this->appendLine("{");
+		$this->appendLine("	/**");
+		$this->appendLine("	 * @var string");
+		$this->appendLine("	 */");
+		$this->appendLine("	protected \$apiVersion = '$apiVersion';");
+		$this->appendLine("");
 		
 		foreach($serviceNodes as $serviceNode)
 		{

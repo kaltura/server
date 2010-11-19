@@ -8,6 +8,9 @@
  */
 class JavaClientGenerator extends ClientGeneratorFromXml 
 {
+	/**
+	 * @var DOMDocument
+	 */
 	private $_doc = null;
 	private $_csprojIncludes = array ();
 	
@@ -639,6 +642,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	function writeMainClient(DOMNodeList $serviceNodes) 
 	{
+		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		
 		$imports = "";
 		$imports .= "package com.kaltura.client;\n";
@@ -646,11 +650,13 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->startNewTextBlock ();
 		$this->appendLine ( $this->getBanner () );
 		$this->appendLine ( "public class KalturaClient extends KalturaClientBase {" );
-		$this->appendLine ( "" );
-		$this->appendLine ( "    public KalturaClient(KalturaConfiguration config) {" );
-		$this->appendLine ( "        super(config);" );
-		$this->appendLine ( "    }" );
-		$this->appendLine ( "" );
+		$this->appendLine ( "	" );
+		$this->appendLine ( "	protected String apiVersion = \"$apiVersion\";" );
+		$this->appendLine ( "	" );
+		$this->appendLine ( "	public KalturaClient(KalturaConfiguration config) {" );
+		$this->appendLine ( "		super(config);" );
+		$this->appendLine ( "	}" );
+		$this->appendLine ( "	" );
 		
 		foreach ( $serviceNodes as $serviceNode ) 
 		{
@@ -659,14 +665,14 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$javaServiceType = "Kaltura" . $this->upperCaseFirstLetter ( $javaServiceName );
 			$imports .= "import com.kaltura.client.services.$javaServiceType;\n";
 			
-			$this->appendLine ( "    protected $javaServiceType $javaServiceName;" );
-			$this->appendLine ( "    public $javaServiceType get" . $this->upperCaseFirstLetter ( $javaServiceName ) . "() {" );
-			$this->appendLine ( "        if(this.$javaServiceName == null)" );
-			$this->appendLine ( "            this.$javaServiceName = new $javaServiceType(this);" );
-			$this->appendLine ( "" );
-			$this->appendLine ( "        return this.$javaServiceName;" );
-			$this->appendLine ( "    }" );
-			$this->appendLine ( "" );
+			$this->appendLine ( "	protected $javaServiceType $javaServiceName;" );
+			$this->appendLine ( "	public $javaServiceType get" . $this->upperCaseFirstLetter ( $javaServiceName ) . "() {" );
+			$this->appendLine ( "		if(this.$javaServiceName == null)" );
+			$this->appendLine ( "			this.$javaServiceName = new $javaServiceType(this);" );
+			$this->appendLine ( "	" );
+			$this->appendLine ( "		return this.$javaServiceName;" );
+			$this->appendLine ( "	}" );
+			$this->appendLine ( "	" );
 		}
 		$this->appendLine ( "}" );
 		

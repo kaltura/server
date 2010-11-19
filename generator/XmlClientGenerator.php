@@ -1,7 +1,14 @@
 <?php
 class XmlClientGenerator extends ClientGeneratorFromPhp  
 {
+    /**
+     * @var DOMDocument
+     */
     private $_doc = null;
+    
+    /**
+     * @var DOMElement
+     */
     private $_xmlElement = null;
     
     public function XmlClientGenerator()
@@ -16,6 +23,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->load();
 		
 	    $this->_xmlElement = $this->_doc->createElement("xml");
+	    $this->_xmlElement->setAttribute('apiVersion', KALTURA_API_VERSION);
 	    $this->_doc->appendChild($this->_xmlElement);
 	    
         $this->_xmlElement->appendChild(new DOMComment(" Generated on date " . strftime("%d/%m/%y %H:%M:%S" , time()) . " "));

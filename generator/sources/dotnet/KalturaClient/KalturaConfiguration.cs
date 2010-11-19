@@ -11,7 +11,6 @@ namespace Kaltura
         private EKalturaServiceFormat _ServiceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
         private int _PartnerId;
         private IKalturaLogger _Logger;
-        private string _APIVersion = "3.0";
         private int _Timeout = 100000;
         private string _ClientTag = "dotnet";
 
@@ -40,12 +39,6 @@ namespace Kaltura
         {
             set { _Logger = value;  }
             get { return _Logger; }
-        }
-
-        public string APIVersion
-        {
-            set { _APIVersion = value; }
-            get { return _APIVersion; }
         }
 
         public int Timeout

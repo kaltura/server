@@ -1,11 +1,15 @@
 <?php
-define("KALTURA_API_VERSION", "3.0");
 define("KALTURA_SERVICE_FORMAT_JSON", 1);
 define("KALTURA_SERVICE_FORMAT_XML",  2);
 define("KALTURA_SERVICE_FORMAT_PHP",  3);
 	
 class KalturaClientBase 
 {
+	/**
+	 * @var string
+	 */
+	var $apiVersion = null;
+	
 	/**
 	 * @var KalturaConfiguration
 	 */
@@ -51,7 +55,7 @@ class KalturaClientBase
 		$this->log("trying to call service: [".$service.".".$action."] using session: [" .$this->ks . "]");
 		
 		// append the basic params
-		$this->addParam($params, "apiVersion", KALTURA_API_VERSION);
+		$this->addParam($params, "apiVersion", $this->apiVersion);
 		
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
 		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)

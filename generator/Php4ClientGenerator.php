@@ -1,6 +1,9 @@
 <?php
 class Php4ClientGenerator extends ClientGeneratorFromXml
 {
+	/**
+	 * @var DOMDocument
+	 */
 	private $_doc = null;
 	
 	function Php4ClientGenerator($xmlPath)
@@ -268,8 +271,15 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function writeMainClient(DOMNodeList $serviceNodes)
 	{
+		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+	
 		$this->appendLine("class KalturaClient extends KalturaClientBase");
 		$this->appendLine("{");
+		$this->appendLine("	/**");
+		$this->appendLine("	 * @var string");
+		$this->appendLine("	 */");
+		$this->appendLine("	var \$apiVersion = '$apiVersion';");
+		$this->appendLine("");
 		
 		foreach($serviceNodes as $serviceNode)
 		{

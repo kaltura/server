@@ -15,7 +15,6 @@ public class KalturaConfiguration {
 	protected String adminSecret;	
 	protected String endpoint;
 	protected int timeout = 100000;
-	protected String apiVersion = "3.0";
 	protected String clientTag = "java";
     protected EKalturaServiceFormat serviceFormat = EKalturaServiceFormat.RESPONSE_TYPE_XML;
 	
@@ -69,14 +68,6 @@ public class KalturaConfiguration {
 
 	public void setParams(Map<String, String> params) {
 		this.params = params;
-	}
-
-	public String getApiVersion() {
-		return apiVersion;
-	}
-
-	public void setApiVersion(String apiVersion) {
-		this.apiVersion = apiVersion;
 	}
 
 	public String getClientTag() {

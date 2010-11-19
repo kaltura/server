@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+define("KALTURA_API_VERSION", file_get_contents(KALTURA_API_PATH.DIRECTORY_SEPARATOR."VERSION.txt"));
 
 
 // Autoloader

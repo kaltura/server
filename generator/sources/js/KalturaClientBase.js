@@ -256,11 +256,14 @@ KalturaClientBase.prototype.init = function(config)
 	}
 };
 
-KalturaClientBase.prototype.KALTURA_API_VERSION = "3.0";
 KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSON = 1;
 KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_XML = 2;
 KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_PHP = 3;
 KalturaClientBase.prototype.KALTURA_SERVICE_FORMAT_JSONP = 9;
+/**
+ * @param string
+ */
+KalturaClientBase.prototype.apiVersion = null;
 /**
  * @param KalturaConfiguration The Kaltura Client - this is the facade through which all service actions should be called.
  */
@@ -310,7 +313,7 @@ KalturaClientBase.prototype.doQueue = function(callback)
 	var files = new Object();
 	this.log("service url: [" + this.config.serviceUrl + "]");
 	// append the basic params
-	this.addParam(params, "apiVersion", this.KALTURA_API_VERSION);
+	this.addParam(params, "apiVersion", this.apiVersion);
 	this.addParam(params, "format", this.config.format);
 	this.addParam(params, "clientTag", this.config.clientTag);
 	var url = this.config.serviceUrl + this.config.serviceBase;

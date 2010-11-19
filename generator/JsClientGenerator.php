@@ -305,6 +305,8 @@ class JsClientGenerator extends ClientGeneratorFromPhp
 	
 	private function writeMainClassDeclaration()
 	{
+		$apiVersion = KALTURA_API_VERSION;
+	
 		$this->echoLine();
 		$this->echoLine("function KalturaClient(config)");
 		$this->echoLine("{");
@@ -313,6 +315,7 @@ class JsClientGenerator extends ClientGeneratorFromPhp
 		
 		$this->echoLine();
 		$this->echoLine("KalturaClient.prototype = new KalturaClientBase()");
+		$this->echoLine("KalturaClientBase.prototype.apiVersion = \"$apiVersion\";");
 	}
 	
 	private function writeMainClassServiceDeclaration(KalturaServiceReflector $serviceReflector)

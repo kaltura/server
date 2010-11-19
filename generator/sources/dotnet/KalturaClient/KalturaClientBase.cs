@@ -14,7 +14,8 @@ namespace Kaltura
     {
         #region Private Fields
 
-        private KalturaConfiguration _Config;
+        protected string _ApiVersion;
+        protected KalturaConfiguration _Config;
         private string _KS;
         private bool _ShouldLog;
         private List<KalturaServiceActionCall> _CallsQueue;
@@ -92,7 +93,7 @@ namespace Kaltura
             KalturaFiles kfiles = new KalturaFiles();
 
             // append the basic params
-            kparams.Add("apiVersion", this._Config.APIVersion);
+            kparams.Add("apiVersion", this._ApiVersion);
             kparams.Add("clientTag", this._Config.ClientTag);
             kparams.AddIntIfNotNull("format", this._Config.ServiceFormat.GetHashCode());
 
