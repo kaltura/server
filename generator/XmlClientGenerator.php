@@ -108,35 +108,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$enumElement->appendChild($const);
 		}
 		
-		if ($typeReflector->isDynamicEnum())
-		{
-			$type = $typeReflector->getType();
-			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func("$type::getEnumClass");
-//			$baseEnumName = $type::getEnumClass();
-			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
-			foreach($pluginInstances as $pluginInstance)
-			{
-				$enums = $pluginInstance->getEnums($baseEnumName);
-				foreach($enums as $enum)
-				{
-					// TODO remove call_user_func after moving to php 5.3
-					$enumConstans = call_user_func("$enum::getAdditionalValues");
-//					$enumConstans = $enum::getAdditionalValues();
-					foreach($enumConstans as $name => $value)
-					{
-						$const = $this->_doc->createElement("const");
-						$const->setAttribute("name", $name);
-						// TODO remove call_user_func after moving to php 5.3
-						$const->setAttribute("value", call_user_func("$enum::get")->apiValue($value));
-//						$const->setAttribute("value", $enum::get()->apiValue($value));
-						
-						$enumElement->appendChild($const);
-					}
-				}
-			}
-		}
-		
 		return $enumElement;
 	}
 	
