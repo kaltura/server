@@ -41,13 +41,13 @@
 				KDLConstants::VideoIndex=>array("icod","intermediate codec","apcn","apch"),
 			),
 			KDLTranscoders::FFMPEG => array(
-				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
-				KDLConstants::VideoIndex=>array("theora", "iv41","iv50","icod","intermediate codec","apcn","apch"),
+//				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
+				KDLConstants::VideoIndex=>array("iv41","iv50","icod","intermediate codec","apcn","apch"),
 //				KDLConstants::AudioIndex=>array("vorbis"),
 			),
 			KDLTranscoders::FFMPEG_AUX => array(
-				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
-				KDLConstants::VideoIndex=>array("theora", "iv41","iv50","icod","intermediate codec","apcn","apch"),
+//				KDLConstants::ContainerIndex=>array("ogg", "ogv"),
+				KDLConstants::VideoIndex=>array("iv41","iv50","icod","intermediate codec","apcn","apch"),
 //				KDLConstants::AudioIndex=>array("vorbis"),
 			),
 			KDLTranscoders::MENCODER => array(
