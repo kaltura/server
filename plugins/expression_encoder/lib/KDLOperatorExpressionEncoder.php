@@ -155,7 +155,7 @@ $tryXML = "<StreamInfo
 		return $xml->asXML();
 	}
 
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target)
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
     {
     	return KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName;
     }
