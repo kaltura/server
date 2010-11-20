@@ -15,7 +15,7 @@ class KDLTranscoderQTPTools extends KDLOperatorBase {
     		parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
     }
 
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target)
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 /*
 pcastaction encode --input=/Users/macuser/Downloads/APCN.pr_the_dark_knight_now_showing_DM.mov --output=/web/content/tmp/apcn.h264_hint_server.mp4 --encoder=h264_hint_server --basedir=~/Downloads/tmp
@@ -28,7 +28,6 @@ pcastaction encode --input=__input__ --output=__outPut__ --encoder=desktop --bas
  // ~/Downloads/qt_tools/pieces/bin/qt_export --video=avc1,,100 --audio=mp4a APCN.pr_the_dark_knight_now_showing_DM.mov aaa227icod.mp5  --replacefile -1
 //		return "qqqqqwwwww"; //$design->ToString();
 	$cmdStr = null;
-	$extra=$this->_extra;
 // rem ffmpeg -i <infilename> -vcodec flv   -r 25 -b 500k  -ar 22050 -ac 2 -acodec libmp3lame -f flv -t 60 -y <outfilename>
 $vcodecParams = "fl";
 $format = "fl";
