@@ -124,18 +124,18 @@ include_once("KDLTranscoderCommand.php");
 				if(!is_null($ee3Id)) {
 //				if(array_key_exists(KDLTranscoders::EE3, $flavor->_transcoders)) {
 $tr = $flavor->_transcoders[$ee3Id];
-//kLog::log(__METHOD__."transcoders==>\n".print_r($trnsStr,true));
-kLog::log(__METHOD__."\n"."transcoder==>\n".print_r($tr,true)."\n<--");
+//KalturaLog::log(__METHOD__."transcoders==>\n".print_r($trnsStr,true));
+KalturaLog::log(__METHOD__."\n"."transcoder==>\n".print_r($tr,true)."\n<--");
 if(is_null($tr->_cmd))
-	kLog::log(__METHOD__." - ee3 cmd is null");
-//					kLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_id."\n<--");
-//					kLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_cmd."\n<--");
+	KalturaLog::log(__METHOD__." - ee3 cmd is null");
+//					KalturaLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_id."\n<--");
+//					KalturaLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_cmd."\n<--");
 					$ee3 = new SimpleXMLElement($flavor->_transcoders[$ee3Id]->_cmd);
 					$ee3Streams=null;
 					if(!is_null($ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile)) {
 						$ee3Streams = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile->Streams;
 						if($ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']!=$flavor->_video->_bitRate) {
-kLog::log(__METHOD__."-->xmlBR=".$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavor->_video->_bitRate);
+KalturaLog::log(__METHOD__."-->xmlBR=".$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavor->_video->_bitRate);
 							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']=$flavor->_video->_bitRate;
 							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate']=round($flavor->_video->_bitRate*1.3);
 						}
