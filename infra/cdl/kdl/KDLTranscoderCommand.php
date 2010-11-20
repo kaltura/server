@@ -21,13 +21,13 @@ class KDLOperatorWrapper extends KDLOperatorBase {
     	parent::__construct($id,$name,$srcBlacklist,$trgBlacklist);
     }
 
-	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target)
+	public function GenerateCommandLine(KDLFlavor $predesign, KDLFlavor $target, $extra=null)
 	{
 		$cmdLineGenerator = $target->SetTranscoderCmdLineGenerator();
 
 		if($target->_video)
 			$cmdLineGenerator->_vidBr = $target->_video->_bitRate;
-		$params = new KDLOperationParams($this->_id, $this->_extra);
+		$params = new KDLOperationParams($this->_id, $extra);
 		return $cmdLineGenerator->Generate($params, $predesign->_video->_bitRate);
 	}
 	
