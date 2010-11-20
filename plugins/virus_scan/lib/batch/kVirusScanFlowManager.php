@@ -191,7 +191,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					KalturaLog::err('Entry not found with id ['.$entry->getId().']');
 				}
 				else {
-					$entry->setStatus(VirusScanEntryStatus::get()->apiValue(VirusScanEntryStatus::INFECTED));
+					$entry->setStatus(VirusScanEntryStatus::get()->coreValue(VirusScanEntryStatus::INFECTED));
 					$entry->save();
 				}
 				
