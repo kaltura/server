@@ -10,7 +10,7 @@ abstract class KDLOperatorBase {
 	protected	$_targetBlacklist = array();
 	
 
-	abstract public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target);
+	abstract public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null);
 	
 	public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
 	{
@@ -18,7 +18,7 @@ abstract class KDLOperatorBase {
 	}
 	
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
-		kLog::log("KDLOperatorBase::__construct: id($id), name($name), sourceBlacklist(".print_r($sourceBlacklist,true)."), targetBlacklist(".print_r($targetBlacklist,true).")");
+		KalturaLog::log("KDLOperatorBase::__construct: id($id), name($name), sourceBlacklist(".print_r($sourceBlacklist,true)."), targetBlacklist(".print_r($targetBlacklist,true).")");
     	$this->_id=$id;
 		$this->_name=$name;
 		$this->_sourceBlacklist = $sourceBlacklist;
