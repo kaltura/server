@@ -22,12 +22,12 @@ class KDLWrap
 		conversionEngineType::FFMPEG_AUX=>KDLTranscoders::FFMPEG_AUX,
 		conversionEngineType::FFMPEG_VP8=>KDLTranscoders::FFMPEG_VP8,
 		conversionEngineType::EXPRESSION_ENCODER3=>KDLTranscoders::EE3,
-		"expressionEncoder.ExpressionEncoder"=>KDLTranscoders::EXPRESSION_ENCODER,
+//		"expressionEncoder.ExpressionEncoder"=>KDLTranscoders::EXPRESSION_ENCODER,
 		"quickTimeTools.QuickTimeTools"=>KDLTranscoders::QUICK_TIME_PLAYER_TOOLS,
-		"fastStart.FastStart"=>KDLTranscoders::QT_FASTSTART,
-		"avidemux.Avidemux"=>KDLTranscoders::AVIDEMUX,
-		conversionEngineType::PDF2SWF=>KDLTranscoders::PDF2SWF,
-		conversionEngineType::PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
+//		"fastStart.FastStart"=>KDLTranscoders::QT_FASTSTART,
+//		"avidemux.Avidemux"=>KDLTranscoders::AVIDEMUX,
+//		conversionEngineType::PDF2SWF=>KDLTranscoders::PDF2SWF,
+//		conversionEngineType::PDF_CREATOR=>KDLTranscoders::PDF_CREATOR,
 	);
 	
 	/* ------------------------------
@@ -237,10 +237,13 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 					$str = $cdlTrnsId;
 					$commandLines[$cdlTrnsId]=$transObj->_cmd;
 				}
+				
+					// Add qt-faststart processing for mp4 targets (relevant to pre-opertors mode) 
 				if($flavor->getFormat()=="mp4" && ($cdlTrnsId==conversionEngineType::FFMPEG || $cdlTrnsId==conversionEngineType::FFMPEG_AUX || $cdlTrnsId==conversionEngineType::MENCODER)){
 					$fsAddonStr = kConvertJobData::CONVERSION_MILTI_COMMAND_LINE_SEPERATOR.kConvertJobData::CONVERSION_FAST_START_SIGN;
 					$commandLines[$cdlTrnsId].=$fsAddonStr;
 				}
+				
 				if($convEnginesAssociated!==null) {
 					$convEnginesAssociated = $convEnginesAssociated.",".$str;
 				}
@@ -596,23 +599,23 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 	$id = $oprObj->_id;
 KalturaLog::log(__METHOD__.":operators id=$id :");
 	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_QUICK_TIME_PLAYER_TOOLS);
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
 	}
-	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_EXPRESSION_ENCODER);
-	}
-	else if($id==KDLTranscoders::QT_FASTSTART) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_FAST_START);
-	}
-	else if($id==KDLTranscoders::AVIDEMUX) {
-		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, kConvertJobData::CONVERSION_ENGINE_AVIDEMUX);
-	}
-	else if($id==KDLTranscoders::PDF_CREATOR) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_PDF_CREATOR);
-	}
-	else if($id==KDLTranscoders::PDF2SWF) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', kConvertJobData::CONVERSION_ENGINE_PDF2SWF);
-	}
+//	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
+//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "expressionEncoder.ExpressionEncoder");
+//	}
+//	else if($id==KDLTranscoders::QT_FASTSTART) {
+//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "fastStart.FastStart");
+//	}
+//	else if($id==KDLTranscoders::AVIDEMUX) {
+//		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, "avidemux.Avidemux");
+//	}
+//	else if($id==KDLTranscoders::PDF_CREATOR) {
+//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', conversionEngineType::PDF_CREATOR);
+//	}
+//	else if($id==KDLTranscoders::PDF2SWF) {
+//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', conversionEngineType::PDF2SWF);
+//	}
 	else {
 		$oprObj->_engine = new KDLOperatorWrapper($id);
 		return;
