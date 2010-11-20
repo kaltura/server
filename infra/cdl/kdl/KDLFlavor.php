@@ -122,7 +122,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	 */
 	public function GenerateTarget(KDLMediaDataSet $source) {
 		if($source==null || !$source->IsDataSet() || $this->_flags&self::ForceCommandLineFlagBit) {
-			kLog::log("FORCE ". $this->_flags);
+			KalturaLog::log("FORCE ". $this->_flags);
 			$target = clone $this;
 			if($target->_video->_gop===null || $target->_video->_gop==0)
 			$target->_video->_gop = KDLConstants::DefaultGOP;
@@ -158,7 +158,7 @@ class KDLFlavor extends KDLMediaDataSet {
 				$this->generateOperationSetCommandLines($target, $trPrmObj);
 			}
 			else{
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target);
+				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target, $trPrmObj->_extra);
 				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $target);
 			}
 		}
@@ -168,7 +168,7 @@ class KDLFlavor extends KDLMediaDataSet {
 	 * generateOperationSetCommandLines
 	 */
 	private function generateOperationSetCommandLines(KDLFlavor $target, $transcoders){
-kLog::log(__METHOD__."==>\n");
+KalturaLog::log(__METHOD__."==>\n");
 		
 		$cnt = count($transcoders);
 		$i=1;
@@ -206,7 +206,7 @@ kLog::log(__METHOD__."==>\n");
 				}
 			}
 //			if(!is_null($trPrmObj->_engine))
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg);
+				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg, $trPrmObj->_extra);
 				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $auxTrg);
 			$i++;
 		}
@@ -217,8 +217,7 @@ kLog::log(__METHOD__."==>\n");
 	 */
 	public function ValidateProduct(KDLMediaDataSet $source, KDLFlavor $product)
 	{
-kLog::log(__METHOD__."==>\n");
-		kLog::log( ".TRG-->".$this->ToString());
+		KalturaLog::log( ".TRG-->".$this->ToString());
 		$rv = $product->ValidateFlavor();
 
 		if($this->_video!==null) {
@@ -274,7 +273,7 @@ kLog::log(__METHOD__."==>\n");
 			// "Invalid File - No media content.";
 			$product->_errors[KDLConstants::ContainerIndex][] = KDLErrors::ToString(KDLErrors::NoValidMediaStream);
 		}
-		kLog::log( ".PRD-->".$product->ToString());
+		KalturaLog::log( ".PRD-->".$product->ToString());
 
 		return $rv;
 	}
@@ -776,7 +775,7 @@ $target->_video = null;
 	 */
 	private function validateTranscoders(KDLMediaDataSet $source, &$transcoders, $inSet=false){
 
-kLog::log(__METHOD__."==>\n");
+KalturaLog::log(__METHOD__."==>\n");
 		$cnt = count($transcoders);
 		$i = 0;
 		foreach($transcoders as $key=>$trPrm) {
@@ -797,7 +796,7 @@ kLog::log(__METHOD__."==>\n");
 				}
 				else {
 					if($inSet){		
-						kLog::log(__METHOD__.": inSet,cnt:$cnt,i:$i");
+						KalturaLog::log(__METHOD__.": inSet,cnt:$cnt,i:$i");
 						if($i>0){
 							$transcoders[$key]->_engine->set_sourceBlacklist(null);
 						}
