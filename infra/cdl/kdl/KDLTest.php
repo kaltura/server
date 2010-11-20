@@ -41,7 +41,7 @@ class KDLTest
 		 
 		*/
 		KDLUtils::RecursiveScan($fl->_transcoders, "transcoderSetFuncTest", null, null);
-//kLog::log(__METHOD__."==>\n".print_r($fl->_transcoders,true));  
+//KalturaLog::log(__METHOD__."==>\n".print_r($fl->_transcoders,true));  
 		return $fl;
 	}
 	
@@ -52,17 +52,17 @@ class KDLTest
 	{
 		if ( !$path )
 		{
-			kLog::log ( "Usage " . $argv[0] . " <path-to-iterate> [<file-pattern>]" );
+			KalturaLog::log ( "Usage " . $argv[0] . " <path-to-iterate> [<file-pattern>]" );
 			die();
 		}
 		
-		kLog::log ( "Will search in path [$path] for pattern [$pattern]" );
+		KalturaLog::log ( "Will search in path [$path] for pattern [$pattern]" );
 		if ( $pattern )
 			$path_pattern = $path . "/" . $pattern;
 		else
 			$path_pattern = $path . "/*";
 		$files = glob ( $path_pattern );
-kLog::log( "--------");
+KalturaLog::log( "--------");
 	
 		foreach ($files as $file )
 		{
@@ -88,7 +88,7 @@ kLog::log( "--------");
 	 */
 	public static function runFileTest($file, &$dlPrc, $profile=null){
 //	echo $profile->ToString()."<br>\n"; 	
-		kLog::log( $file);
+		KalturaLog::log( $file);
 		$mediaInfoStr = shell_exec(MediaInfoProgram." ". realpath($file));
 		self::runMediainfoTest($mediaInfoStr, $dlPrc, $profile);
 //	echo $profile->ToString()."<br>\n"; 	
@@ -114,7 +114,7 @@ kLog::log( "--------");
 	public static function runMediasetTest(KDLMediaDataSet $mediaSet, &$dlPrc, $profile=null){
 			$inFile = realpath($mediaSet->_container->_fileName);
 //$mediaSet = 100; //new KDLMediaDataSet();
-		kLog::log( "....S-->".$mediaSet->ToString());
+		KalturaLog::log( "....S-->".$mediaSet->ToString());
 
 		//		unset($targetList); // Remarked by Tan-Tan $targetList doesn't exist
 		$targetList = array();
@@ -133,32 +133,32 @@ kLog::log( "--------");
 				$rv = true;
 		}
 		if($rv==false){
-			kLog::log( "....E==>");
+			KalturaLog::log( "....E==>");
 			print_r($errors);
-			kLog::log( "\n");
+			KalturaLog::log( "\n");
 		}
-		kLog::log( "....W==>");
+		KalturaLog::log( "....W==>");
 		print_r($warnings);
-		kLog::log( "\n");
+		KalturaLog::log( "\n");
 		if($profile==null)
 			return;
 
 $xmlStr = KDLProcessor::ProceessFlavorsForCollection($targetList);
-kLog::log(__METHOD__."-->XML-->\n".print_r($xmlStr,true)."\n<--");
+KalturaLog::log(__METHOD__."-->XML-->\n".print_r($xmlStr,true)."\n<--");
 	
 		foreach ($targetList as $target){
 
 
 $output = array();
 $rv = 0;
-			kLog::log( "...T-->".$target->ToString());
+			KalturaLog::log( "...T-->".$target->ToString());
 			$outFile = "aaa1.mp4";
 			
 			if(file_exists($outFile)) unlink($outFile);
 $cmdLineGenerator = $target->SetTranscoderCmdLineGenerator($inFile,$outFile);
 			$cmdLineGenerator->_clipDur = 10000;
 $exeStr = "FFMpeg ".$cmdLineGenerator->FFMpeg(null);
-//			kLog::log( ".CMD-->".$exeStr);
+//			KalturaLog::log( ".CMD-->".$exeStr);
 			$exeStr = "cli_encode ".$cmdLineGenerator->Generate(new KDLOperationParams(KDLTranscoders::ON2), 1000);
 			kLog::log( ".CMD-->".$exeStr);
 			$exeStr = "mencoder ".$cmdLineGenerator->Generate(new KDLOperationParams(KDLTranscoders::MENCODER), 1000);
