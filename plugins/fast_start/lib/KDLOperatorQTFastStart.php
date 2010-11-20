@@ -12,7 +12,7 @@ class KDLOperatorQTFastStart extends KDLOperatorBase {
 	/* ---------------------------
 	 * GenerateCommandLine
 	 */
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target)
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 		$cmdStr = " ".KDLCmdlinePlaceholders::InFileName;
 		$cmdStr .= " ".KDLCmdlinePlaceholders::OutFileName;
