@@ -17,7 +17,7 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == QuickTimeToolsConversionEngineType::get()->apiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -26,7 +26,7 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 			return new KOperationEngineQtTools($params->qtToolsCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == QuickTimeToolsConversionEngineType::get()->coreValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == QuickTimeToolsConversionEngineType::get()->apiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
 		{
 			return new KDLTranscoderQTPTools($enumValue);
 		}
