@@ -17,7 +17,7 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == ExpressionEncoderConversionEngineType::get()->apiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::EXPRESSION_ENCODER)
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
@@ -26,7 +26,7 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 			return new KOperationEngineExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->apiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 		{
 			return new KDLOperatorExpressionEncoder($enumValue);
 		}
@@ -41,10 +41,10 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == ExpressionEncoderConversionEngineType::coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KOperationEngine' && $enumValue == ExpressionEncoderConversionEngineType::get()->apiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 			return 'KOperationExpressionEncoder';
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 			return 'KDLOperatorExpressionEncoder';
 		
 		return null;
