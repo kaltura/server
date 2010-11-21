@@ -17,7 +17,7 @@ class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == FastStartConversionEngineType::get()->apiValue(FastStartConversionEngineType::FAST_START))
+		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::FAST_START))
 		{
 			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
 				return null;
