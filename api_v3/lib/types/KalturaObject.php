@@ -67,30 +67,12 @@ class KalturaObject
 	
 	protected function fromDynamicEnumValue($type, $value)
 	{
-		// TODO remove call_user_func after moving to php 5.3
-		$baseEnumName = call_user_func("$type::getEnumClass");
-//		$baseEnumName = $type::getEnumClass();
-	
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
-		foreach($pluginInstances as $pluginInstance)
-		{
-			$enums = $pluginInstance->getEnums($baseEnumName);
-			foreach($enums as $enum)
-			{
-				// TODO remove call_user_func after moving to php 5.3
-				$enumValue = call_user_func("$enum::get")->coreToApi($value);
-//				$enumValue = $enum::get()->coreToApi($value);
-				if(!is_null($enumValue))
-					return $enumValue;
-			}
-		}
-			
-		return $value;
+		return kPluginableEnumsManager::coreToApi($type, $value);
 	}
 	
 	protected function toDynamicEnumValue($type, $value)
 	{
-		return KalturaDynamicEnum::getCoreValue($value, $type);
+		return kPluginableEnumsManager::apiToCore($type, $value);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
