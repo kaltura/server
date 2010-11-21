@@ -71,6 +71,11 @@ class KalturaCriteria extends Criteria
 		$searchPluginName = kConf::get("search_plugin");
 		
 		$searchPlugin = KalturaPluginManager::getPluginInstance($searchPluginName);
+		if (!$searchPlugin)
+		{
+			KalturaLog::err("KalturaCriteria search plugin not found [$searchPluginName]");
+			die;
+		}
 			
 		$criteriaFactory = $searchPlugin->getInstance('IKalturaCriteriaFactory');
 		if (!$criteriaFactory)
