@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-class flavorParamsOutputPeer extends BaseflavorParamsOutputPeer
+class thumbParamsOutputPeer extends assetParamsOutputPeer
 {
 	/** the related Propel class for this table */
 	const OM_CLASS = 'thumbParamsOutput';

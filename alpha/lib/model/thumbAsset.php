@@ -6,7 +6,6 @@
  *
  * @package lib.model
  */ 
-class thumbAsset extends flavorAsset 
+class thumbAsset extends asset 
 {
-	
 }
