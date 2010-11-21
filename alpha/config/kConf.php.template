@@ -184,9 +184,12 @@ class kConf
 					"StorageProfilePlugin", // Should always be enabled
 					"MetadataPlugin", // Should always be enabled
 					// "MultiCentersPlugin", (uncomment to enable moultiple data centers)
+					
 					"DocumentPlugin", // Should be enabled for document entries
 					"SphinxSearchPlugin", // Should always be enabled
                     "AuditPlugin", // Should be enabled only if audit trail support required
+		    "VirusScanPlugin",
+		    "SymantecScanEnginePlugin",
 				),
 
                 "search_plugin"	=> "sphinxSearch",
@@ -199,7 +202,8 @@ class kConf
                 ),
                 "event_consumers_default_priority" => 5,
 				"event_consumers_priorities" => array(
-				),
+					'kVirusScanFlowManager' => 7,
+                ),
                 
 				"cache_root_path" => "@BASE_DIR@/cache/content/",
                 
