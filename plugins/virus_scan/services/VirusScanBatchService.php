@@ -22,7 +22,7 @@ class VirusScanBatchService extends BatchService
 	 */
 	function getExclusiveVirusScanJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		$jobType = VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
