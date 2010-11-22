@@ -41,24 +41,21 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 			return null;
 		}
 		
+		
 		foreach ($profiles as $profile)
 		{
-			entryPeer::setDefaultCriteriaFilter();
-			$entryFilter = $profile->getEntryFilterObject();
-			$cEntry = KalturaCriteria::create(entryPeer::OM_CLASS);
-			$cEntry->addAnd(entryPeer::ID, $entryId);
-			$entryFilter->setPartnerSearchScope($entry->getPartnerId());
-			$entryFilter->attachToCriteria($cEntry);
-			$cEntry->applyFilters();
-			//$count = entryPeer::doCount($cEntry);
-			$count = $cEntry->getRecordsCount();
+			$virusEntryFilter = new VirusScanEntryFilter();
+			$virusEntryFilter->fillObjectFromObject($profile->getEntryFilterObject());
 			
-			if ($count > 0)
+			if ($virusEntryFilter->matches($entry))
 			{
 				KalturaLog::debug('Returning profile with id ['.$profile->getId().']');
 				return $profile;
 			}
+				
 		}
+		
+		return null;
 	}
 	
 	
