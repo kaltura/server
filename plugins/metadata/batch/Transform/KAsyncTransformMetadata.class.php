@@ -46,7 +46,7 @@ class KAsyncTransformMetadata extends KBatchBase
 		return $jobs;
 	}
 	
-	private function transform(KalturaMetadataBatchJob $job, KalturaTransformMetadataJobData $data)
+	private function transform(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
 		$pager = new KalturaFilterPager();
 		$pager->maxPageSize = 40;
@@ -96,7 +96,7 @@ class KAsyncTransformMetadata extends KBatchBase
 		return $job;
 	}
 	
-	private function increaseVersion(KalturaMetadataBatchJob $job, KalturaTransformMetadataJobData $data)
+	private function increaseVersion(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
 		$transformList = $this->kClient->metadataBatch->upgradeMetadataObjects(
 			$data->metadataProfileId,
@@ -125,7 +125,7 @@ class KAsyncTransformMetadata extends KBatchBase
 		return $job;
 	}
 	
-	private function upgrade(KalturaMetadataBatchJob $job, KalturaTransformMetadataJobData $data)
+	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
 		KalturaLog::debug("transform($job->id)");
 		
@@ -149,14 +149,6 @@ class KAsyncTransformMetadata extends KBatchBase
 		return $job;
 	}
 	
-	/**
-	 * @return KalturaBatchJob
-	 */
-	protected function newEmptyJob()
-	{
-		return new KalturaMetadataBatchJob();
-	}
-	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{
 		return $this->kClient->metadataBatch->updateExclusiveTransformMetadataJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
@@ -172,4 +164,3 @@ class KAsyncTransformMetadata extends KBatchBase
 		return $response->job;
 	}
 }
-?>
