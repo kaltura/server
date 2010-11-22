@@ -44,8 +44,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 		
 		foreach ($profiles as $profile)
 		{
-			$virusEntryFilter = new VirusScanEntryFilter();
-			$virusEntryFilter->fillObjectFromObject($profile->getEntryFilterObject());
+			$virusEntryFilter = $profile->getEntryFilterObject();
 			
 			if ($virusEntryFilter->matches($entry))
 			{

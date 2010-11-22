@@ -39,7 +39,7 @@ class VirusScanProfile extends BaseVirusScanProfile {
 			return null;
 			
 		$xml = new SimpleXMLElement($v);
-		$entryFilter = new entryFilter();
+		$entryFilter = new VirusScanEntryFilter();
 		$entryFilter->fillObjectFromXml($xml, '_');
 		return $entryFilter;
 	}
