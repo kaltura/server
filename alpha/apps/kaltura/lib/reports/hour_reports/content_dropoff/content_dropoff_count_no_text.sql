@@ -7,7 +7,7 @@ SELECT COUNT(DISTINCT ev.entry_id) count_all
 WHERE
 	{OBJ_ID_CLAUSE}
 	AND ev.partner_id = {PARTNER_ID} /* PARTNER_ID*/
-    AND date_id BETWEEN calc_time_shift(start_date, 0, time_shift) AND calc_time_shift(end_date, 23, time_shift)
+    AND date_id BETWEEN calc_time_shift(p.start_date, 0, time_shift) AND calc_time_shift(p.end_date, 23, time_shift)
     AND calc_time_shift(date_id, hour_id, time_shift) between p.start_date AND p.end_date
 	AND 
 		( count_plays > 0 OR
