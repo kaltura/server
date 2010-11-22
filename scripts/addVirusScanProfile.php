@@ -47,6 +47,7 @@ $profile->engineType = $engineType;
 $profile->entryFilter = $entryFilter;
 $profile->actionIfInfected = $actionIfInfected;
 
+$dbProfile = null;
 $dbProfile = $profile->toObject($dbProfile);
 $dbProfile->setPartnerId($partnerId);
 $dbProfile->save();
