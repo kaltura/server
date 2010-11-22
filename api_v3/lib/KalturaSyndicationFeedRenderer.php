@@ -1,6 +1,7 @@
 <?php
 class KalturaSyndicationFeedRenderer
 {
+	const MAX_RETUREND_ENTRIES = 10000;
 	const ENTRY_PEER_LIMIT_QUERY = 500;
 	const LEVEL_INDENTATION = '  ';
 	
@@ -14,6 +15,12 @@ class KalturaSyndicationFeedRenderer
 	 * @var array
 	 */
 	private $entryFilters = array();
+	
+	/**
+	 * The number of returned entries
+	 * @var int
+	 */
+	private $returnedEntriesCount = 0;
 	
 	/**
 	 * Stores the current page of entries
@@ -191,6 +198,10 @@ class KalturaSyndicationFeedRenderer
 			$this->lastEntryCreatedAt = 0;
 		}
 		
+		++$this->returnedEntriesCount;
+		if ($this->returnedEntriesCount == self::MAX_RETUREND_ENTRIES)
+			return false;
+				
 		$entry = current($this->entriesCurrentPage);
 		if($entry)
 		{
