@@ -8,7 +8,7 @@ class KDLOperatorExpressionEncoder extends KDLOperatorBase {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
     }
 
-    public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
+    public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 /*		
 $tryXML = "<StreamInfo
@@ -23,7 +23,7 @@ $tryXML = "<StreamInfo
 ";
 		$xml = new SimpleXMLElement($tryXML);
 */
-		$extra=$this->_extra;
+
 		if($target->_container) {
 			$cont = $target->_container;
 			$dir = dirname(__FILE__);
