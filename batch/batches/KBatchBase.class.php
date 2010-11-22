@@ -6,7 +6,7 @@ require_once ("bootstrap.php");
  * 
  * @package Scheduler
  */
-abstract class KBatchBase extends KRunableClass
+abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 {
 	/**
 	 * @var KalturaClient
@@ -236,7 +236,7 @@ abstract class KBatchBase extends KRunableClass
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
 		
 		$this->kClientConfig = new KalturaConfiguration();
-		$this->kClientConfig->setLogger(new KalturaTraccer());
+		$this->kClientConfig->setLogger($this);
 		$this->kClientConfig->serviceUrl = $this->taskConfig->getServiceUrl();
 		$this->kClientConfig->curlTimeout = $this->taskConfig->getCurlTimeout();
 		$this->kClientConfig->clientTag = 'batch: ' . $this->taskConfig->getSchedulerName();
@@ -348,10 +348,13 @@ abstract class KBatchBase extends KRunableClass
 	/**
 	 * @param string $file
 	 * @param int $size
-	 * @return string
+	 * @return bool
 	 */
 	protected function checkFileExists($file, $size = null)
 	{
+		if($this->isUnitTest)
+			return true;
+			
 		KalturaLog::info("Check File Exists[$file] size[$size]");
 		if(! $size)
 		{
@@ -572,7 +575,10 @@ abstract class KBatchBase extends KRunableClass
 		
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
 		if($this->isUnitTest)
+		{
+			$job->status = $status;
 			return $job;
+		}
 		
 		$job = $this->updateExclusiveJob($job->id, $updateJob, $entryStatus);
 		if($job instanceof KalturaBatchJob)
@@ -663,21 +669,9 @@ abstract class KBatchBase extends KRunableClass
 		
 		$this->monitorHandle = null;
 	}
-}
-
-/** 
- * @package Scheduler
- *
- */
-class KalturaTraccer implements IKalturaLogger
-{
-	//	private static $count=1;
+	
 	function log($message)
 	{
-		KalturaLog::debug($message);
-		//		TRACE ( "\n[" . self::$count . "]- $message\n" );
-	//		self::$count++;
+		KalturaLog::log($message);
 	}
 }
-
-?>
