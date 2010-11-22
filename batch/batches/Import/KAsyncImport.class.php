@@ -67,7 +67,8 @@ class KAsyncImport extends KBatchBase
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED, 1);
 			
 			$curlWrapper = new KCurlWrapper($sourceUrl);
-			$curlHeaderResponse = $curlWrapper->getHeader();
+			$useNoBody = ($job->executionAttempts > 1); // if the process crashed first time, tries with no body instead of range 0-0
+			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
 				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_IMPORTING);
