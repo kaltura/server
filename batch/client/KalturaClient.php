@@ -7,6 +7,14 @@ class KalturaAccessControlOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+class KalturaAssetParamsOrderBy
+{
+}
+
+class KalturaAssetParamsOutputOrderBy
+{
+}
+
 class KalturaAssetType
 {
 	const FLAVOR = "1";
@@ -142,6 +150,7 @@ class KalturaBatchJobType
 	const METADATA_IMPORT = "27";
 	const METADATA_TRANSFORM = "28";
 	const FILESYNC_IMPORT = "29";
+	const CAPTURE_THUMB = "30";
 	const VIRUS_SCAN = "virusScan.VirusScan";
 }
 
@@ -237,10 +246,9 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = "99";
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
-	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
-	const FAST_START = "fastStart.FastStart";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const AVIDEMUX = "avidemux.Avidemux";
+	const FAST_START = "fastStart.FastStart";
+	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 }
 
 class KalturaConversionProfileOrderBy
@@ -771,6 +779,22 @@ class KalturaSourceType
 	const AKAMAI_LIVE = 29;
 }
 
+class KalturaThumbCropType
+{
+	const RESIZE = 1;
+	const RESIZE_WITH_PADDING = 2;
+	const CROP = 3;
+	const CROP_FROM_TOP = 4;
+}
+
+class KalturaThumbParamsOrderBy
+{
+}
+
+class KalturaThumbParamsOutputOrderBy
+{
+}
+
 class KalturaTubeMogulSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";
@@ -867,7 +891,7 @@ class KalturaVirusFoundAction
 
 class KalturaVirusScanEngineType
 {
-	const SYMANTEC_SCAN_ENGINE = 1;
+	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
 }
 
 class KalturaVirusScanJobResult
@@ -974,7 +998,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 
 }
 
-class KalturaFlavorParams extends KalturaObjectBase
+class KalturaAssetParams extends KalturaObjectBase
 {
 	/**
 	 * The id of the Flavor Params
@@ -1043,6 +1067,11 @@ class KalturaFlavorParams extends KalturaObjectBase
 	 */
 	public $format = null;
 
+
+}
+
+class KalturaFlavorParams extends KalturaAssetParams
+{
 	/**
 	 * The video codec of the Flavor Params
 	 * 
@@ -2085,6 +2114,168 @@ class KalturaVirusScanJobData extends KalturaJobData
 	 * @var KalturaVirusFoundAction
 	 */
 	public $virusFoundAction = null;
+
+
+}
+
+class KalturaThumbParams extends KalturaAssetParams
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbCropType
+	 */
+	public $cropType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $quality = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropX = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropY = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropWidth = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropHeight = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $videoOffset = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $scaleWidth = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $scaleHeight = null;
+
+	/**
+	 * Hexadecimal value
+	 *
+	 * @var string
+	 */
+	public $backgroundColor = null;
+
+
+}
+
+class KalturaThumbParamsOutput extends KalturaThumbParams
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbParamsVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyBehavior = null;
+
+
+}
+
+class KalturaCaptureThumbJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFileSyncLocalPath = null;
+
+	/**
+	 * The translated path as used by the scheduler
+	 *
+	 * @var string
+	 */
+	public $actualSrcFileSyncLocalPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFileSyncRemoteUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsOutputId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbParamsOutput
+	 */
+	public $thumbParamsOutput;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbPath = null;
 
 
 }
@@ -5133,6 +5324,46 @@ class KalturaPullJobData extends KalturaJobData
 
 }
 
+class KalturaAssetParamsOutput extends KalturaAssetParams
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $assetParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetParamsVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyBehavior = null;
+
+
+}
+
 class KalturaMediaFlavorParams extends KalturaFlavorParams
 {
 
@@ -5354,6 +5585,68 @@ class KalturaNotificationFilter extends KalturaNotificationBaseFilter
 
 }
 
+abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 */
+	public $isSystemDefaultEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaContainerFormat
+	 */
+	public $formatEqual = null;
+
+
+}
+
+class KalturaAssetParamsFilter extends KalturaAssetParamsBaseFilter
+{
+
+}
+
+abstract class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $assetParamsIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetParamsVersionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetVersionEqual = null;
+
+
+}
+
+class KalturaAssetParamsOutputFilter extends KalturaAssetParamsOutputBaseFilter
+{
+
+}
+
 abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	/**
@@ -5378,22 +5671,8 @@ class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
 
 }
 
-abstract class KalturaFlavorParamsBaseFilter extends KalturaFilter
+abstract class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
 {
-	/**
-	 * 
-	 *
-	 * @var KalturaNullableBoolean
-	 */
-	public $isSystemDefaultEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaContainerFormat
-	 */
-	public $formatEqual = null;
-
 
 }
 
@@ -5473,6 +5752,54 @@ abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 }
 
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
+{
+
+}
+
+abstract class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
+{
+
+}
+
+class KalturaThumbParamsFilter extends KalturaThumbParamsBaseFilter
+{
+
+}
+
+abstract class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbParamsVersionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetVersionEqual = null;
+
+
+}
+
+class KalturaThumbParamsOutputFilter extends KalturaThumbParamsOutputBaseFilter
 {
 
 }
@@ -7478,6 +7805,54 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("batch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->addParam($kparams, "entryStatus", $entryStatus);
+		$this->client->queueServiceActionCall("batch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("batch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
 	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -8014,7 +8389,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -8032,7 +8407,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -8678,6 +9053,58 @@ class KalturaJobsService extends KalturaServiceBase
 		$kparams = array();
 		$this->client->addParam($kparams, "jobId", $jobId);
 		$this->client->queueServiceActionCall("jobs", "retryPostConvert", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function getCaptureThumbStatus($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "getCaptureThumbStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function deleteCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "deleteCaptureThumb", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function abortCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "abortCaptureThumb", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function retryCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "retryCaptureThumb", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -9851,6 +10278,54 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->addParam($kparams, "entryStatus", $entryStatus);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
 	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -10387,7 +10862,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -10405,7 +10880,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -11001,6 +11476,54 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->addParam($kparams, "entryStatus", $entryStatus);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
 	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -11537,7 +12060,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -11555,7 +12078,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -12134,6 +12657,54 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->addParam($kparams, "entryStatus", $entryStatus);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
 	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -12670,7 +13241,7 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -12688,7 +13259,7 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = "")
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -12765,6 +13336,11 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 
 class KalturaClient extends KalturaClientBase
 {
+	/**
+	 * @var string
+	 */
+	protected $apiVersion = '3.1';
+
 	/**
 	 * batch service lets you handle different batch process from remote machines.
 	 * As oppesed to other ojects in the system, locking mechanism is critical in this case.

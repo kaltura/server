@@ -17,8 +17,8 @@ class thumbParams extends assetParams
 	const CUSTOM_DATA_FIELD_CROP_Y = "ThumbCropY";
 	const CUSTOM_DATA_FIELD_CROP_WIDTH = "ThumbCropWidth";
 	const CUSTOM_DATA_FIELD_CROP_HEIGHT = "ThumbCropHeight";
-	const CUSTOM_DATA_FIELD_CROP_PROVIDERS = "ThumbCropProviders";
-	const CUSTOM_DATA_FIELD_CROP_PROVIDERS_DATA = "ThumbCropProvidersData";
+	const CUSTOM_DATA_FIELD_CROP_PROVIDER = "ThumbCropProvider";
+	const CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA = "ThumbCropProviderData";
 	const CUSTOM_DATA_FIELD_VIDEO_OFFSET = "ThumbVideoOffset";
 	const CUSTOM_DATA_FIELD_SCALE_WIDTH = "ThumbScaleWidth";
 	const CUSTOM_DATA_FIELD_SCALE_HEIGHT = "ThumbScaleHeight";
@@ -30,8 +30,8 @@ class thumbParams extends assetParams
 	public function getCropY()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_Y);}
 	public function getCropWidth()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_WIDTH);}
 	public function getCropHeight()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_HEIGHT);}
-	public function getCropProviders()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS);}
-	public function getCropProvidersData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS_DATA);}
+	public function getCropProvider()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER);}
+	public function getCropProviderData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA);}
 	public function getVideoOffset()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_VIDEO_OFFSET);}
 	public function getScaleWidth()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_WIDTH);}
 	public function getScaleHeight()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_HEIGHT);}
@@ -43,8 +43,8 @@ class thumbParams extends assetParams
 	public function setCropY($v)				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_Y, $v);}
 	public function setCropWidth($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_WIDTH, $v);}
 	public function setCropHeight($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_HEIGHT, $v);}
-	public function setCropProviders($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS, $v);}
-	public function setCropProvidersData($v)	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS_DATA, $v);}
+	public function setCropProvider($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER, $v);}
+	public function setCropProviderData($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA, $v);}
 	public function setVideoOffset($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_VIDEO_OFFSET, $v);}
 	public function setScaleWidth($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_WIDTH, $v);}
 	public function setScaleHeight($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_HEIGHT, $v);}

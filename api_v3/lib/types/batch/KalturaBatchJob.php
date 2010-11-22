@@ -304,6 +304,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaStorageDeleteJobData();
 				break;
 				
+			case 'kCaptureThumbJobData':
+				$this->data = new KalturaCaptureThumbJobData();
+				break;
+				
 			default:
 				$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
@@ -431,6 +435,12 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$dbData = new kStorageDeleteJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaStorageDeleteJobData();
+				break;
+				
+			case KalturaBatchJobType::CAPTURE_THUMB:
+				$dbData = new kCaptureThumbJobData();
+				if(is_null($this->data))
+					$this->data = new KalturaCaptureThumbJobData();
 				break;
 				
 			default:

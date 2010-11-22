@@ -29,4 +29,5 @@ interface BatchJobType extends BaseEnum
 	const METADATA_IMPORT = 27;
 	const METADATA_TRANSFORM = 28;
 	const FILESYNC_IMPORT = 29;
+	const CAPTURE_THUMB = 30;
 }

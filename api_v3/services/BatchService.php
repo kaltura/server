@@ -649,6 +649,69 @@ class BatchService extends KalturaBaseService
 // --------------------------------- PostConvertJob functions 	--------------------------------- //
 
 	
+// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
+
+	
+	
+	/**
+	 * batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB 
+	 * 
+	 * @action getExclusiveCaptureThumbJobs
+	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
+	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
+	 * @param int $numberOfJobs The maximum number of jobs to return. 
+	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
+	 * @return KalturaBatchJobArray 
+	 */
+	function getExclusiveCaptureThumbJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CAPTURE_THUMB );
+	}
+
+	
+	/**
+	 * batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs
+	 * 
+	 * @action updateExclusiveCaptureThumbJob
+	 * @param int $id The id of the job to free
+	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
+	 * @param KalturaBatchJob $job
+	 * @param KalturaEntryStatus $entryStatus Optional parameter if the entry of the batch should change 
+	 * @return KalturaBatchJob 
+	 */
+	function updateExclusiveCaptureThumbJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job ,
+		 $entryStatus = null)
+	{
+		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
+		
+		// verifies that the job is of the right type
+		if($dbBatchJob->getJobType() != KalturaBatchJobType::CAPTURE_THUMB)
+			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
+	
+		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob), $entryStatus );
+				
+		$batchJob = new KalturaBatchJob(); // start from blank
+		return $batchJob->fromObject($dbBatchJob);
+	}
+
+	
+	/**
+	 * batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs
+	 * 
+	 * @action freeExclusiveCaptureThumbJob
+	 * @param int $id The id of the job to free
+	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
+	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
+	 * @return KalturaFreeJobResponse 
+	 */
+	function freeExclusiveCaptureThumbJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::CAPTURE_THUMB, $resetExecutionAttempts);
+	}	
+
+// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
+
+	
 // --------------------------------- PullJob functions 	--------------------------------- //
 
 	

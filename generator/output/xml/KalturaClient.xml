@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <xml apiVersion="3.1">
-  <!-- Generated on date 19/11/10 10:18:33 -->
+  <!-- Generated on date 22/11/10 11:46:04 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
+    <enum name="KalturaAssetParamsOrderBy" enumType="string"/>
+    <enum name="KalturaAssetParamsOutputOrderBy" enumType="string"/>
     <enum name="KalturaAssetType" enumType="string">
       <const name="FLAVOR" value="1"/>
       <const name="THUMBNAIL" value="2"/>
@@ -47,7 +49,7 @@
       <const name="FLAVOR_ASSET" value="flavorAsset"/>
       <const name="FLAVOR_PARAMS" value="flavorParams"/>
       <const name="FLAVOR_PARAMS_CONVERSION_PROFILE" value="flavorParamsConversionProfile"/>
-      <const name="FLAVOR_PARAMS_OUTPUT" value="thumbParamsOutput"/>
+      <const name="FLAVOR_PARAMS_OUTPUT" value="flavorParamsOutput"/>
       <const name="KSHOW" value="kshow"/>
       <const name="KSHOW_KUSER" value="KshowKuser"/>
       <const name="KUSER" value="kuser"/>
@@ -165,6 +167,7 @@
       <const name="METADATA_IMPORT" value="27"/>
       <const name="METADATA_TRANSFORM" value="28"/>
       <const name="FILESYNC_IMPORT" value="29"/>
+      <const name="CAPTURE_THUMB" value="30"/>
       <const name="VIRUS_SCAN" value="virusScan.VirusScan"/>
     </enum>
     <enum name="KalturaBitRateMode" enumType="int">
@@ -992,6 +995,14 @@
       <const name="BLOCKED" value="0"/>
       <const name="ACTIVE" value="1"/>
     </enum>
+    <enum name="KalturaThumbCropType" enumType="int">
+      <const name="RESIZE" value="1"/>
+      <const name="RESIZE_WITH_PADDING" value="2"/>
+      <const name="CROP" value="3"/>
+      <const name="CROP_FROM_TOP" value="4"/>
+    </enum>
+    <enum name="KalturaThumbParamsOrderBy" enumType="string"/>
+    <enum name="KalturaThumbParamsOutputOrderBy" enumType="string"/>
     <enum name="KalturaTubeMogulSyndicationFeedCategories" enumType="string">
       <const name="ARTS_AND_ANIMATION" value="Arts &amp;amp; Animation"/>
       <const name="COMEDY" value="Comedy"/>
@@ -1500,7 +1511,7 @@
       <property name="containerFormat" type="string" readOnly="0" insertOnly="0" description="The container format&#10;"/>
       <property name="videoCodecId" type="string" readOnly="0" insertOnly="0" description="The video codec&#10;"/>
     </class>
-    <class name="KalturaFlavorParams">
+    <class name="KalturaAssetParams">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Flavor Params&#10;"/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="The name of the Flavor Params&#10;"/>
@@ -1509,6 +1520,8 @@
       <property name="isSystemDefault" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description="True if those Flavor Params are part of system defaults&#10;"/>
       <property name="tags" type="string" readOnly="0" insertOnly="0" description="The Flavor Params tags are used to identify the flavor for different usage (e.g. web, hd, mobile)&#10;"/>
       <property name="format" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description="The container format of the Flavor Params&#10;"/>
+    </class>
+    <class name="KalturaFlavorParams" base="KalturaAssetParams">
       <property name="videoCodec" type="string" enumType="KalturaVideoCodec" readOnly="0" insertOnly="0" description="The video codec of the Flavor Params&#10;"/>
       <property name="videoBitrate" type="int" readOnly="0" insertOnly="0" description="The video bitrate (in KBits) of the Flavor Params&#10;"/>
       <property name="audioCodec" type="string" enumType="KalturaAudioCodec" readOnly="0" insertOnly="0" description="The audio codec of the Flavor Params&#10;"/>
@@ -1532,10 +1545,12 @@
       <property name="flavorParams" type="KalturaFlavorParams" readOnly="0" insertOnly="0" description="The Flavor Params&#10;"/>
       <property name="entryId" type="string" readOnly="0" insertOnly="0" description="The entry id&#10;"/>
     </class>
-    <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaFilter">
+    <class name="KalturaAssetParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
       <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaAssetParamsFilter" base="KalturaAssetParamsBaseFilter"/>
+    <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
     <class name="KalturaFlavorParamsFilter" base="KalturaFlavorParamsBaseFilter"/>
     <class name="KalturaFlavorParamsListResponse">
       <property name="objects" type="array" arrayType="KalturaFlavorParams" readOnly="1" insertOnly="0" description=""/>
@@ -2532,10 +2547,26 @@
     <class name="KalturaMailJobFilter" base="KalturaMailJobBaseFilter"/>
     <class name="KalturaNotificationBaseFilter" abstract="1" base="KalturaBaseJobFilter"/>
     <class name="KalturaNotificationFilter" base="KalturaNotificationBaseFilter"/>
+    <class name="KalturaAssetParamsOutputBaseFilter" abstract="1" base="KalturaAssetParamsFilter">
+      <property name="assetParamsIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetParamsVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAssetParamsOutputFilter" base="KalturaAssetParamsOutputBaseFilter"/>
     <class name="KalturaMediaFlavorParamsBaseFilter" abstract="1" base="KalturaFlavorParamsFilter"/>
     <class name="KalturaMediaFlavorParamsFilter" base="KalturaMediaFlavorParamsBaseFilter"/>
     <class name="KalturaMediaFlavorParamsOutputBaseFilter" abstract="1" base="KalturaFlavorParamsOutputFilter"/>
     <class name="KalturaMediaFlavorParamsOutputFilter" base="KalturaMediaFlavorParamsOutputBaseFilter"/>
+    <class name="KalturaThumbParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
+    <class name="KalturaThumbParamsFilter" base="KalturaThumbParamsBaseFilter"/>
+    <class name="KalturaThumbParamsOutputBaseFilter" abstract="1" base="KalturaThumbParamsFilter">
+      <property name="thumbParamsIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaThumbParamsOutputFilter" base="KalturaThumbParamsOutputBaseFilter"/>
     <class name="KalturaLiveStreamAdminEntryBaseFilter" abstract="1" base="KalturaLiveStreamEntryFilter"/>
     <class name="KalturaLiveStreamAdminEntryFilter" base="KalturaLiveStreamAdminEntryBaseFilter"/>
     <class name="KalturaGoogleVideoSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
@@ -2547,8 +2578,34 @@
     <class name="KalturaYahooSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
     <class name="KalturaYahooSyndicationFeedFilter" base="KalturaYahooSyndicationFeedBaseFilter"/>
     <class name="KalturaThumbAsset" base="KalturaAsset"/>
+    <class name="KalturaAssetParamsOutput" base="KalturaAssetParams">
+      <property name="assetParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="assetVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="readyBehavior" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaMediaFlavorParams" base="KalturaFlavorParams"/>
     <class name="KalturaMediaFlavorParamsOutput" base="KalturaFlavorParamsOutput"/>
+    <class name="KalturaThumbParams" base="KalturaAssetParams">
+      <property name="cropType" type="int" enumType="KalturaThumbCropType" readOnly="0" insertOnly="0" description=""/>
+      <property name="quality" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropX" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropY" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropWidth" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="videoOffset" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleWidth" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
+    </class>
+    <class name="KalturaThumbParamsOutput" base="KalturaThumbParams">
+      <property name="thumbParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="readyBehavior" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaGoogleVideoSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="adultContent" type="string" enumType="KalturaGoogleSyndicationFeedAdultValues" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -2602,6 +2659,14 @@
       <property name="resultsFileUrl" type="string" readOnly="0" insertOnly="0" description="Created by the API&#10;"/>
       <property name="numOfEntries" type="int" readOnly="0" insertOnly="0" description="Number of created entries&#10;"/>
       <property name="csvVersion" type="string" enumType="KalturaBulkUploadCsvVersion" readOnly="0" insertOnly="0" description="The version of the csv file&#10;"/>
+    </class>
+    <class name="KalturaCaptureThumbJobData" base="KalturaJobData">
+      <property name="srcFileSyncLocalPath" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="actualSrcFileSyncLocalPath" type="string" readOnly="0" insertOnly="0" description="The translated path as used by the scheduler&#13;"/>
+      <property name="srcFileSyncRemoteUrl" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsOutputId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsOutput" type="KalturaThumbParamsOutput" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbPath" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaConvartableJobData" base="KalturaJobData">
       <property name="srcFileSyncLocalPath" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3470,15 +3535,14 @@
       </action>
     </service>
     <service id="thumbasset" name="thumbAsset" description="Retrieve information and invoke actions on Thumb Asset&#13;">
-      <action name="setAsDefault" description="setAsDefault&#10;">
-        <param name="assetId" type="string" optional="0" description="&#13;"/>
+      <action name="setAsDefault" description="Tags the thumbnail as DEFAULT_THUMB and removes that tag from all other thumbnail assets of the entry.&#10;Create a new file sync link on the entry thumbnail that points to the thumbnail asset file sync.&#10;">
+        <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
         <result/>
       </action>
-      <action name="updateByEntryId" description="updateByEntryId&#10;Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.&#10;Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions&#10;">
+      <action name="generateByEntryId" description="updateByEntryId&#10;Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.&#10;Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions&#10;">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
-        <param name="timeOffset" type="string" optional="0" description="&#13;"/>
-        <param name="srcParamsId" type="string" optional="1" default="" description="&#13;"/>
-        <param name="dstParamsId" type="string" optional="1" default="" description="&#13;"/>
+        <param name="destThumbParamsId" type="string" optional="1" default="" description="&#13;"/>
+        <param name="srcFlavorParamsId" type="string" optional="1" default="" description="&#13;"/>
         <result/>
       </action>
     </service>
@@ -3619,7 +3683,6 @@
         <result type="string"/>
       </action>
     </service>
-    <service id="xsd" name="xsd" description="XSD service return Schema definition for Kaltura actions results and objects&#13;"/>
     <service id="systemuser_systemuser" name="systemUser" description="System user service&#13;">
       <action name="verifyPassword" description="Verify password for email address&#10;">
         <param name="email" type="string" optional="0" description="&#13;"/>
@@ -4095,6 +4158,26 @@
         <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
         <result type="KalturaFreeJobResponse"/>
       </action>
+      <action name="getExclusiveCaptureThumbJobs" description="batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveCaptureThumbJob" description="batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <param name="entryStatus" type="string" enumType="KalturaEntryStatus" optional="1" default="null" description="Optional parameter if the entry of the batch should change &#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveCaptureThumbJob" description="batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
       <action name="getExclusivePullJobs" description="batch getExclusivePullJob action allows to get a BatchJob of type PULL &#10;">
         <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
         <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
@@ -4552,6 +4635,26 @@
         <result type="KalturaBatchJob"/>
       </action>
       <action name="freeExclusivePostConvertJob" description="batch freeExclusivePostConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusivePostConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveCaptureThumbJobs" description="batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveCaptureThumbJob" description="batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <param name="entryStatus" type="string" enumType="KalturaEntryStatus" optional="1" default="null" description="Optional parameter if the entry of the batch should change &#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveCaptureThumbJob" description="batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs&#10;">
         <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
         <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
         <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
@@ -5116,6 +5219,26 @@
         <result type="KalturaBatchJob"/>
       </action>
       <action name="freeExclusivePostConvertJob" description="batch freeExclusivePostConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusivePostConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveCaptureThumbJobs" description="batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveCaptureThumbJob" description="batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <param name="entryStatus" type="string" enumType="KalturaEntryStatus" optional="1" default="null" description="Optional parameter if the entry of the batch should change &#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveCaptureThumbJob" description="batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs&#10;">
         <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
         <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
         <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>

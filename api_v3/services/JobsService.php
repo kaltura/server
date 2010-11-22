@@ -573,6 +573,63 @@ class JobsService extends KalturaBaseService
 
 // --------------------------------- PostConvertJob functions 	--------------------------------- //
 
+// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
+
+	
+	/**
+	 * batch getCaptureThumbStatusAction returns the status of capture thumbnail task
+	 * 
+	 * @action getCaptureThumbStatus
+	 * @param int $jobId the id of the capture thumbnail job  
+	 * @return KalturaBatchJobResponse 
+	 */
+	function getCaptureThumbStatusAction($jobId)
+	{
+		return $this->getStatusAction($jobId, KalturaBatchJobType::CAPTURE_THUMB);
+	}
+	
+	
+	/**
+	 * batch deleteCaptureThumbAction deletes and returns the status of capture thumbnail task
+	 * 
+	 * @action deleteCaptureThumb
+	 * @param int $jobId the id of the bulk upload job  
+	 * @return KalturaBatchJobResponse 
+	 */
+	function deleteCaptureThumbAction($jobId)
+	{
+		return $this->deleteJobAction($jobId, KalturaBatchJobType::CAPTURE_THUMB);
+	}
+	
+	
+	/**
+	 * batch abortCaptureThumbAction aborts and returns the status of capture thumbnail task
+	 * 
+	 * @action abortCaptureThumb
+	 * @param int $jobId the id of the bulk upload job  
+	 * @return KalturaBatchJobResponse 
+	 */
+	function abortCaptureThumbAction($jobId)
+	{
+		return $this->abortJobAction($jobId, KalturaBatchJobType::CAPTURE_THUMB);
+	}
+	
+	
+	/**
+	 * batch retryCaptureThumbAction retrys and returns the status of capture thumbnail task
+	 * 
+	 * @action retryCaptureThumb
+	 * @param int $jobId the id of the bulk upload job  
+	 * @return KalturaBatchJobResponse 
+	 */
+	function retryCaptureThumbAction($jobId)
+	{
+		return $this->retryJobAction($jobId, KalturaBatchJobType::CAPTURE_THUMB);
+	}
+	
+
+// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
+	
 	
 // --------------------------------- PullJob functions 	--------------------------------- //
 

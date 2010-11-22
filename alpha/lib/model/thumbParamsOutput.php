@@ -14,8 +14,8 @@ class thumbParamsOutput extends flavorParamsOutput
 	public function getCropY()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_Y);}
 	public function getCropWidth()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_WIDTH);}
 	public function getCropHeight()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_HEIGHT);}
-	public function getCropProviders()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS);}
-	public function getCropProvidersData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS_DATA);}
+	public function getCropProvider()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER);}
+	public function getCropProviderData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA);}
 	public function getVideoOffset()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_VIDEO_OFFSET);}
 	public function getScaleWidth()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_WIDTH);}
 	public function getScaleHeight()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_HEIGHT);}
@@ -27,8 +27,8 @@ class thumbParamsOutput extends flavorParamsOutput
 	public function setCropY($v)				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_Y, $v);}
 	public function setCropWidth($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_WIDTH, $v);}
 	public function setCropHeight($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_HEIGHT, $v);}
-	public function setCropProviders($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS, $v);}
-	public function setCropProvidersData($v)	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDERS_DATA, $v);}
+	public function setCropProvider($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER, $v);}
+	public function setCropProviderData($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA, $v);}
 	public function setVideoOffset($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_VIDEO_OFFSET, $v);}
 	public function setScaleWidth($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_WIDTH, $v);}
 	public function setScaleHeight($v)			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCALE_HEIGHT, $v);}
