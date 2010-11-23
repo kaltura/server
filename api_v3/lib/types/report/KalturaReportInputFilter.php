@@ -37,6 +37,12 @@ class KalturaReportInputFilter extends KalturaObject
 	 */
 	public $categories;
 	
+	/**
+	 * time zone offset in minutes
+	 * @var int
+	 */
+	public $timeZoneOffset = 0;
+	
 	public function toReportsInputFilter ()
 	{
 		$reportInputFilter = new reportsInputFilter();
@@ -46,6 +52,7 @@ class KalturaReportInputFilter extends KalturaObject
 		$reportInputFilter->search_in_tags= $this->searchInTags;
 		$reportInputFilter->search_in_admin_tags= $this->searchInAdminTags;
 		$reportInputFilter->categories=$this->categories;
+		$reportInputFilter->timeZoneOffset=$this->timeZoneOffset;
 		
 		return $reportInputFilter;
 	}
@@ -58,6 +65,7 @@ class KalturaReportInputFilter extends KalturaObject
 		$this->searchInTags = $reportInputFilter->search_in_tags ;
 		$this->searchInAdminTags = $reportInputFilter->search_in_admin_tags ;
 		$this->categories=$reportInputFilter->categories;
+		$this->timeZoneOffset=$reportInputFilter->timeZoneOffset;
 		
 		return $this;
 	}	

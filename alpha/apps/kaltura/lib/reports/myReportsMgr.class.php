@@ -656,9 +656,7 @@ class myReportsMgr
 		$obj_ids_str = $obj_ids_clause ? $obj_ids_clause : "1=1";
 		
 		// the diff between user and server timezones 
-		$user_hour = round($input_filter->from_date % 86400 / 3600);
-		$server_hour = round(time() % 86400 / 3600);
-		$time_shift = $server_hour - $user_hour;
+		$time_shift = round($input_filter->timeZoneOffset / 60);
 		
 		date_default_timezone_set('UTC');
 				
@@ -858,6 +856,7 @@ class reportsInputFilter
 	public $search_in_admin_tags;
 	public $extra_map;
 	public $categories;
+	public $timeZoneOffset;
 	
 	public function toShortString()
 	{
