@@ -4,53 +4,53 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * @var KalturaThumbCropType
 	 */
-	public $cropType;
+	public $cropType = 1;
 	
 	/**
 	 * @var int
 	 */
-	public $quality;
+	public $quality = 100;
 	
 	/**
 	 * @var int
 	 */
-	public $cropX;
+	public $cropX = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $cropY;
+	public $cropY = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $cropWidth;
+	public $cropWidth = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $cropHeight;
+	public $cropHeight = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $videoOffset;
+	public $videoOffset = 3;
 	
 	/**
 	 * @var int
 	 */
-	public $scaleWidth;
+	public $width = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $scaleHeight;
+	public $height = 0;
 	
 	/**
 	 * Hexadecimal value
 	 * @var string
 	 */
-	public $backgroundColor;
+	public $backgroundColor = 0;
 	
 //	Maybe support will be added in the future
 //	
