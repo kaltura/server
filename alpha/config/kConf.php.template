@@ -228,7 +228,7 @@ class kConf
 				
 				// ce only settings
 				"kaltura_activation_key" => false,
-				"replace_passwords" => false,
+				"replace_passwords" => @REPLACE_PASSWORDS@,
 				"kaltura_version" => "@KALTURA_VERSION@",
 				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",
 				"usage_tracking_url" => "http://corp.kaltura.com/index.php/events/usage_tracking",
