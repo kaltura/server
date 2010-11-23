@@ -20,18 +20,39 @@ abstract class KBaseCropper
 		if (!file_exists($srcPath))
 			throw new Exception("File not found at [$srcPath]");
 			
-		$this->srcPath = $srcPath;
-		$this->targetPath = $targetPath;
+		$search = array('/', '\\');
+		$replace = array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+		$this->srcPath = str_replace($search, $replace ,$srcPath);
+		$this->targetPath = str_replace($search, $replace ,$targetPath);
 	}
 	
-	public function crop($quality, $cropType, $scaleWidth = 1, $scaleHeight = 1, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $bgcolor = 0xffffff)
+	public function crop($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $bgcolor = 0xffffff)
 	{
-		$cmd = $this->getCommand($quality, $cropType, $scaleWidth, $scaleHeight, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor);
+		if(is_null($quality))
+			$quality = 100;
+		if(is_null($cropType))
+			$cropType = 1;
+		if(is_null($width))
+			$width = 0;
+		if(is_null($height))
+			$height = 0;
+		if(is_null($cropX))
+			$cropX = 0;
+		if(is_null($cropY))
+			$cropY = 0;
+		if(is_null($cropWidth))
+			$cropWidth = 0;
+		if(is_null($cropHeight))
+			$cropHeight = 0;
+		if(is_null($bgcolor))
+			$bgcolor = 0;
+		
+		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor);
 		if($cmd)
 		{
 			KalturaLog::info("Executing: $cmd");
 			$returnValue = null;
-			$output = system( $cmd , $returnValue );
+			$output = system($cmd, $returnValue);
 			KalturaLog::debug("Returned value: '$returnValue'");
 			
 			if($returnValue)

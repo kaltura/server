@@ -1,6 +1,11 @@
 <?php
 class KImageMagickCropper extends KBaseCropper
 {
+	const RESIZE = 1;
+	const RESIZE_WITH_PADDING = 2;
+	const CROP = 3;
+	const CROP_FROM_TOP = 4;
+	
 	protected $cmdPath;
 	protected $srcWidth;
 	protected $srcHeight;
@@ -20,8 +25,8 @@ class KImageMagickCropper extends KBaseCropper
 	{
 		$this->cmdPath = $cmdPath;
 		
-//		list($this->srcWidth, $this->srcHeight, $type, $attr) = getimagesize($srcPath);
-//
+		list($this->srcWidth, $this->srcHeight, $type, $attr) = getimagesize($srcPath);
+
 //		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
 //			$type = IMAGETYPE_JPEG;
 //		
@@ -36,11 +41,8 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $scaleWidth = 1, $scaleHeight = 1, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $bgcolor = 0xffffff)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $bgcolor = 0xffffff)
 	{
-		$width = $this->srcWidth * $scaleWidth;
-		$height = $this->srcHeight * $scaleHeight;
-		
 		$attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
@@ -86,6 +88,9 @@ class KImageMagickCropper extends KBaseCropper
 		// pre-crop
 		if($cropX || $cropY || $cropWidth || $cropHeight)
 		{
+			if($cropType == self::CROP_FROM_TOP)
+				$cropY = 0;
+				
 			$geometrics = "{$cropWidth}x{$cropHeight}";
 			$geometrics .= ($cropX < 0 ? $cropX : "+$cropX");
 			$geometrics .= ($cropY < 0 ? $cropY : "+$cropY");
@@ -98,13 +103,13 @@ class KImageMagickCropper extends KBaseCropper
 		{
 			switch($cropType)
 			{
-				case self::CROP_TYPE_ORIGINAL_ASPECT_RATIO:
+				case self::RESIZE:
 					$w = $width ? $width : '';
 					$h = $height ? $height : '';
 					$attributes[] = "-resize {$w}x{$h}";
 					break;
 					
-				case self::CROP_TYPE_WITHIN_BG_COLOR:
+				case self::RESIZE_WITH_PADDING:
 					if($width && $height)
 					{
 						$borderWidth = 0;
@@ -123,7 +128,8 @@ class KImageMagickCropper extends KBaseCropper
 							$borderWidth = ceil(($width - $w) / 2);
 						}
 						
-						$attributes[] = "-bordercolor '#$bgcolor'";
+						$bgcolor = dechex($bgcolor);
+						$attributes[] = "-bordercolor #$bgcolor";
 						$attributes[] = "-resize {$w}x{$h}";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
 					}
@@ -135,8 +141,8 @@ class KImageMagickCropper extends KBaseCropper
 					}
 					break;
 					
-				case self::CROP_TYPE_EXACT_SIZE:
-				case self::CROP_TYPE_UPPER:
+				case self::CROP:
+				case self::CROP_FROM_TOP:
 					$w = $width ? $width : $height;
 					$h = $height ? $height : $width;
 					
@@ -148,10 +154,9 @@ class KImageMagickCropper extends KBaseCropper
 					else
 						$resizeHeight = $height;
 						
-					
-					if($cropType == self::CROP_TYPE_EXACT_SIZE)
+					if($cropType == self::CROP)
 						$attributes[] = "-gravity Center";
-					elseif($cropType == self::CROP_TYPE_UPPER)
+					elseif($cropType == self::CROP_FROM_TOP)
 						$attributes[] = "-gravity North";
 						
 					$attributes[] = "-resize {$resizeWidth}x{$resizeHeight}";
@@ -164,6 +169,6 @@ class KImageMagickCropper extends KBaseCropper
 			return null;
 			
 		$options = implode(' ', $attributes);
-		return "$this->cmdPath $options $this->srcPath $this->targetPath";
+		return "\"$this->cmdPath\" $options \"$this->srcPath\" \"$this->targetPath\"";
 	}
 }

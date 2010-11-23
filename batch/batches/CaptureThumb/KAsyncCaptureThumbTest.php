@@ -10,9 +10,31 @@ class KAsyncCaptureThumbTest extends PHPUnit_Framework_TestCase
 {
 	const JOB_NAME = 'KAsyncCaptureThumb';
 	
+	private $outputFolder;
+	private $testsConfig;
+	
+	private static $thumbParamsAttributes = array(
+		"cropType",
+		"quality",
+		"cropX",
+		"cropY",
+		"cropWidth",
+		"cropHeight",
+		"videoOffset",
+		"width",
+		"height",
+		"backgroundColor",
+	);
+		
 	public function setUp() 
 	{
 		parent::setUp();
+		
+		$config = new Zend_Config_Ini(dirname(__FILE__) . "/KAsyncCaptureThumbTest.ini");
+		$testConfig = $config->get('config');
+		$this->outputFolder = dirname(__FILE__) . '/' . $testConfig->outputFolder;
+		
+		$this->testsConfig = $config->get('tests');
 	}
 	
 	public function tearDown() 
@@ -20,21 +42,32 @@ class KAsyncCaptureThumbTest extends PHPUnit_Framework_TestCase
 		parent::tearDown();
 	}
 	
-	public function testGoodFile()
+	public function test()
 	{
-		$thumbParamsOutput = new KalturaThumbParamsOutput();
-		$thumbParamsOutput->videoOffset = 6;
-		$this->doTest('C:\web\content\entry\data\0\0\0_p2uga3jg_0_eol5gd3x_1.flv', $thumbParamsOutput, KalturaBatchJobStatus::FINISHED);
+		foreach($this->testsConfig as $testName => $config)
+		{
+			$thumbParamsOutput = new KalturaThumbParamsOutput();
+			foreach(self::$thumbParamsAttributes as $attribute)
+			{
+				if(isset($config->$attribute))
+				{
+					$thumbParamsOutput->$attribute = $config->$attribute;
+					if($attribute == 'backgroundColor' && !is_numeric($thumbParamsOutput->$attribute))
+						$thumbParamsOutput->$attribute = hexdec($thumbParamsOutput->$attribute);
+				}
+			}
+				
+			$this->doTest($config->source, $thumbParamsOutput, $config->expectedStatus, $testName);
+		}
 	}
 	
-	public function testMissingFile()
+	public function doTest($filePath, KalturaThumbParamsOutput $thumbParamsOutput, $expectedStatus, $testName)
 	{
-		$thumbParamsOutput = new KalturaThumbParamsOutput();
-		$this->doTest('aaa', $thumbParamsOutput, KalturaBatchJobStatus::RETRY);
-	}
-	
-	public function doTest($filePath, KalturaThumbParamsOutput $thumbParamsOutput, $expectedStatus)
-	{
+		$outputFileName = "$testName.jpg";
+		$finalPath = "$this->outputFolder/$outputFileName";
+		if(file_exists($finalPath))
+			unlink($finalPath);
+				
 		$iniFile = "batch_config.ini";
 		$schedulerConfig = new KSchedulerConfig($iniFile);
 	
@@ -56,7 +89,16 @@ class KAsyncCaptureThumbTest extends PHPUnit_Framework_TestCase
 		$instance->done();
 		
 		foreach($jobs as $job)
-			$this->assertEquals($expectedStatus, $job->status);
+		{
+			$this->assertEquals($expectedStatus, $job->status, "test [$testName] expected status [$expectedStatus] actual status [$job->status] with message [$job->message]");
+			if($job->status != KalturaBatchJobStatus::FINISHED)
+				continue;
+				
+			$outPath = $job->data->thumbPath;
+			$this->assertFileExists($outPath);
+				
+			rename($outPath, $finalPath);
+		}
 	}
 	
 	private function prepareJobs($filePath, KalturaThumbParamsOutput $thumbParamsOutput)

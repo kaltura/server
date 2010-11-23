@@ -2174,14 +2174,14 @@ class KalturaThumbParams extends KalturaAssetParams
 	 *
 	 * @var int
 	 */
-	public $scaleWidth = null;
+	public $width = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $scaleHeight = null;
+	public $height = null;
 
 	/**
 	 * Hexadecimal value

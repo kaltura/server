@@ -576,7 +576,11 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		KalturaLog::info("job[$job->id] status: [$status] msg : [$msg]");
 		if($this->isUnitTest)
 		{
-			$job->status = $status;
+			$job->status = $updateJob->status;
+			$job->message = $updateJob->message;
+			$job->description = $updateJob->description;
+			$job->errType = $updateJob->errType;
+			$job->errNumber = $updateJob->errNumber;
 			return $job;
 		}
 		

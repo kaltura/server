@@ -120,12 +120,14 @@ class KAsyncCaptureThumb extends KBatchBase
 			$cropWidth = $data->thumbParamsOutput->cropWidth;
 			$cropHeight = $data->thumbParamsOutput->cropHeight;
 			$bgcolor = $data->thumbParamsOutput->backgroundColor;
-			$scaleWidth = $data->thumbParamsOutput->scaleWidth;
-			$scaleHeight = $data->thumbParamsOutput->scaleHeight;
+			$width = $data->thumbParamsOutput->width;
+			$height = $data->thumbParamsOutput->height;
 			
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
-			$cropper->crop($quality, $cropType, $scaleWidth, $scaleHeight, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor);
-			
+			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor);
+			if(!$cropped || !file_exists($thumbPath))
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not cropped", KalturaBatchJobStatus::FAILED);
+				
 			$data->thumbPath = $thumbPath;
 			$job = $this->moveFile($job, $data);
 				
