@@ -384,7 +384,7 @@ class kJobsManager
 			if($flavor->getEngineVersion()) // uses the new engine version
 			{
 				$operatorSet = new kOperatorSets();
-				$operatorSet->setSerialized(stripslashes($flavor->getOperators()));
+				$operatorSet->setSerialized(/*stripslashes*/($flavor->getOperators()));
 				$nextOperator = $operatorSet->getOperator();
 				if(!$nextOperator)
 				{
@@ -419,7 +419,7 @@ class kJobsManager
 				}
 				
 				$operatorSet = new kOperatorSets();
-				$operatorSet->setSerialized(stripslashes($flavor->getOperators()));
+				$operatorSet->setSerialized(/*stripslashes*/($flavor->getOperators()));
 				$nextOperatorSet = $parentData->getCurrentOperationSet();
 				$nextOperatorIndex = $parentData->getCurrentOperationIndex() + 1;
 				$nextOperator = $operatorSet->getOperator($nextOperatorSet, $nextOperatorIndex);
