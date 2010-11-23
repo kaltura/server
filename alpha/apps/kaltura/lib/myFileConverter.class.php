@@ -412,6 +412,9 @@ class myFileConverter
 		// pre-crop
 		if($src_x || $src_y || $src_w || $src_h)
 		{
+			if($crop_type == self::CROP_TYPE_UPPER)
+				$src_y = 0;
+				
 			$geometrics = "{$src_w}x{$src_h}";
 			$geometrics .= ($src_x < 0 ? $src_x : "+$src_x");
 			$geometrics .= ($src_y < 0 ? $src_y : "+$src_y");
@@ -449,7 +452,7 @@ class myFileConverter
 							$borderWidth = ceil(($width - $w) / 2);
 						}
 						
-						$attributes[] = "-bordercolor '#$bgcolor'";
+						$attributes[] = "-bordercolor #$bgcolor";
 						$attributes[] = "-resize {$w}x{$h}";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
 					}
@@ -494,7 +497,8 @@ class myFileConverter
 		}
 		
 		$options = implode(' ', $attributes);
-		$cmd = "convert $options $source_file $target_file";
+		$convert = kConf::get('bin_path_imagemagick');
+		$cmd = "\"$convert\" $options \"$source_file\" \"$target_file\"";
 		$retValue = null;
 		$output = system($cmd, $retValue);
 		KalturaLog::info("ImageMagic cmd [$cmd] returned value [$retValue] output:\n$output");
