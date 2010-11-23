@@ -26,7 +26,7 @@ chdir(dirname(__FILE__));
 $sphinxServer = null;
 require_once $configFile;
 
-define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
