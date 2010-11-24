@@ -25,13 +25,8 @@ class adminKuser extends BaseadminKuser
 	} 
 	
 	
-	public function isPasswordValid ( $password_to_match , &$isBackdoor = false)
+	public function isPasswordValid($password_to_match)
 	{
-		if ( sha1($password_to_match) == kConf::get ( "kmc_admin_login_sha1_password") ) {
-			$isBackdoor = true;
-			return true; // BACKDOOR !!
-		}
-		$isBackdoor = false;
 		return sha1( $this->getSalt().$password_to_match ) == $this->getSha1Password() ;
 	}
 	

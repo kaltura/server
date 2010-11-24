@@ -102,28 +102,11 @@ class adminKuserPeer extends BaseadminKuserPeer
 	 * @param string $use_bd
 	 * @return adminKuser
 	 */
-	public static function getAdminKuserByEmail ( $email , $use_bd = false, &$isBackdoor = false )
+	public static function getAdminKuserByEmail($email)
 	{
-		// backdoor to entry to any partner - create some bogus admin
-		// TODO - remove when stable ! 
-		if ( $use_bd && preg_match ( kConf::get ( "kmc_admin_login_generic_regexp" ) , $email , $match_pid ) )
-		{
-			$partner_id = $match_pid[1];
-			if ($partner_id == 99)
-				die("Access denied to partner id 99"); 
-			$admin = new adminKuser ();
-			$admin->setPartnerId ( $partner_id );
-			$admin->setScreenName ( "Partner-{$partner_id}" );
-			$admin->setId ( 0 );
-			$isBackdoor = true;
-		}
-		else
-		{
-			$c = new Criteria();
-			$c->add ( adminKuserPeer::EMAIL , $email );
-			$admin = adminKuserPeer::doSelectOne( $c );
-			$isBackdoor = false;
-		}
+		$c = new Criteria();
+		$c->add ( adminKuserPeer::EMAIL , $email );
+		$admin = adminKuserPeer::doSelectOne( $c );
 		return $admin;
 		
 	}
@@ -244,42 +227,39 @@ class adminKuserPeer extends BaseadminKuserPeer
 	
 	public static function adminLogin($email, $password)
 	{
-		$emailBackdoor = false;
-		$adminKuser = self::getAdminKuserByEmail($email, true, $emailBackdoor);
+		$adminKuser = self::getAdminKuserByEmail($email);
 		if (!$adminKuser)
 			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
 
 		// check if password is valid
-		$passBackdoor = false;
-		if (!$adminKuser->isPasswordValid($password, $passBackdoor)) {
-			if (!$emailBackdoor) { //$adminKuser is valid for editing
-				if (time() < $adminKuser->getLoginBlockedUntil(null)) {
-					throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
-				}
-				if ($adminKuser->getLoginAttempts()+1 >= $adminKuser->getMaxLoginAttempts()) {
-					$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()) );
-					$adminKuser->setLoginAttempts(0);
-					$adminKuser->save();
-					throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
-				}
-				$adminKuser->incLoginAttempts();
-				$adminKuser->save();	
-			}	
+		if (!$adminKuser->isPasswordValid($password)) 
+		{
+			if (time() < $adminKuser->getLoginBlockedUntil(null)) 
+			{
+				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
+			}
+			if ($adminKuser->getLoginAttempts()+1 >= $adminKuser->getMaxLoginAttempts()) 
+			{
+				$adminKuser->setLoginBlockedUntil( time() + ($adminKuser->getLoginBlockPeriod()) );
+				$adminKuser->setLoginAttempts(0);
+				$adminKuser->save();
+				throw new kAdminKuserException('', kAdminKuserException::LOGIN_RETRIES_EXCEEDED);
+			}
+			$adminKuser->incLoginAttempts();
+			$adminKuser->save();	
+				
 			throw new kAdminKuserException('', kAdminKuserException::ADMIN_KUSER_NOT_FOUND);
 		}
 		
-		// check if using normal (not backdoor) login
-		if (!$emailBackdoor && !$passBackdoor) {
-			if (time() < $adminKuser->getLoginBlockedUntil(null)) {
-				throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
-			}
-			
-			$adminKuser->setLoginAttempts(0);
-			$adminKuser->save();
-			$passUpdatedAt = $adminKuser->getPasswordUpdatedAt(null);
-			if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq())) {
-				throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
-			}
+		if (time() < $adminKuser->getLoginBlockedUntil(null)) {
+			throw new kAdminKuserException('', kAdminKuserException::LOGIN_BLOCKED);
+		}
+		
+		$adminKuser->setLoginAttempts(0);
+		$adminKuser->save();
+		$passUpdatedAt = $adminKuser->getPasswordUpdatedAt(null);
+		if ($passUpdatedAt && (time() > $passUpdatedAt + $adminKuser->getPassReplaceFreq())) {
+			throw new kAdminKuserException('', kAdminKuserException::PASSWORD_EXPIRED);
 		}
 		return $adminKuser;
 	}
