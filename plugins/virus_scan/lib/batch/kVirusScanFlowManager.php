@@ -122,9 +122,14 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
 	{
+		if (kCurrentContext::$ps_vesion == 'ps2') {
+			// virus scan does not work in partner services 2 context because it uses dynamic enums
+			return true;
+		}
+		
 		if($dbBatchJob->getJobType() == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
-		
+
 		return true;
 	}
 		
