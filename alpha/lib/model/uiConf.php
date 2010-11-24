@@ -24,6 +24,10 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_TYPE_KMC_DASHBOARD = 12;
 	const UI_CONF_TYPE_KMC_LOGIN = 13;
 	const UI_CONF_TYPE_SLP = 14;
+	const UI_CONF_CLIENTSIDE_ENCODER = 15;
+	const UI_CONF_KMC_GENERAL = 16;
+	const UI_CONF_KMC_ROLES_AND_PERMISSIONS = 17;
+
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
 	const UI_CONF_CREATION_MODE_WIZARD = 2;

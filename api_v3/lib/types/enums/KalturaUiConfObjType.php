@@ -13,11 +13,13 @@ class KalturaUiConfObjType extends KalturaEnum
 	const APP_STUDIO = 6;
 	const KRECORD = 7;
 	const PLAYER_V3 = 8;
+	const KMC_ACCOUNT = 9;
+	const KMC_ANALYTICS = 10;
+	const KMC_CONTENT = 11;
+	const KMC_DASHBOARD = 12;
+	const KMC_LOGIN = 13;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
 	const KMC_GENERAL = 16;
-	const KMC_CONTENT = 17;
-	const KMC_SETTINGS = 18;
-	const KMC_ANALYTICS = 19;
-	const KMC_DASHBOARD = 20;
+	const KMC_ROLES_AND_PERMISSIONS = 17;
 }
