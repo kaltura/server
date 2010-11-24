@@ -87,9 +87,6 @@ class kConf
 				"priority_percent" => array(1 => 33, 2 => 27, 3 => 20, 4 => 13, 5 => 7),
 				"priority_time_range" => 60,
 		
-				"kmc_admin_login_generic_regexp" => "/__([0-9]+)__@kaltura.com/" ,			// used as generic backdoor to kmc
-				"kmc_admin_login_sha1_password" => "@KMC_BACKDOR_SHA1_PASS@" ,
-				
 				"system_pages_login_username" => "@SYSTEM_PAGES_LOGIN_USER@ ",
 				"system_pages_login_password" => "@SYSTEM_PAGES_LOGIN_PASS@",				
 				"system_allow_edit_kConf" => false,
