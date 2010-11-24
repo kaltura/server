@@ -40,7 +40,7 @@ class adminloginAction extends defPartnerservices2Action
 		$email = trim ( $this->getPM ( "email" ) );
 		$password = trim (  $this->getPM ( "password" ) );
 		
-		$admin = adminKuserPeer::getAdminKuserByEmail ( $email , true );
+		$admin = adminKuserPeer::getAdminKuserByEmail ($email);
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
 		// so no hint about existing admin will leak 
