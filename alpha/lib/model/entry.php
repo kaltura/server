@@ -1925,8 +1925,7 @@ class entry extends Baseentry implements ISyncableFile
 			$newCats = array();
 		
 		if ($this->old_categories !== null && $this->old_categories !== "")
-			$oldCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->old_categories);
-		
+			$oldCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->old_categories);		
 		else
 			$oldCats = array();
 
@@ -1949,7 +1948,7 @@ class entry extends Baseentry implements ISyncableFile
 				$remainingCats[] = $cat;
 		}
 		
-		
+
 		foreach($addedCats as $cat)
 		{
 			$category = categoryPeer::getByFullNameExactMatch($cat);
