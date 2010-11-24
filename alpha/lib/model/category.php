@@ -79,14 +79,15 @@ class category extends Basecategory
 		if ($this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			// decrease for the old parent category
-			$oldParentCat = categoryPeer::retrieveByPK($this->old_parent_id);
+			if($this->old_parent_id)
+				$oldParentCat = categoryPeer::retrieveByPK($this->old_parent_id);
 			if ($oldParentCat)
-				$oldParentCat->decrementEntriesCount($this->entries_count);
+				$oldParentCat->decrementEntriesCount(null, $this->entries_count);
 			
 			// increase for the new parent category
 			$newParentCat = categoryPeer::retrieveByPK($this->parent_id);
 			if ($newParentCat)
-				$newParentCat->incrementEntriesCount($this->entries_count);
+				$newParentCat->incrementEntriesCount(null,$this->entries_count);
 			
 			$this->old_parent_id = null;
 		}
@@ -165,46 +166,17 @@ class category extends Basecategory
 	/**
 	 * Increment entries count (will increment recursively the parent categories too)
 	 */
-	public function incrementEntriesCount($increase = 1)
+	public function incrementEntriesCount($entryId = null, $increase = 1)
 	{
-		$this->setEntriesCount($this->getEntriesCount() + $increase);
-		
-		if ($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if ($parentCat)
-			{
-				$parentCat->incrementEntriesCount($increase);
-			}
-		}
-		
-		$this->save();
+		$this->updateCategoryCount($increase, $entryId);
 	}
 	
 	/**
 	 * Decrement entries count (will decrement recursively the parent categories too)
 	 */
-	public function decrementEntriesCount($decrease = 1)
+	public function decrementEntriesCount($entryId = null, $decrease = 1)
 	{
-		if($this->getDeletedAt(null))
-			return;
-			
-		$newCount = $this->getEntriesCount() - $decrease;
-		if ($newCount <= 0) // don't allow zero values
-			$this->setEntriesCount(0);
-		else
-			$this->setEntriesCount($newCount);
-		
-		if ($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if ($parentCat)
-			{
-				$parentCat->decrementEntriesCount($decrease);
-			}
-		}
-		
-		$this->save();
+		$this->updateCategoryCount((-1)*$decrease, $entryId);
 	}
 	
 	public function validateFullNameIsUnique()
@@ -333,6 +305,59 @@ class category extends Basecategory
 			$entry->removeCategory($this->full_name);
 			$entry->syncCategories();
 		}
+	}
+	
+	/**
+	 * updateCategoryCount for category by counting all entries with this category. it is important to select each time
+	 * all the entries since an entry that exists in two subcategories should be calculated as 1 entry in the parent, and
+	 * not as 2 entries (by Noa).
+	 */
+	public function updateCategoryCount($increase, $entryId = null)
+	{
+		if($this->getDeletedAt(null))
+			return;
+			
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$entryFilter = new entryFilter();
+		$childs = $this->getChilds();
+		$childIdsStr = "";
+		
+		if (count($childs) > 0)
+		{
+			foreach($childs as $child)
+				$childsIds[] = $child->getId();
+			$childIdsStr = "," . implode(",",$childsIds);
+		}
+		
+		$entry = entryPeer::retrieveByPK($entryId);
+		if ($entry == null){
+			$increase = 0;
+		}else{
+			$entryFilter->setIdNotIn(array($entryId));
+		}
+		
+		$entryFilter->set("_matchor_categories_ids", $this->getId().$childIdsStr);
+		$entryFilter->attachToCriteria($c);
+		$c->applyFilters();
+		
+		$CategoryCount = $c->getRecordsCount() + $increase;
+		
+		if ($CategoryCount < 0)
+			$CategoryCount = 0;
+			
+		$this->setEntriesCount($CategoryCount);	
+		$this->save();
+		
+		KalturaLog::log("category count was updateded to total count $CategoryCount for all entries with category id [".$this->getId()."] and childIds [$childIdsStr] with increase [$increase], from sphinx[".$c->getRecordsCount()."]");
+		
+		if ($this->getParentId())
+		{
+			$parentCat = $this->getParentCategory();
+			if ($parentCat)
+			{
+				$parentCat->updateCategoryCount($increase, $entryId);
+			}
+		}		
 	}
 	
 	/**
