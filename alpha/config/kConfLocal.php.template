@@ -63,21 +63,7 @@ class kConfLocal
 				
 				'track_kdpwrapper' =>@TRACK_KDPWRAPPER@,
 			
-				"default_plugins" => array(
-					"FileSyncPlugin", // Should be enabled only on servers that run admin console
-					"SystemUserPlugin", // Should be enabled only on servers that run admin console
-					"SystemPartnerPlugin", // Should be enabled only on servers that run admin console
-					"AdminConsolePlugin", // Should be enabled only on servers that run admin console
-					"StorageProfilePlugin", // Should always be enabled
-					"MetadataPlugin", // Should always be enabled
-					"MultiCentersPlugin", //(uncomment to enable moultiple data centers)
-					
-					"DocumentPlugin", // Should be enabled for document entries
-					"SphinxSearchPlugin", // Should always be enabled
-		                    	"AuditPlugin", // Should be enabled only if audit trail support required
-		    			"VirusScanPlugin",
-		    			"SymantecScanEnginePlugin",
-				),
+
 				"reports_db_config" => array (
 					"host" => "@DWH_HOST@",
 					"user" => "@DWH_USER@",
@@ -108,7 +94,7 @@ class kConfLocal
 				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",
 				"usage_tracking_optin" => @USAGE_TRACKING_OPTIN@,
 				"installation_id" => "@INSTALLATION_UID@",
-                // end of ce only settings
+                		// end of ce only settings
 			)
 		);
 		
