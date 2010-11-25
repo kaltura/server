@@ -65,6 +65,10 @@ class KalturaErrors extends APIErrors
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
 	
+	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED,Entry type \"%s\" not suppported";
+	
+	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED,Entry media type \"%s\" not suppported";
+	
 	const UPLOADED_FILE_NOT_FOUND_BY_TOKEN = "UPLOADED_FILE_NOT_FOUND_BY_TOKEN,The uploaded file was not found by the given token id, or was already used";
 	
 	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND,The recorded webcam file was not found by the given token id, or was already used";
@@ -140,8 +144,6 @@ class KalturaErrors extends APIErrors
 	
 	const FLAVOR_ASSET_RECONVERT_ORIGINAL = "FLAVOR_ASSET_RECONVERT_ORIGINAL,Cannot reconvert original flavor asset";
 	
-	const FLAVOR_ASSET_IS_NOT_READY = "FLAVOR_ASSET_IS_NOT_READY,The flavor asset is not ready";
-	
 	const ORIGINAL_FLAVOR_ASSET_IS_MISSING = "ORIGINAL_FLAVOR_ASSET_IS_MISSING,The original flavor asset is missing";
 	
 	const ORIGINAL_FLAVOR_ASSET_NOT_CREATED = "ORIGINAL_FLAVOR_ASSET_NOT_CREATED,The original flavor asset could not be created [%s]";
@@ -151,9 +153,11 @@ class KalturaErrors extends APIErrors
 	/**
 	 * ThumbAsset Service
 	 */
-	const THUMB_ASSET_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,Thumb asset id \"%s\" not found";
+	const THUMB_ASSET_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,The Thumbnail asset id \"%s\" not found";
 	
-	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY,The flavor asset is not ready";
+	const THUMB_ASSET_PARAMS_ID_NOT_FOUND = "THUMB_ASSET_ID_NOT_FOUND,The Thumbnail asset not found for params id \"%s\"";
+	
+	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY,The thumbnail asset is not ready";
 	
 	/**
 	 * Category Service
