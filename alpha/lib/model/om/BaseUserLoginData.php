@@ -67,6 +67,18 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	protected $is_admin;
 
 	/**
+	 * The value for the created_at field.
+	 * @var        string
+	 */
+	protected $created_at;
+
+	/**
+	 * The value for the updated_at field.
+	 * @var        string
+	 */
+	protected $updated_at;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -208,6 +220,86 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	public function getIsAdmin()
 	{
 		return $this->is_admin;
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [created_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getCreatedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->created_at === null) {
+			return null;
+		}
+
+
+		if ($this->created_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->created_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [updated_at] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
+	{
+		if ($this->updated_at === null) {
+			return null;
+		}
+
+
+		if ($this->updated_at === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->updated_at);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**
@@ -434,6 +526,104 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	} // setIsAdmin()
 
 	/**
+	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     UserLoginData The current object (for fluent API support)
+	 */
+	public function setCreatedAt($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->created_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = UserLoginDataPeer::CREATED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setCreatedAt()
+
+	/**
+	 * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     UserLoginData The current object (for fluent API support)
+	 */
+	public function setUpdatedAt($v)
+	{
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->updated_at !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->updated_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = UserLoginDataPeer::UPDATED_AT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setUpdatedAt()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -493,7 +683,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$this->salt = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->login_blocked_until = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->is_admin = ($row[$startcol + 7] !== null) ? (boolean) $row[$startcol + 7] : null;
-			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -503,7 +695,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserLoginData object", $e);
@@ -731,6 +923,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
+    	$this->setCreatedAt(time());
+    	
+		$this->setUpdatedAt(time());
 		return true;
 	}
 	
@@ -759,6 +954,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	{
 		if($this->isModified())
 		{
+			$this->setUpdatedAt(time());
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->modifiedColumns));
 		}
 		return true;
@@ -887,6 +1083,12 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				return $this->getIsAdmin();
 				break;
 			case 8:
+				return $this->getCreatedAt();
+				break;
+			case 9:
+				return $this->getUpdatedAt();
+				break;
+			case 10:
 				return $this->getCustomData();
 				break;
 			default:
@@ -918,7 +1120,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$keys[5] => $this->getSalt(),
 			$keys[6] => $this->getLoginBlockedUntil(),
 			$keys[7] => $this->getIsAdmin(),
-			$keys[8] => $this->getCustomData(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getUpdatedAt(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -975,6 +1179,12 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				$this->setIsAdmin($value);
 				break;
 			case 8:
+				$this->setCreatedAt($value);
+				break;
+			case 9:
+				$this->setUpdatedAt($value);
+				break;
+			case 10:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1009,7 +1219,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setSalt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setLoginBlockedUntil($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setIsAdmin($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1029,6 +1241,8 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserLoginDataPeer::SALT)) $criteria->add(UserLoginDataPeer::SALT, $this->salt);
 		if ($this->isColumnModified(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL)) $criteria->add(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL, $this->login_blocked_until);
 		if ($this->isColumnModified(UserLoginDataPeer::IS_ADMIN)) $criteria->add(UserLoginDataPeer::IS_ADMIN, $this->is_admin);
+		if ($this->isColumnModified(UserLoginDataPeer::CREATED_AT)) $criteria->add(UserLoginDataPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(UserLoginDataPeer::UPDATED_AT)) $criteria->add(UserLoginDataPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UserLoginDataPeer::CUSTOM_DATA)) $criteria->add(UserLoginDataPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1097,6 +1311,10 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		$copyObj->setLoginBlockedUntil($this->login_blocked_until);
 
 		$copyObj->setIsAdmin($this->is_admin);
+
+		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
 

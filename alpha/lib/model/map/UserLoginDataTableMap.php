@@ -38,13 +38,15 @@ class UserLoginDataTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('LOGIN_EMAIL', 'LoginEmail', 'VARCHAR', true, 100, null);
-		$this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', true, 40, null);
-		$this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', true, 40, null);
+		$this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', false, 40, null);
+		$this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', false, 40, null);
 		$this->addColumn('SHA1_PASSWORD', 'Sha1Password', 'VARCHAR', true, 40, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', true, 32, null);
-		$this->addColumn('LOGIN_BLOCKED_UNTIL', 'LoginBlockedUntil', 'TIMESTAMP', true, null, null);
-		$this->addColumn('IS_ADMIN', 'IsAdmin', 'BOOLEAN', true, null, null);
-		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', true, 255, null);
+		$this->addColumn('LOGIN_BLOCKED_UNTIL', 'LoginBlockedUntil', 'TIMESTAMP', false, null, null);
+		$this->addColumn('IS_ADMIN', 'IsAdmin', 'BOOLEAN', false, null, null);
+		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, 255, null);
 		// validators
 	} // initialize()
 
