@@ -36,7 +36,74 @@ class kBusinessPreConvertDL
 	}
 	
 	/**
-	 * batch decideFlavorConvert is the decision layer for a single flavor conversion 
+	 * decideThumbGenerate is the decision layer for a single thumbnail generation 
+	 * 
+	 * @param entry $entry
+	 * @param thumbParams $destThumbParams
+	 * @return BatchJob 
+	 */
+	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams)
+	{
+		$srcAsset = null;
+		if($destThumbParams->getSourceParamsId())
+			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getSourceParamsId());
+				
+		if(is_null($srcAsset))
+			$srcAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
+				
+		if (is_null($srcAsset) || $srcAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			$srcAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+			
+		if (is_null($srcAsset))
+			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY, $destThumbParams->getSourceParamsId());
+			
+		$errDescription = null;
+		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
+		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription);
+		
+		$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
+		if($thumbAsset)
+		{
+			$description = $thumbAsset->getDescription() . "\n" . $errDescription;
+			$thumbAsset->setDescription($description);
+			$thumbAsset->incrementVersion();
+		}
+		else
+		{
+			$thumbAsset = new thumbAsset();
+			$thumbAsset->setPartnerId($entry->getPartnerId());
+			$thumbAsset->setEntryId($entry->getId());
+			$thumbAsset->setDescription($errDescription);
+			
+			$thumbAsset->setTags($destThumbParams->getTags());
+			$thumbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+			$thumbAsset->setFlavorParamsId($destThumbParams->getId());
+			$thumbAsset->setFileExt($destThumbParams->getFileExt());
+			
+			if(!$destThumbParamsOutput)
+			{
+				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$thumbAsset->save();	
+				return null;
+			}
+				
+			$thumbAsset->save();
+			
+			// save flavor params
+			$destThumbParamsOutput->setPartnerId($entry->getPartnerId());
+			$destThumbParamsOutput->setEntryId($entry->getId());
+			$destThumbParamsOutput->setFlavorAssetId($thumbAsset->getId());
+			$destThumbParamsOutput->setFlavorAssetVersion($thumbAsset->getVersion());
+			$destThumbParamsOutput->save();
+		}
+		
+		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$srcAssetType = $srcAsset->getType();
+		return kJobsManager::addCapturaThumbJob(null, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
+	}
+	
+	/**
+	 * decideFlavorConvert is the decision layer for a single flavor conversion 
 	 * 
 	 * @param FileSyncKey $srcSyncKey
 	 * @param int $flavorParamsId
@@ -341,7 +408,7 @@ class kBusinessPreConvertDL
 	}
 	
 	/**
-	 * batch validateFlavorAndMediaInfo validate and manipulate a flavor according to the given media info
+	 * validateFlavorAndMediaInfo validate and manipulate a flavor according to the given media info
 	 * 
 	 * @param flavorParams $flavor
 	 * @param mediaInfo $mediaInfo
@@ -377,6 +444,59 @@ class kBusinessPreConvertDL
 			return null;
 
 		return reset($cdl->_targetList);
+	}
+	
+	/**
+	 * validateThumbAndMediaInfo validate and manipulate a thumbnail params according to the given media info
+	 * 
+	 * @param thumbParams $thumbParams
+	 * @param mediaInfo $mediaInfo
+	 * @param string $errDescription
+	 * @return thumbParamsOutput or null for fail
+	 */
+	protected static function validateThumbAndMediaInfo(thumbParams $thumbParams, mediaInfo $mediaInfo = null, &$errDescription)
+	{
+		$thumbParamsOutput = new thumbParamsOutput();
+	
+		$thumbParamsOutput->setFlavorParamsId($thumbParams->getId());
+		$thumbParamsOutput->setFlavorParamsVersion($thumbParams->getVersion());
+		$thumbParamsOutput->setName($thumbParams->getName());
+		$thumbParamsOutput->setTags($thumbParams->getTags());
+		$thumbParamsOutput->setDescription($thumbParams->getDescription());
+		$thumbParamsOutput->setReadyBehavior($thumbParams->getReadyBehavior());
+		$thumbParamsOutput->setFormat($thumbParams->getFormat());
+		$thumbParamsOutput->setWidth($thumbParams->getWidth());
+		$thumbParamsOutput->setHeight($thumbParams->getHeight());
+		$thumbParamsOutput->setConversionEngines($thumbParams->getConversionEngines());
+		$thumbParamsOutput->setConversionEnginesExtraParams($thumbParams->getConversionEnginesExtraParams());
+		$thumbParamsOutput->setOperators($thumbParams->getOperators());
+		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
+		
+		
+		$thumbParamsOutput->setCropType($thumbParams->getCropType());
+		$thumbParamsOutput->setQuality($thumbParams->getQuality());
+		$thumbParamsOutput->setCropX($thumbParams->getCropX());
+		$thumbParamsOutput->setCropY($thumbParams->getCropY());
+		$thumbParamsOutput->setCropWidth($thumbParams->getCropWidth());
+		$thumbParamsOutput->setCropHeight($thumbParams->getCropHeight());
+		$thumbParamsOutput->setCropProvider($thumbParams->getCropProvider());
+		$thumbParamsOutput->setCropProviderData($thumbParams->getCropProviderData());
+		$thumbParamsOutput->setVideoOffset($thumbParams->getVideoOffset());
+		$thumbParamsOutput->setWidth($thumbParams->getWidth());
+		$thumbParamsOutput->setHeight($thumbParams->getHeight());
+		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
+		
+		if($mediaInfo)
+		{
+			if($thumbParamsOutput->getVideoOffset() && $mediaInfo->getVideoDuration())
+			{
+				$videoDurationSec = floor($mediaInfo->getVideoDuration() / 1000);
+				if($thumbParamsOutput->getVideoOffset() > $videoDurationSec)
+					$thumbParamsOutput->setVideoOffset($videoDurationSec);
+			}
+		}
+		
+		return $thumbParamsOutput;
 	}
 	
 	/**
