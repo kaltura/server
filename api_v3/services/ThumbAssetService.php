@@ -7,148 +7,97 @@
  * @package api
  * @subpackage services
  */
-class thumbAssetService extends KalturaBaseService
+class ThumbAssetService extends KalturaBaseService
 {
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
-//		parent::applyPartnerFilterForClass(new flavorParamsPeer());
-//		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-//		parent::applyPartnerFilterForClass(new flavorAssetPeer());
+		parent::applyPartnerFilterForClass(new thumbParamsPeer());
+		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+		parent::applyPartnerFilterForClass(new thumbAssetPeer());
 	}
 	
-/*
- * serveByEntryId action
-Serves image based on:
-•	Entry id
-•	Thumbnail params id, if not set, default thumbnail will be used.
-*/
 	/**
-	 * ServeByEntryIdAction
+	 * Serves thumbnail by entry id and thumnail params id
 	 *  
 	 * @action serveByEntryId
 	 * @serverOnly
 	 * @param string $entryId
-	 * @param string $paramId
+	 * @param int $thumbParamId if not set, default thumbnail will be used.
 	 * 
-	 * @throws KalturaErrors::THUMB_IS_NOT_READY
-	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function serveByEntryIdAction($entryId, $paramId = null)
+	public function serveByEntryIdAction($entryId, $thumbParamId = null)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry)
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-
-		$fileName = $dbEntry->getName() . '.jpg';
+		$fileName = $entry->getId() . '.jpg';
 		
-		if(!isset($paramId) || $paramId==null) {
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-			return $this->serveThumbToFile($fileSync, $local, $fileName);
+		$syncKey = null;
+		if(is_null($thumbParamId))
+		{
+			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			if(!kFileSyncUtils::fileSync_exists($syncKey))
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 		}
-		
-		// get the assets for this entry
-		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::FLAVOR_PARAMS_ID, $paramId);
-		$c->add(flavorAssetPeer::STATUS, array(thumbAsset::FLAVOR_ASSET_STATUS_DELETED, thumbAsset::FLAVOR_ASSET_STATUS_TEMP), Criteria::NOT_IN);
-		$thumbAssetsDb = flavorAssetPeer::doSelect($c);
-		
-		if(count($thumbAssetsDb)==0){
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $paramId);
+		else
+		{
+			$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
+			if(!$thumbAsset)
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbParamId);
+			
+			$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			if(!kFileSyncUtils::fileSync_exists($syncKey))
+				throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY, $thumbParamId);
 		}
-
-		$syncKey = $thumbAssetsDb[0]->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-
+			
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		return $this->serveThumbToFile($fileSync, $local, $fileName);
 	}
 
 	/**
-	 * Serve Action
+	 * Serves thumbnail by its id
 	 *  
 	 * @action serve
 	 * @serverOnly
-	 * @param string $assetId
+	 * @param string $thumbAssetId
 	 *  
-	 * @throws KalturaErrors::THUMB_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
-	public function serveAction($assetId)
+	public function serveAction($thumbAssetId)
 	{
-		$dbAsset = flavorAssetPeer::retrieveById($assetId);
-		if (!$dbAsset)
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $assetId);
+		$thumbAsset = flavorAssetPeer::retrieveById($thumbAssetId);
+		if (!$thumbAsset)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 
-		$ext=$dbAsset->getFileExt();
-		if($ext==null)
-			$ext=".jpg";
-		$fileName = $dbAsset->getEntryId()."_" . $dbAsset->getId() . $ext;
+		$ext = $thumbAsset->getFileExt();
+		if(is_null($ext))
+			$ext = 'jpg';
+			
+		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
 		
-		$syncKey = $dbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY, $thumbAsset);
 
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		return $this->serveThumbToFile($fileSync, $local, $fileName);
 	}
-	
-/*
-setAsDefault action
-Tags the thumbnail as DEFAULT_THUMB and removes that tag from all other thumbnail assets of the entry.
-Create a new file sync link on the entry thumbnail that points to the thumbnail asset file sync.
-The following attributes should be provided:
-•	Thumbnail asset id
-*/
-	/**
-	 * setAsDefault
-	 *  
-	 * @action setAsDefault
-	 * @param string $assetId
-	 */
-	public function setAsDefaultAction($assetId)
-	{
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $assetId);
-	}
-
-	/**
-	 * updateByEntryId
-	 * Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
-	 * Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions
-	 *  
-	 * @action updateByEntryId
-	 * @param string $entryId
-	 * @param string $timeOffset
-	 * @param string $srcParamsId
-	 * @param string $dstParamsId 
-	 */
-	public function updateByEntryIdAction($entryId, $timeOffset, $srcParamsId=null, $dstParamsId=null)
-	{
-		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $entryId, $timeOffset, KalturaEntryType::MEDIA_CLIP, $flavorParamsId);
-	}
 
 	
 	/**
-	 * serveDefaultThumb
-	 * 
-	 * @action serveThumbToFile
-	 * @serverOnly
-	 * @param fileSync $fileSync
-	 * @param string $local
+	 * @param FileSync $fileSync
+	 * @param bool $local
 	 * @param string $fileName
 	 * @param bool $forceProxy
-	 * 
-	 * @throws KalturaErrors::THUMB_IS_NOT_READY
 	 */
-	protected function serveThumbToFile($fileSync, $local, $fileName, $forceProxy = false)
+	protected function serveThumbToFile(FileSync $fileSync, $local, $fileName, $forceProxy = false)
 	{
-//		$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-//		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		
-		if(!$fileSync)
-			throw new KalturaAPIException(KalturaErrors::THUMB_IS_NOT_READY, $entry->getId());
-			
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		
 		if($local)
@@ -173,77 +122,197 @@ The following attributes should be provided:
 		}	
 	}
 	
+	/**
+	 * Tags the thumbnail as DEFAULT_THUMB and removes that tag from all other thumbnail assets of the entry.
+	 * Create a new file sync link on the entry thumbnail that points to the thumbnail asset file sync.
+	 *  
+	 * @action setAsDefault
+	 * @param string $thumbAssetId
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 */
+	public function setAsDefaultAction($thumbAssetId)
+	{
+		$thumbAsset = flavorAssetPeer::retrieveById($thumbAssetId);
+		if (!$thumbAsset)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+		
+		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+		foreach($entryThumbAssets as $entryThumbAsset)
+		{
+			if($entryThumbAsset->getId() == $thumbAsset->getId())
+				continue;
+				
+			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				continue;
+				
+			$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			$entryThumbAsset->save();
+		}
+		
+		if(!$thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+		{
+			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			$thumbAsset->save();
+		}
+	}
+
+	/**
+	 * @action generateByEntryId
+	 * @param string $entryId
+	 * @param int $destThumbParamsId indicate the id of the ThumbParams to be generate this thumbnail by
+	 * @return int job id
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
+	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 */
+	public function generateByEntryIdAction($entryId, $destThumbParamsId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		if ($entry->getType() != entryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
+		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
+			
+		$validStatuses = array(
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::PRECONVERT,
+			entryStatus::READY,
+		);
+		
+		if (!in_array($entry->getStatus(), $validStatuses))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
+			
+		$destThumbParams = thumbParamsPeer::retrieveByPK($destThumbParamsId);
+		if(!$destThumbParams)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $destThumbParamsId);
+
+		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		if($job)
+			return $job->getId();
+			
+		return null;
+	}
+
+	/**
+	 * @action generate
+	 * @param string $thumbAssetId
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
+	 */
+	public function generateAction($thumbAssetId)
+	{
+		$thumbAsset = thumbAssetPeer::retrieveByPK($thumbAssetId);
+		if(!$thumbAsset)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			
+		if(is_null($thumbAsset->getFlavorParamsId()))
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, null);
+			
+		$destThumbParams = thumbParamsPeer::retrieveByPK($thumbAsset->getFlavorParamsId());
+		if(!$destThumbParams)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbAsset->getFlavorParamsId());
+			
+		$entry = $thumbAsset->getEntryId();
+		if ($entry->getType() != entryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
+		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
+			
+		$validStatuses = array(
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::PRECONVERT,
+			entryStatus::READY,
+		);
+		
+		if (!in_array($entry->getStatus(), $validStatuses))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
+
+		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		if($job)
+			return $job->getId();
+			
+		return null;
+	}
 	
 	
 	
 /*
 update action
 Generates new thumbnail base on:
-•	Thumbnail asset id
-•	Time offset
-•	Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
+ï¿½	Thumbnail asset id
+ï¿½	Time offset
+ï¿½	Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
 */
 
 /*
 updateByEntryIdFromSourceEntry action
 The following attributes should be provided:
-•	Source entry id
-•	Destination entry id 
-•	Source video flavor params id
-•	Destination thumbnail params id
+ï¿½	Source entry id
+ï¿½	Destination entry id 
+ï¿½	Source video flavor params id
+ï¿½	Destination thumbnail params id
 */
 	
 	
 /*
 updateFromSourceEntry action
 The following attributes should be provided:
-•	Thumbnail asset id
-•	Destination entry id 
-•	Source video flavor params id
+ï¿½	Thumbnail asset id
+ï¿½	Destination entry id 
+ï¿½	Source video flavor params id
 */
 	
 	
 /*
  updateByEntryIdFromUrl action
 The following attributes should be provided:
-•	Entry id 
-•	URL
-•	Destination thumbnail params id
+ï¿½	Entry id 
+ï¿½	URL
+ï¿½	Destination thumbnail params id
 */
 
 /*
 updateFromUrl action
 The following attributes should be provided:
-•	Thumbnail asset id 
-•	URL
+ï¿½	Thumbnail asset id 
+ï¿½	URL
 */
 	
 /*
 updateByEntryIdJpeg action
 The following attributes should be provided:
-•	Entry id 
-•	File
-•	Destination thumbnail params id
+ï¿½	Entry id 
+ï¿½	File
+ï¿½	Destination thumbnail params id
 */
 	
 /*
 updateJpeg action
 The following attributes should be provided:
-•	Thumbnail asset id
-•	File
+ï¿½	Thumbnail asset id
+ï¿½	File
 */
 	
 /*
 deleteByEntryId action
 The following attributes should be provided:
-•	Entry id
-•	Thumbnail params id
+ï¿½	Entry id
+ï¿½	Thumbnail params id
 */
 
 /*
 delete action
 The following attributes should be provided:
-•	Thumbnail asset id
+ï¿½	Thumbnail asset id
 
  */
 }
