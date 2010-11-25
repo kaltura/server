@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xml apiVersion="3.1">
-  <!-- Generated on date 22/11/10 11:46:04 -->
+  <!-- Generated on date 25/11/10 11:04:47 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -1705,6 +1705,7 @@
       <property name="searchInTags" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="searchInAdminTags" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="categories" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="timeZoneOffset" type="int" readOnly="0" insertOnly="0" description="time zone offset in minutes&#13;"/>
     </class>
     <class name="KalturaReportGraph">
       <property name="id" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2595,8 +2596,8 @@
       <property name="cropWidth" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="cropHeight" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="videoOffset" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="scaleWidth" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="scaleHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="height" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
     </class>
     <class name="KalturaThumbParamsOutput" base="KalturaThumbParams">
@@ -3539,10 +3540,13 @@
         <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
         <result/>
       </action>
-      <action name="generateByEntryId" description="updateByEntryId&#10;Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.&#10;Destination thumbnail params id, indicate the id of the ThumbParams to be associated with this thumbnail, if not specified, the id will be selected according to the dimensions&#10;">
+      <action name="generateByEntryId" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
-        <param name="destThumbParamsId" type="string" optional="1" default="" description="&#13;"/>
-        <param name="srcFlavorParamsId" type="string" optional="1" default="" description="&#13;"/>
+        <param name="destThumbParamsId" type="int" optional="0" description="indicate the id of the ThumbParams to be generate this thumbnail by&#13;"/>
+        <result type="int"/>
+      </action>
+      <action name="generate" description="">
+        <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
         <result/>
       </action>
     </service>
