@@ -612,4 +612,14 @@ class Partner extends BasePartner
 		$this->putInCustomData('password_replace_freq', $replaceFreq, null);
 	}
 	
+	public function setLoginUsersQuota($quota)
+	{
+		$this->putInCustomData('login_users_quota', $quota);
+	}
+	
+	public function getLoginUsersQuota()
+	{
+		return $this->getFromCustomData('login_users_quota');
+	}
+	
 }
