@@ -17,7 +17,7 @@ require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "document", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::setClassMapFilePath('../../cache/classMap.cache');
 KAutoloader::register();
 
