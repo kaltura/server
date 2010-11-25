@@ -571,7 +571,7 @@ class myEntryUtils
 	 * 
 	 * @param string $entryId
 	 */
-	protected static function disableAutoThumbnailCreation($entryId)
+	public static function disableAutoThumbnailCreation($entryId)
 	{
 		$convertProfileJobs = BatchJobPeer::retrieveByEntryIdAndType($entryId, BatchJobType::CONVERT_PROFILE);
 		foreach($convertProfileJobs as $convertProfileJob)
