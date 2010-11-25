@@ -108,6 +108,8 @@ class kConfLocal
 		//self::$map['default_plugins'][] = "AuditPlugin"; // Should be enabled only if audit trail support required
 		//self::$map['default_plugins'][] = "VirusScanPlugin";
 		//self::$map['default_plugins'][] = "SymantecScanEnginePlugin";
+		//self::$map['default_plugins'][] = "QuickTimeToolsPlugin";
+		//self::$map['default_plugins'][] = "FastStartPlugin"
 		
 }
 
