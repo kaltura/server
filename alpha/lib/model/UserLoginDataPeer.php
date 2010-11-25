@@ -14,4 +14,27 @@
  */
 class UserLoginDataPeer extends BaseUserLoginDataPeer {
 
+	public static function generateNewPassword()
+	{
+		$minPassLength = 8;
+		$maxPassLength = 14;
+		
+		$mustCharset[] = 'abcdefghijklmnopqrstuvwxyz';
+		$mustCharset[] = '0123456789';
+		$mustCharset[] = '~!@#$%^*-=+?()[]{}';
+		
+		$mustChars = array();
+		foreach ($mustCharset as $charset) {
+			$mustChars[] = $charset[mt_rand(0, strlen($charset)-1)];
+		}
+		$newPassword = self::str_makerand($minPassLength-count($mustChars), $maxPassLength-count($mustChars), true, true, true);
+		foreach ($mustChars as $c) {
+			$i = mt_rand(0, strlen($newPassword));
+			$newPassword = substr($newPassword, 0, $i) . $c . substr($newPassword, $i);
+		}
+
+		return $newPassword;		
+	}
+	
+	
 } // UserLoginDataPeer
