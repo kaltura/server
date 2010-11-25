@@ -9,10 +9,20 @@
  */ 
 class flavorParams extends assetParams
 {
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		$this->type = assetType::FLAVOR;
+	}
+	
 	const SOURCE_FLAVOR_ID = 0;
 	
-	const TAG_THUMB_SOURCE = "thumb_source";
-		
 	const VIDEO_CODEC_NONE = "";
 	const VIDEO_CODEC_VP6 = "vp6";
 	const VIDEO_CODEC_H263 = "h263";
