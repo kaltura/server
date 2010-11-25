@@ -1,15 +1,19 @@
 <?php
 class KalturaClientBase 
 {
-	const KALTURA_API_VERSION = "3.0";
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
 
 	/**
+	 * @var string
+	 */
+	protected $apiVersion = null;
+
+	/**
 	 * @var KalturaConfiguration
 	 */
-	private $config;
+	protected $config;
 	
 	/**
 	 * @var string
@@ -79,7 +83,7 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 		
 		// append the basic params
-		$this->addParam($params, "apiVersion", self::KALTURA_API_VERSION);
+		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
 		
