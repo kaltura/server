@@ -79,7 +79,23 @@ class MetadataBatchService extends BatchService
 	 */
 	function getExclusiveTransformMetadataJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_TRANSFORM );
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::METADATA_TRANSFORM);
+		
+		if($jobs)
+		{
+			foreach ($jobs as &$job)
+			{
+				$data = $job->getData();
+				$metadataProfileId = $data->getMetadataProfileId();
+				$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+				$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+				$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
+				$data->setDestXsdPath($xsdPath);
+				$job->setData($data);
+			}
+		}
+		
+		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
 
 	

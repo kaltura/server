@@ -250,31 +250,34 @@ class MetadataProfileService extends KalturaBaseService
 			$dbMetadataProfile->incrementViewsVersion();
 		}
 			
-		$dbMetadataProfile->save();
-	
+		if($xsdData)
+		{
+		    $xsdPath = sys_get_temp_dir() . '/' . uniqid() . '.xsd';
+		    file_put_contents($xsdPath, $xsdData);
+		    
+			try
+			{
+				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $xsdPath);
+			}
+			catch(kXsdException $e)
+			{
+				throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
+			}
+			
+			$dbMetadataProfile->save();
+			
+			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+			kFileSyncUtils::moveFromFile($xsdPath, $key);
+		}
+		else
+		{
+			$dbMetadataProfile->save();
+		}
+		
 		if(!is_null($viewsData) && $viewsData != '')
 		{
 			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 			kFileSyncUtils::file_put_contents($key, $viewsData);
-		}
-		
-		if($xsdData)
-		{
-			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-			kFileSyncUtils::file_put_contents($key, $xsdData);
-			
-			try
-			{
-				kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd);
-			}
-			catch(kXsdException $e)
-			{
-				// revert back to previous version
-				$dbMetadataProfile->setVersion($oldVersion);
-				$dbMetadataProfile->save();
-				
-				throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM, $e->getMessage());
-			}
 		}
 	
 		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
@@ -378,19 +381,21 @@ class MetadataProfileService extends KalturaBaseService
 		$oldVersion = $dbMetadataProfile->getVersion();
 		
 		$dbMetadataProfile->incrementVersion();
-		$dbMetadataProfile->save();
-		
-		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		kFileSyncUtils::moveFromFile($filePath, $key);
 		
 		try
 		{
-			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd);
+			kMetadataManager::diffMetadataProfile($dbMetadataProfile, $oldVersion, $oldXsd, $dbMetadataProfile->getVersion(), $filePath);
 		}
 		catch(kXsdException $e)
 		{
 			throw new KalturaAPIException(MetadataErrors::METADATA_UNABLE_TO_TRANSFORM);
 		}
+		
+		$dbMetadataProfile->save();
+		
+		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+		kFileSyncUtils::moveFromFile($filePath, $key);
+		
 		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();

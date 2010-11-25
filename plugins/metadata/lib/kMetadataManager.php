@@ -275,19 +275,16 @@ class kMetadataManager
 	 * 
 	 * @return BatchJob
 	 */
-	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsdPath)
+	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsdPath, $newVersion, $newXsdPath)
 	{
-		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-		
-		$xsl = kXsd::compareXsd($prevXsdPath, $xsdPath);
+		$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
 		if(!$xsl)
 			return;
 			
 		if(is_bool($xsl))
-			return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $metadataProfile->getVersion());
+			return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion);
 		
-		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $metadataProfile->getVersion(), $xsdPath, $xsl);
+		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
 	}
 	
 	/**
@@ -409,7 +406,7 @@ class kMetadataManager
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addTransformMetadataJob($partnerId, $metadataProfileId, $srcVersion, $destVersion, $destXsdPath = null, $xsl = null)
+	public static function addTransformMetadataJob($partnerId, $metadataProfileId, $srcVersion, $destVersion, $xsl = null)
 	{
 		// check if any metadata objects require the transform
 		$c = new Criteria();
@@ -432,7 +429,6 @@ class kMetadataManager
 			
 			$xslPath = kFileSyncUtils::getLocalFilePathForKey($key);
 			$data->setSrcXslPath($xslPath);
-			$data->setDestXsdPath($destXsdPath);
 		}
 		
 		$data->setMetadataProfileId($metadataProfileId);
