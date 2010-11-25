@@ -80,7 +80,7 @@ class getentryAction extends defPartnerservices2Action
 			$extra_fields = $this->getExtraFields ();
 			
 			$level = ( $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR );
-			if ( $entry->getType() == entryType::MIX || $entry->getType() == entryType::DVD )
+			if ( $entry->getType() == entryType::MIX )
 				$extra_fields = array ( "allVersionsFormatted" );
 			
 			if ( $extra_fields )
