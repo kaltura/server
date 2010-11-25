@@ -5,9 +5,15 @@
 		<column lazyLoad="false" name="id" type="integer"
 			required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="login_data_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="screen_name" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="full_name" type="varchar" size="40" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="first_name" type="varchar" size="40" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="last_name" type="varchar" size="40" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="email" type="varchar" size="50" />
 		<column primaryKey="false" required="false" autoIncrement="false"
@@ -115,6 +121,9 @@
 		<index name="partner_indexed_partner_data_string">
 			<index-column name="partner_id" />
 			<index-column name="indexed_partner_data_string" />
+		</index>
+		<index name="login_data_id_index">
+			<index-column name="login_data_id" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="kshow" phpName="kshow">

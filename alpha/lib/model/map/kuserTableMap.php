@@ -37,8 +37,11 @@ class kuserTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addColumn('LOGIN_DATA_ID', 'LoginDataId', 'INTEGER', false, null, null);
 		$this->addColumn('SCREEN_NAME', 'ScreenName', 'VARCHAR', false, 20, null);
 		$this->addColumn('FULL_NAME', 'FullName', 'VARCHAR', false, 40, null);
+		$this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', false, 40, null);
+		$this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', false, 40, null);
 		$this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
 		$this->addColumn('SHA1_PASSWORD', 'Sha1Password', 'VARCHAR', false, 40, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', false, 32, null);

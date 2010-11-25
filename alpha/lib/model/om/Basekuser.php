@@ -25,6 +25,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
+	 * The value for the login_data_id field.
+	 * @var        int
+	 */
+	protected $login_data_id;
+
+	/**
 	 * The value for the screen_name field.
 	 * @var        string
 	 */
@@ -35,6 +41,18 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $full_name;
+
+	/**
+	 * The value for the first_name field.
+	 * @var        string
+	 */
+	protected $first_name;
+
+	/**
+	 * The value for the last_name field.
+	 * @var        string
+	 */
+	protected $last_name;
 
 	/**
 	 * The value for the email field.
@@ -471,6 +489,16 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [login_data_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getLoginDataId()
+	{
+		return $this->login_data_id;
+	}
+
+	/**
 	 * Get the [screen_name] column value.
 	 * 
 	 * @return     string
@@ -488,6 +516,26 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function getFullName()
 	{
 		return $this->full_name;
+	}
+
+	/**
+	 * Get the [first_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getFirstName()
+	{
+		return $this->first_name;
+	}
+
+	/**
+	 * Get the [last_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getLastName()
+	{
+		return $this->last_name;
 	}
 
 	/**
@@ -994,6 +1042,29 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	} // setId()
 
 	/**
+	 * Set the value of [login_data_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     kuser The current object (for fluent API support)
+	 */
+	public function setLoginDataId($v)
+	{
+		if(!isset($this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID]))
+			$this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID] = $this->login_data_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->login_data_id !== $v) {
+			$this->login_data_id = $v;
+			$this->modifiedColumns[] = kuserPeer::LOGIN_DATA_ID;
+		}
+
+		return $this;
+	} // setLoginDataId()
+
+	/**
 	 * Set the value of [screen_name] column.
 	 * 
 	 * @param      string $v new value
@@ -1038,6 +1109,52 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setFullName()
+
+	/**
+	 * Set the value of [first_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     kuser The current object (for fluent API support)
+	 */
+	public function setFirstName($v)
+	{
+		if(!isset($this->oldColumnsValues[kuserPeer::FIRST_NAME]))
+			$this->oldColumnsValues[kuserPeer::FIRST_NAME] = $this->first_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->first_name !== $v) {
+			$this->first_name = $v;
+			$this->modifiedColumns[] = kuserPeer::FIRST_NAME;
+		}
+
+		return $this;
+	} // setFirstName()
+
+	/**
+	 * Set the value of [last_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     kuser The current object (for fluent API support)
+	 */
+	public function setLastName($v)
+	{
+		if(!isset($this->oldColumnsValues[kuserPeer::LAST_NAME]))
+			$this->oldColumnsValues[kuserPeer::LAST_NAME] = $this->last_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->last_name !== $v) {
+			$this->last_name = $v;
+			$this->modifiedColumns[] = kuserPeer::LAST_NAME;
+		}
+
+		return $this;
+	} // setLastName()
 
 	/**
 	 * Set the value of [email] column.
@@ -2074,47 +2191,50 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->screen_name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->full_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->email = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->sha1_password = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->salt = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->date_of_birth = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->country = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->state = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->city = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->zip = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->url_list = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->picture = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->icon = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->about_me = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->tags = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->tagline = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->network_highschool = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->network_college = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->network_other = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->mobile_num = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->mature_content = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->gender = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->registration_ip = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
-			$this->registration_cookie = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->im_list = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->views = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-			$this->fans = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->entries = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-			$this->storage_size = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-			$this->produced_kshows = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
-			$this->status = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
-			$this->created_at = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
-			$this->updated_at = ($row[$startcol + 33] !== null) ? (string) $row[$startcol + 33] : null;
-			$this->partner_id = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->display_in_search = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
-			$this->search_text = ($row[$startcol + 36] !== null) ? (string) $row[$startcol + 36] : null;
-			$this->partner_data = ($row[$startcol + 37] !== null) ? (string) $row[$startcol + 37] : null;
-			$this->puser_id = ($row[$startcol + 38] !== null) ? (string) $row[$startcol + 38] : null;
-			$this->admin_tags = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
-			$this->indexed_partner_data_int = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
-			$this->indexed_partner_data_string = ($row[$startcol + 41] !== null) ? (string) $row[$startcol + 41] : null;
+			$this->login_data_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+			$this->screen_name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->full_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->first_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->last_name = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->email = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->sha1_password = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->salt = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->date_of_birth = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->country = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->state = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->city = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->zip = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->url_list = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->picture = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->icon = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->about_me = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->tags = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->tagline = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->network_highschool = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->network_college = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->network_other = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->mobile_num = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->mature_content = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->gender = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+			$this->registration_ip = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+			$this->registration_cookie = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
+			$this->im_list = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
+			$this->views = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+			$this->fans = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+			$this->entries = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->storage_size = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
+			$this->produced_kshows = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->status = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
+			$this->created_at = ($row[$startcol + 35] !== null) ? (string) $row[$startcol + 35] : null;
+			$this->updated_at = ($row[$startcol + 36] !== null) ? (string) $row[$startcol + 36] : null;
+			$this->partner_id = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
+			$this->display_in_search = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
+			$this->search_text = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
+			$this->partner_data = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
+			$this->puser_id = ($row[$startcol + 41] !== null) ? (string) $row[$startcol + 41] : null;
+			$this->admin_tags = ($row[$startcol + 42] !== null) ? (string) $row[$startcol + 42] : null;
+			$this->indexed_partner_data_int = ($row[$startcol + 43] !== null) ? (int) $row[$startcol + 43] : null;
+			$this->indexed_partner_data_string = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2124,7 +2244,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 42; // 42 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 45; // 45 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kuser object", $e);
@@ -2734,126 +2854,135 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getScreenName();
+				return $this->getLoginDataId();
 				break;
 			case 2:
-				return $this->getFullName();
+				return $this->getScreenName();
 				break;
 			case 3:
-				return $this->getEmail();
+				return $this->getFullName();
 				break;
 			case 4:
-				return $this->getSha1Password();
+				return $this->getFirstName();
 				break;
 			case 5:
-				return $this->getSalt();
+				return $this->getLastName();
 				break;
 			case 6:
-				return $this->getDateOfBirth();
+				return $this->getEmail();
 				break;
 			case 7:
-				return $this->getCountry();
+				return $this->getSha1Password();
 				break;
 			case 8:
-				return $this->getState();
+				return $this->getSalt();
 				break;
 			case 9:
-				return $this->getCity();
+				return $this->getDateOfBirth();
 				break;
 			case 10:
-				return $this->getZip();
+				return $this->getCountry();
 				break;
 			case 11:
-				return $this->getUrlList();
+				return $this->getState();
 				break;
 			case 12:
-				return $this->getPicture();
+				return $this->getCity();
 				break;
 			case 13:
-				return $this->getIcon();
+				return $this->getZip();
 				break;
 			case 14:
-				return $this->getAboutMe();
+				return $this->getUrlList();
 				break;
 			case 15:
-				return $this->getTags();
+				return $this->getPicture();
 				break;
 			case 16:
-				return $this->getTagline();
+				return $this->getIcon();
 				break;
 			case 17:
-				return $this->getNetworkHighschool();
+				return $this->getAboutMe();
 				break;
 			case 18:
-				return $this->getNetworkCollege();
+				return $this->getTags();
 				break;
 			case 19:
-				return $this->getNetworkOther();
+				return $this->getTagline();
 				break;
 			case 20:
-				return $this->getMobileNum();
+				return $this->getNetworkHighschool();
 				break;
 			case 21:
-				return $this->getMatureContent();
+				return $this->getNetworkCollege();
 				break;
 			case 22:
-				return $this->getGender();
+				return $this->getNetworkOther();
 				break;
 			case 23:
-				return $this->getRegistrationIp();
+				return $this->getMobileNum();
 				break;
 			case 24:
-				return $this->getRegistrationCookie();
+				return $this->getMatureContent();
 				break;
 			case 25:
-				return $this->getImList();
+				return $this->getGender();
 				break;
 			case 26:
-				return $this->getViews();
+				return $this->getRegistrationIp();
 				break;
 			case 27:
-				return $this->getFans();
+				return $this->getRegistrationCookie();
 				break;
 			case 28:
-				return $this->getEntries();
+				return $this->getImList();
 				break;
 			case 29:
-				return $this->getStorageSize();
+				return $this->getViews();
 				break;
 			case 30:
-				return $this->getProducedKshows();
+				return $this->getFans();
 				break;
 			case 31:
-				return $this->getStatus();
+				return $this->getEntries();
 				break;
 			case 32:
-				return $this->getCreatedAt();
+				return $this->getStorageSize();
 				break;
 			case 33:
-				return $this->getUpdatedAt();
+				return $this->getProducedKshows();
 				break;
 			case 34:
-				return $this->getPartnerId();
+				return $this->getStatus();
 				break;
 			case 35:
-				return $this->getDisplayInSearch();
+				return $this->getCreatedAt();
 				break;
 			case 36:
-				return $this->getSearchText();
+				return $this->getUpdatedAt();
 				break;
 			case 37:
-				return $this->getPartnerData();
+				return $this->getPartnerId();
 				break;
 			case 38:
-				return $this->getPuserId();
+				return $this->getDisplayInSearch();
 				break;
 			case 39:
-				return $this->getAdminTags();
+				return $this->getSearchText();
 				break;
 			case 40:
-				return $this->getIndexedPartnerDataInt();
+				return $this->getPartnerData();
 				break;
 			case 41:
+				return $this->getPuserId();
+				break;
+			case 42:
+				return $this->getAdminTags();
+				break;
+			case 43:
+				return $this->getIndexedPartnerDataInt();
+				break;
+			case 44:
 				return $this->getIndexedPartnerDataString();
 				break;
 			default:
@@ -2878,47 +3007,50 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$keys = kuserPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getScreenName(),
-			$keys[2] => $this->getFullName(),
-			$keys[3] => $this->getEmail(),
-			$keys[4] => $this->getSha1Password(),
-			$keys[5] => $this->getSalt(),
-			$keys[6] => $this->getDateOfBirth(),
-			$keys[7] => $this->getCountry(),
-			$keys[8] => $this->getState(),
-			$keys[9] => $this->getCity(),
-			$keys[10] => $this->getZip(),
-			$keys[11] => $this->getUrlList(),
-			$keys[12] => $this->getPicture(),
-			$keys[13] => $this->getIcon(),
-			$keys[14] => $this->getAboutMe(),
-			$keys[15] => $this->getTags(),
-			$keys[16] => $this->getTagline(),
-			$keys[17] => $this->getNetworkHighschool(),
-			$keys[18] => $this->getNetworkCollege(),
-			$keys[19] => $this->getNetworkOther(),
-			$keys[20] => $this->getMobileNum(),
-			$keys[21] => $this->getMatureContent(),
-			$keys[22] => $this->getGender(),
-			$keys[23] => $this->getRegistrationIp(),
-			$keys[24] => $this->getRegistrationCookie(),
-			$keys[25] => $this->getImList(),
-			$keys[26] => $this->getViews(),
-			$keys[27] => $this->getFans(),
-			$keys[28] => $this->getEntries(),
-			$keys[29] => $this->getStorageSize(),
-			$keys[30] => $this->getProducedKshows(),
-			$keys[31] => $this->getStatus(),
-			$keys[32] => $this->getCreatedAt(),
-			$keys[33] => $this->getUpdatedAt(),
-			$keys[34] => $this->getPartnerId(),
-			$keys[35] => $this->getDisplayInSearch(),
-			$keys[36] => $this->getSearchText(),
-			$keys[37] => $this->getPartnerData(),
-			$keys[38] => $this->getPuserId(),
-			$keys[39] => $this->getAdminTags(),
-			$keys[40] => $this->getIndexedPartnerDataInt(),
-			$keys[41] => $this->getIndexedPartnerDataString(),
+			$keys[1] => $this->getLoginDataId(),
+			$keys[2] => $this->getScreenName(),
+			$keys[3] => $this->getFullName(),
+			$keys[4] => $this->getFirstName(),
+			$keys[5] => $this->getLastName(),
+			$keys[6] => $this->getEmail(),
+			$keys[7] => $this->getSha1Password(),
+			$keys[8] => $this->getSalt(),
+			$keys[9] => $this->getDateOfBirth(),
+			$keys[10] => $this->getCountry(),
+			$keys[11] => $this->getState(),
+			$keys[12] => $this->getCity(),
+			$keys[13] => $this->getZip(),
+			$keys[14] => $this->getUrlList(),
+			$keys[15] => $this->getPicture(),
+			$keys[16] => $this->getIcon(),
+			$keys[17] => $this->getAboutMe(),
+			$keys[18] => $this->getTags(),
+			$keys[19] => $this->getTagline(),
+			$keys[20] => $this->getNetworkHighschool(),
+			$keys[21] => $this->getNetworkCollege(),
+			$keys[22] => $this->getNetworkOther(),
+			$keys[23] => $this->getMobileNum(),
+			$keys[24] => $this->getMatureContent(),
+			$keys[25] => $this->getGender(),
+			$keys[26] => $this->getRegistrationIp(),
+			$keys[27] => $this->getRegistrationCookie(),
+			$keys[28] => $this->getImList(),
+			$keys[29] => $this->getViews(),
+			$keys[30] => $this->getFans(),
+			$keys[31] => $this->getEntries(),
+			$keys[32] => $this->getStorageSize(),
+			$keys[33] => $this->getProducedKshows(),
+			$keys[34] => $this->getStatus(),
+			$keys[35] => $this->getCreatedAt(),
+			$keys[36] => $this->getUpdatedAt(),
+			$keys[37] => $this->getPartnerId(),
+			$keys[38] => $this->getDisplayInSearch(),
+			$keys[39] => $this->getSearchText(),
+			$keys[40] => $this->getPartnerData(),
+			$keys[41] => $this->getPuserId(),
+			$keys[42] => $this->getAdminTags(),
+			$keys[43] => $this->getIndexedPartnerDataInt(),
+			$keys[44] => $this->getIndexedPartnerDataString(),
 		);
 		return $result;
 	}
@@ -2954,126 +3086,135 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setScreenName($value);
+				$this->setLoginDataId($value);
 				break;
 			case 2:
-				$this->setFullName($value);
+				$this->setScreenName($value);
 				break;
 			case 3:
-				$this->setEmail($value);
+				$this->setFullName($value);
 				break;
 			case 4:
-				$this->setSha1Password($value);
+				$this->setFirstName($value);
 				break;
 			case 5:
-				$this->setSalt($value);
+				$this->setLastName($value);
 				break;
 			case 6:
-				$this->setDateOfBirth($value);
+				$this->setEmail($value);
 				break;
 			case 7:
-				$this->setCountry($value);
+				$this->setSha1Password($value);
 				break;
 			case 8:
-				$this->setState($value);
+				$this->setSalt($value);
 				break;
 			case 9:
-				$this->setCity($value);
+				$this->setDateOfBirth($value);
 				break;
 			case 10:
-				$this->setZip($value);
+				$this->setCountry($value);
 				break;
 			case 11:
-				$this->setUrlList($value);
+				$this->setState($value);
 				break;
 			case 12:
-				$this->setPicture($value);
+				$this->setCity($value);
 				break;
 			case 13:
-				$this->setIcon($value);
+				$this->setZip($value);
 				break;
 			case 14:
-				$this->setAboutMe($value);
+				$this->setUrlList($value);
 				break;
 			case 15:
-				$this->setTags($value);
+				$this->setPicture($value);
 				break;
 			case 16:
-				$this->setTagline($value);
+				$this->setIcon($value);
 				break;
 			case 17:
-				$this->setNetworkHighschool($value);
+				$this->setAboutMe($value);
 				break;
 			case 18:
-				$this->setNetworkCollege($value);
+				$this->setTags($value);
 				break;
 			case 19:
-				$this->setNetworkOther($value);
+				$this->setTagline($value);
 				break;
 			case 20:
-				$this->setMobileNum($value);
+				$this->setNetworkHighschool($value);
 				break;
 			case 21:
-				$this->setMatureContent($value);
+				$this->setNetworkCollege($value);
 				break;
 			case 22:
-				$this->setGender($value);
+				$this->setNetworkOther($value);
 				break;
 			case 23:
-				$this->setRegistrationIp($value);
+				$this->setMobileNum($value);
 				break;
 			case 24:
-				$this->setRegistrationCookie($value);
+				$this->setMatureContent($value);
 				break;
 			case 25:
-				$this->setImList($value);
+				$this->setGender($value);
 				break;
 			case 26:
-				$this->setViews($value);
+				$this->setRegistrationIp($value);
 				break;
 			case 27:
-				$this->setFans($value);
+				$this->setRegistrationCookie($value);
 				break;
 			case 28:
-				$this->setEntries($value);
+				$this->setImList($value);
 				break;
 			case 29:
-				$this->setStorageSize($value);
+				$this->setViews($value);
 				break;
 			case 30:
-				$this->setProducedKshows($value);
+				$this->setFans($value);
 				break;
 			case 31:
-				$this->setStatus($value);
+				$this->setEntries($value);
 				break;
 			case 32:
-				$this->setCreatedAt($value);
+				$this->setStorageSize($value);
 				break;
 			case 33:
-				$this->setUpdatedAt($value);
+				$this->setProducedKshows($value);
 				break;
 			case 34:
-				$this->setPartnerId($value);
+				$this->setStatus($value);
 				break;
 			case 35:
-				$this->setDisplayInSearch($value);
+				$this->setCreatedAt($value);
 				break;
 			case 36:
-				$this->setSearchText($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 37:
-				$this->setPartnerData($value);
+				$this->setPartnerId($value);
 				break;
 			case 38:
-				$this->setPuserId($value);
+				$this->setDisplayInSearch($value);
 				break;
 			case 39:
-				$this->setAdminTags($value);
+				$this->setSearchText($value);
 				break;
 			case 40:
-				$this->setIndexedPartnerDataInt($value);
+				$this->setPartnerData($value);
 				break;
 			case 41:
+				$this->setPuserId($value);
+				break;
+			case 42:
+				$this->setAdminTags($value);
+				break;
+			case 43:
+				$this->setIndexedPartnerDataInt($value);
+				break;
+			case 44:
 				$this->setIndexedPartnerDataString($value);
 				break;
 		} // switch()
@@ -3101,47 +3242,50 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$keys = kuserPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setScreenName($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setFullName($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setEmail($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setSha1Password($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setSalt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setDateOfBirth($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCountry($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setState($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCity($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setZip($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setUrlList($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setPicture($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setIcon($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setAboutMe($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setTags($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setTagline($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setNetworkHighschool($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setNetworkCollege($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setNetworkOther($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setMobileNum($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setMatureContent($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setGender($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setRegistrationIp($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setRegistrationCookie($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setImList($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setViews($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setFans($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setEntries($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setStorageSize($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setProducedKshows($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setStatus($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setCreatedAt($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setUpdatedAt($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setPartnerId($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setDisplayInSearch($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setSearchText($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setPartnerData($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setPuserId($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setAdminTags($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setIndexedPartnerDataInt($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setIndexedPartnerDataString($arr[$keys[41]]);
+		if (array_key_exists($keys[1], $arr)) $this->setLoginDataId($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setScreenName($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setFullName($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setFirstName($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setLastName($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setEmail($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setSha1Password($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setSalt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setDateOfBirth($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCountry($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setState($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCity($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setZip($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setUrlList($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setPicture($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setIcon($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setAboutMe($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setTags($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setTagline($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setNetworkHighschool($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setNetworkCollege($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setNetworkOther($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setMobileNum($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setMatureContent($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setGender($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setRegistrationIp($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setRegistrationCookie($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setImList($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setViews($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setFans($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setEntries($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setStorageSize($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setProducedKshows($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setStatus($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setCreatedAt($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setUpdatedAt($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setPartnerId($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setDisplayInSearch($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setSearchText($arr[$keys[39]]);
+		if (array_key_exists($keys[40], $arr)) $this->setPartnerData($arr[$keys[40]]);
+		if (array_key_exists($keys[41], $arr)) $this->setPuserId($arr[$keys[41]]);
+		if (array_key_exists($keys[42], $arr)) $this->setAdminTags($arr[$keys[42]]);
+		if (array_key_exists($keys[43], $arr)) $this->setIndexedPartnerDataInt($arr[$keys[43]]);
+		if (array_key_exists($keys[44], $arr)) $this->setIndexedPartnerDataString($arr[$keys[44]]);
 	}
 
 	/**
@@ -3154,8 +3298,11 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$criteria = new Criteria(kuserPeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(kuserPeer::ID)) $criteria->add(kuserPeer::ID, $this->id);
+		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) $criteria->add(kuserPeer::LOGIN_DATA_ID, $this->login_data_id);
 		if ($this->isColumnModified(kuserPeer::SCREEN_NAME)) $criteria->add(kuserPeer::SCREEN_NAME, $this->screen_name);
 		if ($this->isColumnModified(kuserPeer::FULL_NAME)) $criteria->add(kuserPeer::FULL_NAME, $this->full_name);
+		if ($this->isColumnModified(kuserPeer::FIRST_NAME)) $criteria->add(kuserPeer::FIRST_NAME, $this->first_name);
+		if ($this->isColumnModified(kuserPeer::LAST_NAME)) $criteria->add(kuserPeer::LAST_NAME, $this->last_name);
 		if ($this->isColumnModified(kuserPeer::EMAIL)) $criteria->add(kuserPeer::EMAIL, $this->email);
 		if ($this->isColumnModified(kuserPeer::SHA1_PASSWORD)) $criteria->add(kuserPeer::SHA1_PASSWORD, $this->sha1_password);
 		if ($this->isColumnModified(kuserPeer::SALT)) $criteria->add(kuserPeer::SALT, $this->salt);
@@ -3249,9 +3396,15 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
+		$copyObj->setLoginDataId($this->login_data_id);
+
 		$copyObj->setScreenName($this->screen_name);
 
 		$copyObj->setFullName($this->full_name);
+
+		$copyObj->setFirstName($this->first_name);
+
+		$copyObj->setLastName($this->last_name);
 
 		$copyObj->setEmail($this->email);
 

@@ -13,8 +13,11 @@ DROP TABLE IF EXISTS `kuser`;
 CREATE TABLE `kuser`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`login_data_id` INTEGER,
 	`screen_name` VARCHAR(20),
 	`full_name` VARCHAR(40),
+	`first_name` VARCHAR(40),
+	`last_name` VARCHAR(40),
 	`email` VARCHAR(50),
 	`sha1_password` VARCHAR(40),
 	`salt` VARCHAR(32),
@@ -63,7 +66,8 @@ CREATE TABLE `kuser`
 	KEY `views_index`(`views`),
 	KEY `display_in_search_index`(`display_in_search`),
 	KEY `partner_indexed_partner_data_int`(`partner_id`, `indexed_partner_data_int`),
-	KEY `partner_indexed_partner_data_string`(`partner_id`, `indexed_partner_data_string`)
+	KEY `partner_indexed_partner_data_string`(`partner_id`, `indexed_partner_data_string`),
+	KEY `login_data_id_index`(`login_data_id`)
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------
