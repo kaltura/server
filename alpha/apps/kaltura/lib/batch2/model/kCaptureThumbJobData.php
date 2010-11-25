@@ -32,6 +32,48 @@ class kCaptureThumbJobData extends kJobData
 	 * @var thumbParamsOutput
 	 */
 	private $thumbParamsOutput;
+	
+	/**
+	 * @var string
+	 */
+	private $thumbAssetId;
+	
+	/**
+	 * @var KalturaAssetType
+	 */
+	private $srcAssetType;
+	
+	/**
+	 * @return the $srcAssetType
+	 */
+	public function getSrcAssetType()
+	{
+		return $this->srcAssetType;
+	}
+
+	/**
+	 * @param $srcAssetType the $srcAssetType to set
+	 */
+	public function setSrcAssetType($srcAssetType)
+	{
+		$this->srcAssetType = $srcAssetType;
+	}
+
+	/**
+	 * @return the $thumbAssetId
+	 */
+	public function getThumbAssetId()
+	{
+		return $this->thumbAssetId;
+	}
+
+	/**
+	 * @param $thumbAssetId the $thumbAssetId to set
+	 */
+	public function setThumbAssetId($thumbAssetId)
+	{
+		$this->thumbAssetId = $thumbAssetId;
+	}
 
 	/**
 	 * @return the $srcFileSyncLocalPath
