@@ -37,7 +37,7 @@ class kConf extends kConfLocal
 				"server_api_v2_path" => "/api/" ,
 						
 
-				"default_duplication_time_frame" => 3600 ,								
+				"default_duplication_time_frame" => 60 ,								
 				"job_duplication_time_frame" => array(
 					1 => 7200, //BatchJob::BATCHJOB_TYPE_IMPORT
 				) ,
