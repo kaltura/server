@@ -199,6 +199,9 @@
 		// %s - flavor asset id
 		const INVALID_FLAVOR_ASSET_ID = "INVALID_FLAVOR_ASSET_ID, Invalid flavor asset id %s";
 
+	
+		const FLAVOR_ASSET_IS_NOT_READY = "FLAVOR_ASSET_IS_NOT_READY,The flavor asset is not ready";
+	
 		
 		const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
 
