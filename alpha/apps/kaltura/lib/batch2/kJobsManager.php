@@ -503,6 +503,65 @@ class kJobsManager
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	
+	
+	/**
+	 * addFlavorConvertJob adds a single flavor conversion 
+	 * 
+	 * @param FileSyncKey $srcSyncKey
+	 * @param flavorParamsOutput $flavor
+	 * @param int $flavorAssetId
+	 * @param int $mediaInfoId
+	 * @param BatchJob $parentJob
+	 * @param int $lastEngineType  
+	 * @param BatchJob $dbConvertFlavorJob
+	 * @return BatchJob 
+	 */
+	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetType, thumbParamsOutput $thumbParams = null)
+	{
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		
+		$localPath = null;
+		$remoteUrl = null;
+		if($fileSync)
+		{
+			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
+				$localPath = $fileSync->getFullPath();
+			$remoteUrl = $fileSync->getExternalUrl();
+		}
+		
+		// creates convert data
+		$data = new kCaptureThumbJobData();
+		$data->setThumbAssetId($thumbAssetId);
+		$data->setSrcAssetType($srcAssetType);
+		$data->setSrcFileSyncLocalPath($localPath);
+		$data->setSrcFileSyncRemoteUrl($remoteUrl);
+		$data->setThumbParamsOutputId($thumbParams->getId());
+	
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild();
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setEntryId($entryId);
+			$batchJob->setPartnerId($partnerId);
+		}
+		
+		return kJobsManager::addJob($batchJob, $data, BatchJobType::CAPTURE_THUMB);
+	}
+	
+	/**
+	 * @param BatchJob $parentJob
+	 * @param int $jobSubType
+	 * @param string $srcFileSyncLocalPath
+	 * @param int $flavorAssetId
+	 * @param int $flavorParamsOutputId
+	 * @param bool $createThumb
+	 * @param int $thumbOffset
+	 * @return BatchJob
+	 */
 	public static function addPostConvertJob(BatchJob $parentJob, $jobSubType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
