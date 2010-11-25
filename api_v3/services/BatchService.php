@@ -665,7 +665,20 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveCaptureThumbJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CAPTURE_THUMB );
+		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CAPTURE_THUMB);
+		
+		if($jobs)
+		{
+			foreach ($jobs as &$job)
+			{
+				$data = $job->getData();
+				$thumbParamsOutput = thumbParamsOutputPeer::retrieveByPK($data->getThumbParamsOutputId());
+				$data->setThumbParamsOutput($thumbParamsOutput);
+				$job->setData($data);
+			}
+		}
+		
+		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
 
 	
