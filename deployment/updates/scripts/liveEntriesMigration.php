@@ -73,8 +73,6 @@ while(count($entries))
 	}
 	
 	entryPeer::clearInstancePool();
-	FileSyncPeer::clearInstancePool();
-	flavorAssetPeer::clearInstancePool();
 	
 	$entries = getEntries($con, $lastEntry, $entryLimitEachLoop);
 }
