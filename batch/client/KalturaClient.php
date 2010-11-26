@@ -249,6 +249,7 @@ class KalturaConversionEngineType
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const FAST_START = "fastStart.FastStart";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
