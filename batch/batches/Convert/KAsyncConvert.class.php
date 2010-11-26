@@ -249,7 +249,7 @@ class KAsyncConvert extends KBatchBase
 	protected function getOperator(KalturaConvartableJobData $data)
 	{
 		$operatorsSet = new kOperatorSets();
-		$operatorsSet->setSerialized(stripslashes($data->flavorParamsOutput->operators));
+		$operatorsSet->setSerialized(/*stripslashes*/($data->flavorParamsOutput->operators));
 		return $operatorsSet->getOperator($data->currentOperationSet, $data->currentOperationIndex);
 	}
 	
