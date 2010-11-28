@@ -38,6 +38,7 @@ class kuserTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('LOGIN_DATA_ID', 'LoginDataId', 'INTEGER', false, null, null);
+		$this->addColumn('IS_ADMIN', 'IsAdmin', 'BOOLEAN', false, null, null);
 		$this->addColumn('SCREEN_NAME', 'ScreenName', 'VARCHAR', false, 20, null);
 		$this->addColumn('FULL_NAME', 'FullName', 'VARCHAR', false, 40, null);
 		$this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', false, 40, null);
@@ -81,6 +82,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('ADMIN_TAGS', 'AdminTags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_INT', 'IndexedPartnerDataInt', 'INTEGER', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_STRING', 'IndexedPartnerDataString', 'VARCHAR', false, 64, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

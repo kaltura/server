@@ -61,12 +61,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	protected $login_blocked_until;
 
 	/**
-	 * The value for the is_admin field.
-	 * @var        boolean
-	 */
-	protected $is_admin;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -210,16 +204,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
-	}
-
-	/**
-	 * Get the [is_admin] column value.
-	 * 
-	 * @return     boolean
-	 */
-	public function getIsAdmin()
-	{
-		return $this->is_admin;
 	}
 
 	/**
@@ -503,29 +487,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	} // setLoginBlockedUntil()
 
 	/**
-	 * Set the value of [is_admin] column.
-	 * 
-	 * @param      boolean $v new value
-	 * @return     UserLoginData The current object (for fluent API support)
-	 */
-	public function setIsAdmin($v)
-	{
-		if(!isset($this->oldColumnsValues[UserLoginDataPeer::IS_ADMIN]))
-			$this->oldColumnsValues[UserLoginDataPeer::IS_ADMIN] = $this->is_admin;
-
-		if ($v !== null) {
-			$v = (boolean) $v;
-		}
-
-		if ($this->is_admin !== $v) {
-			$this->is_admin = $v;
-			$this->modifiedColumns[] = UserLoginDataPeer::IS_ADMIN;
-		}
-
-		return $this;
-	} // setIsAdmin()
-
-	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -682,10 +643,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$this->sha1_password = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->salt = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->login_blocked_until = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->is_admin = ($row[$startcol + 7] !== null) ? (boolean) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -695,7 +655,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserLoginData object", $e);
@@ -1080,15 +1040,12 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				return $this->getLoginBlockedUntil();
 				break;
 			case 7:
-				return $this->getIsAdmin();
-				break;
-			case 8:
 				return $this->getCreatedAt();
 				break;
-			case 9:
+			case 8:
 				return $this->getUpdatedAt();
 				break;
-			case 10:
+			case 9:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1119,10 +1076,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$keys[4] => $this->getSha1Password(),
 			$keys[5] => $this->getSalt(),
 			$keys[6] => $this->getLoginBlockedUntil(),
-			$keys[7] => $this->getIsAdmin(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getUpdatedAt(),
-			$keys[10] => $this->getCustomData(),
+			$keys[7] => $this->getCreatedAt(),
+			$keys[8] => $this->getUpdatedAt(),
+			$keys[9] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1176,15 +1132,12 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				$this->setLoginBlockedUntil($value);
 				break;
 			case 7:
-				$this->setIsAdmin($value);
-				break;
-			case 8:
 				$this->setCreatedAt($value);
 				break;
-			case 9:
+			case 8:
 				$this->setUpdatedAt($value);
 				break;
-			case 10:
+			case 9:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1218,10 +1171,9 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setSha1Password($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setSalt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setLoginBlockedUntil($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setIsAdmin($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
 	}
 
 	/**
@@ -1240,7 +1192,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserLoginDataPeer::SHA1_PASSWORD)) $criteria->add(UserLoginDataPeer::SHA1_PASSWORD, $this->sha1_password);
 		if ($this->isColumnModified(UserLoginDataPeer::SALT)) $criteria->add(UserLoginDataPeer::SALT, $this->salt);
 		if ($this->isColumnModified(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL)) $criteria->add(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL, $this->login_blocked_until);
-		if ($this->isColumnModified(UserLoginDataPeer::IS_ADMIN)) $criteria->add(UserLoginDataPeer::IS_ADMIN, $this->is_admin);
 		if ($this->isColumnModified(UserLoginDataPeer::CREATED_AT)) $criteria->add(UserLoginDataPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(UserLoginDataPeer::UPDATED_AT)) $criteria->add(UserLoginDataPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UserLoginDataPeer::CUSTOM_DATA)) $criteria->add(UserLoginDataPeer::CUSTOM_DATA, $this->custom_data);
@@ -1309,8 +1260,6 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		$copyObj->setSalt($this->salt);
 
 		$copyObj->setLoginBlockedUntil($this->login_blocked_until);
-
-		$copyObj->setIsAdmin($this->is_admin);
 
 		$copyObj->setCreatedAt($this->created_at);
 

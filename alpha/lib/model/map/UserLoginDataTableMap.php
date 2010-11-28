@@ -43,10 +43,9 @@ class UserLoginDataTableMap extends TableMap {
 		$this->addColumn('SHA1_PASSWORD', 'Sha1Password', 'VARCHAR', true, 40, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', true, 32, null);
 		$this->addColumn('LOGIN_BLOCKED_UNTIL', 'LoginBlockedUntil', 'TIMESTAMP', false, null, null);
-		$this->addColumn('IS_ADMIN', 'IsAdmin', 'BOOLEAN', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, 255, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 
