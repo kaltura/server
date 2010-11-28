@@ -69,7 +69,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 	protected function init()
 	{ /* non-relevant abstract function */ }
 
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{ /* non-relevant abstract function */ }
 
 	protected function freeExclusiveJob(KalturaBatchJob $job)

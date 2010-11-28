@@ -271,11 +271,11 @@ class kBatchManager
 	}
 	
 	// common to all the jobs using the BatchJob table 
-	public static function updateExclusiveBatchJob($id, kExclusiveLockKey $lockKey, BatchJob $dbBatchJob, $entryStatus = null)
+	public static function updateExclusiveBatchJob($id, kExclusiveLockKey $lockKey, BatchJob $dbBatchJob)
 	{
 		$dbBatchJob = kBatchExclusiveLock::updateExclusive($id, $lockKey, $dbBatchJob);
 		
-		$event = new kBatchJobStatusEvent($dbBatchJob, $entryStatus);
+		$event = new kBatchJobStatusEvent($dbBatchJob);
 		kEventsManager::raiseEvent($event);
 		
 		$dbBatchJob->reload();

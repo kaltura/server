@@ -5,16 +5,15 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 {
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getJobType())
 		{
 			case BatchJobType::FILESYNC_IMPORT:
-				$dbBatchJob = $this->updatedFileSyncImport($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
+				$dbBatchJob = $this->updatedFileSyncImport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 				break;
 			
 			default:
@@ -25,25 +24,25 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 	}
 	
 		
-	protected function updatedFileSyncImport(BatchJob $dbBatchJob, kFileSyncImportJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedFileSyncImport(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			// success
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedFileSyncImportFinished($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedFileSyncImportFinished($dbBatchJob, $data, $twinJob);
 				
 			// failure
 			case BatchJob::BATCHJOB_STATUS_ABORTED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
 			case BatchJob::BATCHJOB_STATUS_FAILED:
-				return $this->updatedFileSyncImportFailed($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedFileSyncImportFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedFileSyncImportFinished(BatchJob $dbBatchJob, kFileSyncImportJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedFileSyncImportFinished(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
 		// Update relevant filesync as READY
 		$fileSyncId = $data->getFilesyncId();
@@ -62,7 +61,7 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 		return $dbBatchJob;
 	}
 	
-	protected function updatedFileSyncImportFailed(BatchJob $dbBatchJob, kFileSyncImportJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedFileSyncImportFailed(BatchJob $dbBatchJob, kFileSyncImportJobData $data, BatchJob $twinJob = null)
 	{
 		// Update relevant filesync as FAILED
 		$fileSyncId = $data->getFilesyncId();

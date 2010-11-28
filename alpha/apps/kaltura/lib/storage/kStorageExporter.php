@@ -167,11 +167,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			return true;

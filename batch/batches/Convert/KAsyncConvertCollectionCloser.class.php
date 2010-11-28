@@ -214,7 +214,7 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 			$job->message = "Files not moved correctly";
 		}
-		return $this->closeJob($job, null, null, $job->message, $job->status, null, $data);
+		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
 	
 	/**
@@ -305,7 +305,7 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 		return true;
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
 		$flavors = null;
 		if($job->data && $job->data->flavors)
@@ -313,7 +313,7 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 			$flavors = $job->data->flavors;
 			$job->data->flavors = null;
 		}
-		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus, $flavors);
+		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

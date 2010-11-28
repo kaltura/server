@@ -26,7 +26,7 @@ class kJobsManager
 		$batchJob->setStatus($status);
 		$batchJob->save();
 		
-		$event = new kBatchJobStatusEvent($batchJob, null, $twinJob);
+		$event = new kBatchJobStatusEvent($batchJob, $twinJob);
 		kEventsManager::raiseEvent($event);
 		$batchJob->reload();
 		return $batchJob;

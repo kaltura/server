@@ -3,20 +3,19 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 {
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function updatedJob(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
+	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getJobType())
 		{
 			case BatchJobType::METADATA_IMPORT:
-				$dbBatchJob = $this->updatedImportMetadata($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
+				$dbBatchJob = $this->updatedImportMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 				break;
 		
 			case BatchJobType::METADATA_TRANSFORM:
-				$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $entryStatus, $twinJob);
+				$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 				break;
 	
 			default:
@@ -27,103 +26,49 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 	}
 	
 		
-	protected function updatedImportMetadata(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedImportMetadata(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
-			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return $this->updatedImportMetadataPending($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_QUEUED:
-				return $this->updatedImportMetadataQueued($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_PROCESSING:
-				return $this->updatedImportMetadataProcessing($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_PROCESSED:
-				return $this->updatedImportMetadataProcessed($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_MOVEFILE:
-				return $this->updatedImportMetadataMoveFile($dbBatchJob, $data, $entryStatus, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedImportMetadataFinished($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedImportMetadataFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
-				return $this->updatedImportMetadataFailed($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_ABORTED:
-				return $this->updatedImportMetadataAborted($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_ALMOST_DONE:
-				return $this->updatedImportMetadataAlmostDone($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_RETRY:
-				return $this->updatedImportMetadataRetry($dbBatchJob, $data, $entryStatus, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedImportMetadataFatal($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedImportMetadataFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedImportMetadataPending(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataQueued(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataProcessing(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataProcessed(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataMoveFile(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataFinished(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedImportMetadataFinished(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		// TODO - update the metadata file sync
 		return $dbBatchJob;
 	}
 	
-	protected function updatedImportMetadataFailed(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedImportMetadataFailed(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		// TODO - set the metadata status to invalid
 		return $dbBatchJob;
 	}
 	
-	protected function updatedImportMetadataAborted(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataAlmostDone(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataRetry(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedImportMetadataFatal(BatchJob $dbBatchJob, kImportMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
-	{
-		return $this->updatedImportMetadataFailed($dbBatchJob, $data, $entryStatus, $twinJob);
-	}
-	
-		
-	protected function updatedTransformMetadata(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedTransformMetadata(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_PENDING:
-				return $this->updatedTransformMetadataPending($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_QUEUED:
-				return $this->updatedTransformMetadataQueued($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_PROCESSING:
-				return $this->updatedTransformMetadataProcessing($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_PROCESSED:
-				return $this->updatedTransformMetadataProcessed($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_MOVEFILE:
-				return $this->updatedTransformMetadataMoveFile($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedTransformMetadataPending($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedTransformMetadataFinished($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedTransformMetadataFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
-				return $this->updatedTransformMetadataFailed($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_ABORTED:
-				return $this->updatedTransformMetadataAborted($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_ALMOST_DONE:
-				return $this->updatedTransformMetadataAlmostDone($dbBatchJob, $data, $entryStatus, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_RETRY:
-				return $this->updatedTransformMetadataRetry($dbBatchJob, $data, $entryStatus, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedTransformMetadataFatal($dbBatchJob, $data, $entryStatus, $twinJob);
+				return $this->updatedTransformMetadataFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
 		$metadataProfile->setStatus(MetadataProfile::STATUS_TRANSFORMING);
@@ -132,15 +77,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 		return $dbBatchJob;
 	}
 	
-	protected function updatedTransformMetadataQueued(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataProcessing(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataProcessed(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataMoveFile(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
 		$metadataProfile->setStatus(MetadataProfile::STATUS_ACTIVE);
@@ -149,7 +86,7 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 		return $dbBatchJob;
 	}
 	
-	protected function updatedTransformMetadataFailed(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
+	protected function updatedTransformMetadataFailed(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		if(!$data->getMetadataProfileId())
 			return $dbBatchJob;
@@ -163,16 +100,4 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 		
 		return $dbBatchJob;
 	}
-	
-	protected function updatedTransformMetadataAborted(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataAlmostDone(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataRetry(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null){ return $dbBatchJob; }
-	
-	protected function updatedTransformMetadataFatal(BatchJob $dbBatchJob, kTransformMetadataJobData $data, $entryStatus, BatchJob $twinJob = null)
-	{
-		return $this->updatedTransformMetadataFailed($dbBatchJob, $data, $entryStatus, $twinJob);
-	}
-	
 }

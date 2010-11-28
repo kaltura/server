@@ -74,7 +74,7 @@ class KAsyncProvisionProvide extends KBatchBase
 		if ( $engine == null )
 		{
 			$err = "Cannot find provision engine [{$job->jobSubType}] for job id [{$job->id}]";
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 		}
 		
 		KalturaLog::info( "Using engine: " . $engine->getName() );
@@ -82,14 +82,14 @@ class KAsyncProvisionProvide extends KBatchBase
 		$results = $engine->provide($job, $data);
 
 		if($results->status == KalturaBatchJobStatus::FINISHED)
-			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, null, $results->data);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $results->data);
 			
-		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $results->errMessage, $results->status, null, $results->data);
+		return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $results->errMessage, $results->status, $results->data);
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveProvisionProvideJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveProvisionProvideJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

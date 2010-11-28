@@ -132,9 +132,9 @@ class KAsyncCaptureThumb extends KBatchBase
 			$job = $this->moveFile($job, $data);
 				
 			if($this->checkFileExists($job->data->thumbPath))
-				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, null, $data);
+				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
 			
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, null, $data);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, $data);
 		}
 		catch(Exception $ex)
 		{
@@ -186,9 +186,9 @@ class KAsyncCaptureThumb extends KBatchBase
 		return $job;
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveCaptureThumbJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveCaptureThumbJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

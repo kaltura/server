@@ -62,7 +62,7 @@ class KAsyncBulkDownloadCloser extends KBatchBase
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
 		return $this->kClient->batch->updateExclusiveBulkDownloadJob($jobId, $this->getExclusiveLockKey(), $job);
 	}

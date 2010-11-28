@@ -198,7 +198,7 @@ class KAsyncConvertCloser extends KBatchBase
 		}
 		$updateData = new KalturaConvertJobData();
 		$updateData->destFileSyncLocalPath = $data->destFileSyncLocalPath;
-		return $this->closeJob($job, null, null, $job->message, $job->status, null, $updateData);
+		return $this->closeJob($job, null, null, $job->message, $job->status, $updateData);
 	}
 	
 	/**
@@ -269,9 +269,9 @@ class KAsyncConvertCloser extends KBatchBase
 		return true;
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveConvertJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveConvertJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

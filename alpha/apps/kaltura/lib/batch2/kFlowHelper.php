@@ -71,11 +71,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleImportFinished(BatchJob $dbBatchJob, kImportJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Import finished, with file: " . $data->getDestFileLocalPath());
 		
@@ -143,11 +142,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kExtractMediaJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleExtractMediaClosed(BatchJob $dbBatchJob, kExtractMediaJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleExtractMediaClosed(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Extract media closed");
 		
@@ -226,11 +224,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertPending(BatchJob $dbBatchJob, kConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertPending(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert created with source file: " . $data->getSrcFileSyncLocalPath());
 		
@@ -256,11 +253,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertCollectionPending(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert collection created with source file: " . $data->getSrcFileSyncLocalPath());
 		
@@ -285,11 +281,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertFinished(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
 		
@@ -468,11 +463,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertQueued(BatchJob $dbBatchJob, kConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertQueued(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
@@ -519,11 +513,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertFailed(BatchJob $dbBatchJob, kConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertFailed(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{		
 		KalturaLog::debug("Convert failed with destination file: " . $data->getDestFileSyncLocalPath());
 		
@@ -599,11 +592,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPostConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handlePostConvertFailed(BatchJob $dbBatchJob, kPostConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handlePostConvertFailed(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
 	{		
 		KalturaLog::debug("Post Convert failed for flavor params output: " . $data->getFlavorParamsOutputId());
 		
@@ -627,11 +619,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionFinished(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertCollectionFinished(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
 	{	
 		KalturaLog::debug("Convert Collection finished for entry id: " . $dbBatchJob->getEntryId());
 		
@@ -788,11 +779,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertCollectionFailed(BatchJob $dbBatchJob, kConvertCollectionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertCollectionFailed(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
 	{		
 		KalturaLog::debug("Convert Collection failed for entry id: " . $dbBatchJob->getEntryId());
 		
@@ -871,11 +861,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPostConvertJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob|BatchJob
 	 */
-	public static function handlePostConvertFinished(BatchJob $dbBatchJob, kPostConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handlePostConvertFinished(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getAbort())
 			return $dbBatchJob;
@@ -924,11 +913,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPullJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handlePullFailed(BatchJob $dbBatchJob, kPullJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handlePullFailed(BatchJob $dbBatchJob, kPullJobData $data, BatchJob $twinJob = null)
 	{
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob)
@@ -940,11 +928,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kPullJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob|BatchJob
 	 */
-	public static function handlePullFinished(BatchJob $dbBatchJob, kPullJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handlePullFinished(BatchJob $dbBatchJob, kPullJobData $data, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getAbort())
 			return $dbBatchJob;
@@ -960,11 +947,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kBulkUploadJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleBulkUploadPending(BatchJob $dbBatchJob, kBulkUploadJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleBulkUploadPending(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
 	{
 		// moved to BulkUploadService
 		// create file sunc
@@ -1026,11 +1012,10 @@ class kFlowHelper
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertProfileJobData $data
-	 * @param int $entryStatus
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
 	 */
-	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertProfilePending(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert Profile created, with input file: " . $data->getInputFileSyncLocalPath());
 		
@@ -1058,7 +1043,7 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert Profile failed");
 		
@@ -1075,7 +1060,7 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
 	{
 		KalturaLog::debug("Convert Profile finished");
 		
@@ -1092,7 +1077,7 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleRemoteConvertPending(BatchJob $dbBatchJob, kRemoteConvertJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleRemoteConvertPending(BatchJob $dbBatchJob, kRemoteConvertJobData $data, BatchJob $twinJob = null)
 	{
 		// creates pull job
 		$pullData = new kPullJobData();
@@ -1105,7 +1090,7 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 
-	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
 	{
 		$entryIds = explode(',', $data->getEntryIds());
 		$flavorParamsId = $data->getFlavorParamsId();
@@ -1198,7 +1183,7 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleProvisionProvideFinished(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
 	{
 		$entry = $dbBatchJob->getEntry();
 		$entry->setStreamUsername($data->getEncoderUsername());
@@ -1213,13 +1198,13 @@ class kFlowHelper
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
 	{
 		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 		return $dbBatchJob; 	
 	}
 	
-	public static function handleBulkDownloadFinished(BatchJob $dbBatchJob, kBulkDownloadJobData $data, $entryStatus, BatchJob $twinJob = null)
+	public static function handleBulkDownloadFinished(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
 	{
 		if($dbBatchJob->getAbort())
 			return $dbBatchJob;

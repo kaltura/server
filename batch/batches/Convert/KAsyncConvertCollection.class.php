@@ -257,10 +257,10 @@ class KAsyncConvertCollection extends KAsyncConvert
 			$job->status = KalturaBatchJobStatus::RETRY;
 			$job->message = "Files not moved correctly";
 		}
-		return $this->closeJob($job, null, null, $job->message, $job->status, null, $data);
+		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
 		$flavors = null;
 		if($job->data->flavors)
@@ -268,7 +268,7 @@ class KAsyncConvertCollection extends KAsyncConvert
 			$flavors = $job->data->flavors;
 			$job->data->flavors = null;
 		}
-		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus, $flavors);
+		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

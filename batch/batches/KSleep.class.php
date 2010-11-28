@@ -24,7 +24,7 @@ class KSleep extends KBatchBase
 		
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null){}
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
 	protected function freeExclusiveJob(KalturaBatchJob $job){}
 	
 	public function run()

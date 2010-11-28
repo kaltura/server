@@ -24,9 +24,8 @@ class KAsyncDirectoryCleanup extends KBatchBase
 	/**
 	 * @param int $jobId
 	 * @param KalturaBatchJob $job
-	 * @param int $entryStatus
 	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null){}
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
 	
 	/**
 	 * @param KalturaBatchJob $job

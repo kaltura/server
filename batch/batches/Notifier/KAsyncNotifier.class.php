@@ -260,9 +260,8 @@ class KAsyncNotifier extends KBatchBase
 	/**
 	 * @param int $jobId
 	 * @param KalturaBatchJob $job
-	 * @param int $entryStatus
 	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
 		KalturaLog::info("job[$job->id] status: [$job->status]");
 		

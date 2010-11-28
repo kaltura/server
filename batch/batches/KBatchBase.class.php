@@ -33,9 +33,8 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	/**
 	 * @param int $jobId
 	 * @param KalturaBatchJob $job
-	 * @param int $entryStatus
 	 */
-	protected abstract function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null);
+	protected abstract function updateExclusiveJob($jobId, KalturaBatchJob $job);
 	
 	/**
 	 * @param KalturaBatchJob $job
@@ -548,11 +547,10 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	 * @param int $errNumber
 	 * @param string $msg
 	 * @param int $status
-	 * @param int $entryStatus
 	 * @param unknown_type $data
 	 * @return KalturaBatchJob
 	 */
-	protected function closeJob(KalturaBatchJob $job, $errType, $errNumber, $msg, $status, $entryStatus = null, $data = null)
+	protected function closeJob(KalturaBatchJob $job, $errType, $errNumber, $msg, $status, $data = null)
 	{
 		if(! is_null($errType))
 			KalturaLog::err($msg);
@@ -584,7 +582,7 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 			return $job;
 		}
 		
-		$job = $this->updateExclusiveJob($job->id, $updateJob, $entryStatus);
+		$job = $this->updateExclusiveJob($job->id, $updateJob);
 		if($job instanceof KalturaBatchJob)
 			$this->onUpdate($job);
 		$this->onUpdate($job);

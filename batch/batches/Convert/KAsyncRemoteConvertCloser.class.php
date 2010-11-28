@@ -59,9 +59,9 @@ class KAsyncRemoteConvertCloser extends KBatchBase
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveRemoteConvertJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveRemoteConvertJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

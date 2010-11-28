@@ -156,7 +156,7 @@ class KAsyncConvert extends KBatchBase
 		if ( $this->operationEngine == null )
 		{
 			$err = "Cannot find operation engine [{$job->jobSubType}] for job id [{$job->id}]";
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 		}
 		
 		KalturaLog::info( "Using engine: " . get_class($this->operationEngine) );
@@ -239,7 +239,7 @@ class KAsyncConvert extends KBatchBase
 		{
 			$msg = $this->operationEngine->getMessage();
 			$msg = "engine [" . get_class($this->operationEngine) . "] converted successfully: $msg";
-			return $this->closeJob($job, null, null, $msg, KalturaBatchJobStatus::ALMOST_DONE, null, $data);
+			return $this->closeJob($job, null, null, $msg, KalturaBatchJobStatus::ALMOST_DONE, $data);
 		}
 		
 		$job = $this->updateJob($job, "engine [" . get_class($this->operationEngine) . "] converted successfully", KalturaBatchJobStatus::MOVEFILE, 90, $data);
@@ -290,12 +290,12 @@ class KAsyncConvert extends KBatchBase
 			$job->status = KalturaBatchJobStatus::RETRY;
 			$job->message = "File not moved correctly";
 		}
-		return $this->closeJob($job, null, null, $job->message, $job->status, null, $data);
+		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveConvertJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveConvertJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

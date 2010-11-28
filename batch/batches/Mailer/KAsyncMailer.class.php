@@ -27,7 +27,7 @@ class KAsyncMailer extends KBatchBase
 		$this->saveQueueFilter(self::getType());		
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null){}
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
 	protected function freeExclusiveJob(KalturaBatchJob $job){}
 	
 	const MAILER_DEFAULT_SENDER_EMAIL = 'notifications@kaltura.com';

@@ -71,13 +71,13 @@ class KAsyncImport extends KBatchBase
 			$curlHeaderResponse = $curlWrapper->getHeader($useNoBody);
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
-				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_IMPORTING);
+				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
 			
 			if(!$curlHeaderResponse->isGoodCode())
 			{
-				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_IMPORTING);
+				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
 			$fileSize = null;
@@ -190,7 +190,7 @@ class KAsyncImport extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_IMPORTING);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		return $job;
 	}
@@ -252,7 +252,7 @@ class KAsyncImport extends KBatchBase
 			
 			if($this->checkFileExists($sharedFile, $fileSize))
 			{
-				$this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, null, $data);
+				$this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 			}
 			else
 			{
@@ -261,14 +261,14 @@ class KAsyncImport extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_IMPORTING);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		return $job;
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusiveImportJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusiveImportJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

@@ -169,7 +169,7 @@ class KAsyncPostConvert extends KBatchBase
 				if(!$created || !file_exists($thumbPath))
 				{
 					$data->createThumb = false;
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, 'Thumbnail not created', KalturaBatchJobStatus::FINISHED, null, $data);
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, 'Thumbnail not created', KalturaBatchJobStatus::FINISHED, $data);
 				}
 				
 				$data->thumbPath = $thumbPath;
@@ -177,13 +177,13 @@ class KAsyncPostConvert extends KBatchBase
 				$job = $this->moveFile($job, $data);
 				
 				if($this->checkFileExists($job->data->thumbPath))
-					return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, null, $data);
+					return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
 				
 				$data->createThumb = false;
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, null, $data);
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, $data);
 			}
 			
-			return $this->closeJob($job, null, null, "Media info id $mediaInfo->id saved", KalturaBatchJobStatus::FINISHED, null, $data);
+			return $this->closeJob($job, null, null, "Media info id $mediaInfo->id saved", KalturaBatchJobStatus::FINISHED, $data);
 		}
 		catch(Exception $ex)
 		{
@@ -235,9 +235,9 @@ class KAsyncPostConvert extends KBatchBase
 		return $job;
 	}
 	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{
-		return $this->kClient->batch->updateExclusivePostConvertJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->batch->updateExclusivePostConvertJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 	
 	protected function freeExclusiveJob(KalturaBatchJob $job)

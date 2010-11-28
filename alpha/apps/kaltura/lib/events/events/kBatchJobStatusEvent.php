@@ -10,24 +10,17 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 	private $dbBatchJob;
 	
 	/**
-	 * @var int
-	 */
-	private $entryStatus;
-	
-	/**
 	 * @var BatchJob
 	 */
 	private $twinJob = null;
 	
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param unknown_type $entryStatus
 	 * @param BatchJob $twinJob
 	 */
-	public function __construct(BatchJob $dbBatchJob, $entryStatus, BatchJob $twinJob = null)
+	public function __construct(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		$this->dbBatchJob = $dbBatchJob;
-		$this->entryStatus = $entryStatus;
 		$this->twinJob = $twinJob;
 	}
 	
@@ -42,7 +35,7 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		return $consumer->updatedJob($this->dbBatchJob, $this->entryStatus, $this->twinJob);
+		return $consumer->updatedJob($this->dbBatchJob, $this->twinJob);
 	}
 
 }
