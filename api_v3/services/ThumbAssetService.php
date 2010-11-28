@@ -161,6 +161,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param int $destThumbParamsId indicate the id of the ThumbParams to be generate this thumbnail by
 	 * @return int job id
+	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
 	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
@@ -200,15 +201,17 @@ class ThumbAssetService extends KalturaBaseService
 	}
 
 	/**
-	 * @action generate
+	 * @action regenerate
 	 * @param string $thumbAssetId
+	 * @return int job id
+	 * 
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
 	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
 	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
 	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
 	 */
-	public function generateAction($thumbAssetId)
+	public function regenerateAction($thumbAssetId)
 	{
 		$thumbAsset = thumbAssetPeer::retrieveByPK($thumbAssetId);
 		if(!$thumbAsset)
@@ -243,76 +246,44 @@ class ThumbAssetService extends KalturaBaseService
 		return null;
 	}
 	
+	/**
+	 * @action addFromUrl
+	 * @param string $entryId
+	 * @param string $url
+	 * @return KalturaThumbAsset
+	 */
+	public function addFromUrlAction($entryId, $url)
+	{
+		
+	}
 	
+	/**
+	 * @action addFromJpeg
+	 * @param string $entryId
+	 * @param file $fileData
+	 * @return KalturaThumbAsset
+	 */
+	public function addFromJpegAction($entryId, $fileData)
+	{
+		
+	}
 	
-/*
-update action
-Generates new thumbnail base on:
-�	Thumbnail asset id
-�	Time offset
-�	Source video flavor params id, if not set, THUMB_SOURCE tagged flavor will be searched, source flavor will be used in not found.
-*/
-
-/*
-updateByEntryIdFromSourceEntry action
-The following attributes should be provided:
-�	Source entry id
-�	Destination entry id 
-�	Source video flavor params id
-�	Destination thumbnail params id
-*/
+	/**
+	 * @action delete
+	 * @param string $thumbAssetId
+	 */
+	public function deleteAction($thumbAssetId)
+	{
+		
+	}
 	
-	
-/*
-updateFromSourceEntry action
-The following attributes should be provided:
-�	Thumbnail asset id
-�	Destination entry id 
-�	Source video flavor params id
-*/
-	
-	
-/*
- updateByEntryIdFromUrl action
-The following attributes should be provided:
-�	Entry id 
-�	URL
-�	Destination thumbnail params id
-*/
-
-/*
-updateFromUrl action
-The following attributes should be provided:
-�	Thumbnail asset id 
-�	URL
-*/
-	
-/*
-updateByEntryIdJpeg action
-The following attributes should be provided:
-�	Entry id 
-�	File
-�	Destination thumbnail params id
-*/
-	
-/*
-updateJpeg action
-The following attributes should be provided:
-�	Thumbnail asset id
-�	File
-*/
-	
-/*
-deleteByEntryId action
-The following attributes should be provided:
-�	Entry id
-�	Thumbnail params id
-*/
-
-/*
-delete action
-The following attributes should be provided:
-�	Thumbnail asset id
-
- */
+	/**
+	 * @action delete
+	 * @param string $entryId
+	 * @param int $thumbParamsId
+	 */
+	public function deleteByEntryIdAction($entryId, $thumbParamsId)
+	{
+		
+	}
 }
