@@ -37,6 +37,16 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	/**
 	 * @var string
 	 */
+	public $thumbAssetId;
+	
+	/**
+	 * @var KalturaAssetType
+	 */
+	public $srcAssetType;
+	
+	/**
+	 * @var string
+	 */
 	public $thumbPath;
 	
 	private static $map_between_objects = array
@@ -45,6 +55,8 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 		"actualSrcFileSyncLocalPath" ,
 		"srcFileSyncRemoteUrl" ,
 		"thumbParamsOutputId" ,
+		"thumbAssetId" ,
+		"srcAssetType" ,
 		"thumbPath" ,
 	);
 
