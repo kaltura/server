@@ -40,9 +40,10 @@ class kBusinessPreConvertDL
 	 * 
 	 * @param entry $entry
 	 * @param thumbParams $destThumbParams
+	 * @param BatchJob $parentJob
 	 * @return BatchJob 
 	 */
-	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams)
+	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null)
 	{
 		$srcAsset = null;
 		if($destThumbParams->getSourceParamsId())
@@ -99,7 +100,7 @@ class kBusinessPreConvertDL
 		
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcAssetType = $srcAsset->getType();
-		return kJobsManager::addCapturaThumbJob(null, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
+		return kJobsManager::addCapturaThumbJob($parentJob, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
 	}
 	
 	/**
@@ -718,6 +719,8 @@ class kBusinessPreConvertDL
 			
 			$entry->addFlavorParamsId($sourceFlavor->getId());
 			$entry->save();
+			
+			kFlowHelper::generateThumbnailsFromFlavor($parentJob);
 		}
 		
 		if(!count($flavors))
