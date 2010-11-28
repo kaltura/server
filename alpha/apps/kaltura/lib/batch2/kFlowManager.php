@@ -29,7 +29,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedExtractMedia(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob=null)
+	protected function updatedExtractMedia(BatchJob $dbBatchJob, kExtractMediaJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -42,7 +42,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedStorageExport(BatchJob $dbBatchJob, kStorageExportJobData $data, BatchJob $twinJob=null)
+	protected function updatedStorageExport(BatchJob $dbBatchJob, kStorageExportJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -56,7 +56,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data, BatchJob $twinJob=null)
+	protected function updatedStorageDelete(BatchJob $dbBatchJob, kStorageDeleteJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -67,21 +67,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedCaptureThumb(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob=null)
+	protected function updatedCaptureThumb(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
-//				return kFlowHelper::handleCaptureThumbFinished($dbBatchJob, $data);
+				return kFlowHelper::handleCaptureThumbFinished($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED:
 			case BatchJob::BATCHJOB_STATUS_FATAL:
-//				return kFlowHelper::handleCaptureThumbFailed($dbBatchJob, $data, $twinJob);
+				return kFlowHelper::handleCaptureThumbFailed($dbBatchJob, $data, $twinJob);
 			default:
 				return $dbBatchJob;
 		}
 	}
 	
-	protected function updatedConvert(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob=null)
+	protected function updatedConvert(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -99,7 +99,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedPostConvert(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob=null)
+	protected function updatedPostConvert(BatchJob $dbBatchJob, kPostConvertJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -113,7 +113,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedBulkUpload(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob=null)
+	protected function updatedBulkUpload(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -126,7 +126,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedConvertCollection(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob=null)
+	protected function updatedConvertCollection(BatchJob $dbBatchJob, kConvertCollectionJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -142,7 +142,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedConvertProfile(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob=null)
+	protected function updatedConvertProfile(BatchJob $dbBatchJob, kConvertProfileJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -158,7 +158,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	protected function updatedBulkDownload(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob=null)
+	protected function updatedBulkDownload(BatchJob $dbBatchJob, kBulkDownloadJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
@@ -171,12 +171,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 		
-	protected function updatedProvisionDelete(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob=null)
+	protected function updatedProvisionDelete(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
 	{
 		return $dbBatchJob;
 	}
 	
-	protected function updatedProvisionProvide(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob=null)
+	protected function updatedProvisionProvide(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
