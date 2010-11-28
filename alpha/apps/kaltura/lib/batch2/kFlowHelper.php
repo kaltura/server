@@ -462,6 +462,101 @@ class kFlowHelper
 	
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kCaptureThumbJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleCaptureThumbFinished(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
+	{
+		KalturaLog::debug("Captire thumbnail finished with destination file: " . $data->getThumbPath());
+		
+		if($dbBatchJob->getAbort())
+			return $dbBatchJob;
+		
+		// verifies that thumb asset created
+		if(!$data->getThumbAssetId())
+			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+		
+		$thumbAsset = thumbAssetPeer::retrieveById($data->getThumbAssetId());
+		// verifies that thumb asset exists
+		if(!$thumbAsset)
+			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+
+		$thumbAsset->incrementVersion();
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		$logPath = $data->getThumbPath() . '.log';
+		if(file_exists($logPath))
+		{
+			$thumbAsset->incLogFileVersion();
+			$thumbAsset->save();
+			
+			// creats the file sync
+			$logSyncKey = $thumbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			try{
+				kFileSyncUtils::moveFromFile($logPath, $logSyncKey);
+			}
+			catch(Exception $e){
+				$err = 'Saving conversion log: ' . $e->getMessage();
+				KalturaLog::err($err);
+				
+				$desc = $dbBatchJob->getDescription() . "\n" . $err;
+				$dbBatchJob->getDescription($desc);
+			}
+		}
+		else
+		{
+			$thumbAsset->save();
+		}
+		
+		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($data->getThumbPath(), $syncKey);
+		
+		$data->setThumbPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+		KalturaLog::debug("Thumbnail archived file to: " . $data->getThumbPath());
+
+		// save the data changes to the db
+		$dbBatchJob->setData($data);
+		$dbBatchJob->save();
+		
+		if($thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+		{
+			$entry = $dbBatchJob->getEntry(false, false);
+			if(!$entry)
+				throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+				
+			// increment thumbnail version
+			$entry->setThumbnail(".jpg");
+			$entry->save();
+			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey, false);
+		
+			if($syncFile)
+			{
+				// removes the DEFAULT_THUMB tag from all other thumb assets
+				$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+				foreach($entryThumbAssets as $entryThumbAsset)
+				{
+					if($entryThumbAsset->getId() == $thumbAsset->getId())
+						continue;
+						
+					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+						continue;
+						
+					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+					$entryThumbAsset->save();
+				}
+			}
+		}
+		
+		if(!is_null($thumbAsset->getFlavorParamsId()))
+			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob, $thumbAsset->getFlavorParamsId());
+			
+		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -585,6 +680,35 @@ class kFlowHelper
 						$extraData, $entryId );
 			}
 		}
+		
+		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kCaptureThumbJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleCaptureThumbFailed(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
+	{		
+		KalturaLog::debug("Captura thumbnail failed with destination file: " . $data->getThumbPath());
+		
+		if($dbBatchJob->getAbort())
+			return $dbBatchJob;
+		
+		// verifies that thumb asset created
+		if(!$data->getThumbAssetId())
+			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+		
+		$thumbAsset = flavorAssetPeer::retrieveById($data->getThumbAssetId());
+		// verifies that thumb asset exists
+		if(!$thumbAsset)
+			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
+
+		$thumbAsset->incrementVersion();
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+		$thumbAsset->save();
 		
 		return $dbBatchJob;
 	}
@@ -789,6 +913,90 @@ class kFlowHelper
 		kBusinessPostConvertDL::handleConvertCollectionFailed($dbBatchJob, $data, $dbBatchJob->getJobSubType());
 		
 		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BatchJob $parentJob
+	 * @param int $srcParamsId
+	 */
+	public static function generateThumbnailsFromFlavor(BatchJob $parentJob, $srcParamsId = null)
+	{
+		$entryId = $parentJob->getEntryId();
+		$profile = null;
+		try
+		{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('getConversionProfile2ForEntry Error: ' . $e->getMessage());
+		}
+		
+		if(!$profile)
+		{
+			KalturaLog::notice("Profile not found for entry id [$entryId]");
+			return;
+		}
+			
+		$assetParamsIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($profile->getId());
+		if(!count($assetParamsIds))
+		{
+			KalturaLog::notice("No asset params objects found for profile id [" . $profile->getId() . "]");
+			return;
+		}
+		
+		// the alternative is the source or the highest bitrate if source not defined 
+		$alternateFlavorParamsId = null;
+		if(is_null($srcParamsId))
+		{
+			$flavorParamsObjects = flavorParamsPeer::retrieveByPKs($assetParamsIds);
+			foreach($flavorParamsObjects as $flavorParams)
+				if($flavorParams->hasTag(flavorParams::TAG_SOURCE))
+					$alternateFlavorParamsId = $flavorParams->getId();
+			
+			if(is_null($alternateFlavorParamsId))
+			{
+				$srcFlavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entryId);
+				$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
+			}
+			
+			if(is_null($alternateFlavorParamsId))
+			{
+				KalturaLog::notice("No source flavor params object found for entry id [$entryId]");
+				return;
+			}
+		}
+		
+		// create list of created thumbnails
+		$thumbAssetsList = array();
+		$thumbAssets = thumbAssetPeer::retrieveByEntryId($entryId);
+		if(count($thumbAssets))
+		{
+			foreach($thumbAssets as $thumbAsset)
+				if(!is_null($thumbAsset->getFlavorParamsId()))
+					$thumbAssetsList[$thumbAsset->getFlavorParamsId()] = $thumbAsset;
+		}
+		
+		$thumbParamsObjects = thumbParamsPeer::retrieveByPKs($assetParamsIds);
+		foreach($thumbParamsObjects as $thumbParams)
+		{
+			// check if this thumbnail already created
+			if(isset($thumbAssetsList[$thumbParams->getId()]))
+				continue;
+				
+			if(is_null($srcParamsId))
+			{
+				// alternative should be used
+				$thumbParams->setSourceParamsId($alternateFlavorParamsId);
+			}
+			elseif($thumbParams->getSourceParamsId() != $srcParamsId)
+			{
+				// only thumbnails that uses srcParamsId should be generated for now
+				continue;
+			}
+			
+			kBusinessPreConvertDL::decideThumbGenerate($parentJob->getEntry(), $thumbParams, $parentJob);
+		}
 	}
 	
 	/**
@@ -1074,6 +1282,8 @@ class kFlowHelper
 		
 		kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		
+		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob);
+			
 		return $dbBatchJob; 	
 	}
 	
