@@ -14,6 +14,7 @@ CREATE TABLE `kuser`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`login_data_id` INTEGER,
+	`is_admin` TINYINT,
 	`screen_name` VARCHAR(20),
 	`full_name` VARCHAR(40),
 	`first_name` VARCHAR(40),
@@ -57,6 +58,7 @@ CREATE TABLE `kuser`
 	`admin_tags` TEXT,
 	`indexed_partner_data_int` INTEGER,
 	`indexed_partner_data_string` VARCHAR(64),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `screen_name_index`(`screen_name`),
 	KEY `full_name_index`(`full_name`),
@@ -1854,10 +1856,9 @@ CREATE TABLE `user_login_data`
 	`sha1_password` VARCHAR(40)  NOT NULL,
 	`salt` VARCHAR(32)  NOT NULL,
 	`login_blocked_until` DATETIME,
-	`is_admin` TINYINT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`custom_data` TEXT(255),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `login_email_index`(`login_email`)
 )Type=MyISAM;

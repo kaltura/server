@@ -7,6 +7,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="login_data_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="is_admin" type="boolean" />
+		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="screen_name" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="full_name" type="varchar" size="40" />
@@ -93,6 +95,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="indexed_partner_data_string" type="varchar"
 			size="64" />
+		<column primaryKey="false" required="false" autoIncrement="false"
+			lazyLoad="false" name="custom_data" type="longvarchar"/>
 		<index name="screen_name_index">
 			<index-column name="screen_name" />
 		</index>
@@ -2545,10 +2549,9 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="sha1_password" type="varchar" size="40"/>
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="salt" type="varchar" size="32"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="login_blocked_until" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_admin" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" size="255"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
 		
 		<index name="login_email_index">
 			<index-column name="login_email" />

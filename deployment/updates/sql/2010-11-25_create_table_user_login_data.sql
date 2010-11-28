@@ -10,7 +10,6 @@ CREATE TABLE `user_login_data`
 	`sha1_password` VARCHAR(40)  NOT NULL,
 	`salt` VARCHAR(32)  NOT NULL,
 	`login_blocked_until` DATETIME,
-	`is_admin` TINYINT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT(255),
