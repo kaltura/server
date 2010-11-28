@@ -57,7 +57,7 @@ class flavorAssetTableMap extends TableMap {
 		$this->addColumn('FILE_EXT', 'FileExt', 'VARCHAR', false, 4, null);
 		$this->addColumn('CONTAINER_FORMAT', 'ContainerFormat', 'VARCHAR', false, 127, null);
 		$this->addColumn('VIDEO_CODEC_ID', 'VideoCodecId', 'VARCHAR', false, 127, null);
-		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 1);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

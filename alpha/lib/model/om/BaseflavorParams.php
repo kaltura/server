@@ -232,7 +232,7 @@ abstract class BaseflavorParams extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the type field.
-	 * Note: this column has a database default value of: 1
+	 * Note: this column has a database default value of: 0
 	 * @var        int
 	 */
 	protected $type;
@@ -317,7 +317,7 @@ abstract class BaseflavorParams extends BaseObject  implements Persistent {
 		$this->gop_size = 0;
 		$this->two_pass = false;
 		$this->creation_mode = 1;
-		$this->type = 1;
+		$this->type = 0;
 	}
 
 	/**
@@ -1686,7 +1686,7 @@ abstract class BaseflavorParams extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->type !== 1) {
+			if ($this->type !== 0) {
 				return false;
 			}
 

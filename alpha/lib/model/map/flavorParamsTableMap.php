@@ -69,7 +69,7 @@ class flavorParamsTableMap extends TableMap {
 		$this->addColumn('ROTATE', 'Rotate', 'INTEGER', false, null, null);
 		$this->addColumn('OPERATORS', 'Operators', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('ENGINE_VERSION', 'EngineVersion', 'SMALLINT', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 1);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		// validators
 	} // initialize()
 
