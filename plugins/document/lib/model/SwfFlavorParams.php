@@ -2,8 +2,18 @@
 
 class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 {
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		$this->type = DocumentAssetType::get()->coreValue(DocumentAssetType::SWF);
+	}
 	
-	//TODO: which TAGS are valid ??
 	
 	/**
 	 * 

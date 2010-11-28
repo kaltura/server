@@ -2,7 +2,17 @@
 
 class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParamsInterface
 {
-	//TODO: which TAGS are valid ??
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		$this->type = DocumentAssetType::get()->coreValue(DocumentAssetType::PDF);
+	}
 	
 	
 	// -- Conversion Parameters --
