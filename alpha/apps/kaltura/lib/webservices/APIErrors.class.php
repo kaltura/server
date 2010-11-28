@@ -199,6 +199,9 @@
 		// %s - flavor asset id
 		const INVALID_FLAVOR_ASSET_ID = "INVALID_FLAVOR_ASSET_ID, Invalid flavor asset id %s";
 
+		// %s - thumb asset id
+		const INVALID_THUMB_ASSET_ID = "INVALID_THUMB_ASSET_ID, Invalid thumbnail asset id %s";
+
 	
 		const FLAVOR_ASSET_IS_NOT_READY = "FLAVOR_ASSET_IS_NOT_READY,The flavor asset is not ready";
 	
