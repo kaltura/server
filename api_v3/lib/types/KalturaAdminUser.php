@@ -32,16 +32,5 @@ class KalturaAdminUser extends KalturaObject
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 
-	public function fromAdminUser ( kuser $entry )
-	{
-		parent::fromObject( $partner );
-	}
 	
-	public function toAdminUser () 
-	{
-		$user = new kuser;
-		return parent::toObject( $user );
-	}
-
 }
-?>
