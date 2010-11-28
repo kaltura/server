@@ -124,7 +124,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 		}
 		
 		// FLAVOR PARAMS
-		if($baseClass == flavorParamsPeer::OM_CLASS)
+		if($baseClass == 'flavorParams')
 		{
 			switch($enumValue)
 			{
@@ -142,7 +142,7 @@ class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObject
 			}
 		}
 	
-		if($baseClass == flavorParamsOutputPeer::OM_CLASS)
+		if($baseClass == 'flavorParamsOutput')
 		{
 			switch($enumValue)
 			{
