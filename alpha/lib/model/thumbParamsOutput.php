@@ -30,8 +30,8 @@ class thumbParamsOutput extends assetParamsOutput
 	public function getCropProvider()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_PROVIDER);}
 	public function getCropProviderData()		{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA);}
 	public function getVideoOffset()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_VIDEO_OFFSET);}
-	public function getWidth()					{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_WIDTH);}
-	public function getHeight()					{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_HEIGHT);}
+	public function getScaleWidth()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_WIDTH);}
+	public function getScaleHeight()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT);}
 	public function getBackgroundColor()		{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR);}
 
 	public function setSourceParamsId($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID, $v);}
@@ -44,7 +44,7 @@ class thumbParamsOutput extends assetParamsOutput
 	public function setCropProvider($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_PROVIDER, $v);}
 	public function setCropProviderData($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_PROVIDER_DATA, $v);}
 	public function setVideoOffset($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_VIDEO_OFFSET, $v);}
-	public function setWidth($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_WIDTH, $v);}
-	public function setHeight($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_HEIGHT, $v);}
+	public function setScaleWidth($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_WIDTH, $v);}
+	public function setScaleHeight($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT, $v);}
 	public function setBackgroundColor($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR, $v);}
 }
