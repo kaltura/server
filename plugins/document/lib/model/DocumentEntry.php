@@ -14,7 +14,7 @@ class DocumentEntry extends entry
 		if(!$flavorParams)
 			return null;
 			
-		$flavorAssets = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($this->getId(), $flavorParams->getId());
+		$flavorAssets = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParams->getId());
 		if(!$flavorAssets)
 			return null;
 			
