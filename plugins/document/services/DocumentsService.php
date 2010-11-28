@@ -116,13 +116,13 @@ class DocumentsService extends KalturaEntryService
 		$srcFlavorAsset = null;
 		if(is_null($sourceFlavorParamsId))
 		{
-			$srcFlavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($sourceEntryId);
+			$srcFlavorAsset = assetPeer::retreiveOriginalByEntryId($sourceEntryId);
 			if(!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		}
 		else
 		{
-			$srcFlavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
+			$srcFlavorAssets = assetPeer::retreiveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
 			if(count($srcFlavorAssets))
 			{
 				$srcFlavorAsset = reset($srcFlavorAssets);
@@ -154,7 +154,7 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
 	{
-		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
+		$srcFlavorAsset = assetPeer::retrieveById($sourceFlavorAssetId);
 
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $sourceFlavorAssetId);
@@ -303,7 +303,7 @@ class DocumentsService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
@@ -382,16 +382,16 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();	
 					
 		$flavorAsset = null;
-		flavorAssetPeer::setDefaultCriteriaFilter();
+		assetPeer::setDefaultCriteriaFilter();
 		if($flavorAssetId)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 			if(!$flavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY, $flavorAssetId);
 		}
 		else
 		{
-			$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+			$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 			if(!$flavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorAssetId);
 		}
@@ -431,16 +431,16 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;
-		flavorAssetPeer::setDefaultCriteriaFilter();
+		assetPeer::setDefaultCriteriaFilter();
 		if($flavorParamsId)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorParamsId);
+			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
 			if(!$flavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY, $flavorParamsId);
 		}
 		else
 		{
-			$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+			$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 			if(!$flavorAsset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorParamsId);
 		}
