@@ -17,7 +17,7 @@ class kBusinessPostConvertDL
 			}
 			catch(Exception $e)
 			{
-				KalturaLog::err(__METHOD__ . ': getConversionProfile2ForEntry Error: ' . $e->getMessage());
+				KalturaLog::err('getConversionProfile2ForEntry Error: ' . $e->getMessage());
 			}
 		}
 		
@@ -91,6 +91,8 @@ class kBusinessPostConvertDL
 		// mark the asset as ready 
 		$currentFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$currentFlavorAsset->save();
+		
+		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
 		return $currentFlavorAsset;
 	}
