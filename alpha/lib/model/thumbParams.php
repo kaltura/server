@@ -9,6 +9,8 @@
  */ 
 class thumbParams extends assetParams
 {
+	const CONTAINER_FORMAT_JPG = "jpg";
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
