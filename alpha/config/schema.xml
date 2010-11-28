@@ -2024,7 +2024,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="engine_version" type="smallint" />
 		<column primaryKey="false" lazyLoad="false"
-			name="type" type="integer" required="true" inheritance="single" default="1" />
+			name="type" type="integer" required="true" inheritance="single" default="0" />
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_params_output"
 		phpName="flavorParamsOutput">
@@ -2107,7 +2107,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="engine_version" type="smallint" />
 		<column primaryKey="false" lazyLoad="false"
-			name="type" type="integer" required="true" inheritance="single" default="1" />
+			name="type" type="integer" required="true" inheritance="single" default="0" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="flavor_params">
 			<reference local="flavor_params_id" foreign="id" />
 		</foreign-key>
@@ -2163,7 +2163,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false"
-			name="type" type="integer" required="true" inheritance="single" default="1" />
+			name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
