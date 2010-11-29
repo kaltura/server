@@ -485,6 +485,15 @@ class kFlowHelper
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		
+		
+		if(file_exists($data->getThumbPath()))
+		{
+			list($width, $height, $type, $attr) = getimagesize($data->getThumbPath());
+			$thumbAsset->setWidth($width);
+			$thumbAsset->setHeight($height);
+			$thumbAsset->setSize(filesize($data->getThumbPath()));
+		}		
+		
 		$logPath = $data->getThumbPath() . '.log';
 		if(file_exists($logPath))
 		{
@@ -984,7 +993,7 @@ class kFlowHelper
 			if(isset($thumbAssetsList[$thumbParams->getId()]))
 				continue;
 				
-			if(is_null($srcParamsId))
+			if(is_null($srcParamsId) && is_null($thumbParams->getSourceParamsId()))
 			{
 				// alternative should be used
 				$thumbParams->setSourceParamsId($alternateFlavorParamsId);
@@ -1258,7 +1267,7 @@ class kFlowHelper
 		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
 		
 		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
+		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
 			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalFlavorAsset->setDeletedAt(time());
