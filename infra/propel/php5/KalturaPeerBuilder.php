@@ -12,6 +12,9 @@ require_once 'propel/engine/builder/om/php5/PHP5PeerBuilder.php';
  */
 class KalturaPeerBuilder extends PHP5PeerBuilder 
 {	
+	const KALTURA_COLUMN_PARTNER_ID = 'partner_id';
+	const KALTURA_COLUMN_DISPLAY_IN_SEARCH = 'display_in_search';
+	
 	/**
 	 * Adds the doCount() method.
 	 * @param      string &$script The script will be modified in this method.
@@ -138,6 +141,103 @@ class KalturaPeerBuilder extends PHP5PeerBuilder
 		".$this->getPeerClassname()."::getCriteriaFilter()->applyFilter(\$criteria);
 	}
 	
+	public static function addPartnerToCriteria(\$partnerId, \$privatePartnerData = false, \$partnerGroup = null, \$kalturaNetwork = null)
+	{";
+	
+		$table = $this->getTable();
+		$partnerIdColumn = $table->getColumn(self::KALTURA_COLUMN_PARTNER_ID);
+		$displayInSearchColumn = $table->getColumn(self::KALTURA_COLUMN_DISPLAY_IN_SEARCH);
+		
+		if($partnerIdColumn)
+		{
+			$script .= "
+		\$criteriaFilter = self::getCriteriaFilter();
+		\$criteria = \$criteriaFilter->getFilter();
+		
+		if(!\$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if(\$kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff";
+			
+			if($displayInSearchColumn)
+			{
+				$script .= "
+				\$criteria->addAnd(self::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+				";
+			}
+			
+			$script .= "
+				if(\$partnerId)
+				{
+					\$orderBy = \"(\" . self::PARTNER_ID . \"<>{\$partnerId})\";  // first take the pattner_id and then the rest
+					myCriteria::addComment(\$criteria , \"Only Kaltura Network\");
+					\$criteria->addAscendingOrderByColumn(\$orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				\$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(empty(\$partnerGroup) && empty(\$kalturaNetwork))
+			{
+				// the default case
+				\$criteria->addAnd(self::PARTNER_ID, \$partnerId);
+			}
+			elseif (\$partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				\$criterion = null;
+				if(\$partnerGroup)
+				{
+					// \$partnerGroup hold a list of partners separated by ',' or \$kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					\$partners = explode(',', trim(\$partnerGroup));
+					foreach(\$partners as &\$p)
+						trim(\$p); // make sure there are not leading or trailing spaces
+	
+					// add the partner_id to the partner_group
+					\$partners[] = \$partnerId;
+					
+					\$criterion = \$criteria->getNewCriterion(self::PARTNER_ID, \$partners, Criteria::IN);
+				}
+				else 
+				{
+					\$criterion = \$criteria->getNewCriterion(self::PARTNER_ID, \$partnerId);
+				}";
+			
+			if($displayInSearchColumn)
+			{
+				$script .= "	
+				
+				if(\$kalturaNetwork)
+				{
+					\$criterionNetwork = \$criteria->getNewCriterion(self::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+					\$criterion->addOr(\$criterionNetwork);
+				}";
+			}
+			
+			$script .= "	
+				
+				\$criteria->addAnd(\$criterion);
+			}
+		}
+			
+		\$criteriaFilter->enable();";
+			
+		}
+		
+		$script .= "
+	}
 	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
