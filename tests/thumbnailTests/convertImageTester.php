@@ -170,7 +170,6 @@ class convertImageTester {
 		$retValue = null;
 		$output = null;
 		$output = system($cmd, $retValue);
-		echo "aa " . $cmd . " aa"; 
 		$compareResult = file_get_contents('resultLog.txt');
 		echo 'score is: ' .$compareResult;
 		unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
