@@ -20,8 +20,12 @@
 		ActKeyUtils::checkCurrent();
 		KalturaLog::setContext("TESTME");
 		
+		$configSection = 'testme';
+		if(isset($_REQUEST['config']))
+			$configSection = $_REQUEST['config'];
+			
 		$config = new Zend_Config_Ini("../../config/testme.ini");
-		$indexConfig = $config->get('testme');
+		$indexConfig = $config->get($configSection);
 		
 		$include = $indexConfig->get("include");
 		$exclude = $indexConfig->get("exclude");
