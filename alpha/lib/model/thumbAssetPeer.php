@@ -113,4 +113,15 @@ class thumbAssetPeer extends assetPeer
 		self::getInstance();
 		return parent::retrieveByEntryIdAndParams($entryId, $paramsId);
 	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @return array<flavorAsset>
+	 */
+	public static function retrieveByEntryId($entryId)
+	{
+		self::getInstance();
+		return parent::retrieveByEntryId($entryId);
+	}
 }
