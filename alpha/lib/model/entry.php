@@ -154,8 +154,9 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function applyDefaultValues()
 	{
-		$this->status = entryStatus::PENDING;
-		$this->moderation_status = self::ENTRY_MODERATION_STATUS_AUTO_APPROVED;
+		parent::applyDefaultValues();
+		$this->setStatus(entryStatus::PENDING);
+		$this->setModerationStatus(self::ENTRY_MODERATION_STATUS_AUTO_APPROVED);
 	}
 	
 	// the columns names is a list of all fields that will participate in the search_text
