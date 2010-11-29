@@ -47,16 +47,25 @@ class kBusinessPreConvertDL
 	{
 		$srcAsset = null;
 		if($destThumbParams->getSourceParamsId())
+		{
+			KalturaLog::debug("Look for flavor params [" . $destThumbParams->getSourceParamsId() . "]");
 			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getSourceParamsId());
+		}
 				
 		if(is_null($srcAsset))
+		{
+			KalturaLog::debug("Look for original flavor");
 			$srcAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
+		}
 				
 		if (is_null($srcAsset) || $srcAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		{
+			KalturaLog::debug("Look for highest bitrate flavor");
 			$srcAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+		}
 			
 		if (is_null($srcAsset))
-			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY, $destThumbParams->getSourceParamsId());
+			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
 			
 		$errDescription = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
