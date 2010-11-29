@@ -79,7 +79,7 @@ class mediaInfoTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('flavorAsset', 'flavorAsset', RelationMap::MANY_TO_ONE, array('flavor_asset_id' => 'id', ), null, null);
+    $this->addRelation('asset', 'asset', RelationMap::MANY_TO_ONE, array('flavor_asset_id' => 'id', ), null, null);
 	} // buildRelations()
 
 } // mediaInfoTableMap

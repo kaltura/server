@@ -2197,7 +2197,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 * api reasonable.  You can provide public methods for those you
 	 * actually need in conversionProfile2.
 	 */
-	public function getflavorParamsConversionProfilesJoinflavorParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public function getflavorParamsConversionProfilesJoinassetParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(conversionProfile2Peer::DATABASE_NAME);
@@ -2214,7 +2214,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 
 				$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $this->id);
 
-				$this->collflavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+				$this->collflavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		} else {
 			// the following code is to determine if a new query is
@@ -2224,7 +2224,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			$criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $this->id);
 
 			if (!isset($this->lastflavorParamsConversionProfileCriteria) || !$this->lastflavorParamsConversionProfileCriteria->equals($criteria)) {
-				$this->collflavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+				$this->collflavorParamsConversionProfiles = flavorParamsConversionProfilePeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		}
 		$this->lastflavorParamsConversionProfileCriteria = $criteria;

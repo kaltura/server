@@ -335,6 +335,9 @@ abstract class BaseSchedulerConfigPeer {
 		SchedulerConfigPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	{
+	}
 	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.

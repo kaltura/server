@@ -444,24 +444,24 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	private $lastwidgetCriteria = null;
 
 	/**
-	 * @var        array flavorParamsOutput[] Collection to store aggregation of flavorParamsOutput objects.
+	 * @var        array assetParamsOutput[] Collection to store aggregation of assetParamsOutput objects.
 	 */
-	protected $collflavorParamsOutputs;
+	protected $collassetParamsOutputs;
 
 	/**
-	 * @var        Criteria The criteria used to select the current contents of collflavorParamsOutputs.
+	 * @var        Criteria The criteria used to select the current contents of collassetParamsOutputs.
 	 */
-	private $lastflavorParamsOutputCriteria = null;
+	private $lastassetParamsOutputCriteria = null;
 
 	/**
-	 * @var        array flavorAsset[] Collection to store aggregation of flavorAsset objects.
+	 * @var        array asset[] Collection to store aggregation of asset objects.
 	 */
-	protected $collflavorAssets;
+	protected $collassets;
 
 	/**
-	 * @var        Criteria The criteria used to select the current contents of collflavorAssets.
+	 * @var        Criteria The criteria used to select the current contents of collassets.
 	 */
-	private $lastflavorAssetCriteria = null;
+	private $lastassetCriteria = null;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -2962,11 +2962,11 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->collwidgets = null;
 			$this->lastwidgetCriteria = null;
 
-			$this->collflavorParamsOutputs = null;
-			$this->lastflavorParamsOutputCriteria = null;
+			$this->collassetParamsOutputs = null;
+			$this->lastassetParamsOutputCriteria = null;
 
-			$this->collflavorAssets = null;
-			$this->lastflavorAssetCriteria = null;
+			$this->collassets = null;
+			$this->lastassetCriteria = null;
 
 		} // if (deep)
 	}
@@ -3182,16 +3182,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				}
 			}
 
-			if ($this->collflavorParamsOutputs !== null) {
-				foreach ($this->collflavorParamsOutputs as $referrerFK) {
+			if ($this->collassetParamsOutputs !== null) {
+				foreach ($this->collassetParamsOutputs as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
 				}
 			}
 
-			if ($this->collflavorAssets !== null) {
-				foreach ($this->collflavorAssets as $referrerFK) {
+			if ($this->collassets !== null) {
+				foreach ($this->collassets as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -3422,16 +3422,16 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					}
 				}
 
-				if ($this->collflavorParamsOutputs !== null) {
-					foreach ($this->collflavorParamsOutputs as $referrerFK) {
+				if ($this->collassetParamsOutputs !== null) {
+					foreach ($this->collassetParamsOutputs as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
 					}
 				}
 
-				if ($this->collflavorAssets !== null) {
-					foreach ($this->collflavorAssets as $referrerFK) {
+				if ($this->collassets !== null) {
+					foreach ($this->collassets as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -4252,15 +4252,15 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				}
 			}
 
-			foreach ($this->getflavorParamsOutputs() as $relObj) {
+			foreach ($this->getassetParamsOutputs() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addflavorParamsOutput($relObj->copy($deepCopy));
+					$copyObj->addassetParamsOutput($relObj->copy($deepCopy));
 				}
 			}
 
-			foreach ($this->getflavorAssets() as $relObj) {
+			foreach ($this->getassets() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-					$copyObj->addflavorAsset($relObj->copy($deepCopy));
+					$copyObj->addasset($relObj->copy($deepCopy));
 				}
 			}
 
@@ -5980,47 +5980,47 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Clears out the collflavorParamsOutputs collection (array).
+	 * Clears out the collassetParamsOutputs collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
 	 * them to be refetched by subsequent calls to accessor method.
 	 *
 	 * @return     void
-	 * @see        addflavorParamsOutputs()
+	 * @see        addassetParamsOutputs()
 	 */
-	public function clearflavorParamsOutputs()
+	public function clearassetParamsOutputs()
 	{
-		$this->collflavorParamsOutputs = null; // important to set this to NULL since that means it is uninitialized
+		$this->collassetParamsOutputs = null; // important to set this to NULL since that means it is uninitialized
 	}
 
 	/**
-	 * Initializes the collflavorParamsOutputs collection (array).
+	 * Initializes the collassetParamsOutputs collection (array).
 	 *
-	 * By default this just sets the collflavorParamsOutputs collection to an empty array (like clearcollflavorParamsOutputs());
+	 * By default this just sets the collassetParamsOutputs collection to an empty array (like clearcollassetParamsOutputs());
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
 	 * @return     void
 	 */
-	public function initflavorParamsOutputs()
+	public function initassetParamsOutputs()
 	{
-		$this->collflavorParamsOutputs = array();
+		$this->collassetParamsOutputs = array();
 	}
 
 	/**
-	 * Gets an array of flavorParamsOutput objects which contain a foreign key that references this object.
+	 * Gets an array of assetParamsOutput objects which contain a foreign key that references this object.
 	 *
 	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
 	 * Otherwise if this entry has previously been saved, it will retrieve
-	 * related flavorParamsOutputs from storage. If this entry is new, it will return
+	 * related assetParamsOutputs from storage. If this entry is new, it will return
 	 * an empty collection or the current collection, the criteria is ignored on a new object.
 	 *
 	 * @param      PropelPDO $con
 	 * @param      Criteria $criteria
-	 * @return     array flavorParamsOutput[]
+	 * @return     array assetParamsOutput[]
 	 * @throws     PropelException
 	 */
-	public function getflavorParamsOutputs($criteria = null, PropelPDO $con = null)
+	public function getassetParamsOutputs($criteria = null, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6030,15 +6030,15 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$criteria = clone $criteria;
 		}
 
-		if ($this->collflavorParamsOutputs === null) {
+		if ($this->collassetParamsOutputs === null) {
 			if ($this->isNew()) {
-			   $this->collflavorParamsOutputs = array();
+			   $this->collassetParamsOutputs = array();
 			} else {
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				flavorParamsOutputPeer::addSelectColumns($criteria);
-				$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelect($criteria, $con);
+				assetParamsOutputPeer::addSelectColumns($criteria);
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelect($criteria, $con);
 			}
 		} else {
 			// criteria has no effect for a new object
@@ -6048,28 +6048,28 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				// one, just return the collection.
 
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				flavorParamsOutputPeer::addSelectColumns($criteria);
-				if (!isset($this->lastflavorParamsOutputCriteria) || !$this->lastflavorParamsOutputCriteria->equals($criteria)) {
-					$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelect($criteria, $con);
+				assetParamsOutputPeer::addSelectColumns($criteria);
+				if (!isset($this->lastassetParamsOutputCriteria) || !$this->lastassetParamsOutputCriteria->equals($criteria)) {
+					$this->collassetParamsOutputs = assetParamsOutputPeer::doSelect($criteria, $con);
 				}
 			}
 		}
-		$this->lastflavorParamsOutputCriteria = $criteria;
-		return $this->collflavorParamsOutputs;
+		$this->lastassetParamsOutputCriteria = $criteria;
+		return $this->collassetParamsOutputs;
 	}
 
 	/**
-	 * Returns the number of related flavorParamsOutput objects.
+	 * Returns the number of related assetParamsOutput objects.
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct
 	 * @param      PropelPDO $con
-	 * @return     int Count of related flavorParamsOutput objects.
+	 * @return     int Count of related assetParamsOutput objects.
 	 * @throws     PropelException
 	 */
-	public function countflavorParamsOutputs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	public function countassetParamsOutputs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6083,14 +6083,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		$count = null;
 
-		if ($this->collflavorParamsOutputs === null) {
+		if ($this->collassetParamsOutputs === null) {
 			if ($this->isNew()) {
 				$count = 0;
 			} else {
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				$count = flavorParamsOutputPeer::doCount($criteria, false, $con);
+				$count = assetParamsOutputPeer::doCount($criteria, false, $con);
 			}
 		} else {
 			// criteria has no effect for a new object
@@ -6100,35 +6100,35 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				// one, just return count of the collection.
 
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				if (!isset($this->lastflavorParamsOutputCriteria) || !$this->lastflavorParamsOutputCriteria->equals($criteria)) {
-					$count = flavorParamsOutputPeer::doCount($criteria, false, $con);
+				if (!isset($this->lastassetParamsOutputCriteria) || !$this->lastassetParamsOutputCriteria->equals($criteria)) {
+					$count = assetParamsOutputPeer::doCount($criteria, false, $con);
 				} else {
-					$count = count($this->collflavorParamsOutputs);
+					$count = count($this->collassetParamsOutputs);
 				}
 			} else {
-				$count = count($this->collflavorParamsOutputs);
+				$count = count($this->collassetParamsOutputs);
 			}
 		}
 		return $count;
 	}
 
 	/**
-	 * Method called to associate a flavorParamsOutput object to this object
-	 * through the flavorParamsOutput foreign key attribute.
+	 * Method called to associate a assetParamsOutput object to this object
+	 * through the assetParamsOutput foreign key attribute.
 	 *
-	 * @param      flavorParamsOutput $l flavorParamsOutput
+	 * @param      assetParamsOutput $l assetParamsOutput
 	 * @return     void
 	 * @throws     PropelException
 	 */
-	public function addflavorParamsOutput(flavorParamsOutput $l)
+	public function addassetParamsOutput(assetParamsOutput $l)
 	{
-		if ($this->collflavorParamsOutputs === null) {
-			$this->initflavorParamsOutputs();
+		if ($this->collassetParamsOutputs === null) {
+			$this->initassetParamsOutputs();
 		}
-		if (!in_array($l, $this->collflavorParamsOutputs, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collflavorParamsOutputs, $l);
+		if (!in_array($l, $this->collassetParamsOutputs, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collassetParamsOutputs, $l);
 			$l->setentry($this);
 		}
 	}
@@ -6139,13 +6139,13 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * an identical criteria, it returns the collection.
 	 * Otherwise if this entry is new, it will return
 	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related flavorParamsOutputs from storage.
+	 * been saved, it will retrieve related assetParamsOutputs from storage.
 	 *
 	 * This method is protected by default in order to keep the public
 	 * api reasonable.  You can provide public methods for those you
 	 * actually need in entry.
 	 */
-	public function getflavorParamsOutputsJoinflavorParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public function getassetParamsOutputsJoinassetParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6155,29 +6155,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$criteria = clone $criteria;
 		}
 
-		if ($this->collflavorParamsOutputs === null) {
+		if ($this->collassetParamsOutputs === null) {
 			if ($this->isNew()) {
-				$this->collflavorParamsOutputs = array();
+				$this->collassetParamsOutputs = array();
 			} else {
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		} else {
 			// the following code is to determine if a new query is
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+			$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-			if (!isset($this->lastflavorParamsOutputCriteria) || !$this->lastflavorParamsOutputCriteria->equals($criteria)) {
-				$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+			if (!isset($this->lastassetParamsOutputCriteria) || !$this->lastassetParamsOutputCriteria->equals($criteria)) {
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		}
-		$this->lastflavorParamsOutputCriteria = $criteria;
+		$this->lastassetParamsOutputCriteria = $criteria;
 
-		return $this->collflavorParamsOutputs;
+		return $this->collassetParamsOutputs;
 	}
 
 
@@ -6186,13 +6186,13 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * an identical criteria, it returns the collection.
 	 * Otherwise if this entry is new, it will return
 	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related flavorParamsOutputs from storage.
+	 * been saved, it will retrieve related assetParamsOutputs from storage.
 	 *
 	 * This method is protected by default in order to keep the public
 	 * api reasonable.  You can provide public methods for those you
 	 * actually need in entry.
 	 */
-	public function getflavorParamsOutputsJoinflavorAsset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public function getassetParamsOutputsJoinasset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6202,73 +6202,73 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$criteria = clone $criteria;
 		}
 
-		if ($this->collflavorParamsOutputs === null) {
+		if ($this->collassetParamsOutputs === null) {
 			if ($this->isNew()) {
-				$this->collflavorParamsOutputs = array();
+				$this->collassetParamsOutputs = array();
 			} else {
 
-				$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-				$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelectJoinflavorAsset($criteria, $con, $join_behavior);
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelectJoinasset($criteria, $con, $join_behavior);
 			}
 		} else {
 			// the following code is to determine if a new query is
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $this->id);
+			$criteria->add(assetParamsOutputPeer::ENTRY_ID, $this->id);
 
-			if (!isset($this->lastflavorParamsOutputCriteria) || !$this->lastflavorParamsOutputCriteria->equals($criteria)) {
-				$this->collflavorParamsOutputs = flavorParamsOutputPeer::doSelectJoinflavorAsset($criteria, $con, $join_behavior);
+			if (!isset($this->lastassetParamsOutputCriteria) || !$this->lastassetParamsOutputCriteria->equals($criteria)) {
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelectJoinasset($criteria, $con, $join_behavior);
 			}
 		}
-		$this->lastflavorParamsOutputCriteria = $criteria;
+		$this->lastassetParamsOutputCriteria = $criteria;
 
-		return $this->collflavorParamsOutputs;
+		return $this->collassetParamsOutputs;
 	}
 
 	/**
-	 * Clears out the collflavorAssets collection (array).
+	 * Clears out the collassets collection (array).
 	 *
 	 * This does not modify the database; however, it will remove any associated objects, causing
 	 * them to be refetched by subsequent calls to accessor method.
 	 *
 	 * @return     void
-	 * @see        addflavorAssets()
+	 * @see        addassets()
 	 */
-	public function clearflavorAssets()
+	public function clearassets()
 	{
-		$this->collflavorAssets = null; // important to set this to NULL since that means it is uninitialized
+		$this->collassets = null; // important to set this to NULL since that means it is uninitialized
 	}
 
 	/**
-	 * Initializes the collflavorAssets collection (array).
+	 * Initializes the collassets collection (array).
 	 *
-	 * By default this just sets the collflavorAssets collection to an empty array (like clearcollflavorAssets());
+	 * By default this just sets the collassets collection to an empty array (like clearcollassets());
 	 * however, you may wish to override this method in your stub class to provide setting appropriate
 	 * to your application -- for example, setting the initial array to the values stored in database.
 	 *
 	 * @return     void
 	 */
-	public function initflavorAssets()
+	public function initassets()
 	{
-		$this->collflavorAssets = array();
+		$this->collassets = array();
 	}
 
 	/**
-	 * Gets an array of flavorAsset objects which contain a foreign key that references this object.
+	 * Gets an array of asset objects which contain a foreign key that references this object.
 	 *
 	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
 	 * Otherwise if this entry has previously been saved, it will retrieve
-	 * related flavorAssets from storage. If this entry is new, it will return
+	 * related assets from storage. If this entry is new, it will return
 	 * an empty collection or the current collection, the criteria is ignored on a new object.
 	 *
 	 * @param      PropelPDO $con
 	 * @param      Criteria $criteria
-	 * @return     array flavorAsset[]
+	 * @return     array asset[]
 	 * @throws     PropelException
 	 */
-	public function getflavorAssets($criteria = null, PropelPDO $con = null)
+	public function getassets($criteria = null, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6278,15 +6278,15 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$criteria = clone $criteria;
 		}
 
-		if ($this->collflavorAssets === null) {
+		if ($this->collassets === null) {
 			if ($this->isNew()) {
-			   $this->collflavorAssets = array();
+			   $this->collassets = array();
 			} else {
 
-				$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-				flavorAssetPeer::addSelectColumns($criteria);
-				$this->collflavorAssets = flavorAssetPeer::doSelect($criteria, $con);
+				assetPeer::addSelectColumns($criteria);
+				$this->collassets = assetPeer::doSelect($criteria, $con);
 			}
 		} else {
 			// criteria has no effect for a new object
@@ -6296,28 +6296,28 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				// one, just return the collection.
 
 
-				$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-				flavorAssetPeer::addSelectColumns($criteria);
-				if (!isset($this->lastflavorAssetCriteria) || !$this->lastflavorAssetCriteria->equals($criteria)) {
-					$this->collflavorAssets = flavorAssetPeer::doSelect($criteria, $con);
+				assetPeer::addSelectColumns($criteria);
+				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
+					$this->collassets = assetPeer::doSelect($criteria, $con);
 				}
 			}
 		}
-		$this->lastflavorAssetCriteria = $criteria;
-		return $this->collflavorAssets;
+		$this->lastassetCriteria = $criteria;
+		return $this->collassets;
 	}
 
 	/**
-	 * Returns the number of related flavorAsset objects.
+	 * Returns the number of related asset objects.
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct
 	 * @param      PropelPDO $con
-	 * @return     int Count of related flavorAsset objects.
+	 * @return     int Count of related asset objects.
 	 * @throws     PropelException
 	 */
-	public function countflavorAssets(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	public function countassets(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6331,14 +6331,14 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		$count = null;
 
-		if ($this->collflavorAssets === null) {
+		if ($this->collassets === null) {
 			if ($this->isNew()) {
 				$count = 0;
 			} else {
 
-				$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-				$count = flavorAssetPeer::doCount($criteria, false, $con);
+				$count = assetPeer::doCount($criteria, false, $con);
 			}
 		} else {
 			// criteria has no effect for a new object
@@ -6348,35 +6348,35 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				// one, just return count of the collection.
 
 
-				$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-				if (!isset($this->lastflavorAssetCriteria) || !$this->lastflavorAssetCriteria->equals($criteria)) {
-					$count = flavorAssetPeer::doCount($criteria, false, $con);
+				if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
+					$count = assetPeer::doCount($criteria, false, $con);
 				} else {
-					$count = count($this->collflavorAssets);
+					$count = count($this->collassets);
 				}
 			} else {
-				$count = count($this->collflavorAssets);
+				$count = count($this->collassets);
 			}
 		}
 		return $count;
 	}
 
 	/**
-	 * Method called to associate a flavorAsset object to this object
-	 * through the flavorAsset foreign key attribute.
+	 * Method called to associate a asset object to this object
+	 * through the asset foreign key attribute.
 	 *
-	 * @param      flavorAsset $l flavorAsset
+	 * @param      asset $l asset
 	 * @return     void
 	 * @throws     PropelException
 	 */
-	public function addflavorAsset(flavorAsset $l)
+	public function addasset(asset $l)
 	{
-		if ($this->collflavorAssets === null) {
-			$this->initflavorAssets();
+		if ($this->collassets === null) {
+			$this->initassets();
 		}
-		if (!in_array($l, $this->collflavorAssets, true)) { // only add it if the **same** object is not already associated
-			array_push($this->collflavorAssets, $l);
+		if (!in_array($l, $this->collassets, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collassets, $l);
 			$l->setentry($this);
 		}
 	}
@@ -6387,13 +6387,13 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * an identical criteria, it returns the collection.
 	 * Otherwise if this entry is new, it will return
 	 * an empty collection; or if this entry has previously
-	 * been saved, it will retrieve related flavorAssets from storage.
+	 * been saved, it will retrieve related assets from storage.
 	 *
 	 * This method is protected by default in order to keep the public
 	 * api reasonable.  You can provide public methods for those you
 	 * actually need in entry.
 	 */
-	public function getflavorAssetsJoinflavorParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public function getassetsJoinassetParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		if ($criteria === null) {
 			$criteria = new Criteria(entryPeer::DATABASE_NAME);
@@ -6403,29 +6403,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$criteria = clone $criteria;
 		}
 
-		if ($this->collflavorAssets === null) {
+		if ($this->collassets === null) {
 			if ($this->isNew()) {
-				$this->collflavorAssets = array();
+				$this->collassets = array();
 			} else {
 
-				$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+				$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-				$this->collflavorAssets = flavorAssetPeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		} else {
 			// the following code is to determine if a new query is
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(flavorAssetPeer::ENTRY_ID, $this->id);
+			$criteria->add(assetPeer::ENTRY_ID, $this->id);
 
-			if (!isset($this->lastflavorAssetCriteria) || !$this->lastflavorAssetCriteria->equals($criteria)) {
-				$this->collflavorAssets = flavorAssetPeer::doSelectJoinflavorParams($criteria, $con, $join_behavior);
+			if (!isset($this->lastassetCriteria) || !$this->lastassetCriteria->equals($criteria)) {
+				$this->collassets = assetPeer::doSelectJoinassetParams($criteria, $con, $join_behavior);
 			}
 		}
-		$this->lastflavorAssetCriteria = $criteria;
+		$this->lastassetCriteria = $criteria;
 
-		return $this->collflavorAssets;
+		return $this->collassets;
 	}
 
 	/**
@@ -6475,13 +6475,13 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collflavorParamsOutputs) {
-				foreach ((array) $this->collflavorParamsOutputs as $o) {
+			if ($this->collassetParamsOutputs) {
+				foreach ((array) $this->collassetParamsOutputs as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
-			if ($this->collflavorAssets) {
-				foreach ((array) $this->collflavorAssets as $o) {
+			if ($this->collassets) {
+				foreach ((array) $this->collassets as $o) {
 					$o->clearAllReferences($deep);
 				}
 			}
@@ -6494,8 +6494,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->collroughcutEntrysRelatedByRoughcutId = null;
 		$this->collroughcutEntrysRelatedByEntryId = null;
 		$this->collwidgets = null;
-		$this->collflavorParamsOutputs = null;
-		$this->collflavorAssets = null;
+		$this->collassetParamsOutputs = null;
+		$this->collassets = null;
 			$this->akshow = null;
 			$this->akuser = null;
 			$this->aaccessControl = null;

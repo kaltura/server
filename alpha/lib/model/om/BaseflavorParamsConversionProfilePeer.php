@@ -299,6 +299,9 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		flavorParamsConversionProfilePeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	{
+	}
 	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -553,7 +556,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related flavorParams table
+	 * Returns the number of rows matching criteria, joining the related assetParams table
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -561,7 +564,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
 	 * @return     int Number of matching rows.
 	 */
-	public static function doCountJoinflavorParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doCountJoinassetParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
@@ -585,7 +588,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 		$stmt = flavorParamsConversionProfilePeer::doCountStmt($criteria, $con);
 
@@ -666,7 +669,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 
 
 	/**
-	 * Selects a collection of flavorParamsConversionProfile objects pre-filled with their flavorParams objects.
+	 * Selects a collection of flavorParamsConversionProfile objects pre-filled with their assetParams objects.
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -674,7 +677,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doSelectJoinflavorParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doSelectJoinassetParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
 
@@ -685,9 +688,9 @@ abstract class BaseflavorParamsConversionProfilePeer {
 
 		flavorParamsConversionProfilePeer::addSelectColumns($criteria);
 		$startcol = (flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS);
-		flavorParamsPeer::addSelectColumns($criteria);
+		assetParamsPeer::addSelectColumns($criteria);
 
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -707,20 +710,20 @@ abstract class BaseflavorParamsConversionProfilePeer {
 				flavorParamsConversionProfilePeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
 
-			$key2 = flavorParamsPeer::getPrimaryKeyHashFromRow($row, $startcol);
+			$key2 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol);
 			if ($key2 !== null) {
-				$obj2 = flavorParamsPeer::getInstanceFromPool($key2);
+				$obj2 = assetParamsPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$omClass = flavorParamsPeer::getOMClass($row, $startcol);
+					$omClass = assetParamsPeer::getOMClass($row, $startcol);
 					$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
-					flavorParamsPeer::addInstanceToPool($obj2, $key2);
+					assetParamsPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 already loaded
 				
-				// Add the $obj1 (flavorParamsConversionProfile) to $obj2 (flavorParams)
+				// Add the $obj1 (flavorParamsConversionProfile) to $obj2 (assetParams)
 				$obj2->addflavorParamsConversionProfile($obj1);
 
 			} // if joined row was not null
@@ -767,7 +770,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		
 		$criteria->addJoin(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, conversionProfile2Peer::ID, $join_behavior);
 
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 		$stmt = flavorParamsConversionProfilePeer::doCountStmt($criteria, $con);
 
@@ -805,12 +808,12 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		conversionProfile2Peer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (conversionProfile2Peer::NUM_COLUMNS - conversionProfile2Peer::NUM_LAZY_LOAD_COLUMNS);
 
-		flavorParamsPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (flavorParamsPeer::NUM_COLUMNS - flavorParamsPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetParamsPeer::addSelectColumns($criteria);
+		$startcol4 = $startcol3 + (assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS);
 
 		$criteria->addJoin(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, conversionProfile2Peer::ID, $join_behavior);
 
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -847,22 +850,22 @@ abstract class BaseflavorParamsConversionProfilePeer {
 				$obj2->addflavorParamsConversionProfile($obj1);
 			} // if joined row not null
 
-			// Add objects for joined flavorParams rows
+			// Add objects for joined assetParams rows
 
-			$key3 = flavorParamsPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+			$key3 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol3);
 			if ($key3 !== null) {
-				$obj3 = flavorParamsPeer::getInstanceFromPool($key3);
+				$obj3 = assetParamsPeer::getInstanceFromPool($key3);
 				if (!$obj3) {
 
-					$omClass = flavorParamsPeer::getOMClass($row, $startcol3);
+					$omClass = assetParamsPeer::getOMClass($row, $startcol3);
           $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj3 = new $cls();
 					$obj3->hydrate($row, $startcol3);
-					flavorParamsPeer::addInstanceToPool($obj3, $key3);
+					assetParamsPeer::addInstanceToPool($obj3, $key3);
 				} // if obj3 loaded
 
-				// Add the $obj1 (flavorParamsConversionProfile) to the collection in $obj3 (flavorParams)
+				// Add the $obj1 (flavorParamsConversionProfile) to the collection in $obj3 (assetParams)
 				$obj3->addflavorParamsConversionProfile($obj1);
 			} // if joined row not null
 
@@ -906,7 +909,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 		$stmt = flavorParamsConversionProfilePeer::doCountStmt($criteria, $con);
 
@@ -921,7 +924,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related flavorParams table
+	 * Returns the number of rows matching criteria, joining the related assetParams table
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -929,7 +932,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
 	 * @return     int Number of matching rows.
 	 */
-	public static function doCountJoinAllExceptflavorParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doCountJoinAllExceptassetParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
@@ -991,10 +994,10 @@ abstract class BaseflavorParamsConversionProfilePeer {
 		flavorParamsConversionProfilePeer::addSelectColumns($criteria);
 		$startcol2 = (flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS);
 
-		flavorParamsPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (flavorParamsPeer::NUM_COLUMNS - flavorParamsPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetParamsPeer::addSelectColumns($criteria);
+		$startcol3 = $startcol2 + (assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, flavorParamsPeer::ID, $join_behavior);
+		$criteria->addJoin(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);
@@ -1014,22 +1017,22 @@ abstract class BaseflavorParamsConversionProfilePeer {
 				flavorParamsConversionProfilePeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
 
-				// Add objects for joined flavorParams rows
+				// Add objects for joined assetParams rows
 
-				$key2 = flavorParamsPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+				$key2 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol2);
 				if ($key2 !== null) {
-					$obj2 = flavorParamsPeer::getInstanceFromPool($key2);
+					$obj2 = assetParamsPeer::getInstanceFromPool($key2);
 					if (!$obj2) {
 	
-						$omClass = flavorParamsPeer::getOMClass($row, $startcol2);
+						$omClass = assetParamsPeer::getOMClass($row, $startcol2);
             $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
-					flavorParamsPeer::addInstanceToPool($obj2, $key2);
+					assetParamsPeer::addInstanceToPool($obj2, $key2);
 				} // if $obj2 already loaded
 
-				// Add the $obj1 (flavorParamsConversionProfile) to the collection in $obj2 (flavorParams)
+				// Add the $obj1 (flavorParamsConversionProfile) to the collection in $obj2 (assetParams)
 				$obj2->addflavorParamsConversionProfile($obj1);
 
 			} // if joined row is not null
@@ -1042,7 +1045,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 
 
 	/**
-	 * Selects a collection of flavorParamsConversionProfile objects pre-filled with all related objects except flavorParams.
+	 * Selects a collection of flavorParamsConversionProfile objects pre-filled with all related objects except assetParams.
 	 *
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
@@ -1051,7 +1054,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doSelectJoinAllExceptflavorParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doSelectJoinAllExceptassetParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
 

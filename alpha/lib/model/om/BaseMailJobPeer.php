@@ -371,6 +371,69 @@ abstract class BaseMailJobPeer {
 		MailJobPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(empty($partnerGroup) && empty($kalturaNetwork))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				$criterion = null;
+				if($partnerGroup)
+				{
+					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					$partners = explode(',', trim($partnerGroup));
+					foreach($partners as &$p)
+						trim($p); // make sure there are not leading or trailing spaces
+	
+					// add the partner_id to the partner_group
+					$partners[] = $partnerId;
+					
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				}	
+				
+				$criteria->addAnd($criterion);
+			}
+		}
+			
+		$criteriaFilter->enable();
+	}
 	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.

@@ -109,8 +109,8 @@ class entryTableMap extends TableMap {
     $this->addRelation('roughcutEntryRelatedByRoughcutId', 'roughcutEntry', RelationMap::ONE_TO_MANY, array('id' => 'roughcut_id', ), null, null);
     $this->addRelation('roughcutEntryRelatedByEntryId', 'roughcutEntry', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
     $this->addRelation('widget', 'widget', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
-    $this->addRelation('flavorParamsOutput', 'flavorParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
-    $this->addRelation('flavorAsset', 'flavorAsset', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
+    $this->addRelation('assetParamsOutput', 'assetParamsOutput', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
+    $this->addRelation('asset', 'asset', RelationMap::ONE_TO_MANY, array('id' => 'entry_id', ), null, null);
 	} // buildRelations()
 
 } // entryTableMap

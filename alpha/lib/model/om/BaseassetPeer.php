@@ -1,58 +1,109 @@
 <?php
 
 /**
- * Base static class for performing query and update operations on the 'kvote' table.
+ * Base static class for performing query and update operations on the 'flavor_asset' table.
  *
  * 
  *
  * @package    lib.model.om
  */
-abstract class BasekvotePeer {
+abstract class BaseassetPeer {
 
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
 
 	/** the table name for this class */
-	const TABLE_NAME = 'kvote';
+	const TABLE_NAME = 'flavor_asset';
 
 	/** the related Propel class for this table */
-	const OM_CLASS = 'kvote';
+	const OM_CLASS = 'asset';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.kvote';
+	const CLASS_DEFAULT = 'lib.model.asset';
 
 	/** the related TableMap class for this table */
-	const TM_CLASS = 'kvoteTableMap';
+	const TM_CLASS = 'assetTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 23;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
-	const ID = 'kvote.ID';
+	const ID = 'flavor_asset.ID';
 
-	/** the column name for the KSHOW_ID field */
-	const KSHOW_ID = 'kvote.KSHOW_ID';
+	/** the column name for the INT_ID field */
+	const INT_ID = 'flavor_asset.INT_ID';
 
-	/** the column name for the ENTRY_ID field */
-	const ENTRY_ID = 'kvote.ENTRY_ID';
+	/** the column name for the PARTNER_ID field */
+	const PARTNER_ID = 'flavor_asset.PARTNER_ID';
 
-	/** the column name for the KUSER_ID field */
-	const KUSER_ID = 'kvote.KUSER_ID';
-
-	/** the column name for the RANK field */
-	const RANK = 'kvote.RANK';
+	/** the column name for the TAGS field */
+	const TAGS = 'flavor_asset.TAGS';
 
 	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'kvote.CREATED_AT';
+	const CREATED_AT = 'flavor_asset.CREATED_AT';
+
+	/** the column name for the UPDATED_AT field */
+	const UPDATED_AT = 'flavor_asset.UPDATED_AT';
+
+	/** the column name for the DELETED_AT field */
+	const DELETED_AT = 'flavor_asset.DELETED_AT';
+
+	/** the column name for the ENTRY_ID field */
+	const ENTRY_ID = 'flavor_asset.ENTRY_ID';
+
+	/** the column name for the FLAVOR_PARAMS_ID field */
+	const FLAVOR_PARAMS_ID = 'flavor_asset.FLAVOR_PARAMS_ID';
+
+	/** the column name for the STATUS field */
+	const STATUS = 'flavor_asset.STATUS';
+
+	/** the column name for the VERSION field */
+	const VERSION = 'flavor_asset.VERSION';
+
+	/** the column name for the DESCRIPTION field */
+	const DESCRIPTION = 'flavor_asset.DESCRIPTION';
+
+	/** the column name for the WIDTH field */
+	const WIDTH = 'flavor_asset.WIDTH';
+
+	/** the column name for the HEIGHT field */
+	const HEIGHT = 'flavor_asset.HEIGHT';
+
+	/** the column name for the BITRATE field */
+	const BITRATE = 'flavor_asset.BITRATE';
+
+	/** the column name for the FRAME_RATE field */
+	const FRAME_RATE = 'flavor_asset.FRAME_RATE';
+
+	/** the column name for the SIZE field */
+	const SIZE = 'flavor_asset.SIZE';
+
+	/** the column name for the IS_ORIGINAL field */
+	const IS_ORIGINAL = 'flavor_asset.IS_ORIGINAL';
+
+	/** the column name for the FILE_EXT field */
+	const FILE_EXT = 'flavor_asset.FILE_EXT';
+
+	/** the column name for the CONTAINER_FORMAT field */
+	const CONTAINER_FORMAT = 'flavor_asset.CONTAINER_FORMAT';
+
+	/** the column name for the VIDEO_CODEC_ID field */
+	const VIDEO_CODEC_ID = 'flavor_asset.VIDEO_CODEC_ID';
+
+	/** the column name for the TYPE field */
+	const TYPE = 'flavor_asset.TYPE';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'flavor_asset.CUSTOM_DATA';
 
 	/**
-	 * An identiy map to hold any loaded instances of kvote objects.
+	 * An identiy map to hold any loaded instances of asset objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
 	 * queries.
-	 * @var        array kvote[]
+	 * @var        array asset[]
 	 */
 	public static $instances = array();
 
@@ -64,11 +115,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KshowId', 'EntryId', 'KuserId', 'Rank', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kshowId', 'entryId', 'kuserId', 'rank', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KSHOW_ID, self::ENTRY_ID, self::KUSER_ID, self::RANK, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kshow_id', 'entry_id', 'kuser_id', 'rank', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'Tags', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'EntryId', 'FlavorParamsId', 'Status', 'Version', 'Description', 'Width', 'Height', 'Bitrate', 'FrameRate', 'Size', 'IsOriginal', 'FileExt', 'ContainerFormat', 'VideoCodecId', 'Type', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'tags', 'createdAt', 'updatedAt', 'deletedAt', 'entryId', 'flavorParamsId', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frameRate', 'size', 'isOriginal', 'fileExt', 'containerFormat', 'videoCodecId', 'type', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::ENTRY_ID, self::FLAVOR_PARAMS_ID, self::STATUS, self::VERSION, self::DESCRIPTION, self::WIDTH, self::HEIGHT, self::BITRATE, self::FRAME_RATE, self::SIZE, self::IS_ORIGINAL, self::FILE_EXT, self::CONTAINER_FORMAT, self::VIDEO_CODEC_ID, self::TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'tags', 'created_at', 'updated_at', 'deleted_at', 'entry_id', 'flavor_params_id', 'status', 'version', 'description', 'width', 'height', 'bitrate', 'frame_rate', 'size', 'is_original', 'file_ext', 'container_format', 'video_codec_id', 'type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
 	/**
@@ -78,11 +129,11 @@ abstract class BasekvotePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KshowId' => 1, 'EntryId' => 2, 'KuserId' => 3, 'Rank' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kshowId' => 1, 'entryId' => 2, 'kuserId' => 3, 'rank' => 4, 'createdAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KSHOW_ID => 1, self::ENTRY_ID => 2, self::KUSER_ID => 3, self::RANK => 4, self::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kshow_id' => 1, 'entry_id' => 2, 'kuser_id' => 3, 'rank' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'Tags' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'DeletedAt' => 6, 'EntryId' => 7, 'FlavorParamsId' => 8, 'Status' => 9, 'Version' => 10, 'Description' => 11, 'Width' => 12, 'Height' => 13, 'Bitrate' => 14, 'FrameRate' => 15, 'Size' => 16, 'IsOriginal' => 17, 'FileExt' => 18, 'ContainerFormat' => 19, 'VideoCodecId' => 20, 'Type' => 21, 'CustomData' => 22, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'tags' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'deletedAt' => 6, 'entryId' => 7, 'flavorParamsId' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frameRate' => 15, 'size' => 16, 'isOriginal' => 17, 'fileExt' => 18, 'containerFormat' => 19, 'videoCodecId' => 20, 'type' => 21, 'customData' => 22, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::TAGS => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::DELETED_AT => 6, self::ENTRY_ID => 7, self::FLAVOR_PARAMS_ID => 8, self::STATUS => 9, self::VERSION => 10, self::DESCRIPTION => 11, self::WIDTH => 12, self::HEIGHT => 13, self::BITRATE => 14, self::FRAME_RATE => 15, self::SIZE => 16, self::IS_ORIGINAL => 17, self::FILE_EXT => 18, self::CONTAINER_FORMAT => 19, self::VIDEO_CODEC_ID => 20, self::TYPE => 21, self::CUSTOM_DATA => 22, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'tags' => 3, 'created_at' => 4, 'updated_at' => 5, 'deleted_at' => 6, 'entry_id' => 7, 'flavor_params_id' => 8, 'status' => 9, 'version' => 10, 'description' => 11, 'width' => 12, 'height' => 13, 'bitrate' => 14, 'frame_rate' => 15, 'size' => 16, 'is_original' => 17, 'file_ext' => 18, 'container_format' => 19, 'video_codec_id' => 20, 'type' => 21, 'custom_data' => 22, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, )
 	);
 
 	/**
@@ -131,12 +182,12 @@ abstract class BasekvotePeer {
 	 *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
 	 * </code>
 	 * @param      string $alias The alias for the current table.
-	 * @param      string $column The column name for current table. (i.e. kvotePeer::COLUMN_NAME).
+	 * @param      string $column The column name for current table. (i.e. assetPeer::COLUMN_NAME).
 	 * @return     string
 	 */
 	public static function alias($alias, $column)
 	{
-		return str_replace(kvotePeer::TABLE_NAME.'.', $alias.'.', $column);
+		return str_replace(assetPeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
 
 	/**
@@ -152,12 +203,29 @@ abstract class BasekvotePeer {
 	 */
 	public static function addSelectColumns(Criteria $criteria)
 	{
-		$criteria->addSelectColumn(kvotePeer::ID);
-		$criteria->addSelectColumn(kvotePeer::KSHOW_ID);
-		$criteria->addSelectColumn(kvotePeer::ENTRY_ID);
-		$criteria->addSelectColumn(kvotePeer::KUSER_ID);
-		$criteria->addSelectColumn(kvotePeer::RANK);
-		$criteria->addSelectColumn(kvotePeer::CREATED_AT);
+		$criteria->addSelectColumn(assetPeer::ID);
+		$criteria->addSelectColumn(assetPeer::INT_ID);
+		$criteria->addSelectColumn(assetPeer::PARTNER_ID);
+		$criteria->addSelectColumn(assetPeer::TAGS);
+		$criteria->addSelectColumn(assetPeer::CREATED_AT);
+		$criteria->addSelectColumn(assetPeer::UPDATED_AT);
+		$criteria->addSelectColumn(assetPeer::DELETED_AT);
+		$criteria->addSelectColumn(assetPeer::ENTRY_ID);
+		$criteria->addSelectColumn(assetPeer::FLAVOR_PARAMS_ID);
+		$criteria->addSelectColumn(assetPeer::STATUS);
+		$criteria->addSelectColumn(assetPeer::VERSION);
+		$criteria->addSelectColumn(assetPeer::DESCRIPTION);
+		$criteria->addSelectColumn(assetPeer::WIDTH);
+		$criteria->addSelectColumn(assetPeer::HEIGHT);
+		$criteria->addSelectColumn(assetPeer::BITRATE);
+		$criteria->addSelectColumn(assetPeer::FRAME_RATE);
+		$criteria->addSelectColumn(assetPeer::SIZE);
+		$criteria->addSelectColumn(assetPeer::IS_ORIGINAL);
+		$criteria->addSelectColumn(assetPeer::FILE_EXT);
+		$criteria->addSelectColumn(assetPeer::CONTAINER_FORMAT);
+		$criteria->addSelectColumn(assetPeer::VIDEO_CODEC_ID);
+		$criteria->addSelectColumn(assetPeer::TYPE);
+		$criteria->addSelectColumn(assetPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -176,21 +244,21 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
 		// BasePeer returns a PDOStatement
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -205,7 +273,7 @@ abstract class BasekvotePeer {
 	 *
 	 * @param      Criteria $criteria object used to create the SELECT statement.
 	 * @param      PropelPDO $con
-	 * @return     kvote
+	 * @return     asset
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -213,7 +281,7 @@ abstract class BasekvotePeer {
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = kvotePeer::doSelect($critcopy, $con);
+		$objects = assetPeer::doSelect($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -230,7 +298,7 @@ abstract class BasekvotePeer {
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
-		return kvotePeer::populateObjects(kvotePeer::doSelectStmt($criteria, $con));
+		return assetPeer::populateObjects(assetPeer::doSelectStmt($criteria, $con));
 	}
 
 	public static function alternativeCon($con)
@@ -239,7 +307,7 @@ abstract class BasekvotePeer {
 			$con = myDbHelper::alternativeCon($con);
 			
 		if($con === null)
-			$con = Propel::getConnection(kvotePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+			$con = Propel::getConnection(assetPeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
@@ -251,7 +319,7 @@ abstract class BasekvotePeer {
 	
 	public static function  setUseCriteriaFilter ( $use )
 	{
-		$criteria_filter = kvotePeer::getCriteriaFilter();
+		$criteria_filter = assetPeer::getCriteriaFilter();
 		
 		if ( $use )  $criteria_filter->enable(); 
 		else $criteria_filter->disable();
@@ -265,7 +333,7 @@ abstract class BasekvotePeer {
 	public static function &getCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
-			kvotePeer::setDefaultCriteriaFilter();
+			assetPeer::setDefaultCriteriaFilter();
 		
 		return self::$s_criteria_filter;
 	}
@@ -292,11 +360,71 @@ abstract class BasekvotePeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		kvotePeer::getCriteriaFilter()->applyFilter($criteria);
+		assetPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(empty($partnerGroup) && empty($kalturaNetwork))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				$criterion = null;
+				if($partnerGroup)
+				{
+					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					$partners = explode(',', trim($partnerGroup));
+					foreach($partners as &$p)
+						trim($p); // make sure there are not leading or trailing spaces
+	
+					// add the partner_id to the partner_group
+					$partners[] = $partnerId;
+					
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				}	
+				
+				$criteria->addAnd($criterion);
+			}
+		}
+			
+		$criteriaFilter->enable();
 	}
 	
 	/**
@@ -315,10 +443,10 @@ abstract class BasekvotePeer {
 	public static function doCountStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		// attach default criteria
-		kvotePeer::attachCriteriaFilter($criteria);
+		assetPeer::attachCriteriaFilter($criteria);
 		
 		// set the connection to slave server
-		$con = kvotePeer::alternativeCon ( $con );
+		$con = assetPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
@@ -340,7 +468,7 @@ abstract class BasekvotePeer {
 	 */
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
-		$con = kvotePeer::alternativeCon($con);
+		$con = assetPeer::alternativeCon($con);
 		
 		if ($criteria->hasSelectClause()) 
 		{
@@ -348,20 +476,20 @@ abstract class BasekvotePeer {
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
 			{
 				$criteria = clone $criteria;
-				kvotePeer::addSelectColumns($criteria);
+				assetPeer::addSelectColumns($criteria);
 			}
 		}
 		else
 		{
 			$criteria = clone $criteria;
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
 		// attach default criteria
-		kvotePeer::attachCriteriaFilter($criteria);
+		assetPeer::attachCriteriaFilter($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -375,14 +503,14 @@ abstract class BasekvotePeer {
 	 * to the cache in order to ensure that the same objects are always returned by doSelect*()
 	 * and retrieveByPK*() calls.
 	 *
-	 * @param      kvote $value A kvote object.
+	 * @param      asset $value A asset object.
 	 * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
 	 */
-	public static function addInstanceToPool(kvote $obj, $key = null)
+	public static function addInstanceToPool(asset $obj, $key = null)
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
-				$key = (string) $obj->getId();
+				$key = (string) $obj->getIntId();
 			} // if key === null
 			self::$instances[$key] = $obj;
 		}
@@ -396,18 +524,18 @@ abstract class BasekvotePeer {
 	 * methods in your stub classes -- you may need to explicitly remove objects
 	 * from the cache in order to prevent returning objects that no longer exist.
 	 *
-	 * @param      mixed $value A kvote object or a primary key value.
+	 * @param      mixed $value A asset object or a primary key value.
 	 */
 	public static function removeInstanceFromPool($value)
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
-			if (is_object($value) && $value instanceof kvote) {
-				$key = (string) $value->getId();
+			if (is_object($value) && $value instanceof asset) {
+				$key = (string) $value->getIntId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
 			} else {
-				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or kvote object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or asset object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
 
@@ -422,7 +550,7 @@ abstract class BasekvotePeer {
 	 * a multi-column primary key, a serialize()d version of the primary key will be returned.
 	 *
 	 * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-	 * @return     kvote Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+	 * @return     asset Found object or NULL if 1) no instance exists for specified key or 2) instance pooling has been disabled.
 	 * @see        getPrimaryKeyHash()
 	 */
 	public static function getInstanceFromPool($key)
@@ -446,7 +574,7 @@ abstract class BasekvotePeer {
 	}
 	
 	/**
-	 * Method to invalidate the instance pool of all tables related to kvote
+	 * Method to invalidate the instance pool of all tables related to flavor_asset
 	 * by a foreign key with ON DELETE CASCADE
 	 */
 	public static function clearRelatedInstancePool()
@@ -466,10 +594,10 @@ abstract class BasekvotePeer {
 	public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
 	{
 		// If the PK cannot be derived from the row, return NULL.
-		if ($row[$startcol] === null) {
+		if ($row[$startcol + 1] === null) {
 			return null;
 		}
-		return (string) $row[$startcol];
+		return (string) $row[$startcol + 1];
 	}
 
 	/**
@@ -483,73 +611,27 @@ abstract class BasekvotePeer {
 	{
 		$results = array();
 	
-		// set the class once to avoid overhead in the loop
-		$cls = kvotePeer::getOMClass(false);
 		// populate the object(s)
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj = kvotePeer::getInstanceFromPool($key))) {
+			$key = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = assetPeer::getInstanceFromPool($key))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj->hydrate($row, 0, true); // rehydrate
 				$results[] = $obj;
 			} else {
+				// class must be set each time from the record row
+				$cls = assetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
-				kvotePeer::addInstanceToPool($obj, $key);
+				assetPeer::addInstanceToPool($obj, $key);
 			} // if key exists
 		}
 		$stmt->closeCursor();
 		return $results;
 	}
-
-	/**
-	 * Returns the number of rows matching criteria, joining the related kshowRelatedByKshowId table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinkshowRelatedByKshowId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
-
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
-	}
-
 
 	/**
 	 * Returns the number of rows matching criteria, joining the related entry table
@@ -568,14 +650,14 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
@@ -584,9 +666,9 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -599,7 +681,7 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related kshowRelatedByKuserId table
+	 * Returns the number of rows matching criteria, joining the related assetParams table
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -607,7 +689,7 @@ abstract class BasekvotePeer {
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
 	 * @return     int Number of matching rows.
 	 */
-	public static function doCountJoinkshowRelatedByKuserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doCountJoinassetParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
@@ -615,14 +697,14 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
@@ -631,9 +713,9 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -646,77 +728,11 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Selects a collection of kvote objects pre-filled with their kshow objects.
+	 * Selects a collection of asset objects pre-filled with their entry objects.
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinkshowRelatedByKshowId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		kvotePeer::addSelectColumns($criteria);
-		$startcol = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
-		kshowPeer::addSelectColumns($criteria);
-
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doSelectStmt($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-
-				$cls = kvotePeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
-			} // if $obj1 already loaded
-
-			$key2 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol);
-			if ($key2 !== null) {
-				$obj2 = kshowPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = kshowPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol);
-					kshowPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 already loaded
-				
-				// Add the $obj1 (kvote) to $obj2 (kshow)
-				$obj2->addkvoteRelatedByKshowId($obj1);
-
-			} // if joined row was not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
-
-	/**
-	 * Selects a collection of kvote objects pre-filled with their entry objects.
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
+	 * @return     array Array of asset objects.
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -729,28 +745,29 @@ abstract class BasekvotePeer {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
 
-		kvotePeer::addSelectColumns($criteria);
-		$startcol = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
+		assetPeer::addSelectColumns($criteria);
+		$startcol = (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
 		entryPeer::addSelectColumns($criteria);
 
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$stmt = kvotePeer::doSelectStmt($criteria, $con);
+		$stmt = assetPeer::doSelectStmt($criteria, $con);
 		$results = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
+			$key1 = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = assetPeer::getInstanceFromPool($key1))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 
-				$cls = kvotePeer::getOMClass(false);
+				$omClass = assetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
+				assetPeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
 
 			$key2 = entryPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -766,8 +783,8 @@ abstract class BasekvotePeer {
 					entryPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 already loaded
 				
-				// Add the $obj1 (kvote) to $obj2 (entry)
-				$obj2->addkvote($obj1);
+				// Add the $obj1 (asset) to $obj2 (entry)
+				$obj2->addasset($obj1);
 
 			} // if joined row was not null
 
@@ -779,15 +796,15 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Selects a collection of kvote objects pre-filled with their kshow objects.
+	 * Selects a collection of asset objects pre-filled with their assetParams objects.
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
+	 * @return     array Array of asset objects.
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doSelectJoinkshowRelatedByKuserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doSelectJoinassetParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
 
@@ -796,44 +813,46 @@ abstract class BasekvotePeer {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
 
-		kvotePeer::addSelectColumns($criteria);
-		$startcol = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
-		kshowPeer::addSelectColumns($criteria);
+		assetPeer::addSelectColumns($criteria);
+		$startcol = (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetParamsPeer::addSelectColumns($criteria);
 
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
-		$stmt = kvotePeer::doSelectStmt($criteria, $con);
+		$stmt = assetPeer::doSelectStmt($criteria, $con);
 		$results = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
+			$key1 = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = assetPeer::getInstanceFromPool($key1))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 
-				$cls = kvotePeer::getOMClass(false);
+				$omClass = assetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
+				assetPeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
 
-			$key2 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol);
+			$key2 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol);
 			if ($key2 !== null) {
-				$obj2 = kshowPeer::getInstanceFromPool($key2);
+				$obj2 = assetParamsPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$cls = kshowPeer::getOMClass(false);
+					$omClass = assetParamsPeer::getOMClass($row, $startcol);
+					$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
-					kshowPeer::addInstanceToPool($obj2, $key2);
+					assetParamsPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 already loaded
 				
-				// Add the $obj1 (kvote) to $obj2 (kshow)
-				$obj2->addkvoteRelatedByKuserId($obj1);
+				// Add the $obj1 (asset) to $obj2 (assetParams)
+				$obj2->addasset($obj1);
 
 			} // if joined row was not null
 
@@ -861,14 +880,14 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
@@ -877,13 +896,11 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -895,12 +912,12 @@ abstract class BasekvotePeer {
 	}
 
 	/**
-	 * Selects a collection of kvote objects pre-filled with all related objects.
+	 * Selects a collection of asset objects pre-filled with all related objects.
 	 *
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
+	 * @return     array Array of asset objects.
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -913,147 +930,79 @@ abstract class BasekvotePeer {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
 
-		kvotePeer::addSelectColumns($criteria);
-		$startcol2 = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
-
-		kshowPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetPeer::addSelectColumns($criteria);
+		$startcol2 = (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
 
 		entryPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
+		$startcol3 = $startcol2 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		kshowPeer::addSelectColumns($criteria);
-		$startcol5 = $startcol4 + (kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetParamsPeer::addSelectColumns($criteria);
+		$startcol4 = $startcol3 + (assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doSelectStmt($criteria, $con);
+		$stmt = assetPeer::doSelectStmt($criteria, $con);
 		$results = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
+			$key1 = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = assetPeer::getInstanceFromPool($key1))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = kvotePeer::getOMClass(false);
+				$omClass = assetPeer::getOMClass($row, 0);
+        $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
+				assetPeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
-
-			// Add objects for joined kshow rows
-
-			$key2 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-			if ($key2 !== null) {
-				$obj2 = kshowPeer::getInstanceFromPool($key2);
-				if (!$obj2) {
-
-					$cls = kshowPeer::getOMClass(false);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol2);
-					kshowPeer::addInstanceToPool($obj2, $key2);
-				} // if obj2 loaded
-
-				// Add the $obj1 (kvote) to the collection in $obj2 (kshow)
-				$obj2->addkvoteRelatedByKshowId($obj1);
-			} // if joined row not null
 
 			// Add objects for joined entry rows
 
-			$key3 = entryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+			$key2 = entryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+			if ($key2 !== null) {
+				$obj2 = entryPeer::getInstanceFromPool($key2);
+				if (!$obj2) {
+
+					$omClass = entryPeer::getOMClass($row, $startcol2);
+          $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
+
+					$obj2 = new $cls();
+					$obj2->hydrate($row, $startcol2);
+					entryPeer::addInstanceToPool($obj2, $key2);
+				} // if obj2 loaded
+
+				// Add the $obj1 (asset) to the collection in $obj2 (entry)
+				$obj2->addasset($obj1);
+			} // if joined row not null
+
+			// Add objects for joined assetParams rows
+
+			$key3 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol3);
 			if ($key3 !== null) {
-				$obj3 = entryPeer::getInstanceFromPool($key3);
+				$obj3 = assetParamsPeer::getInstanceFromPool($key3);
 				if (!$obj3) {
 
-					$omClass = entryPeer::getOMClass($row, $startcol3);
+					$omClass = assetParamsPeer::getOMClass($row, $startcol3);
           $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj3 = new $cls();
 					$obj3->hydrate($row, $startcol3);
-					entryPeer::addInstanceToPool($obj3, $key3);
+					assetParamsPeer::addInstanceToPool($obj3, $key3);
 				} // if obj3 loaded
 
-				// Add the $obj1 (kvote) to the collection in $obj3 (entry)
-				$obj3->addkvote($obj1);
-			} // if joined row not null
-
-			// Add objects for joined kshow rows
-
-			$key4 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol4);
-			if ($key4 !== null) {
-				$obj4 = kshowPeer::getInstanceFromPool($key4);
-				if (!$obj4) {
-
-					$cls = kshowPeer::getOMClass(false);
-
-					$obj4 = new $cls();
-					$obj4->hydrate($row, $startcol4);
-					kshowPeer::addInstanceToPool($obj4, $key4);
-				} // if obj4 loaded
-
-				// Add the $obj1 (kvote) to the collection in $obj4 (kshow)
-				$obj4->addkvoteRelatedByKuserId($obj1);
+				// Add the $obj1 (asset) to the collection in $obj3 (assetParams)
+				$obj3->addasset($obj1);
 			} // if joined row not null
 
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
 		return $results;
-	}
-
-
-	/**
-	 * Returns the number of rows matching criteria, joining the related kshowRelatedByKshowId table
-	 *
-	 * @param      Criteria $criteria
-	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     int Number of matching rows.
-	 */
-	public static function doCountJoinAllExceptkshowRelatedByKshowId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		// we're going to modify criteria, so copy it first
-		$criteria = clone $criteria;
-
-		// We need to set the primary table name, since in the case that there are no WHERE columns
-		// it will be impossible for the BasePeer::createSelectSql() method to determine which
-		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
-		
-		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-			$criteria->setDistinct();
-		}
-
-		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
-		}
-		
-		$criteria->clearOrderByColumns(); // ORDER BY should not affect count
-		
-		// Set the correct dbName
-		$criteria->setDbName(self::DATABASE_NAME);
-		
-		
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
-
-		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$count = (int) $row[0];
-		} else {
-			$count = 0; // no rows returned; we infer that means 0 matches.
-		}
-		$stmt->closeCursor();
-		return $count;
 	}
 
 
@@ -1074,14 +1023,14 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		$criteria->clearOrderByColumns(); // ORDER BY should not affect count
@@ -1090,11 +1039,9 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
-
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -1107,7 +1054,7 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related kshowRelatedByKuserId table
+	 * Returns the number of rows matching criteria, joining the related assetParams table
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1115,7 +1062,7 @@ abstract class BasekvotePeer {
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
 	 * @return     int Number of matching rows.
 	 */
-	public static function doCountJoinAllExceptkshowRelatedByKuserId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doCountJoinAllExceptassetParams(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
@@ -1123,14 +1070,14 @@ abstract class BasekvotePeer {
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
-		$criteria->setPrimaryTableName(kvotePeer::TABLE_NAME);
+		$criteria->setPrimaryTableName(assetPeer::TABLE_NAME);
 		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
 
 		if (!$criteria->hasSelectClause()) {
-			kvotePeer::addSelectColumns($criteria);
+			assetPeer::addSelectColumns($criteria);
 		}
 		
 		$criteria->clearOrderByColumns(); // ORDER BY should not affect count
@@ -1139,9 +1086,9 @@ abstract class BasekvotePeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
-		$stmt = kvotePeer::doCountStmt($criteria, $con);
+		$stmt = assetPeer::doCountStmt($criteria, $con);
 
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
@@ -1154,86 +1101,12 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Selects a collection of kvote objects pre-filled with all related objects except kshowRelatedByKshowId.
+	 * Selects a collection of asset objects pre-filled with all related objects except entry.
 	 *
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function doSelectJoinAllExceptkshowRelatedByKshowId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-	{
-		$criteria = clone $criteria;
-
-		// Set the correct dbName if it has not been overridden
-		// $criteria->getDbName() will return the same object if not set to another value
-		// so == check is okay and faster
-		if ($criteria->getDbName() == Propel::getDefaultDB()) {
-			$criteria->setDbName(self::DATABASE_NAME);
-		}
-
-		kvotePeer::addSelectColumns($criteria);
-		$startcol2 = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
-
-		entryPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
-
-
-		$stmt = BasePeer::doSelect($criteria, $con);
-		$results = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
-				// We no longer rehydrate the object, since this can cause data loss.
-				// See http://propel.phpdb.org/trac/ticket/509
-				// $obj1->hydrate($row, 0, true); // rehydrate
-			} else {
-				$cls = kvotePeer::getOMClass(false);
-
-				$obj1 = new $cls();
-				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
-			} // if obj1 already loaded
-
-				// Add objects for joined entry rows
-
-				$key2 = entryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-				if ($key2 !== null) {
-					$obj2 = entryPeer::getInstanceFromPool($key2);
-					if (!$obj2) {
-	
-						$omClass = entryPeer::getOMClass($row, $startcol2);
-            $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
-
-					$obj2 = new $cls();
-					$obj2->hydrate($row, $startcol2);
-					entryPeer::addInstanceToPool($obj2, $key2);
-				} // if $obj2 already loaded
-
-				// Add the $obj1 (kvote) to the collection in $obj2 (entry)
-				$obj2->addkvote($obj1);
-
-			} // if joined row is not null
-
-			$results[] = $obj1;
-		}
-		$stmt->closeCursor();
-		return $results;
-	}
-
-
-	/**
-	 * Selects a collection of kvote objects pre-filled with all related objects except entry.
-	 *
-	 * @param      Criteria  $criteria
-	 * @param      PropelPDO $con
-	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
+	 * @return     array Array of asset objects.
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
@@ -1248,72 +1121,50 @@ abstract class BasekvotePeer {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
 
-		kvotePeer::addSelectColumns($criteria);
-		$startcol2 = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
+		assetPeer::addSelectColumns($criteria);
+		$startcol2 = (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		kshowPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetParamsPeer::addSelectColumns($criteria);
+		$startcol3 = $startcol2 + (assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		kshowPeer::addSelectColumns($criteria);
-		$startcol4 = $startcol3 + (kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS);
-
-		$criteria->addJoin(kvotePeer::KSHOW_ID, kshowPeer::ID, $join_behavior);
-
-		$criteria->addJoin(kvotePeer::KUSER_ID, kshowPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::FLAVOR_PARAMS_ID, assetParamsPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);
 		$results = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
+			$key1 = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = assetPeer::getInstanceFromPool($key1))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = kvotePeer::getOMClass(false);
+				$omClass = assetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
+				assetPeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
 
-				// Add objects for joined kshow rows
+				// Add objects for joined assetParams rows
 
-				$key2 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+				$key2 = assetParamsPeer::getPrimaryKeyHashFromRow($row, $startcol2);
 				if ($key2 !== null) {
-					$obj2 = kshowPeer::getInstanceFromPool($key2);
+					$obj2 = assetParamsPeer::getInstanceFromPool($key2);
 					if (!$obj2) {
 	
-						$cls = kshowPeer::getOMClass(false);
+						$omClass = assetParamsPeer::getOMClass($row, $startcol2);
+            $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
-					kshowPeer::addInstanceToPool($obj2, $key2);
+					assetParamsPeer::addInstanceToPool($obj2, $key2);
 				} // if $obj2 already loaded
 
-				// Add the $obj1 (kvote) to the collection in $obj2 (kshow)
-				$obj2->addkvoteRelatedByKshowId($obj1);
-
-			} // if joined row is not null
-
-				// Add objects for joined kshow rows
-
-				$key3 = kshowPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-				if ($key3 !== null) {
-					$obj3 = kshowPeer::getInstanceFromPool($key3);
-					if (!$obj3) {
-	
-						$cls = kshowPeer::getOMClass(false);
-
-					$obj3 = new $cls();
-					$obj3->hydrate($row, $startcol3);
-					kshowPeer::addInstanceToPool($obj3, $key3);
-				} // if $obj3 already loaded
-
-				// Add the $obj1 (kvote) to the collection in $obj3 (kshow)
-				$obj3->addkvoteRelatedByKuserId($obj1);
+				// Add the $obj1 (asset) to the collection in $obj2 (assetParams)
+				$obj2->addasset($obj1);
 
 			} // if joined row is not null
 
@@ -1325,16 +1176,16 @@ abstract class BasekvotePeer {
 
 
 	/**
-	 * Selects a collection of kvote objects pre-filled with all related objects except kshowRelatedByKuserId.
+	 * Selects a collection of asset objects pre-filled with all related objects except assetParams.
 	 *
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-	 * @return     array Array of kvote objects.
+	 * @return     array Array of asset objects.
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doSelectJoinAllExceptkshowRelatedByKuserId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doSelectJoinAllExceptassetParams(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
 
@@ -1345,30 +1196,31 @@ abstract class BasekvotePeer {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
 
-		kvotePeer::addSelectColumns($criteria);
-		$startcol2 = (kvotePeer::NUM_COLUMNS - kvotePeer::NUM_LAZY_LOAD_COLUMNS);
+		assetPeer::addSelectColumns($criteria);
+		$startcol2 = (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
 
 		entryPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(kvotePeer::ENTRY_ID, entryPeer::ID, $join_behavior);
+		$criteria->addJoin(assetPeer::ENTRY_ID, entryPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);
 		$results = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-			$key1 = kvotePeer::getPrimaryKeyHashFromRow($row, 0);
-			if (null !== ($obj1 = kvotePeer::getInstanceFromPool($key1))) {
+			$key1 = assetPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj1 = assetPeer::getInstanceFromPool($key1))) {
 				// We no longer rehydrate the object, since this can cause data loss.
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-				$cls = kvotePeer::getOMClass(false);
+				$omClass = assetPeer::getOMClass($row, 0);
+				$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
-				kvotePeer::addInstanceToPool($obj1, $key1);
+				assetPeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
 
 				// Add objects for joined entry rows
@@ -1386,8 +1238,8 @@ abstract class BasekvotePeer {
 					entryPeer::addInstanceToPool($obj2, $key2);
 				} // if $obj2 already loaded
 
-				// Add the $obj1 (kvote) to the collection in $obj2 (entry)
-				$obj2->addkvote($obj1);
+				// Add the $obj1 (asset) to the collection in $obj2 (entry)
+				$obj2->addasset($obj1);
 
 			} // if joined row is not null
 
@@ -1414,33 +1266,39 @@ abstract class BasekvotePeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BasekvotePeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BasekvotePeer::TABLE_NAME))
+	  $dbMap = Propel::getDatabaseMap(BaseassetPeer::DATABASE_NAME);
+	  if (!$dbMap->hasTable(BaseassetPeer::TABLE_NAME))
 	  {
-	    $dbMap->addTableObject(new kvoteTableMap());
+	    $dbMap->addTableObject(new assetTableMap());
 	  }
 	}
 
 	/**
-	 * The class that the Peer will make instances of.
+	 * The returned Class will contain objects of the default type or
+	 * objects that inherit from the default.
 	 *
-	 * If $withPrefix is true, the returned path
-	 * uses a dot-path notation which is tranalted into a path
-	 * relative to a location on the PHP include_path.
-	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
-	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
-	 * @return     string path.to.ClassName
+	 * @param      array $row PropelPDO result row.
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function getOMClass($withPrefix = true)
+	public static function getOMClass($row, $colnum)
 	{
-		return $withPrefix ? kvotePeer::CLASS_DEFAULT : kvotePeer::OM_CLASS;
+		try {
+
+			$omClass = $row[$colnum + 21];
+			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
+
+		} catch (Exception $e) {
+			throw new PropelException('Unable to get OM class.', $e);
+		}
+		return $omClass;
 	}
 
 	/**
-	 * Method perform an INSERT on the database, given a kvote or Criteria object.
+	 * Method perform an INSERT on the database, given a asset or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or kvote object containing data that is used to create the INSERT statement.
+	 * @param      mixed $values Criteria or asset object containing data that is used to create the INSERT statement.
 	 * @param      PropelPDO $con the PropelPDO connection to use
 	 * @return     mixed The new primary key.
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -1449,17 +1307,17 @@ abstract class BasekvotePeer {
 	public static function doInsert($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(kvotePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(assetPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
-			$criteria = $values->buildCriteria(); // build Criteria from kvote object
+			$criteria = $values->buildCriteria(); // build Criteria from asset object
 		}
 
-		if ($criteria->containsKey(kvotePeer::ID) && $criteria->keyContainsValue(kvotePeer::ID) ) {
-			throw new PropelException('Cannot insert a value for auto-increment primary key ('.kvotePeer::ID.')');
+		if ($criteria->containsKey(assetPeer::INT_ID) && $criteria->keyContainsValue(assetPeer::INT_ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.assetPeer::INT_ID.')');
 		}
 
 
@@ -1481,9 +1339,9 @@ abstract class BasekvotePeer {
 	}
 
 	/**
-	 * Method perform an UPDATE on the database, given a kvote or Criteria object.
+	 * Method perform an UPDATE on the database, given a asset or Criteria object.
 	 *
-	 * @param      mixed $values Criteria or kvote object containing data that is used to create the UPDATE statement.
+	 * @param      mixed $values Criteria or asset object containing data that is used to create the UPDATE statement.
 	 * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 * @throws     PropelException Any exceptions caught during processing will be
@@ -1492,7 +1350,7 @@ abstract class BasekvotePeer {
 	public static function doUpdate($values, PropelPDO $con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(kvotePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(assetPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
@@ -1500,10 +1358,10 @@ abstract class BasekvotePeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(kvotePeer::ID);
-			$selectCriteria->add(kvotePeer::ID, $criteria->remove(kvotePeer::ID), $comparison);
+			$comparison = $criteria->getComparison(assetPeer::INT_ID);
+			$selectCriteria->add(assetPeer::INT_ID, $criteria->remove(assetPeer::INT_ID), $comparison);
 
-		} else { // $values is kvote object
+		} else { // $values is asset object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
@@ -1515,26 +1373,26 @@ abstract class BasekvotePeer {
 	}
 
 	/**
-	 * Method to DELETE all rows from the kvote table.
+	 * Method to DELETE all rows from the flavor_asset table.
 	 *
 	 * @return     int The number of affected rows (if supported by underlying database driver).
 	 */
 	public static function doDeleteAll($con = null)
 	{
 		if ($con === null) {
-			$con = Propel::getConnection(kvotePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(assetPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			$affectedRows += BasePeer::doDeleteAll(kvotePeer::TABLE_NAME, $con);
+			$affectedRows += BasePeer::doDeleteAll(assetPeer::TABLE_NAME, $con);
 			// Because this db requires some delete cascade/set null emulation, we have to
 			// clear the cached instance *after* the emulation has happened (since
 			// instances get re-added by the select statement contained therein).
-			kvotePeer::clearInstancePool();
-			kvotePeer::clearRelatedInstancePool();
+			assetPeer::clearInstancePool();
+			assetPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1544,9 +1402,9 @@ abstract class BasekvotePeer {
 	}
 
 	/**
-	 * Method perform a DELETE on the database, given a kvote or Criteria object OR a primary key value.
+	 * Method perform a DELETE on the database, given a asset or Criteria object OR a primary key value.
 	 *
-	 * @param      mixed $values Criteria or kvote object or primary key or array of primary keys
+	 * @param      mixed $values Criteria or asset object or primary key or array of primary keys
 	 *              which is used to create the DELETE statement
 	 * @param      PropelPDO $con the connection to use
 	 * @return     int 	The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -1557,27 +1415,27 @@ abstract class BasekvotePeer {
 	 public static function doDelete($values, PropelPDO $con = null)
 	 {
 		if ($con === null) {
-			$con = Propel::getConnection(kvotePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$con = Propel::getConnection(assetPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
 
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
 			// from the cache based on this Criteria.
-			kvotePeer::clearInstancePool();
+			assetPeer::clearInstancePool();
 			// rename for clarity
 			$criteria = clone $values;
-		} elseif ($values instanceof kvote) { // it's a model object
+		} elseif ($values instanceof asset) { // it's a model object
 			// invalidate the cache for this single object
-			kvotePeer::removeInstanceFromPool($values);
+			assetPeer::removeInstanceFromPool($values);
 			// create criteria based on pk values
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(kvotePeer::ID, (array) $values, Criteria::IN);
+			$criteria->add(assetPeer::INT_ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
-				kvotePeer::removeInstanceFromPool($singleval);
+				assetPeer::removeInstanceFromPool($singleval);
 			}
 		}
 
@@ -1592,7 +1450,7 @@ abstract class BasekvotePeer {
 			$con->beginTransaction();
 			
 			$affectedRows += BasePeer::doDelete($criteria, $con);
-			kvotePeer::clearRelatedInstancePool();
+			assetPeer::clearRelatedInstancePool();
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -1602,24 +1460,24 @@ abstract class BasekvotePeer {
 	}
 
 	/**
-	 * Validates all modified columns of given kvote object.
+	 * Validates all modified columns of given asset object.
 	 * If parameter $columns is either a single column name or an array of column names
 	 * than only those columns are validated.
 	 *
 	 * NOTICE: This does not apply to primary or foreign keys for now.
 	 *
-	 * @param      kvote $obj The object to validate.
+	 * @param      asset $obj The object to validate.
 	 * @param      mixed $cols Column name or array of column names.
 	 *
 	 * @return     mixed TRUE if all columns are valid or the error message of the first invalid column.
 	 */
-	public static function doValidate(kvote $obj, $cols = null)
+	public static function doValidate(asset $obj, $cols = null)
 	{
 		$columns = array();
 
 		if ($cols) {
-			$dbMap = Propel::getDatabaseMap(kvotePeer::DATABASE_NAME);
-			$tableMap = $dbMap->getTable(kvotePeer::TABLE_NAME);
+			$dbMap = Propel::getDatabaseMap(assetPeer::DATABASE_NAME);
+			$tableMap = $dbMap->getTable(assetPeer::TABLE_NAME);
 
 			if (! is_array($cols)) {
 				$cols = array($cols);
@@ -1635,7 +1493,7 @@ abstract class BasekvotePeer {
 
 		}
 
-		return BasePeer::doValidate(kvotePeer::DATABASE_NAME, kvotePeer::TABLE_NAME, $columns);
+		return BasePeer::doValidate(assetPeer::DATABASE_NAME, assetPeer::TABLE_NAME, $columns);
 	}
 
 	/**
@@ -1643,19 +1501,19 @@ abstract class BasekvotePeer {
 	 *
 	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     kvote
+	 * @return     asset
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
 
-		if (null !== ($obj = kvotePeer::getInstanceFromPool((string) $pk))) {
+		if (null !== ($obj = assetPeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
 
-		$criteria = new Criteria(kvotePeer::DATABASE_NAME);
-		$criteria->add(kvotePeer::ID, $pk);
+		$criteria = new Criteria(assetPeer::DATABASE_NAME);
+		$criteria->add(assetPeer::INT_ID, $pk);
 
-		$v = kvotePeer::doSelect($criteria, $con);
+		$v = assetPeer::doSelect($criteria, $con);
 
 		return !empty($v) > 0 ? $v[0] : null;
 	}
@@ -1674,16 +1532,16 @@ abstract class BasekvotePeer {
 		if (empty($pks)) {
 			$objs = array();
 		} else {
-			$criteria = new Criteria(kvotePeer::DATABASE_NAME);
-			$criteria->add(kvotePeer::ID, $pks, Criteria::IN);
-			$objs = kvotePeer::doSelect($criteria, $con);
+			$criteria = new Criteria(assetPeer::DATABASE_NAME);
+			$criteria->add(assetPeer::INT_ID, $pks, Criteria::IN);
+			$objs = assetPeer::doSelect($criteria, $con);
 		}
 		return $objs;
 	}
 
-} // BasekvotePeer
+} // BaseassetPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BasekvotePeer::buildTableMap();
+BaseassetPeer::buildTableMap();
 

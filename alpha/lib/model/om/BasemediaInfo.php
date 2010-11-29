@@ -229,9 +229,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	protected $multi_stream;
 
 	/**
-	 * @var        flavorAsset
+	 * @var        asset
 	 */
-	protected $aflavorAsset;
+	protected $aasset;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -812,8 +812,8 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = mediaInfoPeer::FLAVOR_ASSET_ID;
 		}
 
-		if ($this->aflavorAsset !== null && $this->aflavorAsset->getId() !== $v) {
-			$this->aflavorAsset = null;
+		if ($this->aasset !== null && $this->aasset->getId() !== $v) {
+			$this->aasset = null;
 		}
 
 		return $this;
@@ -1628,8 +1628,8 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	public function ensureConsistency()
 	{
 
-		if ($this->aflavorAsset !== null && $this->flavor_asset_id !== $this->aflavorAsset->getId()) {
-			$this->aflavorAsset = null;
+		if ($this->aasset !== null && $this->flavor_asset_id !== $this->aasset->getId()) {
+			$this->aasset = null;
 		}
 	} // ensureConsistency
 
@@ -1670,7 +1670,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 
 		if ($deep) {  // also de-associate any related objects?
 
-			$this->aflavorAsset = null;
+			$this->aasset = null;
 		} // if (deep)
 	}
 
@@ -1784,11 +1784,11 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			// method.  This object relates to these object(s) by a
 			// foreign key reference.
 
-			if ($this->aflavorAsset !== null) {
-				if ($this->aflavorAsset->isModified() || $this->aflavorAsset->isNew()) {
-					$affectedRows += $this->aflavorAsset->save($con);
+			if ($this->aasset !== null) {
+				if ($this->aasset->isModified() || $this->aasset->isNew()) {
+					$affectedRows += $this->aasset->save($con);
 				}
-				$this->setflavorAsset($this->aflavorAsset);
+				$this->setasset($this->aasset);
 			}
 
 			if ($this->isNew() ) {
@@ -1951,9 +1951,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			// method.  This object relates to these object(s) by a
 			// foreign key reference.
 
-			if ($this->aflavorAsset !== null) {
-				if (!$this->aflavorAsset->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aflavorAsset->getValidationFailures());
+			if ($this->aasset !== null) {
+				if (!$this->aasset->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aasset->getValidationFailures());
 				}
 			}
 
@@ -2584,13 +2584,13 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Declares an association between this object and a flavorAsset object.
+	 * Declares an association between this object and a asset object.
 	 *
-	 * @param      flavorAsset $v
+	 * @param      asset $v
 	 * @return     mediaInfo The current object (for fluent API support)
 	 * @throws     PropelException
 	 */
-	public function setflavorAsset(flavorAsset $v = null)
+	public function setasset(asset $v = null)
 	{
 		if ($v === null) {
 			$this->setFlavorAssetId(NULL);
@@ -2598,10 +2598,10 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 			$this->setFlavorAssetId($v->getId());
 		}
 
-		$this->aflavorAsset = $v;
+		$this->aasset = $v;
 
 		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the flavorAsset object, it will not be re-added.
+		// If this object has already been added to the asset object, it will not be re-added.
 		if ($v !== null) {
 			$v->addmediaInfo($this);
 		}
@@ -2611,27 +2611,27 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 
 
 	/**
-	 * Get the associated flavorAsset object
+	 * Get the associated asset object
 	 *
 	 * @param      PropelPDO Optional Connection object.
-	 * @return     flavorAsset The associated flavorAsset object.
+	 * @return     asset The associated asset object.
 	 * @throws     PropelException
 	 */
-	public function getflavorAsset(PropelPDO $con = null)
+	public function getasset(PropelPDO $con = null)
 	{
-		if ($this->aflavorAsset === null && (($this->flavor_asset_id !== "" && $this->flavor_asset_id !== null))) {
-			$c = new Criteria(flavorAssetPeer::DATABASE_NAME);
-			$c->add(flavorAssetPeer::ID, $this->flavor_asset_id);
-			$this->aflavorAsset = flavorAssetPeer::doSelectOne($c, $con);
+		if ($this->aasset === null && (($this->flavor_asset_id !== "" && $this->flavor_asset_id !== null))) {
+			$c = new Criteria(assetPeer::DATABASE_NAME);
+			$c->add(assetPeer::ID, $this->flavor_asset_id);
+			$this->aasset = assetPeer::doSelectOne($c, $con);
 			/* The following can be used additionally to
 			   guarantee the related object contains a reference
 			   to this object.  This level of coupling may, however, be
 			   undesirable since it could result in an only partially populated collection
 			   in the referenced object.
-			   $this->aflavorAsset->addmediaInfos($this);
+			   $this->aasset->addmediaInfos($this);
 			 */
 		}
-		return $this->aflavorAsset;
+		return $this->aasset;
 	}
 
 	/**
@@ -2648,7 +2648,7 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		if ($deep) {
 		} // if ($deep)
 
-			$this->aflavorAsset = null;
+			$this->aasset = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */

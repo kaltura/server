@@ -411,6 +411,9 @@ abstract class BasemediaInfoPeer {
 		mediaInfoPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
+	{
+	}
 	
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -618,7 +621,7 @@ abstract class BasemediaInfoPeer {
 	}
 
 	/**
-	 * Returns the number of rows matching criteria, joining the related flavorAsset table
+	 * Returns the number of rows matching criteria, joining the related asset table
 	 *
 	 * @param      Criteria $criteria
 	 * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -626,7 +629,7 @@ abstract class BasemediaInfoPeer {
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
 	 * @return     int Number of matching rows.
 	 */
-	public static function doCountJoinflavorAsset(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doCountJoinasset(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
@@ -650,7 +653,7 @@ abstract class BasemediaInfoPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, flavorAssetPeer::ID, $join_behavior);
+		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, assetPeer::ID, $join_behavior);
 
 		$stmt = mediaInfoPeer::doCountStmt($criteria, $con);
 
@@ -665,7 +668,7 @@ abstract class BasemediaInfoPeer {
 
 
 	/**
-	 * Selects a collection of mediaInfo objects pre-filled with their flavorAsset objects.
+	 * Selects a collection of mediaInfo objects pre-filled with their asset objects.
 	 * @param      Criteria  $criteria
 	 * @param      PropelPDO $con
 	 * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -673,7 +676,7 @@ abstract class BasemediaInfoPeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	public static function doSelectJoinflavorAsset(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	public static function doSelectJoinasset(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
 
@@ -684,9 +687,9 @@ abstract class BasemediaInfoPeer {
 
 		mediaInfoPeer::addSelectColumns($criteria);
 		$startcol = (mediaInfoPeer::NUM_COLUMNS - mediaInfoPeer::NUM_LAZY_LOAD_COLUMNS);
-		flavorAssetPeer::addSelectColumns($criteria);
+		assetPeer::addSelectColumns($criteria);
 
-		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, flavorAssetPeer::ID, $join_behavior);
+		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, assetPeer::ID, $join_behavior);
 
 		$stmt = mediaInfoPeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -706,20 +709,20 @@ abstract class BasemediaInfoPeer {
 				mediaInfoPeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
 
-			$key2 = flavorAssetPeer::getPrimaryKeyHashFromRow($row, $startcol);
+			$key2 = assetPeer::getPrimaryKeyHashFromRow($row, $startcol);
 			if ($key2 !== null) {
-				$obj2 = flavorAssetPeer::getInstanceFromPool($key2);
+				$obj2 = assetPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$omClass = flavorAssetPeer::getOMClass($row, $startcol);
+					$omClass = assetPeer::getOMClass($row, $startcol);
 					$cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
-					flavorAssetPeer::addInstanceToPool($obj2, $key2);
+					assetPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 already loaded
 				
-				// Add the $obj1 (mediaInfo) to $obj2 (flavorAsset)
+				// Add the $obj1 (mediaInfo) to $obj2 (asset)
 				$obj2->addmediaInfo($obj1);
 
 			} // if joined row was not null
@@ -764,7 +767,7 @@ abstract class BasemediaInfoPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, flavorAssetPeer::ID, $join_behavior);
+		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, assetPeer::ID, $join_behavior);
 
 		$stmt = mediaInfoPeer::doCountStmt($criteria, $con);
 
@@ -799,10 +802,10 @@ abstract class BasemediaInfoPeer {
 		mediaInfoPeer::addSelectColumns($criteria);
 		$startcol2 = (mediaInfoPeer::NUM_COLUMNS - mediaInfoPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		flavorAssetPeer::addSelectColumns($criteria);
-		$startcol3 = $startcol2 + (flavorAssetPeer::NUM_COLUMNS - flavorAssetPeer::NUM_LAZY_LOAD_COLUMNS);
+		assetPeer::addSelectColumns($criteria);
+		$startcol3 = $startcol2 + (assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, flavorAssetPeer::ID, $join_behavior);
+		$criteria->addJoin(mediaInfoPeer::FLAVOR_ASSET_ID, assetPeer::ID, $join_behavior);
 
 		$stmt = mediaInfoPeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -821,22 +824,22 @@ abstract class BasemediaInfoPeer {
 				mediaInfoPeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
 
-			// Add objects for joined flavorAsset rows
+			// Add objects for joined asset rows
 
-			$key2 = flavorAssetPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+			$key2 = assetPeer::getPrimaryKeyHashFromRow($row, $startcol2);
 			if ($key2 !== null) {
-				$obj2 = flavorAssetPeer::getInstanceFromPool($key2);
+				$obj2 = assetPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
 
-					$omClass = flavorAssetPeer::getOMClass($row, $startcol2);
+					$omClass = assetPeer::getOMClass($row, $startcol2);
           $cls = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
-					flavorAssetPeer::addInstanceToPool($obj2, $key2);
+					assetPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 loaded
 
-				// Add the $obj1 (mediaInfo) to the collection in $obj2 (flavorAsset)
+				// Add the $obj1 (mediaInfo) to the collection in $obj2 (asset)
 				$obj2->addmediaInfo($obj1);
 			} // if joined row not null
 

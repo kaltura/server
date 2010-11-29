@@ -66,9 +66,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	protected $aconversionProfile2;
 
 	/**
-	 * @var        flavorParams
+	 * @var        assetParams
 	 */
-	protected $aflavorParams;
+	protected $aassetParams;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -298,8 +298,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID;
 		}
 
-		if ($this->aflavorParams !== null && $this->aflavorParams->getId() !== $v) {
-			$this->aflavorParams = null;
+		if ($this->aassetParams !== null && $this->aassetParams->getId() !== $v) {
+			$this->aassetParams = null;
 		}
 
 		return $this;
@@ -523,8 +523,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if ($this->aconversionProfile2 !== null && $this->conversion_profile_id !== $this->aconversionProfile2->getId()) {
 			$this->aconversionProfile2 = null;
 		}
-		if ($this->aflavorParams !== null && $this->flavor_params_id !== $this->aflavorParams->getId()) {
-			$this->aflavorParams = null;
+		if ($this->aassetParams !== null && $this->flavor_params_id !== $this->aassetParams->getId()) {
+			$this->aassetParams = null;
 		}
 	} // ensureConsistency
 
@@ -566,7 +566,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if ($deep) {  // also de-associate any related objects?
 
 			$this->aconversionProfile2 = null;
-			$this->aflavorParams = null;
+			$this->aassetParams = null;
 		} // if (deep)
 	}
 
@@ -687,11 +687,11 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 				$this->setconversionProfile2($this->aconversionProfile2);
 			}
 
-			if ($this->aflavorParams !== null) {
-				if ($this->aflavorParams->isModified() || $this->aflavorParams->isNew()) {
-					$affectedRows += $this->aflavorParams->save($con);
+			if ($this->aassetParams !== null) {
+				if ($this->aassetParams->isModified() || $this->aassetParams->isNew()) {
+					$affectedRows += $this->aassetParams->save($con);
 				}
-				$this->setflavorParams($this->aflavorParams);
+				$this->setassetParams($this->aassetParams);
 			}
 
 			if ($this->isNew() ) {
@@ -856,9 +856,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 				}
 			}
 
-			if ($this->aflavorParams !== null) {
-				if (!$this->aflavorParams->validate($columns)) {
-					$failureMap = array_merge($failureMap, $this->aflavorParams->getValidationFailures());
+			if ($this->aassetParams !== null) {
+				if (!$this->aassetParams->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aassetParams->getValidationFailures());
 				}
 			}
 
@@ -1230,13 +1230,13 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	}
 
 	/**
-	 * Declares an association between this object and a flavorParams object.
+	 * Declares an association between this object and a assetParams object.
 	 *
-	 * @param      flavorParams $v
+	 * @param      assetParams $v
 	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
 	 * @throws     PropelException
 	 */
-	public function setflavorParams(flavorParams $v = null)
+	public function setassetParams(assetParams $v = null)
 	{
 		if ($v === null) {
 			$this->setFlavorParamsId(NULL);
@@ -1244,10 +1244,10 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->setFlavorParamsId($v->getId());
 		}
 
-		$this->aflavorParams = $v;
+		$this->aassetParams = $v;
 
 		// Add binding for other direction of this n:n relationship.
-		// If this object has already been added to the flavorParams object, it will not be re-added.
+		// If this object has already been added to the assetParams object, it will not be re-added.
 		if ($v !== null) {
 			$v->addflavorParamsConversionProfile($this);
 		}
@@ -1257,25 +1257,25 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 
 
 	/**
-	 * Get the associated flavorParams object
+	 * Get the associated assetParams object
 	 *
 	 * @param      PropelPDO Optional Connection object.
-	 * @return     flavorParams The associated flavorParams object.
+	 * @return     assetParams The associated assetParams object.
 	 * @throws     PropelException
 	 */
-	public function getflavorParams(PropelPDO $con = null)
+	public function getassetParams(PropelPDO $con = null)
 	{
-		if ($this->aflavorParams === null && ($this->flavor_params_id !== null)) {
-			$this->aflavorParams = flavorParamsPeer::retrieveByPk($this->flavor_params_id);
+		if ($this->aassetParams === null && ($this->flavor_params_id !== null)) {
+			$this->aassetParams = assetParamsPeer::retrieveByPk($this->flavor_params_id);
 			/* The following can be used additionally to
 			   guarantee the related object contains a reference
 			   to this object.  This level of coupling may, however, be
 			   undesirable since it could result in an only partially populated collection
 			   in the referenced object.
-			   $this->aflavorParams->addflavorParamsConversionProfiles($this);
+			   $this->aassetParams->addflavorParamsConversionProfiles($this);
 			 */
 		}
-		return $this->aflavorParams;
+		return $this->aassetParams;
 	}
 
 	/**
@@ -1293,7 +1293,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		} // if ($deep)
 
 			$this->aconversionProfile2 = null;
-			$this->aflavorParams = null;
+			$this->aassetParams = null;
 	}
 
 } // BaseflavorParamsConversionProfile
