@@ -75,6 +75,9 @@ abstract class KRunableClass
 			$this->taskConfig = $taskConfig;
 		}
 		
+		if(!$this->taskConfig)
+			die("Task config not supplied");
+		
 		date_default_timezone_set($this->taskConfig->getTimezone());
 		
 		// clear seperator between executions
