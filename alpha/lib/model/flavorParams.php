@@ -18,7 +18,7 @@ class flavorParams extends assetParams
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = assetType::FLAVOR;
+		$this->setType(assetType::FLAVOR);
 	}
 	
 	const SOURCE_FLAVOR_ID = 0;

@@ -17,7 +17,7 @@ class thumbParamsOutput extends assetParamsOutput
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = assetType::THUMBNAIL;
+		$this->setType(assetType::THUMBNAIL);
 	}
 
 	public function getSourceParamsId()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID);}

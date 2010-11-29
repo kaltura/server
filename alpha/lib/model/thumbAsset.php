@@ -6,7 +6,7 @@
  *
  * @package lib.model
  */ 
-class thumbAsset extends asset 
+class thumbAsset extends asset
 {
 	/**
 	 * Applies default values to this object.
@@ -17,7 +17,7 @@ class thumbAsset extends asset
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->file_ext = 'jpg';
-		$this->type = assetType::THUMBNAIL;
+		$this->setFileExt('jpg');
+		$this->setType(assetType::THUMBNAIL);
 	}
 }

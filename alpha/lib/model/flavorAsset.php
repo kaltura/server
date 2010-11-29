@@ -18,7 +18,7 @@ class flavorAsset extends asset
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = assetType::FLAVOR;
+		$this->setType(assetType::FLAVOR);
 	}
 	
 	const CUSTOM_DATA_FIELD_BITRATE = "FlavorBitrate";

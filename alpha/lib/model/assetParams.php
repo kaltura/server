@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-abstract class assetParams extends BaseflavorParams
+class assetParams extends BaseassetParams
 {
 	const CONTAINER_FORMAT_FLV = "flv";
 	const CONTAINER_FORMAT_MP4 = "mp4";

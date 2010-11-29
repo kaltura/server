@@ -12,19 +12,71 @@ class flavorAssetPeer extends assetPeer
 	/** the related Propel class for this table */
 	const OM_CLASS = 'flavorAsset';
 	
-	public static function setDefaultCriteriaFilter ()
+	/**
+	 * @var flavorAssetPeer
+	 */
+	private static $myInstance;
+		
+	public function setInstanceCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
-		{
 			self::$s_criteria_filter = new criteriaFilter ();
+
+		$c = self::$s_criteria_filter->getFilter();
+		if($c)
+		{
+			$c->remove(self::STATUS);
+			$c->remove(self::TYPE);
+		}
+		else
+		{
+			$c = new Criteria();
 		}
 
-		$c = new Criteria();
-		$c->add ( self::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL );
+		$c->add ( self::STATUS, asset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL );
 		$c->add ( self::TYPE, assetType::FLAVOR );
+			
 		self::$s_criteria_filter->setFilter ( $c );
 	}
+
+	private function __construct()
+	{
+	}
+
+	public static function getInstance()
+	{
+		if(!self::$myInstance)
+			self::$myInstance = new flavorAssetPeer();
+			
+		if(!self::$instance || !(self::$instance instanceof flavorAssetPeer))
+			self::$instance = self::$myInstance;
+			
+		return self::$myInstance;
+	}
+
+	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doCount($criteria, $distinct, $con);
+	}
 	
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelect($criteria, $con);	
+	}
+	
+	public static function doSelectOne(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelectOne($criteria, $con);	
+	}
+	
+	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelectStmt($criteria, $con);	
+	}
 	
 	/**
 	 * 
@@ -84,6 +136,7 @@ class flavorAssetPeer extends assetPeer
 		$c = new Criteria();
 		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
 		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->add(flavorAssetPeer::TYPE, assetType::FLAVOR);
 		
 		$flavorAssets = self::doSelect($c);
 		if(!count($flavorAssets))
@@ -101,5 +154,16 @@ class flavorAssetPeer extends assetPeer
 				$ret = $flavorAsset;
 				
 		return $ret;
+	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @return array<flavorAsset>
+	 */
+	public static function retrieveByEntryId($entryId)
+	{
+		self::getInstance();
+		return parent::retrieveByEntryId($entryId);
 	}
 }

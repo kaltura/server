@@ -12,17 +12,70 @@ class flavorParamsOutputPeer extends assetParamsOutputPeer
 	/** the related Propel class for this table */
 	const OM_CLASS = 'flavorParamsOutput';
 	
-	public static function setDefaultCriteriaFilter ()
+	/**
+	 * @var flavorParamsOutputPeer
+	 */
+	private static $myInstance;
+		
+	public function setInstanceCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
-		{
 			self::$s_criteria_filter = new criteriaFilter ();
+
+		$c = self::$s_criteria_filter->getFilter();
+		if($c)
+		{
+			$c->remove(self::DELETED_AT);
+			$c->remove(self::TYPE);
+		}
+		else
+		{
+			$c = new Criteria();
 		}
 
-		$c = new Criteria();
-		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
-		$c->add ( self::TYPE, assetType::FLAVOR );
+		$c->add(self::DELETED_AT, null, Criteria::EQUAL);
+		$c->add(self::TYPE, assetType::FLAVOR);
+			
 		self::$s_criteria_filter->setFilter ( $c );
+	}
+
+	private function __construct()
+	{
+	}
+
+	public static function getInstance()
+	{
+		if(!self::$myInstance)
+			self::$myInstance = new flavorParamsOutputPeer();
+			
+		if(!self::$instance || !(self::$instance instanceof flavorParamsOutputPeer))
+			self::$instance = self::$myInstance;
+			
+		return self::$myInstance;
+	}
+
+	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doCount($criteria, $distinct, $con);
+	}
+	
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelect($criteria, $con);	
+	}
+	
+	public static function doSelectOne(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelectOne($criteria, $con);	
+	}
+	
+	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
+	{
+		self::getInstance();
+		return parent::doSelectStmt($criteria, $con);	
 	}
 
 	/**

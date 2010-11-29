@@ -7,13 +7,41 @@
  *
  * @package lib.model
  */ 
-abstract class assetParamsPeer extends BaseflavorParamsPeer
+abstract class assetParamsPeer extends BaseassetParamsPeer
 {
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => flavorParamsPeer::OM_CLASS,
 		assetType::THUMBNAIL => thumbParamsPeer::OM_CLASS,
 	);
+	
+	/**
+	 * @var assetParamsPeer
+	 */
+	protected static $instance = null;
+
+	abstract public function setInstanceCriteriaFilter();
+	
+	/**
+	 * Returns the default criteria filter
+	 *
+	 * @return     criteriaFilter The default criteria filter.
+	 */
+	public static function &getCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			assetParamsPeer::setDefaultCriteriaFilter();
+			
+		if(self::$instance)
+			self::$instance->setInstanceCriteriaFilter();
+			
+		return self::$s_criteria_filter;
+	}
+
+	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null , $kalturaNetwork = null)
+	{
+		return parent::addPartnerToCriteria($partnerId, $privatePartnerData, "$partnerGroup,0", $kalturaNetwork);
+	}
 	
 	/**
 	 * The returned Class will contain objects of the default type or
@@ -108,22 +136,5 @@ abstract class assetParamsPeer extends BaseflavorParamsPeer
 		$criteria->add(flavorParamsPeer::ID, $flavorIds, Criteria::IN);
 
 		return flavorParamsPeer::doSelect($criteria, $con);
-	}
-	
-	/**
-	 * Allow access to partner X besides the current session partner
-	 */
-	public static function allowAccessToSystemDefaultParamsAndPartnerX($partnerXId)
-	{
-		// remove the partner id from the defualt criteria
-		$defaultCriteria = flavorParamsPeer::getCriteriaFilter()->getFilter();
-		$defaultCriteria->remove(flavorParamsPeer::PARTNER_ID);
-		
-		// add partner id or is_default=1
-		$crit1 = $defaultCriteria->getNewCriterion( flavorParamsPeer::PARTNER_ID , $partnerXId);
-		$crit2 = $defaultCriteria->getNewCriterion ( flavorParamsPeer::IS_DEFAULT , flavorParams::SYSTEM_DEFAULT );
-		$crit1->addOr ( $crit2 );
-		
-		$defaultCriteria->addAnd ( $crit1 );
 	}
 }

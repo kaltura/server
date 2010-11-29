@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-abstract class asset extends BaseflavorAsset implements ISyncableFile
+class asset extends Baseasset implements ISyncableFile
 {
 	const FLAVOR_ASSET_STATUS_ERROR = -1;
 	const FLAVOR_ASSET_STATUS_QUEUED = 0;
@@ -241,9 +241,9 @@ abstract class asset extends BaseflavorAsset implements ISyncableFile
 
 	public function getFormat()
 	{
-		$flavorParams = $this->getflavorParams();
-		if ($flavorParams)
-			return $flavorParams->getFormat();
+		$assetParams = $this->getassetParams();
+		if ($assetParams)
+			return $assetParams->getFormat();
 		else
 			return null;
 	}

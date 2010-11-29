@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-class assetParamsOutput extends BaseflavorParamsOutput
+class assetParamsOutput extends BaseassetParamsOutput
 {
 	const STR_SEPARATOR = "|||" ;
 	const KEY_SEPARATOR = "@@@" ; 

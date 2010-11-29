@@ -7,13 +7,36 @@
  *
  * @package lib.model
  */ 
-class assetParamsOutputPeer extends BaseflavorParamsOutputPeer
+abstract class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 {
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => flavorParamsOutputPeer::OM_CLASS,
 		assetType::THUMBNAIL => thumbParamsOutputPeer::OM_CLASS,
 	);
+	
+	/**
+	 * @var assetParamsPeer
+	 */
+	protected static $instance = null;
+
+	abstract public function setInstanceCriteriaFilter();
+	
+	/**
+	 * Returns the default criteria filter
+	 *
+	 * @return     criteriaFilter The default criteria filter.
+	 */
+	public static function &getCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::setDefaultCriteriaFilter();
+			
+		if(self::$instance)
+			self::$instance->setInstanceCriteriaFilter();
+			
+		return self::$s_criteria_filter;
+	}
 	
 	/**
 	 * @param string $entryId

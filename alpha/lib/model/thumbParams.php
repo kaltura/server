@@ -20,7 +20,7 @@ class thumbParams extends assetParams
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = assetType::THUMBNAIL;
+		$this->setType(assetType::THUMBNAIL);
 	}
 	
 	const TAG_DEFAULT_THUMB = "default_thumb";

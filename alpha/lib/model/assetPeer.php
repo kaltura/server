@@ -7,13 +7,36 @@
  *
  * @package lib.model
  */ 
-abstract class assetPeer extends BaseflavorAssetPeer
+abstract class assetPeer extends BaseassetPeer
 {
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => flavorAssetPeer::OM_CLASS,
 		assetType::THUMBNAIL => thumbAssetPeer::OM_CLASS,
 	);
+	
+	/**
+	 * @var assetParamsPeer
+	 */
+	protected static $instance = null;
+
+	abstract public function setInstanceCriteriaFilter();
+	
+	/**
+	 * Returns the default criteria filter
+	 *
+	 * @return     criteriaFilter The default criteria filter.
+	 */
+	public static function &getCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::setDefaultCriteriaFilter();
+			
+		if(self::$instance)
+			self::$instance->setInstanceCriteriaFilter();
+			
+		return self::$s_criteria_filter;
+	}
 
 	/**
 	 * The returned Class will contain objects of the default type or
@@ -73,15 +96,15 @@ abstract class assetPeer extends BaseflavorAssetPeer
 	public static function retrieveById($id, $con = null)
 	{
 		$c = new Criteria(); 
-		$c->add(flavorAssetPeer::ID, $id); 
-		return flavorAssetPeer::doSelectOne($c, $con);
+		$c->add(assetPeer::ID, $id); 
+		return assetPeer::doSelectOne($c, $con);
 	}
 	
 	public static function doSelectOneJoinFlavorParams(Criteria $criteria, $con = null)
 	{
 		$critcopy = clone $criteria;
 		$critcopy->setLimit(1);
-		$objects = flavorAssetPeer::doSelectJoinflavorParams($critcopy, $con);
+		$objects = assetPeer::doSelectJoinflavorParams($critcopy, $con);
 		if ($objects) {
 			return $objects[0];
 		}
@@ -145,14 +168,14 @@ abstract class assetPeer extends BaseflavorAssetPeer
 	public static function retreiveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
 	{
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$c->add(flavorAssetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
 		
 		// The client will most probably expect the list to be ordered by bitrate
-		$c->addAscendingOrderByColumn ( flavorAssetPeer::BITRATE ); /// TODO - should be server side ?
+		$c->addAscendingOrderByColumn ( assetPeer::BITRATE ); /// TODO - should be server side ?
 		
-		return flavorAssetPeer::doSelect($c);
+		return assetPeer::doSelect($c);
 	}
 	
 	/**
@@ -162,22 +185,22 @@ abstract class assetPeer extends BaseflavorAssetPeer
 	public static function retreiveOriginalByEntryId($entryId)
 	{
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::IS_ORIGINAL, true);
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::IS_ORIGINAL, true);
 		
-		return flavorAssetPeer::doSelectOne($c);
+		return assetPeer::doSelectOne($c);
 	}
 	
 	public static function retreiveReadyByEntryId($entryId)
 	{
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		
 		// The client will most probably expect the list to be ordered by bitrate
-		$c->addAscendingOrderByColumn ( flavorAssetPeer::BITRATE ); /// TODO - should be server side ?
+		$c->addAscendingOrderByColumn ( assetPeer::BITRATE ); /// TODO - should be server side ?
 		
-		return flavorAssetPeer::doSelect($c);
+		return assetPeer::doSelect($c);
 	}
 	
 	public static function retrieveReadyWebByEntryId($entryId)

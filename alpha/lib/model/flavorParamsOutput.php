@@ -18,7 +18,7 @@ class flavorParamsOutput extends assetParamsOutput
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = assetType::FLAVOR;
+		$this->setType(assetType::FLAVOR);
 	}
 	
 	public function getCollectionTag()
