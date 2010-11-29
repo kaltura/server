@@ -15,14 +15,16 @@ class KGenericDebuger
 	private $configFileName = null;
 	
 	private $logDir = "/web/kaltura/log";
+	private $initOnly = false;
 	
 	/**
 	 * @param string $configFileName
 	 */
-	public function __construct($configFileName)
+	public function __construct($configFileName, $initOnly = false)
 	{
 		$this->debug(__LINE__, "__construct($configFileName)");
 		$this->configFileName = $configFileName;
+		$this->initOnly = $initOnly;
 		$this->loadConfig();
 	}
 	
@@ -55,7 +57,12 @@ class KGenericDebuger
 		foreach($taskConfigs as $taskConfig)
 		{
 			if($taskConfig->name == $jobName)
+			{
+				if($this->initOnly)
+					$taskConfig->setInitOnly(true);
+					
 				$this->exeJob($taskConfig);
+			}
 		}
 		
 		$this->debug(__LINE__, "-- Done --");
