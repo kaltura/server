@@ -199,6 +199,7 @@ class KalturaContainerFormat
 	const WEBM = "webm";
 	const SWF = "swf";
 	const PDF = "pdf";
+	const JPG = "jpg";
 }
 
 class KalturaControlPanelCommandOrderBy
@@ -246,9 +247,9 @@ class KalturaConversionEngineType
 	const FFMPEG_AUX = "99";
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const FAST_START = "fastStart.FastStart";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const AVIDEMUX = "avidemux.Avidemux";
 }
 
@@ -320,7 +321,6 @@ class KalturaEntryType
 	const AUTOMATIC = "-1";
 	const MEDIA_CLIP = "1";
 	const MIX = "2";
-	const BUBBLES = "4";
 	const PLAYLIST = "5";
 	const DATA = "6";
 	const LIVE_STREAM = "7";
@@ -824,13 +824,15 @@ class KalturaUiConfObjType
 	const APP_STUDIO = 6;
 	const KRECORD = 7;
 	const PLAYER_V3 = 8;
+	const KMC_ACCOUNT = 9;
+	const KMC_ANALYTICS = 10;
+	const KMC_CONTENT = 11;
+	const KMC_DASHBOARD = 12;
+	const KMC_LOGIN = 13;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
 	const KMC_GENERAL = 16;
-	const KMC_CONTENT = 17;
-	const KMC_SETTINGS = 18;
-	const KMC_ANALYTICS = 19;
-	const KMC_DASHBOARD = 20;
+	const KMC_ROLES_AND_PERMISSIONS = 17;
 }
 
 class KalturaUiConfOrderBy
@@ -2185,6 +2187,20 @@ class KalturaThumbParams extends KalturaAssetParams
 	public $height = null;
 
 	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $scaleWidth = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $scaleHeight = null;
+
+	/**
 	 * Hexadecimal value
 	 *
 	 * @var string
@@ -2223,13 +2239,6 @@ class KalturaThumbParamsOutput extends KalturaThumbParams
 	 * @var string
 	 */
 	public $thumbAssetVersion = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $readyBehavior = null;
 
 
 }
@@ -2270,6 +2279,20 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	 * @var KalturaThumbParamsOutput
 	 */
 	public $thumbParamsOutput;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAssetType
+	 */
+	public $srcAssetType = null;
 
 	/**
 	 * 
@@ -4974,6 +4997,149 @@ class KalturaBatchJobListResponse extends KalturaObjectBase
 
 }
 
+class KalturaMetadata extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $metadataProfileVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataObjectType
+	 * @readonly
+	 */
+	public $metadataObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $objectId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $xml = null;
+
+
+}
+
+class KalturaTransformMetadataResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMetadata
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lowerVersionCount = null;
+
+
+}
+
+class KalturaUpgradeMetadataResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lowerVersionCount = null;
+
+
+}
+
 class KalturaFileSync extends KalturaObjectBase
 {
 	/**
@@ -5159,149 +5325,6 @@ class KalturaFileSync extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $isCurrentDc = null;
-
-
-}
-
-class KalturaMetadata extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $metadataProfileId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $metadataProfileVersion = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataObjectType
-	 * @readonly
-	 */
-	public $metadataObjectType = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $objectId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $version = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataStatus
-	 * @readonly
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $xml = null;
-
-
-}
-
-class KalturaTransformMetadataResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaMetadata
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $lowerVersionCount = null;
-
-
-}
-
-class KalturaUpgradeMetadataResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $lowerVersionCount = null;
 
 
 }
@@ -7373,13 +7396,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7512,54 +7534,6 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("batch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("batch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("batch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -7594,13 +7568,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null, array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -7615,13 +7588,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7712,13 +7684,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7775,13 +7746,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7823,13 +7793,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7846,53 +7815,6 @@ class KalturaBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
 		$this->client->queueServiceActionCall("batch", "freeExclusiveCaptureThumbJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("batch", "getExclusivePullJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("batch", "updateExclusivePullJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("batch", "freeExclusivePullJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -7918,13 +7840,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7979,13 +7900,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -8027,13 +7947,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -8075,13 +7994,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -8123,13 +8041,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -8426,13 +8343,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -9636,29 +9552,6 @@ class KalturaSystemService extends KalturaServiceBase
 	}
 }
 
-class KalturaFileSyncService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function sync($fileSyncId, $fileData)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSync");
-		return $resultObject;
-	}
-}
-
 class KalturaMetadataService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -9846,13 +9739,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -9985,54 +9877,6 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -10067,13 +9911,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null, array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -10088,13 +9931,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10185,13 +10027,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10248,13 +10089,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10296,13 +10136,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10319,53 +10158,6 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusiveCaptureThumbJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusivePullJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusivePullJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusivePullJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -10391,13 +10183,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10452,13 +10243,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10500,13 +10290,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10548,13 +10337,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10596,13 +10384,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10899,13 +10686,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10952,6 +10738,29 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaFileExistsResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaFileSyncService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function sync($fileSyncId, $fileData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileSync");
 		return $resultObject;
 	}
 }
@@ -11044,13 +10853,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11183,54 +10991,6 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -11265,13 +11025,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null, array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -11286,13 +11045,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11383,13 +11141,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11446,13 +11203,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11494,13 +11250,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11517,53 +11272,6 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusiveCaptureThumbJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusivePullJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusivePullJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusivePullJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -11589,13 +11297,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11650,13 +11357,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11698,13 +11404,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11746,13 +11451,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11794,13 +11498,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12097,13 +11800,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12225,13 +11927,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12364,54 +12065,6 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -12446,13 +12099,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null, array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -12467,13 +12119,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12564,13 +12215,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12627,13 +12277,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12675,13 +12324,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12698,53 +12346,6 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveCaptureThumbJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusivePullJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusivePullJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusivePullJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -12770,13 +12371,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12831,13 +12431,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12879,13 +12478,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12927,13 +12525,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12975,13 +12572,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -13278,13 +12874,12 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = null)
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -13410,13 +13005,6 @@ class KalturaClient extends KalturaClientBase
 	public $system = null;
 
 	/**
-	 * System user service
-	 *
-	 * @var KalturaFileSyncService
-	 */
-	public $fileSync = null;
-
-	/**
 	 * Metadata service
 	 *
 	 * @var KalturaMetadataService
@@ -13429,6 +13017,13 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaMetadataBatchService
 	 */
 	public $metadataBatch = null;
+
+	/**
+	 * System user service
+	 *
+	 * @var KalturaFileSyncService
+	 */
+	public $fileSync = null;
 
 	/**
 	 * 
@@ -13455,9 +13050,9 @@ class KalturaClient extends KalturaClientBase
 		$this->media = new KalturaMediaService($this);
 		$this->session = new KalturaSessionService($this);
 		$this->system = new KalturaSystemService($this);
-		$this->fileSync = new KalturaFileSyncService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataBatch = new KalturaMetadataBatchService($this);
+		$this->fileSync = new KalturaFileSyncService($this);
 		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
 		$this->virusScanBatch = new KalturaVirusScanBatchService($this);
 	}
