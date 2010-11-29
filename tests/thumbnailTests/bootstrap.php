@@ -55,8 +55,8 @@ kLog::setLogger(KalturaLog::getInstance());
 
 */
 
-require_once('C:/opt/kaltura/app/alpha/config/sfrootdir.php');
-require_once('C:/opt/kaltura/app/api_v3/bootstrap.php');
+require_once('/opt/kaltura/app/alpha/config/sfrootdir.php');
+require_once('/opt/kaltura/app/api_v3/bootstrap.php');
 
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
