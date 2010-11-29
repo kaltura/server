@@ -321,6 +321,14 @@ flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |
 flavorparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |
 flavorparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |
 
+thumbparams.add						|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbparams.get						|			|2		|1	|1		|2		|1		|	|0,		|	|   |
+thumbparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |
+thumbparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |
+
 flavorasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |
 flavorasset.getbyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
 flavorasset.getwebplayablebyentryid |			|1		|1	|1		|2		|1		|	|		|	|   |
@@ -329,6 +337,17 @@ flavorasset.reconvert 				|			|2		|1	|1		|2		|1		|	|		|	|   |
 flavorasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
 flavorasset.getflavorassetswithparams|			|2		|1	|1		|2		|1		|	|0,		|	|   |
 flavorasset.getdownloadurl			|			|2		|1	|1		|2		|1		|	|		|	|   |
+
+thumbasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.servebyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
+thumbasset.serve		 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
+thumbasset.setasdefault 			|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.generatebyentryid		|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.regenerate				|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.addfromurl				|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.addfromjpeg				|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.deletebyentryid			|			|2		|1	|1		|2		|1		|	|		|	|   |
 
 syndicationfeed.add					|			|2		|1	|1		|2		|1		|	|		|	|   |
 syndicationfeed.get					|			|2		|1	|1		|2		|1		|	|		|	|   |

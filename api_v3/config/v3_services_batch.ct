@@ -138,6 +138,9 @@ batch.freeexclusiveremoteconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.getexclusivebulkdownloadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.updateexclusivebulkdownloadjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.freeexclusivebulkdownloadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.getexclusivecapturethumbjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.updateexclusivecapturethumbjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+batch.freeexclusivecapturethumbjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.logconversion					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 batch.resetjobexecutionattempts		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 

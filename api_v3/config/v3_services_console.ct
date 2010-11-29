@@ -55,6 +55,10 @@ entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+thumbasset.regenerate				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+
+thumbasset.getbyentryid				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+thumbparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 
 emailingestionprofile.add				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 emailingestionprofile.get				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
