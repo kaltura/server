@@ -1953,7 +1953,7 @@
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_params"
-		phpName="flavorParams">
+		phpName="assetParams">
 		<column lazyLoad="false" name="id" type="integer"
 			required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false"
@@ -2027,7 +2027,7 @@
 			name="type" type="integer" required="true" inheritance="single" default="0" />
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_params_output"
-		phpName="flavorParamsOutput">
+		phpName="assetParamsOutput">
 		<column lazyLoad="false" name="id" type="integer"
 			required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false"
@@ -2119,7 +2119,7 @@
 		</foreign-key>
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_asset"
-		phpName="flavorAsset">
+		phpName="asset">
 		<column primaryKey="false" lazyLoad="false"
 			name="id" type="varchar" required="true" size="20" />
 		<column lazyLoad="false" name="int_id"
