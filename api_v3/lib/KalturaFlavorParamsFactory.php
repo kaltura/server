@@ -9,7 +9,7 @@ class KalturaFlavorParamsFactory
 				return new KalturaFlavorParamsOutput();
 				
 			case KalturaAssetType::THUMBNAIL:
-				return new KalturaFlavorParamsOutput();
+				return new KalturaThumbParamsOutput();
 				
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaFlavorParamsOutput', $type);
@@ -28,7 +28,7 @@ class KalturaFlavorParamsFactory
 				return new KalturaFlavorParams();
 				
 			case KalturaAssetType::THUMBNAIL:
-				return new KalturaFlavorParams();
+				return new KalturaThumbParams();
 				
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaFlavorParams', $type);
