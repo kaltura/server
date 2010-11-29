@@ -38,10 +38,14 @@ class kPluginableEnumsManager
 //		$baseEnumName = $type::getEnumClass();
  
 		$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
+		if (!$pluginInstance) {
+			KalturaLog::ALERT('Server is missing plugin ['.$pluginName.'] used by client');
+			return null;
+		}
 		$enums = $pluginInstance->getEnums($baseEnumName);
 		
 		foreach($enums as $enum)
-		{		
+		{
 			// TODO remove call_user_func after moving to php 5.3
 			$enumConstans = call_user_func("$enum::getAdditionalValues");
 //			$enumConstans = $enum::getAdditionalValues();
