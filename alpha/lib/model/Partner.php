@@ -16,7 +16,7 @@ class Partner extends BasePartner
 	const BATCH_PARTNER_ID = -1;
 	const ADMIN_CONSOLE_PARTNER_ID = -2;
 	
-	const PARTNER_THAT_DOWS_NOT_EXIST = -1;
+	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
 	const VALIDATE_WRONG_LOGIN = -1;
 	const VALIDATE_WRONG_PASSWORD = -2;
