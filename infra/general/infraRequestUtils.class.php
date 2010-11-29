@@ -150,7 +150,7 @@ class infraRequestUtils
 		}
 		
 		// if still mepty .... 
-		if (!$remote_addr)
+		if (!$remote_addr && isset($_SERVER['REMOTE_ADDR']))
 			$remote_addr = $_SERVER['REMOTE_ADDR'];
 		
 		return $remote_addr;
