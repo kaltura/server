@@ -12,6 +12,11 @@ class FlavorAssetService extends KalturaBaseService
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		
+		flavorParamsPeer::setInstance();
+		flavorParamsOutputPeer::setInstance();
+		flavorAssetPeer::setInstance();
+		
 		parent::applyPartnerFilterForClass(new flavorParamsPeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new flavorAssetPeer());

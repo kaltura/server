@@ -12,6 +12,11 @@ class ThumbAssetService extends KalturaBaseService
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		
+		thumbParamsPeer::setInstance();
+		thumbParamsOutputPeer::setInstance();
+		thumbAssetPeer::setInstance();
+		
 		parent::applyPartnerFilterForClass(new thumbParamsPeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new thumbAssetPeer());
@@ -247,6 +252,27 @@ class ThumbAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * @action get
+	 * @param string $thumbAssetId
+	 * @return KalturaThumbAsset
+	 */
+	public function getAction($thumbAssetId)
+	{
+		
+	}
+	
+	/**
+	 * @action getByEntryId
+	 * @param string $entryId
+	 * @param int $thumbParamsId
+	 * @return KalturaThumbAsset
+	 */
+	public function getByEntryIdAction($entryId, $thumbParamsId)
+	{
+		
+	}
+	
+	/**
 	 * @action addFromUrl
 	 * @param string $entryId
 	 * @param string $url
@@ -278,7 +304,7 @@ class ThumbAssetService extends KalturaBaseService
 	}
 	
 	/**
-	 * @action delete
+	 * @action deleteByEntryId
 	 * @param string $entryId
 	 * @param int $thumbParamsId
 	 */
