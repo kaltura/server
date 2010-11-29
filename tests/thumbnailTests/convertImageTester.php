@@ -126,7 +126,6 @@ class convertImageTester {
 		}
 		
 		// filed to generate reference file
-		echo var_dump(filesize($this->referenceFile));
 		if (!file_exists($this->referenceFile) || @filesize($this->referenceFile) == 0)
 		{
 			echo 'reference file [' . $this->outputReferenceFile . '] was not produced' . PHP_EOL;
