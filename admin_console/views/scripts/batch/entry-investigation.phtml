@@ -311,7 +311,7 @@
 			
 			<br/><br/>
 			
-			<h2><?php echo $this->translate('entry-investigate assets title'); ?></h2>
+			<h2><?php echo $this->translate('entry-investigate flavor assets title'); ?></h2>
 			<table>
 				<thead>
 					<tr>
@@ -683,6 +683,249 @@
 							</tr>
 						<?php
 					}
+				?>
+				</tbody>
+			</table>
+	
+			<br/><br/>
+			
+			<h2><?php echo $this->translate('entry-investigate thumb assets title'); ?></h2>
+			<table>
+				<thead>
+					<tr>
+						<th><?php echo $this->translate('entry-investigate asset id th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset version th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset tags th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset created th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset updated th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset deleted th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset status th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset description th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset width th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset height th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset size th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset original th'); ?></th>
+						<th><?php echo $this->translate('entry-investigate asset ext th'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					
+					if($investigateData->thumbAssets && count($investigateData->thumbAssets))
+					{
+						foreach($investigateData->thumbAssets as $thumb)
+						{
+							$thumbAsset = $thumb->thumbAsset;
+							$thumbParams = $thumb->thumbParams;
+							$thumbParamsOutputs = $thumb->thumbParamsOutputs;
+							$thumbFiles = $thumb->fileSyncs;
+							?>
+								<tr class="<?php echo $this->cycle(array('odd', 'even'), 'asset')->next(); ?>">
+									<td class="link" onclick="toggleView('tr_thumb_data_<?php echo $thumbAsset->id; ?>')"><?php echo $thumbAsset->id; ?></td>
+									<td><?php echo $thumbAsset->version; ?></td>
+									<td><?php echo $thumbAsset->tags; ?></td>
+									<td><?php echo date($this->translate('date format'), $thumbAsset->createdAt); ?></td>
+									<td><?php echo date($this->translate('date format'), $thumbAsset->updatedAt); ?></td>
+									<td><?php echo date($this->translate('date format'), $thumbAsset->deletedAt); ?></td>
+									<td><?php echo $this->enumTranslate('KalturaFlavorAssetStatus', $thumbAsset->status); ?></td>
+									<td><?php echo $thumbAsset->description; ?></td>
+									<td><?php echo $thumbAsset->width; ?></td>
+									<td><?php echo $thumbAsset->height; ?></td>
+									<td><?php echo $thumbAsset->size; ?></td>
+									<td><?php echo $thumbAsset->isOriginal; ?></td>
+									<td><?php echo $thumbAsset->fileExt; ?></td>
+								</tr>
+								<tr class="additionalData" id="tr_thumb_data_<?php echo $thumbAsset->id; ?>" style="display: none">
+									<td colspan="18">
+										<?php 
+											if($enableActions && !$thumbAsset->isOriginal)
+											{
+												?>
+													<button onclick="doRegenerate('<?php echo $thumbAsset->id; ?>');"><?php echo $this->translate('entry-investigate thumb regenerate'); ?></button>
+													<br/><br/>
+												<?php
+											}
+											
+											if($thumbParams)
+											{
+												?>
+												<h3><?php echo $this->translate('entry-investigate thumb params title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate thumb params id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params name th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params description th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params createdAt th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params isSystemDefault th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params tags th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params format th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params width th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params height th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbParams$thumbAsset->id")->next(); ?>">
+															<td><?php echo $thumbParams->id; ?></td>
+															<td><?php echo $thumbParams->name; ?></td>
+															<td><?php echo $thumbParams->description; ?></td>
+															<td><?php echo $thumbParams->createdAt; ?></td>
+															<td><?php echo $thumbParams->isSystemDefault; ?></td>
+															<td><?php echo $thumbParams->tags; ?></td>
+															<td><?php echo $thumbParams->format; ?></td>
+															<td><?php echo $thumbParams->width; ?></td>
+															<td><?php echo $thumbParams->height; ?></td>
+														</tr>
+													</tbody>
+												</table>
+												<?php
+											}
+											
+											if($thumbParamsOutputs && $thumbParamsOutputs->totalCount)
+											{
+												?>
+												<br/><br/>
+												<h3><?php echo $this->translate('entry-investigate thumb params output title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate thumb params id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params name th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params output thumbParamsId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params output thumbParamsVersion th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params output thumbAssetId th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params output thumbAssetVersion th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params description th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params createdAt th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params isSystemDefault th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params tags th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params format th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params width th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params height th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate thumb params output commandLinesStr th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<?php foreach($thumbParamsOutputs->objects as $thumbParams): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbParamsOutputFiles$thumbAsset->id")->next(); ?>">
+															<td><?php echo $thumbParams->id; ?></td>
+															<td><?php echo $thumbParams->name; ?></td>
+															<td><?php echo $thumbParams->thumbParamsId; ?></td>
+															<td><?php echo $thumbParams->thumbParamsVersion; ?></td>
+															<td><?php echo $thumbParams->thumbAssetId; ?></td>
+															<td><?php echo $thumbParams->thumbAssetVersion; ?></td>
+															<td><?php echo $thumbParams->description; ?></td>
+															<td><?php echo $thumbParams->createdAt; ?></td>
+															<td><?php echo $thumbParams->isSystemDefault; ?></td>
+															<td><?php echo $thumbParams->tags; ?></td>
+															<td><?php echo $thumbParams->format; ?></td>
+															<td><?php echo $thumbParams->width; ?></td>
+															<td><?php echo $thumbParams->height; ?></td>
+															<td><?php echo $thumbParams->commandLinesStr; ?></td>
+														</tr>
+														<?php endforeach; ?>
+													</tbody>
+												</table>
+												<?php
+											} 
+											
+											if($thumbFiles && $thumbFiles->totalCount)
+											{
+												?>
+												<br/><br/>
+												<h3><?php echo $this->translate('entry-investigate files title'); ?></h3>
+												<table>
+													<thead>
+														<tr>
+															<th><?php echo $this->translate('entry-investigate files id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files version th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files sub type th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files dc th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files original th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files created th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files ready time th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files sync time th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files status th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files type th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files link id th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files link count th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files root th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files path th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files size th'); ?></th>
+															<th><?php echo $this->translate('entry-investigate files disc size th'); ?></th>
+														</tr>
+													</thead>
+													<tfoot>
+													</tfoot>
+													<tbody>
+														<?php foreach($thumbFiles->objects as $file): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbFiles$thumbAsset->id")->next(); ?>">
+															<?php 
+																if(strlen($file->fileContent))
+																{
+																	?>
+																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
+																	<?php
+																}
+																elseif($file->status == KalturaFileSyncStatus::READY)
+																{
+																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+																}
+																else
+																{
+																	?><td><?php echo $file->id; ?></td><?php
+																}
+															?>
+															<td><?php echo $file->version; ?></td>
+															<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
+															<td><?php echo $file->dc; ?></td>
+															<td><?php echo $file->original; ?></td>
+															<td><?php echo date($this->translate('date format'), $file->createdAt); ?></td>
+															<td><?php echo date($this->translate('date format'), $file->readyAt); ?></td>
+															<td><?php echo date($this->translate('date format'), $file->syncTime); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+															<td><?php echo $file->linkedId; ?></td>
+															<td><?php echo $file->linkCount; ?></td>
+															<td><?php echo $file->fileRoot; ?></td>
+															<td><?php echo $file->filePath; ?></td>
+															<td><?php echo $file->fileSize; ?></td>
+															<td><?php echo $file->fileDiscSize; ?></td>
+														</tr>
+														<?php 
+															if(strlen($file->fileContent))
+															{
+																?>
+																<tr class="additionalData" id="tr_filesync_data_<?php echo $file->id; ?>" style="display: none">
+																	<td colspan="15"><textarea rows="20" cols="150"><?php echo $file->fileContent; ?></textarea> </td>
+																</tr>
+																<?php
+															}
+														?>
+														<?php endforeach; ?>
+													</tbody>
+												</table>
+												<?php
+											} 
+										?>
+									</td>
+								</tr>
+						
+							<?php 
+						}
+					}
+					else
+					{
+						?>
+							<tr class="odd">
+								<td colspan="18"><?php echo $this->translate('no results'); ?></td>
+							</tr>
+						<?php
+					}
 					
 				?>
 				</tbody>
@@ -846,12 +1089,24 @@
 		var frm = document.getElementById("frmSupport");
 		frm.submit();
 	}
-
+	
 	function doReconvertEntry(){
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
-		
+
+		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
 		$('#submitAction').val('reconvertEntry');
+	
+		frm.submit();
+	}
+
+	function doRegenerate(thumbAssetId){
+		var frm = document.getElementById("frmSearch");
+		frm.reset();
+
+		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		$('#actionFlavorAssetId').val(thumbAssetId);
+		$('#submitAction').val('regenerate');
 	
 		frm.submit();
 	}
@@ -859,7 +1114,8 @@
 	function doReconvert(flavorAssetId){
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
-		
+
+		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
 		$('#actionFlavorAssetId').val(flavorAssetId);
 		$('#submitAction').val('reconvert');
 

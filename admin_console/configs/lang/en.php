@@ -35,6 +35,7 @@ return array(
 	'KalturaBatchJobType::METADATA_TRANSFORM' => 'MetaData Transform',
 	'KalturaBatchJobType::FILESYNC_IMPORT' => 'Filesync Import',
 	'KalturaBatchJobType::VIRUS_SCAN' => 'Virus Scan',
+	'KalturaBatchJobType::CAPTURE_THUMB' => 'Capture Thumbnail',
 
 
 	'KalturaConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
@@ -113,6 +114,7 @@ return array(
 	'KalturaFlavorAssetStatus::READY' => 'Ready',
 	'KalturaFlavorAssetStatus::DELETED' => 'Deleted',
 	'KalturaFlavorAssetStatus::NOT_APPLICABLE' => 'Not Applicable',
+	'KalturaFlavorAssetStatus::TEMP' => 'Temporary',
 
 	'KalturaFileSyncStatus::ERROR' => 'Error',
 	'KalturaFileSyncStatus::PENDING' => 'Pending',
@@ -361,7 +363,8 @@ return array(
 	'entry-investigate files size th' => 'Size',
 	'entry-investigate files disc size th' => 'Size on Disc',
 
-	'entry-investigate assets title' => 'Flavor Assets',
+	'entry-investigate flavor assets title' => 'Flavor Assets',
+	'entry-investigate thumb assets title' => 'Thumbnail Assets',
 
 	'entry-investigate asset id th' => 'ID',
 	'entry-investigate asset version th' => 'Version',
@@ -382,6 +385,7 @@ return array(
 	'entry-investigate asset codec th' => 'Codec',
 
 	'entry-investigate flavor reconvert' => 'Reconvert',
+	'entry-investigate thumb regenerate' => 'Regenerate',
 
 	'entry-investigate flavor params title' => 'Flavor Params',
 	'entry-investigate flavor params id th' => 'ID',
@@ -405,6 +409,17 @@ return array(
 	'entry-investigate flavor params conversionEnginesExtraParams th' => ' Engines Extra Params',
 	'entry-investigate flavor params twoPass th' => 'Two Pass',
 
+	'entry-investigate thumb params title' => 'Thumbnail Params',
+	'entry-investigate thumb params id th' => 'ID',
+	'entry-investigate thumb params name th' => 'Name',
+	'entry-investigate thumb params description th' => 'Description',
+	'entry-investigate thumb params createdAt th' => 'Create Time (' . date('T') . ')',
+	'entry-investigate thumb params isSystemDefault th' => 'Is System Default',
+	'entry-investigate thumb params tags th' => 'Tags',
+	'entry-investigate thumb params format th' => 'Format',
+	'entry-investigate thumb params width th' => 'Width',
+	'entry-investigate thumb params height th' => 'Height',
+
 	'entry-investigate flavor params output title' => 'Flavor Params Output Objects',
 	'entry-investigate flavor params output flavorParamsId th' => 'Flavor Params ID',
 	'entry-investigate flavor params output commandLinesStr th' => 'Command Lines',
@@ -412,6 +427,13 @@ return array(
 	'entry-investigate flavor params output flavorAssetId th' => 'Flavor Asset ID',
 	'entry-investigate flavor params output flavorAssetVersion th' => 'Flavor Asset Version',
 	'entry-investigate flavor params output readyBehavior th' => 'Ready Behavior',
+
+	'entry-investigate thumb params output title' => 'Thumbnail Params Output Objects',
+	'entry-investigate thumb params output thumbParamsId th' => 'Flavor Params ID',
+	'entry-investigate thumb params output commandLinesStr th' => 'Command Lines',
+	'entry-investigate thumb params output thumbParamsVersion th' => 'Flavor Params Version',
+	'entry-investigate thumb params output thumbAssetId th' => 'Flavor Asset ID',
+	'entry-investigate thumb params output thumbAssetVersion th' => 'Flavor Asset Version',
 
 	'entry-investigate media info title' => 'Media Info Objects',
 	'entry-investigate media info id th' => 'ID',

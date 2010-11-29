@@ -28,9 +28,10 @@ class Form_Batch_SearchEntry extends Form_Base
             'label'    => 'entry-history search button',
         ));
         
-        $this->addElement('hidden', 'submitAction');        
-        $this->addElement('hidden', 'actionFlavorAssetId');          
-        $this->addElement('hidden', 'actionJobId');        
+        $this->addElement('hidden', 'submitAction');
+        $this->addElement('hidden', 'partnerId');
+        $this->addElement('hidden', 'actionFlavorAssetId');
+        $this->addElement('hidden', 'actionJobId');
         $this->addElement('hidden', 'actionJobType');
     }
 }

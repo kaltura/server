@@ -632,7 +632,12 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		$flavorParams = array();
+		$thumbParams = array();
 		$templateFlavorParams = null;
+		$templateThumbParams = null;
+		$partnerFlavorParams = null;
+		$partnerThumbParams = null;
+		
 		try{
 			$templateFlavorParamsList = $client->flavorParams->listAction();
 			$templateFlavorParams = $templateFlavorParamsList->objects;
@@ -641,15 +646,30 @@ class BatchController extends Zend_Controller_Action
 			$errors[] = 'Template Flavor Params not found: ' . $e->getMessage();
 		}
 	
+		try{
+			$templateThumbParamsList = $client->thumbParams->listAction();
+			$templateThumbParams = $templateThumbParamsList->objects;
+		}
+		catch(Exception $e){
+			$errors[] = 'Template Thumb Params not found: ' . $e->getMessage();
+		}
+	
 		Kaltura_ClientHelper::impersonate($entry->partnerId);
 		
-		$partnerFlavorParams = null;
 		try{
 			$partnerFlavorParamsList = $client->flavorParams->listAction();
 			$partnerFlavorParams = $partnerFlavorParamsList->objects;
 		}
 		catch(Exception $e){
 			$errors[] = 'Partner Flavor Params not found: ' . $e->getMessage();
+		}
+	
+		try{
+			$partnerThumbParamsList = $client->thumbParams->listAction();
+			$partnerThumbParams = $partnerThumbParamsList->objects;
+		}
+		catch(Exception $e){
+			$errors[] = 'Partner Thumb Params not found: ' . $e->getMessage();
 		}
 	
 		if(count($templateFlavorParams))
@@ -662,7 +682,17 @@ class BatchController extends Zend_Controller_Action
 			foreach($partnerFlavorParams as $param)
 				$flavorParams[$param->id] = $param;
 		}
-		
+	
+		if(count($templateThumbParams))
+		{
+			foreach($templateThumbParams as $param)
+				$thumbParams[$param->id] = $param;
+		}
+		if(count($partnerThumbParams))
+		{
+			foreach($partnerThumbParams as $param)
+				$thumbParams[$param->id] = $param;
+		}
 		
 		$flavors = null;
 		try{
@@ -670,6 +700,14 @@ class BatchController extends Zend_Controller_Action
 		}
 		catch(Exception $e){
 			$errors[] = 'Flavors not found: ' . $e->getMessage();
+		}
+		
+		$thumbs = null;
+		try{
+			$thumbs = $client->thumbAsset->getByEntryId($entryId);
+		}
+		catch(Exception $e){
+			$errors[] = 'Thumbs not found: ' . $e->getMessage();
 		}
 		
 		Kaltura_ClientHelper::unimpersonate();
@@ -720,6 +758,42 @@ class BatchController extends Zend_Controller_Action
 			$flavorsData[] = $flavorData;
 		}
 		$investigateData->flavorAssets = $flavorsData;
+		
+		$thumbsData = array();
+		foreach($thumbs as $thumb)
+		{
+			$thumbData = new KalturaInvestigateThumbAssetData();
+			$thumbData->thumbAsset = $thumb;
+			$thumbData->thumbParams = null;
+			$thumbData->thumbParamsOutputs = array();
+			$thumbData->fileSyncs = array();
+			
+			if(isset($thumbParams[$thumb->thumbParamsId]))
+				$thumbData->thumbParams = $thumbParams[$thumb->thumbParamsId];
+		
+			$filter = new KalturaFileSyncFilter();
+			$filter->objectTypeEqual = KalturaFileSyncObjectType::FLAVOR_ASSET;
+			$filter->objectIdEqual = $thumb->id;
+			try{
+				$filesList = $client->fileSync->listAction($filter);
+				$thumbData->fileSyncs = $filesList;
+			}
+			catch(Exception $e){
+				$errors[] = "Thumb [$thumb->id] files not found: " . $e->getMessage();
+			}
+		
+			$filter = new KalturaThumbParamsOutputFilter();
+			$filter->thumbAssetIdEqual = $thumb->id;
+			try{
+				$thumbParamsOutputsList = $client->thumbParamsOutput->listAction($filter);
+				$thumbData->thumbParamsOutputs = $thumbParamsOutputsList;
+			}
+			catch(Exception $e){
+				$errors[] = "Thumb [$thumb->id] thumb params outputs not found: " . $e->getMessage();
+			}
+			$thumbsData[] = $thumbData;
+		}
+		$investigateData->thumbAssets = $thumbsData;
 		
 		return $investigateData;
 	}
@@ -774,11 +848,13 @@ class BatchController extends Zend_Controller_Action
 		$submitAction = $request->getParam('submitAction', false);
 		if($submitAction && strlen($submitAction))
 		{
+			$partnerId = $request->getParam('partnerId', 0);
+			Kaltura_ClientHelper::impersonate($partnerId);
+			
 			if($submitAction == 'retry')
 			{
 				$jobId = $request->getParam('actionJobId', 0);
 				$jobType = $request->getParam('actionJobType', 0);
-				
 				$client->jobs->retryJob($jobId, $jobType);
 			}
 			
@@ -790,11 +866,16 @@ class BatchController extends Zend_Controller_Action
 			if($submitAction == 'reconvert')
 			{
 				$flavorAssetId = $request->getParam('actionFlavorAssetId', 0);
-			
-//				Kaltura_ClientHelper::impersonate($partnerId);
 				$client->flavorAsset->reconvert($flavorAssetId);
-//				Kaltura_ClientHelper::unimpersonate();
 			}
+			
+			if($submitAction == 'regenerate')
+			{
+				$thumbAssetId = $request->getParam('actionFlavorAssetId', 0);
+				$client->thumbAsset->regenerate($thumbAssetId);
+			}
+			
+			Kaltura_ClientHelper::unimpersonate();
 		}
 		
 		$this->view->investigateData = $this->getEntryInvestigationData($entryId, $this->view->errors);
