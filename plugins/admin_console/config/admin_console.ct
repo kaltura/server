@@ -21,4 +21,5 @@ name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags
 ------------------------------------------------------------------------------------------------
 
 flavorparamsoutput.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+thumbparamsoutput.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
 mediainfo.list						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console

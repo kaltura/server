@@ -24,4 +24,10 @@ class KalturaInvestigateEntryData extends KalturaObject
 	 * @readonly
 	 */
 	public $flavorAssets;
+	
+	/**
+	 * @var KalturaInvestigateThumbAssetDataArray
+	 * @readonly
+	 */
+	public $thumbAssets;
 }

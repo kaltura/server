@@ -1,12 +1,12 @@
 <?php
 /**
- * Flavor Params Output service
+ * Thumb Params Output service
  *
- * @service flavorParamsOutput
+ * @service thumbParamsOutput
  * @package api
  * @subpackage extServices
  */
-class FlavorParamsOutputService extends KalturaBaseService
+class ThumbParamsOutputService extends KalturaBaseService
 {
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
@@ -19,35 +19,35 @@ class FlavorParamsOutputService extends KalturaBaseService
 	}
 	
 	/**
-	 * List flavor params output objects by filter and pager
+	 * List thumb params output objects by filter and pager
 	 * 
 	 * @action list
-	 * @param KalturaFlavorParamsOutputFilter $filter
+	 * @param KalturaThumbParamsOutputFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaFlavorParamsOutputListResponse
+	 * @return KalturaThumbParamsOutputListResponse
 	 */
-	function listAction(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaThumbParamsOutputFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
-			$filter = new KalturaFlavorParamsOutputFilter();
+			$filter = new KalturaThumbParamsOutputFilter();
 
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$flavorParamsOutputFilter = new assetParamsOutputFilter();
+		$thumbParamsOutputFilter = new assetParamsOutputFilter();
 		
-		$filter->toObject($flavorParamsOutputFilter);
+		$filter->toObject($thumbParamsOutputFilter);
 
 		$c = new Criteria();
-		$flavorParamsOutputFilter->attachToCriteria($c);
+		$thumbParamsOutputFilter->attachToCriteria($c);
 		
-		$totalCount = flavorParamsOutputPeer::doCount($c);
+		$totalCount = thumbParamsOutputPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = flavorParamsOutputPeer::doSelect($c);
+		$dbList = thumbParamsOutputPeer::doSelect($c);
 		
-		$list = KalturaFlavorParamsOutputArray::fromDbArray($dbList);
-		$response = new KalturaFlavorParamsOutputListResponse();
+		$list = KalturaThumbParamsOutputArray::fromDbArray($dbList);
+		$response = new KalturaThumbParamsOutputListResponse();
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
 		return $response;
