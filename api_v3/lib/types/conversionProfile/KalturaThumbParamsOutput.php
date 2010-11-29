@@ -25,18 +25,12 @@ class KalturaThumbParamsOutput extends KalturaThumbParams
 	 */
 	public $thumbAssetVersion;
 	
-	/**
-	 * @var int
-	 */
-	public $readyBehavior;
-	
 	private static $map_between_objects = array
 	(
-		"thumbParamsId",
-		"thumbParamsVersion",
-		"thumbAssetId",
-		"thumbAssetVersion",
-		"readyBehavior",
+		"thumbParamsId" => "flavorParamsId",
+		"thumbParamsVersion" => "flavorParamsVersion",
+		"thumbAssetId" => "flavorAssetId",
+		"thumbAssetVersion" => "flavorAssetVersion",
 	);
 	
 	public function getMapBetweenObjects()

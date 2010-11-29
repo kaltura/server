@@ -12,9 +12,11 @@ class FlavorParamsService extends KalturaBaseService
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new flavorAssetPeer());
-		parent::applyPartnerFilterForClass(new flavorParamsPeer()); // note that partner 0 is defined as partner group in service.ct
+		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance()); // note that partner 0 is defined as partner group in service.ct
 	}
 	
 	/**
@@ -111,15 +113,13 @@ class FlavorParamsService extends KalturaBaseService
 	 */
 	public function listAction(KalturaFlavorParamsFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId());
-		
 		if (!$filter)
 			$filter = new KalturaFlavorParamsFilter();
 
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
-		$flavorParamsFilter = new flavorParamsFilter();
+		$flavorParamsFilter = new assetParamsFilter();
 		
 		$filter->toObject($flavorParamsFilter);
 		

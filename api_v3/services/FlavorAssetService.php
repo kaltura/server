@@ -13,13 +13,10 @@ class FlavorAssetService extends KalturaBaseService
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 		
-		flavorParamsPeer::setInstance();
-		flavorParamsOutputPeer::setInstance();
-		flavorAssetPeer::setInstance();
-		
-		parent::applyPartnerFilterForClass(new flavorParamsPeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new flavorAssetPeer());
+		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
 	}
 	
 	/**
@@ -115,7 +112,6 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId()); // the flavor params can be from partner X too
 		$flavorParamsDb = flavorParamsPeer::retrieveByPK($flavorParamsId);
 		flavorParamsPeer::setDefaultCriteriaFilter();
 		if (!$flavorParamsDb)
@@ -211,7 +207,6 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	public function getFlavorAssetsWithParamsAction($entryId)
 	{
-		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId()); // the flavor params can be from partner 0 too
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);

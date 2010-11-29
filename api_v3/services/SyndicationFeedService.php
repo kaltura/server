@@ -12,6 +12,9 @@ class SyndicationFeedService extends KalturaBaseService
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
+		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
 		parent::applyPartnerFilterForClass(new entryPeer());
 		parent::applyPartnerFilterForClass(new syndicationFeedPeer());
 	}
@@ -184,8 +187,6 @@ class SyndicationFeedService extends KalturaBaseService
 	 */
 	public function requestConversionAction($feedId)
 	{
-		flavorParamsPeer::allowAccessToSystemDefaultParamsAndPartnerX($this->getPartnerId()); // the flavor params can be from partner 0 too
-		
 		// find entry ids that already converted to the flavor
 		$feedRendererWithTheFlavor = new KalturaSyndicationFeedRenderer($feedId);
 		$feedRendererWithTheFlavor->addFlavorParamsAttachedFilter();

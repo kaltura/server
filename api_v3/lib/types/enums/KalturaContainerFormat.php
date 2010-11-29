@@ -17,4 +17,7 @@ class KalturaContainerFormat extends KalturaStringEnum
 	
 	const SWF = 'swf';
 	const PDF = 'pdf';
+	
+	
+	const JPG = 'jpg';
 }

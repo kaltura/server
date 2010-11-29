@@ -72,13 +72,19 @@ class KalturaFlavorAsset extends KalturaAsset
 	
 	private static $map_between_objects = array
 	(
+		"flavorParamsId",
 		"width",
 		"height",
 		"bitrate",
-		"size",
+		"frameRate",
 		"isOriginal",
 		"isWeb",
 		"containerFormat",
+		"videoCodecId",
 	);
 	
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
 }

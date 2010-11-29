@@ -49,12 +49,12 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * @var int
 	 */
-	public $widthScale = 0;
+	public $scaleWidth = 0;
 	
 	/**
 	 * @var int
 	 */
-	public $heightScale = 0;
+	public $scaleHeight = 0;
 	
 	/**
 	 * Hexadecimal value
@@ -86,8 +86,8 @@ class KalturaThumbParams extends KalturaAssetParams
 		"videoOffset",
 		"width",
 		"height",
-		"widthScale",
-		"heightScale",
+		"scaleWidth",
+		"scaleHeight",
 		"backgroundColor",
 	
 //		Maybe support will be added in the future

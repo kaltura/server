@@ -13,13 +13,10 @@ class ThumbAssetService extends KalturaBaseService
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 		
-		thumbParamsPeer::setInstance();
-		thumbParamsOutputPeer::setInstance();
-		thumbAssetPeer::setInstance();
-		
-		parent::applyPartnerFilterForClass(new thumbParamsPeer());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new thumbAssetPeer());
+		parent::applyPartnerFilterForClass(thumbParamsOutputPeer::getInstance());
+		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance());
+		parent::applyPartnerFilterForClass(thumbAssetPeer::getInstance());
 	}
 	
 	/**
@@ -218,7 +215,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function regenerateAction($thumbAssetId)
 	{
-		$thumbAsset = thumbAssetPeer::retrieveByPK($thumbAssetId);
+		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
 		if(!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
@@ -229,7 +226,7 @@ class ThumbAssetService extends KalturaBaseService
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbAsset->getFlavorParamsId());
 			
-		$entry = $thumbAsset->getEntryId();
+		$entry = $thumbAsset->getentry();
 		if ($entry->getType() != entryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
@@ -255,21 +252,39 @@ class ThumbAssetService extends KalturaBaseService
 	 * @action get
 	 * @param string $thumbAssetId
 	 * @return KalturaThumbAsset
+	 * 
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
 	public function getAction($thumbAssetId)
 	{
+		$thumbAssetsDb = thumbAssetPeer::retrieveById($thumbAssetId);
+		if(!$thumbAssetsDb)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
+		$thumbAssets = new KalturaThumbAsset();
+		$thumbAssets->fromObject($thumbAssetsDb);
+		return $thumbAssets;
 	}
 	
 	/**
 	 * @action getByEntryId
 	 * @param string $entryId
-	 * @param int $thumbParamsId
-	 * @return KalturaThumbAsset
+	 * @return KalturaThumbAssetArray
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function getByEntryIdAction($entryId, $thumbParamsId)
+	public function getByEntryIdAction($entryId)
 	{
-		
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		// get the flavor assets for this entry
+		$c = new Criteria();
+		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
+		$thumbAssetsDb = thumbAssetPeer::doSelect($c);
+		$thumbAssets = KalturaThumbAssetArray::fromDbArray($thumbAssetsDb);
+		return $thumbAssets;
 	}
 	
 	/**
@@ -280,7 +295,35 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function addFromUrlAction($entryId, $url)
 	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		$ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
 		
+		$dbThumbAsset = new thumbAsset();
+		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbThumbAsset->setEntryId($dbEntry->getId());
+		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbThumbAsset->setFileExt($ext);
+		$dbThumbAsset->incrementVersion();
+		$dbThumbAsset->save();
+		
+		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($url));
+		
+		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$dbThumbAsset->setWidth($width);
+		$dbThumbAsset->setHeight($height);
+		$dbThumbAsset->setSize(filesize($finalPath));
+		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbThumbAsset->save();
+		
+		$thumbAssets = new KalturaThumbAsset();
+		$thumbAssets->fromObject($dbThumbAsset);
+		return $thumbAssets;
 	}
 	
 	/**
@@ -288,28 +331,56 @@ class ThumbAssetService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param file $fileData
 	 * @return KalturaThumbAsset
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	public function addFromJpegAction($entryId, $fileData)
 	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
+		$dbThumbAsset = new thumbAsset();
+		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbThumbAsset->setEntryId($dbEntry->getId());
+		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbThumbAsset->setFileExt($ext);
+		$dbThumbAsset->incrementVersion();
+		$dbThumbAsset->save();
+		
+		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
+		
+		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$dbThumbAsset->setWidth($width);
+		$dbThumbAsset->setHeight($height);
+		$dbThumbAsset->setSize(filesize($finalPath));
+		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbThumbAsset->save();
+		
+		$thumbAssets = new KalturaThumbAsset();
+		$thumbAssets->fromObject($dbThumbAsset);
+		return $thumbAssets;
 	}
 	
 	/**
 	 * @action delete
 	 * @param string $thumbAssetId
+	 * 
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
 	public function deleteAction($thumbAssetId)
 	{
-		
-	}
-	
-	/**
-	 * @action deleteByEntryId
-	 * @param string $entryId
-	 * @param int $thumbParamsId
-	 */
-	public function deleteByEntryIdAction($entryId, $thumbParamsId)
-	{
-		
+		$thumbAssetDb = flavorAssetPeer::retrieveById($thumbAssetId);
+		if (!$thumbAssetDb)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
+			
+		$thumbAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$thumbAssetDb->setDeletedAt(time());
+		$thumbAssetDb->save();
 	}
 }
