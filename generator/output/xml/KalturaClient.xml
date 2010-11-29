@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xml apiVersion="3.1">
-  <!-- Generated on date 27/11/10 09:23:41 -->
+  <!-- Generated on date 29/11/10 15:39:27 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -206,6 +206,7 @@
       <const name="WEBM" value="webm"/>
       <const name="SWF" value="swf"/>
       <const name="PDF" value="pdf"/>
+      <const name="JPG" value="jpg"/>
     </enum>
     <enum name="KalturaControlPanelCommandOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -245,6 +246,8 @@
       <const name="PDF_CREATOR" value="202"/>
       <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
       <const name="FAST_START" value="fastStart.FastStart"/>
+      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
+      <const name="AVIDEMUX" value="avidemux.Avidemux"/>
     </enum>
     <enum name="KalturaConversionProfileOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -1808,6 +1811,31 @@
       <property name="actualEntryCount" type="int" readOnly="0" insertOnly="0" description="count of entries that will appear in the feed (including all relevant filters)&#13;"/>
       <property name="requireTranscodingCount" type="int" readOnly="0" insertOnly="0" description="count of entries that requires transcoding in order to be included in feed&#13;"/>
     </class>
+    <class name="KalturaThumbAsset" base="KalturaAsset">
+      <property name="thumbParamsId" type="int" readOnly="1" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
+      <property name="width" type="int" readOnly="1" insertOnly="0" description="The width of the Flavor Asset &#10;"/>
+      <property name="height" type="int" readOnly="1" insertOnly="0" description="The height of the Flavor Asset&#10;"/>
+    </class>
+    <class name="KalturaThumbParams" base="KalturaAssetParams">
+      <property name="cropType" type="int" enumType="KalturaThumbCropType" readOnly="0" insertOnly="0" description=""/>
+      <property name="quality" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropX" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropY" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropWidth" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="cropHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="videoOffset" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="height" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleWidth" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
+    </class>
+    <class name="KalturaThumbParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
+    <class name="KalturaThumbParamsFilter" base="KalturaThumbParamsBaseFilter"/>
+    <class name="KalturaThumbParamsListResponse">
+      <property name="objects" type="array" arrayType="KalturaThumbParams" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaUiConf">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="Name of the uiConf, this is not a primary key&#13;"/>
@@ -2386,6 +2414,23 @@
       <property name="objects" type="array" arrayType="KalturaFlavorParamsOutput" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaThumbParamsOutputBaseFilter" abstract="1" base="KalturaThumbParamsFilter">
+      <property name="thumbParamsIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaThumbParamsOutputFilter" base="KalturaThumbParamsOutputBaseFilter"/>
+    <class name="KalturaThumbParamsOutput" base="KalturaThumbParams">
+      <property name="thumbParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaThumbParamsOutputListResponse">
+      <property name="objects" type="array" arrayType="KalturaThumbParamsOutput" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaMediaInfoBaseFilter" abstract="1" base="KalturaFilter">
       <property name="flavorAssetIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -2549,15 +2594,6 @@
     <class name="KalturaMediaFlavorParamsFilter" base="KalturaMediaFlavorParamsBaseFilter"/>
     <class name="KalturaMediaFlavorParamsOutputBaseFilter" abstract="1" base="KalturaFlavorParamsOutputFilter"/>
     <class name="KalturaMediaFlavorParamsOutputFilter" base="KalturaMediaFlavorParamsOutputBaseFilter"/>
-    <class name="KalturaThumbParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
-    <class name="KalturaThumbParamsFilter" base="KalturaThumbParamsBaseFilter"/>
-    <class name="KalturaThumbParamsOutputBaseFilter" abstract="1" base="KalturaThumbParamsFilter">
-      <property name="thumbParamsIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbParamsVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbAssetIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbAssetVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaThumbParamsOutputFilter" base="KalturaThumbParamsOutputBaseFilter"/>
     <class name="KalturaLiveStreamAdminEntryBaseFilter" abstract="1" base="KalturaLiveStreamEntryFilter"/>
     <class name="KalturaLiveStreamAdminEntryFilter" base="KalturaLiveStreamAdminEntryBaseFilter"/>
     <class name="KalturaGoogleVideoSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
@@ -2568,7 +2604,6 @@
     <class name="KalturaTubeMogulSyndicationFeedFilter" base="KalturaTubeMogulSyndicationFeedBaseFilter"/>
     <class name="KalturaYahooSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
     <class name="KalturaYahooSyndicationFeedFilter" base="KalturaYahooSyndicationFeedBaseFilter"/>
-    <class name="KalturaThumbAsset" base="KalturaAsset"/>
     <class name="KalturaAssetParamsOutput" base="KalturaAssetParams">
       <property name="assetParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="assetParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2578,27 +2613,6 @@
     </class>
     <class name="KalturaMediaFlavorParams" base="KalturaFlavorParams"/>
     <class name="KalturaMediaFlavorParamsOutput" base="KalturaFlavorParamsOutput"/>
-    <class name="KalturaThumbParams" base="KalturaAssetParams">
-      <property name="cropType" type="int" enumType="KalturaThumbCropType" readOnly="0" insertOnly="0" description=""/>
-      <property name="quality" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="cropX" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="cropY" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="cropWidth" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="cropHeight" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="videoOffset" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="height" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="widthScale" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="heightScale" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
-    </class>
-    <class name="KalturaThumbParamsOutput" base="KalturaThumbParams">
-      <property name="thumbParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbAssetId" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbAssetVersion" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="readyBehavior" type="int" readOnly="0" insertOnly="0" description=""/>
-    </class>
     <class name="KalturaGoogleVideoSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="adultContent" type="string" enumType="KalturaGoogleSyndicationFeedAdultValues" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -2659,6 +2673,8 @@
       <property name="srcFileSyncRemoteUrl" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="thumbParamsOutputId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="thumbParamsOutput" type="KalturaThumbParamsOutput" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbAssetId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="srcAssetType" type="string" enumType="KalturaAssetType" readOnly="0" insertOnly="0" description=""/>
       <property name="thumbPath" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaConvartableJobData" base="KalturaJobData">
@@ -3537,9 +3553,59 @@
         <param name="destThumbParamsId" type="int" optional="0" description="indicate the id of the ThumbParams to be generate this thumbnail by&#13;"/>
         <result type="int"/>
       </action>
-      <action name="generate" description="">
+      <action name="regenerate" description="">
+        <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
+        <result type="int"/>
+      </action>
+      <action name="get" description="">
+        <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaThumbAsset"/>
+      </action>
+      <action name="getByEntryId" description="">
+        <param name="entryId" type="string" optional="0" description="&#13;"/>
+        <result type="array" arrayType="KalturaThumbAsset"/>
+      </action>
+      <action name="addFromUrl" description="">
+        <param name="entryId" type="string" optional="0" description="&#13;"/>
+        <param name="url" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaThumbAsset"/>
+      </action>
+      <action name="addFromJpeg" description="">
+        <param name="entryId" type="string" optional="0" description="&#13;"/>
+        <param name="fileData" type="file" optional="0" description="&#13;"/>
+        <result type="KalturaThumbAsset"/>
+      </action>
+      <action name="delete" description="">
         <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
         <result/>
+      </action>
+    </service>
+    <service id="thumbparams" name="thumbParams" description="Add &amp; Manage Thumb Params&#13;">
+      <action name="add" description="Add new Thumb Params&#10;">
+        <param name="thumbParams" type="KalturaThumbParams" optional="0" description="&#13;"/>
+        <result type="KalturaThumbParams"/>
+      </action>
+      <action name="get" description="Get Thumb Params by ID&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaThumbParams"/>
+      </action>
+      <action name="update" description="Update Thumb Params by ID&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <param name="thumbParams" type="KalturaThumbParams" optional="0" description="&#13;"/>
+        <result type="KalturaThumbParams"/>
+      </action>
+      <action name="delete" description="Delete Thumb Params by ID&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="list" description="List Thumb Params by filter with paging support (By default - all system default params will be listed too)&#10;">
+        <param name="filter" type="KalturaThumbParamsFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaThumbParamsListResponse"/>
+      </action>
+      <action name="getByConversionProfileId" description="Get Thumb Params by Conversion Profile ID&#10;">
+        <param name="conversionProfileId" type="int" optional="0" description="&#13;"/>
+        <result type="array" arrayType="KalturaThumbParams"/>
       </action>
     </service>
     <service id="uiconf" name="uiConf" description="UiConf service lets you create and manage your UIConfs for the various flash components&#10;This service is used by the KMC-ApplicationStudio&#13;">
@@ -4413,6 +4479,13 @@
         <param name="filter" type="KalturaFlavorParamsOutputFilter" optional="1" default="null" description="&#13;"/>
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
         <result type="KalturaFlavorParamsOutputListResponse"/>
+      </action>
+    </service>
+    <service id="adminconsole_thumbparamsoutput" name="thumbParamsOutput" description="Thumb Params Output service&#13;">
+      <action name="list" description="List thumb params output objects by filter and pager&#10;">
+        <param name="filter" type="KalturaThumbParamsOutputFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaThumbParamsOutputListResponse"/>
       </action>
     </service>
     <service id="adminconsole_mediainfo" name="mediaInfo" description="Media Info service&#13;">
