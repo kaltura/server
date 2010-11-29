@@ -76,7 +76,6 @@ class kBusinessPreConvertDL
 		{
 			$description = $thumbAsset->getDescription() . "\n" . $errDescription;
 			$thumbAsset->setDescription($description);
-			$thumbAsset->incrementVersion();
 		}
 		else
 		{
@@ -84,28 +83,28 @@ class kBusinessPreConvertDL
 			$thumbAsset->setPartnerId($entry->getPartnerId());
 			$thumbAsset->setEntryId($entry->getId());
 			$thumbAsset->setDescription($errDescription);
-			
-			$thumbAsset->setTags($destThumbParams->getTags());
-			$thumbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 			$thumbAsset->setFlavorParamsId($destThumbParams->getId());
-			$thumbAsset->setFileExt($destThumbParams->getFileExt());
-			
-			if(!$destThumbParamsOutput)
-			{
-				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$thumbAsset->save();	
-				return null;
-			}
-				
-			$thumbAsset->save();
-			
-			// save flavor params
-			$destThumbParamsOutput->setPartnerId($entry->getPartnerId());
-			$destThumbParamsOutput->setEntryId($entry->getId());
-			$destThumbParamsOutput->setFlavorAssetId($thumbAsset->getId());
-			$destThumbParamsOutput->setFlavorAssetVersion($thumbAsset->getVersion());
-			$destThumbParamsOutput->save();
 		}
+	
+		$thumbAsset->incrementVersion();
+		$thumbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
+		$thumbAsset->setTags($destThumbParamsOutput->getTags());
+		$thumbAsset->setFileExt($destThumbParamsOutput->getFileExt());
+		
+		if(!$destThumbParamsOutput)
+		{
+			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$thumbAsset->save();	
+			return null;
+		}
+		$thumbAsset->save();
+			
+		// save flavor params
+		$destThumbParamsOutput->setPartnerId($entry->getPartnerId());
+		$destThumbParamsOutput->setEntryId($entry->getId());
+		$destThumbParamsOutput->setFlavorAssetId($thumbAsset->getId());
+		$destThumbParamsOutput->setFlavorAssetVersion($thumbAsset->getVersion());
+		$destThumbParamsOutput->save();
 		
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcAssetType = $srcAsset->getType();
@@ -481,6 +480,7 @@ class kBusinessPreConvertDL
 		$thumbParamsOutput->setConversionEnginesExtraParams($thumbParams->getConversionEnginesExtraParams());
 		$thumbParamsOutput->setOperators($thumbParams->getOperators());
 		$thumbParamsOutput->setEngineVersion($thumbParams->getEngineVersion());
+		$thumbParamsOutput->setFileExt('jpg');
 		
 		
 		$thumbParamsOutput->setCropType($thumbParams->getCropType());
