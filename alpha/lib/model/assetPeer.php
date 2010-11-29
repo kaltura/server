@@ -223,19 +223,6 @@ abstract class assetPeer extends BaseassetPeer
 	}
 	
 	/**
-	 * 
-	 * @return flavorAsset
-	 */
-	public static function retrieveOriginalByEntryId($entryId)
-	{
-		$c = new Criteria();
-		$c->add(self::ENTRY_ID, $entryId);
-		$c->add(self::IS_ORIGINAL, true);
-		
-		return self::doSelectOne($c);
-	}
-	
-	/**
 	 * Leaves only the specified tag in the flavor assets array
 	 * 
 	 * @param array $assets
