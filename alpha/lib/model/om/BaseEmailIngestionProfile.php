@@ -953,6 +953,39 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	}
 
 	/**
+	 * Saves the modified columns temporarily while saving
+	 * @var array
+	 */
+	private $tempModifiedColumns = array();
+	
+	/**
+	 * Returns whether the object has been modified.
+	 *
+	 * @return     boolean True if the object has been modified.
+	 */
+	public function isModified()
+	{
+		if(!empty($this->tempModifiedColumns))
+			return true;
+			
+		return !empty($this->modifiedColumns);
+	}
+
+	/**
+	 * Has specified column been modified?
+	 *
+	 * @param      string $col
+	 * @return     boolean True if $col has been modified.
+	 */
+	public function isColumnModified($col)
+	{
+		if(in_array($col, $this->tempModifiedColumns))
+			return true;
+			
+		return in_array($col, $this->modifiedColumns);
+	}
+
+	/**
 	 * Code to be run before updating the object in database
 	 * @param PropelPDO $con
 	 * @return boolean
@@ -960,11 +993,22 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	public function preUpdate(PropelPDO $con = null)
 	{
 		if($this->isModified())
-		{
 			$this->setUpdatedAt(time());
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->modifiedColumns));
-		}
+		
+		$this->tempModifiedColumns = $this->modifiedColumns;
 		return true;
+	}
+
+	/**
+	 * Code to be run after updating the object in database
+	 * @param PropelPDO $con
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		if($this->isModified())
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			
+		$this->tempModifiedColumns = array();
 	}
 	
 	/**
