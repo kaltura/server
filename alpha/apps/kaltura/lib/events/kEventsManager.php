@@ -100,6 +100,7 @@ class kEventsManager
 			{
 				if($event instanceof IKalturaCancelableEvent)
 				{
+					KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
 					break;
 				}
 				else
