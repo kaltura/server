@@ -312,7 +312,8 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
 			
-		$this->data->fromObject($dbData);
+		if($this->data)
+			$this->data->fromObject($dbData);
 	}
 	    
 	public function fromObject($dbBatchJob)
