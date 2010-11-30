@@ -1,5 +1,5 @@
 sourceFile	outputReferenceFile
- a.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/width/200/height/300/src_h/250/src_w/250/
+a.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/width/200/height/300/src_h/250/src_w/250/
 a.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/width/200/height/300/src_h/250/src_w/250/src_x/250/src_y/250/
 a.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/width/200/height/300/src_x/250/src_y/250/
 a.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/width/200/height/300/src_h/250/
