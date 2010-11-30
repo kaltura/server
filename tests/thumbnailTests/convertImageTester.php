@@ -169,8 +169,8 @@ class convertImageTester {
 		$retValue = null;
 		$output = null;
 		$output = system($cmd, $retValue);
-		$compareResult = file_get_contents('resultLog.txt');
-		echo 'score is: ' .$compareResult;
+		$compareResult = floatval(file_get_contents('resultLog.txt'));
+		echo 'score is: ' . $compareResult . PHP_EOL;
 		unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
 		@unlink("resultLog.txt");	// delete tmp log file that was used to retrieve compare return value
 		if ($retValue != 0)
@@ -180,7 +180,7 @@ class convertImageTester {
 		}
 		if ($compareResult > $this->PSNRTolerance)
 		{ 	
-			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
+			echo "graphical comparison returned with highly un-identical value [floatval($compareResult)]" . PHP_EOL;
 			return false;
 		}				
 		return true; 	
