@@ -4,8 +4,8 @@ require_once 'convertImageTester.php';
 require_once 'bootstrap.php';
 
 /**
- * this class tests the compatibility of a new code with the code  residinf in producion.
- * the myconverter::convertImage function will run on a known set of image files and convert them
+ * this class tests the compatibility of a new code with the code  residing in producion.
+ * the myConverter::convertImage function will run on a known set of image files and convert them
  * using some parameters. the same will be done by calling to URL request (production side). after that
  * the two outputs will be compared.
  * @author ori
