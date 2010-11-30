@@ -7,7 +7,7 @@
  *
  * @package lib.model
  */ 
-abstract class assetPeer extends BaseassetPeer
+class assetPeer extends BaseassetPeer
 {
 	// cache classes by their type
 	protected static $class_types_cache = array(
@@ -20,7 +20,10 @@ abstract class assetPeer extends BaseassetPeer
 	 */
 	protected static $instance = null;
 
-	abstract public function setInstanceCriteriaFilter();
+	public function setInstanceCriteriaFilter()
+	{
+		
+	}
 	
 	/**
 	 * Returns the default criteria filter
