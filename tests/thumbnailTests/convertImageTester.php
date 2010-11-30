@@ -140,7 +140,7 @@ class convertImageTester {
 		}
 
 		// check if the file's size are the same (upto a known tolerance)					
-		if (abs(@filesize(abs($this->targetFile) - @filesize($this->referenceFile))) > $this->sizeTolerance)
+		if (abs(@filesize($this->targetFile) - @filesize($this->referenceFile)) > $this->sizeTolerance)
 		{
 			echo 'files sizes are not identical' . PHP_EOL;
 			echo $this->targetFile . ': ' . @filesize($this->targetFile) . PHP_EOL;
@@ -180,7 +180,7 @@ class convertImageTester {
 		}
 		if ($compareResult > $this->PSNRTolerance)
 		{ 	
-			echo "graphical comparison returned with highly un-identical value [floatval($compareResult)]" . PHP_EOL;
+			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
 			return false;
 		}				
 		return true; 	
