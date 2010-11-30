@@ -144,7 +144,7 @@ class convertImageTester {
 		{
 			echo 'files sizes are not identical' . PHP_EOL;
 			echo $this->targetFile . ': ' . @filesize($this->targetFile) . PHP_EOL;
-			echo $this->referenceFile . ': ' . @filesize($this->referenceFile) . PHP_EOL;
+			echo $this->outputReferenceFile . ': ' . @filesize($this->referenceFile) . PHP_EOL;
 			return false;
 		}
 		
@@ -156,7 +156,7 @@ class convertImageTester {
 		{
 			echo 'files width and/or height are not identical' , PHP_EOL;
 			echo $this->targetFile . ': '  . $targetImageSize[0] . 'x' . $targetImageSize[1] . PHP_EOL;
-			echo $this->referenceFile . ': '  . $referenceImageSize[0] . 'x' . $referenceImageSize[1] . PHP_EOL;
+			echo $this->outputReferenceFile . ': '  . $referenceImageSize[0] . 'x' . $referenceImageSize[1] . PHP_EOL;
 			return false;
 		}
 		
