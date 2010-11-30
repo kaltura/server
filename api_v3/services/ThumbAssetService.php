@@ -73,7 +73,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function serveAction($thumbAssetId)
 	{
-		$thumbAsset = flavorAssetPeer::retrieveById($thumbAssetId);
+		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 
@@ -134,10 +134,14 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function setAsDefaultAction($thumbAssetId)
 	{
-		$thumbAsset = flavorAssetPeer::retrieveById($thumbAssetId);
+		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
+		$entry = $thumbAsset->getentry();
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
 		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
@@ -156,6 +160,13 @@ class ThumbAssetService extends KalturaBaseService
 			$thumbAsset->addTags(array(thumbParams::TAG_DEFAULT_THUMB));
 			$thumbAsset->save();
 		}
+		
+		$entry->setThumbnail(".jpg");
+		$entry->save();
+		
+		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey, false);
 	}
 
 	/**
@@ -279,9 +290,9 @@ class ThumbAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		// get the flavor assets for this entry
+		// get the thumb assets for this entry
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
+		$c->add(thumbAssetPeer::ENTRY_ID, $entryId);
 		$thumbAssetsDb = thumbAssetPeer::doSelect($c);
 		$thumbAssets = KalturaThumbAssetArray::fromDbArray($thumbAssetsDb);
 		return $thumbAssets;
@@ -375,11 +386,11 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function deleteAction($thumbAssetId)
 	{
-		$thumbAssetDb = flavorAssetPeer::retrieveById($thumbAssetId);
+		$thumbAssetDb = thumbAssetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAssetDb)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
-		$thumbAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$thumbAssetDb->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$thumbAssetDb->setDeletedAt(time());
 		$thumbAssetDb->save();
 	}
