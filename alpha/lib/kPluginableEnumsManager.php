@@ -38,8 +38,9 @@ class kPluginableEnumsManager
 //		$baseEnumName = $type::getEnumClass();
  
 		$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
-		if (!$pluginInstance) {
-			KalturaLog::ALERT('Server is missing plugin ['.$pluginName.'] used by client');
+		if (!$pluginInstance) 
+		{
+			KalturaLog::alert("Server is missing plugin [$pluginName] used by client");
 			return null;
 		}
 		$enums = $pluginInstance->getEnums($baseEnumName);
