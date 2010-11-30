@@ -17,8 +17,8 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		if($object instanceof BatchJob)
 			$this->batchJobDeleted($object);
 			
-		if($object instanceof flavorAsset)
-			$this->flavorAssetDeleted($object);
+		if($object instanceof asset)
+			$this->assetDeleted($object);
 			
 		return true;
 	}
@@ -51,15 +51,15 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		
 		// delete flavor assets
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entry->getId());
-		$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL);
-		$c->add(flavorAssetPeer::DELETED_AT, null, Criteria::ISNULL);
-		$flavorAssets = flavorAssetPeer::doSelect($c);
-		foreach($flavorAssets as $flavorAsset)
+		$c->add(assetPeer::ENTRY_ID, $entry->getId());
+		$c->add(assetPeer::STATUS, asset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->add(assetPeer::DELETED_AT, null, Criteria::ISNULL);
+		$assets = assetPeer::doSelect($c);
+		foreach($assets as $asset)
 		{
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-			$flavorAsset->setDeletedAt(time());
-			$flavorAsset->save();
+			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
+			$asset->setDeletedAt(time());
+			$asset->save();
 		}
 	
 		$c = new Criteria();
@@ -90,10 +90,10 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	}
 
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $asset
 	 */
-	protected function flavorAssetDeleted(flavorAsset $flavorAsset) 
+	protected function assetDeleted(asset $asset) 
 	{
-		$this->syncableDeleted($flavorAsset->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET);
+		$this->syncableDeleted($asset->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET);
 	}
 }
