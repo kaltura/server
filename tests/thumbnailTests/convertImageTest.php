@@ -49,6 +49,7 @@ class convertImageTest
 	{
 		$status = null;
 		$tester = null;
+		
 		// test all source files and compare result to output reference file
 		for ($i = 0; $i < count($this->sourceFiles); $i++) {			
 			$tester = new convertImageTester($this->sourceFiles[$i], $this->outputReferenceFiles[$i]);

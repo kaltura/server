@@ -7,8 +7,8 @@ class convertImageTester {
 	private $outputReferenceFile;
 	private $referenceFile;
 	
-	private $sizeTolerance = 10; 	// number of bytes
-	private	$PSNRTolerance = 5;		// PSNR
+	private $sizeTol = 1000; 	// number of bytes
+	private	$graphicTol = 5;	// PSNR
 	
 	private $params = array();	// wanted parameters of target file
 	
@@ -84,9 +84,13 @@ class convertImageTester {
 	
 	public function setSrcH ($srcH = 0) { $this->params['srcH'] = $srcH; }
 	
-	public function setPSNRTolerance($PSNRTol) { $this->PSNRTolerance = $PSNRTol; }
+	public function setGraphicTol($graphicTol) { $this->graphicTol = $graphicTol; }
 	
-	public function setByteTolerance($byteTol) { $this->sizeTolerance = $byteTol; }
+	public function setByteTol($byteTol) { $this->sizeTol = $byteTol; }
+	
+	public function getGraphicTol() { return $this->graphicTol; }
+	
+	public function getByteTol() { return $this->sizeTol; }
 	
 	/**
 	 * run an image converting test, according to $sourceFile and wanted parameters.
@@ -140,7 +144,7 @@ class convertImageTester {
 		}
 
 		// check if the file's size are the same (upto a known tolerance)
-		if ((abs(@filesize($this->targetFile) - @filesize($this->referenceFile))) > $this->sizeTolerance)
+		if ((abs(@filesize($this->targetFile) - @filesize($this->referenceFile))) > $this->sizeTol)
 		{
 			echo 'files sizes are not identical' . PHP_EOL;
 			echo $this->targetFile . ': ' . @filesize($this->targetFile) . PHP_EOL;
@@ -163,7 +167,7 @@ class convertImageTester {
 		// check if images are identical, graphica-wise (upto a given tolerance) 
 		$tmpFile = tempnam(dirname(__FILE__), 'imageComperingTmp');
 		$convert = dirname(kConf::get('bin_path_imagemagick')) . '\compare';
-		$options = '-metric PSNR';
+		$options = '-metric RMSE';
 		$cmd = $convert . ' ' . $options . ' ' . $this->targetFile . ' ' . $this->referenceFile . ' ' . $tmpFile .
 			' 2>resultLog.txt';		
 		$retValue = null;
@@ -178,7 +182,7 @@ class convertImageTester {
 			echo 'unable to perform graphical comparison'. PHP_EOL;
 			return false;
 		}
-		if ($compareResult > $this->PSNRTolerance)
+		if ($compareResult > $this->graphicTol)
 		{ 	
 			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
 			return false;
@@ -194,8 +198,6 @@ class convertImageTester {
 	 */
 	public function downloadUrlFile()
 	{
-		$this->setPSNRTolerance(30);
-		$this->setByteTolerance(100);
 		$url = $this->outputReferenceFile;
 		$fileName = explode('.', basename($this->targetFile));
 		$this->referenceFile = dirname($this->targetFile) . "/" . $fileName[0] . 'ProductionDownload.' . $fileName[1];
