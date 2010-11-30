@@ -374,6 +374,7 @@ class KalturaFlavorAssetStatus
 	const READY = 2;
 	const DELETED = 3;
 	const NOT_APPLICABLE = 4;
+	const TEMP = 5;
 }
 
 class KalturaFlavorParamsOrderBy
