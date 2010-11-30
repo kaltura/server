@@ -139,8 +139,8 @@ class convertImageTester {
 			return false;
 		}
 
-		// check if the file's size are the same (upto a known tolerance)					
-		if (abs(@filesize($this->targetFile) - @filesize($this->referenceFile)) > $this->sizeTolerance)
+		// check if the file's size are the same (upto a known tolerance)
+		if ((abs(@filesize($this->targetFile) - @filesize($this->referenceFile))) > $this->sizeTolerance)
 		{
 			echo 'files sizes are not identical' . PHP_EOL;
 			echo $this->targetFile . ': ' . @filesize($this->targetFile) . PHP_EOL;
