@@ -1956,7 +1956,7 @@ class entry extends Baseentry implements ISyncableFile
 			if (!$category)
 				$category = category::createByPartnerAndFullName($this->getPartnerId(), $cat);
 				
-			$category->incrementEntriesCount($this->getId());
+			$category->incrementEntriesCount();
 			$allIds[] = $category->getId();
 		}
 		
@@ -1964,7 +1964,7 @@ class entry extends Baseentry implements ISyncableFile
 		{
 			$category = categoryPeer::getByFullNameExactMatch($cat);
 			if ($category)
-				$category->decrementEntriesCount($this->getId());
+				$category->decrementEntriesCount();
 		}
 		
 		foreach($remainingCats as $cat)
