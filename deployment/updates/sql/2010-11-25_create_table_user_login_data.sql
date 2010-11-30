@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS `user_login_data`;
-
 
 CREATE TABLE `user_login_data`
 (
