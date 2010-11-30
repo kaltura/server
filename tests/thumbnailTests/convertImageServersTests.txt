@@ -1,0 +1,36 @@
+server1(Production)	server2(newkaldev)	parameters
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_h/250/src_w/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_h/250/src_w/250/src_x/250/src_y/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_x/250/src_y/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_h/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_w/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_x/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_ysq2ahj2/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_uwhww4v6/	width/200/height/300/src_y/250/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_r4n7hgw0/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_bwt6xhxs/	width/124/height/124/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xplaw9af/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_10txsznn/	width/320/height/320/type/3/bGColor/0xffffff/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xplaw9af/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_10txsznn/	width/320/height/320/type/3/bGColor/0xffffff/quality/25/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xplaw9af/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_10txsznn/	width/320/height/320/type/3/bGColor/0xffffff/quality/50/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xplaw9af/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_10txsznn/	width/320/height/320/type/3/bGColor/0xffffff/quality/75/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_1tswvscl/	width/90/height/120/type/1/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_1tswvscl/	width/90/height/120/type/3/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_1tswvscl/	width/120/height/90/type/1/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xv067jmt/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_bpt6ji3z/	width/1419/height/1001/type/3/quality/120/src_y/130/src_h/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xv067jmt/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_bpt6ji3z/	width/1419/height/1001/type/3/quality/120/src_y/130/src_h/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_zo49ncds/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_9l5vpgg5/	width/300/height/300/type/1/src_x/150/src_w/90/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_zo49ncds/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_9l5vpgg5/	width/300/height/300/type/1/src_x/150/src_w/90/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xg1qo1u8/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_wmqnud4z/	width/500/height/100/type/1/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xg1qo1u8/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_wmqnud4z/	width/500/height/100/type/2/bGCollor/0xaaff00/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xg1qo1u8/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_wmqnud4z/	width/500/height/100/type/3/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xg1qo1u8/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_wmqnud4z/	width/500/height/100/type/4/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_gt54bxrs/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_e9kp2bbs/	
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_gt54bxrs/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_e9kp2bbs/	width/451/height/451/type/1/bGColor/0xaaafff/src_x/150/src_y/120/src_w/120/src_h/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_gt54bxrs/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_e9kp2bbs/	type/1/bGColor/0xaaafff/src_x/150/src_y/150/src_h/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_1t79hnou/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_gfajwsvi/	width/1000/height/1200/type/2/src_x/150/src_y/120/src_w/120/src_h/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_1t79hnou/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_gfajwsvi/	width/1000/height/1200/type/2/quality/60/src_x/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_1t79hnou/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_gfajwsvi/	width/1000/height/1200/type/3/quality/60/src_x/150/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_5qprj7yo/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_xwtoy2w6/	
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_7x67ue2u/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_tar3wta8/	width/124/height/124/type/4/quality/70/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_0kkuh9p1/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_zeu36ma8/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_0kkuh9p1/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_zeu36ma8/	width/-20/height/200/type/2/quality/70/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_0kkuh9p1/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_zeu36ma8/	width/200/height/-120/type/3/quality/70/
+http://www.kaltura.com/p/420231/thumbnail/entry_id/1_0kkuh9p1/	http://newkaldev.kaltura.dev/p/148/thumbnail/entry_id/0_zeu36ma8/	width/-120/height/-300/type/3/
