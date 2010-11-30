@@ -49,13 +49,19 @@ class syndicationFeed extends BasesyndicationFeed
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BasesyndicationFeed#preUpdate()
+	 * @see lib/model/om/BasesyndicationFeed#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(BasesyndicationFeedPeer::STATUS) && $this->getStatus() == self::SYNDICATION_DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 }

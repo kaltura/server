@@ -2106,14 +2106,20 @@ class entry extends Baseentry implements ISyncableFile
 
 	
 	/* (non-PHPdoc)
-	 * @see lib/model/om/Baseentry#preUpdate()
+	 * @see lib/model/om/Baseentry#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	/*************** Bulk download functions - start ******************/

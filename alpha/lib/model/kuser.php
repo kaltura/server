@@ -56,14 +56,20 @@ class kuser extends Basekuser
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/Basekuser#preUpdate()
+	 * @see lib/model/om/Basekuser#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == self::KUSER_STATUS_DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	public static function isAdmin ( $kuser_id )

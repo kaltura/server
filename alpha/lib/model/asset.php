@@ -73,18 +73,24 @@ class asset extends Baseasset implements ISyncableFile
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseflavorAsset#preUpdate()
+	 * @see lib/model/om/BaseflavorAsset#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if(
 			($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
 			||
 			($this->isColumnModified(flavorAssetPeer::DELETED_AT) && !is_null($this->getDeletedAt(null)))
 		)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	public function incrementVersion()

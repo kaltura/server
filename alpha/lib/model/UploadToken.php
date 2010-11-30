@@ -51,14 +51,20 @@ class UploadToken extends BaseUploadToken
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseUploadToken#preUpdate()
+	 * @see lib/model/om/BaseUploadToken#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(UploadTokenPeer::STATUS) && $this->getStatus() == self::UPLOAD_TOKEN_DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	public function calculateId()

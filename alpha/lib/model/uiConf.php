@@ -122,14 +122,20 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseuiConf#preUpdate()
+	 * @see lib/model/om/BaseuiConf#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(uiConfPeer::STATUS) && $this->getStatus() == self::UI_CONF_STATUS_DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	private function validateConfFilesExistance()

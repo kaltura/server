@@ -60,14 +60,20 @@ class conversionProfile2 extends BaseconversionProfile2
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseconversionProfile2#preUpdate()
+	 * @see lib/model/om/BaseconversionProfile2#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(conversionProfile2Peer::DELETED_AT) && !is_null($this->getDeletedAt()))
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 	
 	public function copyInto($copyObj, $deepCopy = false)
