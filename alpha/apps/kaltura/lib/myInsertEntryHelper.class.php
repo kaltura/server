@@ -501,7 +501,7 @@ class myInsertEntryHelper
 //				}
 			}
 		}
-		else if ($entry->getStatus() == entryStatus::READY)
+		else if ($entry->getStatus() == entryStatus::PENDING)
 		{
 			$entry->setData($entry_fullPath);
 			$entry->save();
@@ -630,6 +630,8 @@ class myInsertEntryHelper
 						throw $e;
 					}
 				}
+				$entry->setStatus(entryStatus::READY);
+				$entry->save();			
 			}
 			
 //			Remarked by Tan-Tan, the flavor asset should be synced instead of the entry 
