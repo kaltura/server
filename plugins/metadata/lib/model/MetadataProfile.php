@@ -32,14 +32,20 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	}
 
 	/* (non-PHPdoc)
-	 * @see lib/model/om/BaseMetadataProfile#preUpdate()
+	 * @see lib/model/om/BaseMetadataProfile#postUpdate()
 	 */
-	public function preUpdate(PropelPDO $con = null)
+	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectDeleted = false;
 		if($this->isColumnModified(MetadataProfilePeer::STATUS) && $this->getStatus() == self::STATUS_DEPRECATED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
-		return parent::preUpdate($con);
+		return $ret;
 	}
 
 	public function incrementVersion()
