@@ -333,34 +333,66 @@ class myFileConverter
 		imagedestroy($im);
 	}
 
+	/**
+	 * return the extension (as string) according to it's type
+	 * @param unknown_type $type
+	 */
 	static public function imageExtByType($type)
 	{
 		if ($type == IMAGETYPE_GIF)
-		return "gif";
+			return "gif";
 		else if ($type == IMAGETYPE_PNG)
-		return "png";
+			return "png";
 		else if ($type == IMAGETYPE_BMP)
-		return "png";
+			return "png";
 		else if ($type == IMAGETYPE_JPEG)
-		return "jpg";
-
+			return "jpg";
+		else if($type == IMAGETYPE_TIFF_II || $type == IMAGETYPE_TIFF_MM)
+			return "tiff";
 		return "";
 	}
 
-	// convert an image to a desired size while maintaining its aspect ratio
-	// if the image is of type BMP it will be converted into JPEG
-	// NOTE: images are only scaled down, so a small image wont be changed (apart for the JPEG quality)
-	// the function returns the $target_file after changing its extension
-	//
-	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
+	/**
+	 * 
+	 * convert an image to a desired size while maintaining its aspect ratio
+	 * if the image is of type BMP it will be converted into JPEG
+	 * NOTE: images are only scaled down, so a small image wont be changed (apart for the JPEG quality)
+	 * the function returns the $target_file after changing its extension
+	 * @param unknown_type $source_file - Sourct file path
+	 * @param unknown_type $target_file - Target file path (after converting)
+	 * @param unknown_type $width - Requested width in pixels
+	 * @param unknown_type $height - Requested height in pixels
+	 * @param unknown_type $crop_type - Type of crop to be used [1-4] :
+	 * 		self::CROP_TYPE_ORIGINAL_ASPECT_RATIO: 	Resize according to the given dimensions while maintaining the original aspect ratio.
+	 * 		self::CROP_TYPE_WITHIN_BG_COLOR:  		Place the image within the given dimensions and fill the remaining spaces using the given background color.
+	 * 		self::CROP_TYPE_EXACT_SIZE:				Crop according to the given dimensions while maintaining the original aspect ratio.
+	 * 												The resulting image may be cover only part of the original image.
+	 * 		self::CROP_TYPE_UPPER: 					Crops the image so that only the upper part of the image remains.
+	 * @param unknown_type $bgcolor - backround color (6 hex digits web colorcode)
+	 * @param unknown_type $force_jpeg - Force the source image file to convert into a Jpeg file 
+	 * @param unknown_type $quality - Jpeg quality for output [0-100]
+	 * @param unknown_type $src_x - 1st part of a rectangle to take from original picture (starting from vertical picsal {value} to right end of picture)
+	 * @param unknown_type $src_y - 2nd part of a rectangle to take from original picture (starting from horizonal picasl {value} downto down end of picture)
+	 * @param unknown_type $src_w - 3rd part of a rectangle to take from original picture (starting from picsal left end of picture to vertical picsal {value})
+	 * @param unknown_type $src_h - 4rd part of a rectangle to take from original picture (starting from up end of picture downto horizonal picasl {value})
+	 * @return path to targetFile or null if the $source_file is not an image file
+	 */
+	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
+		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
 	{
-		$attributes = array();
-		
-		list($source_width, $source_height, $type, $attr) = getimagesize($source_file);
 
+		// check if the source file is not an image file
+		if (getimagesize($source_file) === false)
+		{
+        	KalturaLog::log("convertImage - failed to get image size [$source_file] while creating [$target_file]");
+        		return null;
+		}
+		
+		// change target file extension if needed
+		list($source_width, $source_height, $type, $attr) = getimagesize($source_file);
 		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
 			$type = IMAGETYPE_JPEG;
-
 		if ($force_jpeg)
 		{
 			$target_file = kFile::replaceExt($target_file, "jpg");
@@ -368,145 +400,35 @@ class myFileConverter
 		}
 		else
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
-
-		$exif_data = @exif_read_data($source_file);
-		$orientation = isset($exif_data["Orientation"]) ? $exif_data["Orientation"] : 1;
 		
-		switch($orientation)
-		{
-			case 1: // nothing
-			break;
-		
-			case 2: // horizontal flip
-				$attributes[] = "-flop";
-			break;
-									
-			case 3: // 180 rotate left
-				$attributes[] = "-rotate 180";
-			break;
-						
-			case 4: // vertical flip
-				$attributes[] = "-flip";
-			break;
-					
-			case 5: // vertical flip + 90 rotate right
-				$attributes[] = "-transpose";
-			break;
-					
-			case 6: // 90 rotate right
-				$attributes[] = "-rotate 90";
-			break;
-					
-			case 7: // horizontal flip + 90 rotate right
-				$attributes[] = "-transverse";
-			break;
-					
-			case 8:    // 90 rotate left
-				$attributes[] = "-rotate 270";
-			break;
-		}
-
-		if($quality)
-			$attributes[] = "-quality $quality";
-			
-		// pre-crop
-		if($src_x || $src_y || $src_w || $src_h)
-		{
-			if($crop_type == self::CROP_TYPE_UPPER)
-				$src_y = 0;
-				
-			$geometrics = "{$src_w}x{$src_h}";
-			$geometrics .= ($src_x < 0 ? $src_x : "+$src_x");
-			$geometrics .= ($src_y < 0 ? $src_y : "+$src_y");
-			
-			$attributes[] = "-crop $geometrics";
-		}
-		
-		// crop or resize
-		if($width || $height)
-		{
-			switch($crop_type)
-			{
-				case self::CROP_TYPE_ORIGINAL_ASPECT_RATIO:
-					$w = $width ? $width : '';
-					$h = $height ? $height : '';
-					$attributes[] = "-resize {$w}x{$h}";
-					break;
-					
-				case self::CROP_TYPE_WITHIN_BG_COLOR:
-					if($width && $height)
-					{
-						$borderWidth = 0;
-						$borderHeight = 0;
-						
-						if($width < $height)
-						{
-							$w = $width;
-							$h = ceil($source_height * ($width / $source_width));
-							$borderHeight = ceil(($height - $h) / 2);
-						}
-						else 
-						{
-							$h = $height;
-							$w = ceil($source_width * ($height / $source_height));
-							$borderWidth = ceil(($width - $w) / 2);
-						}
-						
-						$attributes[] = "-bordercolor #$bgcolor";
-						$attributes[] = "-resize {$w}x{$h}";
-						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
-					}
-					else 
-					{
-						$w = $width ? $width : '';
-						$h = $height ? $height : '';
-						$attributes[] = "-resize {$w}x{$h}";
-					}
-					break;
-					
-				case self::CROP_TYPE_EXACT_SIZE:
-				case self::CROP_TYPE_UPPER:
-					$w = $width ? $width : $height;
-					$h = $height ? $height : $width;
-					
-					$resizeWidth = '';
-					$resizeHeight = '';
-					
-					if($width > $height)
-						$resizeWidth = $width;
-					else
-						$resizeHeight = $height;
-						
-					
-					if($crop_type == self::CROP_TYPE_EXACT_SIZE)
-						$attributes[] = "-gravity Center";
-					elseif($crop_type == self::CROP_TYPE_UPPER)
-						$attributes[] = "-gravity North";
-						
-					$attributes[] = "-resize {$resizeWidth}x{$resizeHeight}";
-					$attributes[] = "-crop {$w}x{$h}+0+0";
-					break;
-			}
-		}
-
-		// no conversion required
-		if(!count($attributes))
-		{
-			copy($source_file, $target_file);
-			return $target_file;
-		}
-		
-		$options = implode(' ', $attributes);
-		$convert = kConf::get('bin_path_imagemagick');
-		$cmd = "\"$convert\" $options \"$source_file\" \"$target_file\"";
-		$retValue = null;
-		$output = system($cmd, $retValue);
-		KalturaLog::info("ImageMagic cmd [$cmd] returned value [$retValue] output:\n$output");
-		
+		// do convertion
+		$status = null;
+		$imageCropper = new KImageMagickCropper($source_file, $target_file);
+		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, $bgcolor);
+		if (!$status)
+			return null;
 		return $target_file;
 	}
 
-	static public function convertImageUsingCropProvider ( $source_file , $target_file ,
+	/**
+	 * 
+	 *  convert an image to a desired size while maintaining its aspect ratio.
+	 *  use a provied crop to load the image onto it
+	 * @param unknown_type $source_file - see myFileConverter::converImage
+	 * @param unknown_type $target_file - see myFileConverter::converImage
+	 * @param unknown_type $width - see myFileConverter::converImage
+	 * @param unknown_type $height - see myFileConverter::converImage
+	 * @param unknown_type $crop_type - see myFileConverter::converImage
+	 * @param unknown_type $crop_provider - 
+	 * @param unknown_type $bgcolor - see myFileConverter::converImage
+	 * @param unknown_type $force_jpeg - see myFileConverter::converImage
+	 * @param unknown_type $quality - see myFileConverter::converImage
+	 * @param unknown_type $src_x - see myFileConverter::converImage
+	 * @param unknown_type $src_y - see myFileConverter::converImage
+	 * @param unknown_type $src_w - see myFileConverter::converImage
+	 * @param unknown_type $src_h - see myFileConverter::converImage
+	 */
+	static public function convertImageUsingCropProvider ($source_file , $target_file ,
 	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT, $crop_type = 1, $crop_provider = null, $bgcolor = 0xffffff, $force_jpeg = false,
 	$quality = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
 	{
