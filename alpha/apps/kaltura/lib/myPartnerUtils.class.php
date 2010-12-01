@@ -1254,5 +1254,50 @@ class myPartnerUtils
 			}
 		}
 	}
+	
+	/*
+	 * Ensure the request for media arrived in a way approved by the partner.
+	 * this may include restricting to a specific cdn, enforcing token usage etc..
+	 * Die in case of a breach.
+	 * 
+	 * @param int $partnerId
+	 */
+	public static function enforceDelivery($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK( $partnerId );
+		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
+			return;
+
+		$deliveryRestrictions = $partner->getDeliveryRestrictions();
+
+		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
+		if ($deliveryRestrictions != $delivery)
+		{
+			KalturaLog::log ( "enforceDelivery: DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
+			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
+        }
+	}
+	
+	/*
+	 * Ensure the request for media arrived in a way approved by the partner.
+	 * this may include restricting to a specific cdn, enforcing token usage etc..
+	 * Die in case of a breach.
+	 *
+	 * @param int $partnerId
+	 */
+	public static function enforceDelivery($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK( $partnerId );
+		if ( !$partner || (! $partner->getDeliveryRestrictions() ) )
+			return;
+
+		$deliveryRestrictions = $partner->getDeliveryRestrictions();
+
+		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
+		if ($deliveryRestrictions != $delivery)
+		{
+			KalturaLog::log ( "enforceDelivery: DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
+			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
+		}
+	}
 }
-?>

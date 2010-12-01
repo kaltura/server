@@ -477,6 +477,10 @@ class Partner extends BasePartner
 	public function getDelivryBlockCountries() { return $this->getFromCustomData("delivryBlockCountries", null); }
 	public function setDelivryBlockCountries( $v ) { $this->putInCustomData("delivryBlockCountries", $v); }
 	
+	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
+	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
+	public function setDeliveryRestrictions( $v ) { $this->putInCustomData("deliveryRestrictions", $v); }
+	
 	public function getPluginEnabled($pluginNmae) 
 	{ 
 		$enabledPlugins = $this->getFromCustomData("enabledPlugins", null, 0);

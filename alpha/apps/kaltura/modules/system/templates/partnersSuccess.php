@@ -282,7 +282,6 @@ if ( count ( $partner_list ) > 1 )
 <?php echo  prop ( $partner , "appStudioExampleEntry"  , "text" , "60" , ""  , "" ,  "appstudio: default Entry when creating a new playlist"  ) ?>
 <?php echo  prop ( $partner , "appStudioExamplePlayList0"  , "text" , "60" , ""  , "" ,  "appstudio: default playlist 0 id for multiple playlists"  ) ?>
 <?php echo  prop ( $partner , "appStudioExamplePlayList1"  , "text" , "60" , ""  , "" ,  "appstudio: default playlist 1 id for multiple playlists"  ) ?>
-<?php echo  prop ( $partner , "delivryBlockCountries"  , "text" , "" , ""  , "" , "country code to block file-serving for users from that country - to have no block at all put DONT_BLOCK"  ) ?>
 
 
 <tr><td style="font-weight:bold; text-" colspan="3"><hr/>Files Storage and Delivery</td></tr>
@@ -291,6 +290,8 @@ if ( count ( $partner_list ) > 1 )
 <?php echo  prop ( $partner , "rtmpUrl"  , "text" , "60" , ""  , ""  , "RTMP url (rtmp://partner.url/ondemand)"  ) ?>
 <?php echo  prop ( $partner , "storageDeleteFromKaltura"  , "select" , "1" , "0"  , "boolean_int_type" , "Indicates if file should be deleted from kaltura data centers after exporting to external storage"  ) ?>
 <?php echo  prop ( $partner , "storageServePriority"  , "select" , "1" , "1"  , "net_storage_priority" , "Indicates what storage will be used for files delivery"  ) ?>
+<?php echo  prop ( $partner , "delivryBlockCountries"  , "text" , "" , ""  , "" , "country code to block file-serving for users from that country - to have no block at all put DONT_BLOCK"  ) ?>
+<?php echo  prop ( $partner , "deliveryRestrictions"  , "text" , "" , ""  , "" , "delivery type restriction such as cdnbakmi.kaltura.com+token to restrict file-serving to specific cdn and delivery methods"  ) ?>
 
 <tr><td style="font-weight:bold; text-" colspan="3"><hr/>Password Security</td></tr>
 <?php echo  prop ( $partner , "maxLoginAttempts"  , "text" , "60" , ""  , ""  , "maximum login attempts before being blocked"  ) ?>

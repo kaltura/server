@@ -125,14 +125,64 @@ class kAkamaiUrlManager extends kUrlManager
 		}
 		else
 		{		
-			$url .= '?novar=0';
-				
 			if($this->seekFromTime > 0)
-				$url .= '&aktimeoffset=' . floor($this->seekFromTime / 1000);
+				$url .= '?aktimeoffset=' . floor($this->seekFromTime / 1000);
 		}
 			
 		$url = str_replace('\\', '/', $url);
+
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP && @$this->params['http_auth_salt'])
+		{
+			$window = $this->params['http_auth_seconds'];
+			$param = $this->params['http_auth_param'];
+			$salt = $this->params['http_auth_salt'];
+			$url = $this->urlauth_gen_url("/s".$url, $param, $window, $salt, null, null);
+		}
+
 		return $url;
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function authenticateRequest($url)
+	{
+		return authenticateRequestUrl($_SERVER["SCRIPT_URL"]);
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function authenticateRequestUrl($url)
+	{
+		$authHeaderData = $this->params['auth_header_data'];
+		$authHeaderSign = $this->params['auth_header_sign'];
+		$authHeaderTimeout = $this->params['auth_header_timeout'];
+		$authHeaderSalt = $this->params['auth_header_salt'];
+		
+		//'auth_data_header' => 'HTTP_X_AKAMAI_G2O_AUTH_DATA' 
+		//'auth_sign_header' => 'HTTP_X_AKAMAI_G2O_AUTH_SIGN' 
+		$authData = $this->params[$authDataHeader];
+		$authSign = $this->params[$authSignHeader];
+		$window = $this->params['smooth_auth_seconds'];
+		$param = $this->params['smooth_auth_param'];
+		$salt = $this->params['smooth_auth_salt'];
+		
+		list($version, $ghostIp, $clientIp, $time, $uniqueId, $nonce) = explode(",", $authData);
+		if ($authHeaderTimeout) {
+		    // Compare the absolute value of the difference between the current time
+		    // and the "token" time.
+			if (abs(time() - $time) > $authHeaderTimeout ) {
+				return false;
+			}
+		}
+		
+		$newSign = base64_encode(md5($authHeaderSalt . $authData . $url, true));		
+        if ($newSign == $authSign) {
+            return true;
+        }
+
+        return false;
 	}
 
 	/**
@@ -161,12 +211,33 @@ class kAkamaiUrlManager extends kUrlManager
 		}
 		
 		$path = str_replace('//', '/', $path);
-		
-		$window = kConf::get('akamai_auth_smooth_seconds');
-		$param = kConf::get('akamai_auth_smooth_param');
-		$salt = kConf::get('akamai_auth_smooth_salt');
+
+		$window = $this->params['smooth_auth_seconds'];
+		$param = $this->params['smooth_auth_param'];
+		$salt = $this->params['smooth_auth_salt'];
 		$authPath = $this->urlauth_gen_url($path, $param, $window, $salt, null, null);
 		
 		return $serverUrl . '/' . $authPath;
 	}
+
+	/**
+	 * check whether this url manager sent the current request.
+	 * if so, return a string describing the usage. e.g. cdn.acme.com+token for
+	 * using cdn.acme.com with secure token delivery. This string can be matched to the
+	 * partner settings in order to enforce a specific delivery method. 
+	 * @return string
+	 */
+	public function identifyRequest()
+	{
+		$delivery = @$_SERVER['HTTP_HOST'];
+		if ($delivery != @$this->params["http_header_host"])
+			return false;
+		
+		$uri = $_SERVER["REQUEST_URI"];
+		if (strpos($uri, "/s/") === 0)
+			$delivery .= "+token";
+			
+		return $delivery;
+	}
+
 }

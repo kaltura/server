@@ -2,6 +2,11 @@
 class kUrlManager
 {
 	/**
+	 * @var array
+	 */
+	protected $params = null;
+	
+	/**
 	 * @var string
 	 */
 	protected $extention = null;
@@ -45,13 +50,17 @@ class kUrlManager
 		$class = 'kUrlManager';
 		
 		$cdnHost = preg_replace('/https?:\/\//', '', $cdnHost);
-		
+		$params = null;
+	
 		$urlManagers = kConf::get('url_managers');
 		if(isset($urlManagers[$cdnHost]))
-			$class = $urlManagers[$cdnHost];
+		{
+			$class = $urlManagers[$cdnHost]["class"];
+			$params = @$urlManagers[$cdnHost]["params"];
+		}
 			
 		KalturaLog::log("Uses url manager [$class]");
-		return new $class();
+		return new $class(null, $params);
 	}
 	
 	/**
@@ -70,9 +79,10 @@ class kUrlManager
 		return new $class($storageProfileId);
 	}
 	
-	public function __construct($storageProfileId = null)
+	public function __construct($storageProfileId = null, $params = null)
 	{
 		$this->storageProfileId = $storageProfileId;
+		$this->params = $params ? $params : array();
 	}
 	
 	/**
@@ -207,4 +217,38 @@ class kUrlManager
 		$url = str_replace('\\', '/', $url);
 		return $url;
 	}
+
+	/**
+	 * check whether this url manager sent the current request.
+	 * if so, return a string describing the usage. e.g. cdn.acme.com+token for
+	 * using cdn.acme.com with secure token delivery. This string can be matched to the
+	 * partner settings in order to enforce a specific delivery method. 
+	 * @return string
+	 */
+	public function identifyRequest()
+	{
+		return false;
+	}
+	
+	/**
+	 * find the url manager which sent the current request
+	 * @return string
+	 */
+	public static function getUrlManagerIdentifyRequest()
+	{
+		$urlManagers = kConf::get('url_managers');
+		foreach($urlManagers as $cdnHost => $data)
+		{
+			$class = $data["class"];
+			$params = @$data["params"];
+			$manager = new $class(null, $params);
+
+			$result = $manager->identifyRequest();
+			if ($result !== false)
+				return $result;
+		}
+
+		return false;
+	}
+
 }
