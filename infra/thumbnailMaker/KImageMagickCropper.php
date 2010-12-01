@@ -27,6 +27,8 @@ class KImageMagickCropper extends KBaseCropper
 		
 		list($this->srcWidth, $this->srcHeight, $type, $attr) = getimagesize($srcPath);
 
+		// forceJpeg var is not used.
+		// there is no return of the new target file (as string) after the extension change
 //		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
 //			$type = IMAGETYPE_JPEG;
 //		
