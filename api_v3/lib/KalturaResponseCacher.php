@@ -49,7 +49,16 @@ class KalturaResponseCacher
 			return;
 		}
 		
-		$ks = isset($params['ks']) ? $params['ks'] : ''; 
+		$ks = isset($params['ks']) ? $params['ks'] : '';
+		foreach($params as $key => $value)
+		{
+			if(preg_match('/[\d]+:ks/', $key))
+			{
+				$ks = $value;
+				unset($params[$key]);
+			}
+		}
+			
 		unset($params['ks']);
 		unset($params['kalsig']);
 		unset($params['clientTag']);
@@ -112,7 +121,8 @@ class KalturaResponseCacher
 		
 		if ($response)
 		{
-			if ($contentTypeHdr = @file_get_contents($this->_cacheHeadersFilePath)) {
+			$contentTypeHdr = @file_get_contents($this->_cacheHeadersFilePath);
+			if ($contentTypeHdr) {
 				header($contentTypeHdr, true);
 			}	
 			header("Expires: Thu, 19 Nov 2000 08:52:00 GMT", true);
