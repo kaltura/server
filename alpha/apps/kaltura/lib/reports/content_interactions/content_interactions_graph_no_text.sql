@@ -6,7 +6,7 @@ SELECT
 	SUM(count_download) count_download,
 	SUM(count_report) count_report
 FROM 
-	dwh_aggr_events_entry ev,
+	dwh_hourly_events_entry ev,
     (SELECT {TIME_SHIFT} time_shift, # time shift in hours
 		{FROM_DATE_ID} start_date, # from date
 		{TO_DATE_ID} end_date # to date
