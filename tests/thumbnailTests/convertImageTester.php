@@ -183,8 +183,8 @@ class convertImageTester {
 			return false;
 		}
 
-		$compareResult = $matches[0];
-		echo 'score is: ' . floatval($compareResult) . PHP_EOL;
+		$compareResult = floatval($matches[0]);
+		echo 'score is: ' . $compareResult . PHP_EOL;
 		
 		if ($compareResult > $this->graphicTol)
 		{ 	

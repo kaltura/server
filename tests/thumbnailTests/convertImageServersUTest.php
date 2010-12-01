@@ -121,7 +121,8 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase {
 			$retValue = null;
 			$output = null;
 			$output = system($cmd, $retValue);
-			$compareResult = floatval(file_get_contents('resultLog.txt'));
+			$matches = array();
+			preg_match('/[0-9]*\.?[0-9]*\)/', file_get_contents('resultLog.txt'), $matches);
 			@unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
 			@unlink("resultLog.txt");	// delete tmp log file that (used to retrieve compare return value)
 			if ($retValue != 0)
@@ -132,7 +133,9 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase {
 					echo 'unable to perform graphical comparison. beside that images seem identical' . PHP_EOL;
 				continue;
 			}
+			$compareResult = floatval($matches[0]);
 			echo 'score is: ' . $compareResult . PHP_EOL;
+			
 			if ($compareResult > $PSNRTolerance)
 			{ 	
 				echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;

@@ -46,8 +46,8 @@ class convertImageServersTest
 	 */
 	public function testConvertImage()
 	{
-		$sizeTolerance = 1000* 100;	// bytes tolerance, under this limit files will be considered as having the same size
-		$PSNRTolerance = 41;		//	PSNR tolerance, under this limit fiesl will be considered as having the same graphical characteristic
+		$sizeTol = 1000* 100;	// bytes tolerance, under this limit files will be considered as having the same size
+		$graphicTol = 0.2;		//	PSNR tolerance, under this limit fiesl will be considered as having the same graphical characteristic
 
 		// downloaded files from url's. as convencion server 1 is production and server 2 is another sever
 		$downloadedFileServer1 = dirname(__FILE__) . '/Server1.jpg';	
@@ -85,7 +85,7 @@ class convertImageServersTest
 			}
 
 			// check if the file's size are the same (upto a known tolerance)					
-			if ((abs(@filesize($downloadedFileServer1) - @filesize($downloadedFileServer2))) > $sizeTolerance)
+			if ((abs(@filesize($downloadedFileServer1) - @filesize($downloadedFileServer2))) > $sizeTol)
 			{
 				echo 'files sizes are not identical' . PHP_EOL;
 				echo $this->urlServer1[$i] . ': ' . @filesize($downloadedFileServer1) . PHP_EOL;
@@ -114,7 +114,8 @@ class convertImageServersTest
 			$retValue = null;
 			$output = null;
 			$output = system($cmd, $retValue);
-			$compareResult = floatval(file_get_contents('resultLog.txt'));
+			$matches = array();
+			preg_match('/[0-9]*\.?[0-9]*\)/', file_get_contents('resultLog.txt'), $matches);
 			@unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
 			@unlink("resultLog.txt");	// delete tmp log file that (used to retrieve compare return value)
 			if ($retValue != 0)
@@ -125,8 +126,10 @@ class convertImageServersTest
 					echo 'unable to perform graphical comparison. beside that images seem identical' . PHP_EOL;
 				continue;
 			}
+			$compareResult = floatval($matches[0]);
 			echo 'score is: ' . $compareResult . PHP_EOL;
-			if ($compareResult > $PSNRTolerance)
+			
+			if ($compareResult > $graphicTol)
 			{ 	
 				echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
 				continue;
