@@ -292,4 +292,10 @@ class kString
 	{
 		return substr(base_convert(md5(uniqid(rand(), true)), 16, 36), 1, 8);
 	}
+	
+	
+	public static function isEmailString($string)
+	{
+		return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i', $string);
+	}
 }
