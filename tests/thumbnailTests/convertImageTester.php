@@ -8,7 +8,7 @@ class convertImageTester {
 	private $referenceFile;
 	
 	private $sizeTol = 1000; 	// number of bytes
-	private	$graphicTol = 5;	// PSNR
+	private	$graphicTol = 100;	// PSNR
 	
 	private $params = array();	// wanted parameters of target file
 	
@@ -99,7 +99,7 @@ class convertImageTester {
 	 * @return - true if excute succeeded and call was succsusfull, otherwise false
 	 */
 	public function execute() {		
-		@unlink($this->targetFile);	
+		@unlink($this->targetFile);					
 		$this->targetFile = @myFileConverter::convertImage($this->sourceFile, $this->targetFile, $this->params['width'], $this->params['height'],
 			$this->params['cropType'], $this->params['bGColor'], $this->params['forceJpeg'], $this->params['quality'],
 			$this->params['srcX'], $this->params['srcY'], $this->params['srcW'], $this->params['srcH']);
@@ -137,7 +137,7 @@ class convertImageTester {
 		}
 		
 		// check if the file's extensions are identical		
-		if (pathinfo($this->targetFile, PATHINFO_EXTENSION) != pathinfo($this->referenceFile, PATHINFO_EXTENSION))
+		if (strcasecmp(pathinfo($this->targetFile, PATHINFO_EXTENSION), pathinfo($this->referenceFile, PATHINFO_EXTENSION)) !== 0)
 		{
 			echo 'files extension are not identical' . PHP_EOL;
 			return false;

@@ -1,5 +1,8 @@
 <?php
 
+/*
+
+ */
 require_once 'convertImageTester.php';
 require_once 'bootstrap.php';
 
@@ -71,7 +74,7 @@ class convertImageTest
 				array_key_exists('width', $params) ? $tester->setWidth($params['width']) :  $tester->setWidth();
 				array_key_exists('height', $params) ? $tester->setHeight($params['height']) : $tester->setHeight();
 				array_key_exists('cropType', $params) ? $tester->setCropType($params['cropType']) : $tester->setCropType();
-				array_key_exists('bGColor', $params) ? $tester->setBGColor($params['bGColor']) : $tester->setBGColor();
+				array_key_exists('bGColor', $params) ? $tester->setBGColor(hexdec($params['bGColor'])) : $tester->setBGColor();
 				array_key_exists('forceJpeg', $params) ? $tester->setForceJpeg($params['forceJpeg']) : $tester->setForceJpeg();
 				array_key_exists('quality', $params) ? $tester->setQuality($params['quality']) : $tester->setQuality();
 				array_key_exists('srcX', $params) ? $tester->setSrcX($params['srcX']) : $tester->setSrcX();

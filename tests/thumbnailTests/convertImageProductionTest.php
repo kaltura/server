@@ -88,7 +88,7 @@ class convertImageProductionTest
 			// check if output is identical to reference output
 			$tester->downloadUrlFile();
 			$tester->setGraphicTol($tester->getGraphicTol() * 100);
-			$tester->setByteTol($tester->getByteTol() * 100);
+			$tester->setByteTol($tester->getByteTol() * 15);
 			$status = $tester->compareTargetReference();
 			$tester->deleteDownloadFile();
 				if ($status === false)
