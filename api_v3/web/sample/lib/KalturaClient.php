@@ -119,50 +119,6 @@ class KalturaWidgetSecurityType
 	const TIMEHASH = 2;
 }
 
-class KalturaAdminLoginResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $subpId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $ks = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $uid = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaAdminUser
-	 * @readonly
-	 */
-	public $adminUser;
-
-
-}
 
 class KalturaAdminUser extends KalturaObjectBase
 {
@@ -2762,7 +2718,7 @@ class KalturaAdminuserService extends KalturaServiceBase
 		$this->client->addParam($kparams, "password", $password);
 		$resultObject = $this->client->callService("adminuser", "login", $kparams);
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaAdminLoginResponse");
+		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
