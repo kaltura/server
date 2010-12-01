@@ -205,6 +205,7 @@ class SystemPartnerService extends KalturaBaseService
 
 		$configuration->toUpdatableObject($dbPartner);
 		$dbPartner->save();
+		PartnerPeer::removePartnerFromCache($partnerId);
 	}
 	
 	/**
