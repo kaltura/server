@@ -8,7 +8,7 @@ class convertImageTester {
 	private $referenceFile;
 	
 	private $sizeTol = 1000; 	// number of bytes
-	private	$graphicTol = 100;	// PSNR
+	private	$graphicTol = 0.2;	// PSNR
 	
 	private $params = array();	// wanted parameters of target file
 	
@@ -173,15 +173,19 @@ class convertImageTester {
 		$retValue = null;
 		$output = null;
 		$output = system($cmd, $retValue);
-		$compareResult = floatval(file_get_contents('resultLog.txt'));
-		echo 'score is: ' . $compareResult . PHP_EOL;
-		unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
+		$matches = array();
+		preg_match('/[0-9]*\.?[0-9]*\)/', file_get_contents('resultLog.txt'), $matches);
+		@unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
 		@unlink("resultLog.txt");	// delete tmp log file that was used to retrieve compare return value
 		if ($retValue != 0)
 		{
 			echo 'unable to perform graphical comparison'. PHP_EOL;
 			return false;
 		}
+
+		$compareResult = $matches[0];
+		echo 'score is: ' . floatval($compareResult) . PHP_EOL;
+		
 		if ($compareResult > $this->graphicTol)
 		{ 	
 			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
