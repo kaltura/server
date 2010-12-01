@@ -626,4 +626,13 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('login_users_quota');
 	}
 	
+	public function getLoginUsersNumber()
+	{
+		$c = new Criteria();
+		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, null, Criteria::ISNOTNULL);
+		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		return kuserPeer::doCount($c);
+	}
+	
 }
