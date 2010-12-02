@@ -169,10 +169,6 @@ abstract class kalturaAction extends sfAction
 		
 		$likuser_id = $this->getLoggedInUserId();
 		
-		if ( kuser::isAdmin ( $likuser_id ) )
-		{
-			return true;
-		}
 		
 		// if the user is eother the producer or an admin - return true
 		$viewer_type = myKshowUtils::getViewerType($kshow , $likuser_id ) ;

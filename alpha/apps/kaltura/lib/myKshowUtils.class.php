@@ -794,11 +794,9 @@ return array($genericWidget, $myspaceWidget);
 		$viewerType = KshowKuser::KSHOWKUSER_VIEWER_USER; // viewer
 		if ($kuserId)
 		{
-			// for admin - act as the producer
-			if ( kuser::isAdmin( $kuserId ))
-			$viewerType = KshowKuser::KSHOWKUSER_VIEWER_PRODUCER; // producer
-			elseif ($kshow->getProducerId() == $kuserId)
-			$viewerType = KshowKuser::KSHOWKUSER_VIEWER_PRODUCER; // producer
+			if ($kshow->getProducerId() == $kuserId) {
+				$viewerType = KshowKuser::KSHOWKUSER_VIEWER_PRODUCER; // producer
+			}
 			else
 			{
 				if (myKshowUtils::isSubscribed($kshow->getId(), $kuserId))
