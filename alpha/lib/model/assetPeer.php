@@ -194,18 +194,6 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelectOne($c);
 	}
 	
-	public static function retreiveReadyByEntryId($entryId)
-	{
-		$c = new Criteria();
-		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		
-		// The client will most probably expect the list to be ordered by bitrate
-		$c->addAscendingOrderByColumn ( assetPeer::BITRATE ); /// TODO - should be server side ?
-		
-		return assetPeer::doSelect($c);
-	}
-	
 	public static function retrieveReadyWebByEntryId($entryId)
 	{
 		$flavorAssets = self::retreiveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);
@@ -243,5 +231,22 @@ class assetPeer extends BaseassetPeer
 		
 		$assets = $newAssets;
 		return $newAssets;
+	}
+
+	/**
+	 * @param array $paramsIds
+	 * @param $con
+	 * 
+	 * @return array
+	 */
+	public static function getReadyIdsByParamsIds(array $paramsIds, $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->addSelectColumn(assetPeer::ID);
+		$criteria->add(assetPeer::STATUS, asset::FLAVOR_ASSET_STATUS_READY);
+		$criteria->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
+
+		$stmt = assetPeer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
 }
