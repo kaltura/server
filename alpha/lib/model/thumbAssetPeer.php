@@ -124,4 +124,13 @@ class thumbAssetPeer extends assetPeer
 		self::getInstance();
 		return parent::retrieveByEntryId($entryId);
 	}
+	
+	public static function retreiveReadyByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		return self::doSelect($c);
+	}
 }
