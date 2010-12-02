@@ -254,6 +254,11 @@ class kBatchManager
 		$c = new Criteria();
 		$c->add(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::IN);
 		$c->add(BatchJobPeer::BATCH_INDEX, null, Criteria::ISNOTNULL);
+			// The 'closed' jobs should be donn for at least 10min. 
+			// before the cleanup starts messing upo with'em
+			// This solves cases when job (convert) completes succesfully, 
+			// but the next job (closure)does not get a chance to take over due to the clean-up
+		$c->add(BatchJobPeer::FINISH_TIME, time()-600, Criteria::LESS_THAN); 
 		
 		// MUST be the master DB
 		$jobs = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
