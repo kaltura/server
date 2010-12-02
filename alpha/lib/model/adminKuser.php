@@ -186,7 +186,7 @@ class adminKuser extends BaseadminKuser
 		$this->putInCustomData('previous_passwords', $passwords, null);
 	}
 	
-	private function getPreviousPasswords()
+	public function getPreviousPasswords()
 	{
 		return $this->getFromCustomData('previous_passwords', null, null);
 	}
