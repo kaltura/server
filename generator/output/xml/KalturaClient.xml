@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1">
-  <!-- Generated on date 29/11/10 15:39:27 -->
+<xml apiVersion="3.1.1" generatedDate="1291213896">
+  <!-- Generated on date 01/12/10 14:31:36 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -369,6 +369,7 @@
       <const name="READY" value="2"/>
       <const name="DELETED" value="3"/>
       <const name="NOT_APPLICABLE" value="4"/>
+      <const name="TEMP" value="5"/>
     </enum>
     <enum name="KalturaFlavorParamsOrderBy" enumType="string"/>
     <enum name="KalturaFlavorParamsOutputOrderBy" enumType="string"/>
@@ -3570,7 +3571,7 @@
         <param name="url" type="string" optional="0" description="&#13;"/>
         <result type="KalturaThumbAsset"/>
       </action>
-      <action name="addFromJpeg" description="">
+      <action name="addFromImage" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <param name="fileData" type="file" optional="0" description="&#13;"/>
         <result type="KalturaThumbAsset"/>
