@@ -338,14 +338,14 @@ class ThumbAssetService extends KalturaBaseService
 	}
 	
 	/**
-	 * @action addFromJpeg
+	 * @action addFromImage
 	 * @param string $entryId
 	 * @param file $fileData
 	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	public function addFromJpegAction($entryId, $fileData)
+	public function addFromImageAction($entryId, $fileData)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
