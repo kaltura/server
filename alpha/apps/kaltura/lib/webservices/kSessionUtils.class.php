@@ -296,10 +296,14 @@ class ks
 			$ks->valid_until, 
 			$ks->type, 
 			$ks->rand, 
-			$ks->user, 
-			$ks->privileges
 		) = $parts;
 		
+		if(isset($parts[5]))
+			$ks->user = $parts[5];
+			
+		if(isset($parts[6]))
+			$ks->privileges = $parts[6];
+			
 		if(isset($parts[7]))
 			$ks->master_partner_id = $parts[7];
 			
