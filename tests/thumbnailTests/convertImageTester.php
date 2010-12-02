@@ -118,8 +118,6 @@ class convertImageTester {
 	 * @return - true if files are identical (as expected), otherwise false
 	 */
 	public function compareTargetReference() {
-		echo 'comparing image files: [' . $this->targetFile . '], [' . $this->outputReferenceFile . ']' . PHP_EOL;
-		
 		// check if the converting was not complete
 		if ($this->targetFile === null)
 		{
@@ -184,8 +182,6 @@ class convertImageTester {
 		}
 
 		$compareResult = floatval($matches[0]);
-		echo 'score is: ' . $compareResult . PHP_EOL;
-		
 		if ($compareResult > $this->graphicTol)
 		{ 	
 			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
