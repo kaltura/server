@@ -24,7 +24,7 @@ class baseObjectUtils
 			// instanceof - very important !!
 			if ( ! $obj instanceof BaseObject )
 			{
-				throw Exception ( "fillObjectFromRequest should have the second parameter an object of type BaseObject" );
+				throw new Exception ( "fillObjectFromRequest should have the second parameter an object of type BaseObject" );
 			}
 
 			if ( strlen ( $request_params[$param]) == 0 ) continue;
@@ -79,7 +79,7 @@ class baseObjectUtils
 			// instanceof - very important !!
 			if ( ! $obj instanceof BaseObject )
 			{
-				throw Exception ( "fillObjectFromMap should have the second parameter an object of type BaseObject" );
+				throw new Exception ( "fillObjectFromMap should have the second parameter an object of type BaseObject" );
 			}
 			if ( strlen ( @$request_params[$param]) == 0 && (! $allow_empty ) ) continue;
 
@@ -138,7 +138,7 @@ class baseObjectUtils
 		// instanceof - very important !!
 		if ( ! $obj instanceof BaseObject )
 		{
-			throw Exception ( "fillObjectFromMap should have the second parameter an object of type BaseObject" );
+			throw new Exception ( "fillObjectFromMap should have the second parameter an object of type BaseObject" );
 		}
 	
 		$fields_modified = array();
