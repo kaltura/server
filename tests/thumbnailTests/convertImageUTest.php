@@ -71,11 +71,11 @@ class convertImageUTest extends PHPUnit_Framework_TestCase
 			{
 				$params ["$tmp[$j]"] = $tmp [$j + 1];
 				$j += 2;
-			}
+			}	
 			array_key_exists('width', $params) ? $tester->setWidth($params['width']) : $tester->setWidth();
 			array_key_exists('height', $params) ? $tester->setHeight($params['height']) : $tester->setHeight();
 			array_key_exists('cropType', $params) ? $tester->setCropType($params['cropType']) : $tester->setCropType();
-			array_key_exists('bgColor', $params) ? $tester->setBGColor($params['bGColor']) : $tester->setBGColor();
+			array_key_exists('bGColor', $params) ? $tester->setBGColor(hexdec($params['bGColor'])) : $tester->setBGColor();
 			array_key_exists('forceJpeg', $params) ? $tester->setForceJpeg($params['forceJpeg']) : $tester->setForceJpeg();
 			array_key_exists('quality', $params) ? $tester->setQuality($params['quality']) : $tester->setQuality();
 			array_key_exists('srcX', $params) ? $tester->setSrcX ($params ['srcX']) : $tester->setSrcX();
@@ -83,17 +83,34 @@ class convertImageUTest extends PHPUnit_Framework_TestCase
 			array_key_exists('srcW', $params) ? $tester->setSrcW ($params ['srcW']) : $tester->setSrcW();
 			array_key_exists('srcH', $params) ? $tester->setSrcH ($params ['srcH']) : $tester->setSrcH();
 		}
-		
+
 		// excute test and assert 
 		if (($status = $tester->execute()) === false)
 			unset($tester);
 		$this->assertTrue($status, 'unable to convert [' . $tester->getSourceFile() . '] with parameterrs: ' .
 			print_r($tester->getParams(), true));
 		
-		// check if output is identical to reference output
-		$this->assertTrue($status, 'images files: [' . $tester->getOutputReferenceFile() . '], [' .
-			$tester->getTargetFile () . '] are not identical');
+		// check that file was not suposed to be produced (doc / notepad file, etc.)
+		if ($tester->getTargetFile() === null && @getimagesize($tester->getSourceFile()) === false)
+			return;
 			
+		// check if output is identical to reference output
+		$this->assertFalse($tester->checkConvertionComplete(),
+			'reference file [' . $tester->getOutputReferenceFile() . '] was not produced' . PHP_EOL);
+		$this->assertTrue($tester->checkExtensions(),
+			'files extension are not identical' . PHP_EOL);
+		$this->assertTrue($tester->checkSize(),
+			'files sizes are not identical' . 
+			$tester->getTargetFile() . ': ' . @filesize($tester->getTargetFile()) . ' bytes' . PHP_EOL .
+			$tester->getOutputReferenceFile() . ': ' . @filesize($tester->getOutputReferenceFile()) . ' bytes' . PHP_EOL);
+		$this->assertTrue($tester->checkWidthHeigth(),
+			'files width / height are not identical'); 
+		$status = $tester->checkGraphicSimilarity();
+		$this->assertTrue($status < 1,
+			'unable to perform graphical comparison'. PHP_EOL);
+		$this->assertTrue($tester->getGraphicTol() > $status,
+			"graphical comparison returned with highly un-identical value [$status]" . PHP_EOL);
+
 		unset($tester);
 	}
 

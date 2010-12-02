@@ -9,6 +9,7 @@ class convertImageTester {
 	
 	private $sizeTol = 1000; 	// number of bytes
 	private	$graphicTol = 0.2;	// PSNR
+	private $pixelTol = 5;		// pixel tolerance
 	
 	private $params = array();	// wanted parameters of target file
 	
@@ -88,9 +89,13 @@ class convertImageTester {
 	
 	public function setByteTol($byteTol) { $this->sizeTol = $byteTol; }
 	
+	public function setPixelTol($pixelTol) { $this->pixelTol = $pixelTol; }
+	
 	public function getGraphicTol() { return $this->graphicTol; }
 	
 	public function getByteTol() { return $this->sizeTol; }
+	
+	public function getPixelTol() { return $this->pixelTol; }
 	
 	/**
 	 * run an image converting test, according to $sourceFile and wanted parameters.
@@ -113,55 +118,55 @@ class convertImageTester {
 	}
 	
 	/**
-	 * compare two image files: $outputFile and $outputReferenceFile.
-	 * a call to this method should take place only after a call to $this->setOutputRefererenceFile, $this->execute() (succsusfull call)
-	 * @return - true if files are identical (as expected), otherwise false
+	 * 
+	 * check if a file was produced by server
+	 * @return true if file was nor produced
 	 */
-	public function compareTargetReference() {
-		// check if the converting was not complete
-		if ($this->targetFile === null)
-		{
-			// if $this->sourceFile is not an image file
-			if (@exif_imagetype($this->sourceFile) === false || @getimagesize($this->sourceFile) === false)
-				return true;
-			return false;
-		}
-		
-		// filed to generate reference file
-		if (!file_exists($this->referenceFile) || @filesize($this->referenceFile) == 0)
-		{
-			echo 'reference file [' . $this->outputReferenceFile . '] was not produced' . PHP_EOL;
-			return false;
-		}
-		
-		// check if the file's extensions are identical		
-		if (strcasecmp(pathinfo($this->targetFile, PATHINFO_EXTENSION), pathinfo($this->referenceFile, PATHINFO_EXTENSION)) !== 0)
-		{
-			echo 'files extension are not identical' . PHP_EOL;
-			return false;
-		}
-
-		// check if the file's size are the same (upto a known tolerance)
-		if ((abs(@filesize($this->targetFile) - @filesize($this->referenceFile))) > $this->sizeTol)
-		{
-			echo 'files sizes are not identical' . PHP_EOL;
-			echo $this->targetFile . ': ' . @filesize($this->targetFile) . PHP_EOL;
-			echo $this->outputReferenceFile . ': ' . @filesize($this->referenceFile) . PHP_EOL;
-			return false;
-		}
-		
-		// check if the image's height and width are the same
+	public function checkConvertionComplete()
+	{
+		return (!file_exists($this->referenceFile) || @filesize($this->referenceFile) == 0);
+	}
+	
+	/**
+	 * 
+	 * check if reference file and output file have the same extension
+	 * @return true if they have same extension
+	 */
+	public function checkExtensions()
+	{
+		return (strcasecmp(pathinfo($this->targetFile, PATHINFO_EXTENSION), pathinfo($this->referenceFile, PATHINFO_EXTENSION)) === 0);
+	}
+	
+	/**
+	 * 
+	 *  check if the file's size are the same (upto a known tolerance)
+	 *  @return true if they have the same size
+	 */
+	public function checkSize()
+	{
+		return ((abs(@filesize($this->targetFile) - @filesize($this->referenceFile))) < $this->sizeTol);
+	}
+	
+	/**
+	 * 
+	 * check if the image's height and width are the same
+	 *  @return true if they have the same width and height
+	 */
+	public function checkWidthHeigth()
+	{
 		$referenceImageSize = getimagesize($this->referenceFile);
 		$targetImageSize = getimagesize($this->targetFile);
-		if (($targetImageSize[0] !== $referenceImageSize[0]) ||
-			($targetImageSize[1] !== $referenceImageSize[1]))
-		{
-			echo 'files width and/or height are not identical' , PHP_EOL;
-			echo $this->targetFile . ': '  . $targetImageSize[0] . 'x' . $targetImageSize[1] . PHP_EOL;
-			echo $this->outputReferenceFile . ': '  . $referenceImageSize[0] . 'x' . $referenceImageSize[1] . PHP_EOL;
-			return false;
-		}
-		
+		return ((abs($targetImageSize[0] - $referenceImageSize[0])) < $this->pixelTol &&
+			abs(($targetImageSize[1] - $referenceImageSize[1])) < $this->pixelTol);
+	}
+	
+	/**
+	 * 
+	 * check that reference and output file are identical graphicaly.
+	 * @return result pf graphical comperison
+	 */
+	public function checkGraphicSimilarity()
+	{
 		// check if images are identical, graphica-wise (upto a given tolerance) 
 		$tmpFile = tempnam(dirname(__FILE__), 'imageComperingTmp');
 		$convert = dirname(kConf::get('bin_path_imagemagick')) . '\compare';
@@ -176,20 +181,10 @@ class convertImageTester {
 		@unlink($tmpFile);			// delete tmp comparing file (used to copmpare the two image files)
 		@unlink("resultLog.txt");	// delete tmp log file that was used to retrieve compare return value
 		if ($retValue != 0)
-		{
-			echo 'unable to perform graphical comparison'. PHP_EOL;
-			return false;
-		}
-
-		$compareResult = floatval($matches[0]);
-		if ($compareResult > $this->graphicTol)
-		{ 	
-			echo "graphical comparison returned with highly un-identical value [$compareResult]" . PHP_EOL;
-			return false;
-		}				
-		return true; 	
+			return $retValue;
+		return floatval($matches[0]);
 	}
-	
+
 	/**
 	 * this function exists for enabling url tests.
 	 * it will download the file from $this->outputReferenceFile URL

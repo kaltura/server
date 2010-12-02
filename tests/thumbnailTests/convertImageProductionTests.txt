@@ -15,7 +15,6 @@ d.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/width/90/hei
 d.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/width/90/height/120/type/3/
 d.gif	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_2iyzjmbo/width/120/height/90/type/1/
 e.TIFF	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xv067jmt/width/1419/height/1001/type/3/quality/120/src_y/130/src_h/150/
-e.TIFF	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xv067jmt/width/1419/height/1001/type/3/quality/120/src_y/130/src_h/150/
 f.png	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_zo49ncds/width/300/height/300/type/1/src_x/150/src_w/90/
 f.png	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_zo49ncds/width/300/height/300/type/1/src_x/150/src_w/90/
 g.jpg	http://www.kaltura.com/p/420231/thumbnail/entry_id/1_xg1qo1u8/width/500/height/100/type/1/
