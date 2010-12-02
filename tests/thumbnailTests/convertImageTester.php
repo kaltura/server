@@ -103,7 +103,8 @@ class convertImageTester {
 	 * a call to this function should take place only after $this->setTargetFile, $this->setSourceFile (succsusfull call)
 	 * @return - true if excute succeeded and call was succsusfull, otherwise false
 	 */
-	public function execute() {		
+	public function execute()
+	{		
 		@unlink($this->targetFile);					
 		$this->targetFile = @myFileConverter::convertImage($this->sourceFile, $this->targetFile, $this->params['width'], $this->params['height'],
 			$this->params['cropType'], $this->params['bGColor'], $this->params['forceJpeg'], $this->params['quality'],
