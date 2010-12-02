@@ -22,20 +22,18 @@ class convertImageUTest extends PHPUnit_Framework_TestCase
 	 */
 	public function providerTestList()
 	{
-		$testsFile = TESTSFILE;
-		$imagesDir = IMAGESDIR;
 		$fileHundler = null;
 		$dataProvided = array();
-		if (($fileHundler = fopen ( $testsFile, "r" )) === false)
-			die ('unable to read tests file [' . $testsFile . ']' );
+		if (($fileHundler = fopen ( TESTSFILE, "r" )) === false)
+			die ('unable to read tests file [' . TESTSFILE . ']' );
 			
 		fgets ($fileHundler ); // discard form header line
 		while (!feof ($fileHundler)) {
 			$line = fgets ($fileHundler);
 			$line = explode ("\t", $line);
-			$sourceFile = $imagesDir . '/' . trim ($line[0]);
+			$sourceFile = IMAGESDIR . '/' . trim ($line[0]);
 			if (count($line) > 1)
-				$outputReferenceFile = $imagesDir . '/' . trim ($line[1]);
+				$outputReferenceFile = IMAGESDIR . '/' . trim ($line[1]);
 			else
 				$outputReferenceFile = null;
 				
@@ -96,7 +94,7 @@ class convertImageUTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($status, 'images files: [' . $tester->getOutputReferenceFile() . '], [' .
 			$tester->getTargetFile () . '] are not identical');
 			
-		unset ( $tester );
+		unset($tester);
 	}
 
 }
