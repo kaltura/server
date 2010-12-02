@@ -30,7 +30,11 @@ abstract class KProvisionEngine
 			case KalturaSourceType::AKAMAI_LIVE:
 				$engine = new KProvisionEngineAkamai( $taskConfig );
 				break;
+			
+			default:
+				$engine = KalturaPluginManager::loadObject('KProvisionEngine', $provider, array($taskConfig));
 		}
+		
 		
 		return $engine;
 	}
