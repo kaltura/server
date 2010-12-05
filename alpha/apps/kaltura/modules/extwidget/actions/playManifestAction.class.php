@@ -453,6 +453,7 @@ class playManifestAction extends kalturaAction
 				$streamUsername = $this->entry->getStreamUsername();
 				
 				$baseUrl = $this->entry->getStreamUrl();
+				$baseUrl = rtrim($baseUrl, '/');
 				$flavors = $this->entry->getStreamBitrates();
 				if(count($flavors))
 				{
