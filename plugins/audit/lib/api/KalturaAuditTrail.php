@@ -240,7 +240,8 @@ class KalturaAuditTrail extends KalturaObject implements IFilterable
 				break;
 				
 			default:
-				$this->data = new KalturaAuditTrailInfo();
+//				$this->data = new KalturaAuditTrailInfo();
+				$this->data = null;
 				break;
 		}
 		
