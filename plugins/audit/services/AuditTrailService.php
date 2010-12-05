@@ -37,8 +37,10 @@ class AuditTrailService extends KalturaBaseService
 		$auditTrailFilter->attachToCriteria($c);
 		$count = AuditTrailPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$pager->attachToCriteria($c);
 		$list = AuditTrailPeer::doSelect($c);
 		
 		$response = new KalturaAuditTrailListResponse();
