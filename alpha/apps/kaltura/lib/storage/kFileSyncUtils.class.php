@@ -88,7 +88,6 @@ class kFileSyncUtils
 	 * @param FileSyncKey $key
 	 * @param $content
 	 * @param $strict - default true. use false if need to override an existing file.
-	 * @return unknown_type
 	 */
 	public static function file_put_contents ( FileSyncKey $key , $content , $strict = true )
 	{
