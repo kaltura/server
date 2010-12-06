@@ -26,7 +26,7 @@ class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 			return new KOperationEngineFastStart($params->fastStartCmd, $constructorArgs['outFilePath']);
 		}
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == FastStartConversionEngineType::get()->coreValue(FastStartConversionEngineType::FAST_START))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == FastStartConversionEngineType::get()->apiValue(FastStartConversionEngineType::FAST_START))
 		{
 			return new KDLOperatorQTFastStart($enumValue);
 		}
