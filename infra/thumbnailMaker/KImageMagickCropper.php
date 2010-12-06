@@ -151,7 +151,7 @@ class KImageMagickCropper extends KBaseCropper
 					$resizeWidth = '';
 					$resizeHeight = '';
 					
-					if($width > $height)
+					if($width >= $height)
 						$resizeWidth = $width;
 					else
 						$resizeHeight = $height;
