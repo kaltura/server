@@ -383,10 +383,7 @@ class myFileConverter
 	{
 		
 		if (is_string($bgcolor) && strpos($bgcolor, '0x') === false)
-		{
-			KalturaLog::debug($bgcolor);
 			$bgcolor = hexdec('0x' . $bgcolor);
-		}
 		
 		// check if the source file is not an image file
 		if (getimagesize($source_file) === false)
