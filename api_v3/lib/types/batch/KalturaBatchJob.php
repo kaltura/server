@@ -327,7 +327,8 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			
 		$dbData = $dbBatchJob->getData();
 		$this->fromData($dbData);
-		$this->jobSubType = $this->data->fromSubType($dbBatchJob->getJobSubType());
+		if($this->data)
+			$this->jobSubType = $this->data->fromSubType($dbBatchJob->getJobSubType());
 		
 		return $this;
 	}
