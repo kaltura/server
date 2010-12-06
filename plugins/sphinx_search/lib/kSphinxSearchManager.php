@@ -3,6 +3,7 @@
 class kSphinxSearchManager implements
 	kObjectChangedEventConsumer, 
 	kObjectCreatedEventConsumer,
+	kObjectDeletedEventConsumer,
 	kObjectDataChangedEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura_entry';
@@ -41,7 +42,7 @@ class kSphinxSearchManager implements
 	 * @param BaseObject $object
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectDataChanged(BaseObject $object) 
+	public function objectDeleted(BaseObject $object)
 	{
 		if(!class_exists('Metadata') || !($object instanceof Metadata))
 			return true;
@@ -56,16 +57,24 @@ class kSphinxSearchManager implements
 		return true;
 	}
 	
-	public function array2sphinxData(array $arr, $pluginName)
+	/**
+	 * @param BaseObject $object
+	 * @param string $previousVersion
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectDataChanged(BaseObject $object, $previousVersion = null)
 	{
-		if(!isset($arr[$pluginName]))
-			return null;
-			
-		$data = $arr[$pluginName];
-		if(is_array($data))
-			$data = implode(',', $data);
-			
-		return $data;
+		if(!class_exists('Metadata') || !($object instanceof Metadata))
+			return true;
+
+		if($object->getObjectType() == Metadata::TYPE_ENTRY)
+		{
+			$entry = kMetadataManager::getObjectFromPeer($object);
+			if ($entry && $entry instanceOf entry)
+				$this->saveToSphinx($entry, false, true);
+		}
+		
+		return true;
 	}
 	
 	public static function getSphinxFields()
@@ -187,45 +196,34 @@ class kSphinxSearchManager implements
 			
 		
 		// TODO - implement as multi values - one value per plugin
-//		if($isInsert || $entry->isColumnModified(entryPeer::CUSTOM_DATA))
+//		if($isInsert)
 //		{
-			$pluginsData = $entry->getPluginData();
-			$sphinxPluginsData = array();
-			if($pluginsData && is_array($pluginsData))
-			{
-				foreach($pluginsData as $pluginName => $pluginData)
-				{
-					$sphinxPluginData = $this->array2sphinxData($pluginsData, $pluginName);
-					if($sphinxPluginData)
-						$sphinxPluginsData[] = $sphinxPluginData;
-				}
-			}
-			
 			// TODO - remove after solving the replace bug that removes all fields
-			try
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSearchDataContributor');
+			$sphinxPluginsData = array();
+			foreach($pluginInstances as $pluginName => $pluginInstance)
 			{
-				if(class_exists('Metadata'))
+				KalturaLog::debug("Loading $pluginName sphinx texts");
+				$sphinxPluginData = null;
+				try
 				{
-					KalturaLog::debug("Loading metadata sphinx texts");
-					$sphinxPluginData = kMetadataManager::getSearchValuesByObject(Metadata::TYPE_ENTRY, $entry->getId());
-					if($sphinxPluginData)
-					{
-						KalturaLog::debug("Sphinx data for metadata: [$sphinxPluginData]");
-						$sphinxPluginsData[] = $sphinxPluginData;
-					}
+					$sphinxPluginData = $pluginInstance->getSearchData($entry);
 				}
-								
-				if(count($sphinxPluginsData))
+				catch(Exception $e)
 				{
-					$dataStrings['plugins_data'] = implode(',', $sphinxPluginsData);
-					KalturaLog::debug("Adding plugins_data");
+					KalturaLog::err($e->getMessage());
+					continue;
 				}
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::err($e->getMessage());
+				
+				if($sphinxPluginData)
+				{
+					KalturaLog::debug("Sphinx data for $pluginName [$sphinxPluginData]");
+					$sphinxPluginsData[] = $sphinxPluginData;
+				}
 			}
 			
+			if(count($sphinxPluginsData))
+				$dataStrings['plugins_data'] = implode(',', $sphinxPluginsData);
 //		}
 		
 //		if($isInsert)
