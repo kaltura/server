@@ -373,15 +373,21 @@ class myFileConverter
 	 * @param unknown_type $quality - Jpeg quality for output [0-100]
 	 * @param unknown_type $src_x - 1st part of a rectangle to take from original picture (starting from vertical picsal {value} to right end of picture)
 	 * @param unknown_type $src_y - 2nd part of a rectangle to take from original picture (starting from horizonal picasl {value} downto down end of picture)
-	 * @param unknown_type $src_w - 3rd part of a rectangle to take from original picture (starting from picsal left end of picture to vertical picsal {value})
-	 * @param unknown_type $src_h - 4rd part of a rectangle to take from original picture (starting from up end of picture downto horizonal picasl {value})
+	 * @param unknown_type $src_w - 3rd part of a rectangle to take from original picture (starting from picsal left end of picture to vertical pixel {value})
+	 * @param unknown_type $src_h - 4rd part of a rectangle to take from original picture (starting from up end of picture downto horizonal pixesl {value})
 	 * @return path to targetFile or null if the $source_file is not an image file
 	 */
 	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
 		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
 	{
-
+		
+		if (is_string($bgcolor) && strpos($bgcolor, '0x') === false)
+		{
+			KalturaLog::debug($bgcolor);
+			$bgcolor = hexdec('0x' . $bgcolor);
+		}
+		
 		// check if the source file is not an image file
 		if (getimagesize($source_file) === false)
 		{
