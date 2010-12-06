@@ -1583,28 +1583,6 @@ class entry extends Baseentry implements ISyncableFile
 	public function getPrivacySettings ()	{		return $this->getPermissions();	}
 	public function setPrivacySettings ( $v )	{		return $this->setPermissions( $v );	}
 
-	public function getPluginData($pluginName = null)
-	{
-		$pluginData = $this->getFromCustomData('pluginData');
-		if(is_null($pluginName))
-			return $pluginData;
-			
-		if(!$pluginData || !is_array($pluginData) || !isset($pluginData[$pluginName]))
-			return null;
-
-		return $pluginData[$pluginName];
-	}
-	
-	public function setPluginData($pluginName, $v)
-	{
-		$pluginData = $this->getFromCustomData('pluginData');
-		if(!$pluginData || !is_array($pluginData))
-			$pluginData = array();
-
-		$pluginData[$pluginName] = $v;
-		$this->putInCustomData("pluginData", $pluginData);
-	}
-	
 	public function incrementIsmVersion (  )
 	{	
 		$version = $this->getIsmVersion() + 1;
