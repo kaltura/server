@@ -1,5 +1,5 @@
 <?php
-class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler
+class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -408,7 +408,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 		if($status == Metadata::STATUS_VALID)
 		{
-			kMetadataManager::updateSearchIndex($dbMetadata);
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 		}
 		else
 		{
@@ -484,6 +484,23 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 			$currentNode->appendChild($valueNode);
 			$currentNode = $valueNode;
 		}
+	}
+	
+	/**
+	 * Return textual search data to be associated with the object
+	 * 
+	 * @param BaseObject $object
+	 * @return string
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof entry)
+		{
+			if(self::isAllowedPartner($object->getPartnerId()))
+				return kMetadataManager::getSearchValuesByObject(Metadata::TYPE_ENTRY, $object->getId());
+		}
+			
+		return null;
 	}
 
 //	/**
