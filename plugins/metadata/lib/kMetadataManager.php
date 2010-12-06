@@ -150,19 +150,6 @@ class kMetadataManager
 	}
 	
 	/**
-	 * Parse the XML and update the list of search values
-	 * 
-	 * @param Metadata $metadata
-	 * @param boolean $delete
-	 * 
-	 * @return array
-	 */
-	public static function updateSearchIndex(Metadata $metadata)
-	{
-		kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));		
-	}
-	
-	/**
 	 * Return search texts per object id
 	 * 
 	 * @param int $objectType
@@ -259,11 +246,6 @@ class kMetadataManager
 			$ret['text'] = $searchTexts['text'];
 			
 		return $ret;
-	}
-	
-	public static function removeMetadataFromObject(Metadata $metadata)
-	{
-		self::updateSearchIndex($metadata);
 	}
 	
 	/**
