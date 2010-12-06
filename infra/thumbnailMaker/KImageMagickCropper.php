@@ -171,6 +171,6 @@ class KImageMagickCropper extends KBaseCropper
 			return null;
 			
 		$options = implode(' ', $attributes);
-		return "\"$this->cmdPath\" $options \"$this->srcPath\" \"$this->targetPath\"";
+		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
 	}
 }
