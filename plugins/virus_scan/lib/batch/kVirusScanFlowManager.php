@@ -96,6 +96,10 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	 */
 	public function objectAdded(BaseObject $object)
 	{
+		// virus scan does not work in partner services 2 context because it uses dynamic enums
+		if (kCurrentContext::$ps_vesion == 'ps2')
+			return true;		
+		
 		$response = true;
 		if($object instanceof flavorAsset)
 		{
