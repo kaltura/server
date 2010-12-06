@@ -15,7 +15,7 @@ class MetadataProfileService extends KalturaBaseService
 		myPartnerUtils::addPartnerToCriteria(new entryPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 //		myPartnerUtils::addPartnerToCriteria(new FileSyncPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
-		if(!MetadataPlugin::isAllowedPartner(kCurrentContext::$ks_partner_id))
+		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
 	}
 	
@@ -173,11 +173,7 @@ class MetadataProfileService extends KalturaBaseService
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
 		foreach($metadatas as $metadata)
-		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
-			
-			kMetadataManager::updateSearchIndex($metadata);
-		}
 		
 		$update = new Criteria();
 		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
