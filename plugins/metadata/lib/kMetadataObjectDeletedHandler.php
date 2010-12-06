@@ -49,11 +49,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::doSelect($c);
 		foreach($metadatas as $metadata)
-		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
-			
-			kMetadataManager::updateSearchIndex($metadata);
-		}
 		
 		$update = new Criteria();
 		$update->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED);
