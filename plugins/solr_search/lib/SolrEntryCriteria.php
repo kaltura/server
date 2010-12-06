@@ -119,24 +119,11 @@ class SolrEntryCriteria extends KalturaCriteria
 	protected $whereClause = array();
 	
 	/**
-	 * The count of total returned items
-	 * @var int
-	 */
-	private static $recordsCount = 0;
-	
-	/**
 	 * Counts how many criterions couldn't be handled
 	 * @var int
 	 */
 	private $criteriasLeft;
 	
-	/**
-	 * @return int $recordsCount
-	 */
-	public function getRecordsCount() {
-		return self::$recordsCount;
-	}
-
 	/* (non-PHPdoc)
 	 * @see SolrCriteria#applyFilters()
 	 */
@@ -268,18 +255,18 @@ class SolrEntryCriteria extends KalturaCriteria
 		
 		$this->addAnd(entryPeer::ID, $ids, Criteria::IN);
 		
-		self::$recordsCount = 0;
+		$this->recordsCount = 0;
 		
 		if($setLimit)
 		{
-			self::$recordsCount = $response['numFound'];
+			$this->recordsCount = $response['numFound'];
 		}
 		else
 		{
 			$c = clone $this;
 			$c->setLimit(null);
 			$c->setOffset(null);
-			self::$recordsCount = entryPeer::doCount($c);
+			$this->recordsCount = entryPeer::doCount($c);
 		}
 	}
 	
