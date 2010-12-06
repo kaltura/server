@@ -131,7 +131,7 @@ class KImageMagickCropper extends KBaseCropper
 						}
 						
 						$bgcolor = dechex($bgcolor);
-						$attributes[] = "-bordercolor #$bgcolor";
+						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
 						$attributes[] = "-resize {$w}x{$h}";
 						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
 					}
