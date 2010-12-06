@@ -123,7 +123,7 @@ class MetadataService extends KalturaBaseService
 		if($status == KalturaMetadataStatus::VALID)
 		{
 			$this->deleteOldVersions($dbMetadata);
-			kMetadataManager::updateSearchIndex($dbMetadata);
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 		}
 		else
 		{
@@ -194,8 +194,8 @@ class MetadataService extends KalturaBaseService
 		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 		if($status == KalturaMetadataStatus::VALID)
 		{
-			kMetadataManager::updateSearchIndex($dbMetadata);
 			$this->deleteOldVersions($dbMetadata);
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 		}
 		else
 		{
@@ -338,7 +338,9 @@ class MetadataService extends KalturaBaseService
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 		
-//		$dbMetadata = $metadata->toUpdatableObject($dbMetadata);
+		$previousVersion = null;
+		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
+			$previousVersion = $dbMetadata->getVersion();
 		
 		if($xmlData)
 			$dbMetadata->incrementVersion();
@@ -352,15 +354,9 @@ class MetadataService extends KalturaBaseService
 			
 			$errorMessage = '';
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-			if($status == KalturaMetadataStatus::VALID)
-			{
-				kMetadataManager::updateSearchIndex($dbMetadata);
-			}
-			else 
-			{
-				kMetadataManager::removeMetadataFromObject($dbMetadata);
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			if($status != KalturaMetadataStatus::VALID)
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-			}
 		}
 		
 		$metadata = new KalturaMetadata();
@@ -396,7 +392,9 @@ class MetadataService extends KalturaBaseService
 				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
 		}
 		
-//		$dbMetadata = $metadata->toUpdatableObject($dbMetadata);
+		$previousVersion = null;
+		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
+			$previousVersion = $dbMetadata->getVersion();
 		
 		if($filePath)
 			$dbMetadata->incrementVersion();
@@ -410,15 +408,9 @@ class MetadataService extends KalturaBaseService
 			
 			$errorMessage = '';
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-			if($status == KalturaMetadataStatus::VALID)
-			{
-				kMetadataManager::updateSearchIndex($dbMetadata);
-			}
-			else
-			{
-				kMetadataManager::removeMetadataFromObject($dbMetadata);
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
+			if($status != KalturaMetadataStatus::VALID)
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-			}
 		}
 		
 		$metadata = new KalturaMetadata();
