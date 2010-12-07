@@ -68,22 +68,14 @@ class KalturaCriteria extends Criteria
 	 */
 	public static function create($objectType)
 	{
-		$searchPluginName = kConf::get("search_plugin");
-		
-		$searchPlugin = KalturaPluginManager::getPluginInstance($searchPluginName);
-		if (!$searchPlugin)
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCriteriaFactory');
+		foreach($pluginInstances as $pluginInstance)
 		{
-			KalturaLog::err("KalturaCriteria search plugin not found [$searchPluginName]");
-			die;
+			$criteria = $pluginInstance->getKalturaCriteria($objectType);
+			if($criteria)
+				return $criteria;
 		}
 			
-		$criteriaFactory = $searchPlugin->getInstance('IKalturaCriteriaFactory');
-		if (!$criteriaFactory)
-		{
-			KalturaLog::err("KalturaCriteria IKalturaCriteriaFactory not found for [$searchPluginName] plugin");
-			die;
-		}
-			
-		return $criteriaFactory->getKalturaCriteria($objectType);
+		return new KalturaCriteria();
 	}
 }
