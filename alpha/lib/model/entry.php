@@ -6,7 +6,7 @@
  *
  * @package lib.model
  */
-class entry extends Baseentry implements ISyncableFile
+class entry extends Baseentry implements ISyncableFile, IIndexable
 {
 	private $previous_status ;
 	protected $old_categories;
@@ -1224,6 +1224,14 @@ class entry extends Baseentry implements ISyncableFile
 		return (int)round($this->getDuration());
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getDurationType()
+	{
+		return entryPeer::getDurationType($this->getDurationInt());
+	}
+
 	public function getMetadata( $version = null)
 	{
 		if ( $this->getMediaType() != entry::ENTRY_MEDIA_TYPE_SHOW )
@@ -2088,6 +2096,7 @@ class entry extends Baseentry implements ISyncableFile
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
 			$objectDeleted = true;
@@ -2097,7 +2106,20 @@ class entry extends Baseentry implements ISyncableFile
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+			
 		return $ret;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/*************** Bulk download functions - start ******************/
@@ -2174,4 +2196,133 @@ class entry extends Baseentry implements ISyncableFile
 	}
 	
 	/*************** Bulk download functions - end ******************/
+	
+	/**
+	 * @return int sorting value
+	 */
+	public function getSortName()
+	{
+		return kUTF8::str2int64($this->getName());
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getIndexedId()
+	{
+		return crc32($this->getId());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getEntryId()
+	 */
+	public function getEntryId()
+	{
+		return $this->getId();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getObjectIndexName()
+	 */
+	public function getObjectIndexName()
+	{
+		return entryPeer::OM_CLASS;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldsMap()
+	 */
+	public function getIndexFieldsMap()
+	{
+		return array(
+			'entry_id' => 'id',
+			'str_entry_id' => 'id',
+			'int_entry_id' => 'indexedId',
+		
+			'name' => 'name',
+			'sort_name' => 'sortName',
+		
+			'tags' => 'tags',
+			'categories' => 'categoriesIds',
+			'flavor_params' => 'flavorParamsIds',
+			'source_link' => 'sourceLink',
+			'kshow_id' => 'kshowId',
+			'group_id' => 'groupId',
+			'description' => 'description',
+			'admin_tags' => 'adminTags',
+			'duration_type' => 'durationType',
+		
+			'kuser_id' => 'kuserId',
+			'entry_status' => 'status',
+			'type' => 'type',
+			'media_type' => 'mediaType',
+			'views' => 'views',
+			'partner_id' => 'partnerId',
+			'moderation_status' => 'moderationStatus',
+			'display_in_search' => 'displayInSearch',
+			'duration' => 'durationInt',
+			'access_control_id' => 'accessControlId',
+			'moderation_count' => 'moderationCount',
+			'rank' => 'rank',
+			'plays' => 'plays',
+		
+			'created_at' => 'createdAt',
+			'updated_at' => 'updatedAt',
+			'modified_at' => 'modifiedAt',
+			'media_date' => 'mediaDate',
+			'start_date' => 'startDate',
+			'end_date' => 'endDate',
+			'available_from' => 'availableFrom',
+		);
+	}
+	
+	private static $indexFieldTypes = array(
+			'entry_id' => IIndexable::FIELD_TYPE_STRING,
+			'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
+			'name' => IIndexable::FIELD_TYPE_STRING,
+			'tags' => IIndexable::FIELD_TYPE_STRING,
+			'categories' => IIndexable::FIELD_TYPE_STRING,
+			'flavor_params' => IIndexable::FIELD_TYPE_STRING,
+			'source_link' => IIndexable::FIELD_TYPE_STRING,
+			'kshow_id' => IIndexable::FIELD_TYPE_STRING,
+			'group_id' => IIndexable::FIELD_TYPE_STRING,
+			'description' => IIndexable::FIELD_TYPE_STRING,
+			'admin_tags' => IIndexable::FIELD_TYPE_STRING,
+			'duration_type' => IIndexable::FIELD_TYPE_STRING,
+			
+			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
+			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'entry_status' => IIndexable::FIELD_TYPE_INTEGER,
+			'type' => IIndexable::FIELD_TYPE_INTEGER,
+			'media_type' => IIndexable::FIELD_TYPE_INTEGER,
+			'views' => IIndexable::FIELD_TYPE_INTEGER,
+			'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'moderation_status' => IIndexable::FIELD_TYPE_INTEGER,
+			'display_in_search' => IIndexable::FIELD_TYPE_INTEGER,
+			'duration' => IIndexable::FIELD_TYPE_INTEGER,
+			'access_control_id' => IIndexable::FIELD_TYPE_INTEGER,
+			'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
+			'rank' => IIndexable::FIELD_TYPE_INTEGER,
+			'plays' => IIndexable::FIELD_TYPE_INTEGER,
+		
+			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'modified_at' => IIndexable::FIELD_TYPE_DATETIME,
+			'media_date' => IIndexable::FIELD_TYPE_DATETIME,
+			'start_date' => IIndexable::FIELD_TYPE_DATETIME,
+			'end_date' => IIndexable::FIELD_TYPE_DATETIME,
+			'available_from' => IIndexable::FIELD_TYPE_DATETIME,
+	);
+	
+	/**
+	 * @return string field type, string, int or timestamp
+	 */
+	public function getIndexFieldType($field)
+	{
+		if(isset(self::$indexFieldTypes[$field]))
+			return self::$indexFieldTypes[$field];
+			
+		return null;
+	}
 }
