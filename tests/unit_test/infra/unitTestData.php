@@ -1,5 +1,6 @@
 <?php
 
+	chdir(dirname(__FILE__));
 	require_once('../bootstrap.php');
 	
 	/**
@@ -13,10 +14,24 @@
 	{
 		/**
 		 * 
+		 * The config file path
+		 * @var string
+		 */
+		public $filePath;
+		
+//		/**
+//		 * 
+//		 * Represents if the file is in relative path
+//		 * @var bool
+//		 */
+//		public $isRelative = false;
+		 
+		/**
+		 * 
 		 * All the tests in the config file (each with file name and needed data)
 		 * @var array<TestDataFile>
 		 */
-		public $tests = array();
+		public $testFiles = array();
 		
 		/**
 		 * 
@@ -59,25 +74,31 @@
 					//For each input create the needed Kaltura object identifier
 					foreach ($xmlUnitTestData->Inputs->Input as $input)
 					{
-						$kalturaObjectIdentifier = new KalturaObjectIdentifier(((string)$input["type"]), ((string)$input["key"]));
-						$unitTestData->input[] = $kalturaObjectIdentifier;
+						$additionalData = kXml::getAttributesAsArray($input);
+						$unitTestDataObjectIdentifier = new UnitTestDataObject(((string)$input["type"]), $additionalData);
+						$unitTestData->input[] = $unitTestDataObjectIdentifier;
 					}
 					
 					//And for each output reference create the needed kaltura object identifier
 					foreach ($xmlUnitTestData->OutputReferences->OutputReference as $outputReference)
 					{
-						$kalturaObjectIdentifier = new KalturaObjectIdentifier(((string)$outputReference["type"]), ((string)$outputReference["key"]));
-						$unitTestData->outputReference[] = $kalturaObjectIdentifier;		
+						$additionalData = kXml::getAttributesAsArray($outputReference);
+						$unitTestDataObjectIdentifier = new UnitTestDataObject(((string)$outputReference["type"]), $additionalData);
+						$unitTestData->outputReference[] = $unitTestDataObjectIdentifier;		
 					}
+					
+					//Add the new unit test into the tests array.
+					$testDataFile->unitTestsData[] = $unitTestData;
 				}
 				
 				//Add the test file: description and file name
 				$testDataFile->description = trim((string)$xmlTestDataFile->Description);
 				$testDataFile->fileName = trim((string)$xmlTestDataFile->FileName);
 				
-				//Add the new unit test into the tests array.
-				$testDataFile->unitTestsData[] = $unitTestData;
-				$this->tests[] = $testDataFile;
+//				$isRelativeAttribute = kXml::getXmlAttributeAsString($xmlTestDataFile->FileName, "type");
+//				$testDataFile->isRelative = $isRelativeAttribute == "relative";
+														
+				$this->testFiles[] = $testDataFile;
 			}
 		}
 	}
@@ -92,10 +113,23 @@
 	{
 		/**
 		 * 
+		 * The test data file header 
+		 * @var unknown_type
+		 */
+		public $header; 
+		
+		/**
+		 * 
 		 * The test file name
 		 * @var string
 		 */
 		public $fileName;
+		
+//		/**
+//		 * Represend if the file path is relative
+//		 * @var bool
+//		 */
+//		public $isRelative;
 		
 		/**
 		 * 
@@ -134,7 +168,7 @@
 		public function fromXML(SimpleXMLElement $simpleXMLElement)
 		{
 			$this->fileName = trim((string)$simpleXMLElement->FileName);
-
+									
 			$this->description = trim((string)$simpleXMLElement->Description);
 			
 			foreach ($simpleXMLElement->UnitTestsData->UnitTestData as $xmlUnitTestData)
@@ -142,20 +176,20 @@
 				$unitTestData = new unitTestData();
 					foreach ($xmlUnitTestData->Inputs->Input as $input)
 					{
-						$kalturaObjectIdentifier = new KalturaObjectIdentifier(((string)$input["type"]), ((string)$input["key"]));
-						$unitTestData->input[] = $kalturaObjectIdentifier;
+						$unitTestObjectIdentifier = new UnitTestDataObject(((string)$input["type"]), ((string)$input["key"]));
+						$unitTestData->input[] = $unitTestObjectIdentifier;
 					}
 					
 					foreach ($xmlUnitTestData->OutputReferences->OutputReference as $outputReference)
 					{
-						$kalturaObjectIdentifier = new KalturaObjectIdentifier(((string)$outputReference["type"]), ((string)$outputReference["key"]));
-						$unitTestData->outputReference[] = $kalturaObjectIdentifier;		
+						$unitTestObjectIdentifier = new UnitTestDataObject(((string)$outputReference["type"]), ((string)$outputReference["key"]));
+						$unitTestData->outputReference[] = $unitTestObjectIdentifier;		
 					}
 												
 				$this->unitTestsData[] = $unitTestData;
-			} 
+			}
 		}
-		
+	
 		/**
 		 * 
 		 * Returns the test data file in XML format (including the objects) 
@@ -203,11 +237,20 @@
 					{
 						$importedNode = $dom->importNode($objectAsDOM->documentElement, true);
 						
-						$objectType = get_class($input);
+//						$objectType = $this->getObjectType($input);
+//						$objectId = $this->getObjectId($input);	
+//																	
+//						$importedNode->setAttribute("type", $objectType);	
+//						
+//						if(class_exists($objectType))
+//						{
+//							$importedNode->setAttribute("key", $objectId);
+//						}
+//						else
+//						{
+//							$importedNode->setAttribute("value", $objectId);
+//						}
 						
-						$importedNode->setAttribute("type", $objectType);		
-						$importedNode->setAttribute("key", $input->getId());
-
 						//Add him to the input elements
 						$inputs->appendChild($importedNode);
 					}
@@ -228,10 +271,11 @@
 					{
 						$importedNode = $dom->importNode($objectAsDOM->documentElement, true);
 						
-						$objectType = get_class($outputReference);
-						
-						$importedNode->setAttribute("type", $objectType);		
-						$importedNode->setAttribute("key", $outputReference->getId());
+//						$objectType = $this->getObjectType($outputReference);
+//						$objectId = $this->getObjectId($outputReference);
+//						
+//						$importedNode->setAttribute("type", $objectType);		
+//						$importedNode->setAttribute("key", $objectId);
 
 						//Add him to the output reference elements
 						$outputReferences->appendChild($importedNode);
@@ -239,7 +283,7 @@
 					else
 					{
 						//Object is null so we make only an empty node!
-						throw new Exception("One of the objects is null : " . $outputReference);
+						throw new Exception("One of the objects is null : " . var_dump($outputReference));
 					}
 				}
 				
@@ -251,8 +295,60 @@
 						
 			return $dom->saveXML();
 		}
+		
+		/**
+		 * 
+		 * gets an object and returns his id
+		 * @param unknown_type $object
+		 * @return string - the given object Id  
+		 */
+		private function getObjectId($object)
+		{
+			if($object instanceof BaseObject)
+			{
+				$objectId = $object->getByName("Id");	
+			}
+			else if ($object instanceof KalturaObject || $object instanceof KalturaObjectBase)
+			{
+				//TODO: check if all kaltura objects are supported
+				$reflector = new ReflectionObject($object);
+				$idProperty  = $reflector->getProperty("id");
+				$objectId = $idProperty->getValue($object);
+			}
+			else 
+			{
+				$objectId = $object;
+			}
+				
+			return $objectId;
+		}
+
+				/**
+		 * 
+		 * gets an object and returns his type or class name
+		 * @param unknown_type $object
+		 * @return string - the given object type  
+		 */
+		private function getObjectType($object)
+		{
+			if($object instanceof BaseObject)
+			{
+				$objectType = get_class($object);	
+			}
+			else if ($object instanceof KalturaObject || $object instanceof KalturaObjectBase)
+			{
+				//TODO: check if all kaltura objects are supported
+				$objectType = get_class($object);
+			}
+			else 
+			{
+				$objectType = gettype($object);
+			}
+				
+			return $objectType;
+		}
 	}
-	
+
 		/**
 	 * 
 	 * Represents a single unit test data
@@ -286,21 +382,22 @@
 	/**
 	 * 
 	 * Represent all propel object identifiers
-	 * needed so we can get the object from the DB
+	 * needed so we can get the object from the DB / API
 	 * @author Roni
 	 *
 	 */
-	class KalturaObjectIdentifier
+	class UnitTestDataObject
 	{
 		/**
 		 * Creates a new Kaltura Object Identifier
 		 * @param $keys
 		 * @param $type
 		 */
-		function __construct($type = null, $keys = null)
+		function __construct($type = null, $additionalData = null, $dataObject = null)
 		{
 			$this->type = $type;
-			$this->keys = $keys;
+			$this->additionalData = $additionalData;
+			$this->dataObject = $dataObject;
 		}
 		
 		/**
@@ -309,10 +406,16 @@
 		public $type;
 		
 		/**
-		 * the object keys / key
+		 * 
+		 * Additional data for the object identifier (such as key, partnerId, secret, value)
+		 * @var array<key => value>
+		 */
+		public $additionalData = array();
+		
+		/**
+		 * 
+		 * The data object to be retrieved like propel or kaltura object
 		 * @var unknown_type
 		 */
-		public $keys = array();
+		public $dataObject;
 	}
-
-?>

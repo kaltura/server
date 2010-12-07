@@ -1,6 +1,6 @@
 <?php
 
-require_once 'tests/unit_test/bootstrap.php';
+require_once '../bootstrap.php';
 
 /**
  * Static test suite.

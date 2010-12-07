@@ -1,0 +1,931 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Description>a test data file for the decision layer first unit test (testKDLWrapCDLGenerateTargetFlavors)</Description>
+  <UnitTestsData>
+    <UnitTestData>
+      <Description>test data 1 - MBR LOW bit rate test</Description>
+      <Inputs>
+        <Input type="flavorParams" key="5">
+          <Id>5</Id>
+          <Version>0</Version>
+          <PartnerId>0</PartnerId>
+          <Name>Basic - Small</Name>
+          <Tags>web,mbr</Tags>
+          <Description>Basic web quality, small frame. To be used for low resource environments.</Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-01-24 09:11:21</CreatedAt>
+          <UpdatedAt>2010-05-16 04:08:02</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>1</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>400</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>0</AudioChannels>
+          <AudioSampleRate>0</AudioSampleRate>
+          <AudioResolution>0</AudioResolution>
+          <Width>0</Width>
+          <Height>352</Height>
+          <FrameRate>0</FrameRate>
+          <GopSize>0</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <ViewOrder>0</ViewOrder>
+          <CreationMode>1</CreationMode>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion></EngineVersion>
+        </Input>
+        <Input type="mediaInfo" key="32653152">
+          <Id>32653152</Id>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <FlavorAssetId>0_m778mlh3</FlavorAssetId>
+          <FileSize>74649</FileSize>
+          <ContainerFormat>mpeg-4</ContainerFormat>
+          <ContainerId>mp42</ContainerId>
+          <ContainerProfile></ContainerProfile>
+          <ContainerDuration>152000</ContainerDuration>
+          <ContainerBitRate>4022</ContainerBitRate>
+          <VideoFormat>avc</VideoFormat>
+          <VideoCodecId>avc1</VideoCodecId>
+          <VideoDuration>152000</VideoDuration>
+          <VideoBitRate>3901</VideoBitRate>
+          <VideoBitRateMode></VideoBitRateMode>
+          <VideoWidth>1280</VideoWidth>
+          <VideoHeight>720</VideoHeight>
+          <VideoFrameRate>29.97</VideoFrameRate>
+          <VideoDar>1.77778</VideoDar>
+          <VideoRotation>0</VideoRotation>
+          <AudioFormat>aac</AudioFormat>
+          <AudioCodecId>40</AudioCodecId>
+          <AudioDuration>152000</AudioDuration>
+          <AudioBitRate>115</AudioBitRate>
+          <AudioBitRateMode></AudioBitRateMode>
+          <AudioChannels>2</AudioChannels>
+          <AudioSamplingRate>44100</AudioSamplingRate>
+          <AudioResolution></AudioResolution>
+          <WritingLib></WritingLib>
+          <CustomData></CustomData>
+          <RawData>General
+Complete name                    : /web/storage/r30/v1/content/entry/data/46/799/0_muf6ach2_0_m778mlh3_1.mp4
+Format                           : MPEG-4
+Format profile                   : Base Media / Version 2
+Codec ID                         : mp42
+File size                        : 72.9 MiB
+Duration                         : 2mn 32s
+Overall bit rate                 : 4 022 Kbps
+Encoded date                     : UTC 2010-11-18 21:23:14
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+Video
+ID                               : 2
+Format                           : AVC
+Format/Info                      : Advanced Video Codec
+Format profile                   : Main@L3.1
+Format settings, CABAC           : No
+Format settings, ReFrames        : 2 frames
+Codec ID                         : avc1
+Codec ID/Info                    : Advanced Video Coding
+Duration                         : 2mn 32s
+Bit rate mode                    : Variable
+Bit rate                         : 3 901 Kbps
+Width                            : 1 280 pixels
+Height                           : 720 pixels
+Display aspect ratio             : 16:9
+Frame rate mode                  : Constant
+Frame rate                       : 29.970 fps
+Resolution                       : 8 bits
+Colorimetry                      : 4:2:0
+Scan type                        : Progressive
+Bits/(Pixel*Frame)               : 0.141
+Stream size                      : 70.7 MiB (97%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+Color primaries                  : BT.709-5, BT.1361, IEC 61966-2-4, SMPTE RP177
+Transfer characteristics         : BT.709-5, BT.1361
+Matrix coefficients              : BT.709-5, BT.1361, IEC 61966-2-4 709, SMPTE RP177
+
+Audio
+ID                               : 1
+Format                           : AAC
+Format/Info                      : Advanced Audio Codec
+Format version                   : Version 4
+Format profile                   : LC
+Format settings, SBR             : No
+Codec ID                         : 40
+Duration                         : 2mn 32s
+Bit rate mode                    : Constant
+Bit rate                         : 115 Kbps
+Nominal bit rate                 : 128 Kbps
+Channel(s)                       : 2 channels
+Channel positions                : L R
+Sampling rate                    : 44.1 KHz
+Stream size                      : 2.08 MiB (3%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+
+</RawData>
+          <MultiStreamInfo></MultiStreamInfo>
+          <FlavorAssetVersion>1</FlavorAssetVersion>
+          <ScanType>0</ScanType>
+          <MultiStream></MultiStream>
+        </Input>
+      </Inputs>
+      <OutputReferences>
+        <OutputReference type="flavorParamsOutput" key="17467722">
+          <Id>17467722</Id>
+          <FlavorParamsId>5</FlavorParamsId>
+          <FlavorParamsVersion>0</FlavorParamsVersion>
+          <PartnerId>337071</PartnerId>
+          <EntryId>0_muf6ach2</EntryId>
+          <FlavorAssetId>0_x3cddwfw</FlavorAssetId>
+          <FlavorAssetVersion></FlavorAssetVersion>
+          <Name>Basic - Small</Name>
+          <Tags>web,mbr</Tags>
+          <Description></Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>0</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>400</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>2</AudioChannels>
+          <AudioSampleRate>44100</AudioSampleRate>
+          <AudioResolution></AudioResolution>
+          <Width>624</Width>
+          <Height>352</Height>
+          <FrameRate>29.97</FrameRate>
+          <GopSize>60</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <array>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 624 -h 352 -a 96 -s 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=624:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+          </array>
+          <FileExt>flv</FileExt>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion>0</EngineVersion>
+        </OutputReference>
+      </OutputReferences>
+    </UnitTestData>
+    <UnitTestData>
+      <Description>test data 2 - MBR</Description>
+      <Inputs>
+        <Input type="flavorParams" key="4">
+          <Id>4</Id>
+          <Version>0</Version>
+          <PartnerId>0</PartnerId>
+          <Name>Standard - Small</Name>
+          <Tags>web,mbr</Tags>
+          <Description>Standard web quality, small frame</Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-01-24 09:11:17</CreatedAt>
+          <UpdatedAt>2010-05-16 04:07:21</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>1</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>750</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>0</AudioChannels>
+          <AudioSampleRate>0</AudioSampleRate>
+          <AudioResolution>0</AudioResolution>
+          <Width>0</Width>
+          <Height>352</Height>
+          <FrameRate>0</FrameRate>
+          <GopSize>0</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <ViewOrder>0</ViewOrder>
+          <CreationMode>1</CreationMode>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion></EngineVersion>
+        </Input>
+        <Input type="mediaInfo" key="32653152">
+          <Id>32653152</Id>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <FlavorAssetId>0_m778mlh3</FlavorAssetId>
+          <FileSize>74649</FileSize>
+          <ContainerFormat>mpeg-4</ContainerFormat>
+          <ContainerId>mp42</ContainerId>
+          <ContainerProfile></ContainerProfile>
+          <ContainerDuration>152000</ContainerDuration>
+          <ContainerBitRate>4022</ContainerBitRate>
+          <VideoFormat>avc</VideoFormat>
+          <VideoCodecId>avc1</VideoCodecId>
+          <VideoDuration>152000</VideoDuration>
+          <VideoBitRate>3901</VideoBitRate>
+          <VideoBitRateMode></VideoBitRateMode>
+          <VideoWidth>1280</VideoWidth>
+          <VideoHeight>720</VideoHeight>
+          <VideoFrameRate>29.97</VideoFrameRate>
+          <VideoDar>1.77778</VideoDar>
+          <VideoRotation>0</VideoRotation>
+          <AudioFormat>aac</AudioFormat>
+          <AudioCodecId>40</AudioCodecId>
+          <AudioDuration>152000</AudioDuration>
+          <AudioBitRate>115</AudioBitRate>
+          <AudioBitRateMode></AudioBitRateMode>
+          <AudioChannels>2</AudioChannels>
+          <AudioSamplingRate>44100</AudioSamplingRate>
+          <AudioResolution></AudioResolution>
+          <WritingLib></WritingLib>
+          <CustomData></CustomData>
+          <RawData>General
+Complete name                    : /web/storage/r30/v1/content/entry/data/46/799/0_muf6ach2_0_m778mlh3_1.mp4
+Format                           : MPEG-4
+Format profile                   : Base Media / Version 2
+Codec ID                         : mp42
+File size                        : 72.9 MiB
+Duration                         : 2mn 32s
+Overall bit rate                 : 4 022 Kbps
+Encoded date                     : UTC 2010-11-18 21:23:14
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+Video
+ID                               : 2
+Format                           : AVC
+Format/Info                      : Advanced Video Codec
+Format profile                   : Main@L3.1
+Format settings, CABAC           : No
+Format settings, ReFrames        : 2 frames
+Codec ID                         : avc1
+Codec ID/Info                    : Advanced Video Coding
+Duration                         : 2mn 32s
+Bit rate mode                    : Variable
+Bit rate                         : 3 901 Kbps
+Width                            : 1 280 pixels
+Height                           : 720 pixels
+Display aspect ratio             : 16:9
+Frame rate mode                  : Constant
+Frame rate                       : 29.970 fps
+Resolution                       : 8 bits
+Colorimetry                      : 4:2:0
+Scan type                        : Progressive
+Bits/(Pixel*Frame)               : 0.141
+Stream size                      : 70.7 MiB (97%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+Color primaries                  : BT.709-5, BT.1361, IEC 61966-2-4, SMPTE RP177
+Transfer characteristics         : BT.709-5, BT.1361
+Matrix coefficients              : BT.709-5, BT.1361, IEC 61966-2-4 709, SMPTE RP177
+
+Audio
+ID                               : 1
+Format                           : AAC
+Format/Info                      : Advanced Audio Codec
+Format version                   : Version 4
+Format profile                   : LC
+Format settings, SBR             : No
+Codec ID                         : 40
+Duration                         : 2mn 32s
+Bit rate mode                    : Constant
+Bit rate                         : 115 Kbps
+Nominal bit rate                 : 128 Kbps
+Channel(s)                       : 2 channels
+Channel positions                : L R
+Sampling rate                    : 44.1 KHz
+Stream size                      : 2.08 MiB (3%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+
+</RawData>
+          <MultiStreamInfo></MultiStreamInfo>
+          <FlavorAssetVersion>1</FlavorAssetVersion>
+          <ScanType>0</ScanType>
+          <MultiStream></MultiStream>
+        </Input>
+      </Inputs>
+      <OutputReferences>
+        <OutputReference type="flavorParamsOutput" key="17467742">
+          <Id>17467742</Id>
+          <FlavorParamsId>4</FlavorParamsId>
+          <FlavorParamsVersion>0</FlavorParamsVersion>
+          <PartnerId>337071</PartnerId>
+          <EntryId>0_muf6ach2</EntryId>
+          <FlavorAssetId>0_m56eolqo</FlavorAssetId>
+          <FlavorAssetVersion></FlavorAssetVersion>
+          <Name>Standard - Small</Name>
+          <Tags>web,mbr</Tags>
+          <Description></Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>0</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>750</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>2</AudioChannels>
+          <AudioSampleRate>44100</AudioSampleRate>
+          <AudioResolution></AudioResolution>
+          <Width>624</Width>
+          <Height>352</Height>
+          <FrameRate>29.97</FrameRate>
+          <GopSize>60</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <array>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 750 -k 60 -w 624 -h 352 -a 96 -s 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 750k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 750k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=750:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=624:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+          </array>
+          <FileExt>flv</FileExt>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion>0</EngineVersion>
+        </OutputReference>
+      </OutputReferences>
+    </UnitTestData>
+    <UnitTestData>
+      <Description>test data 3 - MBR</Description>
+      <Inputs>
+        <Input type="flavorParams" key="3">
+          <Id>3</Id>
+          <Version>0</Version>
+          <PartnerId>0</PartnerId>
+          <Name>Standard - Large</Name>
+          <Tags>web,mbr</Tags>
+          <Description>Standard web quality, large frame</Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-01-24 09:11:13</CreatedAt>
+          <UpdatedAt>2010-01-24 09:11:13</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>1</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>1350</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>0</AudioChannels>
+          <AudioSampleRate>0</AudioSampleRate>
+          <AudioResolution>0</AudioResolution>
+          <Width>0</Width>
+          <Height>720</Height>
+          <FrameRate>0</FrameRate>
+          <GopSize>0</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <ViewOrder>0</ViewOrder>
+          <CreationMode>1</CreationMode>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion></EngineVersion>
+        </Input>
+        <Input type="mediaInfo" key="32653152">
+          <Id>32653152</Id>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <FlavorAssetId>0_m778mlh3</FlavorAssetId>
+          <FileSize>74649</FileSize>
+          <ContainerFormat>mpeg-4</ContainerFormat>
+          <ContainerId>mp42</ContainerId>
+          <ContainerProfile></ContainerProfile>
+          <ContainerDuration>152000</ContainerDuration>
+          <ContainerBitRate>4022</ContainerBitRate>
+          <VideoFormat>avc</VideoFormat>
+          <VideoCodecId>avc1</VideoCodecId>
+          <VideoDuration>152000</VideoDuration>
+          <VideoBitRate>3901</VideoBitRate>
+          <VideoBitRateMode></VideoBitRateMode>
+          <VideoWidth>1280</VideoWidth>
+          <VideoHeight>720</VideoHeight>
+          <VideoFrameRate>29.97</VideoFrameRate>
+          <VideoDar>1.77778</VideoDar>
+          <VideoRotation>0</VideoRotation>
+          <AudioFormat>aac</AudioFormat>
+          <AudioCodecId>40</AudioCodecId>
+          <AudioDuration>152000</AudioDuration>
+          <AudioBitRate>115</AudioBitRate>
+          <AudioBitRateMode></AudioBitRateMode>
+          <AudioChannels>2</AudioChannels>
+          <AudioSamplingRate>44100</AudioSamplingRate>
+          <AudioResolution></AudioResolution>
+          <WritingLib></WritingLib>
+          <CustomData></CustomData>
+          <RawData>General
+Complete name                    : /web/storage/r30/v1/content/entry/data/46/799/0_muf6ach2_0_m778mlh3_1.mp4
+Format                           : MPEG-4
+Format profile                   : Base Media / Version 2
+Codec ID                         : mp42
+File size                        : 72.9 MiB
+Duration                         : 2mn 32s
+Overall bit rate                 : 4 022 Kbps
+Encoded date                     : UTC 2010-11-18 21:23:14
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+Video
+ID                               : 2
+Format                           : AVC
+Format/Info                      : Advanced Video Codec
+Format profile                   : Main@L3.1
+Format settings, CABAC           : No
+Format settings, ReFrames        : 2 frames
+Codec ID                         : avc1
+Codec ID/Info                    : Advanced Video Coding
+Duration                         : 2mn 32s
+Bit rate mode                    : Variable
+Bit rate                         : 3 901 Kbps
+Width                            : 1 280 pixels
+Height                           : 720 pixels
+Display aspect ratio             : 16:9
+Frame rate mode                  : Constant
+Frame rate                       : 29.970 fps
+Resolution                       : 8 bits
+Colorimetry                      : 4:2:0
+Scan type                        : Progressive
+Bits/(Pixel*Frame)               : 0.141
+Stream size                      : 70.7 MiB (97%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+Color primaries                  : BT.709-5, BT.1361, IEC 61966-2-4, SMPTE RP177
+Transfer characteristics         : BT.709-5, BT.1361
+Matrix coefficients              : BT.709-5, BT.1361, IEC 61966-2-4 709, SMPTE RP177
+
+Audio
+ID                               : 1
+Format                           : AAC
+Format/Info                      : Advanced Audio Codec
+Format version                   : Version 4
+Format profile                   : LC
+Format settings, SBR             : No
+Codec ID                         : 40
+Duration                         : 2mn 32s
+Bit rate mode                    : Constant
+Bit rate                         : 115 Kbps
+Nominal bit rate                 : 128 Kbps
+Channel(s)                       : 2 channels
+Channel positions                : L R
+Sampling rate                    : 44.1 KHz
+Stream size                      : 2.08 MiB (3%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+
+</RawData>
+          <MultiStreamInfo></MultiStreamInfo>
+          <FlavorAssetVersion>1</FlavorAssetVersion>
+          <ScanType>0</ScanType>
+          <MultiStream></MultiStream>
+        </Input>
+      </Inputs>
+      <OutputReferences>
+        <OutputReference type="flavorParamsOutput" key="17467762">
+          <Id>17467762</Id>
+          <FlavorParamsId>3</FlavorParamsId>
+          <FlavorParamsVersion>0</FlavorParamsVersion>
+          <PartnerId>337071</PartnerId>
+          <EntryId>0_muf6ach2</EntryId>
+          <FlavorAssetId>0_epl2z9or</FlavorAssetId>
+          <FlavorAssetVersion></FlavorAssetVersion>
+          <Name>Standard - Large</Name>
+          <Tags>web,mbr</Tags>
+          <Description></Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>0</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>1350</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>96</AudioBitrate>
+          <AudioChannels>2</AudioChannels>
+          <AudioSampleRate>44100</AudioSampleRate>
+          <AudioResolution></AudioResolution>
+          <Width>1280</Width>
+          <Height>720</Height>
+          <FrameRate>29.97</FrameRate>
+          <GopSize>60</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <array>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 1350 -k 60 -w 1280 -h 720 -a 96 -s 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1350k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1350k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1350:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+          </array>
+          <FileExt>flv</FileExt>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion>0</EngineVersion>
+        </OutputReference>
+      </OutputReferences>
+    </UnitTestData>
+    <UnitTestData>
+      <Description>test data 4 - MBR</Description>
+      <Inputs>
+        <Input type="flavorParams" key="2">
+          <Id>2</Id>
+          <Version>0</Version>
+          <PartnerId>0</PartnerId>
+          <Name>High - Large</Name>
+          <Tags>web,mbr</Tags>
+          <Description>High web quality, large frame</Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-01-24 09:11:09</CreatedAt>
+          <UpdatedAt>2010-01-24 09:11:09</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>1</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>2500</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>128</AudioBitrate>
+          <AudioChannels>0</AudioChannels>
+          <AudioSampleRate>0</AudioSampleRate>
+          <AudioResolution>0</AudioResolution>
+          <Width>0</Width>
+          <Height>720</Height>
+          <FrameRate>0</FrameRate>
+          <GopSize>0</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <ViewOrder>0</ViewOrder>
+          <CreationMode>1</CreationMode>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion></EngineVersion>
+        </Input>
+        <Input type="mediaInfo" key="32653152">
+          <Id>32653152</Id>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <FlavorAssetId>0_m778mlh3</FlavorAssetId>
+          <FileSize>74649</FileSize>
+          <ContainerFormat>mpeg-4</ContainerFormat>
+          <ContainerId>mp42</ContainerId>
+          <ContainerProfile></ContainerProfile>
+          <ContainerDuration>152000</ContainerDuration>
+          <ContainerBitRate>4022</ContainerBitRate>
+          <VideoFormat>avc</VideoFormat>
+          <VideoCodecId>avc1</VideoCodecId>
+          <VideoDuration>152000</VideoDuration>
+          <VideoBitRate>3901</VideoBitRate>
+          <VideoBitRateMode></VideoBitRateMode>
+          <VideoWidth>1280</VideoWidth>
+          <VideoHeight>720</VideoHeight>
+          <VideoFrameRate>29.97</VideoFrameRate>
+          <VideoDar>1.77778</VideoDar>
+          <VideoRotation>0</VideoRotation>
+          <AudioFormat>aac</AudioFormat>
+          <AudioCodecId>40</AudioCodecId>
+          <AudioDuration>152000</AudioDuration>
+          <AudioBitRate>115</AudioBitRate>
+          <AudioBitRateMode></AudioBitRateMode>
+          <AudioChannels>2</AudioChannels>
+          <AudioSamplingRate>44100</AudioSamplingRate>
+          <AudioResolution></AudioResolution>
+          <WritingLib></WritingLib>
+          <CustomData></CustomData>
+          <RawData>General
+Complete name                    : /web/storage/r30/v1/content/entry/data/46/799/0_muf6ach2_0_m778mlh3_1.mp4
+Format                           : MPEG-4
+Format profile                   : Base Media / Version 2
+Codec ID                         : mp42
+File size                        : 72.9 MiB
+Duration                         : 2mn 32s
+Overall bit rate                 : 4 022 Kbps
+Encoded date                     : UTC 2010-11-18 21:23:14
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+Video
+ID                               : 2
+Format                           : AVC
+Format/Info                      : Advanced Video Codec
+Format profile                   : Main@L3.1
+Format settings, CABAC           : No
+Format settings, ReFrames        : 2 frames
+Codec ID                         : avc1
+Codec ID/Info                    : Advanced Video Coding
+Duration                         : 2mn 32s
+Bit rate mode                    : Variable
+Bit rate                         : 3 901 Kbps
+Width                            : 1 280 pixels
+Height                           : 720 pixels
+Display aspect ratio             : 16:9
+Frame rate mode                  : Constant
+Frame rate                       : 29.970 fps
+Resolution                       : 8 bits
+Colorimetry                      : 4:2:0
+Scan type                        : Progressive
+Bits/(Pixel*Frame)               : 0.141
+Stream size                      : 70.7 MiB (97%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+Color primaries                  : BT.709-5, BT.1361, IEC 61966-2-4, SMPTE RP177
+Transfer characteristics         : BT.709-5, BT.1361
+Matrix coefficients              : BT.709-5, BT.1361, IEC 61966-2-4 709, SMPTE RP177
+
+Audio
+ID                               : 1
+Format                           : AAC
+Format/Info                      : Advanced Audio Codec
+Format version                   : Version 4
+Format profile                   : LC
+Format settings, SBR             : No
+Codec ID                         : 40
+Duration                         : 2mn 32s
+Bit rate mode                    : Constant
+Bit rate                         : 115 Kbps
+Nominal bit rate                 : 128 Kbps
+Channel(s)                       : 2 channels
+Channel positions                : L R
+Sampling rate                    : 44.1 KHz
+Stream size                      : 2.08 MiB (3%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+
+</RawData>
+          <MultiStreamInfo></MultiStreamInfo>
+          <FlavorAssetVersion>1</FlavorAssetVersion>
+          <ScanType>0</ScanType>
+          <MultiStream></MultiStream>
+        </Input>
+      </Inputs>
+      <OutputReferences>
+        <OutputReference type="flavorParamsOutput" key="17467792">
+          <Id>17467792</Id>
+          <FlavorParamsId>2</FlavorParamsId>
+          <FlavorParamsVersion>0</FlavorParamsVersion>
+          <PartnerId>337071</PartnerId>
+          <EntryId>0_muf6ach2</EntryId>
+          <FlavorAssetId>0_ea1y5x6g</FlavorAssetId>
+          <FlavorAssetVersion></FlavorAssetVersion>
+          <Name>High - Large</Name>
+          <Tags>web,mbr</Tags>
+          <Description></Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-11-29 11:36:56</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:56</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>0</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>2500</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>128</AudioBitrate>
+          <AudioChannels>2</AudioChannels>
+          <AudioSampleRate>44100</AudioSampleRate>
+          <AudioResolution></AudioResolution>
+          <Width>1280</Width>
+          <Height>720</Height>
+          <FrameRate>29.97</FrameRate>
+          <GopSize>60</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <array>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 2500 -k 60 -w 1280 -h 720 -a 128 -s 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 2500k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 128k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 2500k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 128k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=2500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=128 -srate 44100 -o __outFileName__</CommandLines>
+          </array>
+          <FileExt>flv</FileExt>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion>0</EngineVersion>
+        </OutputReference>
+      </OutputReferences>
+    </UnitTestData>
+    <UnitTestData>
+      <Description>test data 5 - MBR</Description>
+      <Inputs>
+        <Input type="flavorParams" key="1">
+          <Id>1</Id>
+          <Version>0</Version>
+          <PartnerId>0</PartnerId>
+          <Name>HD</Name>
+          <Tags>web,mbr</Tags>
+          <Description>High Definition</Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-01-24 09:10:58</CreatedAt>
+          <UpdatedAt>2010-01-24 09:10:58</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>1</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>4000</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>192</AudioBitrate>
+          <AudioChannels>0</AudioChannels>
+          <AudioSampleRate>0</AudioSampleRate>
+          <AudioResolution>0</AudioResolution>
+          <Width>0</Width>
+          <Height>1080</Height>
+          <FrameRate>0</FrameRate>
+          <GopSize>0</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <ViewOrder>0</ViewOrder>
+          <CreationMode>1</CreationMode>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion></EngineVersion>
+        </Input>
+        <Input type="mediaInfo" key="32653152">
+          <Id>32653152</Id>
+          <CreatedAt>2010-11-29 11:36:55</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:55</UpdatedAt>
+          <FlavorAssetId>0_m778mlh3</FlavorAssetId>
+          <FileSize>74649</FileSize>
+          <ContainerFormat>mpeg-4</ContainerFormat>
+          <ContainerId>mp42</ContainerId>
+          <ContainerProfile></ContainerProfile>
+          <ContainerDuration>152000</ContainerDuration>
+          <ContainerBitRate>4022</ContainerBitRate>
+          <VideoFormat>avc</VideoFormat>
+          <VideoCodecId>avc1</VideoCodecId>
+          <VideoDuration>152000</VideoDuration>
+          <VideoBitRate>3901</VideoBitRate>
+          <VideoBitRateMode></VideoBitRateMode>
+          <VideoWidth>1280</VideoWidth>
+          <VideoHeight>720</VideoHeight>
+          <VideoFrameRate>29.97</VideoFrameRate>
+          <VideoDar>1.77778</VideoDar>
+          <VideoRotation>0</VideoRotation>
+          <AudioFormat>aac</AudioFormat>
+          <AudioCodecId>40</AudioCodecId>
+          <AudioDuration>152000</AudioDuration>
+          <AudioBitRate>115</AudioBitRate>
+          <AudioBitRateMode></AudioBitRateMode>
+          <AudioChannels>2</AudioChannels>
+          <AudioSamplingRate>44100</AudioSamplingRate>
+          <AudioResolution></AudioResolution>
+          <WritingLib></WritingLib>
+          <CustomData></CustomData>
+          <RawData>General
+Complete name                    : /web/storage/r30/v1/content/entry/data/46/799/0_muf6ach2_0_m778mlh3_1.mp4
+Format                           : MPEG-4
+Format profile                   : Base Media / Version 2
+Codec ID                         : mp42
+File size                        : 72.9 MiB
+Duration                         : 2mn 32s
+Overall bit rate                 : 4 022 Kbps
+Encoded date                     : UTC 2010-11-18 21:23:14
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+Video
+ID                               : 2
+Format                           : AVC
+Format/Info                      : Advanced Video Codec
+Format profile                   : Main@L3.1
+Format settings, CABAC           : No
+Format settings, ReFrames        : 2 frames
+Codec ID                         : avc1
+Codec ID/Info                    : Advanced Video Coding
+Duration                         : 2mn 32s
+Bit rate mode                    : Variable
+Bit rate                         : 3 901 Kbps
+Width                            : 1 280 pixels
+Height                           : 720 pixels
+Display aspect ratio             : 16:9
+Frame rate mode                  : Constant
+Frame rate                       : 29.970 fps
+Resolution                       : 8 bits
+Colorimetry                      : 4:2:0
+Scan type                        : Progressive
+Bits/(Pixel*Frame)               : 0.141
+Stream size                      : 70.7 MiB (97%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+Color primaries                  : BT.709-5, BT.1361, IEC 61966-2-4, SMPTE RP177
+Transfer characteristics         : BT.709-5, BT.1361
+Matrix coefficients              : BT.709-5, BT.1361, IEC 61966-2-4 709, SMPTE RP177
+
+Audio
+ID                               : 1
+Format                           : AAC
+Format/Info                      : Advanced Audio Codec
+Format version                   : Version 4
+Format profile                   : LC
+Format settings, SBR             : No
+Codec ID                         : 40
+Duration                         : 2mn 32s
+Bit rate mode                    : Constant
+Bit rate                         : 115 Kbps
+Nominal bit rate                 : 128 Kbps
+Channel(s)                       : 2 channels
+Channel positions                : L R
+Sampling rate                    : 44.1 KHz
+Stream size                      : 2.08 MiB (3%)
+Language                         : English
+Encoded date                     : UTC 2010-11-18 21:16:36
+Tagged date                      : UTC 2010-11-18 21:23:16
+
+
+</RawData>
+          <MultiStreamInfo></MultiStreamInfo>
+          <FlavorAssetVersion>1</FlavorAssetVersion>
+          <ScanType>0</ScanType>
+          <MultiStream></MultiStream>
+        </Input>
+      </Inputs>
+      <OutputReferences>
+        <OutputReference type="flavorParamsOutput" key="17467802">
+          <Id>17467802</Id>
+          <FlavorParamsId>1</FlavorParamsId>
+          <FlavorParamsVersion>0</FlavorParamsVersion>
+          <PartnerId>337071</PartnerId>
+          <EntryId>0_muf6ach2</EntryId>
+          <FlavorAssetId>0_t7x9tq36</FlavorAssetId>
+          <FlavorAssetVersion></FlavorAssetVersion>
+          <Name>HD</Name>
+          <Tags>web,mbr</Tags>
+          <Description></Description>
+          <ReadyBehavior>2</ReadyBehavior>
+          <CreatedAt>2010-11-29 11:36:56</CreatedAt>
+          <UpdatedAt>2010-11-29 11:36:56</UpdatedAt>
+          <DeletedAt></DeletedAt>
+          <IsDefault>0</IsDefault>
+          <Format>flv</Format>
+          <VideoCodec>vp6</VideoCodec>
+          <VideoBitrate>4000</VideoBitrate>
+          <AudioCodec>mp3</AudioCodec>
+          <AudioBitrate>192</AudioBitrate>
+          <AudioChannels>2</AudioChannels>
+          <AudioSampleRate>44100</AudioSampleRate>
+          <AudioResolution></AudioResolution>
+          <Width>1280</Width>
+          <Height>720</Height>
+          <FrameRate>29.97</FrameRate>
+          <GopSize>60</GopSize>
+          <TwoPass></TwoPass>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
+          <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
+          <CustomData></CustomData>
+          <array>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 4000 -k 60 -w 1280 -h 720 -a 192 -s 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 4000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 192k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 4000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 192k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=4000:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=192 -srate 44100 -o __outFileName__</CommandLines>
+          </array>
+          <FileExt>flv</FileExt>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
+          <Operators></Operators>
+          <EngineVersion>0</EngineVersion>
+        </OutputReference>
+      </OutputReferences>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>

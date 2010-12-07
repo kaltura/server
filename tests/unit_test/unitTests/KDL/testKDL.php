@@ -1,14 +1,16 @@
 <?php
 
-	require_once ('../../bootstrap.php');
-			
+	chdir(dirname(__FILE__));
+	require_once( '../../bootstrap.php');
+	chdir(dirname(__FILE__));
+	
 	/**
 	 * The KDl unit test case
 	 * tests if decision layer makes a right decision about converting and validating files 
 	 * @author Roni
 	 *
 	 */
-	class DLUnitTest extends unitTestBase
+	class KDLUnitTest extends unitTestBase
 	{
 		/**
 		 * 
@@ -46,8 +48,8 @@
 		{ 
 			$result = KDLWrap::CDLValidateProduct($cdlSourceMediaInfo, $cdlTarget, $cdlProductMediaInfo);
 
-			//assert that no errors were generated
-			$this->assertEquals(null, $result->errors);
+			//assert that 0 errors were generated
+			$this->assertEquals(0, count($result->_errors));
 		}
 		
 		/**
@@ -58,7 +60,8 @@
 		public function providerCDLGenerateTargetFlavors()
 		{
 			//TODO: from where to get the data file path.
-			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/Test1.Data");
+//			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/RealTest1.Data"
+			$inputs = parent::provider(dirname(__FILE__) . "/tests_data/RealTest1.Data");
 			return $inputs; 
 		}
 	
@@ -68,7 +71,8 @@
 		 */
 		public function providerCDLValidateProduct()
 		{
-			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/Test2.Data");
+//			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/RealTest2.Data");
+			$inputs = parent::provider(dirname(__FILE__) . "/tests_data/RealTest2.Data");
 			return $inputs;
 		}
 		

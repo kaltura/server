@@ -1,12 +1,15 @@
 <?php 
 
-//TODO: Fix this shit. move the cache localy or discard it.
-require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."../..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
-require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+//TODO:Fix this and the cache
 
-//TODO:Fix this adn the cache
+//API bootstrap
+require_once (dirname(__FILE__). '/../../api_v3/bootstrap.php');
+
+//The kaltura client
+require_once (dirname(__FILE__). '/lib/kalturaClient.php');
+
+require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
+
 define("KALTURA_UNIT_TEST_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."tests".DIRECTORY_SEPARATOR."unit_test");
 
 // Autoloader
@@ -23,7 +26,9 @@ date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_Y
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
-//Unit Test Project files
-require_once ('tests/unit_test/unitTestDataGenerator/unitTestDataGenerator.php');require_once ('tests/unit_test/infra/unitTestBase.php');
+//Unit Test Project files (used in the zend phpunit library notneeded for the command line)
+require_once ('/PHPUnit/Framework.php');
 
-?>
+//Absolute path with a var (good for all systems as we are using KALTURA_ROOT_PATH)
+require_once (dirname(__FILE__). '/unitTestDataGenerator/unitTestDataGenerator.php');
+require_once (dirname(__FILE__). '/infra/unitTestData.php');require_once (dirname(__FILE__). '/infra/unitTestBase.php');
