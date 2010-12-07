@@ -9,6 +9,12 @@ require_once("bootstrap.php");
 abstract class KAsyncDistribute extends KBatchBase
 {
 	/**
+	 * Enter description here ...
+	 * @var DistributionEngine
+	 */
+	protected $engine;
+	
+	/**
 	 * @return array<KalturaBatchJob>
 	 */
 	abstract protected function getExclusiveDistributeJobs();
@@ -17,6 +23,12 @@ abstract class KAsyncDistribute extends KBatchBase
 	 * @return DistributionEngine
 	 */
 	abstract protected function getDistributionEngine($providerType);
+	
+	/**
+	 * Throw detailed exceptions for any failure 
+	 * @return bool true if job is closed, false for almost done
+	 */
+	abstract protected function execute();
 	
 	public function run($jobs = null)
 	{
@@ -49,23 +61,15 @@ abstract class KAsyncDistribute extends KBatchBase
 		
 		try
 		{
-			$engine = $this->getDistributionEngine($job->jobSubType);
-			if (!$engine)
+			$this->engine = $this->getDistributionEngine($job->jobSubType);
+			if (!$this->engine)
 			{
 				KalturaLog::err('Cannot create DistributeEngine of type ['.$job->jobSubType.']');
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot create DistributeEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
 						
-			// configure engine
-			if (!$engine->config($this->taskConfig->params))
-			{
-				KalturaLog::err('Cannot configure DistributeEngine of type ['.$job->jobSubType.']');
-				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot configure DistributeEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
-				return $job;
-			}
-			
-			$closed = $engine->execute();
+			$closed = $this->execute();
 			if($closed)
 				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 			 			
