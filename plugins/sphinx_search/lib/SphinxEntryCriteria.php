@@ -219,7 +219,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 				$orderBy = 'ORDER BY ' . implode(',', $orders);
 		}
 			
-		$index = kSphinxSearchManager::SPHINX_INDEX_NAME;
+		$index = kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);
 		$maxMatches = kSphinxSearchManager::SPHINX_MAX_RECORDS;
 		$limit = $maxMatches;
 		

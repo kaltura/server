@@ -30,14 +30,14 @@ class kMetadataManager
 	 * 
 	 * @return BaseObject returns the object referenced by the peer
 	 */
-	public static function getObjectFromPeer($object)
+	public static function getObjectFromPeer(Metadata $metadata)
 	{
-		$objectType = $object->getObjectType();
+		$objectType = $metadata->getObjectType();
 		$peer = self::getObjectPeer($objectType);
 		if(!$peer)
 			return null;
 			
-		$objectId = $object->getObjectId();
+		$objectId = $metadata->getObjectId();
 		return $peer->retrieveByPK($objectId);
 	}
 	

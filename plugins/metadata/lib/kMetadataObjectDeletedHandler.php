@@ -24,6 +24,11 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 	protected function metadataDeleted(Metadata $metadata) 
 	{
 		$this->syncableDeleted($metadata->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_METADATA);
+		
+		// updated in the indexing server (sphinx)
+		$object = kMetadataManager::getObjectFromPeer($metadata);
+		if($object && $object instanceof IIndexable)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($object));
 	}
 	
 	/**

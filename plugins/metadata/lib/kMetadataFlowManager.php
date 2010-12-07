@@ -1,5 +1,5 @@
 <?php
-class kMetadataFlowManager implements kBatchJobStatusEventConsumer
+class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataChangedEventConsumer
 {
 	/**
 	 * @param BatchJob $dbBatchJob
@@ -99,5 +99,23 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer
 		$metadataProfile->save();
 		
 		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @param string $previousVersion
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectDataChanged(BaseObject $object, $previousVersion = null)
+	{
+		if(!class_exists('Metadata') || !($object instanceof Metadata))
+			return true;
+
+		// updated in the indexing server (sphinx)
+		$relatedObject = kMetadataManager::getObjectFromPeer($object);
+		if($relatedObject && $relatedObject instanceof IIndexable)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($relatedObject));
+		
+		return true;
 	}
 }

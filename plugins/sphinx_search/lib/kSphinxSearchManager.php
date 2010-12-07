@@ -1,118 +1,43 @@
 <?php
 
-class kSphinxSearchManager implements
-	kObjectChangedEventConsumer, 
-	kObjectCreatedEventConsumer,
-	kObjectDeletedEventConsumer,
-	kObjectDataChangedEventConsumer
+class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
 {
-	const SPHINX_INDEX_NAME = 'kaltura_entry';
+	const SPHINX_INDEX_NAME = 'kaltura';
 	const SPHINX_MAX_RECORDS = 1000;
+	
+	/**
+	 * @param string $baseName
+	 * @return string
+	 */
+	public static function getSphinxIndexName($baseName)
+	{
+		return self::SPHINX_INDEX_NAME . '_' . $baseName;
+	}
 	
 	/**
 	 * @param BaseObject $object
 	 * @return bool true if should continue to the next consumer
 	 */
-	public function objectCreated(BaseObject $object) 
+	public function objectUpdated(BaseObject $object)
 	{
-		if(!($object instanceof entry))
+		if(!($object instanceof IIndexable))
+			return true;
+
+		$this->saveToSphinx($object);
+		return true;
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if(!($object instanceof IIndexable))
 			return true;
 
 		$this->saveToSphinx($object, true);
 		return true;
-	}
-
-	/**
-	 * @param BaseObject $object
-	 * @param array $modifiedColumns
-	 * @return bool true if should continue to the next consumer
-	 */
-	public function objectChanged(BaseObject $object, array $modifiedColumns) 
-	{
-		if(!($object instanceof entry))
-			return true;
-
-		if($object->isModified())
-			$this->saveToSphinx($object);
-			
-		return true;
-	}
-	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
-	 */
-	public function objectDeleted(BaseObject $object)
-	{
-		if(!class_exists('Metadata') || !($object instanceof Metadata))
-			return true;
-
-		if($object->getObjectType() == Metadata::TYPE_ENTRY)
-		{
-			$entry = kMetadataManager::getObjectFromPeer($object);
-			if ($entry && $entry instanceOf entry)
-				$this->saveToSphinx($entry, false, true);
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * @param BaseObject $object
-	 * @param string $previousVersion
-	 * @return bool true if should continue to the next consumer
-	 */
-	public function objectDataChanged(BaseObject $object, $previousVersion = null)
-	{
-		if(!class_exists('Metadata') || !($object instanceof Metadata))
-			return true;
-
-		if($object->getObjectType() == Metadata::TYPE_ENTRY)
-		{
-			$entry = kMetadataManager::getObjectFromPeer($object);
-			if ($entry && $entry instanceOf entry)
-				$this->saveToSphinx($entry, false, true);
-		}
-		
-		return true;
-	}
-	
-	public static function getSphinxFields()
-	{
-		return array(
-			entryPeer::INT_ID,
-			entryPeer::ID,
-			entryPeer::NAME,
-			entryPeer::TAGS,
-			entryPeer::CATEGORIES_IDS,
-			entryPeer::FLAVOR_PARAMS_IDS,
-			entryPeer::SOURCE_LINK,
-			entryPeer::KSHOW_ID,
-			entryPeer::GROUP_ID,
-			entryPeer::DESCRIPTION,
-			entryPeer::ADMIN_TAGS,
-			entryPeer::CUSTOM_DATA,
-			entryPeer::KUSER_ID,
-			entryPeer::STATUS,
-			entryPeer::TYPE,
-			entryPeer::MEDIA_TYPE,
-			entryPeer::VIEWS,
-			entryPeer::PARTNER_ID,
-			entryPeer::MODERATION_STATUS,
-			entryPeer::DISPLAY_IN_SEARCH,
-			entryPeer::LENGTH_IN_MSECS,
-			entryPeer::ACCESS_CONTROL_ID,
-			entryPeer::MODERATION_COUNT,
-			entryPeer::RANK,
-			entryPeer::PLAYS,
-			entryPeer::CREATED_AT,
-			entryPeer::UPDATED_AT,
-			entryPeer::MODIFIED_AT,
-			entryPeer::MEDIA_DATE,
-			entryPeer::START_DATE,
-			entryPeer::END_DATE,
-			entryPeer::AVAILABLE_FROM,
-		);
 	}
 	
 	/**
@@ -125,41 +50,25 @@ class kSphinxSearchManager implements
 		return crc32($object->getId());
 	}
 
-	public function saveToSphinxRequired($entry)
-	{
-		$cols = self::getSphinxFields();
-		foreach($cols as $col)
-			if($entry->isColumnModified($col))
-				return true;
-				
-		return false;
-	}
-	
 	// TODO remove $force after replace bug solved
 	/**
-	 * @param entry $entry
+	 * @param IIndexable $object
 	 * @param bool $isInsert
 	 * @param bool $force
 	 * @return string|bool
 	 */
-	public function getSphinxSaveSql(entry $entry, $isInsert = false, $force = false)
+	public function getSphinxSaveSql(IIndexable $object, $isInsert = false, $force = false)
 	{
-		$id = $entry->getIntId();
+		$id = $object->getIntId();
 		if(!$id)
 		{
-			KalturaLog::err("Entry [" . $entry->getId() . "] could not be saved to sphinx, int_id is empty");
+			KalturaLog::err("Object [" . get_class($object) . "] id [" . $object->getId() . "] could not be saved to sphinx, int_id is empty");
 			return false;
 		}
 		
-		if(!$force && !$isInsert && !$this->saveToSphinxRequired($entry))
-			return false;
+//		if(!$force && !$isInsert && !$this->saveToSphinxRequired($object))
+//			return false;
 			
-		$categoriesIds = explode(',', $entry->getCategoriesIds());
-		$categories = implode(',', $categoriesIds);
-		
-		$flavorParamsIds = explode(',', $entry->getFlavorParamsIds());
-		$flavorParams = implode(',', $flavorParamsIds);
-		
 		$data = array('id' => $id);
 		
 		// NOTE: the order matters
@@ -167,108 +76,53 @@ class kSphinxSearchManager implements
 		$dataInts = array();
 		$dataTimes = array();
 		
-//		if($isInsert)
-			$dataStrings['entry_id'] = $entry->getId();
-			$dataStrings['str_entry_id'] = $entry->getId();
-		
-//		if($isInsert || $entry->isColumnModified(entryPeer::NAME))
-			$dataStrings['name'] = $entry->getName();
-			$dataInts['sort_name'] = kUTF8::str2int64($entry->getName());
+		$fields = $object->getIndexFieldsMap();
+		foreach($fields as $field => $getterName)
+		{
+			$fieldType = $object->getIndexFieldType($field);
+			$getter = "get{$getterName}";
 			
-//		if($isInsert || $entry->isColumnModified(entryPeer::TAGS))
-			$dataStrings['tags'] = $entry->getTags();
-//		if($isInsert || $entry->isColumnModified(entryPeer::CATEGORIES_IDS))
-			$dataStrings['categories'] = $categories;
-//		if($isInsert || $entry->isColumnModified(entryPeer::FLAVOR_PARAMS_IDS))
-			$dataStrings['flavor_params'] = $flavorParams;
-//		if($isInsert || $entry->isColumnModified(entryPeer::SOURCE_LINK))
-			$dataStrings['source_link'] = $entry->getSourceLink();
-//		if($isInsert || $entry->isColumnModified(entryPeer::KSHOW_ID))
-			$dataStrings['kshow_id'] = $entry->getKshowId();
-//		if($isInsert || $entry->isColumnModified(entryPeer::GROUP_ID))
-			$dataStrings['group_id'] = $entry->getGroupId();
-//		if($isInsert || $entry->isColumnModified(entryPeer::DESCRIPTION))
-			$dataStrings['description'] = $entry->getDescription();
-//		if($isInsert || $entry->isColumnModified(entryPeer::ADMIN_TAGS))
-			$dataStrings['admin_tags'] = $entry->getAdminTags();
-//		if($isInsert || $entry->isColumnModified(entryPeer::LENGTH_IN_MSECS))
-			$dataStrings['duration_type'] = entryPeer::getDurationType($entry->getDurationInt());
-			
-		
-		// TODO - implement as multi values - one value per plugin
-//		if($isInsert)
-//		{
-			// TODO - remove after solving the replace bug that removes all fields
-			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSearchDataContributor');
-			$sphinxPluginsData = array();
-			foreach($pluginInstances as $pluginName => $pluginInstance)
+			switch($fieldType)
 			{
-				KalturaLog::debug("Loading $pluginName sphinx texts");
-				$sphinxPluginData = null;
-				try
-				{
-					$sphinxPluginData = $pluginInstance->getSearchData($entry);
-				}
-				catch(Exception $e)
-				{
-					KalturaLog::err($e->getMessage());
-					continue;
-				}
-				
-				if($sphinxPluginData)
-				{
-					KalturaLog::debug("Sphinx data for $pluginName [$sphinxPluginData]");
-					$sphinxPluginsData[] = $sphinxPluginData;
-				}
+				case IIndexable::FIELD_TYPE_STRING:
+					$dataStrings[$field] = $object->$getter();
+					break;
+					
+				case IIndexable::FIELD_TYPE_INTEGER:
+					$dataInts[$field] = $object->$getter();
+					break;
+					
+				case IIndexable::FIELD_TYPE_STRING:
+					$dataTimes[$field] = $object->$getter(null);
+					break;
+			}
+		}
+		
+		// TODO - remove after solving the replace bug that removes all fields
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSearchDataContributor');
+		$sphinxPluginsData = array();
+		foreach($pluginInstances as $pluginName => $pluginInstance)
+		{
+			KalturaLog::debug("Loading $pluginName sphinx texts");
+			$sphinxPluginData = null;
+			try
+			{
+				$sphinxPluginData = $pluginInstance->getSearchData($object);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				continue;
 			}
 			
-			if(count($sphinxPluginsData))
-				$dataStrings['plugins_data'] = implode(',', $sphinxPluginsData);
-//		}
-		
-//		if($isInsert)
-			$dataInts['int_entry_id'] = $this->getSphinxId($entry);
-//		if($isInsert || $entry->isColumnModified(entryPeer::KUSER_ID))
-			$dataInts['kuser_id'] = $entry->getKuserId();
-//		if($isInsert || $entry->isColumnModified(entryPeer::STATUS))
-			$dataInts['entry_status'] = $entry->getStatus();
-//		if($isInsert || $entry->isColumnModified(entryPeer::TYPE))
-			$dataInts['type'] = $entry->getType();
-//		if($isInsert || $entry->isColumnModified(entryPeer::MEDIA_TYPE))
-			$dataInts['media_type'] = $entry->getMediaType();
-//		if($isInsert || $entry->isColumnModified(entryPeer::VIEWS))
-			$dataInts['views'] = $entry->getViews();
-//		if($isInsert || $entry->isColumnModified(entryPeer::PARTNER_ID))
-			$dataInts['partner_id'] = $entry->getPartnerId();
-//		if($isInsert || $entry->isColumnModified(entryPeer::MODERATION_STATUS))
-			$dataInts['moderation_status'] = $entry->getModerationStatus();
-//		if($isInsert || $entry->isColumnModified(entryPeer::DISPLAY_IN_SEARCH))
-			$dataInts['display_in_search'] = $entry->getDisplayInSearch();
-//		if($isInsert || $entry->isColumnModified(entryPeer::LENGTH_IN_MSECS))
-			$dataInts['duration'] = $entry->getDurationInt();
-//		if($isInsert || $entry->isColumnModified(entryPeer::ACCESS_CONTROL_ID))
-			$dataInts['access_control_id'] = $entry->getAccessControlId();
-//		if($isInsert || $entry->isColumnModified(entryPeer::MODERATION_COUNT))
-			$dataInts['moderation_count'] = $entry->getModerationCount();
-//		if($isInsert || $entry->isColumnModified(entryPeer::RANK))
-			$dataInts['rank'] = $entry->getRank();
-//		if($isInsert || $entry->isColumnModified(entryPeer::PLAYS))
-			$dataInts['plays'] = $entry->getPlays();
-		
-//		if($isInsert || $entry->isColumnModified(entryPeer::CREATED_AT))
-			$dataTimes['created_at'] = $entry->getCreatedAt(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::UPDATED_AT))
-			$dataTimes['updated_at'] = $entry->getUpdatedAt(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::MODIFIED_AT))
-			$dataTimes['modified_at'] = $entry->getModifiedAt(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::MEDIA_DATE))
-			$dataTimes['media_date'] = $entry->getMediaDate(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::START_DATE))
-			$dataTimes['start_date'] = $entry->getStartDate(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::END_DATE))
-			$dataTimes['end_date'] = $entry->getEndDate(null);
-//		if($isInsert || $entry->isColumnModified(entryPeer::AVAILABLE_FROM))
-			$dataTimes['available_from'] = $entry->getAvailableFrom(null);
+			if($sphinxPluginData)
+			{
+				KalturaLog::debug("Sphinx data for $pluginName [$sphinxPluginData]");
+				$sphinxPluginsData[] = $sphinxPluginData;
+			}
+		}
+		if(count($sphinxPluginsData))
+			$dataStrings['plugins_data'] = implode(',', $sphinxPluginsData);
 		
 		foreach($dataStrings as $key => $value)
 		{
@@ -293,7 +147,7 @@ class kSphinxSearchManager implements
 		$values = implode(',', $data);
 		$fields = implode(',', array_keys($data));
 		
-		$index = kSphinxSearchManager::SPHINX_INDEX_NAME;
+		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
 		$command = 'insert';
 		if(!$isInsert)
 			$command = 'replace';
@@ -301,48 +155,18 @@ class kSphinxSearchManager implements
 		return "$command into $index ($fields) values($values)";
 	}
 		
-	/*
-	public function updateSphinx($entry, $field, $value, $type = PDO::PARAM_STR)
-	{
-		$index = kSphinxSearchManager::SPHINX_INDEX_NAME;
-		
-		switch($type)
-		{
-			case PDO::PARAM_STR:
-				$search=array("\\","\0","\n","\r","\x1a","'",'"');
-				$replace=array("\\\\","\\0","\\n","\\r","\\Z","\\'",'\"');
-				$value = str_replace($search, $replace, $value);
-				$value = "'$value'";
-				break;
-				
-			case PDO::PARAM_INT:
-				if($value < 0)
-					throw new Exception("Entry [" . $entry->getId() . "] field [$field] can't be negative [$value]");
-				break;
-					
-			default:
-				throw new Exception("Field [$field] type must be PDO::PARAM_STR or PDO::PARAM_INT");
-		}
-		
-		$id = $entry->getIntId();
-		$sql = "replace into $index (id, $field) values($id, $value)";
-		
-		$this->execSphinx($sql);
-	}
-	*/
-		
 	/**
 	 * @param string $sql
-	 * @param entry $entry
+	 * @param IIndexable $object
 	 * @return bool
 	 */
-	public function execSphinx($sql, entry $entry)
+	public function execSphinx($sql, IIndexable $object)
 	{
 		KalturaLog::debug($sql);
 		
 		$sphinxLog = new SphinxLog();
-		$sphinxLog->setEntryId($entry->getId());
-		$sphinxLog->setPartnerId($entry->getPartnerId());
+		$sphinxLog->setEntryId($object->getEntryId());
+		$sphinxLog->setPartnerId($object->getPartnerId());
 		$sphinxLog->setSql($sql);
 		$sphinxLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 
@@ -359,20 +183,21 @@ class kSphinxSearchManager implements
 		return false;
 	}
 		
-	// TODO remove $force after replace bug solved
 	/**
-	 * @param entry $entry
+	 * @param IIndexable $object
 	 * @param bool $isInsert
-	 * @param bool $force
+	 * @param bool $force 
+	 * TODO remove $force after replace bug solved
+	 * 
 	 * @return bool
 	 */
-	public function saveToSphinx(entry $entry, $isInsert = false, $force = false)
+	public function saveToSphinx(IIndexable $object, $isInsert = false, $force = false)
 	{
-		KalturaLog::debug('Updating sphinx for entry [' . $entry->getId() . ']');
-		$sql = $this->getSphinxSaveSql($entry, $isInsert, $force);
+		KalturaLog::debug('Updating sphinx for object [' . get_class($object) . '] [' . $object->getId() . ']');
+		$sql = $this->getSphinxSaveSql($object, $isInsert, $force);
 		if(!$sql)
 			return true;
 		
-		return $this->execSphinx($sql, $entry);
+		return $this->execSphinx($sql, $object);
 	}
 }
