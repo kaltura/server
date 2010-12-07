@@ -1,4 +1,5 @@
 <?php
+
 class kXml
 {
 	public static function getFirstElement ( $xml_node , $element_name , $xpath_str = null )
@@ -62,8 +63,7 @@ class kXml
 		$node = self::getLastElement($xml_doc, $element_name, $xpath_str);
 		return $node ? $node->nodeValue : "";
 	}
-	
-	
+		
 	// manipulate the xml_dom
 	// @return if the xml_doc was modified
 	public static function setChildElement ( DOMDocument &$xml_doc , $parent_element , 
@@ -113,6 +113,261 @@ class kXml
 		}
 		
 		return $modified;
+	}
+
+	/**
+	 * The main function for converting to an Domdocument.
+	 * Pass in a BaseObject (from kaltura) and returns that object serialized as a DomDocument
+	 *
+	 * @param BaseObject $data
+	 * @param string $rootNodeName - what you want the root node to be - defaultsto data.
+	 * @return DomDocument XML
+	 */
+	public static function objectToXml(UnitTestDataObject $data, $rootNodeName = 'data')
+	{
+		$xml = new DOMDocument(1.0);
+		$rootNode = $xml->createElement($rootNodeName);
+		$xml->appendChild($rootNode); 
+		
+		foreach ($data->additionalData as $key => $value)
+		{
+			$rootNode->setAttribute($key, $value);
+		}
+		
+		//we need to check if this is a propel object
+		if(is_object($data->dataObject))
+		{
+			if($data->dataObject instanceof BaseObject)
+			{
+				//TODO: support in a different method, break this method into two parts
+//				propelObjectToXml();
+				
+				//Gets the data peer of the object (used to geting all the obejct feilds)
+				$dataPeer = $data->dataObject->getPeer(); 
+				
+				//Gets all object fields
+				$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
+				
+				//Create the xml elements by all fields and their values
+				foreach ($fields as $field)
+				{
+					$value = $data->dataObject->getByName($field);
+				
+					if(!is_array($value ))
+					{
+						$node = $xml->createElement($field, $value);
+						$rootNode->appendChild($node);
+					}
+					else
+					{
+						//create the array node
+						$arrayNode = $xml->createElement("array");
+						
+						foreach ($value as $key => $singleValue)
+						{
+							$node = $xml->createElement($field, $singleValue);
+							$node->setAttribute("key", $key );
+							$arrayNode->appendChild($node);
+						}
+											
+						$rootNode->appendChild($arrayNode); 
+					}
+				}
+			}
+			else // object is Kaltura object
+			{
+				//TODO: serialize the kaltura object into XML.
+				$reflector = new ReflectionClass($data->dataObject);
+				$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
+				foreach ($properties as $property)
+				{
+					$value = $property->getValue($data->dataObject);
+					$propertyName = $property->getName();
+					
+					if(!is_array($value))
+					{
+						$node = $xml->createElement($propertyName, $value);
+						$rootNode->appendChild($node);
+					}
+					else
+					{
+						//create the array node
+						$arrayNode = $xml->createElement("array");
+						
+						foreach ($value as $key => $singleValue)
+						{
+							$node = $xml->createElement($propertyName, $singleValue);
+							$node->setAttribute("key", $key);
+							$arrayNode->appendChild($node);
+						}
+											
+						$rootNode->appendChild($arrayNode); 
+					}
+				}
+			}
+		}
+		else
+		{
+			//Value types will be written in the same line as their type
+			
+//			$node = $xml->createElement(gettype($data), $data);
+//			$rootNode->appendChild($node);
+//			$rootNode->setAttribute("value", $data);
+		}
+		 		
+		// pass back DomElement object
+		return $xml;
+	}
+
+	private static function propelObjectToXml(BaseObject $data)
+	{
+		throw new Exception("Please use objectToXml method");
+	}
+	
+	/**
+	 * Gets a xml based data and returns a new unit test data object with those values
+	 * @param SimpleXMLElement $xml
+	 * @return UnitTestDataObject the new unit test data object with the given data
+	 */
+	public static function XmlToObject($xml)
+	{
+		$objectInstace = new UnitTestDataObject();
+		 
+		$objectInstace->type = (string)$xml['type'];
+			
+		$objectInstace->dataObject = kXml::getObjectInstance($objectInstace->type);	
+	
+		$objectInstace->additionalData = kXml::getAttributesAsArray($xml);
+		
+		if(class_exists($objectInstace->type))
+		{
+			foreach ($xml->children() as $childKey => $childValue)
+			{
+				try
+				{
+					//TODO: handle fields which are arrays (currently handled hard coded)
+					if($childKey == "array")
+					{
+						$arrayValue = array();
+						
+						foreach ($childValue as $singleElementKey => $singleElementValue)
+						{
+							$key = (string)$singleElementValue["key"];
+							$arrayValue[$key] = (string)$singleElementValue;
+							$arrayKey = $singleElementKey;
+						}
+						
+						kXml::setPropertyValue(&$objectInstace->objectData, $arrayKey, $arrayValue);
+					}
+	 				else 
+	 				{
+	 					kXml::setPropertyValue(&$objectInstace->objectData, $childKey, $childValue);
+	 				}
+				}	
+				catch (Exception $e)
+				{
+					print("Error can't set by name" . $childValue . $e);
+				}
+			}
+		}
+		else
+		{
+			//Handle no classes objects like string and int
+			//TODO: add support for file... here or there...
+		}
+
+		// pass back propel object
+		return $objectInstace;
+	}
+
+	/**
+	 * 
+	 * Sets the given object's given property value 
+	 * @param unknown_type $objectInstace
+	 * @param $fieldName
+	 * @param unknown_type $fieldValue
+	 */
+	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue)
+	{
+		if($objectInstace instanceof BaseObject)
+		{
+			$objectInstace->setByName($fieldName, $fieldValue);
+		}
+		else if($objectInstace instanceof KalturaObject)
+		{
+			$objectInstace->$fieldName = (string)$fieldValue;
+		}
+		else
+		{
+			$objectInstace = (string)$fieldValue;
+		}
+	} 
+	
+	/**
+	 * 
+	 * Returns an objetct instance from the given type 
+	 * @param unknown_type $objectInstace
+	 * @param $fieldName
+	 * @param unknown_type $fieldValue
+	 */
+	private static function getObjectInstance($objectInstaceType)
+	{
+		$objectInstace = "";
+		
+		if(class_exists($objectInstaceType))
+		{
+			$objectInstace = new $objectInstaceType;
+		}
+		else  //regular type (string, int, ...)
+		{
+			//TODO: check all base types like int, string, ...
+		}		
+		
+		return $objectInstace;
+	} 
+	
+	/**
+	 * 
+	 * Gets a xml attribute if one exists Safe method (no exception is thrown)
+	 * @param unknown_type $object
+	 * @param unknown_type $attribute
+	 * @return string  - the attribute value if such exists
+	 */
+	public static function getXmlAttributeAsString($object, $attribute)
+	{
+	    if(isset($object[$attribute]))
+	        return (string) $object[$attribute];
+	}
+	
+	/**
+	 * 
+	 * Gets a xml attribute if one exists Safe method (no exception is thrown)
+	 * @param unknown_type $object
+	 * @param unknown_type $attribute
+	 * @return int - the attribute value if such exists
+	 */
+	public static function getXmlAttributeAsInt($object, $attribute)
+	{
+	    if(isset($object[$attribute]))
+	        return (string) $object[$attribute];
+	}
+
+	/**
+	 * 
+	 * creates the additional data from the given xml object
+	 * @param SimpleXMLElement $xmlobject
+	 * @return array<key => value> - the additional data as key / value pair
+	 */
+	public static function getAttributesAsArray(SimpleXMLElement $xmlobject)
+	{
+		$attributesArray = array();
+		
+		foreach ($xmlobject->attributes() as $attributeKey => $attributeValue) 
+		{
+			$attributesArray[$attributeKey] = (string)$attributeValue;
+		}
+		
+		return $attributesArray;
 	}
 }
 
