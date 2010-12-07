@@ -127,8 +127,6 @@ class kConf extends kConfLocal
 					"StorageProfilePlugin", // Should always be enabled
 				),
 				
-                "search_plugin"	=> "sphinxSearch",
-											
 				"event_consumers" => array(
                 	"kFlowManager",
                 	"kStorageExporter",
