@@ -31,4 +31,5 @@ require_once ('/PHPUnit/Framework.php');
 
 //Absolute path with a var (good for all systems as we are using KALTURA_ROOT_PATH)
 require_once (dirname(__FILE__). '/unitTestDataGenerator/unitTestDataGenerator.php');
-require_once (dirname(__FILE__). '/infra/unitTestData.php');require_once (dirname(__FILE__). '/infra/unitTestBase.php');
+require_once (dirname(__FILE__). '/infra/unitTestData.php');
+require_once (dirname(__FILE__). '/infra/unitTestBase.php');
