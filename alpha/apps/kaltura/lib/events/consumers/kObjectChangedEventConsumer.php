@@ -1,4 +1,7 @@
 <?php
+/**
+ * Auto-raised event that raised by the propel generated objects
+ */
 interface kObjectChangedEventConsumer extends KalturaEventConsumer
 {
 	/**

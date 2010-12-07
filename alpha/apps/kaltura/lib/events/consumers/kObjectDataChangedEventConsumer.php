@@ -1,4 +1,7 @@
 <?php
+/**
+ * Applicative event that raised implicitly by the developer
+ */
 interface kObjectDataChangedEventConsumer extends KalturaEventConsumer
 {
 	/**
