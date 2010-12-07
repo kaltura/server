@@ -1,5 +1,5 @@
 <?php
-interface ISyncableFile 
+interface ISyncableFile extends IBaseObject
 {
 	public function getSyncKey( $sub_type , $version=null);
 	
@@ -28,9 +28,4 @@ interface ISyncableFile
 	 * @param FileSync $file_sync
 	 */
 	public function setFileSync ( FileSync $file_sync );
-	
-	/**
-	 * @return int
-	 */
-	public function getPartnerId();
 }

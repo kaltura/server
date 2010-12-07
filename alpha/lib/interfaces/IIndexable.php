@@ -1,5 +1,5 @@
 <?php
-interface IIndexable
+interface IIndexable extends IBaseObject
 {
 	const FIELD_TYPE_STRING = 'string';
 	const FIELD_TYPE_INTEGER = 'int';
@@ -16,11 +16,6 @@ interface IIndexable
 	 * @return int
 	 */
 	public function getIntId();
-	
-	/**
-	 * @return int
-	 */
-	public function getPartnerId();
 	
 	/**
 	 * @return string
