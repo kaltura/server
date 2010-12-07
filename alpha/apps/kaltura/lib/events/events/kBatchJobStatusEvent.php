@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Applicative event that raised implicitly by the developer
+ */
 class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kBatchJobStatusEventConsumer';

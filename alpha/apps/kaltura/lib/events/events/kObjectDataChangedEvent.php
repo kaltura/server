@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Applicative event that raised implicitly by the developer
+ */
 class kObjectDataChangedEvent extends KalturaEvent implements IKalturaContinualEvent
 {
 	const EVENT_CONSUMER = 'kObjectDataChangedEventConsumer';

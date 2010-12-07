@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Auto-raised event that raised by the propel generated objects
+ */
 class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 {
 	const EVENT_CONSUMER = 'kObjectCopiedEventConsumer';
