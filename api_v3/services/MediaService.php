@@ -508,6 +508,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
+	 * 
+	 * @deprecated
 	 */
 	function updateThumbnailAction($entryId, $timeOffset, $flavorParamsId = null)
 	{
@@ -527,6 +529,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
+	 * 
+	 * @deprecated
 	 */
 	function updateThumbnailFromSourceEntryAction($entryId, $sourceEntryId, $timeOffset, $flavorParamsId = null)
 	{
@@ -543,6 +547,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
+	 * 
+	 * @deprecated
 	 */
 	function updateThumbnailJpegAction($entryId, $fileData)
 	{
@@ -559,6 +565,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY
+	 * 
+	 * @deprecated
 	 */
 	function updateThumbnailFromUrlAction($entryId, $url)
 	{
