@@ -1,0 +1,35 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+------------------------------------------------------------------------------------------------
+name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
+------------------------------------------------------------------------------------------------
+
+annotation.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotation.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotation.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |
+annotation.add						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotation.get						|			|1		|1	|1		|2		|1		|r	|		|	|   |
+
+annotationsession.update			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotationsession.delete			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotationsession.list				|			|1		|1	|1		|2		|1		|r	|		|	|   |
+annotationsession.add				|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotationsession.get				|			|1		|1	|1		|2		|1		|r	|		|	|   |
+annotationsession.publish			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotationsession.AppendAnnotation	|			|1		|1	|1		|2		|1		|rw	|		|	|   |
