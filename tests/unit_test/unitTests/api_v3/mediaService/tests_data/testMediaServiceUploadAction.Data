@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Description>a test data file for the media service (testUploadAction)</Description>
+  <UnitTestsData>
+    <UnitTestData>
+      <Description>test data 1 - regular file</Description>
+      <Inputs>
+        <Input type="file" value="C:\Users\Public\Videos\Sample Videos\Wildlife.wmv" partnerId="407081" secret="021e6b694af8004ed2ef890e5664ae24"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>
