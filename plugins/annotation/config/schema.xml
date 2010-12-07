@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="lib.model">
 	<table skipSql="false" abstract="false" name="annotation">
-		<column lazyLoad="false" name="int_id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="id" type="varchar" />
+		<column lazyLoad="false" name="int_id" type="integer" required="true" primaryKey="false" autoIncrement="true" />
+		<column required="false" lazyLoad="false" name="id" type="varchar" primaryKey="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="session_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="entry_id" type="varchar" size="31" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
@@ -15,21 +15,19 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="kuser_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_data" type="longvarchar"/>
-		<index name="id_index">
-			<index-column name="id" />
-		</index>
 		<index name="partner_entry_index">
 			<index-column name="partner_id" />
 			<index-column name="entry_id" />
 		</index>
 		<index name="session_entry_index">
+			<index-column name="partner_id" />
 			<index-column name="session_id" />
 			<index-column name="entry_id" />
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="annotation_session">
-		<column lazyLoad="false" name="int_id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="id" type="varchar" />
+		<column lazyLoad="false" name="int_id" type="integer" required="true" primaryKey="false" autoIncrement="true" />
+		<column required="false" lazyLoad="false" name="id" type="varchar" primaryKey="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="session_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="entry_id" type="varchar" size="31" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
@@ -37,14 +35,12 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
-		<index name="id_index">
-			<index-column name="id" />
-		</index>
 		<index name="partner_entry_index">
 			<index-column name="partner_id" />
 			<index-column name="entry_id" />
 		</index>
 		<index name="session_entry_index">
+			<index-column name="partner_id" />
 			<index-column name="session_id" />
 			<index-column name="entry_id" />
 		</index>
