@@ -302,7 +302,7 @@
 		<xsl:for-each select="schedulers/item">
 			schd <xsl:value-of select="configuredId"/> name: <xsl:value-of select="name"/>
 			schd <xsl:value-of select="configuredId"/> status time: <xsl:value-of select="lastStatus"/>
-			<xsl:for-each select="workers/item">
+		<!--	<xsl:for-each select="workers/item">
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> name: <xsl:value-of select="name"/>
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> type: <xsl:value-of select="type"/>
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> type name: <xsl:value-of select="typeName"/>
@@ -313,7 +313,7 @@
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> avg wait: <xsl:value-of select="avgWait"/>
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> avg work: <xsl:value-of select="avgWork"/>
 				schd <xsl:value-of select="configuredId"/> wrk <xsl:value-of select="configuredId"/> status time: <xsl:value-of select="lastStatus"/>
-			</xsl:for-each>
+			</xsl:for-each> -->
 		</xsl:for-each>
 		
 		XSL time: 
