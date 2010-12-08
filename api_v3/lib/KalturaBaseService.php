@@ -102,7 +102,18 @@ abstract class KalturaBaseService
 			if ( $ticket_type == kSessionUtils::REQUIED_TICKET_NOT_ACCESSIBLE )
 			{
 				// partner cannot access this service
-				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
+				if($ks_partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
+				{
+					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+				}
+				elseif($ks_partner->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
+				{
+					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_FULLY_BLOCKED);
+				}
+				else
+				{
+					throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
+				}
 			}
 			
 			// 2009-07-13 - Roman & Liron - removed this check because if a session was passed we can (and maybe should) validate it anyway.
@@ -187,7 +198,18 @@ abstract class KalturaBaseService
 			if ( $ticket_type == kSessionUtils::REQUIED_TICKET_NOT_ACCESSIBLE )
 			{
 				// partner cannot access this service
-				throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
+				if($this->partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
+				{
+					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+				}
+				elseif($this->partner->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
+				{
+					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_FULLY_BLOCKED);
+				}
+				else
+				{
+					throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
+				}
 			}
 			if ( $this->force_ticket_check && $ticket_type != kSessionUtils::REQUIED_TICKET_NONE )
 			{
