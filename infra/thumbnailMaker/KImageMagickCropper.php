@@ -86,9 +86,10 @@ class KImageMagickCropper extends KBaseCropper
 
 		if($quality)
 			$attributes[] = "-quality $quality";
-			
-		// pre-crop
-		if($cropX || $cropY || $cropWidth || $cropHeight)
+
+		// pre-crop (only in case no additional crop is needed)
+		if ((intval($cropType) == self::RESIZE || intval($cropType) == self::RESIZE_WITH_PADDING) &&
+			($cropX || $cropY || $cropWidth || $cropHeight))
 		{
 			if($cropType == self::CROP_FROM_TOP)
 				$cropY = 0;
@@ -99,7 +100,7 @@ class KImageMagickCropper extends KBaseCropper
 			
 			$attributes[] = "-crop $geometrics";
 		}
-		
+				
 		// crop or resize
 		if($width || $height)
 		{
@@ -117,6 +118,11 @@ class KImageMagickCropper extends KBaseCropper
 						$borderWidth = 0;
 						$borderHeight = 0;
 						
+						if ($cropHeight)
+							$this->srcHeight = $cropHeight;
+						if ($cropWidth)
+							$this->srcWidth = $cropWidth;
+						
 						if($width < $height)
 						{
 							$w = $width;
@@ -133,7 +139,9 @@ class KImageMagickCropper extends KBaseCropper
 						$bgcolor = dechex($bgcolor);
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
 						$attributes[] = "-resize {$w}x{$h}";
-						$attributes[] = "-border {$borderWidth}x{$borderHeight}";
+						$borderWidth = ($cropX ? $cropX : $cropWidth);
+						$borderHeight = ($cropY ? $cropY : $cropHeight);
+						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
 					{
@@ -147,22 +155,51 @@ class KImageMagickCropper extends KBaseCropper
 				case self::CROP_FROM_TOP:
 					$w = $width ? $width : $height;
 					$h = $height ? $height : $width;
+					$gravity = null;
+					if ($cropHeight)
+					{
+						$this->srcHeight = $cropHeight;
+						$gravity = "-gravity North";
+					}
+					if ($cropWidth)
+					{
+						$this->srcWidth = $cropWidth;
+						$gravity = "-gravity West";
+					}
 					
-					$resizeWidth = '';
-					$resizeHeight = '';
-					
-					if($width >= $height)
-						$resizeWidth = $width;
+					$resizeWidth = $this->srcWidth;
+					$resizeHeight = $this->srcHeight;
+					$ratio = 0;
+					if ($w < $h) 
+					{
+						$ratio = round($h / $w, 3);
+						if ($this->srcHeight / $ratio <= $resizeWidth)
+							$resizeWidth = $this->srcHeight / $ratio;
+						else
+							$resizeHeight = $this->srcWidth / $ratio;
+					}
+					elseif ($h < $w)
+					{
+						$ratio = round($w / $h, 3);
+						if ($this->srcHeight * $ratio <= $resizeWidth)
+							$resizeWidth = $this->srcHeight * $ratio;
+						else
+							$resizeHeight = $this->srcWidth / $ratio;
+					}
 					else
-						$resizeHeight = $height;
-						
-					if($cropType == self::CROP)
+					{
+						$resizeHeight = $resizeWidth = ($resizeHeight < $resizeWidth ? $resizeHeight : $resizeWidth);
+					}
+					$resizeHeight = round($resizeHeight);
+					$resizeWidth = round($resizeWidth);
+					if($cropType == self::CROP && !$gravity)
 						$attributes[] = "-gravity Center";
-					elseif($cropType == self::CROP_FROM_TOP)
+					elseif($cropType == self::CROP_FROM_TOP && !$gravity)
 						$attributes[] = "-gravity North";
 						
-					$attributes[] = "-resize {$resizeWidth}x{$resizeHeight}";
-					$attributes[] = "-crop {$w}x{$h}+0+0";
+					$attributes[] = $gravity;	
+					$attributes[] = "-crop {$resizeWidth}x{$resizeHeight}+0+0";
+					$attributes[] = "-resize {$w}x{$h}";
 					break;
 			}
 		}
