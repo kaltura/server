@@ -1,9 +1,5 @@
 <?php
-/*
 
-
-
- */
 require_once 'PHPUnit\Framework\TestCase.php';
 require_once 'bootstrap.php';
 
@@ -90,6 +86,7 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase
 			$urlRequest2 . ': ' . @filesize($downloadedFileServer2) . ' bytes' .PHP_EOL);
 		
 		// check if the image's height and width are the same
+		// if images width/height is within tolerance but not identical end test (as success)
 		$server1ImageSize = getimagesize($downloadedFileServer1);
 		$server2ImageSize = getimagesize($downloadedFileServer2);
 		$this->assertTrue((abs($server1ImageSize[0] - $server2ImageSize[0]) < $pixelTol) &&
@@ -97,6 +94,9 @@ class convertImageServersUTest extends PHPUnit_Framework_TestCase
 						'files width and/or height are not identical: ' . PHP_EOL .
 						$urlRequest1 . ': '  . $server1ImageSize[0] . 'x' . $server1ImageSize[1] . PHP_EOL .
 						$urlRequest2 . ': '  . $server2ImageSize[0] . 'x' . $server2ImageSize[1] . PHP_EOL);
+		if ($server1ImageSize[0] !== $server2ImageSize[0] || $server1ImageSize[1] !== $server2ImageSize[1])
+			return;				
+		
 
 		// check if images are identical, graphica-wise (upto a given tolerance) 
 		$tmpFile = tempnam(dirname(__FILE__), 'imageComperingTmp');
