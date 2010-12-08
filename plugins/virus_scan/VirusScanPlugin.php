@@ -50,8 +50,8 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	 */
 	public static function getEnums($baseEnumName)
 	{
-		// virus scan does not work in partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		// virus scan only works in api_v3 context because it uses dynamic enums
+		if (!self::isApiV3())
 			return array();
 			
 		if($baseEnumName == 'entryStatus')
@@ -71,8 +71,8 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		// virus scan does not work in partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		// virus scan only works in api_v3 context because it uses dynamic enums
+		if (!self::isApiV3())
 			return null;
 			
 		if($baseClass == 'kJobData')
@@ -101,8 +101,8 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		// virus scan does not work in partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		// virus scan only works in api_v3 context because it uses dynamic enums
+		if (!self::isApiV3())
 			return null;
 			
 		if($baseClass == 'kJobData')
@@ -123,4 +123,5 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		
 		return null;
 	}
+
 }
