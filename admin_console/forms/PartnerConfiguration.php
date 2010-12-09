@@ -50,6 +50,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('text', 'login_users_quota', array(
+			'label'			=> 'Login users quota:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'Usage Package:',
 			'filters'		=> array('StringTrim'),
