@@ -20,6 +20,13 @@ error_reporting(E_ALL);
 
 $databaseManager = new sfDatabaseManager();
 $databaseManager->initialize();
+
+if (count($argv) !== 1)
+{
+	die('please provide a partner id' . PHP_EOL . 
+		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
+		'whereas X is partner id' . PHP_EOL);
+}
 $partner_id = @$argv[1];
 
 $partner = PartnerPeer::retrieveByPK($partner_id);

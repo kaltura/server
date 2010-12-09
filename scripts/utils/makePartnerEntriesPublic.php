@@ -34,7 +34,6 @@ if (count($argv) !== 1)
 		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
 		'whereas X is partner id' . PHP_EOL);
 }
-
 $partner_id = @$argv[1];
 
 $partner = PartnerPeer::retrieveByPK($partner_id);
