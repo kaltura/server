@@ -24,7 +24,6 @@ class AnnotationPlugin implements IKalturaPlugin, IKalturaServices
 	{
 		$map = array(
 			'annotation' => 'AnnotationService',
-			'annotationSession' => 'AnnotationSessionService',
 		);
 		return $map;
 	}
