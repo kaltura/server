@@ -301,7 +301,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
 				
 			$str .= "\n";
-			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " extends KalturaCall\n" ;
+			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " " ;
+			
+			if($isFileCall)
+				$str .= "extends KalturaFileCall\n" ;
+			else
+				$str .= "extends KalturaCall\n" ;
+				
 			$str .= "	{\n";
 			if($isFileCall)
 			$str .= "		public var fileData:FileReference;\n";
@@ -347,14 +353,15 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
-			$str .= "{\n";
-			$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n";
+			$str .= "{\n"; 
+			$str .= "	import flash.utils.getDefinitionByName;\n\n";
 			$str .= "	import com.kaltura.config.KalturaConfig;\n";
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
-			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n\n"; 
-			$str .= "	import flash.utils.getDefinitionByName;\n";
+			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n";
 			if($isFileCall)
 			{
+				$str .= "	import com.kaltura.errors.KalturaError;\n";
+				$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n\n";
 				$str .= "	import flash.events.DataEvent;\n";
 				$str .= "	import flash.events.Event;\n";
 				$str .= "	import flash.net.URLRequest;\n\n";
