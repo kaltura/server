@@ -32,8 +32,12 @@ class myCache
 						
 			self::$s_memcache = new Memcache;
 			//self::$s_memcache->pconnect(self::SERVER, self::PORT) // this will use a persistent connection 
-			
-			$res = @self::$s_memcache->connect( kConf::get ( "memcache_host") , kConf::get ( "memcache_port" ) );
+			try {
+				$res = @self::$s_memcache->connect( kConf::get ( "memcache_host") , kConf::get ( "memcache_port" ) );
+			}
+			catch (Exception $e) {
+				$res = false;
+			}
 			if ( !$res )
 			{
 				kLog::log( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
