@@ -35,10 +35,17 @@ user.add							|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.update							|			|2		|1	|2		|1		|1		|	|		|	|   |
 user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |
-user.updateid						|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |
 user.notifyban						|			|2		|1	|0		|0		|1		|	|		|	|   |
-user.login							|			|N		|1	|0		|0		|1		|	|		|	|   |
+
+user.login							|			|0		|1	|0		|0		|1		|	|		|	|   |
+user.loginbyloginid			        |			|0		|0	|0		|0		|1		|	|		|	|   |
+user.getbyloginid                   |   		|2		|1	|0		|0		|1		|	|		|	|   |
+user.updatelogindata		        |			|0		|0	|0		|0		|1		|	|		|	|   |
+user.resetpassword				    |			|0		|0	|0		|0		|1		|	|		|	|   |
+user.setinitialpassword 		    |			|0		|0	|0		|0		|1		|	|		|	|   |
+user.enableLogin                    |   		|2		|1	|0		|0		|1		|	|		|	|   |
+user.disableLogin                   |   		|2		|1	|0		|0		|1		|	|		|	|   |
 
 widget.add							|			|1		|1	|0		|0		|1		|	|		|	|   |
 widget.clone						|			|1		|1	|0		|0		|1		|	|		|	|   |
