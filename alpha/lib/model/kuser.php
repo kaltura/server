@@ -19,7 +19,6 @@ class kuser extends Basekuser
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
-	const KUSER_ALLOW_ALL = 1000;
 	  
 	// enum for different status
 	const KUSER_STATUS_SUSPENDED = 0;
@@ -71,12 +70,7 @@ class kuser extends Basekuser
 			
 		return $ret;
 	}
-	
-	public static function isAdmin ( $kuser_id )
-	{
-		return ( $kuser_id > 0 && $kuser_id < self::KUSER_ALLOW_ALL ); 	
-	}
-	
+		
 	public function setRoughcutCount ( $count )
 	{
 		$this->roughcut_count = $count ;
@@ -94,18 +88,7 @@ class kuser extends Basekuser
 		}
 		return $this->roughcut_count;
 	}
-	
-	public function setPassword($password) 
-	{ 
-		$salt = md5(rand(100000, 999999).$this->getScreenname().$this->getEmail()); 
-		$this->setSalt($salt); 
-		$this->setSha1Password(sha1($salt.$password));  
-	} 
-	
-	public function isPasswordValid ( $password_to_match )
-	{
-		return sha1( $this->getSalt().$password_to_match ) == $this->getSha1Password() ;
-	}
+
 	
 	static public function getKuserById ( $id )
 	{
@@ -183,12 +166,7 @@ class kuser extends Basekuser
 	{
 		return myBlockedEmailUtils::createBlockEmailUrl ( $this->getEmail() );	
 	}
-	
-	public function getPicId() 
-	{ 
-		return sha1( $this->getSalt().$this->getId() );
-	}
-	
+		
 	public function getPicturePath() 
 	{ 
 		$picfile = $this->getPicture();
@@ -489,4 +467,298 @@ class kuser extends Basekuser
 		return $this->getId();
 	}
 	
+	/**
+	 * Set last_login_time parameter to $time (in custom_data)
+	 * @param int $time timestamp
+	 */
+	public function setLastLoginTime($time)
+	{
+		$this->putInCustomData('last_login_time', $time);
+	}
+	
+	/**
+	 * @return last_login_time parameter from custom_data
+	 */
+	public function getLastLoginTime()
+	{
+		return $this->getFromCustomData('last_login_time');
+	}
+	
+	//TODO: check if needed
+	public function getIsAdmin()
+	{
+		return parent::getisAdmin() == true;
+	}
+	
+	
+	/**
+	 * @return Kuser's full name = first_name + last_name
+	 */
+	public function getFullName()
+	{
+		if ($this->getFirstName()) {
+			return trim($this->getFirstName().' '.$this->getLastName());
+		}
+		else {
+			// full_name is deprecated - this is for backward compatibiliy and for migration
+			KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated but still being read');
+			return parent::getFullName();
+		}
+	}
+	
+	
+	private function setStatusUpdatedAt($v)
+	{		
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		$curValue = $this->getStatusUpdatedAt();
+		if ( $curValue !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($curValue !== null && $tmpDt = new DateTime($curValue)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$newValue = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->putInCustomData('status_updated_at', $newValue, null);
+			}
+		} // if either are not null
+
+		return $this;
+	}
+	
+	public function getStatusUpdatedAt($format = 'Y-m-d H:i:s')
+	{
+		$value = $this->getFromCustomData('status_updated_at', null, null);
+		
+		if ($value === null) {
+			return null;
+		}
+
+		if ($value === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($value);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($value, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+	
+	
+	private function setDeletedAt($v)
+	{		
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		$curValue = $this->getDeletedAt();
+		if ( $curValue !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($curValue !== null && $tmpDt = new DateTime($curValue)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$newValue = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->putInCustomData('deleted_at', $newValue, null);
+			}
+		} // if either are not null
+
+		return $this;
+	}
+	
+	public function getDeletedAt($format = 'Y-m-d H:i:s')
+	{
+		$value = $this->getFromCustomData('deleted_at', null, null);
+		
+		if ($value === null) {
+			return null;
+		}
+
+		if ($value === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($value);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($value, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
+	}
+	
+	/**
+	 * Set status and statusUpdatedAt fields
+	 * @see Basekuser::setStatus()
+	 */
+	public function setStatus($status)
+	{
+		parent::setStatus($status);
+		$this->setStatusUpdatedAt(time());
+		if ($status == kuser::KUSER_STATUS_DELETED) {
+			$this->setDeletedAt(time());
+		}
+	}
+	
+
+	
+	// -- start of deprecated functions
+	
+	public function setSalt($v)
+	{
+		// salt column is deprecated
+		KalturaLog::ALERT('Field [salt] on object [kuser] is deprecated');
+		throw new Exception('Field [salt] on object [kuser] is deprecated');
+	}
+	
+	public function setSha1Password($v)
+	{
+		// sha1_password column is deprecated
+		KalturaLog::ALERT('Field [sha1_password] on object [kuser] is deprecated - trace: ');
+		throw new Exception('Field [sha1_password] on object [kuser] is deprecated');
+	}
+	
+	public function getSalt()
+	{
+		// salt column is deprecated
+		KalturaLog::ALERT('Field [salt] on object [kuser] is deprecated - getSalt should be removed from schema after migration');
+		return parent::getSalt();
+	}
+	
+	public function getSha1Password()
+	{
+		// sha1_password column is deprecated
+		KalturaLog::ALERT('Field [sha1_password] on object [kuser] is deprecated - getSha1Password should be removed from schema after migration');
+		return parent::getSha1Password();
+	}
+	
+	public function setFullName($v)
+	{
+		// full_name column is deprecated
+		KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated');
+		throw new Exception('Field [full_name] on object [kuser] is deprecated');
+	}
+	
+	// -- end of deprecated functions
+	
+	
+	/**
+	 * Disable user login
+	 * @throws kUserException::USER_LOGIN_ALREADY_DISABLED
+	 */
+	public function disableLogin()
+	{
+		if (!$this->getLoginDataId())
+		{
+			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_DISABLED);
+		}
+		
+		$loginDataId = $this->getLoginDataId();
+		$this->setLoginDataId(null);
+		$this->save();
+		
+		UserLoginDataPeer::notifyOneLessUser($loginDataId);
+			
+		return true;	
+	}
+	
+	/**
+	 * Enable user login 
+	 * @param string $loginId
+	 * @param string $password
+	 * @param bool $checkPasswordStructure
+	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
+	 * @throws kUserException::INVALID_EMAIL
+	 * @throws kUserException::INVALID_PARTNER
+	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
+	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 */
+	public function enableLogin($loginId, $password, $checkPasswordStructure = true)
+	{
+		if ($this->getLoginDataId())
+		{
+			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_ENABLED);
+		}
+		
+		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $checkPasswordStructure);	
+		if (!$loginData)
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		
+		$this->setLoginDataId($loginData->getId());
+		$this->save();
+		return true;
+	}
+			
 }

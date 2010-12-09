@@ -25,7 +25,12 @@ class adminloginAction extends defPartnerservices2Action
 					"ks" => array ( "type" => "string" , "desc" => "" ),
 					),
 				"errors" => array (
-					APIErrors::ADMIN_KUSER_NOT_FOUND
+					APIErrors::ADMIN_KUSER_NOT_FOUND,
+					APIErrors::LOGIN_RETRIES_EXCEEDED,
+					APIErrors::LOGIN_BLOCKED,
+					APIErrors::USER_WRONG_PASSWORD,
+					APIErrors::PASSWORD_EXPIRED,
+					APIErrors::UNKNOWN_PARTNER_ID,
 					)
 			);
 	}
@@ -36,52 +41,66 @@ class adminloginAction extends defPartnerservices2Action
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
 		defPartnerservices2baseAction::disableCache();
+		kuserPeer::setUseCriteriaFilter(false);
 		
 		$email = trim ( $this->getPM ( "email" ) );
 		$password = trim (  $this->getPM ( "password" ) );
 		
-		$admin = adminKuserPeer::getAdminKuserByEmail ($email);
+		$loginData = UserLoginDataPeer::getByEmail ($email);
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
 		// so no hint about existing admin will leak 
-		if ( count ( $admin ) < 1 )
+		if ( count ( $loginData ) < 1 )
 		{
 			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
 			return;
 		}
 
 		try {
-			$adminKuser = adminKuserPeer::adminLogin($email, $password);
+			$adminKuser = UserLoginDataPeer::userLoginByEmail($email, $password, $partner_id);
 		}
-		catch (kAdminKuserException $e) {
+		catch (kUserException $e) {
 			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
+			if ($code == kUserException::USER_NOT_FOUND) {
 				$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
 				return null;
 			}
-			else if ($code == kAdminKuserException::LOGIN_RETRIES_EXCEEDED) {
+			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
+				$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				return null;
+			}
+			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED) {
 				$this->addError  ( APIErrors::LOGIN_RETRIES_EXCEEDED );
 				return null;
 			}
-			else if ($code == kAdminKuserException::LOGIN_BLOCKED) {
+			else if ($code == kUserException::LOGIN_BLOCKED) {
 				$this->addError  ( APIErrors::LOGIN_BLOCKED );
 				return null;
 			}
-			else if ($code == kAdminKuserException::PASSWORD_EXPIRED) {
+			else if ($code == kUserException::PASSWORD_EXPIRED) {
 				$this->addError  ( APIErrors::PASSWORD_EXPIRED );
 				return null;
+			}
+			else if ($code == kUserException::WRONG_PASSWORD) {
+				$this->addError  (APIErrors::ADMIN_KUSER_NOT_FOUND);
 			}
 			$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 			return null;
 		}
-		if (!$adminKuser) {
+		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
 			$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
 			return null;
 		}
 		
+		
+		if ($partner_id && $partner_id != $adminKuser->getPartnerId()) {
+			$this->addError  ( APIErrors::UNKNOWN_PARTNER_ID );
+			return;
+		}
+		
 		$partner = PartnerPeer::retrieveByPK( $adminKuser->getPartnerId() );
 		
-		if ( ! $partner )
+		if (!$partner)
 		{
 			$this->addError  ( APIErrors::UNKNOWN_PARTNER_ID );
 			return;		
@@ -89,10 +108,10 @@ class adminloginAction extends defPartnerservices2Action
 		
 		$partner_id = $partner->getId();
 		$subp_id = $partner->getSubpId() ;
-		$admin_puser_id = "__ADMIN__" . $admin->getId(); // the prefix __ADMIN__ and the id in the admin_kuser table
+		$admin_puser_id = $adminKuser->getPuserId();
 		
 		// get the puser_kuser for this admin if exists, if not - creae it and return it - create a kuser too
-		$puser_kuser = PuserKuserPeer::createPuserKuser ( $partner_id , $subp_id, $admin_puser_id , $admin->getScreenName() , $admin->getScreenName(), true );
+		$puser_kuser = PuserKuserPeer::createPuserKuser ( $partner_id , $subp_id, $admin_puser_id , $adminKuser->getScreenName() , $adminKuser->getScreenName(), true );
 		$uid = $puser_kuser->getPuserId();
 		$ks = null;
 		// create a ks for this admin_kuser as if entered the admin_secret using the API
@@ -104,9 +123,8 @@ class adminloginAction extends defPartnerservices2Action
 		$this->addMsg ( "subp_id" , $subp_id );		
 		$this->addMsg ( "uid" , $uid );
 		$this->addMsg ( "ks" , $ks );
-		$this->addMsg ( "screenName" , $admin->getFullName() );
-		$this->addMsg ( "fullName" , $admin->getFullName() );
-		$this->addMsg ( "email" , $admin->getEmail() );
+		$this->addMsg ( "screenName" , $adminKuser->getFullName() );
+		$this->addMsg ( "fullName" , $adminKuser->getFullName() );
+		$this->addMsg ( "email" , $adminKuser->getEmail() );
 	}
 }
-?>

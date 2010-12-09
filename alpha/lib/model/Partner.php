@@ -559,7 +559,7 @@ class Partner extends BasePartner
 	{
 		$maxAttempts = $this->getFromCustomData('max_login_attempts', null, null);
 		if (!$maxAttempts) {
-			$maxAttempts = kConf::get('admin_kuser_max_login_attempts');
+			$maxAttempts = kConf::get('user_login_max_wrong_attempts');
 		}
 		return $maxAttempts;
 	}
@@ -575,7 +575,7 @@ class Partner extends BasePartner
 	{
 		$blockPeriod = $this->getFromCustomData('login_blocked_period', null, null);
 		if (!$blockPeriod) {
-			$blockPeriod = kConf::get('admin_kuser_login_block_period');
+			$blockPeriod = kConf::get('user_login_block_period');
 		}
 		return $blockPeriod;
 	}
@@ -590,7 +590,7 @@ class Partner extends BasePartner
 	{
 		$prevPass = $this->getFromCustomData('num_prev_passwords_to_keep', null, null);
 		if (!$prevPass) {
-			$prevPass = kConf::get('admin_kuser_num_prev_passwords_to_keep');
+			$prevPass = kConf::get('user_login_num_prev_passwords_to_keep');
 		}
 		return $prevPass;
 	}
@@ -601,12 +601,11 @@ class Partner extends BasePartner
 	}
 
 	
-	
 	public function getPassReplaceFreq()
 	{
 		$replaceFreq = $this->getFromCustomData('password_replace_freq', null, null);
 		if (!$replaceFreq) {
-			$replaceFreq = kConf::get('admin_kuser_password_replace_freq');
+			$replaceFreq = kConf::get('user_login_password_replace_freq');
 		}
 		return $replaceFreq;
 	}
@@ -634,5 +633,16 @@ class Partner extends BasePartner
 		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}
+	
+	public function setPassResetUrlPrefix($prefix)
+	{
+		$this->putInCustomData('pass_reset_url_prefix', $prefix);
+	}
+	
+	public function getPassResetUrlPrefix()
+	{
+		return $this->getFromCustomData('pass_reset_url_prefix');
+	}
+	
 	
 }

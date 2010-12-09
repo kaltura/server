@@ -8,6 +8,8 @@
  * @package lib.model
  */ 
 class SystemUserPeer extends BaseSystemUserPeer
+
+//TODO: class is deprecated - should be deleted after users migration!
 {
 	public static function setDefaultCriteriaFilter ()
 	{

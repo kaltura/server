@@ -12,8 +12,8 @@ class kmcAction extends kalturaAction
 		$this->hashKeyErrorCode = null;
 		if ($this->setPassHashKey) {
 			try {
-				if (!adminKuserPeer::isHashKeyValid($this->setPassHashKey)) {
-					$this->hashKeyErrorCode = kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID;
+				if (!UserLoginDataPeer::isHashKeyValid($this->setPassHashKey)) {
+					$this->hashKeyErrorCode = kUserException::NEW_PASSWORD_HASH_KEY_INVALID;
 				}
 			}
 			catch (kCoreException $e) {

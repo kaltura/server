@@ -8,6 +8,8 @@
  * @package lib.model
  */ 
 class adminKuser extends BaseadminKuser
+
+//TODO: class is deprecated - should be deleted after users migration!
 {
 	const ADMIN_KUSER_PARTNER_SERVICE_PREFIX = 'ADMINKUSER';
 	

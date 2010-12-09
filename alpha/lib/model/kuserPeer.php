@@ -8,6 +8,8 @@
  */ 
 class kuserPeer extends BasekuserPeer 
 {
+	const ROOT_ADMIN_PUSER_ID = '__ROOT_ADMIN__';
+	
 	private static $s_default_count_limit = 301;
 
 	public static function setDefaultCriteriaFilter ()
@@ -60,7 +62,7 @@ class kuserPeer extends BasekuserPeer
 		return self::doSelectOne($c);			
 	}
 	
-	public static function createKuserForPartner($partner_id, $puser_id)
+	public static function createKuserForPartner($partner_id, $puser_id, $is_admin = false)
 	{
 		$kuser = self::getKuserByPartnerAndUid($partner_id, $puser_id);
 		
@@ -69,9 +71,10 @@ class kuserPeer extends BasekuserPeer
 			$kuser = new kuser();
 			$kuser->setPuserId($puser_id);
 			$kuser->setScreenName($puser_id);
-			$kuser->setFullName($puser_id);
+			$kuser->setFirstName($puser_id);
 			$kuser->setPartnerId($partner_id);
 			$kuser->setStatus(1); // KalturaUserStatus::ACTIVE
+			$kuser->setIsAdmin($is_admin);
 			$kuser->save();
 		}
 		
@@ -304,15 +307,81 @@ class kuserPeer extends BasekuserPeer
 	 * @param int $partnerId
 	 * @return kuser
 	 */
-	public static function userLogin($puserId, $password, $partnerId = null)
+	public static function userLogin($puserId, $password, $partnerId)
 	{
 		$kuser = self::getKuserByPartnerAndUid($partnerId , $puserId);
-		if (!$kuser)
-			throw new kKuserException('', kKuserException::KUSER_NOT_FOUND);
+		if (!$kuser) {
+			throw new kUserException('', kUserException::USER_NOT_FOUND);
+		}
 
-		if (!$kuser->isPasswordValid($password)) 
-			throw new kKuserException('', kKuserException::KUSER_WRONG_PASSWORD);	
+		if (!$kuser->getLoginDataId()) {
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
 		
+		$kuser = UserLoginDataPeer::userLoginByDataId($kuser->getLoginDataId(), $password, $partnerId);
+					
 		return $kuser;
 	}
+	
+	
+	public static function getByLoginDataAndPartner($loginDataId, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
+		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$kuser = self::doSelectOne($c);
+		if (!$kuser) {
+			return false;
+		}
+		return $kuser;
+	}
+	
+	
+	/**
+	 * Adds a new kuser and user_login_data records as needed
+	 * @param kuser $user
+	 * @param string $password
+	 * @param bool $checkPasswordStructure
+	 * @throws kUserException::USER_NOT_FOUND
+	 * @throws kUserException::USER_ALREADY_EXISTS
+	 * @throws kUserException::INVALID_EMAIL
+	 * @throws kUserException::INVALID_PARTNER
+	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 */
+	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true)
+	{
+		if (!$user->getPuserId()) {
+			throw new kUserException('', kUserException::USER_ID_MISSING);
+		}
+		
+		// check if user with the same partner and puserId already exists		
+		$existingUser = kuserPeer::getKuserByPartnerAndUid($user->getPartnerId(), $user->getPuserId());
+		if ($existingUser) {
+			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
+		}
+
+		
+		if($user->getScreenName() === null) {
+			$user->setScreenName($user->getPuserId());
+		}
+			
+		if($user->getFullName() === null) {
+			$user->setFirstName($user->getPuserId());
+		}
+		
+		$user->setStatus(KalturaUserStatus::ACTIVE);
+		
+		// if password is set, user should be able to login to the system - add a user_login_data record
+		if ($password) {
+			// throws an action on error
+			$user->enableLogin($user->getEmail(), $password);
+		}	
+		
+		$user->save();
+		return $user;
+	}
+			
 }

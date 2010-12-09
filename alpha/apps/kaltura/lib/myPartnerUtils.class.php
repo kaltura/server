@@ -1086,6 +1086,7 @@ class myPartnerUtils
  		$toPartner->setEnableVast($fromPartner->getEnableVast());
  		$toPartner->setEnable508Players($fromPartner->getEnable508Players());
  		$toPartner->setLiveStreamEnabled($fromPartner->getLiveStreamEnabled());
+ 		$toPartner->setLoginUsersQuota($fromPartner->getLoginUsersQuota());
  		$toPartner->save();
  		
  		kEventsManager::raiseEvent(new kObjectCopiedEvent($fromPartner, $toPartner));

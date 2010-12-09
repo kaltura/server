@@ -57,11 +57,24 @@ class getpartnerAction extends defPartnerservices2Action
 			return;	
 		}
 		
+		$login_data = UserLoginDataPeer::getByEmail($partner_adminEmail);
+		if (!$login_data) {
+			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			return;
+		}
+		if ( !$login_data->isPasswordValid ( $cms_password ))
+		{
+			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			return;			
+		}
+		
 		$c = new Criteria();
-		$c->add ( adminKuserPeer::EMAIL , $partner_adminEmail );
-		$c->add ( adminKuserPeer::PARTNER_ID , $partner_id );
+		$c->add ( kuserPeer::EMAIL , $partner_adminEmail );
+		$c->add ( kuserPeer::PARTNER_ID , $partner_id );
+		$c->add ( kuserPeer::LOGIN_DATA_ID, $login_data->getId() );
+		$c->add ( kuserPeer::IS_ADMIN, true );
 		$c->setLimit ( 20 ); // just to limit the number of partners returned
-		$admin = adminKuserPeer::doSelectOne( $c );
+		$admin = kuserPeer::doSelectOne( $c );
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
 		// so no hint about existing admin will leak 
@@ -70,17 +83,11 @@ class getpartnerAction extends defPartnerservices2Action
 			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
 			return;
 		}
-
-		if ( ! $admin->isPasswordValid ( $cms_password ))
-		{
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
-			return;			
-		}
 		
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		
 		$partner_registration = new myPartnerRegistration ();
-		$partner_registration->sendRegistrationInformationForPartner( $partner , $partner->getSubp() , $cms_password , true, $admin->getPasswordHashKey() );
+		$partner_registration->sendRegistrationInformationForPartner( $partner , $partner->getSubp() , $cms_password , true, $login_data->getPasswordHashKey() );
 		
 		$subpid = $partner_id * 100;
 		$level = ( $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR );
@@ -90,4 +97,3 @@ class getpartnerAction extends defPartnerservices2Action
 		$this->addMsg ( "subp_id" , $partner->getSubp() );
 	}
 }
-?>

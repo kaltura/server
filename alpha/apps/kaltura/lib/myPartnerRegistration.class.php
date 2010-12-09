@@ -46,7 +46,7 @@ class myPartnerRegistration
 											$partner->getAdminSecret(),
 											$partner->getSecret(),
 											$partner->getAdminEmail(),
-											adminKuserPeer::getPassResetLink($hashKey),
+											UserLoginDataPeer::getPassResetLink($hashKey),
 											null,
 											$partner->getType());
 											
@@ -59,7 +59,7 @@ class myPartnerRegistration
 												$partner->getAdminSecret(),
 												$partner->getSecret(),
 												$partner->getAdminEmail(),
-												adminKuserPeer::getPassResetLink($hashKey),
+												UserLoginDataPeer::getPassResetLink($hashKey),
 												self::KALTURA_SUPPORT );
 
 			// if need to hook into SalesForce - this is the place
@@ -120,9 +120,9 @@ class myPartnerRegistration
 		// These is enforced by code, and not by constraint in the DB
 		// since we might want to allow several partners with different emails
 		$c = new Criteria();
-		$c->add( adminKuserPeer::EMAIL , $email );
-		$adminKuser = adminKuserPeer::doSelectOne($c);
-		if ($adminKuser) 
+		$c->add( UserLoginDataPeer::LOGIN_EMAIL , $email );
+		$loginData = UserLoginDataPeer::doSelectOne($c);
+		if ($loginData) 
 		{
 			// the user already exist in the system
 			throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
@@ -139,7 +139,7 @@ class myPartnerRegistration
 		$newPartner->setUrl1($website_url);
 		if ($ID_is_for === "commercial_use" || $ID_is_for === KalturaCommercialUseType::COMMERCIAL_USE)
 			$newPartner->setCommercialUse(true);
-		else //($ID_is_for === "non-commercial_use" || $ID_is_for === KalturaCommercialUseType::NON_COMMERCIAL_USE)
+		else //($ID_is_for == "non-commercial_use") || $ID_is_for === KalturaCommercialUseType::NON_COMMERCIAL_USE)
 			$newPartner->setCommercialUse(false);
 		$newPartner->setDescription($description);
 		$newPartner->setKsMaxExpiryInSeconds(86400);
@@ -216,37 +216,31 @@ class myPartnerRegistration
 	// if the adminKuser already exists - use his password - it should always be the same one for a given email !!
 	private function createNewAdminKuser($newPartner , $existing_password )
 	{
-		// create the user
-		$adminKuser = new adminKuser();
-		$adminKuser->setEmail($newPartner->getAdminEmail());
-		$adminKuser->setFullName($newPartner->getAdminName());
-
-		// set the password (random one)
-//		$salt = md5(rand(100000, 999999).$adminKuser->getFullName().$adminKuser->getEmail());
-//		$adminKuser->setSalt($salt);
-		if ( $existing_password != null )
-		{
+		// generate a new password if not given
+		if ( $existing_password != null ) {
 			$password = $existing_password;
 		}
-		else
-		{
-			$password = adminKuserPeer::generateNewPassword();
+		else {
+			$password = UserLoginDataPeer::generateNewPassword();
 		}
-//		$passHash = sha1($adminKuser->getSalt().$password);
-//		$adminKuser->setSha1Password($passHash);
-		$adminKuser->setPassword( $password );
-		$adminKuser->setLoginAttempts(0);
-		$adminKuser->setLoginBlockedUntil(null);
-		$adminKuser->resetPreviousPasswords();
-		$adminKuser->setPartnerId($newPartner->getId());
-		$adminKuser->save();
 		
-		// now $adminKusr has an id and hash key can be generated
-		$hashKey = $adminKuser->newPassHashKey();
-		$adminKuser->setPasswordHashKey($hashKey);
-		$adminKuser->save();
+		// create the user
+		$kuser = new kuser();
+		$kuser->setEmail($newPartner->getAdminEmail());
+		
+		list($firstName, $lastName) = kString::nameSplit($newPartner->getAdminName());
+		$kuser->setFirstName($firstName);
+		$kuser->setLastName($lastName);
 
-		return array($password, $hashKey);
+		$kuser->setPartnerId($newPartner->getId());
+		$kuser->setIsAdmin(true);
+		$kuser->setPuserId(ROOT_ADMIN_PUSER_ID);
+
+		$kuser = kuserPeer::addUser($kuser, $password, false); //this also saves the kuser and adds a user_login_data record
+		
+		$loginData = UserLoginDataPeer::retrieveByPK($kuser->getLoginDataId());
+	
+		return array($password, $loginData->getPasswordHashKey());
 	}
 
 	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
@@ -261,7 +255,8 @@ class myPartnerRegistration
 		if ($email == "")
 			throw new SignupException('Please fill in Administrator\'s Email Address', SignupException::INVALID_FIELD_VALUE);
 		
-		if(!preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i", $email))
+			
+		if(!kString::isEmailString($email))
 			throw new SignupException('Invalid email address', SignupException::INVALID_FIELD_VALUE);
 
 		if ($description == "")
@@ -273,23 +268,10 @@ class myPartnerRegistration
 
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
-			
-		// Gonen 19-09-2010 - removed checking of sent password
-		// this was breaking backward compatibility - Drupal extension is sending cms_password in the API
-		/*if ($password) {
-			if (!adminKuserPeer::isPasswordStructureValid($password)   ||
-				stripos($password, $partner_name) !== false     ||
-		  		stripos($password, $contact) !== false    ) {
-		  		$pos = strpos(APIErrors::PASSWORD_STRUCTURE_INVALID, ",");
-		  		$errMessage = substr(APIErrors::PASSWORD_STRUCTURE_INVALID, $pos + 1);
-		  		throw new SignupException($errMessage, SignupException::PASSWORD_STRUCTURE_INVALID);
-			}
-		}*/
-			
+						
 		// TODO: log request
 		$newPartner = NULL;
 		$newSubPartner = NULL;
-		$newAdminKuser = NULL;
 		try {
 			// create the new partner
 			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner );

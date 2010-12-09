@@ -55,6 +55,12 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	protected $salt;
 
 	/**
+	 * The value for the config_partner_id field.
+	 * @var        int
+	 */
+	protected $config_partner_id;
+
+	/**
 	 * The value for the login_blocked_until field.
 	 * @var        string
 	 */
@@ -164,6 +170,16 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	public function getSalt()
 	{
 		return $this->salt;
+	}
+
+	/**
+	 * Get the [config_partner_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getConfigPartnerId()
+	{
+		return $this->config_partner_id;
 	}
 
 	/**
@@ -435,6 +451,29 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	} // setSalt()
 
 	/**
+	 * Set the value of [config_partner_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     UserLoginData The current object (for fluent API support)
+	 */
+	public function setConfigPartnerId($v)
+	{
+		if(!isset($this->oldColumnsValues[UserLoginDataPeer::CONFIG_PARTNER_ID]))
+			$this->oldColumnsValues[UserLoginDataPeer::CONFIG_PARTNER_ID] = $this->config_partner_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->config_partner_id !== $v) {
+			$this->config_partner_id = $v;
+			$this->modifiedColumns[] = UserLoginDataPeer::CONFIG_PARTNER_ID;
+		}
+
+		return $this;
+	} // setConfigPartnerId()
+
+	/**
 	 * Sets the value of [login_blocked_until] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -642,10 +681,11 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$this->last_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->sha1_password = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->salt = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->login_blocked_until = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->config_partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->login_blocked_until = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -655,7 +695,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = UserLoginDataPeer::NUM_COLUMNS - UserLoginDataPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserLoginData object", $e);
@@ -1081,15 +1121,18 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				return $this->getSalt();
 				break;
 			case 6:
-				return $this->getLoginBlockedUntil();
+				return $this->getConfigPartnerId();
 				break;
 			case 7:
-				return $this->getCreatedAt();
+				return $this->getLoginBlockedUntil();
 				break;
 			case 8:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 9:
+				return $this->getUpdatedAt();
+				break;
+			case 10:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1119,10 +1162,11 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 			$keys[3] => $this->getLastName(),
 			$keys[4] => $this->getSha1Password(),
 			$keys[5] => $this->getSalt(),
-			$keys[6] => $this->getLoginBlockedUntil(),
-			$keys[7] => $this->getCreatedAt(),
-			$keys[8] => $this->getUpdatedAt(),
-			$keys[9] => $this->getCustomData(),
+			$keys[6] => $this->getConfigPartnerId(),
+			$keys[7] => $this->getLoginBlockedUntil(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getUpdatedAt(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1173,15 +1217,18 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 				$this->setSalt($value);
 				break;
 			case 6:
-				$this->setLoginBlockedUntil($value);
+				$this->setConfigPartnerId($value);
 				break;
 			case 7:
-				$this->setCreatedAt($value);
+				$this->setLoginBlockedUntil($value);
 				break;
 			case 8:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 9:
+				$this->setUpdatedAt($value);
+				break;
+			case 10:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1214,10 +1261,11 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setLastName($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setSha1Password($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setSalt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setLoginBlockedUntil($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[6], $arr)) $this->setConfigPartnerId($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setLoginBlockedUntil($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1235,6 +1283,7 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserLoginDataPeer::LAST_NAME)) $criteria->add(UserLoginDataPeer::LAST_NAME, $this->last_name);
 		if ($this->isColumnModified(UserLoginDataPeer::SHA1_PASSWORD)) $criteria->add(UserLoginDataPeer::SHA1_PASSWORD, $this->sha1_password);
 		if ($this->isColumnModified(UserLoginDataPeer::SALT)) $criteria->add(UserLoginDataPeer::SALT, $this->salt);
+		if ($this->isColumnModified(UserLoginDataPeer::CONFIG_PARTNER_ID)) $criteria->add(UserLoginDataPeer::CONFIG_PARTNER_ID, $this->config_partner_id);
 		if ($this->isColumnModified(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL)) $criteria->add(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL, $this->login_blocked_until);
 		if ($this->isColumnModified(UserLoginDataPeer::CREATED_AT)) $criteria->add(UserLoginDataPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(UserLoginDataPeer::UPDATED_AT)) $criteria->add(UserLoginDataPeer::UPDATED_AT, $this->updated_at);
@@ -1302,6 +1351,8 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 		$copyObj->setSha1Password($this->sha1_password);
 
 		$copyObj->setSalt($this->salt);
+
+		$copyObj->setConfigPartnerId($this->config_partner_id);
 
 		$copyObj->setLoginBlockedUntil($this->login_blocked_until);
 

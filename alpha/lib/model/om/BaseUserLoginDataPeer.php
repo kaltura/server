@@ -25,7 +25,7 @@ abstract class BaseUserLoginDataPeer {
 	const TM_CLASS = 'UserLoginDataTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -47,6 +47,9 @@ abstract class BaseUserLoginDataPeer {
 
 	/** the column name for the SALT field */
 	const SALT = 'user_login_data.SALT';
+
+	/** the column name for the CONFIG_PARTNER_ID field */
+	const CONFIG_PARTNER_ID = 'user_login_data.CONFIG_PARTNER_ID';
 
 	/** the column name for the LOGIN_BLOCKED_UNTIL field */
 	const LOGIN_BLOCKED_UNTIL = 'user_login_data.LOGIN_BLOCKED_UNTIL';
@@ -76,11 +79,11 @@ abstract class BaseUserLoginDataPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'LoginEmail', 'FirstName', 'LastName', 'Sha1Password', 'Salt', 'LoginBlockedUntil', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'loginEmail', 'firstName', 'lastName', 'sha1Password', 'salt', 'loginBlockedUntil', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::LOGIN_EMAIL, self::FIRST_NAME, self::LAST_NAME, self::SHA1_PASSWORD, self::SALT, self::LOGIN_BLOCKED_UNTIL, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'login_email', 'first_name', 'last_name', 'sha1_password', 'salt', 'login_blocked_until', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'LoginEmail', 'FirstName', 'LastName', 'Sha1Password', 'Salt', 'ConfigPartnerId', 'LoginBlockedUntil', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'loginEmail', 'firstName', 'lastName', 'sha1Password', 'salt', 'configPartnerId', 'loginBlockedUntil', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::LOGIN_EMAIL, self::FIRST_NAME, self::LAST_NAME, self::SHA1_PASSWORD, self::SALT, self::CONFIG_PARTNER_ID, self::LOGIN_BLOCKED_UNTIL, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'login_email', 'first_name', 'last_name', 'sha1_password', 'salt', 'config_partner_id', 'login_blocked_until', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -90,11 +93,11 @@ abstract class BaseUserLoginDataPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'LoginEmail' => 1, 'FirstName' => 2, 'LastName' => 3, 'Sha1Password' => 4, 'Salt' => 5, 'LoginBlockedUntil' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'CustomData' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'loginEmail' => 1, 'firstName' => 2, 'lastName' => 3, 'sha1Password' => 4, 'salt' => 5, 'loginBlockedUntil' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'customData' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::LOGIN_EMAIL => 1, self::FIRST_NAME => 2, self::LAST_NAME => 3, self::SHA1_PASSWORD => 4, self::SALT => 5, self::LOGIN_BLOCKED_UNTIL => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::CUSTOM_DATA => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'login_email' => 1, 'first_name' => 2, 'last_name' => 3, 'sha1_password' => 4, 'salt' => 5, 'login_blocked_until' => 6, 'created_at' => 7, 'updated_at' => 8, 'custom_data' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'LoginEmail' => 1, 'FirstName' => 2, 'LastName' => 3, 'Sha1Password' => 4, 'Salt' => 5, 'ConfigPartnerId' => 6, 'LoginBlockedUntil' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'loginEmail' => 1, 'firstName' => 2, 'lastName' => 3, 'sha1Password' => 4, 'salt' => 5, 'configPartnerId' => 6, 'loginBlockedUntil' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::LOGIN_EMAIL => 1, self::FIRST_NAME => 2, self::LAST_NAME => 3, self::SHA1_PASSWORD => 4, self::SALT => 5, self::CONFIG_PARTNER_ID => 6, self::LOGIN_BLOCKED_UNTIL => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'login_email' => 1, 'first_name' => 2, 'last_name' => 3, 'sha1_password' => 4, 'salt' => 5, 'config_partner_id' => 6, 'login_blocked_until' => 7, 'created_at' => 8, 'updated_at' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -170,6 +173,7 @@ abstract class BaseUserLoginDataPeer {
 		$criteria->addSelectColumn(UserLoginDataPeer::LAST_NAME);
 		$criteria->addSelectColumn(UserLoginDataPeer::SHA1_PASSWORD);
 		$criteria->addSelectColumn(UserLoginDataPeer::SALT);
+		$criteria->addSelectColumn(UserLoginDataPeer::CONFIG_PARTNER_ID);
 		$criteria->addSelectColumn(UserLoginDataPeer::LOGIN_BLOCKED_UNTIL);
 		$criteria->addSelectColumn(UserLoginDataPeer::CREATED_AT);
 		$criteria->addSelectColumn(UserLoginDataPeer::UPDATED_AT);

@@ -34,6 +34,8 @@
 		
 		const DUPLICATE_USER_BY_ID= "DUPLICATE_USER_BY_ID,User with id [%s] already exists in system";
 		
+		const DUPLICATE_USER_BY_LOGIN_ID = "DUPLICATE_USER_BY_LOGIN_ID,Loginable user with email [%s] already exists in system";
+		
 		// %s - param_name
 		const MANDATORY_PARAMETER_MISSING = "MANDATORY_PARAMETER_MISSING,Mandatory parameter missing [%s]";
 		
@@ -257,5 +259,21 @@
 		const NEW_PASSWORD_HASH_KEY_EXPIRED = "NEW_PASSWORD_HASH_KEY_EXPIRED,Given has key has expired";
 		
 		const CANT_UPDATE_PARAMETER = "CANT_UPDATE_PARAMETER,The following parameter cannot be updated [%s]";
+		
+		const LOGIN_DATA_NOT_FOUND = "LOGIN_DATA_NOT_FOUND,The data you entered is invalid";
+		
+		const WRONG_OLD_PASSWORD = "WRONG_OLD_PASSWORD,old password is wrong";
+		
+		const ADMIN_USER_PASSWORD_MISSING = "ADMIN_USER_PASSWORD_MISSING,Admin user must have a password";
+		
+		const LOGIN_USERS_QUOTA_EXCEEDED = "LOGIN_USERS_QUOTA_EXCEEDED,Partner login users quota exceeded";
+		
+		const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+		
+		const USER_EXISTS_WITH_DIFFERENT_PASSWORD = "USER_EXISTS_WITH_DIFFERENT_PASSWORD,A user with the same login id but a different password already exists";
+	
+		const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA,Login data cannot be updated by this action";
+	
+		const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED,Same login id is already in use";
 	}
 ?>

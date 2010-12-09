@@ -8,6 +8,8 @@
  * @package lib.model
  */ 
 class adminKuserPeer extends BaseadminKuserPeer
+
+//TODO: class is deprecated - should be deleted after users migration!
 {
 	private static function str_makerand ($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
 	{

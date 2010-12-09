@@ -49,11 +49,7 @@ class varpartnerlistAction extends kalturaAction
 		{
 			$ks = null;
 			kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  'varAdmin' , $ks , 30 * 86400 , 2 , "" , "*" );
-			$c = new Criteria();
-			$c->addAnd(adminKuserPeer::PARTNER_ID, $partner->getId());
-			$subPartnerAdminUser = adminKuserPeer::doSelectOne($c);
-			$adminUser_email = '';
-			if($subPartnerAdminUser) $adminUser_email = $subPartnerAdminUser->getEmail();
+			$adminUser_email = $partner->getAdminEmail();
 			$partner_id_param_name = 'pid';
 			$subpid_param_name = 'subpid';
 			if($partner->getKmcVersion() == 1)

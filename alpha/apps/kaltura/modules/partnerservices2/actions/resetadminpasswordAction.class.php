@@ -26,34 +26,37 @@ class resetadminpasswordAction extends defPartnerservices2Action
 			);
 	}
 
-    // TODO - maybe see that the password doesn't change too often 
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
 		defPartnerservices2baseAction::disableCache();
 		
 		$email = trim ( $this->getPM ( "email" ) );
 		try {	
-			$akp = new adminKuserPeer(); // TODO - why not static ?
-			list( $new_password , $new_email ) = $akp->resetUserPassword ( $email  );
+			list( $new_password , $new_email ) = UserLoginDataPeer::resetUserPassword ( $email  );
 		}		
-		catch (kAdminKuserException $e) {
+		catch (kUserException $e) {
 			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
+			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
 				$this->addException( APIErrors::ADMIN_KUSER_NOT_FOUND );
 				return null;
 			}
-			if ($code == kAdminKuserException::ADMIN_KUSER_WRONG_OLD_PASSWORD) {
-				$this->addException( APIErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD );
-				return null;
-			}
-			if ($code == kAdminKuserException::PASSWORD_STRUCTURE_INVALID) {
+			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$this->addException( APIErrors::PASSWORD_STRUCTURE_INVALID );
 				return null;
 			}
-			if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
+			if ($code == kUserException::PASSWORD_ALREADY_USED) {
 				$this->addException( APIErrors::PASSWORD_ALREADY_USED );
 				return null;
 			}
+			if ($code == kUserException::INVALID_EMAIL) {
+				$this->addException( APIErrors::INVALID_FIELD_VALUE, 'email' );
+				return null;
+			}
+			if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
+				$this->addException( APIErrors::LOGIN_ID_ALREADY_USED);
+				return null;
+			}			
+			throw $e;
 		}
 		
 		if ( ! $new_password )

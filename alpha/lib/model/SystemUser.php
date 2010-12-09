@@ -8,6 +8,8 @@
  * @package lib.model
  */ 
 class SystemUser extends BaseSystemUser
+
+//TODO: class is deprecated - should be deleted after users migration!
 {
 	const SYSTEM_USER_BLOCKED = 0;
 	const SYSTEM_USER_ACTIVE = 1;

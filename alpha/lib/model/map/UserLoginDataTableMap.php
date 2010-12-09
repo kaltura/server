@@ -42,6 +42,7 @@ class UserLoginDataTableMap extends TableMap {
 		$this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', false, 40, null);
 		$this->addColumn('SHA1_PASSWORD', 'Sha1Password', 'VARCHAR', true, 40, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', true, 32, null);
+		$this->addColumn('CONFIG_PARTNER_ID', 'ConfigPartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('LOGIN_BLOCKED_UNTIL', 'LoginBlockedUntil', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

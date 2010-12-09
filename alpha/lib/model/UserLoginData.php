@@ -13,13 +13,15 @@
  * @package    lib.model
  */
 class UserLoginData extends BaseUserLoginData {
-
-	//TODO: functions copied from AdminKuser - need to go over, change and fix
 	
+	public function getFullName()
+	{
+		return trim($this->getFirstName() . ' ' . $this->getLastName());
+	}
 	
 	public function setLastLoginPartnerId($partnerId)
 	{
-		$this->putInCustomData('last_login_partner_id');
+		$this->putInCustomData('last_login_partner_id', $partnerId);
 	}
 	
 	public function getLastLoginPartnerId()
@@ -29,7 +31,7 @@ class UserLoginData extends BaseUserLoginData {
 	
 	public function setPassword($password) 
 	{ 
-		$salt = md5(rand(100000, 999999).$this->getEmail()); 
+		$salt = md5(rand(100000, 999999).$this->getLoginEmail()); 
 		$this->setSalt($salt); 
 		$this->setSha1Password(sha1($salt.$password)); 
 		$this->setPasswordUpdatedAt(time());
@@ -191,22 +193,31 @@ class UserLoginData extends BaseUserLoginData {
 			$passwords = array();
 		}
 		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt));
-		while (count($passwords) > $this->getNumPrevPassToKeep()) {
+		$passToKeep = $this->getNumPrevPassToKeep();
+		while (count($passwords) > $passToKeep) {
 			array_pop($passwords);
 		}
-		$this->putInCustomData('previous_passwords', $passwords, null);
+		$this->setPreviousPasswords($passwords);
 	}
 	
-	private function getPreviousPasswords()
+	//TODO: should be set private after migration from admin_kuser to user_login_data
+	public function getPreviousPasswords()
 	{
 		return $this->getFromCustomData('previous_passwords', null, null);
+	}
+	
+	//TODO: should be set private after migration from admin_kuser to user_login_data
+	public function setPreviousPasswords($prevPass)
+	{
+		$this->putInCustomData('previous_passwords', $prevPass);
 	}
 	
 	public function passwordUsedBefore($pass)
 	{
 		$previousPass = $this->getPreviousPasswords();
 		$i = 0;
-		while ($i < count($previousPass) && $i < $this->getNumPrevPassToKeep()) {
+		$passToKeep = $this->getNumPrevPassToKeep();
+		while ($i < count($previousPass) && $i < $passToKeep) {
 			if ($previousPass[$i]['sha1'] == sha1($previousPass[$i]['salt'] . $pass)) {
 				return true;
 			}
@@ -215,38 +226,38 @@ class UserLoginData extends BaseUserLoginData {
 		return false;		
 	}
 	
-	public function getMaxLoginAttempts($partnerId)
+	public function getMaxLoginAttempts()
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($this->getConfigPartnerId());
 		if (!$partner) {
-			return kConf::get('admin_kuser_max_login_attempts');
+			return kConf::get('user_login_max_wrong_attempts');
 		}
 		return $partner->getMaxLoginAttempts();
 	}
 	
-	public function getLoginBlockPeriod($partnerId)
+	public function getLoginBlockPeriod()
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($this->getConfigPartnerId());
 		if (!$partner) {
-			return kConf::get('admin_kuser_login_block_period');
+			return kConf::get('user_login_block_period');
 		}
 		return $partner->getLoginBlockPeriod();
 	}
 		
-	public function getNumPrevPassToKeep($partnerId)
+	public function getNumPrevPassToKeep()
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($this->getConfigPartnerId());
 		if (!$partner) {
-			return kConf::get('admin_kuser_num_prev_passwords_to_keep');
+			return kConf::get('user_login_num_prev_passwords_to_keep');
 		}
 		return $partner->getNumPrevPassToKeep();
 	}
 		
-	public function getPassReplaceFreq($partnerId)
+	public function getPassReplaceFreq()
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partner = PartnerPeer::retrieveByPK($this->getConfigPartnerId());
 		if (!$partner) {
-			return kConf::get('admin_kuser_password_replace_freq');
+			return kConf::get('user_login_password_replace_freq');
 		}
 		return $partner->getPassReplaceFreq();
 	}
@@ -256,7 +267,7 @@ class UserLoginData extends BaseUserLoginData {
 	public function newPassHashKey()
 	{
 		$loginDataId = $this->getId();
-		$expiryTime = time() + (kConf::get('admin_kuser_set_password_hash_key_validity')); // now + 24 hours
+		$expiryTime = time() + (kConf::get('user_login_set_password_hash_key_validity')); // now + 24 hours
 		$random = sha1( uniqid() . (time() * rand(0,1)) );
 		$hashKey = base64_encode(implode('|', array($loginDataId, $expiryTime, $random)));
 		return $hashKey;
@@ -266,26 +277,25 @@ class UserLoginData extends BaseUserLoginData {
 	{
 		// check if same as user's saved hash key
 		if (base64_decode($hashKey) != base64_decode($this->getPasswordHashKey())) {
-			throw new kUserLoginException('', kUserLoginException::NEW_PASSWORD_HASH_KEY_INVALID);
+			throw new kUserException('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
 		
 		// decode
-		$params = adminKuserPeer::decodePassHashKey($hashKey);
+		$params = UserLoginDataPeer::decodePassHashKey($hashKey);
 		if (!$params) {
-			throw new kUserLoginException('', kUserLoginException::NEW_PASSWORD_HASH_KEY_INVALID);
+			throw new kUserException('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
 
-		// check if admin_kuser id is right
+		// check if user_login_data id is right
 		if ($params[0] != $this->getId()) {
-			throw new kUserLoginException('', kUserLoginException::NEW_PASSWORD_HASH_KEY_INVALID);
+			throw new kUserException('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
 		// check if not expired
 		if ($params[1] < time()) {
-			throw new kUserLoginException('', kUserLoginException::NEW_PASSWORD_HASH_KEY_EXPIRED);
+			throw new kUserException('', kUserException::NEW_PASSWORD_HASH_KEY_EXPIRED);
 		}
 		
 		return true;
 	}
-	
-	
+		
 } // UserLoginData

@@ -82,7 +82,11 @@ class PuserKuserPeer extends BasePuserKuserPeer
 				// create kuser for this puser
 				$kuser = new kuser ();
 				$kuser->setScreenName( $kuser_name );
-				$kuser->setFullName( $kuser_name );
+				
+				list($firstName, $lastName) = kString::nameSplit($kuser_name);
+				$kuser->setFirstName($firstName);
+				$kuser->setLastName($lastName);
+
 				$kuser->setPartnerId( $partner_id );
 				// set puserId for forward compatibility with PS3
 				$kuser->setPuserId( $puser_id );
