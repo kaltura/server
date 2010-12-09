@@ -298,4 +298,19 @@ class kString
 	{
 		return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i', $string);
 	}
+	
+	public static function nameSplit($fullName)
+	{
+		$nameSplit = explode(' ', $fullName, 2);
+		$firstName = null;
+		$lastName = null;
+		if (isset($nameSplit[1])) {
+			$firstName = $nameSplit[0];
+			$lastName = $nameSplit[1];
+		}
+		else {
+			$firstName = $fullName;
+		}
+		return array($firstName, $lastName);
+	}
 }
