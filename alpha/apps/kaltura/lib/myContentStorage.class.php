@@ -188,7 +188,7 @@ class myContentStorage
 		// found user in db, generate hash
 		if($user)
 		{
-			$salt = $user->getSalt();
+			$salt = ''; // kusers didn't have salt'
 
 			return $hash = sha1($salt.$kuser_id.$entityName);
 		}
