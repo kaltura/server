@@ -15,7 +15,7 @@ require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.D
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'lib/batch/myBatchPartnerUsage.class.php');
 
 ini_set('memory_limit', '1024M');
-kCurrentContext::$ps_vesion == 'ps2';
+kCurrentContext::$ps_vesion = 'ps2';
 $batchClient = new myBatchPartnerUsage();
 
 ?>
