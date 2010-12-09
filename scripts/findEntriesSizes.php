@@ -40,6 +40,7 @@ if (!$requested_day)
 
 $next_day = @$argv[2] ? $argv[2] : date('Y-m-d', strtotime($requested_day) + 86400);
 
+
 while(1)
 {
 	$c = new Criteria();
@@ -47,7 +48,7 @@ while(1)
 	$c->setOffset( $i );
 	$c->add(entryPeer::MODIFIED_AT, $requested_day, Criteria::GREATER_EQUAL);
 	$c->addAnd(entryPeer::MODIFIED_AT, $next_day, Criteria::LESS_THAN);
-	$c->addAnd(entryPeer::TYPE, entryType::MEDIACLIP);
+	$c->addAnd(entryPeer::TYPE, entryType::MEDIA_CLIP);
 	$c->addAnd(entryPeer::PARTNER_ID, 100, Criteria::NOT_EQUAL);
 	/**
 	 * Allow selecting deleted entries as well, so we will actually deduct storage for partners
