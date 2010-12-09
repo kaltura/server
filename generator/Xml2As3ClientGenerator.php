@@ -163,6 +163,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$keys_values_creator .= "			var valueArr : Array = new Array();\n";
 			$keys_values_creator .= "			var keyValArr : Array = new Array();\n";
 			
+			$isFileCall = false;
+			
 			foreach($child->children() as $prop)
 			{
 				if($prop->getName() == "param" )
@@ -249,6 +251,23 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$keys_values_creator .= "			keyArr = keyArr.concat( keyValArr[0] );\n";
 							$keys_values_creator .= "			valueArr = valueArr.concat( keyValArr[1] );\n";
 						break;
+						case "file" :
+							$isFileCall = true;
+							 
+							$const_props .= $prop->attributes()->name . " : FileReference";
+							if($prop->attributes()->optional == "1")	
+							{
+								$add_check_init = true;
+								$check_init .= "			if(" . $prop->attributes()->name . "== null)" . $prop->attributes()->name . "= new FileReference();\n";
+								
+								$const_props .= "=null";	
+							}
+							$const_props .= ",";
+							$imports .=  "	import flash.net.FileReference;\n";
+							$imports .=  "	import com.kaltura.net.KalturaFileCall;\n";
+							$keys_values_creator .= "			this." . $prop->attributes()->name . " = " . $prop->attributes()->name . ";\n";
+								
+						break;
 						default: //is Object	
 							$const_props .= $prop->attributes()->name . " : " . $prop->attributes()->type;
 							if($prop->attributes()->optional == "1")
@@ -277,10 +296,16 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "{\n";
 			$str .= $imports;
 			$str .= "	import com.kaltura.delegates." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate;\n";
-			$str .= "	import com.kaltura.net.KalturaCall;\n\n";
 			
+			if(!$isFileCall)
+			$str .= "	import com.kaltura.net.KalturaCall;\n";
+				
+			$str .= "\n";
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " extends KalturaCall\n" ;
 			$str .= "	{\n";
+			if($isFileCall)
+			$str .= "		public var fileData:FileReference;\n";
+			else
 			$str .= "		public var filterFields : String;\n";
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
 			$str .= "		{\n";
@@ -309,15 +334,38 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
+			$isFileCall = false;
+			$fileAttributeName = null;
+			foreach($child->children() as $prop)
+			{
+				if($prop->getName() == "param" && $prop->attributes()->type == "file")
+				{
+					$isFileCall = true;
+					$fileAttributeName = $prop->attributes()->name;
+				}
+			}
+			
+			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
 			$str .= "{\n";
-			$str .= "	import flash.utils.getDefinitionByName;\n";
+			$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n";
 			$str .= "	import com.kaltura.config.KalturaConfig;\n";
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
-			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n"; 
-
+			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n\n"; 
+			$str .= "	import flash.utils.getDefinitionByName;\n";
+			if($isFileCall)
+			{
+				$str .= "	import flash.events.DataEvent;\n";
+				$str .= "	import flash.events.Event;\n";
+				$str .= "	import flash.net.URLRequest;\n\n";
+				$str .= "	import ru.inspirit.net.MultipartURLLoader;\n";
+			}
+			
+			$str .= "\n"; 
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate extends WebDelegateBase\n" ;
 			$str .= "	{\n";
+			if($isFileCall)
+			$str .= "		protected var mrloader:MultipartURLLoader;\n\n";
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate(call:KalturaCall, config:KalturaConfig)\n";
 			$str .= "		{\n";
 			$str .= "			super(call, config);\n";
@@ -362,6 +410,38 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				break;
 			}
 			
+			if($isFileCall)
+			{
+				$str .= "		override protected function sendRequest():void {\n";
+				$str .= "			//construct the loader\n";
+				$str .= "			createURLLoader();\n";
+				$str .= "			\n";
+				$str .= "			//create the service request for normal calls\n";
+				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
+				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
+				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").fileData.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
+				$str .= "			var urlRequest:URLRequest = new URLRequest(req);\n";
+				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").fileData.upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+				$str .= "		}\n\n";
+				
+				$str .= "		// Event Handlers\n";
+				$str .= "		override protected function onDataComplete(event:Event):void {\n";
+				$str .= "			try{\n";
+				$str .= "				handleResult( XML(event[\"data\"]) );\n";
+				$str .= "			}\n";
+				$str .= "			catch( e:Error ){\n";
+				$str .= "				var kErr : KalturaError = new KalturaError();\n";
+				$str .= "				kErr.errorCode = String(e.errorID);\n";
+				$str .= "				kErr.errorMsg = e.message;\n";
+				$str .= "				_call.handleError( kErr );\n";
+				$str .= "			}\n";
+				$str .= "		}\n\n";
+				
+				$str .= "		override protected function createURLLoader():void {\n";
+				$str .= "			mrloader = new MultipartURLLoader();\n";
+				$str .= "			mrloader.addEventListener(Event.COMPLETE, onDataComplete);\n";
+				$str .= "		}\n\n";
+			}
 
 			$str .= "	}\n";
 			$str .= "}\n";
