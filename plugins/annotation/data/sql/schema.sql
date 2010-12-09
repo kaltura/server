@@ -14,44 +14,21 @@ CREATE TABLE `annotation`
 (
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`id` VARCHAR(255)  NOT NULL,
-	`session_id` INTEGER,
-	`entry_id` VARCHAR(31),
-	`partner_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`data` TEXT,
+	`parent_id` INTEGER,
+	`entry_id` VARCHAR(31)  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
+	`created_at` DATETIME  NOT NULL,
+	`updated_at` DATETIME  NOT NULL,
+	`text` TEXT,
 	`tag` VARCHAR(255),
 	`start_time` TIME,
 	`end_time` TIME,
-	`status` TINYINT,
+	`status` TINYINT  NOT NULL,
 	`kuser_id` INTEGER,
 	`partner_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
-	KEY `session_entry_index`(`partner_id`, `session_id`, `entry_id`)
-)Type=MyISAM;
-
-#-----------------------------------------------------------------------------
-#-- annotation_session
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `annotation_session`;
-
-
-CREATE TABLE `annotation_session`
-(
-	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`id` VARCHAR(255)  NOT NULL,
-	`session_id` INTEGER,
-	`entry_id` VARCHAR(31),
-	`partner_id` INTEGER,
-	`kuser_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`status` TINYINT,
-	PRIMARY KEY (`id`),
-	KEY `partner_entry_index`(`partner_id`, `entry_id`),
-	KEY `session_entry_index`(`partner_id`, `session_id`, `entry_id`)
+	KEY `session_entry_index`(`partner_id`, `parent_id`, `entry_id`)
 )Type=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier

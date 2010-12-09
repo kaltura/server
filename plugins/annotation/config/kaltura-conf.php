@@ -29,8 +29,5 @@ return array (
     'AnnotationTableMap' => 'lib/model/map/AnnotationTableMap.php',
     'AnnotationPeer' => 'lib/model/AnnotationPeer.php',
     'Annotation' => 'lib/model/Annotation.php',
-    'AnnotationSessionTableMap' => 'lib/model/map/AnnotationSessionTableMap.php',
-    'AnnotationSessionPeer' => 'lib/model/AnnotationSessionPeer.php',
-    'AnnotationSession' => 'lib/model/AnnotationSession.php',
   ),
 );

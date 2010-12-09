@@ -31,10 +31,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
-	 * The value for the session_id field.
+	 * The value for the parent_id field.
 	 * @var        int
 	 */
-	protected $session_id;
+	protected $parent_id;
 
 	/**
 	 * The value for the entry_id field.
@@ -61,10 +61,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
-	 * The value for the data field.
+	 * The value for the text field.
 	 * @var        string
 	 */
-	protected $data;
+	protected $text;
 
 	/**
 	 * The value for the tag field.
@@ -151,13 +151,13 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [session_id] column value.
+	 * Get the [parent_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getSessionId()
+	public function getParentId()
 	{
-		return $this->session_id;
+		return $this->parent_id;
 	}
 
 	/**
@@ -261,13 +261,13 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [data] column value.
+	 * Get the [text] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getData()
+	public function getText()
 	{
-		return $this->data;
+		return $this->text;
 	}
 
 	/**
@@ -427,27 +427,27 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	} // setId()
 
 	/**
-	 * Set the value of [session_id] column.
+	 * Set the value of [parent_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
-	public function setSessionId($v)
+	public function setParentId($v)
 	{
-		if(!isset($this->oldColumnsValues[AnnotationPeer::SESSION_ID]))
-			$this->oldColumnsValues[AnnotationPeer::SESSION_ID] = $this->session_id;
+		if(!isset($this->oldColumnsValues[AnnotationPeer::PARENT_ID]))
+			$this->oldColumnsValues[AnnotationPeer::PARENT_ID] = $this->parent_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->session_id !== $v) {
-			$this->session_id = $v;
-			$this->modifiedColumns[] = AnnotationPeer::SESSION_ID;
+		if ($this->parent_id !== $v) {
+			$this->parent_id = $v;
+			$this->modifiedColumns[] = AnnotationPeer::PARENT_ID;
 		}
 
 		return $this;
-	} // setSessionId()
+	} // setParentId()
 
 	/**
 	 * Set the value of [entry_id] column.
@@ -594,27 +594,27 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
-	 * Set the value of [data] column.
+	 * Set the value of [text] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
-	public function setData($v)
+	public function setText($v)
 	{
-		if(!isset($this->oldColumnsValues[AnnotationPeer::DATA]))
-			$this->oldColumnsValues[AnnotationPeer::DATA] = $this->data;
+		if(!isset($this->oldColumnsValues[AnnotationPeer::TEXT]))
+			$this->oldColumnsValues[AnnotationPeer::TEXT] = $this->text;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->data !== $v) {
-			$this->data = $v;
-			$this->modifiedColumns[] = AnnotationPeer::DATA;
+		if ($this->text !== $v) {
+			$this->text = $v;
+			$this->modifiedColumns[] = AnnotationPeer::TEXT;
 		}
 
 		return $this;
-	} // setData()
+	} // setText()
 
 	/**
 	 * Set the value of [tag] column.
@@ -846,12 +846,12 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 			$this->int_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->session_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->parent_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->entry_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->data = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->text = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->tag = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->start_time = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->end_time = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
@@ -1272,7 +1272,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 2:
-				return $this->getSessionId();
+				return $this->getParentId();
 				break;
 			case 3:
 				return $this->getEntryId();
@@ -1287,7 +1287,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 				return $this->getUpdatedAt();
 				break;
 			case 7:
-				return $this->getData();
+				return $this->getText();
 				break;
 			case 8:
 				return $this->getTag();
@@ -1330,12 +1330,12 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		$result = array(
 			$keys[0] => $this->getIntId(),
 			$keys[1] => $this->getId(),
-			$keys[2] => $this->getSessionId(),
+			$keys[2] => $this->getParentId(),
 			$keys[3] => $this->getEntryId(),
 			$keys[4] => $this->getPartnerId(),
 			$keys[5] => $this->getCreatedAt(),
 			$keys[6] => $this->getUpdatedAt(),
-			$keys[7] => $this->getData(),
+			$keys[7] => $this->getText(),
 			$keys[8] => $this->getTag(),
 			$keys[9] => $this->getStartTime(),
 			$keys[10] => $this->getEndTime(),
@@ -1357,12 +1357,12 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		if ($this->isColumnModified(AnnotationPeer::INT_ID)) $criteria->add(AnnotationPeer::INT_ID, $this->int_id);
 		if ($this->isColumnModified(AnnotationPeer::ID)) $criteria->add(AnnotationPeer::ID, $this->id);
-		if ($this->isColumnModified(AnnotationPeer::SESSION_ID)) $criteria->add(AnnotationPeer::SESSION_ID, $this->session_id);
+		if ($this->isColumnModified(AnnotationPeer::PARENT_ID)) $criteria->add(AnnotationPeer::PARENT_ID, $this->parent_id);
 		if ($this->isColumnModified(AnnotationPeer::ENTRY_ID)) $criteria->add(AnnotationPeer::ENTRY_ID, $this->entry_id);
 		if ($this->isColumnModified(AnnotationPeer::PARTNER_ID)) $criteria->add(AnnotationPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(AnnotationPeer::CREATED_AT)) $criteria->add(AnnotationPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(AnnotationPeer::UPDATED_AT)) $criteria->add(AnnotationPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(AnnotationPeer::DATA)) $criteria->add(AnnotationPeer::DATA, $this->data);
+		if ($this->isColumnModified(AnnotationPeer::TEXT)) $criteria->add(AnnotationPeer::TEXT, $this->text);
 		if ($this->isColumnModified(AnnotationPeer::TAG)) $criteria->add(AnnotationPeer::TAG, $this->tag);
 		if ($this->isColumnModified(AnnotationPeer::START_TIME)) $criteria->add(AnnotationPeer::START_TIME, $this->start_time);
 		if ($this->isColumnModified(AnnotationPeer::END_TIME)) $criteria->add(AnnotationPeer::END_TIME, $this->end_time);
@@ -1425,7 +1425,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		$copyObj->setId($this->id);
 
-		$copyObj->setSessionId($this->session_id);
+		$copyObj->setParentId($this->parent_id);
 
 		$copyObj->setEntryId($this->entry_id);
 
@@ -1435,7 +1435,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		$copyObj->setUpdatedAt($this->updated_at);
 
-		$copyObj->setData($this->data);
+		$copyObj->setText($this->text);
 
 		$copyObj->setTag($this->tag);
 

@@ -38,16 +38,16 @@ class AnnotationTableMap extends TableMap {
 		// columns
 		$this->addColumn('INT_ID', 'IntId', 'INTEGER', true, null, null);
 		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 255, null);
-		$this->addColumn('SESSION_ID', 'SessionId', 'INTEGER', false, null, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 31, null);
-		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
-		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('DATA', 'Data', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PARENT_ID', 'ParentId', 'INTEGER', false, null, null);
+		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 31, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
+		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
+		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+		$this->addColumn('TEXT', 'Text', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('TAG', 'Tag', 'VARCHAR', false, 255, null);
 		$this->addColumn('START_TIME', 'StartTime', 'TIME', false, null, null);
 		$this->addColumn('END_TIME', 'EndTime', 'TIME', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'LONGVARCHAR', false, null, null);
 		// validators
