@@ -101,7 +101,6 @@ class kConfLocal
 		
 		// additional plugins
 		//self::$map['default_plugins'][] = "FileSyncPlugin"; // Should be enabled only on servers that run admin console
-		//self::$map['default_plugins'][] = "SystemUserPlugin"; // Should be enabled only on servers that run admin console
 		//self::$map['default_plugins'][] = "SystemPartnerPlugin"; // Should be enabled only on servers that run admin console
 		//self::$map['default_plugins'][] = "AdminConsolePlugin"; // Should be enabled only on servers that run admin console
 		//self::$map['default_plugins'][] = "MultiCentersPlugin"; // Should be enabled on multiple data centers

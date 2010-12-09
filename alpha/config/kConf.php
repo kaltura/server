@@ -87,8 +87,8 @@ class kConf extends kConfLocal
 				"kmc_account_show_usage" => true,			
 
 			/* kmc applications versions */
-				"kmc_content_version" => 'v3.2.11.1',
-				"kmc_account_version" => 'v3.1.1',
+				"kmc_content_version" => 'v3.2.12.1',
+				"kmc_account_version" => 'v3.1.3',
 				"kmc_appstudio_version" => 'v2.2.3',
 				"kmc_rna_version" => 'v1.1.8.4',
 				"kmc_dashboard_version" => 'v1.0.14.2',
@@ -127,6 +127,8 @@ class kConf extends kConfLocal
 					"StorageProfilePlugin", // Should always be enabled
 				),
 				
+                "search_plugin"	=> "sphinxSearch",
+											
 				"event_consumers" => array(
                 	"kFlowManager",
                 	"kStorageExporter",
@@ -143,12 +145,12 @@ class kConf extends kConfLocal
                 
 				"exec_sphinx" => false, // Should be set to false in multiple data centers environments
                 
-                'admin_kuser_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
-                'admin_kuser_max_login_attempts' => 5000,
-                'admin_kuser_login_block_period' => 0,
-                'admin_kuser_num_prev_passwords_to_keep' => 0,
-                'admin_kuser_password_replace_freq' => 60*60*24*5000, /* 5000 days */
-                'admin_kuser_password_structure' => array(
+                'user_login_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
+                'user_login_max_wrong_attempts' => 5000,
+                'user_login_block_period' => 0,
+                'user_login_num_prev_passwords_to_keep' => 0,
+                'user_login_password_replace_freq' => 60*60*24*5000, /* 5000 days */
+                'user_login_password_structure' => array(
 					'/^.{8,14}$/',
 					'/[0-9]+/',
 					'/[a-z]+/',
