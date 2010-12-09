@@ -38,6 +38,7 @@ $objectsToTrack = array(
 			accessControlPeer::KDIR_RESTRICT_TYPE,
 		),
 	),
+	// admin_kuser is deperecated
 	KalturaAuditTrailObjectType::ADMIN_KUSER => array(
 		'actions' => array(
 			KalturaAuditTrailAction::CREATED,
