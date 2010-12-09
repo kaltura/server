@@ -74,7 +74,7 @@ class MetadataProfilesAction extends KalturaAdminConsolePlugin
 				$metadataProfileFilter->partnerIdEqual = $partnerId;
 				$this->view->inQueuePaginator = null;
 				
-				//$client->systemUser->add($systemUser);
+				//$client->user->add($systemUser);
 				
 			}
 			catch(Exception $ex)
