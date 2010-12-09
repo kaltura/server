@@ -24,13 +24,6 @@ DbManager::initialize ();
 if (count($argv) !== 1)
 {
 	die('pleas provide partner id as input' . PHP_EOL . 
-		'to run script: ' . __FILE__ . ' X' . PHP_EOL . 
-		'whereas X is partner id' . PHP_EOL);
-}
-
-if (count($argv) !== 1)
-{
-	die('please provide a partner id' . PHP_EOL . 
 		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
 		'whereas X is partner id' . PHP_EOL);
 }
