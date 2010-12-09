@@ -40,6 +40,7 @@ $partner->save();
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partner_id);
 $c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK);
+$c->addOr(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_NONE);
 $c->setLimit(20);
 
 $entries = entryPeer::doSelect($c);
