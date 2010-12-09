@@ -164,6 +164,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$keys_values_creator .= "			var keyValArr : Array = new Array();\n";
 			
 			$isFileCall = false;
+			$fileAttributeName = null;
 			
 			foreach($child->children() as $prop)
 			{
@@ -253,6 +254,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 						break;
 						case "file" :
 							$isFileCall = true;
+							$fileAttributeName = $prop->attributes()->name;
 							 
 							$const_props .= $prop->attributes()->name . " : FileReference";
 							if($prop->attributes()->optional == "1")	
@@ -310,7 +312,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				
 			$str .= "	{\n";
 			if($isFileCall)
-			$str .= "		public var fileData:FileReference;\n";
+			$str .= "		public var " . $fileAttributeName . ":FileReference;\n";
 			else
 			$str .= "		public var filterFields : String;\n";
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
@@ -426,9 +428,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "			//create the service request for normal calls\n";
 				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
 				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
-				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").fileData.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
+				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
 				$str .= "			var urlRequest:URLRequest = new URLRequest(req);\n";
-				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").fileData.upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".upload(urlRequest,\"" . $fileAttributeName . "\");\n";
 				$str .= "		}\n\n";
 				
 				$str .= "		// Event Handlers\n";
