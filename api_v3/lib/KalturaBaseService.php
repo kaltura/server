@@ -274,7 +274,8 @@ abstract class KalturaBaseService
 		if ( $this->getPartner() )
 			$partner_id = $this->getPartner()->getId();
 		else
-			$partner_id = -1; 
+			$partner_id = Partner::PARTNER_THAT_DOWS_NOT_EXIST;
+			
 		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
 	}	
 	
