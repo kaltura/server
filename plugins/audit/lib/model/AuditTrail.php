@@ -17,7 +17,7 @@ class AuditTrail extends BaseAuditTrail
 	protected $puserId = null;
 	
 	const AUDIT_TRAIL_OBJECT_TYPE_ACCESS_CONTROL = accessControlPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_ADMIN_KUSER = adminKuserPeer::OM_CLASS;
+	const AUDIT_TRAIL_OBJECT_TYPE_ADMIN_KUSER = adminKuserPeer::OM_CLASS; // deprecated
 	const AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB = BatchJobPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_CATEGORY = categoryPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_CONVERSION_PROFILE_2 = conversionProfile2Peer::OM_CLASS;

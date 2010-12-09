@@ -3,7 +3,7 @@
 class KalturaAuditTrailObjectType extends KalturaStringEnum
 {
 	const ACCESS_CONTROL = accessControlPeer::OM_CLASS;
-	const ADMIN_KUSER = adminKuserPeer::OM_CLASS;
+	const ADMIN_KUSER = adminKuserPeer::OM_CLASS; //deprecated
 	const BATCH_JOB = BatchJobPeer::OM_CLASS;
 	const CATEGORY = categoryPeer::OM_CLASS;
 	const CONVERSION_PROFILE_2 = conversionProfile2Peer::OM_CLASS;
