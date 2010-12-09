@@ -45,9 +45,10 @@ $c->setLimit(200);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 $entries = entryPeer::doSelect($c, $con);
-echo "number of entries:".count($entries)."\n";
+$changedEntriesCounter = 0;
 while(count($entries))
 {
+		$changedEntriesCounter += count($entries);
         foreach($entries as $entry)
         {
                 echo "changed DISPLAY_IN_SEARCH for entry: ".$entry->getId()."\n";
@@ -58,4 +59,4 @@ while(count($entries))
         $entries = entryPeer::doSelect($c, $con);
 }
 
-echo 'Done';
+echo "Done. {$changedEntriesCounter} entries where changed";

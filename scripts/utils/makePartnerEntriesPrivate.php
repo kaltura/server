@@ -43,8 +43,10 @@ $c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_N
 $c->setLimit(20);
 
 $entries = entryPeer::doSelect($c);
+$changedEntriesCounter = 0;
 while(count($entries))
 {
+	$changedEntriesCounter += count($entries);
 	foreach($entries as $entry)
 	{
 		$entry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
@@ -53,4 +55,4 @@ while(count($entries))
 	$entries = entryPeer::doSelect($c);
 }
 
-echo 'Done';
+echo "Done. {$changedEntriesCounter} entries where changed";
