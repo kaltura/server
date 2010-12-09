@@ -7,6 +7,12 @@ class KalturaAccessControlOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+class KalturaAdminUserOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+}
+
 class KalturaAssetParamsOrderBy
 {
 }
@@ -6408,6 +6414,117 @@ class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 
 }
 
+abstract class KalturaUserBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $screenNameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $screenNameStartsWith = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $emailLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $emailStartsWith = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdminEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $loginEnabledEqual = null;
+
+
+}
+
+class KalturaUserFilter extends KalturaUserBaseFilter
+{
+
+}
+
+abstract class KalturaAdminUserBaseFilter extends KalturaUserFilter
+{
+
+}
+
+class KalturaAdminUserFilter extends KalturaAdminUserBaseFilter
+{
+
+}
+
 abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 {
 
@@ -6727,93 +6844,6 @@ abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 }
 
 class KalturaUploadTokenFilter extends KalturaUploadTokenBaseFilter
-{
-
-}
-
-abstract class KalturaUserBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $screenNameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $screenNameStartsWith = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $emailLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $emailStartsWith = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-
-}
-
-class KalturaUserFilter extends KalturaUserBaseFilter
 {
 
 }
@@ -12935,7 +12965,7 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * @var string
 	 */
-	protected $apiVersion = '3.1';
+	protected $apiVersion = '3.1.1';
 
 	/**
 	 * batch service lets you handle different batch process from remote machines.
