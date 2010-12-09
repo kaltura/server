@@ -1,6 +1,6 @@
 <?php
 	
-class KalturaSystemUserRole extends KalturaStringEnum
+class KalturaAdminConsoleUserRole
 {
 	const ROLE_GUEST = 'guest';
 	const ROLE_PROFESIONAL_SERVICES = 'ps';
