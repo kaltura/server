@@ -6,8 +6,8 @@ class UserController extends Zend_Controller_Action
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
-		$filter = new KalturaSystemUserFilter();
-		$paginatorAdapter = new Kaltura_FilterPaginator("systemUser", "listAction", $filter);
+		$filter = new KalturaUserFilter();
+		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -46,33 +46,22 @@ class UserController extends Zend_Controller_Action
 		if ($request->isPost())
 		{
 			$client = Kaltura_ClientHelper::getClient();
-			$user = $client->systemUser->getByEmail($request->getPost('email'));
-			if (!$user)
-			{
-				$form->setDescription('email not found');
-			}
-			else if ($user->status != KalturaSystemUserStatus::ACTIVE)
-			{
-				$form->setDescription('user is not active');
-			}
-			else
-			{
-				$array = array(
-					'id' => $user->id,
-					'expiry' => time() + 60*60*24 // 24 hours
-				);
-				$config = Zend_Registry::get('config');
-				$token = kString::signString(serialize($array), $config->settings->secret);
-				$url = $this->view->serverUrl($this->_helper->url('reset-password-link', 'user', null, array('token' => $token)));
-				$mailJobData = new KalturaMailJobData();
-				$mailJobData->mailType = KalturaMailType::MAIL_TYPE_SYSTEM_USER_RESET_PASSWORD;
-				$mailJobData->recipientEmail = $user->email;
-				$mailJobData->bodyParams = $url;
-				$client->jobs->addMailJob($mailJobData);
-				$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
-				$form->setDescription(sprintf($tranlsate->_('password instructions emailed to %s'), $user->email));
-				$form->hideForm();
-			}
+			$userEmail = $request->getPost('email');
+			$array = array(
+				'email' => $request->getPost('email'),
+				'expiry' => time() + 60*60*24 // 24 hours
+			);
+			$config = Zend_Registry::get('config');
+			$token = kString::signString(serialize($array), $config->settings->secret);
+			$url = $this->view->serverUrl($this->_helper->url('reset-password-link', 'user', null, array('token' => $token)));
+			
+			$client->user->resetPassword($array['email']); // ask to reset password
+			//TODO: fix it so that reset password link will lead to admin console instead of kmc!
+			
+			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
+			$form->setDescription(sprintf($tranlsate->_('password instructions emailed to %s'), $request->getPost('email')));
+			$form->hideForm();
+			
 		}
 		
 		$this->view->form = $form;
@@ -85,37 +74,31 @@ class UserController extends Zend_Controller_Action
 		$config = Zend_Registry::get('config');
 		$result = kString::crackString($token, $config->settings->secret);
 		$array = unserialize($result);
-		if (!is_array($array) || !isset($array['id']) || !isset($array['expiry']) || ($array['expiry']) <= time())
+		if (!is_array($array) || !isset($array['email']) || !isset($array['expiry']) || ($array['expiry']) <= time())
 		{
 			$invalidToken = true;
-		}
-		else
-		{
-			$id = $array['id'];
-			$client = Kaltura_ClientHelper::getClient();
-			$user = $client->systemUser->get($id);
-			if (!$user)
-				$invalidToken = true;
 		}
 		
 		if ($invalidToken)
 			$this->_helper->redirector('reset-password-ok', 'user', null, array('invalid-token' => true));
 		
-		// create new password
-		$newPassword = $client->systemUser->generateNewPassword();
+		$form = new Form_ResetPasswordLink();
 		
-		// set the new password
-		$client->systemUser->setNewPassword($id, $newPassword);
 		
-		// email the new password
-		$mailJobData = new KalturaMailJobData();
-		$mailJobData->mailType = KalturaMailType::MAIL_TYPE_SYSTEM_USER_RESET_PASSWORD_SUCCESS;
-		$mailJobData->recipientEmail = $user->email;
-		$mailJobData->bodyParams = $newPassword;
-		$client->jobs->addMailJob($mailJobData);
+		if ($request->isPost())
+		{
+			
+			
+			// redirect to display the message, and to hide the url with the token
+			$this->_helper->redirector('reset-password-ok', 'user');
+			$form->hideForm();
+		}
 		
-		// redirect to display the message, and to hide the url with the token
-		$this->_helper->redirector('reset-password-ok', 'user'); 
+		//$this->view->form = $form;
+		
+		
+		//TODO: fix it so that reset password link will lead to admin console instead of kmc!
+				 
 	}
 	
 	public function resetPasswordOkAction()
@@ -134,7 +117,7 @@ class UserController extends Zend_Controller_Action
 			$adapter = new Kaltura_AuthAdapter($request->getPost('email'), $request->getPost('password'));
 			$auth = Zend_Auth::getInstance();
 			$result = $auth->authenticate($adapter);
-			
+
 			if ($result->isValid())
 			{
 				if ($request->getPost('remember_me'))
@@ -171,9 +154,9 @@ class UserController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
 		$client = Kaltura_ClientHelper::getClient();
-		$systemUser = new KalturaSystemUser();
-		$systemUser->status = KalturaSystemUserStatus::BLOCKED;
-		$client->systemUser->update($userId, $systemUser);
+		$user = new KalturaUser();
+		$user->status = KalturaUserStatus::BLOCKED;
+		$client->user->update($userId, $user);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -182,9 +165,9 @@ class UserController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
 		$client = Kaltura_ClientHelper::getClient();
-		$systemUser = new KalturaSystemUser();
-		$systemUser->status = KalturaSystemUserStatus::ACTIVE;
-		$client->systemUser->update($userId, $systemUser);
+		$user = new KalturaUser();
+		$user->status = KalturaUserStatus::ACTIVE;
+		$client->user->update($userId, $user);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -193,7 +176,7 @@ class UserController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
 		$client = Kaltura_ClientHelper::getClient();
-		$client->systemUser->delete($userId);
+		$client->user->delete($userId);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -206,13 +189,15 @@ class UserController extends Zend_Controller_Action
 			try
 			{
 				$client = Kaltura_ClientHelper::getClient();
-				$systemUser = new KalturaSystemUser();
-				$systemUser->email = $request->getPost('email');
-				$systemUser->firstName = $request->getPost('first_name');
-				$systemUser->lastName = $request->getPost('last_name');
-				$systemUser->status = KalturaSystemUserStatus::ACTIVE;
-				$systemUser->role = $request->getPost('role');
-				$client->systemUser->add($systemUser);
+				$user = new KalturaUser();
+				$user->email = $request->getPost('email');
+				$user->firstName = $request->getPost('first_name');
+				$user->lastName = $request->getPost('last_name');
+				$user->status = KalturaUserStatus::ACTIVE;
+				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
+				$partnerData->role = $request->getPost('role');
+				$user->partnerData = serialize($partnerData);
+				$client->user->add($user);
 				$this->_helper->redirector('index');
 			}
 			catch(Exception $ex)
@@ -237,55 +222,59 @@ class UserController extends Zend_Controller_Action
 		if ($form->isValid($formData))
 		{
 			$client = Kaltura_ClientHelper::getClient();
+			$client->setKs(null);
 			$auth = Zend_Auth::getInstance();
 			$identity = $auth->getIdentity();
 			
-			// try to login with the old email and the old password
-			$ks = null;
 			try
 			{
-				$validDetails = true;
-				$client->systemUser->verifyPassword($identity->email, $request->getPost('old_password'));
+				$client->user->updateLoginData(
+					$identity->email,
+					$request->getPost('old_password'),
+					$request->getPost('email_address'),
+					$request->getPost('new_password')
+				);
+				
+				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Kaltura_ClientHelper::getPartnerId());				
+				$client->setKs($ks);
+				$user = $client->user->getByLoginId($request->getPost('email_address'), Kaltura_ClientHelper::getPartnerId());
+				if (!$user->isAdmin || $user->partnerId != Kaltura_ClientHelper::getPartnerId()) {
+					throw new Exception('', 'LOGIN_DATA_NOT_FOUND');
+				}
+				
+				$auth->getStorage()->write($user); // new identity (email could be updated)
+				
+				$this->view->done = true;
 			}
 			catch(Exception $ex)
 			{
-				$validDetails = false;
-			}
-			
-			if ($validDetails)
-			{
-				// now that we know that the old details are correct, we can update its details
-				$systemUser = new KalturaSystemUser();
-				$systemUser->email = $request->getPost('email_address');
-				$systemUser->password = $request->getPost('new_password');
-				
-				try
-				{
-					$updatedSystemUser = $client->systemUser->update($identity->id, $systemUser);
-					
-					$auth->getStorage()->write($updatedSystemUser); // new identity (email could be updated)
-					
-					$mailJobData = new KalturaMailJobData();
-					$mailJobData->mailType = KalturaMailType::MAIL_TYPE_SYSTEM_USER_CREDENTIALS_SAVED;
-					$mailJobData->recipientEmail = $updatedSystemUser->email;
-					$mailJobData->bodyParams = $systemUser->password;
-					$client->jobs->addMailJob($mailJobData);
-					
-					$this->view->done = true;
+				if ($ex->getCode() === 'LOGIN_DATA_NOT_FOUND') {
+					$form->setDescription('user not found');
 				}
-				catch(Exception $ex)
-				{
-					if ($ex->getCode() === 'SYSTEM_USER_ALREADY_EXISTS')
-						$form->setDescription('user already exists');
-					else
-						throw $ex;
-				}
-			}
-			else
-			{
-				$form->getElement('old_password')
+				else if ($ex->getCode() === 'WRONG_OLD_PASSWORD') {
+					$form->getElement('old_password')
 					->addErrorMessage('invalid password')
 					->markAsError();
+					$form->setDescription('old password is wong');
+				}
+				else if ($ex->getCode() === 'PASSWORD_STRUCTURE_INVALID') {
+					$form->setDescription('new password structure is invalid');
+				}
+				else if ($ex->getCode() === 'PASSWORD_ALREADY_USED') {
+					$form->setDescription('password was already used before');
+				}
+				else if ($ex->getCode() === 'USER_ALREADY_EXISTS') {
+					$form->setDescription('new email is already used by a different user');
+				}
+				else if ($ex->getCode() === 'USER_NOT_FOUND') {
+					$form->setDescription('user not found');
+				}
+				else if ($ex->getCode() === 'INVALID_FIELD_VALUE') {
+					$form->setDescription('new email is invalid');
+				}
+				else {
+					throw $ex;
+				}				
 			}
 		}
 		else

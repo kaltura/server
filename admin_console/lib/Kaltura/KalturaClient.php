@@ -7,6 +7,12 @@ class KalturaAccessControlOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+class KalturaAdminUserOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+}
+
 class KalturaAssetParamsOrderBy
 {
 }
@@ -383,6 +389,13 @@ class KalturaFlavorParamsOrderBy
 
 class KalturaFlavorParamsOutputOrderBy
 {
+}
+
+class KalturaGender
+{
+	const UNKNOWN = 0;
+	const MALE = 1;
+	const FEMALE = 2;
 }
 
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -855,27 +868,6 @@ class KalturaStorageServePriority
 	const EXTERNAL_ONLY = 4;
 }
 
-class KalturaSystemUserOrderBy
-{
-	const ID_ASC = "+id";
-	const ID_DESC = "-id";
-	const STATUS_ASC = "+status";
-	const STATUS_DESC = "-status";
-}
-
-class KalturaSystemUserRole
-{
-	const ROLE_GUEST = "guest";
-	const ROLE_PROFESIONAL_SERVICES = "ps";
-	const ROLE_ADMINISTRATOR = "admin";
-}
-
-class KalturaSystemUserStatus
-{
-	const BLOCKED = 0;
-	const ACTIVE = 1;
-}
-
 class KalturaThumbCropType
 {
 	const RESIZE = 1;
@@ -959,6 +951,13 @@ class KalturaUserOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaUserStatus
+{
+	const BLOCKED = 0;
+	const ACTIVE = 1;
+	const DELETED = 2;
 }
 
 class KalturaVideoCodec
@@ -3831,108 +3830,226 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
+class KalturaUser extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
+	 * @readonly
 	 */
-	public $idEqual = null;
+	public $partnerId = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $idIn = null;
+	public $screenName = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $nameLike = null;
+	public $fullName = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
+	public $email = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $statusEqual = null;
+	public $dateOfBirth = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $statusIn = null;
+	public $country = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+	public $state = null;
 
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
-{
 	/**
 	 * 
 	 *
-	 * @var KalturaCommercialUseType
+	 * @var string
 	 */
-	public $commercialUseEqual = null;
+	public $city = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $zip = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbnailUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * Admin tags can be updated only by using an admin session
+	 *
+	 * @var string
+	 */
+	public $adminTags = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGender
+	 */
+	public $gender = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserStatus
+	 */
+	public $status = null;
+
+	/**
+	 * Creation date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Last update date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Can be used to store various partner related data as a string 
+	 *
+	 * @var string
+	 */
+	public $partnerData = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $partnerPackageEqual = null;
+	public $indexedPartnerDataInt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $indexedPartnerDataString = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
-	public $partnerPackageGreaterThanOrEqual = null;
+	public $storageSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $firstName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastName = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdmin = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
-	public $partnerPackageLessThanOrEqual = null;
+	public $lastLoginTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $statusUpdatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $deletedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $loginEnabled = null;
 
 
 }
@@ -5393,6 +5510,128 @@ class KalturaThumbParamsListResponse extends KalturaObjectBase
 
 }
 
+abstract class KalturaUserBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $screenNameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $screenNameStartsWith = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $emailLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $emailStartsWith = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdminEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $loginEnabledEqual = null;
+
+
+}
+
+class KalturaUserFilter extends KalturaUserBaseFilter
+{
+
+}
+
+class KalturaUserListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaUser
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
 abstract class KalturaMetadataBaseFilter extends KalturaFilter
 {
 	/**
@@ -5878,6 +6117,79 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -6284,124 +6596,6 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 
 }
 
-class KalturaSystemUser extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $email = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $firstName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $lastName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $password = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdBy = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSystemUserStatus
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $isPrimary = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $statusUpdatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSystemUserRole
-	 */
-	public $role = null;
-
-
-}
-
-abstract class KalturaSystemUserBaseFilter extends KalturaFilter
-{
-
-}
-
-class KalturaSystemUserFilter extends KalturaSystemUserBaseFilter
-{
-
-}
-
-class KalturaSystemUserListResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaSystemUser
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-
-}
-
 class KalturaSystemPartnerUsageFilter extends KalturaFilter
 {
 	/**
@@ -6751,6 +6945,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 * @var int
 	 */
 	public $defThumbOffset = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $loginUsersQuota = null;
 
 
 }
@@ -8559,6 +8760,16 @@ class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 
 }
 
+abstract class KalturaAdminUserBaseFilter extends KalturaUserFilter
+{
+
+}
+
+class KalturaAdminUserFilter extends KalturaAdminUserBaseFilter
+{
+
+}
+
 abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 {
 
@@ -8797,93 +9008,6 @@ class KalturaUploadTokenFilter extends KalturaUploadTokenBaseFilter
 
 }
 
-abstract class KalturaUserBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $screenNameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $screenNameStartsWith = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $emailLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $emailStartsWith = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-
-}
-
-class KalturaUserFilter extends KalturaUserBaseFilter
-{
-
-}
-
 abstract class KalturaWidgetBaseFilter extends KalturaFilter
 {
 	/**
@@ -8984,6 +9108,11 @@ abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicat
 }
 
 class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
+{
+
+}
+
+class KalturaAdminUser extends KalturaUser
 {
 
 }
@@ -10302,6 +10431,216 @@ class KalturaThumbParamsService extends KalturaServiceBase
 	}
 }
 
+class KalturaUserService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUser $user)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "user", $user->toParams());
+		$this->client->queueServiceActionCall("user", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function update($userId, KalturaUser $user, $allUserPartners = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "user", $user->toParams());
+		$this->client->addParam($kparams, "allUserPartners", $allUserPartners);
+		$this->client->queueServiceActionCall("user", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function get($userId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->queueServiceActionCall("user", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function getByLoginId($loginId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->queueServiceActionCall("user", "getByLoginId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function delete($userId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->queueServiceActionCall("user", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function listAction(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("user", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserListResponse");
+		return $resultObject;
+	}
+
+	function notifyBan($userId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->queueServiceActionCall("user", "notifyBan", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function login($partnerId, $userId, $password, $expiry = 86400, $privileges = "*")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "expiry", $expiry);
+		$this->client->addParam($kparams, "privileges", $privileges);
+		$this->client->queueServiceActionCall("user", "login", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function loginByLoginId($loginId, $password, $partnerId = "", $expiry = 86400, $privileges = "*")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "expiry", $expiry);
+		$this->client->addParam($kparams, "privileges", $privileges);
+		$this->client->queueServiceActionCall("user", "loginByLoginId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function updateLoginData($oldLoginId, $password, $newLoginId = "", $newPassword = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "oldLoginId", $oldLoginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "newLoginId", $newLoginId);
+		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->queueServiceActionCall("user", "updateLoginData", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function resetPassword($email)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "email", $email);
+		$this->client->queueServiceActionCall("user", "resetPassword", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function setInitialPassword($hashKey, $newPassword)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "hashKey", $hashKey);
+		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->queueServiceActionCall("user", "setInitialPassword", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function enableLogin($userId, $loginId, $password)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->queueServiceActionCall("user", "enableLogin", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function disableLogin($loginId, $userId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->queueServiceActionCall("user", "disableLogin", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+}
+
 class KalturaMetadataService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -10712,136 +11051,6 @@ class KalturaFileSyncService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaFileSync");
-		return $resultObject;
-	}
-}
-
-class KalturaSystemUserService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function verifyPassword($email, $password)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "email", $email);
-		$this->client->addParam($kparams, "password", $password);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "verifyPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function generateNewPassword()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("systemuser_systemuser", "generateNewPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function setNewPassword($userId, $password)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->addParam($kparams, "password", $password);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "setNewPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function add(KalturaSystemUser $systemUser)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "systemUser", $systemUser->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "add", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function get($userId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function getByEmail($email)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "email", $email);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "getByEmail", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function update($userId, KalturaSystemUser $systemUser)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->addParam($kparams, "systemUser", $systemUser->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "update", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function delete($userId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "delete", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function listAction(KalturaSystemUserFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUserListResponse");
 		return $resultObject;
 	}
 }
@@ -12248,7 +12457,7 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * @var string
 	 */
-	protected $apiVersion = '3.1';
+	protected $apiVersion = '3.1.1';
 
 	/**
 	 * batch service lets you handle different batch process from remote machines.
@@ -12312,6 +12521,14 @@ class KalturaClient extends KalturaClientBase
 	public $thumbParams = null;
 
 	/**
+	 * Manage partner users on Kaltura's side
+	 * The userId in kaltura is the unique Id in the partner's system, and the [partnerId,Id] couple are unique key in kaltura's DB
+	 *
+	 * @var KalturaUserService
+	 */
+	public $user = null;
+
+	/**
 	 * Metadata service
 	 *
 	 * @var KalturaMetadataService
@@ -12338,13 +12555,6 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaFileSyncService
 	 */
 	public $fileSync = null;
-
-	/**
-	 * System user service
-	 *
-	 * @var KalturaSystemUserService
-	 */
-	public $systemUser = null;
 
 	/**
 	 * System partner service
@@ -12406,11 +12616,11 @@ class KalturaClient extends KalturaClientBase
 		$this->partner = new KalturaPartnerService($this);
 		$this->thumbAsset = new KalturaThumbAssetService($this);
 		$this->thumbParams = new KalturaThumbParamsService($this);
+		$this->user = new KalturaUserService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataProfile = new KalturaMetadataProfileService($this);
 		$this->storageProfile = new KalturaStorageProfileService($this);
 		$this->fileSync = new KalturaFileSyncService($this);
-		$this->systemUser = new KalturaSystemUserService($this);
 		$this->systemPartner = new KalturaSystemPartnerService($this);
 		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($this);
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($this);

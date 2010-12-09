@@ -41,7 +41,7 @@ class Form_NewUser extends Zend_Form
 			'decorators' => array('ViewHelper')
 		));
 		
-		$role = new Kaltura_Form_Element_EnumSelect('role', array('enum' => 'KalturaSystemUserRole'));
+		$role = new Kaltura_Form_Element_EnumSelect('role', array('enum' => 'KalturaAdminConsoleUserRole'));
 		$role->setLabel('Role:');
 		$this->addElements(array($role));
 		

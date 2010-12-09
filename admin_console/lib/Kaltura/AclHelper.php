@@ -10,11 +10,13 @@ class Kaltura_AclHelper
 	 */
 	public static function getCurrentRole()
 	{
-		if (Zend_Auth::getInstance()->hasIdentity())
-			if (Zend_Auth::getInstance()->getIdentity()->role)
-				return Zend_Auth::getInstance()->getIdentity()->role;
+		if (Zend_Auth::getInstance()->hasIdentity()) {
+			$partnerData = unserialize(Zend_Auth::getInstance()->getIdentity()->partnerData);
+			if (isset($partnerData->role) && $partnerData->role)
+				return $partnerData->role;
 			else
 				return self::ROLE_GUEST;
+		}
 		else
 			return self::ROLE_GUEST;
 	}

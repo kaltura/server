@@ -91,8 +91,9 @@ return array(
 	'KalturaPartnerStatus::BLOCKED' => 'Blocked',
 	'KalturaPartnerStatus::FULL_BLOCK' => 'Removed',
 
-	'KalturaSystemUserStatus::BLOCKED' => 'Blocked',
-	'KalturaSystemUserStatus::ACTIVE' => 'Active',
+	'KalturaUserStatus::BLOCKED' => 'Blocked',
+	'KalturaUserStatus::ACTIVE' => 'Active',
+	'KalturaUserStatus::DELETED' => 'Deleted',
 
 	'KalturaSystemPartnerPackage::PACKAGE_FREE' => 'Free',
 	'KalturaSystemPartnerPackage::PACKAGE_20' => 'Package 20',
@@ -101,9 +102,9 @@ return array(
 	'KalturaSystemPartnerPackage::PACKAGE_250' => 'Package 250',
 	'KalturaSystemPartnerPackage::PACKAGE_500' => 'Package 500',
 
-	'KalturaSystemUserRole::ROLE_GUEST' => 'Guest',
-	'KalturaSystemUserRole::ROLE_PROFESIONAL_SERVICES' => 'Profesional Services',
-	'KalturaSystemUserRole::ROLE_ADMINISTRATOR' => 'Administrator',	
+	'KalturaAdminConsoleUserRole::ROLE_GUEST' => 'Guest',
+	'KalturaAdminConsoleUserRole::ROLE_PROFESIONAL_SERVICES' => 'Profesional Services',
+	'KalturaAdminConsoleUserRole::ROLE_ADMINISTRATOR' => 'Administrator',	
 
 	'KalturaBitRateMode::CBR' => 'CBR',
 	'KalturaBitRateMode::VBR' => 'VBR',

@@ -33,15 +33,20 @@ class Kaltura_AuthAdapter implements Zend_Auth_Adapter_Interface
 			return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 			
 		$client = Kaltura_ClientHelper::getClient();
-		$ks = null;
+		$client->setKs(null);
 		try
 		{
-			$systemUser = $client->systemUser->verifyPassword($this->username, $this->password);
-			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $systemUser);
+			$ks = $client->user->loginByLoginId($this->username, $this->password, Kaltura_ClientHelper::getPartnerId());
+			$client->setKs($ks);
+			$user = $client->user->getByLoginId($this->username, Kaltura_ClientHelper::getPartnerId());
+			if (!$user->isAdmin || $user->partnerId != Kaltura_ClientHelper::getPartnerId()) {
+				throw new Exception('', 'SYSTEM_USER_INVALID_CREDENTIALS');
+			}
+			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $user);
 		}
 		catch(Exception $ex)
 		{
-			if ($ex->getCode() === 'SYSTEM_USER_INVALID_CREDENTIALS' || $ex->getCode() === 'SYSTEM_USER_DISABLED')
+			if ($ex->getCode() === 'SYSTEM_USER_INVALID_CREDENTIALS' || $ex->getCode() === 'SYSTEM_USER_DISABLED' || $ex->getCode() === 'USER_WRONG_PASSWORD' || $ex->getCode() === 'USER_NOT_FOUND')
 				return new Zend_Auth_Result(Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null);
 			else
 				throw $ex;

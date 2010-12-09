@@ -21,26 +21,26 @@
 		<tbody>
 			<?php foreach($this->paginator as $user): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php echo $this->enumTranslate('KalturaSystemUserStatus', $user->status); ?></td>
+				<td><?php echo $this->enumTranslate('KalturaUserStatus', $user->status); ?></td>
 				<td><?php echo $user->id; ?></td>
 				<td><?php echo $user->email; ?></td>
 				<td>
 					<?php echo $user->firstName; ?> <?php echo $user->lastName; ?>
 					<?php $titles = array(); ?>
 					<?php if ($user->email == $this->myEmail) { $titles[] = $this->translate('you'); }; ?>
-					<?php if ($user->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
+					<?php if (unserialize($user->partnerData)->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
 					<?php if (count($titles)): ?>
 						(<?php echo implode($titles, ', '); ?>)
 					<?php endif; ?>
 				</td>
 				<td>
-					<?php $disabled = (($user->email == $this->myEmail) || $user->isPrimary) ? ' disabled="disabled"' : ''; ?>
+					<?php $disabled = (($user->email == $this->myEmail) || unserialize($user->partnerData)->isPrimary) ? ' disabled="disabled"' : ''; ?>
 					<select class="options" onchange="doAction(this.value, <?php echo $user->id; ?>)"<?php echo $disabled; ?>>
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if ($user->email != $this->myEmail): ?>
-							<?php if ($user->status === KalturaSystemUserStatus::ACTIVE): ?>
+							<?php if ($user->status === KalturaUserStatus::ACTIVE): ?>
 							<option value="block" ><?php echo $this->translate('Block'); ?></option>
-							<?php elseif ($user->status === KalturaSystemUserStatus::BLOCKED): ?>
+							<?php elseif ($user->status === KalturaUserStatus::BLOCKED): ?>
 							<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
 							<?php endif; ?>
 							<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
