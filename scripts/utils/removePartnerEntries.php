@@ -26,7 +26,7 @@ KalturaLog::setLogger(new KalturaStdoutLogger());
 $typesToDelete = array(
 //	entryType::AUTOMATIC,
 //	entryType::BACKGROUND,
-//	entryType::MEDIACLIP,
+//	entryType::MEDIA_CLIP,
 //	entryType::SHOW,
 //	entryType::BUBBLES,
 //	entryType::PLAYLIST,
