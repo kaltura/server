@@ -21,6 +21,20 @@ $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
 
+if (count($argv) !== 1)
+{
+	die('pleas provide partner id as input' . PHP_EOL . 
+		'to run script: ' . __FILE__ . ' X' . PHP_EOL . 
+		'whereas X is partner id' . PHP_EOL);
+}
+
+if (count($argv) !== 1)
+{
+	die('please provide a partner id' . PHP_EOL . 
+		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
+		'whereas X is partner id' . PHP_EOL);
+}
+
 $partner_id = @$argv[1];
 
 $partner = PartnerPeer::retrieveByPK($partner_id);
@@ -34,6 +48,7 @@ $partner->save();
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partner_id);
 $c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_PARTNER_ONLY);
+$c->addOr(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_NONE);
 $c->setLimit(200);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
