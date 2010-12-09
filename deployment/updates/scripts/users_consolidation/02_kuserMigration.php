@@ -122,7 +122,7 @@ while(count($users))
 	
 	kuserPeer::clearInstancePool();
 	PartnerPeer::clearInstancePool();
-	UserLogindataPeer::clearInstancePool();
+	UserLoginDataPeer::clearInstancePool();
 	
 	$users = getUsers($con, $lastUser, $userLimitEachLoop);
 }
