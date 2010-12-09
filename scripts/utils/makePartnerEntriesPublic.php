@@ -21,7 +21,7 @@ $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
 
-if (count($argv) !== 1)
+if (count($argv) !== 2)
 {
 	die('pleas provide partner id as input' . PHP_EOL . 
 		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 

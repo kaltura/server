@@ -21,7 +21,7 @@ error_reporting(E_ALL);
 $databaseManager = new sfDatabaseManager();
 $databaseManager->initialize();
 
-if (count($argv) !== 1)
+if (count($argv) !== 2)
 {
 	die('please provide a partner id' . PHP_EOL . 
 		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
