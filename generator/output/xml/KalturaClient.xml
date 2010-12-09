@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1291213896">
-  <!-- Generated on date 01/12/10 14:31:36 -->
+<xml apiVersion="3.1.1" generatedDate="1291896473">
+  <!-- Generated on date 09/12/10 14:07:53 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
+    <enum name="KalturaAdminUserOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
@@ -982,21 +986,6 @@
       <const name="ITUNES" value="3"/>
       <const name="TUBE_MOGUL" value="4"/>
     </enum>
-    <enum name="KalturaSystemUserOrderBy" enumType="string">
-      <const name="ID_ASC" value="+id"/>
-      <const name="ID_DESC" value="-id"/>
-      <const name="STATUS_ASC" value="+status"/>
-      <const name="STATUS_DESC" value="-status"/>
-    </enum>
-    <enum name="KalturaSystemUserRole" enumType="string">
-      <const name="ROLE_GUEST" value="guest"/>
-      <const name="ROLE_PROFESIONAL_SERVICES" value="ps"/>
-      <const name="ROLE_ADMINISTRATOR" value="admin"/>
-    </enum>
-    <enum name="KalturaSystemUserStatus" enumType="int">
-      <const name="BLOCKED" value="0"/>
-      <const name="ACTIVE" value="1"/>
-    </enum>
     <enum name="KalturaThumbCropType" enumType="int">
       <const name="RESIZE" value="1"/>
       <const name="RESIZE_WITH_PADDING" value="2"/>
@@ -1206,11 +1195,39 @@
       <property name="objects" type="array" arrayType="KalturaAccessControl" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaAdminUser">
-      <property name="password" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="email" type="string" readOnly="1" insertOnly="0" description=""/>
+    <class name="KalturaUser">
+      <property name="id" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="screenName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="fullName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="email" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dateOfBirth" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="country" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="state" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="city" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="zip" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="thumbnailUrl" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="adminTags" type="string" readOnly="0" insertOnly="0" description="Admin tags can be updated only by using an admin session&#13;"/>
+      <property name="gender" type="int" enumType="KalturaGender" readOnly="0" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaUserStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds)&#13;"/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description="Last update date as Unix timestamp (In seconds)&#13;"/>
+      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description="Can be used to store various partner related data as a string &#13;"/>
+      <property name="indexedPartnerDataInt" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="indexedPartnerDataString" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="storageSize" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="password" type="string" readOnly="0" insertOnly="1" description=""/>
+      <property name="firstName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="isAdmin" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastLoginTime" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="statusUpdatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="deletedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="loginEnabled" type="bool" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaAdminUser" base="KalturaUser"/>
     <class name="KalturaDynamicEnum"/>
     <class name="KalturaBaseEntry">
       <property name="id" type="string" readOnly="1" insertOnly="0" description="Auto generated 10 characters alphanumeric string&#10;"/>
@@ -1907,31 +1924,6 @@
       <property name="objects" type="array" arrayType="KalturaUploadToken" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaUser">
-      <property name="id" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="screenName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="fullName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="email" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="dateOfBirth" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="country" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="state" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="city" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="zip" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="thumbnailUrl" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="adminTags" type="string" readOnly="0" insertOnly="0" description="Admin tags can be updated only by using an admin session&#13;"/>
-      <property name="gender" type="int" enumType="KalturaGender" readOnly="0" insertOnly="0" description=""/>
-      <property name="status" type="int" enumType="KalturaUserStatus" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds)&#13;"/>
-      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description="Last update date as Unix timestamp (In seconds)&#13;"/>
-      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description="Can be used to store various partner related data as a string &#13;"/>
-      <property name="indexedPartnerDataInt" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="indexedPartnerDataString" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="storageSize" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="password" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
     <class name="KalturaUserBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1944,6 +1936,8 @@
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="isAdminEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="loginEnabledEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserFilter" base="KalturaUserBaseFilter"/>
     <class name="KalturaUserListResponse">
@@ -2319,25 +2313,6 @@
       <property name="objects" type="array" arrayType="KalturaFileSync" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaSystemUser">
-      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="email" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="firstName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="lastName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="password" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdBy" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="status" type="int" enumType="KalturaSystemUserStatus" readOnly="0" insertOnly="0" description=""/>
-      <property name="isPrimary" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="statusUpdatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="role" type="string" enumType="KalturaSystemUserRole" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaSystemUserBaseFilter" abstract="1" base="KalturaFilter"/>
-    <class name="KalturaSystemUserFilter" base="KalturaSystemUserBaseFilter"/>
-    <class name="KalturaSystemUserListResponse">
-      <property name="objects" type="array" arrayType="KalturaSystemUser" readOnly="1" insertOnly="0" description=""/>
-      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
-    </class>
     <class name="KalturaSystemPartnerUsageFilter" base="KalturaFilter">
       <property name="fromDate" type="int" readOnly="0" insertOnly="0" description="Date range from&#10;"/>
       <property name="toDate" type="int" readOnly="0" insertOnly="0" description="Date range to&#10;"/>
@@ -2391,6 +2366,7 @@
       <property name="enableMetadata" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableAuditTrail" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="defThumbOffset" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="loginUsersQuota" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSystemPartnerPackage">
       <property name="id" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2597,6 +2573,8 @@
     <class name="KalturaMediaFlavorParamsOutputFilter" base="KalturaMediaFlavorParamsOutputBaseFilter"/>
     <class name="KalturaLiveStreamAdminEntryBaseFilter" abstract="1" base="KalturaLiveStreamEntryFilter"/>
     <class name="KalturaLiveStreamAdminEntryFilter" base="KalturaLiveStreamAdminEntryBaseFilter"/>
+    <class name="KalturaAdminUserBaseFilter" abstract="1" base="KalturaUserFilter"/>
+    <class name="KalturaAdminUserFilter" base="KalturaAdminUserBaseFilter"/>
     <class name="KalturaGoogleVideoSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
     <class name="KalturaGoogleVideoSyndicationFeedFilter" base="KalturaGoogleVideoSyndicationFeedBaseFilter"/>
     <class name="KalturaITunesSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
@@ -2832,6 +2810,7 @@
       <action name="login" description="Get an admin session using admin email and password (Used for login to the KMC application)&#10;">
         <param name="email" type="string" optional="0" description="&#13;"/>
         <param name="password" type="string" optional="0" description="&#13;"/>
+        <param name="partnerId" type="int" optional="1" default="" description="&#13;"/>
         <result type="string"/>
       </action>
       <action name="setInitialPassword" description="Set initial users password&#10;">
@@ -3687,10 +3666,15 @@
       <action name="update" description="Update exisitng user, it is possible to update the user id too&#10;">
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <param name="user" type="KalturaUser" optional="0" description="Id&#13;"/>
+        <param name="allUserPartners" type="bool" optional="1" default="false" description="wheter to update the user details for all partners he/she can login to&#13;"/>
         <result type="KalturaUser"/>
       </action>
-      <action name="get" description="Retrieve user&#10;">
+      <action name="get" description="Get user by user ID&#10;">
         <param name="userId" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaUser"/>
+      </action>
+      <action name="getByLoginId" description="Get user by user's login ID and partner ID&#10;">
+        <param name="loginId" type="string" optional="0" description="&#13;"/>
         <result type="KalturaUser"/>
       </action>
       <action name="delete" description="Mark the user as deleted&#10;">
@@ -3706,13 +3690,48 @@
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <result/>
       </action>
-      <action name="login" description="Get a session using user email and password&#10;">
+      <action name="login" description="Get a session using user id and password&#10;">
         <param name="partnerId" type="int" optional="0" description="&#13;"/>
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <param name="password" type="string" optional="0" description="&#13;"/>
         <param name="expiry" type="int" optional="1" default="86400" description="&#13;"/>
         <param name="privileges" type="string" optional="1" default="*" description="&#13;"/>
         <result type="string"/>
+      </action>
+      <action name="loginByLoginId" description="Get a session using user's kaltura id and password&#10;">
+        <param name="loginId" type="string" optional="0" description="login email&#13;"/>
+        <param name="password" type="string" optional="0" description="&#13;"/>
+        <param name="partnerId" type="int" optional="1" default="" description="&#13;"/>
+        <param name="expiry" type="int" optional="1" default="86400" description="&#13;"/>
+        <param name="privileges" type="string" optional="1" default="*" description="&#13;"/>
+        <result type="string"/>
+      </action>
+      <action name="updateLoginData" description="Update user password and email&#10;">
+        <param name="oldLoginId" type="string" optional="0" description="&#13;"/>
+        <param name="password" type="string" optional="0" description="&#13;"/>
+        <param name="newLoginId" type="string" optional="1" default="" description="Optional, provide only when you want to update the login id&#13;"/>
+        <param name="newPassword" type="string" optional="1" default="" description="&#13;"/>
+        <result type="KalturaUser"/>
+      </action>
+      <action name="resetPassword" description="Reset admin user password and send it to the users email address&#10;">
+        <param name="email" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="setInitialPassword" description="Set initial users password&#10;">
+        <param name="hashKey" type="string" optional="0" description="&#13;"/>
+        <param name="newPassword" type="string" optional="0" description="new password to set&#13;"/>
+        <result/>
+      </action>
+      <action name="enableLogin" description="Enable the user to login with a loginId (email) and password.&#10;">
+        <param name="userId" type="string" optional="0" description="&#13;"/>
+        <param name="loginId" type="string" optional="0" description="&#13;"/>
+        <param name="password" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="disableLogin" description="Disallow user to login with an id/password.&#10;Passing either a loginId or a userId is allowed.&#10;">
+        <param name="loginId" type="string" optional="0" description="&#13;"/>
+        <param name="userId" type="string" optional="1" default="" description="&#13;"/>
+        <result/>
       </action>
     </service>
     <service id="widget" name="widget" description="widget service for full widget management&#13;">
@@ -4394,47 +4413,6 @@
         <param name="fileSyncId" type="int" optional="0" description="&#13;"/>
         <param name="fileData" type="file" optional="0" description="&#13;"/>
         <result type="KalturaFileSync"/>
-      </action>
-    </service>
-    <service id="systemuser_systemuser" name="systemUser" description="System user service&#13;">
-      <action name="verifyPassword" description="Verify password for email address&#10;">
-        <param name="email" type="string" optional="0" description="&#13;"/>
-        <param name="password" type="string" optional="0" description="&#13;"/>
-        <result type="KalturaSystemUser"/>
-      </action>
-      <action name="generateNewPassword" description="Generate new random password&#10;">
-        <result type="string"/>
-      </action>
-      <action name="setNewPassword" description="Set new password for user by email address&#10;">
-        <param name="userId" type="int" optional="0" description="&#13;"/>
-        <param name="password" type="string" optional="0" description="&#13;"/>
-        <result/>
-      </action>
-      <action name="add" description="Add new system administrative user&#10;">
-        <param name="systemUser" type="KalturaSystemUser" optional="0" description="&#13;"/>
-        <result type="KalturaSystemUser"/>
-      </action>
-      <action name="get" description="Get system administrative user by id&#10;">
-        <param name="userId" type="int" optional="0" description="&#13;"/>
-        <result type="KalturaSystemUser"/>
-      </action>
-      <action name="getByEmail" description="Get system administrative user by email&#10;">
-        <param name="email" type="string" optional="0" description="&#13;"/>
-        <result type="KalturaSystemUser"/>
-      </action>
-      <action name="update" description="Update system administrative user by id &#10;">
-        <param name="userId" type="int" optional="0" description="&#13;"/>
-        <param name="systemUser" type="KalturaSystemUser" optional="0" description="&#13;"/>
-        <result type="KalturaSystemUser"/>
-      </action>
-      <action name="delete" description="Delete system administrative user by id&#10;">
-        <param name="userId" type="int" optional="0" description="&#13;"/>
-        <result/>
-      </action>
-      <action name="list" description="List system administrative users by filter and pager&#10;">
-        <param name="filter" type="KalturaSystemUserFilter" optional="1" default="null" description="&#13;"/>
-        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
-        <result type="KalturaSystemUserListResponse"/>
       </action>
     </service>
     <service id="systempartner_systempartner" name="systemPartner" description="System partner service&#13;">
