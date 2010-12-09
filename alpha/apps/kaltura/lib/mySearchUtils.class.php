@@ -202,7 +202,7 @@ class mySearchUtils
 				elseif ( $obj instanceof entry )
 				{
 					// status=READY , type=MEDIACLIP, view permissions of kshow 
-					self::setRes ( $res , $obj->getStatus() == entryStatus::READY );
+					self::setRes ( $res , true );
 				}
 				else
 				{
