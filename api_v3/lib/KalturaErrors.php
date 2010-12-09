@@ -234,4 +234,9 @@ class KalturaErrors extends APIErrors
 	const USER_NOT_FOUND = "USER_NOT_FOUND,User was not found";
 	
 	const USER_WRONG_PASSWORD = "USER_WRONG_PASSWORD,Wrong password supplied";
+	
+	const USER_LOGIN_ALREADY_ENABLED = 'USER_LOGIN_ALREADY_ENABLED,User is already allowed to login';
+	
+	const USER_LOGIN_ALREADY_DISABLED = 'USER_LOGIN_ALREADY_DISABLED,User is already not allowed to login';
+	
 }

@@ -140,11 +140,21 @@ class PartnerService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		
+		$loginData = UserLoginDataPeer::getByEmail($adminEmail);
+		if (!$loginData) {
+			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+		}
+		if (!$loginData->isPasswordValid($cmsPassword)) {
+			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+		}
+		
 		$c = new Criteria();
-		$c->add ( adminKuserPeer::EMAIL , $adminEmail );
-		$c->add ( adminKuserPeer::PARTNER_ID , $partnerId );
+		$c->add ( kuserPeer::EMAIL , $adminEmail );
+		$c->add ( kuserPeer::PARTNER_ID , $partnerId );
+		$c->add ( kuserPeer::LOGIN_DATA_ID , $loginData->getId() );
+		$c->add ( kuserPeer::IS_ADMIN, true);
 		$c->setLimit ( 20 ); // just to limit the number of partners returned
-		$adminKuser = adminKuserPeer::doSelectOne( $c );
+		$adminKuser = kuserPeer::doSelectOne( $c );
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
 		// so no hint about existing admin will leak 
@@ -152,8 +162,6 @@ class PartnerService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
 
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );
-		if ( ! $adminKuser->isPasswordValid ( $cmsPassword ))
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
 		
 		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
 		$partner = new KalturaPartner;

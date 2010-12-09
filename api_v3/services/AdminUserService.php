@@ -6,8 +6,33 @@
  * @package api
  * @subpackage services
  */
-class AdminUserService extends KalturaBaseService 
+class AdminUserService extends KalturaBaseUserService 
 {
+
+	/**
+	 * keep backward compatibility with changed error codes
+	 * @param KalturaAPIException $e
+	 * @throws KalturaAPIException
+	 */
+	private function throwTranslatedException(KalturaAPIException $e)
+	{
+		$code = $e->getCode();
+		if ($code == KalturaErrors::USER_NOT_FOUND) {
+			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+		}
+		else if ($code == KalturaErrors::WRONG_OLD_PASSWORD) {
+			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD, "wrong password" );
+		}
+		else if ($code == KalturaErrors::USER_WRONG_PASSWORD) {
+			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+		}
+		else if ($code == KalturaErrors::LOGIN_DATA_NOT_FOUND) {
+			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+		}
+		throw $e;
+	}
+	
+	
 	/**
 	 * Update admin user password and email
 	 * 
@@ -20,45 +45,32 @@ class AdminUserService extends KalturaBaseService
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
+	 * @throws KalturaErrors::INVALID_FIELD_VALUE
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "" )
+	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "" )
 	{
-		KalturaResponseCacher::disableCache();
-		
-		if ($newEmail != "")
+		try
 		{
-			if(!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i', $newEmail))
-				throw new KalturaAPIException ( KalturaErrors::INVALID_FIELD_VALUE, "newEmail" );
+			$user = parent::updateLoginDataImpl($email, $password, $newEmail, $newPassword);
+			
+			// copy required parameters to a KalturaAdminUser object for backward compatibility
+			$adminUser = new KalturaAdminUser();
+			$adminUser->email = $user->email;
+			$adminUser->password = $user->password;
+			
+			return $adminUser;
 		}
-
-		try {
-			$adminKuserPeer = new adminKuserPeer(); // TODO - why not static ?
-			list( $new_password , $new_email) = $adminKuserPeer->resetUserPassword ( $email , $newPassword , $password , $newEmail );
+		catch (KalturaAPIException $e) // keep backward compatibility with changed error codes
+		{
+			$this->throwTranslatedException($e);
 		}
-		catch (kAdminKuserException $e) {
-			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
-			}
-			else if ($code == kAdminKuserException::ADMIN_KUSER_WRONG_OLD_PASSWORD) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD, "wrong password" );
-			}
-			else if ($code == kAdminKuserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
-			}
-			else if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
-			}
-			throw $e;			
-		}			
-		
-		$adminUser = new KalturaAdminUser;
-		$adminUser->email = ( $new_email )? $new_email: $email;
-		$adminUser->password = $new_password;
-		
-		return $adminUser;
 	}
-
+	
+	
 	/**
 	 * Reset admin user password and send it to the users email address
 	 * 
@@ -66,89 +78,57 @@ class AdminUserService extends KalturaBaseService
 	 * @param string $email
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
+	 * @throws KalturaErrors::INVALID_FIELD_VALUE
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */	
-	function resetPasswordAction($email)
+	public function resetPasswordAction($email)
 	{
-		KalturaResponseCacher::disableCache();
-		
-		try {
-			$adminKuserPeer = new adminKuserPeer(); // TODO - why not static ?
-			list( $new_password , $new_email) = $adminKuserPeer->resetUserPassword($email);
+		try
+		{
+			return parent::resetPasswordImpl($email);
 		}
-		catch (kAdminKuserException $e) {
-			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND, "user not found");
-			}
-			else if ($code == kAdminKuserException::ADMIN_KUSER_WRONG_OLD_PASSWORD) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD, "wrong password" );
-			}
-			else if ($code == kAdminKuserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
-			}
-			else if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
-			}
-			throw $e;			
-		}	
-		
-		if (!$new_password)
-			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND, "user not found" );
+		catch (KalturaAPIException $e) // keep backward compatibility with changed error codes
+		{
+			$this->throwTranslatedException($e);
+		}
 	}
-
+	
 	/**
 	 * Get an admin session using admin email and password (Used for login to the KMC application)
 	 * 
 	 * @action login
 	 * @param string $email
 	 * @param string $password
+	 * @param int $partnerId
 	 * @return string
 	 *
 	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
+	 * @thrown KalturaErrors::LOGIN_RETRIES_EXCEEDED
+	 * @thrown KalturaErrors::LOGIN_BLOCKED
+	 * @thrown KalturaErrors::PASSWORD_EXPIRED
+	 * @thrown KalturaErrors::INVALID_PARTNER_ID
+	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */		
-	function loginAction($email, $password)
+	public function loginAction($email, $password, $partnerId = null)
 	{
-		KalturaResponseCacher::disableCache();
-		
-		try {
-			$adminKuser = adminKuserPeer::adminLogin($email, $password);
+		try
+		{
+			$ks = parent::loginImpl(null, $email, $password, $partnerId, null, null);
+			$ks = kSessionUtils::crackKs($ks);
+			if (!$ks->isAdmin()) {
+				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND); 
+			}
+			return $ks;
 		}
-		catch (kAdminKuserException $e) {
-			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
-			}
-			else if ($code == kAdminKuserException::LOGIN_RETRIES_EXCEEDED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_RETRIES_EXCEEDED);
-			}
-			else if ($code == kAdminKuserException::LOGIN_BLOCKED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_BLOCKED);
-			}
-			else if ($code == kAdminKuserException::PASSWORD_EXPIRED) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_EXPIRED);
-			}
-			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+		catch (KalturaAPIException $e) // keep backward compatibility with changed error codes
+		{
+			$this->throwTranslatedException($e);
 		}
-		if (!$adminKuser) {
-			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
-		}
-		
-		
-		$partner = PartnerPeer::retrieveByPK($adminKuser->getPartnerId());
-		
-		if (!$partner)
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $adminKuser->getPartnerId());
-		
-		$admin_puser_id = "__ADMIN__" . $adminKuser->getId(); // the prefix __ADMIN__ and the id in the admin_kuser table
-		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $admin_puser_id);
-		
-		$ks = null;
-		// create a ks for this admin_kuser as if entered the admin_secret using the API
-		kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  $kuser->getPuserId() , $ks , 86400 , 2 , "" , "*" );
-		
-		return $ks;
 	}
+	
 	
 	
 	/**
@@ -158,37 +138,24 @@ class AdminUserService extends KalturaBaseService
 	 * @param string $hashKey
 	 * @param string $newPassword new password to set
 	 *
-	 * @throws 
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED
+	 * @throws KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID
+	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
 	 */	
-	function setInitialPasswordAction($hashKey, $newPassword)
+	public function setInitialPasswordAction($hashKey, $newPassword)
 	{
-		KalturaResponseCacher::disableCache();
-		
-		try {
-			$result = adminKuserPeer::setInitialPassword($hashKey, $newPassword);
+		try
+		{
+			return parent::setInitialPasswordImpl($hashKey, $newPassword);
 		}
-		catch (kAdminKuserException $e) {
-			$code = $e->getCode();
-			if ($code == kAdminKuserException::ADMIN_KUSER_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
-			}
-			if ($code == kAdminKuserException::PASSWORD_STRUCTURE_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
-			}
-			if ($code == kAdminKuserException::NEW_PASSWORD_HASH_KEY_EXPIRED) {
-				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED);
-			}
-			if ($code == kAdminKuserException::NEW_PASSWORD_HASH_KEY_INVALID) {
-				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID);
-			}
-			if ($code == kAdminKuserException::PASSWORD_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
-			}
-			
-			throw $e;
-		}
-		if (!$result) {
-			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
+		catch (KalturaAPIException $e) // keep backward compatibility with changed error codes
+		{
+			$this->throwTranslatedException($e);
 		}
 	}
+	
+	
 }

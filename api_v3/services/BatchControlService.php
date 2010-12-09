@@ -284,7 +284,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function stopSchedulerAction($schedulerId, $adminId, $cause)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		$schedulerDb = SchedulerPeer::retrieveByPK($schedulerId);
 		if(!$schedulerDb)
 			throw new KalturaAPIException(KalturaErrors::SCHEDULER_NOT_FOUND, $schedulerId);
@@ -332,7 +332,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function stopWorkerAction($workerId, $adminId, $cause)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		
 		$workerDb = SchedulerWorkerPeer::retrieveByPK($workerId);
 		if(!$workerDb)
@@ -395,7 +395,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function killAction($workerId, $batchIndex, $adminId, $cause)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		
 		$workerDb = SchedulerWorkerPeer::retrieveByPK($workerId);
 		if(!$workerDb)
@@ -462,7 +462,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function startWorkerAction($workerId, $adminId, $cause = null)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		
 		$workerDb = SchedulerWorkerPeer::retrieveByPK($workerId);
 		if(!$workerDb)
@@ -527,7 +527,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function setSchedulerConfigAction($schedulerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		
 		$schedulerDb = SchedulerPeer::retrieveByPK($schedulerId);
 		if(!$schedulerDb)
@@ -590,7 +590,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	function setWorkerConfigAction($workerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null)
 	{
-		$adminDb = SystemUserPeer::retrieveByPK($adminId);
+		$adminDb = kuserPeer::retrieveByPK($adminId);
 		
 		$workerDb = SchedulerWorkerPeer::retrieveByPK($workerId);
 		if(!$workerDb)

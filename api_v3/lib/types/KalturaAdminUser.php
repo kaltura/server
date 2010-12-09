@@ -3,34 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAdminUser extends KalturaObject 
+class KalturaAdminUser extends KalturaUser 
 {
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $password;
-
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $email;
-	
-	/**
-	 * @var string
-	 */
-	public $screenName;
-	
-	private static $map_between_objects = array
-	(
-		"email" , "screenName" 
-	);
-
-	public function getMapBetweenObjects ( )
-	{
-		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
-	}
-
-	
+	// class exists for backward compatibility only
+	// should function the same as a KalturaUser with isAdmin=true
 }
