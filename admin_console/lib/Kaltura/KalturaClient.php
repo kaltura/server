@@ -158,6 +158,11 @@ class KalturaBatchJobType
 	const FILESYNC_IMPORT = "29";
 	const CAPTURE_THUMB = "30";
 	const VIRUS_SCAN = "virusScan.VirusScan";
+	const DISTRIBUTION_SUBMIT = "virusScan.DistributionSubmit";
+	const DISTRIBUTION_UPDATE = "virusScan.DistributionUpdate";
+	const DISTRIBUTION_DELETE = "virusScan.DistributionDelete";
+	const DISTRIBUTION_FETCH_REPORT = "virusScan.DistributionFetchReport";
+	const DISTRIBUTION_SYNC = "virusScan.DistributionSync";
 }
 
 class KalturaBitRateMode
@@ -255,8 +260,6 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -277,6 +280,41 @@ class KalturaDataEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+}
+
+class KalturaDistributionAction
+{
+	const SUBMIT = 1;
+	const UPDATE = 2;
+	const DELETE = 3;
+	const FETCH_REPORT = 4;
+}
+
+class KalturaDistributionErrorType
+{
+	const MISSING_FLAVOR = 1;
+	const MISSING_THUMBNAIL = 2;
+	const MISSING_METADATA = 3;
+	const INVALID_DATA = 4;
+}
+
+class KalturaDistributionProfileActionStatus
+{
+	const DISABLED = 1;
+	const AUTOMATIC = 2;
+	const MANUAL = 3;
+}
+
+class KalturaDistributionProfileStatus
+{
+	const DISABLED = 1;
+	const ENABLED = 2;
+	const DELETED = 3;
+}
+
+class KalturaDistributionProviderType
+{
+	const GENERIC = "1";
 }
 
 class KalturaDocumentType
@@ -1022,6 +1060,230 @@ class KalturaYahooSyndicationFeedOrderBy
 	const TYPE_DESC = "-type";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaUser extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $screenName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fullName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $email = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $dateOfBirth = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $country = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $state = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $city = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $zip = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbnailUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * Admin tags can be updated only by using an admin session
+	 *
+	 * @var string
+	 */
+	public $adminTags = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGender
+	 */
+	public $gender = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserStatus
+	 */
+	public $status = null;
+
+	/**
+	 * Creation date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Last update date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Can be used to store various partner related data as a string 
+	 *
+	 * @var string
+	 */
+	public $partnerData = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $indexedPartnerDataInt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $indexedPartnerDataString = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $storageSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $firstName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastName = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdmin = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lastLoginTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $statusUpdatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $deletedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $loginEnabled = null;
+
+
 }
 
 class KalturaDynamicEnum extends KalturaObjectBase
@@ -3830,14 +4092,114 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
-class KalturaUser extends KalturaObjectBase
+class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
+	public $srcFileSyncLocalPath = null;
+
+	/**
+	 * The translated path as used by the scheduler
+	 *
+	 * @var string
+	 */
+	public $actualSrcFileSyncLocalPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFileSyncRemoteUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsOutputId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbParamsOutput
+	 */
+	public $thumbParamsOutput;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAssetType
+	 */
+	public $srcAssetType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbPath = null;
+
+
+}
+
+class KalturaDistributionThumbDimensions extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $width = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $height = null;
+
+
+}
+
+abstract class KalturaDistributionProfile extends KalturaObjectBase
+{
+	/**
+	 * Auto generated unique id
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
 	public $id = null;
+
+	/**
+	 * Profile creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Profile last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
 
 	/**
 	 * 
@@ -3850,65 +4212,113 @@ class KalturaUser extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var KalturaDistributionProviderType
+	 * @insertonly
 	 */
-	public $screenName = null;
+	public $providerType = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $fullName = null;
+	public $name = null;
 
 	/**
 	 * 
+	 *
+	 * @var KalturaDistributionProfileStatus
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $submitEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $updateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $deleteEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $reportEnabled = null;
+
+	/**
+	 * Comma separated flavor params ids that should be auto converted
 	 *
 	 * @var string
 	 */
-	public $email = null;
+	public $autoCreateFlavors = null;
 
 	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $dateOfBirth = null;
-
-	/**
-	 * 
+	 * Comma separated thumbnail params ids that should be auto generated
 	 *
 	 * @var string
 	 */
-	public $country = null;
+	public $autoCreateThumb = null;
+
+	/**
+	 * Comma separated flavor params ids that should be submitted if ready
+	 *
+	 * @var string
+	 */
+	public $optionalFlavorParamsIds = null;
+
+	/**
+	 * Comma separated flavor params ids that required to be readt before submission
+	 *
+	 * @var string
+	 */
+	public $requiredFlavorParamsIds = null;
+
+	/**
+	 * Thumbnail dimensions that should be submitted if ready
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $optionalThumbDimensions;
+
+	/**
+	 * Thumbnail dimensions that required to be readt before submission
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $requiredThumbDimensions;
+
+
+}
+
+abstract class KalturaDistributionValidationError extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionAction
+	 */
+	public $action = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var KalturaDistributionErrorType
 	 */
-	public $state = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $city = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $zip = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbnailUrl = null;
+	public $errorType = null;
 
 	/**
 	 * 
@@ -3917,36 +4327,23 @@ class KalturaUser extends KalturaObjectBase
 	 */
 	public $description = null;
 
+
+}
+
+class KalturaEntryDistribution extends KalturaObjectBase
+{
 	/**
+	 * Auto generated unique id
 	 * 
 	 *
-	 * @var string
+	 * @var int
+	 * @readonly
 	 */
-	public $tags = null;
+	public $id = null;
 
 	/**
-	 * Admin tags can be updated only by using an admin session
-	 *
-	 * @var string
-	 */
-	public $adminTags = null;
-
-	/**
+	 * Entry distribution creation date as Unix timestamp (In seconds)
 	 * 
-	 *
-	 * @var KalturaGender
-	 */
-	public $gender = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUserStatus
-	 */
-	public $status = null;
-
-	/**
-	 * Creation date as Unix timestamp (In seconds)
 	 *
 	 * @var int
 	 * @readonly
@@ -3954,7 +4351,8 @@ class KalturaUser extends KalturaObjectBase
 	public $createdAt = null;
 
 	/**
-	 * Last update date as Unix timestamp (In seconds)
+	 * Entry distribution last update date as Unix timestamp (In seconds)
+	 * 
 	 *
 	 * @var int
 	 * @readonly
@@ -3962,33 +4360,13 @@ class KalturaUser extends KalturaObjectBase
 	public $updatedAt = null;
 
 	/**
-	 * Can be used to store various partner related data as a string 
-	 *
-	 * @var string
-	 */
-	public $partnerData = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $indexedPartnerDataInt = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $indexedPartnerDataString = null;
-
-	/**
+	 * Entry distribution submission date as Unix timestamp (In seconds)
 	 * 
 	 *
 	 * @var int
 	 * @readonly
 	 */
-	public $storageSize = null;
+	public $submittedAt = null;
 
 	/**
 	 * 
@@ -3996,60 +4374,179 @@ class KalturaUser extends KalturaObjectBase
 	 * @var string
 	 * @insertonly
 	 */
-	public $password = null;
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $dirtyStatus = null;
+
+	/**
+	 * Comma separated thumbnail asset ids
+	 *
+	 * @var string
+	 */
+	public $thumbAssetIds = null;
+
+	/**
+	 * Comma separated flavor asset ids
+	 *
+	 * @var string
+	 */
+	public $flavorAssetIds = null;
+
+	/**
+	 * Entry distribution publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $sunrise = null;
+
+	/**
+	 * Entry distribution un-publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $sunset = null;
+
+	/**
+	 * The id as returned from the distributed destination
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+	/**
+	 * The plays as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 */
+	public $plays = null;
+
+	/**
+	 * The views as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 */
+	public $views = null;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionValidationError
+	 */
+	public $validationErrors;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionErrorType
+	 */
+	public $errorType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $errorNumber = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $firstName = null;
+	public $errorDescription = null;
+
+
+}
+
+class KalturaDistributionJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
 
 	/**
 	 * 
+	 *
+	 * @var KalturaDistributionProfile
+	 */
+	public $distributionProfile;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $entryDistributionId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistribution
+	 */
+	public $entryDistribution;
+
+	/**
+	 * Id of the media in the remote system
 	 *
 	 * @var string
 	 */
-	public $lastName = null;
+	public $remoteId = null;
 
+
+}
+
+class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
+{
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var int
 	 */
-	public $isAdmin = null;
+	public $plays = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
-	 * @readonly
 	 */
-	public $lastLoginTime = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $statusUpdatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $deletedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $loginEnabled = null;
+	public $views = null;
 
 
 }
@@ -5515,20 +6012,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
 	 * @var int
 	 */
 	public $partnerIdEqual = null;
@@ -5596,6 +6079,25 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 */
 	public $isAdminEqual = null;
 
+
+}
+
+class KalturaUserFilter extends KalturaUserBaseFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
 	/**
 	 * 
 	 *
@@ -5603,11 +6105,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 */
 	public $loginEnabledEqual = null;
 
-
-}
-
-class KalturaUserFilter extends KalturaUserBaseFilter
-{
 
 }
 
@@ -7650,6 +8147,11 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 
 }
 
+class KalturaAdminUser extends KalturaUser
+{
+
+}
+
 class KalturaMailJob extends KalturaBaseJob
 {
 	/**
@@ -7846,67 +8348,6 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 * @var KalturaBulkUploadCsvVersion
 	 */
 	public $csvVersion = null;
-
-
-}
-
-class KalturaCaptureThumbJobData extends KalturaJobData
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $srcFileSyncLocalPath = null;
-
-	/**
-	 * The translated path as used by the scheduler
-	 *
-	 * @var string
-	 */
-	public $actualSrcFileSyncLocalPath = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $srcFileSyncRemoteUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $thumbParamsOutputId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaThumbParamsOutput
-	 */
-	public $thumbParamsOutput;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbAssetId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaAssetType
-	 */
-	public $srcAssetType = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbPath = null;
 
 
 }
@@ -9108,11 +9549,6 @@ abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicat
 }
 
 class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
-{
-
-}
-
-class KalturaAdminUser extends KalturaUser
 {
 
 }
@@ -10580,7 +11016,7 @@ class KalturaUserService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaUser");
+		$this->client->validateObjectType($resultObject, "null");
 		return $resultObject;
 	}
 
@@ -10622,21 +11058,21 @@ class KalturaUserService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
+		$this->client->validateObjectType($resultObject, "KalturaUser");
 		return $resultObject;
 	}
 
-	function disableLogin($loginId, $userId = "")
+	function disableLogin($userId = "", $loginId = "")
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "loginId", $loginId);
 		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "loginId", $loginId);
 		$this->client->queueServiceActionCall("user", "disableLogin", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
+		$this->client->validateObjectType($resultObject, "KalturaUser");
 		return $resultObject;
 	}
 }

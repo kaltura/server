@@ -109,6 +109,7 @@ class kConfLocal
 		//self::$map['default_plugins'][] = "SymantecScanEnginePlugin";
 		//self::$map['default_plugins'][] = "QuickTimeToolsPlugin";
 		//self::$map['default_plugins'][] = "FastStartPlugin";
+		//self::$map['default_plugins'][] = "ContentDistributionPlugin";
 		
 }
 

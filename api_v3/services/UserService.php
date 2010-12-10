@@ -103,9 +103,11 @@ class UserService extends KalturaBaseUserService
 		
 		if ($allUserPartners && $dbUser->getLoginDataId()) {
 			// if current user has a login record for multiple partners, update for all partners
+			kuserPeer::setUseCriteriaFilter(false);
 			$c = new Criteria();
 			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $dbUser->getLoginDataId());
 			$c->addAnd(kuserPeer::ID, $dbUser->getId(), Criteria::NOT_EQUAL);
+			$c->addAnd(kuserPeer::PARTNER_ID, null, Criteria::NOT_EQUAL);
 			$otherKusers = kuserPeer::doSelect($c);
 			
 			foreach ($otherKusers as $kuser) {
@@ -113,6 +115,7 @@ class UserService extends KalturaBaseUserService
 				$kuser = $user->toUpdatableObject($kuser);
 				$kuser->save();
 			}
+			kuserPeer::setUseCriteriaFilter(false);
 			
 			// update user's login data record
 			try {
@@ -201,8 +204,6 @@ class UserService extends KalturaBaseUserService
 		$dbUser->setStatus(KalturaUserStatus::DELETED);
 		$dbUser->save();
 		
-		UserLoginDataPeer::notifyOneLessUser($dbUser->getLoginDataId());
-			
 		$user = new KalturaUser();
 		$user->fromObject($dbUser);
 		
@@ -321,7 +322,6 @@ class UserService extends KalturaBaseUserService
 	 * @param string $password
 	 * @param string $newLoginId Optional, provide only when you want to update the login id
 	 * @param string $newPassword
-	 * @return KalturaUser
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -382,6 +382,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId
 	 * @param string $loginId
 	 * @param string $password
+	 * @return KalturaUser
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -442,15 +443,17 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @action disableLogin
 	 * 
-	 * @param string $loginId
 	 * @param string $userId
+	 * @param string $loginId
+	 * 
+	 * @return KalturaUser
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 *
 	 */	
-	public function disableLoginAction($loginId, $userId = null)
+	public function disableLoginAction($userId = null, $loginId = null)
 	{
 		if (!$loginId && !userId)
 		{

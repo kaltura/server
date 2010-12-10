@@ -44,8 +44,8 @@ user.getbyloginid                   |   		|2		|1	|0		|0		|1		|	|		|	|   |
 user.updatelogindata		        |			|0		|0	|0		|0		|1		|	|		|	|   |
 user.resetpassword				    |			|0		|0	|0		|0		|1		|	|		|	|   |
 user.setinitialpassword 		    |			|0		|0	|0		|0		|1		|	|		|	|   |
-user.enableLogin                    |   		|2		|1	|0		|0		|1		|	|		|	|   |
-user.disableLogin                   |   		|2		|1	|0		|0		|1		|	|		|	|   |
+user.enablelogin                    |   		|2		|1	|0		|0		|1		|	|		|	|   |
+user.disablelogin                   |   		|2		|1	|0		|0		|1		|	|		|	|   |
 
 widget.add							|			|1		|1	|0		|0		|1		|	|		|	|   |
 widget.clone						|			|1		|1	|0		|0		|1		|	|		|	|   |

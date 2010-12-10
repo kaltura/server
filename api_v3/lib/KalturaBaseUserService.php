@@ -16,7 +16,6 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param string $password
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
-	 * @return KalturaUser
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -61,8 +60,6 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			throw $e;			
 		}
-		
-		return true;
 	}
 
 	
@@ -133,6 +130,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		kuserPeer::setUseCriteriaFilter(false);
 		
+		// if a KS of a specific partner is used, don't allow logging in to a different partner
 		if ($this->getPartnerId() && $partnerId && $this->getPartnerId() != $partnerId) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 		}		

@@ -51,8 +51,13 @@ class kuser extends Basekuser
 		
 		mySearchUtils::setDisplayInSearch( $this );
 		
+		if (!$this->getIsAdmin()) {
+			$this->setIsAdmin(false);
+		}
+		
 		return parent::save( $con );	
 	}
+	
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basekuser#postUpdate()
@@ -60,13 +65,28 @@ class kuser extends Basekuser
 	public function postUpdate(PropelPDO $con = null)
 	{
 		$objectDeleted = false;
-		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == self::KUSER_STATUS_DELETED)
+		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == self::KUSER_STATUS_DELETED) {
 			$objectDeleted = true;
+		}
 			
+		$oldLoginDataId = null;
+			if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
+			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
+		}
+					
 		$ret = parent::postUpdate($con);
 		
-		if($objectDeleted)
+		if ($objectDeleted)
+		{
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			// if user is deleted - check if shoult also delete login data
+			UserLoginDataPeer::notifyOneLessUser($this->getLoginDataId());
+		}
+		else if (!is_null($oldLoginDataId) && is_null($this->getLoginDataId()))
+		{
+			// if login was disabled - check if should also delete login data
+			UserLoginDataPeer::notifyOneLessUser($oldLoginDataId);
+		}
 			
 		return $ret;
 	}
@@ -724,8 +744,6 @@ class kuser extends Basekuser
 		$this->setLoginDataId(null);
 		$this->save();
 		
-		UserLoginDataPeer::notifyOneLessUser($loginDataId);
-			
 		return true;	
 	}
 	

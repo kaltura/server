@@ -7,7 +7,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $id;
 
@@ -176,7 +175,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 	/**
 	 * @var bool
 	 * @readonly
-	 * @filter eq
 	 */
 	public $loginEnabled;
 
@@ -208,7 +206,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"lastLoginTime",
 		"statusUpdatedAt",
 		"deletedAt",
-		"loginEnabled",
 	);
 
 	public function getMapBetweenObjects ( )

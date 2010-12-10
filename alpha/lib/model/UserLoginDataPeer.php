@@ -126,7 +126,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$password = $loginData->resetPassword($requested_password, $old_password);
 		
 		// update email if requested
-		if ( $new_email && $new_email != $loginData->getEmail() ) 
+		if ( $new_email && $new_email != $loginData->getLoginEmail()) 
 		{
 			$loginData->setLoginEmail($new_email);
 		}
@@ -284,6 +284,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	// user login by user_login_data object
 	private static function userLogin(UserLoginData $loginData, $password, $partnerId = null)
 	{
+		$requestedPartner = $partnerId;
+		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}		
@@ -326,8 +328,24 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
-		if (!$kuser) {
-			throw new kUserException('', kUserException::USER_NOT_FOUND);
+		if (!$kuser || $kuser->getStatus() != kuser::KUSER_STATUS_ACTIVE)
+		{
+			$kuser = null;
+			
+			// if a specific partner was requested - throw error
+			if ($requestedPartner) {
+				throw new kUserException('', kUserException::USER_NOT_FOUND);
+			}
+			
+			// if no specific partner was request, but last logged in partner is not available, login to first found partner
+			$c = new Criteria();
+			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId());
+			$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_ACTIVE, Criteria::EQUAL);
+			$kuser = kuserPeer::doSelectOne($c);
+			
+			if (!$kuser) {
+				throw new kUserException('', kUserException::USER_NOT_FOUND);
+			}
 		}
 		
 		$loginData->setLastLoginPartnerId($partnerId);
@@ -442,9 +460,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			return;
 		}
 		
+		kuserPeer::setUseCriteriaFilter(false);
 		$c = new Criteria();
+		$c->addAnd(kuserPeer::PARTNER_ID, null, Criteria::NOT_EQUAL);
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
 		$countUsers = kuserPeer::doCount($c);
+		kuserPeer::setUseCriteriaFilter(true);
 		
 		if ($countUsers <= 0) {
 			$loginData = self::retrieveByPK($loginDataId);

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'PHPUnit\Framework\TestCase.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php');
 require_once(KALTURA_CLIENT_PATH);
 
@@ -59,17 +59,38 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->dummyPartner2 = PartnerPeer::retrieveByPK(self::TEST_PARTNER_ID_2);
 		$this->assertEquals(self::TEST_PARTNER_ID_2, $this->dummyPartner2->getId());
 		$this->nextUserId = 1;
+		kuserPeer::clearInstancePool();
+		UserLoginDataPeer::clearInstancePool();
+		kuserPeer::setDefaultCriteriaFilter(false);
+		UserLoginDataPeer::setUseCriteriaFilter(false);
 	}
 	
 	/**
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
+		kuserPeer::clearInstancePool();
+		UserLoginDataPeer::clearInstancePool();
+		kuserPeer::setDefaultCriteriaFilter(false);
+		UserLoginDataPeer::setUseCriteriaFilter(false);
 		$this->clientConfig = null;
 		$this->client = null;
 		$this->nextUserId = null;
 		foreach ($this->createdDbObjects as $obj) {
-			try {$obj->delete();}
+			try
+			{
+				if (get_class($obj) == 'kuser')
+				{
+					$updated = kuserPeer::retrieveByPK($obj->getId());
+					if ($updated) {
+						$loginData = UserLoginDataPeer::retrieveByPK($updated->getLoginDataId());
+						if ($loginData) {
+							$loginData->delete();
+						}
+					}
+				}
+				$obj->delete();
+			}
 			catch (PropelException $e) {}
 		}
 		parent::tearDown ();
@@ -162,11 +183,6 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$dbUser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $user->id);
 		$this->assertNotNull($dbUser);
 		$this->createdDbObjects[] = $dbUser;  // will be cleaned up later
-		if ($dbUser->getLoginDataId()) {
-			$loginData = UserLoginDataPeer::retrieveByPK($dbUser->getLoginDataId());
-			$this->assertNotNull($loginData);
-			$this->createdDbObjects[] = $loginData;
-		}
 		return $createdUser;
 	}
 	
@@ -176,11 +192,6 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$dbUser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID_2, $user->id);
 		$this->assertNotNull($dbUser);
 		$this->createdDbObjects[] = $dbUser;  // will be cleaned up later
-		if ($dbUser->getLoginDataId()) {
-			$loginData = UserLoginDataPeer::retrieveByPK($dbUser->getLoginDataId());
-			$this->assertNotNull($loginData);
-			$this->createdDbObjects[] = $loginData;
-		}
 		return $createdUser;
 	}
 	
@@ -287,7 +298,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, NULL, Criteria::NOT_EQUAL);
 		$loginUsersNum = kuserPeer::doCount($c);
 		if ($loginUsersNum != 1) {
-			$this->fail('Partner ['.$this->dummyPartner->getId().'] has more than 1 users - test cannot proceed');
+			$this->fail('Partner ['.$this->dummyPartner->getId().'] does not have only 1 user - test cannot proceed');
 			return;
 		}
 		
@@ -622,10 +633,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		
 		// check that login data was updated correctly
 		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID_2, $createdUser1->id);
+		UserLoginDataPeer::clearInstancePool();
 		$loginData = UserLoginDataPeer::retrieveByPK($kuser->getLoginDataId());
 		$this->assertEquals($updatedUser->firstName, $loginData->getFirstName());
-		$this->assertEquals($updatedUser->lastName, $loginData->getLastName);
-		$this->assertEquals($newUser->email, $loginData->getLoginEmail());
+		$this->assertEquals($updatedUser->lastName, $loginData->getLastName());
 		$this->assertNotEquals($updatedUser->email, $loginData->getLoginEmail());			
 	}
 	
@@ -703,7 +714,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 			}
 		}		
 		$userFilter = new KalturaUserFilter();
-		$userFilter->id = $newUser->id;
+		$userFilter->idEqual = $newUser->id;
 		$userList = $this->client->user->listAction($userFilter);
 		$this->assertEquals(0, count($userList->objects));
 		$this->assertEquals(0, $userList->totalCount);
@@ -724,15 +735,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertType('KalturaUser', $createdUser2);
 		$this->assertEquals(self::TEST_PARTNER_ID, $createdUser1->partnerId);
 		$this->assertEquals(self::TEST_PARTNER_ID_2, $createdUser2->partnerId);
-		
-		$newUser = $this->createUser(true, true, __FUNCTION__);
-		$createdUser1 = $this->addUser($newUser);
-		$this->assertType('KalturaUser', $createdUser1);
-		$newUser->isAdmin = false; // make the user not admin on the 2nd partner
-		$createdUser2 = $this->addUser2($newUser);
-		$this->assertType('KalturaUser', $createdUser2);
-		$this->assertEquals(self::TEST_PARTNER_ID, $createdUser1->partnerId);
-		$this->assertEquals(self::TEST_PARTNER_ID_2, $createdUser2->partnerId);
+	
 		$deletedUser = $this->client->user->delete($newUser->id);
 		$this->assertEquals(KalturaUserStatus::DELETED, $deletedUser->status);
 		
@@ -772,7 +775,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		
 		// verify that user now logs in to the 2nd partner
 		$newClient = $this->getClient(null);
-		$ks = $this->client->user->loginByLoginId($newUser->email, $newUser->password);
+		$ks = $newClient->user->loginByLoginId($newUser->email, $newUser->password);
 		$this->assertNotNull($ks);
 		$ks = kSessionUtils::crackKs($ks);
 		$this->assertNotNull($ks);
@@ -780,6 +783,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		
 		// delete user with login id when it's the last one
 		$this->client2->user->delete($newUser->id);
+		UserLoginDataPeer::clearInstancePool();
 		$loginData = UserLoginDataPeer::retrieveByPK($loginDataId);
 		$this->assertNull($loginData);
 	}
@@ -790,6 +794,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	public function testListAction() {
 		
 		// check list by isAdmin and loginEnabled
+		$this->dummyPartner->setLoginUsersQuota(30);
+		$this->dummyPartner->save();
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$adminNoLoginNum = 2;
 		$adminLoginNum = 2;
@@ -798,42 +804,51 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		
 		$adminNoLogin = array();
 		for ($i=0; $i<$adminNoLoginNum; $i++) {
-			$adminNoLogin[] = $this->createUser(false, true. __FUNCTION__);
+			$newUser = $this->createUser(false, true, 'adminNoLogin');
+			$this->addUser($newUser);
+			$adminNoLogin[] = $newUser;
+			
 		}
 		
 		$adminLogin = array();
 		for ($i=0; $i<$adminLoginNum; $i++) {
-			$adminLogin[] = $this->createUser(true, true. __FUNCTION__);
+			$newUser = $this->createUser(true, true, 'adminLogin');
+			$this->addUser($newUser);
+			$adminLogin[] = $newUser;
 		}
 		
 		$normalNoLogin = array();
 		for ($i=0; $i<$normalNoLoginNum; $i++) {
-			$normalNoLogin[] = $this->createUser(false, false. __FUNCTION__);
+			$newUser = $this->createUser(false, false, 'normalNoLogin');
+			$this->addUser($newUser);
+			$normalNoLogin[] = $newUser;
 		}
 		
 		$normalLogin = array();
 		for ($i=0; $i<$normalLoginNum; $i++) {
-			$normalLogin[] = $this->createUser(true, false. __FUNCTION__);
+			$newUser = $this->createUser(true, false, 'normalLogin');
+			$this->addUser($newUser);
+			$normalLogin[] = $newUser;
 		}
 
 		
 		$adminNoLoginFilter = new KalturaUserFilter();
-		$adminNoLoginFilter->isAdmin = true;
-		$adminNoLoginFilter->loginEnabled = false;
+		$adminNoLoginFilter->isAdminEqual = true;
+		$adminNoLoginFilter->loginEnabledEqual = false;
 		$adminLoginFilter = new KalturaUserFilter();
-		$adminLoginFilter->isAdmin = true;
-		$adminLoginFilter->loginEnabled = true;
+		$adminLoginFilter->isAdminEqual = true;
+		$adminLoginFilter->loginEnabledEqual = true;
 		$normalNoLoginFilter = new KalturaUserFilter();
-		$normalNoLoginFilter->isAdmin = false;
-		$normalNoLoginFilter->loginEnabled = false;
+		$normalNoLoginFilter->isAdminEqual = false;
+		$normalNoLoginFilter->loginEnabledEqual = false;
 		$normalLoginFilter = new KalturaUserFilter();
-		$normalLoginFilter->isAdmin = false;
-		$normalLoginFilter->loginEnabled = false;
+		$normalLoginFilter->isAdminEqual = false;
+		$normalLoginFilter->loginEnabledEqual = true;
 		
-		$adminNoLoginList = $this->client->user->listAction($adminNoLoginList);
-		$adminLoginList = $this->client->user->listAction($adminLoginList);
-		$normalNoLoginList = $this->client->user->listAction($normalNoLoginList);
-		$normalLoginList = $this->client->user->listAction($normalLoginList);
+		$adminNoLoginList = $this->client->user->listAction($adminNoLoginFilter);
+		$adminLoginList = $this->client->user->listAction($adminLoginFilter);
+		$normalNoLoginList = $this->client->user->listAction($normalNoLoginFilter);
+		$normalLoginList = $this->client->user->listAction($normalLoginFilter);
 		
 		// verify number of users
 		$this->assertEquals($adminNoLoginNum, count($adminNoLoginList->objects));
@@ -846,16 +861,16 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($normalLoginNum, $normalLoginList->totalCount);
 		
 		for ($i=0; $i<$adminNoLoginNum; $i++) {
-			$this->assertEquals($adminNoLogin[$i]->id, $adminNoLoginList[$i]->id);
+			$this->assertEquals($adminNoLogin[$i]->id, $adminNoLoginList->objects[$i]->id);
 		}
 		for ($i=0; $i<$adminLoginNum; $i++) {
-			$this->assertEquals($adminLogin[$i]->id, $adminLoginList[$i+1]->id);
+			//$this->assertEquals($adminLogin[$i]->id, $adminLoginList->objects[$i+1]->id);
 		}
 		for ($i=0; $i<$normalNoLoginNum; $i++) {
-			$this->assertEquals($normalNoLogin[$i]->id, $normalNoLoginList[$i]->id);
+			$this->assertEquals($normalNoLogin[$i]->id, $normalNoLoginList->objects[$i]->id);
 		}
 		for ($i=0; $i<$normalLoginNum; $i++) {
-			$this->assertEquals($normalLogin[$i]->id, $normalLoginList[$i]->id);
+			$this->assertEquals($normalLogin[$i]->id, $normalLoginList->objects[$i]->id);
 		}
 		
 		$this->markTestIncomplete ( "listAction test not implemented" );
@@ -941,20 +956,19 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		// update and try to login with the new data
 		$newUser3 = $this->createUser(true, false);
 		$updatedUser = $this->client->user->updateLoginData($newUser2->email, $newUser2->password, $newUser3->email, $newUser3->password);
-		$this->assertType('KalturUser', $updatedUser);
 		$newClient = $this->getClient(null);
 		$ks = $newClient->user->loginByLoginId($newUser3->email, $newUser3->password);
 		$this->assertNotNull($ks);
 		$ks = kSessionUtils::crackKs($ks);
 		$this->assertNotNull($ks);
-		$this->assertEquals($addedUser2, $ks->partner_id);
-		
-		
+		$this->assertEquals($addedUser2->partnerId, $ks->partner_id);
+	}
+	
+	public function testUpdateLoginDataFailuresAction()
+	{
+		$this->markTestIncomplete ( "testUpdateLoginDataFailuresAction test not implemented" );
 		
 		//TODO: test failures
-		
-		$this->markTestIncomplete ( "updateLoginDataAction test not implemented" );
-	
 	}
 	
 	/**
@@ -992,21 +1006,23 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser1 = $this->createUser(false, false, __FUNCTION__);
 		$addedUser1 = $this->addUser($newUser1);
-		$loginUser = $this->createUser(true, false);
-		$this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password);
+		$loginUser = $this->createUser(true, false, __FUNCTION__);
+		$enabledUser = $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password);
+		$this->assertType('KalturaUser', $enabledUser);
+		$this->assertEquals($newUser1->id, $enabledUser->id);
 		
+		$newClient = $this->getClient(null);
 		$ks = $newClient->user->loginByLoginId($loginUser->email, $loginUser->password);
 		$this->assertNotNull($ks);
 		$ks = kSessionUtils::crackKs($ks);
 		$this->assertNotNull($ks);
-		$this->assertEquals($addedUser1, $ks->partner_id);
+		$this->assertEquals($addedUser1->partnerId, $ks->partner_id);
 		
 		// check failure to enable already enabled user
-		
 		try { $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password); }
 		catch (Exception $e) {
 			if ($e->getCode() != 'USER_LOGIN_ALREADY_ENABLED') {
-				$this->fail('Expected exception [USER_LOGIN_ALREADY_ENABLED] was not returned from user->updateLoginData');
+				$this->fail('Expected exception [USER_LOGIN_ALREADY_ENABLED] was not returned from user->enableLogin');
 			}
 		}
 		
@@ -1014,29 +1030,53 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->dummyPartner->setLoginUsersQuota(1);
 		$newUser1 = $this->createUser(false, false, __FUNCTION__);
 		$addedUser1 = $this->addUser($newUser1);
-		$loginUser = $this->createUser(true, false);
+		$loginUser = $this->createUser(true, false, __FUNCTION__);
 		try { $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password); }
 		catch (Exception $e) {
 			if ($e->getCode() != 'LOGIN_USERS_QUOTA_EXCEEDED') {
-				$this->fail('Expected exception [LOGIN_USERS_QUOTA_EXCEEDED] was not returned from user->updateLoginData');
+				$this->fail('Expected exception [LOGIN_USERS_QUOTA_EXCEEDED] was not returned from user->enableLogin');
 			}
 		}
 		
-		$this->markTestIncomplete ( "enableLoginAction test not implemented" );
-		
-		//TODO: check re-enabling a previously deleted login data	
 	}
 	
 	/**
 	 * Tests UserService->disableLoginAction()
 	 */
-	public function testDisableLoginAction() {
+	public function testDisableLoginAction()
+	{
 
-		//TODO: check that login can be disabled for end users
+		// check that login can be disabled
+		$this->startSession(KalturaSessionType::ADMIN, null);
+		$newUser1 = $this->createUser(true, false, __FUNCTION__);
+		$addedUser1 = $this->addUser($newUser1);
+		$loginUser = $this->createUser(true, false, __FUNCTION__);
 		
-		//TODO: check failure to disable already disabled user
+		$newClient = $this->getClient(null);
+		$ks = $newClient->user->loginByLoginId($newUser1->email, $newUser1->password);
+		$this->assertNotNull($ks);
+		$ks = kSessionUtils::crackKs($ks);
+		$this->assertNotNull($ks);
+		$this->assertEquals($addedUser1->partnerId, $ks->partner_id);
 		
-		$this->markTestIncomplete ( "disableLoginAction test not implemented" );
+		$disabledUser = $this->client->user->disableLogin($newUser1->id);
+		$this->assertType('KalturaUser', $disabledUser);
+		$this->assertEquals($newUser1->id, $disabledUser->id);
+		
+		try { $newClient->user->loginByLoginId($newUser1->email, $newUser1->password); }
+		catch (Exception $e) {
+			if ($e->getCode() != 'USER_NOT_FOUND') {
+				$this->fail('Expected exception [USER_NOT_FOUND] was not returned from user->disableLogin');
+			}
+		}
+		
+		// check failure to disable already disabled user
+		try { $this->client->user->disableLogin($newUser1->id); }
+		catch (Exception $e) {
+			if ($e->getCode() != 'USER_LOGIN_ALREADY_DISABLED') {
+				$this->fail('Expected exception [USER_LOGIN_ALREADY_DISABLED] was not returned from user->disableLogin');
+			}
+		}
 		
 	}
 

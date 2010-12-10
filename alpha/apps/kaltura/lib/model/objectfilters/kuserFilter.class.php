@@ -8,19 +8,37 @@ class kuserFilter extends baseObjectFilter
 	{
 		// TODO - should separate the schema of the fields from the actual values
 		// or can use this to set default valuse
-		$this->fields = kArray::makeAssociativeDefaultValue ( array (
-			"_likex_screen_name"   , 
-			"_like_screen_name"   , 
-			"_likex_email" ,
-			"_like_country" ,
-			"_like_tags" ,
-			"_gte_produced_kshows" ,
-			"_gte_entries" ,
-			"_eq_partner_id" , 
-			"_like_tags" ,
-			"_gte_id" , 
-			"_lte_id" ,
-			"_notin_id" ) , NULL );
+		$this->fields = kArray::makeAssociativeDefaultValue (
+			array (
+				"_likex_screen_name"   , 
+				"_like_screen_name"   ,
+				"_like_email",
+				"_likex_email" ,
+				"_like_country" ,
+				"_like_tags" ,
+				"_mlikeor_tags",
+				"_mlikeand_tags" ,
+				"_gte_created_at" ,
+				"_lte_created_at" ,
+				"_gte_produced_kshows" ,
+				"_gte_entries" ,
+				"_eq_partner_id" , 
+				"_like_tags" ,
+				"_eq_puser_id",
+				"_in_puser_id",
+				"_gte_puser_id" , 
+				"_lte_puser_id" ,
+				"_eq_id",
+				"_in_id",
+				"_gte_id" , 
+				"_lte_id" ,
+				"_notin_id",
+				"_gte_login_data_id",
+				"_ltornull_login_data_id",
+				"_eq_is_admin",				
+			) ,
+			NULL
+		);
 			
 		$this->allowed_order_fields = array("created_at");
 	}
