@@ -266,7 +266,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		
 //echo "flavor "; print_r($flavor);
 		
-KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
+//KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		return $flavor;
 	}
 	
@@ -334,7 +334,7 @@ KalturaLog::log(__METHOD__."\nflavorOutputParams==>\n".print_r($flavor,true));
 		
 $operators = $cdlFlavor->getOperators();
 $transObjArr = array();
-KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
+//KalturaLog::log(__METHOD__."\nCDL Flavor==>\n".print_r($cdlFlavor,true));
 		if(!empty($operators) || $cdlFlavor->getEngineVersion()==1) {
 			$transObjArr = KDLWrap::convertOperatorsCdl2Kdl($operators);
 			$kdlFlavor->_engineVersion = 1;
@@ -387,7 +387,7 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
 		}
 		
-KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
+//KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
 		return $kdlFlavor;
 	}
 	
@@ -598,8 +598,31 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 //	$oprObj->_engine = KDLWrap::GetEngineObject($oprObj->_id);
 	$id = $oprObj->_id;
 KalturaLog::log(__METHOD__.":operators id=$id :");
+	switch($id){
+		case KDLTranscoders::KALTURA:
+		case KDLTranscoders::ON2:
+		case KDLTranscoders::FFMPEG:
+		case KDLTranscoders::MENCODER:
+		case KDLTranscoders::ENCODING_COM:
+		case KDLTranscoders::FFMPEG_AUX:
+		case KDLTranscoders::FFMPEG_VP8:
+		case KDLTranscoders::EE3:
+			$oprObj->_engine = new KDLOperatorWrapper($id);
+			return;
+		case KDLTranscoders::QUICK_TIME_PLAYER_TOOLS:
+			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
+			break;
+		default:
+//		KalturaLog::log("in default :operators id=$id :");
+			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
+			break;
+	}
+/*
 	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
 		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
+	}
+	else if($id=="fastStart.FastStart") {
+		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
 	}
 //	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
 //		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "expressionEncoder.ExpressionEncoder");
@@ -620,6 +643,7 @@ KalturaLog::log(__METHOD__.":operators id=$id :");
 		$oprObj->_engine = new KDLOperatorWrapper($id);
 		return;
 	}
+*/
 	if(is_null($oprObj->_engine)) {
 		KalturaLog::log(__METHOD__.":ERROR - plugin manager returned with null");
 	}
