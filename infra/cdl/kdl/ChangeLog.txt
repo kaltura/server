@@ -99,3 +99,36 @@ admin_console/configs/lang/en.php - avidemux
 - plugins/exp_enc/lib/ismtempl.xml
 - plugins/exp_enc/lib/wmvtempl.xml
 - plugins/exp_enc/lib/KOperationEngineExpressionEncoder.php
+
+2010-11-20
+KDLOperationParams::GenerateCommandLine - restore extra
+KDLTranscoderCommand - KDLOperatorWrapper::GenerateCommandLine - restore extra
+KDLFlavor - added extra
+   $transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg, $trPrmObj->_extra);
+KDLCommon - removed ogv/theora from ffmpeg-aux source blacklist    
+KDLTranscoderQTPTools::GenerateCommandLine - restore extra
+KDLOperatorQTFastStart::GenerateCommandLine - restore extra
+KDLOperatorExpressionEncoder::GenerateCommandLine - restore extra
+
+2010-11-21
+plugins/avidemux/AvidemuxPlugin.php - loadObject, getObjectClass
+plugins/avidemux/lib/AvidemuxConversionEngineType.php - new
+plugins/ee/EEPlugin.php - loadObject, getObjectClass
+plugins/quick_time_tools/QuickTimeToolsPlugin.php - loadObject, getObjectClass
+
+----- for QA drop Nov 28-------------------------------------------------
+2010-11-22
+tr+tag - kJobsManager.php - remove 'stripslashes' not in tag yet
+
+2010-11-24
+tr+tar - KAsyncConvert.class.php - remove 'stripslashes' not in trunk & tag yet
+
+2010-11-24
+tr+tag - KDLOperatorAvidemax - - restore the 'extra' arg
+tr+tag - K:\opt\kaltura\app\plugins\avidemux\AvidemuxPlugin.php - 'implements' in class def
+tag - kConf - add EE & AVI & faststart
+batch_config.ini - add EE & AVI & faststart
+tr+tag - /opt/kaltura/app/admin_console/lib/Kaltura/KalturaClient.php - const AVIDEMUX = "avidemux.Avidemux";
+tr+tag - /opt/kaltura/app/batch/client/KalturaClient.php: -  - const AVIDEMUX = "avidemux.Avidemux";
+tr - batch_config.template.ini - avidmux
+tr - kConfLocal.php - avidemux + ee
