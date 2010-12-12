@@ -3,17 +3,17 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 {
 	public function getEntryId(FileSync $fileSync)
 	{
-		if($fileSync->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY)
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY)
 			return $fileSync->getObjectId();
 			
-		if($fileSync->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB)
+		if($fileSync->getObjectType() == FileSyncObjectType::BATCHJOB)
 		{
 			$job = BatchJobPeer::retrieveByPK($fileSync->getObjectId());
 			if($job)
 				return $job->getEntryId();
 		}
 			
-		if($fileSync->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET)
+		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET)
 		{
 			$flavor = flavorAssetPeer::retrieveById($fileSync->getObjectId());
 			if($flavor)
