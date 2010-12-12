@@ -1,7 +1,10 @@
 <?php
 
-$defaultLoginUsersQuota = null; //5; // must be set!
+$defaultLoginUsersQuota = 5; // must be set!
 $dryRun = true; //TODO: change for real run
+if($argc > 1 && $argv[1] == 'realrun')
+	$dryRun = false;
+	
 $stopFile = dirname(__FILE__).'/stop_partner_migration'; // creating this file will stop the script
 $partnerLimitEachLoop = 20;
 

@@ -1,6 +1,9 @@
 <?php
 
 $dryRun = true; //TODO: change for real run
+if($argc > 1 && $argv[1] == 'realrun')
+	$dryRun = false;
+	
 $admin_console_partner_id = -2;
 $stopFile = dirname(__FILE__).'/stop_user_migration'; // creating this file will stop the script
 $userLimitEachLoop = 20; //TODO: change
