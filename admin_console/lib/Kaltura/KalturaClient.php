@@ -158,11 +158,6 @@ class KalturaBatchJobType
 	const FILESYNC_IMPORT = "29";
 	const CAPTURE_THUMB = "30";
 	const VIRUS_SCAN = "virusScan.VirusScan";
-	const DISTRIBUTION_SUBMIT = "virusScan.DistributionSubmit";
-	const DISTRIBUTION_UPDATE = "virusScan.DistributionUpdate";
-	const DISTRIBUTION_DELETE = "virusScan.DistributionDelete";
-	const DISTRIBUTION_FETCH_REPORT = "virusScan.DistributionFetchReport";
-	const DISTRIBUTION_SYNC = "virusScan.DistributionSync";
 }
 
 class KalturaBitRateMode
@@ -260,6 +255,8 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -374,10 +371,12 @@ class KalturaEntryType
 
 class KalturaFileSyncObjectType
 {
-	const ENTRY = 1;
-	const UICONF = 2;
-	const BATCHJOB = 3;
-	const FLAVOR_ASSET = 4;
+	const ENTRY = "1";
+	const UICONF = "2";
+	const BATCHJOB = "3";
+	const FLAVOR_ASSET = "4";
+	const METADATA = "5";
+	const METADATA_PROFILE = "6";
 }
 
 class KalturaFileSyncOrderBy
@@ -4092,6 +4091,112 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
+
+}
+
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -4492,6 +4597,11 @@ class KalturaEntryDistribution extends KalturaObjectBase
 
 }
 
+abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
+{
+
+}
+
 class KalturaDistributionJobData extends KalturaJobData
 {
 	/**
@@ -4528,6 +4638,20 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $remoteId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 */
+	public $providerType = null;
+
+	/**
+	 * Additional data that relevant for the provider only
+	 *
+	 * @var KalturaDistributionJobProviderData
+	 */
+	public $providerData;
 
 
 }
@@ -6611,79 +6735,6 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
-
-}
-
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
 
 }
 

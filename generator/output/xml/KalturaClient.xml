@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1291896473">
-  <!-- Generated on date 09/12/10 14:07:53 -->
+<xml apiVersion="3.1.1" generatedDate="1292145507">
+  <!-- Generated on date 12/12/10 09:18:27 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -40,6 +40,11 @@
       <const name="SCRIPT" value="0"/>
       <const name="PS2" value="1"/>
       <const name="API_V3" value="2"/>
+    </enum>
+    <enum name="KalturaAuditTrailFileSyncType" enumType="int">
+      <const name="FILE" value="1"/>
+      <const name="LINK" value="2"/>
+      <const name="URL" value="3"/>
     </enum>
     <enum name="KalturaAuditTrailObjectType" enumType="string">
       <const name="ACCESS_CONTROL" value="accessControl"/>
@@ -336,11 +341,13 @@
       <const name="LIVE_STREAM" value="7"/>
       <const name="DOCUMENT" value="10"/>
     </enum>
-    <enum name="KalturaFileSyncObjectType" enumType="int">
+    <enum name="KalturaFileSyncObjectType" enumType="string">
       <const name="ENTRY" value="1"/>
       <const name="UICONF" value="2"/>
       <const name="BATCHJOB" value="3"/>
       <const name="FLAVOR_ASSET" value="4"/>
+      <const name="METADATA" value="5"/>
+      <const name="METADATA_PROFILE" value="6"/>
     </enum>
     <enum name="KalturaFileSyncOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -1166,6 +1173,25 @@
     <class name="KalturaMetadataSearchItem" base="KalturaSearchOperator">
       <property name="metadataProfileId" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaAuditTrailInfo" abstract="1"/>
+    <class name="KalturaAuditTrailChangeItem">
+      <property name="descriptor" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="oldValue" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="newValue" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAuditTrailChangeInfo" base="KalturaAuditTrailInfo">
+      <property name="changedItems" type="array" arrayType="KalturaAuditTrailChangeItem" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAuditTrailFileSyncCreateInfo" base="KalturaAuditTrailInfo">
+      <property name="version" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="objectSubType" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="dc" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="original" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileType" type="int" enumType="KalturaAuditTrailFileSyncType" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAuditTrailTextInfo" base="KalturaAuditTrailInfo">
+      <property name="info" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaBaseRestriction"/>
     <class name="KalturaAccessControl">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Access Control Profile&#10;"/>
@@ -1925,8 +1951,6 @@
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserBaseFilter" abstract="1" base="KalturaFilter">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameLike" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1937,9 +1961,12 @@
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="isAdminEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaUserFilter" base="KalturaUserBaseFilter">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="loginEnabledEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaUserFilter" base="KalturaUserBaseFilter"/>
     <class name="KalturaUserListResponse">
       <property name="objects" type="array" arrayType="KalturaUser" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
@@ -2254,7 +2281,7 @@
     </class>
     <class name="KalturaFileSyncBaseFilter" abstract="1" base="KalturaFilter">
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="fileObjectTypeEqual" type="int" enumType="KalturaFileSyncObjectType" readOnly="0" insertOnly="0" description=""/>
+      <property name="fileObjectTypeEqual" type="string" enumType="KalturaFileSyncObjectType" readOnly="0" insertOnly="0" description=""/>
       <property name="fileObjectTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="objectIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="objectIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2287,7 +2314,7 @@
     <class name="KalturaFileSync">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="fileObjectType" type="int" enumType="KalturaFileSyncObjectType" readOnly="1" insertOnly="0" description=""/>
+      <property name="fileObjectType" type="string" enumType="KalturaFileSyncObjectType" readOnly="1" insertOnly="0" description=""/>
       <property name="objectId" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="version" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="objectSubType" type="int" readOnly="1" insertOnly="0" description=""/>
@@ -2456,7 +2483,6 @@
       <property name="clientTagEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAuditTrailFilter" base="KalturaAuditTrailBaseFilter"/>
-    <class name="KalturaAuditTrailInfo" abstract="1"/>
     <class name="KalturaAuditTrail">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
@@ -3189,29 +3215,6 @@
         <param name="fileData" type="file" optional="0" description="The file data&#13;"/>
         <result type="string"/>
       </action>
-      <action name="updateThumbnail" description="Update media entry thumbnail by a specified time offset (In seconds)&#10;If flavor params id not specified, source flavor will be used by default&#10;">
-        <param name="entryId" type="string" optional="0" description="Media entry id&#13;"/>
-        <param name="timeOffset" type="int" optional="0" description="Time offset (in seconds)&#13;"/>
-        <param name="flavorParamsId" type="int" optional="1" default="" description="The flavor params id to be used&#13;"/>
-        <result type="KalturaMediaEntry"/>
-      </action>
-      <action name="updateThumbnailFromSourceEntry" description="Update media entry thumbnail from a different entry by a specified time offset (In seconds)&#10;If flavor params id not specified, source flavor will be used by default&#10;">
-        <param name="entryId" type="string" optional="0" description="Media entry id&#13;"/>
-        <param name="sourceEntryId" type="string" optional="0" description="Media entry id&#13;"/>
-        <param name="timeOffset" type="int" optional="0" description="Time offset (in seconds)&#13;"/>
-        <param name="flavorParamsId" type="int" optional="1" default="" description="The flavor params id to be used&#13;"/>
-        <result type="KalturaMediaEntry"/>
-      </action>
-      <action name="updateThumbnailJpeg" description="Update media entry thumbnail using a raw jpeg file&#10;">
-        <param name="entryId" type="string" optional="0" description="Media entry id&#13;"/>
-        <param name="fileData" type="file" optional="0" description="Jpeg file data&#13;"/>
-        <result type="KalturaMediaEntry"/>
-      </action>
-      <action name="updateThumbnailFromUrl" description="Update entry thumbnail using url&#10;">
-        <param name="entryId" type="string" optional="0" description="Media entry id&#13;"/>
-        <param name="url" type="string" optional="0" description="file url&#13;"/>
-        <result type="KalturaBaseEntry"/>
-      </action>
       <action name="requestConversion" description="Request a new conversion job, this can be used to convert the media entry to a different format&#10;">
         <param name="entryId" type="string" optional="0" description="Media entry id&#13;"/>
         <param name="fileFormat" type="string" optional="0" description="Format to convert&#13;"/>
@@ -3711,7 +3714,7 @@
         <param name="password" type="string" optional="0" description="&#13;"/>
         <param name="newLoginId" type="string" optional="1" default="" description="Optional, provide only when you want to update the login id&#13;"/>
         <param name="newPassword" type="string" optional="1" default="" description="&#13;"/>
-        <result type="KalturaUser"/>
+        <result/>
       </action>
       <action name="resetPassword" description="Reset admin user password and send it to the users email address&#10;">
         <param name="email" type="string" optional="0" description="&#13;"/>
@@ -3726,12 +3729,12 @@
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <param name="loginId" type="string" optional="0" description="&#13;"/>
         <param name="password" type="string" optional="0" description="&#13;"/>
-        <result/>
+        <result type="KalturaUser"/>
       </action>
       <action name="disableLogin" description="Disallow user to login with an id/password.&#10;Passing either a loginId or a userId is allowed.&#10;">
-        <param name="loginId" type="string" optional="0" description="&#13;"/>
         <param name="userId" type="string" optional="1" default="" description="&#13;"/>
-        <result/>
+        <param name="loginId" type="string" optional="1" default="" description="&#13;"/>
+        <result type="KalturaUser"/>
       </action>
     </service>
     <service id="widget" name="widget" description="widget service for full widget management&#13;">
