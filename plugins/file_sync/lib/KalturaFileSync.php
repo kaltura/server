@@ -276,7 +276,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		
 		if($this->isCurrentDc)
 		{
-			if($source_object->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET && $source_object->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG)
+			if($source_object->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $source_object->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG)
 			{
 				$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
 			}
