@@ -1,9 +1,9 @@
 <?php
 abstract class KalturaPlugin implements IKalturaPlugin
 {
-	public function getInstance($intrface)
+	public function getInstance($interface)
 	{
-		if($this instanceof $intrface)
+		if($this instanceof $interface)
 			return $this;
 			
 		return null;
