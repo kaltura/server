@@ -80,6 +80,7 @@ class KalturaFileSyncBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
+	 * @dynamicType KalturaFileSyncObjectType
 	 * @var string
 	 */
 	public $fileObjectTypeIn;
