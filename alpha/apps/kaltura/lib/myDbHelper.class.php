@@ -4,6 +4,7 @@
  */
 class myDbHelper
 {
+	const DB_HELPER_CONN_MASTER = "propel";
 	const DB_HELPER_CONN_PROPEL2 = "propel2";
 	const DB_HELPER_CONN_PROPEL3 = "propel3";
 	const DB_HELPER_CONN_SPHINX_LOG = "sphinx_log";
