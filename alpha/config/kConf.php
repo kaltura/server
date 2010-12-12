@@ -96,6 +96,7 @@ class kConf extends kConfLocal
 				"kcw_flex_wrapper_version" => 'v1.2',
 				"editors_flex_wrapper_version" => 'v1.01',
 				"kdp_wrapper_version" => 'v11.0',
+				"kdp3_wrapper_version" => 'v32.0',
 				"kmc_secured_login" => false,
 				
 				"paypal_data" => array (),

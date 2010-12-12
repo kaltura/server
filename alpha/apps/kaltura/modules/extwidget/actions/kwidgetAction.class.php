@@ -236,7 +236,7 @@ class kwidgetAction extends sfAction
 			{
 				$kdp3 = true;
 				// further in the code, $wrapper_swf is being used and not $base_wrapper_swf
-				$wrapper_swf = $base_wrapper_swf = myContentStorage::getFSFlashRootPath ()."/kdp3wrapper/v32.0/kdp3wrapper.swf";
+				$wrapper_swf = $base_wrapper_swf = myContentStorage::getFSFlashRootPath ().'/kdp3wrapper/'.kConf::get('kdp3_wrapper_version').'/kdp3wrapper.swf';
 				$widgetIdStr = "widgetId=$widget_id";
 				$uiconf_id_str = "&uiConfId=$uiconf_id";
 				$partnerIdStr = "partnerId=$partner_id&subpId=$subp_id";
