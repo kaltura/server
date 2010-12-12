@@ -10,6 +10,8 @@ class kFileTransferMgrType
 	const FTP  = 1; // FTP Protocol
 	const SCP  = 2; // SCP Protocol
 	const SFTP = 3; // SFTP Protocol
+	const HTTP = 4;
+	const HTTPS = 5;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
 define ("PATH_TO_MANAGERS", "file_transfer_managers");
