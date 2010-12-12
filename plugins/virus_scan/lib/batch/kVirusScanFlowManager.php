@@ -49,7 +49,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		if(!($object instanceof FileSync) || $object->getStatus() != FileSync::FILE_SYNC_STATUS_PENDING || $object->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_FILE)
 			return true;
 			
-		if ($object->getObjectType() != filesync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET)
+		if ($object->getObjectType() != FileSyncObjectType::FLAVOR_ASSET)
 			return true;
 		
 		$flavorAssetId = $object->getObjectId();
