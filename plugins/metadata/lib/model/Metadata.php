@@ -68,7 +68,7 @@ class Metadata extends BaseMetadata implements ISyncableFile
 		);
 		
 		if(! in_array($sub_type, $valid_sub_types))
-			throw new FileSyncException(FileSync::FILE_SYNC_OBJECT_TYPE_METADATA, $sub_type, $valid_sub_types);
+			throw new FileSyncException(FileSyncObjectType::METADATA, $sub_type, $valid_sub_types);
 	}
 	
 	/* (non-PHPdoc)
@@ -133,7 +133,7 @@ class Metadata extends BaseMetadata implements ISyncableFile
 			$version = $this->getVersion();
 		
 		$key = new FileSyncKey();
-		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_METADATA;
+		$key->object_type = FileSyncObjectType::METADATA;
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;

@@ -23,7 +23,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 	 */
 	protected function metadataDeleted(Metadata $metadata) 
 	{
-		$this->syncableDeleted($metadata->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_METADATA);
+		$this->syncableDeleted($metadata->getId(), FileSyncObjectType::METADATA);
 		
 		// updated in the indexing server (sphinx)
 		$object = kMetadataManager::getObjectFromPeer($metadata);
@@ -36,7 +36,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 	 */
 	protected function metadataProfileDeleted(MetadataProfile $metadataProfile) 
 	{
-		$this->syncableDeleted($metadataProfile->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE);
+		$this->syncableDeleted($metadataProfile->getId(), FileSyncObjectType::METADATA_PROFILE);
 	}
 	
 	/**

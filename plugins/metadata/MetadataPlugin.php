@@ -75,13 +75,13 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 			
 			switch($enumValue)
 			{
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				case FileSyncObjectType::METADATA:
 					MetadataPeer::setUseCriteriaFilter ( false );
 					$object = MetadataPeer::retrieveByPK( $objectId );
 					MetadataPeer::setUseCriteriaFilter ( true );
 					return $object;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				case FileSyncObjectType::METADATA_PROFILE:
 					MetadataProfilePeer::setUseCriteriaFilter ( false );
 					$object = MetadataProfilePeer::retrieveByPK( $objectId );
 					MetadataProfilePeer::setUseCriteriaFilter ( true );
@@ -127,10 +127,10 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		{
 			switch($enumValue)
 			{
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				case FileSyncObjectType::METADATA:
 					return 'Metadata';
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				case FileSyncObjectType::METADATA_PROFILE:
 					return 'MetadataProfile';
 			}
 		}
