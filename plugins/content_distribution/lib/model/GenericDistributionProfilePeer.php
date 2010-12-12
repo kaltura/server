@@ -3,6 +3,17 @@ class GenericDistributionProfilePeer extends DistributionProfilePeer
 {
 	const OM_CLASS = 'GenericDistributionProfile';
 
+	public function setInstanceCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( DistributionProfilePeer::PROVIDER_TYPE, DistributionProviderType::GENERIC); 
+		$c->addAnd ( DistributionProfilePeer::STATUS, DistributionProfileStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 	/**
 	 * Retrieve all profiles of the provider.
 	 *

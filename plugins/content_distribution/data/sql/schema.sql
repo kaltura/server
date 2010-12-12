@@ -110,6 +110,7 @@ CREATE TABLE `generic_distribution_provider_action`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
+	`partner_id` INTEGER,
 	`generic_distribution_provider_id` INTEGER,
 	`action` TINYINT,
 	`status` TINYINT,

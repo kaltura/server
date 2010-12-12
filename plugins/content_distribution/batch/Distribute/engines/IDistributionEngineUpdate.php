@@ -3,7 +3,8 @@ interface IDistributionEngineUpdate
 {
 	/**
 	 * updates media or metadata.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionUpdateJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function update(KalturaDistributionJobData $data);
+	public function update(KalturaDistributionUpdateJobData $data);
 }

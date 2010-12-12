@@ -6,6 +6,17 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 	const CONTENT_DSTRIBUTION_MANAGER = 'kContentDistributionFlowManager';
+
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		if($interface == 'IKalturaMrssContributor')
+			return kContentDistributionMrssManager::get();
+			
+		return null;
+	}
 	
 	public static function getPluginName()
 	{
@@ -31,6 +42,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			'entryDistribution' => 'EntryDistributionService',
 			'distributionProvider' => 'DistributionProviderService',
 			'genericDistributionProvider' => 'GenericDistributionProviderService',
+			'genericDistributionProviderAction' => 'GenericDistributionProviderActionService',
 			'contentDistributionBatch' => 'ContentDistributionBatchService',
 		);
 		return $map;
@@ -118,13 +130,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if($baseClass == 'KalturaJobData')
 		{
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
-				return new KalturaDistributionJobData();
+				return new KalturaDistributionSubmitJobData();
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
-				return new KalturaDistributionJobData();
+				return new KalturaDistributionUpdateJobData();
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
-				return new KalturaDistributionJobData();
+				return new KalturaDistributionDeleteJobData();
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return new KalturaDistributionFetchReportJobData();
@@ -162,13 +174,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if($baseClass == 'KalturaJobData')
 		{
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
-				return 'KalturaDistributionJobData';
+				return 'KalturaDistributionSubmitJobData';
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
-				return 'KalturaDistributionJobData';
+				return 'KalturaDistributionUpdateJobData';
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
-				return 'KalturaDistributionJobData';
+				return 'KalturaDistributionDeleteJobData';
 				
 			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return 'KalturaDistributionFetchReportJobData';

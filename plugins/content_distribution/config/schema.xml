@@ -89,6 +89,7 @@
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="generic_distribution_provider_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="action" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />

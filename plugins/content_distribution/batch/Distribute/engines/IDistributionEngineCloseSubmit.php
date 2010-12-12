@@ -3,7 +3,8 @@ interface IDistributionEngineCloseSubmit
 {
 	/**
 	 * check for submission closure in case the submission is asynchronous.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function closeSubmit(KalturaDistributionJobData $data);
+	public function closeSubmit(KalturaDistributionSubmitJobData $data);
 }

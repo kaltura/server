@@ -3,7 +3,8 @@ interface IDistributionEngineReport
 {
 	/**
 	 * retrieves statistics.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionFetchReportJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data);
 }

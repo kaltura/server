@@ -9,5 +9,7 @@ class ContentDistributionErrors extends KalturaErrors
 	
 	const GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND = "GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND,Generic distrbution provider not found [%s]";
 	
+	const GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND = "GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND,Generic distrbution provider action not found [%s]";
+	
 	const CANNOT_DELETE_DEFAULT_DISTRIBUTION_PROVIDER = "CANNOT_DELETE_DEFAULT_DISTRIBUTION_PROVIDER,Cannot delete default generic distribution provider";
 }

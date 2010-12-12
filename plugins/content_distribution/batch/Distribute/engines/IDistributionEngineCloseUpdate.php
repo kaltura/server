@@ -3,7 +3,8 @@ interface IDistributionEngineCloseUpdate
 {
 	/**
 	 * check for update closure in case the update is asynchronous.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionUpdateJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function closeUpdate(KalturaDistributionJobData $data);
+	public function closeUpdate(KalturaDistributionUpdateJobData $data);
 }

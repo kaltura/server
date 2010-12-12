@@ -3,7 +3,8 @@ interface IDistributionEngineSubmit
 {
 	/**
 	 * sends media to external system.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function submit(KalturaDistributionJobData $data);
+	public function submit(KalturaDistributionSubmitJobData $data);
 }

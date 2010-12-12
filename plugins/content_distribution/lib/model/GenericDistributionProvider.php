@@ -14,12 +14,20 @@
  */
 class GenericDistributionProvider extends BaseGenericDistributionProvider implements IDistributionProvider 
 {
+	const CUSTOM_DATA_FIELD_SCHEDULE_UPDATE_ENABLED = "scheduleUpdateEnabled";
+	const CUSTOM_DATA_FIELD_DELETE_INSTEAD_UPDATE = "deleteInsteadUpdate";
+	const CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNRISE = "intervalBeforeSunrise";
+	const CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNSET = "intervalBeforeSunset";
+	const CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS = "updateRequiredEntryFields";
+	const CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS = "updateRequiredMetadataXPaths";
+	
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::isDeleteEnabled()
 	 */
 	public function isDeleteEnabled()
 	{
-		// TODO Auto-generated method stub
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getId(), DistributionAction::DELETE);
+		return !is_null($action);
 	}
 
 	/* (non-PHPdoc)
@@ -27,7 +35,8 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function isUpdateEnabled()
 	{
-		// TODO Auto-generated method stub
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getId(), DistributionAction::UPDATE);
+		return !is_null($action);
 	}
 
 	/* (non-PHPdoc)
@@ -35,7 +44,8 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function isReportsEnabled()
 	{
-		// TODO Auto-generated method stub
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getId(), DistributionAction::FETCH_REPORT);
+		return !is_null($action);
 	}
 
 	/* (non-PHPdoc)
@@ -43,7 +53,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCHEDULE_UPDATE_ENABLED);
 	}
 
 	/* (non-PHPdoc)
@@ -51,7 +61,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function useDeleteInsteadOfUpdate()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_INSTEAD_UPDATE);
 	}
 
 	/* (non-PHPdoc)
@@ -59,7 +69,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function getJobIntervalBeforeSunrise()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNRISE);
 	}
 
 	/* (non-PHPdoc)
@@ -67,7 +77,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function getJobIntervalBeforeSunset()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNSET);
 	}
 	
 	/* (non-PHPdoc)
@@ -75,7 +85,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function getUpdateRequiredEntryFields()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS);
 	}
 	
 	/* (non-PHPdoc)
@@ -83,7 +93,7 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function getUpdateRequiredMetadataXPaths()
 	{
-		// TODO Auto-generated method stub
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS);
 	}
 	
 	/* (non-PHPdoc)
@@ -102,5 +112,12 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 			
 		return $ret;
 	}
+	
+	public function setScheduleUpdateEnabled($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SCHEDULE_UPDATE_ENABLED, $v);}
+	public function setDeleteInsteadUpdate($v)			{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETE_INSTEAD_UPDATE, $v);}
+	public function setIntervalBeforeSunrise($v)		{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNRISE, $v);}
+	public function setIntervalBeforeSunset($v)			{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_INTERVAL_BEFORE_SUNSET, $v);}
+	public function setUpdateRequiredEntryFields($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS, $v);}
+	public function setUpdateRequiredMetadataXpaths($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS, $v);}
 	
 } // GenericDistributionProvider

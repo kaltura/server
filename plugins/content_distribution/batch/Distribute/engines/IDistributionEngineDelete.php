@@ -3,7 +3,8 @@ interface IDistributionEngineDelete
 {
 	/**
 	 * removes media.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionDeleteJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function delete(KalturaDistributionJobData $data);
+	public function delete(KalturaDistributionDeleteJobData $data);
 }

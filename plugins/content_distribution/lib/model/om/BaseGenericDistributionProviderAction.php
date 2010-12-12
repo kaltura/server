@@ -37,6 +37,12 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 	protected $updated_at;
 
 	/**
+	 * The value for the partner_id field.
+	 * @var        int
+	 */
+	protected $partner_id;
+
+	/**
 	 * The value for the generic_distribution_provider_id field.
 	 * @var        int
 	 */
@@ -224,6 +230,16 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [partner_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPartnerId()
+	{
+		return $this->partner_id;
 	}
 
 	/**
@@ -466,6 +482,29 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 
 		return $this;
 	} // setUpdatedAt()
+
+	/**
+	 * Set the value of [partner_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     GenericDistributionProviderAction The current object (for fluent API support)
+	 */
+	public function setPartnerId($v)
+	{
+		if(!isset($this->oldColumnsValues[GenericDistributionProviderActionPeer::PARTNER_ID]))
+			$this->oldColumnsValues[GenericDistributionProviderActionPeer::PARTNER_ID] = $this->partner_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->partner_id !== $v) {
+			$this->partner_id = $v;
+			$this->modifiedColumns[] = GenericDistributionProviderActionPeer::PARTNER_ID;
+		}
+
+		return $this;
+	} // setPartnerId()
 
 	/**
 	 * Set the value of [generic_distribution_provider_id] column.
@@ -775,18 +814,19 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->created_at = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->generic_distribution_provider_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->action = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->results_parser = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->protocol = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->server_address = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->remote_path = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->remote_username = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->remote_password = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->editable_fields = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->mandatory_fields = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->custom_data = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+			$this->generic_distribution_provider_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->action = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->results_parser = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->protocol = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->server_address = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->remote_path = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->remote_username = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->remote_password = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->editable_fields = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->mandatory_fields = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -796,7 +836,7 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 15; // 15 = GenericDistributionProviderActionPeer::NUM_COLUMNS - GenericDistributionProviderActionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 16; // 16 = GenericDistributionProviderActionPeer::NUM_COLUMNS - GenericDistributionProviderActionPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating GenericDistributionProviderAction object", $e);
@@ -1213,39 +1253,42 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 				return $this->getUpdatedAt();
 				break;
 			case 3:
-				return $this->getGenericDistributionProviderId();
+				return $this->getPartnerId();
 				break;
 			case 4:
-				return $this->getAction();
+				return $this->getGenericDistributionProviderId();
 				break;
 			case 5:
-				return $this->getStatus();
+				return $this->getAction();
 				break;
 			case 6:
-				return $this->getResultsParser();
+				return $this->getStatus();
 				break;
 			case 7:
-				return $this->getProtocol();
+				return $this->getResultsParser();
 				break;
 			case 8:
-				return $this->getServerAddress();
+				return $this->getProtocol();
 				break;
 			case 9:
-				return $this->getRemotePath();
+				return $this->getServerAddress();
 				break;
 			case 10:
-				return $this->getRemoteUsername();
+				return $this->getRemotePath();
 				break;
 			case 11:
-				return $this->getRemotePassword();
+				return $this->getRemoteUsername();
 				break;
 			case 12:
-				return $this->getEditableFields();
+				return $this->getRemotePassword();
 				break;
 			case 13:
-				return $this->getMandatoryFields();
+				return $this->getEditableFields();
 				break;
 			case 14:
+				return $this->getMandatoryFields();
+				break;
+			case 15:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1272,18 +1315,19 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getCreatedAt(),
 			$keys[2] => $this->getUpdatedAt(),
-			$keys[3] => $this->getGenericDistributionProviderId(),
-			$keys[4] => $this->getAction(),
-			$keys[5] => $this->getStatus(),
-			$keys[6] => $this->getResultsParser(),
-			$keys[7] => $this->getProtocol(),
-			$keys[8] => $this->getServerAddress(),
-			$keys[9] => $this->getRemotePath(),
-			$keys[10] => $this->getRemoteUsername(),
-			$keys[11] => $this->getRemotePassword(),
-			$keys[12] => $this->getEditableFields(),
-			$keys[13] => $this->getMandatoryFields(),
-			$keys[14] => $this->getCustomData(),
+			$keys[3] => $this->getPartnerId(),
+			$keys[4] => $this->getGenericDistributionProviderId(),
+			$keys[5] => $this->getAction(),
+			$keys[6] => $this->getStatus(),
+			$keys[7] => $this->getResultsParser(),
+			$keys[8] => $this->getProtocol(),
+			$keys[9] => $this->getServerAddress(),
+			$keys[10] => $this->getRemotePath(),
+			$keys[11] => $this->getRemoteUsername(),
+			$keys[12] => $this->getRemotePassword(),
+			$keys[13] => $this->getEditableFields(),
+			$keys[14] => $this->getMandatoryFields(),
+			$keys[15] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1325,39 +1369,42 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 				$this->setUpdatedAt($value);
 				break;
 			case 3:
-				$this->setGenericDistributionProviderId($value);
+				$this->setPartnerId($value);
 				break;
 			case 4:
-				$this->setAction($value);
+				$this->setGenericDistributionProviderId($value);
 				break;
 			case 5:
-				$this->setStatus($value);
+				$this->setAction($value);
 				break;
 			case 6:
-				$this->setResultsParser($value);
+				$this->setStatus($value);
 				break;
 			case 7:
-				$this->setProtocol($value);
+				$this->setResultsParser($value);
 				break;
 			case 8:
-				$this->setServerAddress($value);
+				$this->setProtocol($value);
 				break;
 			case 9:
-				$this->setRemotePath($value);
+				$this->setServerAddress($value);
 				break;
 			case 10:
-				$this->setRemoteUsername($value);
+				$this->setRemotePath($value);
 				break;
 			case 11:
-				$this->setRemotePassword($value);
+				$this->setRemoteUsername($value);
 				break;
 			case 12:
-				$this->setEditableFields($value);
+				$this->setRemotePassword($value);
 				break;
 			case 13:
-				$this->setMandatoryFields($value);
+				$this->setEditableFields($value);
 				break;
 			case 14:
+				$this->setMandatoryFields($value);
+				break;
+			case 15:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1387,18 +1434,19 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setGenericDistributionProviderId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setAction($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setResultsParser($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setProtocol($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setServerAddress($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setRemotePath($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setRemoteUsername($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setRemotePassword($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setEditableFields($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setMandatoryFields($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCustomData($arr[$keys[14]]);
+		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setGenericDistributionProviderId($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setAction($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setResultsParser($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setProtocol($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setServerAddress($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setRemotePath($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setRemoteUsername($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setRemotePassword($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setEditableFields($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setMandatoryFields($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
 	}
 
 	/**
@@ -1413,6 +1461,7 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::ID)) $criteria->add(GenericDistributionProviderActionPeer::ID, $this->id);
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::CREATED_AT)) $criteria->add(GenericDistributionProviderActionPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::UPDATED_AT)) $criteria->add(GenericDistributionProviderActionPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(GenericDistributionProviderActionPeer::PARTNER_ID)) $criteria->add(GenericDistributionProviderActionPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::GENERIC_DISTRIBUTION_PROVIDER_ID)) $criteria->add(GenericDistributionProviderActionPeer::GENERIC_DISTRIBUTION_PROVIDER_ID, $this->generic_distribution_provider_id);
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::ACTION)) $criteria->add(GenericDistributionProviderActionPeer::ACTION, $this->action);
 		if ($this->isColumnModified(GenericDistributionProviderActionPeer::STATUS)) $criteria->add(GenericDistributionProviderActionPeer::STATUS, $this->status);
@@ -1482,6 +1531,8 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setGenericDistributionProviderId($this->generic_distribution_provider_id);
 

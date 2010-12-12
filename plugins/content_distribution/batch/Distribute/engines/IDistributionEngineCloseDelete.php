@@ -3,7 +3,8 @@ interface IDistributionEngineCloseDelete
 {
 	/**
 	 * check for deletion closure in case the deletion is asynchronous.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionDeleteJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
-	public function closeDelete(KalturaDistributionJobData $data);
+	public function closeDelete(KalturaDistributionDeleteJobData $data);
 }

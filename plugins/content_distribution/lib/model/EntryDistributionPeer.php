@@ -14,6 +14,16 @@
  */
 class EntryDistributionPeer extends BaseEntryDistributionPeer 
 {
+	public function setInstanceCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( EntryDistributionPeer::STATUS, EntryDistributionStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 	/**
 	 * Retrieve objects by entry id.
 	 *

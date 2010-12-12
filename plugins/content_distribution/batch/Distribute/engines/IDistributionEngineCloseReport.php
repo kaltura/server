@@ -3,7 +3,8 @@ interface IDistributionEngineCloseReport
 {
 	/**
 	 * check for report fetching closure in case the fething is asynchronous.
-	 * @return KalturaBatchJobStatus
+	 * @param KalturaDistributionFetchReportJobData $data
+	 * @return bool true if finished, false if will be finished asynchronously
 	 */
 	public function closeReport(KalturaDistributionFetchReportJobData $data);
 }

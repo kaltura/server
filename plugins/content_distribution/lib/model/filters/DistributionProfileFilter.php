@@ -3,8 +3,6 @@ class DistributionProfileFilter extends baseObjectFilter
 {
 	public function init ()
 	{
-		// TODO - should separate the schema of the fields from the actual values
-		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",

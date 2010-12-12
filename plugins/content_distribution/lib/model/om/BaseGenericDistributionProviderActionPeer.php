@@ -25,7 +25,7 @@ abstract class BaseGenericDistributionProviderActionPeer {
 	const TM_CLASS = 'GenericDistributionProviderActionTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 15;
+	const NUM_COLUMNS = 16;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -38,6 +38,9 @@ abstract class BaseGenericDistributionProviderActionPeer {
 
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'generic_distribution_provider_action.UPDATED_AT';
+
+	/** the column name for the PARTNER_ID field */
+	const PARTNER_ID = 'generic_distribution_provider_action.PARTNER_ID';
 
 	/** the column name for the GENERIC_DISTRIBUTION_PROVIDER_ID field */
 	const GENERIC_DISTRIBUTION_PROVIDER_ID = 'generic_distribution_provider_action.GENERIC_DISTRIBUTION_PROVIDER_ID';
@@ -91,11 +94,11 @@ abstract class BaseGenericDistributionProviderActionPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'GenericDistributionProviderId', 'Action', 'Status', 'ResultsParser', 'Protocol', 'ServerAddress', 'RemotePath', 'RemoteUsername', 'RemotePassword', 'EditableFields', 'MandatoryFields', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'genericDistributionProviderId', 'action', 'status', 'resultsParser', 'protocol', 'serverAddress', 'remotePath', 'remoteUsername', 'remotePassword', 'editableFields', 'mandatoryFields', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::GENERIC_DISTRIBUTION_PROVIDER_ID, self::ACTION, self::STATUS, self::RESULTS_PARSER, self::PROTOCOL, self::SERVER_ADDRESS, self::REMOTE_PATH, self::REMOTE_USERNAME, self::REMOTE_PASSWORD, self::EDITABLE_FIELDS, self::MANDATORY_FIELDS, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'generic_distribution_provider_id', 'action', 'status', 'results_parser', 'protocol', 'server_address', 'remote_path', 'remote_username', 'remote_password', 'editable_fields', 'mandatory_fields', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'GenericDistributionProviderId', 'Action', 'Status', 'ResultsParser', 'Protocol', 'ServerAddress', 'RemotePath', 'RemoteUsername', 'RemotePassword', 'EditableFields', 'MandatoryFields', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'genericDistributionProviderId', 'action', 'status', 'resultsParser', 'protocol', 'serverAddress', 'remotePath', 'remoteUsername', 'remotePassword', 'editableFields', 'mandatoryFields', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::GENERIC_DISTRIBUTION_PROVIDER_ID, self::ACTION, self::STATUS, self::RESULTS_PARSER, self::PROTOCOL, self::SERVER_ADDRESS, self::REMOTE_PATH, self::REMOTE_USERNAME, self::REMOTE_PASSWORD, self::EDITABLE_FIELDS, self::MANDATORY_FIELDS, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'generic_distribution_provider_id', 'action', 'status', 'results_parser', 'protocol', 'server_address', 'remote_path', 'remote_username', 'remote_password', 'editable_fields', 'mandatory_fields', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
 	/**
@@ -105,11 +108,11 @@ abstract class BaseGenericDistributionProviderActionPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'GenericDistributionProviderId' => 3, 'Action' => 4, 'Status' => 5, 'ResultsParser' => 6, 'Protocol' => 7, 'ServerAddress' => 8, 'RemotePath' => 9, 'RemoteUsername' => 10, 'RemotePassword' => 11, 'EditableFields' => 12, 'MandatoryFields' => 13, 'CustomData' => 14, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'genericDistributionProviderId' => 3, 'action' => 4, 'status' => 5, 'resultsParser' => 6, 'protocol' => 7, 'serverAddress' => 8, 'remotePath' => 9, 'remoteUsername' => 10, 'remotePassword' => 11, 'editableFields' => 12, 'mandatoryFields' => 13, 'customData' => 14, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::GENERIC_DISTRIBUTION_PROVIDER_ID => 3, self::ACTION => 4, self::STATUS => 5, self::RESULTS_PARSER => 6, self::PROTOCOL => 7, self::SERVER_ADDRESS => 8, self::REMOTE_PATH => 9, self::REMOTE_USERNAME => 10, self::REMOTE_PASSWORD => 11, self::EDITABLE_FIELDS => 12, self::MANDATORY_FIELDS => 13, self::CUSTOM_DATA => 14, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'generic_distribution_provider_id' => 3, 'action' => 4, 'status' => 5, 'results_parser' => 6, 'protocol' => 7, 'server_address' => 8, 'remote_path' => 9, 'remote_username' => 10, 'remote_password' => 11, 'editable_fields' => 12, 'mandatory_fields' => 13, 'custom_data' => 14, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'GenericDistributionProviderId' => 4, 'Action' => 5, 'Status' => 6, 'ResultsParser' => 7, 'Protocol' => 8, 'ServerAddress' => 9, 'RemotePath' => 10, 'RemoteUsername' => 11, 'RemotePassword' => 12, 'EditableFields' => 13, 'MandatoryFields' => 14, 'CustomData' => 15, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'genericDistributionProviderId' => 4, 'action' => 5, 'status' => 6, 'resultsParser' => 7, 'protocol' => 8, 'serverAddress' => 9, 'remotePath' => 10, 'remoteUsername' => 11, 'remotePassword' => 12, 'editableFields' => 13, 'mandatoryFields' => 14, 'customData' => 15, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::GENERIC_DISTRIBUTION_PROVIDER_ID => 4, self::ACTION => 5, self::STATUS => 6, self::RESULTS_PARSER => 7, self::PROTOCOL => 8, self::SERVER_ADDRESS => 9, self::REMOTE_PATH => 10, self::REMOTE_USERNAME => 11, self::REMOTE_PASSWORD => 12, self::EDITABLE_FIELDS => 13, self::MANDATORY_FIELDS => 14, self::CUSTOM_DATA => 15, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'generic_distribution_provider_id' => 4, 'action' => 5, 'status' => 6, 'results_parser' => 7, 'protocol' => 8, 'server_address' => 9, 'remote_path' => 10, 'remote_username' => 11, 'remote_password' => 12, 'editable_fields' => 13, 'mandatory_fields' => 14, 'custom_data' => 15, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
 	/**
@@ -182,6 +185,7 @@ abstract class BaseGenericDistributionProviderActionPeer {
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::ID);
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::CREATED_AT);
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::UPDATED_AT);
+		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::PARTNER_ID);
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::GENERIC_DISTRIBUTION_PROVIDER_ID);
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::ACTION);
 		$criteria->addSelectColumn(GenericDistributionProviderActionPeer::STATUS);
@@ -333,6 +337,66 @@ abstract class BaseGenericDistributionProviderActionPeer {
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(empty($partnerGroup) && empty($kalturaNetwork))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				$criterion = null;
+				if($partnerGroup)
+				{
+					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					$partners = explode(',', trim($partnerGroup));
+					foreach($partners as &$p)
+						trim($p); // make sure there are not leading or trailing spaces
+	
+					// add the partner_id to the partner_group
+					$partners[] = $partnerId;
+					
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				}	
+				
+				$criteria->addAnd($criterion);
+			}
+		}
+			
+		$criteriaFilter->enable();
 	}
 	
 	/**

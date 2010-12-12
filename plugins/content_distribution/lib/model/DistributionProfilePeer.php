@@ -18,6 +18,16 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 	protected static $class_types_cache = array(
 		DistributionProviderType::GENERIC => GenericDistributionProfilePeer::OM_CLASS,
 	);
+
+	public function setInstanceCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( DistributionProfilePeer::STATUS, DistributionProfileStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
 	
 	/**
 	 * Retrieve all partner profiles.

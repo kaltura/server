@@ -21,6 +21,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 	const CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION = "mrssTransformerVersion";
 	const CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION = "mrssValidatorVersion";
 	const CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION = "resultsTransformerVersion";
+	const CUSTOM_DATA_FIELD_FTP_PASSIVE_MODE = "ftpPassiveMode";
 	
 	/**
 	 * @param int $sub_type
@@ -69,7 +70,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 			$version = self::getFileSyncversion($sub_type);
 		
 		$key = new FileSyncKey();
-		$key->object_type = FileSyncObjectType::METADATA;
+		$key->object_type = ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION);
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;
@@ -122,14 +123,18 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 		
 		return $this->getId() . "_{$sub_type}_{$version}.{$extension}";	
 	}
+	
+	/**
+	 * @var FileSync
+	 */
+	private $m_file_sync;
 
 	/* (non-PHPdoc)
 	 * @see ISyncableFile::getFileSync()
 	 */
 	public function getFileSync()
 	{
-		// TODO Auto-generated method stub
-		
+		return $this->m_file_sync; 
 	}
 
 	/* (non-PHPdoc)
@@ -137,24 +142,17 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 	 */
 	public function setFileSync(FileSync $file_sync)
 	{
-		// TODO Auto-generated method stub
-		
+		 $this->m_file_sync = $file_sync;
 	}
 
-	/* (non-PHPdoc)
-	 * @see IBaseObject::getPartnerId()
-	 */
-	public function getPartnerId()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
+	public function getFtpPassiveMode()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FTP_PASSIVE_MODE);}
 	public function getMrssTransformerVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION);}
 	public function getMrssValidatorVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION);}
 	public function getResultsTransformerVersion()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION);}
+
+	public function setFtpPassiveMode($v)					{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FTP_PASSIVE_MODE, $v);}
 	
-	public function imcrementMrssTransformerVersion($v)		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION);}
-	public function imcrementMrssValidatorVersion($v)		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION);}
-	public function imcrementResultsTransformerVersion($v)	{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION);}
+	public function incrementMrssTransformerVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_TRANSFORMER_VERSION);}
+	public function incrementMrssValidatorVersion()			{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_MRSS_VALIDATOR_VERSION);}
+	public function incrementResultsTransformerVersion()	{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_RESULTS_TRANSFORMER_VERSION);}
 }

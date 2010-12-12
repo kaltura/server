@@ -39,6 +39,7 @@ class GenericDistributionProviderActionTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('GENERIC_DISTRIBUTION_PROVIDER_ID', 'GenericDistributionProviderId', 'INTEGER', false, null, null);
 		$this->addColumn('ACTION', 'Action', 'TINYINT', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);

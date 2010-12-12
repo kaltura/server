@@ -101,6 +101,23 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		'editableFields',
 		'mandatoryFields',
 	);
+
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new GenericDistributionProvider();
+			
+		$object = parent::toObject($object, $skip);
+		
+		$object->setScheduleUpdateEnabled($this->scheduleUpdateEnabled);
+		$object->setDeleteInsteadUpdate($this->deleteInsteadUpdate);
+		$object->setIntervalBeforeSunrise($this->intervalBeforeSunrise);
+		$object->setIntervalBeforeSunset($this->intervalBeforeSunset);
+		$object->setUpdateRequiredEntryFields($this->updateRequiredEntryFields);
+		$object->setUpdateRequiredMetadataXpaths($this->updateRequiredMetadataXPaths);
+		
+		return $object;		
+	}
 		 
 	public function getMapBetweenObjects()
 	{

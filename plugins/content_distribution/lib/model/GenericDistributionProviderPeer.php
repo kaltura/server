@@ -12,6 +12,15 @@
  *
  * @package    lib.model
  */
-class GenericDistributionProviderPeer extends BaseGenericDistributionProviderPeer {
-
-} // GenericDistributionProviderPeer
+class GenericDistributionProviderPeer extends BaseGenericDistributionProviderPeer 
+{
+	public function setInstanceCriteriaFilter ()
+	{
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( GenericDistributionProviderPeer::STATUS, GenericDistributionProviderStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+}
