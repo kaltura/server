@@ -108,18 +108,18 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		{
 			switch($object->getObjectType())
 			{
-				case FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY:
+				case FileSyncObjectType::ENTRY:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_ENTRY);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					$auditTrail->setEntryId($object->getObjectId());
 					break;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_UICONF:
+				case FileSyncObjectType::UICONF:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_UI_CONF);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					break;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB:
+				case FileSyncObjectType::BATCHJOB:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
@@ -129,7 +129,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 						
 					break;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET:
+				case FileSyncObjectType::FLAVOR_ASSET:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_ASSET);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
@@ -139,7 +139,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 						
 					break;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA:
+				case FileSyncObjectType::METADATA:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
@@ -151,7 +151,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					}
 					break;
 					
-				case FileSync::FILE_SYNC_OBJECT_TYPE_METADATA_PROFILE:
+				case FileSyncObjectType::METADATA_PROFILE:
 					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					break;
