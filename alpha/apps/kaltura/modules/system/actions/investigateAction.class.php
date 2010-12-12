@@ -120,7 +120,7 @@ class investigateAction extends kalturaSystemAction
 
 		// find all relevant files on disk
 		$c = new Criteria();
-		$c->add ( FileSyncPeer::OBJECT_TYPE , FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY );
+		$c->add ( FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::ENTRY );
 		$c->add ( FileSyncPeer::OBJECT_ID , $entry_id );
 		// order by OBJECT SUB TYPE
 		$c->addAscendingOrderByColumn ( FileSyncPeer::OBJECT_SUB_TYPE );
@@ -143,7 +143,7 @@ class investigateAction extends kalturaSystemAction
 		 
 		// find all relevant files on disk
 		$c = new Criteria();
-		$c->add ( FileSyncPeer::OBJECT_TYPE , FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET );
+		$c->add ( FileSyncPeer::OBJECT_TYPE , FileSyncObjectType::FLAVOR_ASSET );
 		$c->add ( FileSyncPeer::OBJECT_ID , $flavor_ids , Criteria::IN );
 		// order by OBJECT SUB TYPE
 		$c->addAscendingOrderByColumn ( FileSyncPeer::OBJECT_SUB_TYPE );

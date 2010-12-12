@@ -420,7 +420,7 @@ file_sizeint(11)
 			$content = null;
 			if ( $local_file )
 			{
-				if ( $fs->getObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET && 
+				if ( $fs->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && 
 					$fs->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG )
 				{
 					$path = $fs->getFileRoot() . $fs->getFilePath();

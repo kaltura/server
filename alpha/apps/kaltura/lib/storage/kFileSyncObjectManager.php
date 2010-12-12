@@ -14,22 +14,22 @@ class kFileSyncObjectManager
 		
 		switch ( $objectType )
 		{
-			case FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY:
+			case FileSyncObjectType::ENTRY:
 				entryPeer::setUseCriteriaFilter ( false );
 				$object = entryPeer::retrieveByPK( $objectId );
 				entryPeer::setUseCriteriaFilter ( true );
 				break;
-			case FileSync::FILE_SYNC_OBJECT_TYPE_UICONF:
+			case FileSyncObjectType::UICONF:
 				uiConfPeer::setUseCriteriaFilter ( false );
 				$object = uiConfPeer::retrieveByPK( $objectId );
 				uiConfPeer::setUseCriteriaFilter ( true );
 				break;
-			case FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB:
+			case FileSyncObjectType::BATCHJOB:
 				BatchJobPeer::setUseCriteriaFilter ( false );
 				$object = BatchJobPeer::retrieveByPK( $objectId );
 				BatchJobPeer::setUseCriteriaFilter ( true );
 				break;
-			case FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET:
+			case FileSyncObjectType::FLAVOR_ASSET:
 				flavorAssetPeer::setUseCriteriaFilter ( false );
 				$object = flavorAssetPeer::retrieveById( $objectId );
 				flavorAssetPeer::setUseCriteriaFilter ( true );

@@ -47,7 +47,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	 */
 	protected function entryDeleted(entry $entry) 
 	{
-		$this->syncableDeleted($entry->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY);
+		$this->syncableDeleted($entry->getId(), FileSyncObjectType::ENTRY);
 		
 		// delete flavor assets
 		$c = new Criteria();
@@ -78,7 +78,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	 */
 	protected function uiConfDeleted(uiConf $uiConf) 
 	{
-		$this->syncableDeleted($uiConf->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_UICONF);
+		$this->syncableDeleted($uiConf->getId(), FileSyncObjectType::UICONF);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	 */
 	protected function batchJobDeleted(BatchJob $batchJob) 
 	{
-		$this->syncableDeleted($batchJob->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB);
+		$this->syncableDeleted($batchJob->getId(), FileSyncObjectType::BATCHJOB);
 	}
 
 	/**
@@ -94,6 +94,6 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	 */
 	protected function assetDeleted(asset $asset) 
 	{
-		$this->syncableDeleted($asset->getId(), FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET);
+		$this->syncableDeleted($asset->getId(), FileSyncObjectType::FLAVOR_ASSET);
 	}
 }
