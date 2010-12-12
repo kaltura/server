@@ -201,6 +201,8 @@ class KalturaErrors extends APIErrors
 	
 	const UPLOAD_ERROR = "UPLOAD_ERROR,Upload failed";
 	
+	const UPLOADED_FILE_NOT_FOUND = "UPLOADED_FILE_NOT_FOUND,Uploaded file not found [%s]";
+	
 	const BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR,Unable to create file sync object for bulk upload csv";
 	
 	const BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR,Unable to create file sync object for bulk upload result";
