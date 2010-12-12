@@ -127,9 +127,8 @@ foreach($stats as $partner_id => $dates)
 			" WHERE ".PartnerActivityPeer::ACTIVITY."=".PartnerActivity::PARTNER_ACTIVITY_STORAGE.
 			" AND ".PartnerActivityPeer::PARTNER_ID."=".$partner_id.
 			" AND ".PartnerActivityPeer::ACTIVITY_DATE."='".$date."'";
-			
-		$statement = $connection->prepareStatement($query);
-		$resultset = $statement->executeQuery();
+		
+		$connection->exec($query);
 		
 		//print "$partner_id $date ".$pstats["size"]." ".$pstats["count"]."\n";
 		// output partner ID and date, 
