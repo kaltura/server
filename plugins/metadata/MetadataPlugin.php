@@ -13,6 +13,17 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	const BULK_UPLOAD_MULTI_VALUES_DELIMITER = '|,|';
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		if($interface == 'IKalturaMrssContributor')
+			return kMetadataMrssManager::get();
+			
+		return null;
+	}
 	
 	public static function getPluginName()
 	{
