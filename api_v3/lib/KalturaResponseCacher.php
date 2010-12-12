@@ -200,7 +200,14 @@ class KalturaResponseCacher
 		if (!self::$_useCache)
 			return false;
 			
-		$ks = kSessionUtils::crackKs($this->_ks);
+		$ks = null;
+		try{
+			$ks = kSessionUtils::crackKs($this->_ks);
+		}
+		catch(Exception $e){
+			KalturaLog::err($e->getMessage());
+		}
+		
 		if(!$ks)
 			return true;
 		
