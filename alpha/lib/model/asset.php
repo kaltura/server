@@ -128,7 +128,7 @@ class asset extends Baseasset implements ISyncableFile
 			self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG,
 		);
 		if (!in_array($sub_type, $valid_sub_types))
-			throw new FileSyncException(FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET, $sub_type, $valid_sub_types);		
+			throw new FileSyncException(FileSyncObjectType::FLAVOR_ASSET, $sub_type, $valid_sub_types);		
 	}
 	
 	/**
@@ -139,7 +139,7 @@ class asset extends Baseasset implements ISyncableFile
 	{
 		self::validateFileSyncSubType($sub_type);
 		$key = new FileSyncKey();
-		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET;
+		$key->object_type = FileSyncObjectType::FLAVOR_ASSET;
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		if ($version)

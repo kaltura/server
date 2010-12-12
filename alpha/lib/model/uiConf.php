@@ -245,7 +245,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
-		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_UICONF;
+		$key->object_type = FileSyncObjectType::UICONF;
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 //		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA )
@@ -316,7 +316,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	private static function validateFileSyncSubType ( $sub_type )
 	{
 		if ( $sub_type != self::FILE_SYNC_UICONF_SUB_TYPE_DATA && $sub_type != self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES )
-			throw new FileSyncException ( FileSync::FILE_SYNC_OBJECT_TYPE_UICONF ,
+			throw new FileSyncException ( FileSyncObjectType::UICONF ,
 				 $sub_type , array ( self::FILE_SYNC_UICONF_SUB_TYPE_DATA ,  self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES ) );		
 	}
 	

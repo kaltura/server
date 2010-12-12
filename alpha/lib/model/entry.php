@@ -467,7 +467,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
-		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY;
+		$key->object_type = FileSyncObjectType::ENTRY;
 		
 //		// remarked by Tan-Tan 13/01/2010
 //		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
@@ -686,7 +686,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG  &&
 			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
 		)
-			throw new FileSyncException ( FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY ,
+			throw new FileSyncException ( FileSyncObjectType::ENTRY ,
 				 $sub_type , array ( 
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , 
 				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT, 

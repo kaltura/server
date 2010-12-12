@@ -281,7 +281,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
-		$key->object_type = FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB;
+		$key->object_type = FileSyncObjectType::BATCHJOB;
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;
@@ -355,7 +355,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		);
 		
 		if (!in_array($sub_type, $valid_sub_types))
-			throw new FileSyncException(FileSync::FILE_SYNC_OBJECT_TYPE_BATCHJOB, $sub_type, $valid_sub_types);		
+			throw new FileSyncException(FileSyncObjectType::BATCHJOB, $sub_type, $valid_sub_types);		
 	}
 	
 	public function isRetriesExceeded()
