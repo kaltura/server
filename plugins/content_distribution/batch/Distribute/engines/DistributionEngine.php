@@ -29,7 +29,6 @@ abstract class DistributionEngine
 	
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
-	 * @param KalturaDistributionJobData $data
 	 */
-	abstract public function configure(KSchedularTaskConfig $taskConfig, KalturaDistributionJobData $data);
+	abstract public function configure(KSchedularTaskConfig $taskConfig);
 }

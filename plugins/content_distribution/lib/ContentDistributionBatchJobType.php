@@ -40,6 +40,6 @@ class ContentDistributionBatchJobType extends KalturaBatchJobType
 	
 	public function getPluginName()
 	{
-		return VirusScanPlugin::getPluginName();
+		return ContentDistributionPlugin::getPluginName();
 	}
 }

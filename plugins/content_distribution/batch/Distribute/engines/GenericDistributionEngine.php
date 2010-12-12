@@ -12,7 +12,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaDistributionJobData $data)
+	public function configure(KSchedularTaskConfig $taskConfig)
 	{
 		
 	}
@@ -20,7 +20,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineSubmit::submit()
 	 */
-	public function submit()
+	public function submit(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -29,7 +29,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseSubmit::closeSubmit()
 	 */
-	public function closeSubmit()
+	public function closeSubmit(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -38,7 +38,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineDelete::delete()
 	 */
-	public function delete()
+	public function delete(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -47,7 +47,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseDelete::closeDelete()
 	 */
-	public function closeDelete()
+	public function closeDelete(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -56,7 +56,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseReport::closeReport()
 	 */
-	public function closeReport()
+	public function closeReport(KalturaDistributionFetchReportJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -65,7 +65,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseUpdate::closeUpdate()
 	 */
-	public function closeUpdate()
+	public function closeUpdate(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -74,7 +74,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineReport::fetchReport()
 	 */
-	public function fetchReport()
+	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
@@ -83,11 +83,9 @@ class GenericDistributionEngine extends DistributionEngine implements
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineUpdate::update()
 	 */
-	public function update()
+	public function update(KalturaDistributionJobData $data)
 	{
 		// TODO Auto-generated method stub
 		
 	}
-
-	
 }

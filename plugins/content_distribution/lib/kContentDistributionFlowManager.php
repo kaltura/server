@@ -8,7 +8,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return true;
 		
 		if($object instanceof entry && $object->getStatus() == entryStatus::READY)
@@ -35,7 +35,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return true;
 		
 		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
@@ -60,7 +60,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function objectDeleted(BaseObject $object)
 	{
 		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return true;
 		
 		if($object instanceof entry)
@@ -80,7 +80,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function objectDataChanged(BaseObject $object, $previousVersion = null)
 	{
 		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return true;
 		
 		if(!class_exists('Metadata') || !($object instanceof Metadata))

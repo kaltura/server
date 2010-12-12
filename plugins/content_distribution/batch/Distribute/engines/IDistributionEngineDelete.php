@@ -5,5 +5,5 @@ interface IDistributionEngineDelete
 	 * removes media.
 	 * @return KalturaBatchJobStatus
 	 */
-	public function delete();
+	public function delete(KalturaDistributionJobData $data);
 }

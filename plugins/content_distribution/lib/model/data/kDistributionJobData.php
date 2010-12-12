@@ -16,7 +16,51 @@ class kDistributionJobData extends kJobData
 	 * @var string
 	 */
 	private $remoteId;
+
+	/**
+	 * enum from DistributionProviderType
+	 * @var int
+	 */
+	private $providerType;
+
+	/**
+	 * Additional data that relevant for the provider only
+	 * @var kDistributionJobProviderData
+	 */
+	private $providerData;
 	
+	/**
+	 * @return the $providerType
+	 */
+	public function getProviderType()
+	{
+		return $this->providerType;
+	}
+
+	/**
+	 * @param int $providerType
+	 */
+	public function setProviderType($providerType)
+	{
+		$this->providerType = $providerType;
+	}
+
+	/**
+	 * @return kDistributionJobProviderData $providerData
+	 */
+	public function getProviderData()
+	{
+		return $this->providerData;
+	}
+
+	/**
+	 * @param kDistributionJobProviderData $providerData
+	 */
+	public function setProviderData(kDistributionJobProviderData $providerData)
+	{
+		$this->providerData = $providerData;
+	}
+
 	/**
 	 * @return the $remoteId
 	 */

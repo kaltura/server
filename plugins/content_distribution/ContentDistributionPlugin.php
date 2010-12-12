@@ -97,7 +97,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 			
 		if($baseClass == 'kJobData')
@@ -141,7 +141,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion == 'ps2')
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 	
 		if($baseClass == 'kJobData')

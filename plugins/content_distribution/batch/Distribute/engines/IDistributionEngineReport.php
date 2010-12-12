@@ -5,5 +5,5 @@ interface IDistributionEngineReport
 	 * retrieves statistics.
 	 * @return KalturaBatchJobStatus
 	 */
-	public function fetchReport();
+	public function fetchReport(KalturaDistributionFetchReportJobData $data);
 }

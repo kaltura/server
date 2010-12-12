@@ -33,6 +33,17 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $remoteId;
+
+	/**
+	 * @var KalturaDistributionProviderType
+	 */
+	public $providerType;
+
+	/**
+	 * Additional data that relevant for the provider only
+	 * @var KalturaDistributionJobProviderData
+	 */
+	public $providerData;
 	
 	
 	private static $map_between_objects = array
@@ -40,6 +51,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		"distributionProfileId" ,
 		"entryDistributionId" ,
 		"remoteId" ,
+		"providerType" ,
 	);
 
 	public function getMapBetweenObjects ( )
@@ -70,10 +82,53 @@ class KalturaDistributionJobData extends KalturaJobData
 				$this->entryDistribution->fromObject($entryDistribution);
 			}
 		}
+		
+		$providerData = $sourceObject->getProviderData();
+		$providerType = $this->getProviderType();
+		if($providerType && $providerData && $providerData instanceof kDistributionJobProviderData)
+		{
+			if($providerType == KalturaDistributionProviderType::GENERIC)
+			{
+				$this->providerData = new KalturaGenericDistributionJobProviderData($this);
+			}
+			else 
+			{
+				$this->providerData = KalturaPluginManager::loadObject('KalturaDistributionJobProviderData', $providerType, array($this));
+			}
+			
+			if($this->providerData)
+				$this->providerData->fromObject($providerData);
+		}
+	}
+	
+	public function toObject($object = null, $skip = array())
+	{
+		$object = parent::toObject($object, $skip);
+		
+		if($this->providerType && $this->providerData && $this->providerData instanceof KalturaDistributionJobProviderData)
+		{
+			$providerData = null;
+			if($this->providerType == KalturaDistributionProviderType::GENERIC)
+			{
+				$providerData = new kGenericDistributionJobProviderData($object);
+			}
+			else 
+			{
+				$providerData = KalturaPluginManager::loadObject('kDistributionJobProviderData', $this->providerType, array($object));
+			}
+			
+			if($providerData)
+			{
+				$providerData = $this->providerData->toObject($providerData);
+				$object->setProviderData($providerData);
+			}
+		}
+		
+		return $object;
 	}
 	
 	/**
-	 * @param string $subType
+	 * @param string $subType is the provider type
 	 * @return int
 	 */
 	public function toSubType($subType)
