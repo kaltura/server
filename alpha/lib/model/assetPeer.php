@@ -194,25 +194,6 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelectOne($c);
 	}
 	
-	public static function retrieveReadyWebByEntryId($entryId)
-	{
-		$flavorAssets = self::retreiveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);
-		// TODO - until now production was searching by tag 'mbr',
-		// until we test this deeper, we keep MBR.
-//		$flavorAssets = self::retreiveReadyByEntryIdAndTag($entryId, flavorParams::TAG_WEB);
-		return $flavorAssets;
-	}
-	
-	public static function retrieveBestEditByEntryId($entryId)
-	{
-		$flavorAssets = self::retreiveReadyByEntryIdAndTag($entryId, flavorParams::TAG_EDIT);
-		
-		if (count($flavorAssets) > 0)
-			return $flavorAssets[0];
-		else
-			return self::retrieveBestPlayByEntryId($entryId);
-	}
-	
 	/**
 	 * Leaves only the specified tag in the flavor assets array
 	 * 
