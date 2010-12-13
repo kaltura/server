@@ -59,6 +59,7 @@ class KalturaFrontController
 			catch(Exception $ex)
 			{
 				$result = $this->getExceptionObject($ex);
+				KalturaResponseCacher::disableCache();
 			}
 		}
 		
@@ -206,6 +207,7 @@ class KalturaFrontController
 	        catch(Exception $ex)
 	        {
 	            $currentResult = $this->getExceptionObject($ex);
+				KalturaResponseCacher::disableCache();
 	        }
 	        
             $results[$i] = $currentResult;	        
