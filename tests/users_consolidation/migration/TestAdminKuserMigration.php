@@ -92,7 +92,7 @@ class TestAdminKuserMigration extends PHPUnit_Framework_TestCase {
 		// check copied values
 		$this->assertEquals($this->adminKuser->getFullName(),$this->kuser->getFullName(), 'full_name for '.$this->getParams());
 		$this->assertEquals($this->adminKuser->getIcon(),$this->kuser->getIcon(), 'icon for '.$this->getParams());
-		$this->assertEquals('__ADMIN__'.$this->adminKuser->getId(),$this->kuser->getPuserId(), 'puserid for '.$this->getParams());
+		$this->assertEquals(kuserPeer::ROOT_ADMIN_PUSER_ID,$this->kuser->getPuserId(), 'puserid for '.$this->getParams());
 		$this->assertEquals($this->adminKuser->getPartnerId(),$this->kuser->getPartnerId(), 'partner_id for '.$this->getParams());
 		$this->assertEquals($this->adminKuser->getPicture(),$this->kuser->getPicture(), 'picture for '.$this->getParams());
 		$this->assertEquals($this->adminKuser->getEmail(),$this->kuser->getEmail(), 'email for '.$this->getParams());
