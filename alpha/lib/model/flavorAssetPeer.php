@@ -112,6 +112,13 @@ class flavorAssetPeer extends assetPeer
 		return self::doSelectOne($c);
 	}
 	
+	public static function retreiveReadyByEntryIdAndTag($entryId, $tag)
+	{
+		$flavorAssets = self::retreiveReadyByEntryId($entryId);
+		self::filterByTag($flavorAssets, $tag);
+		return $flavorAssets;
+	}
+	
 	public static function retrieveReadyWebByEntryId($entryId)
 	{
 		$flavorAssets = self::retreiveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);

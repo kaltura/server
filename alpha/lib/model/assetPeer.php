@@ -161,13 +161,6 @@ class assetPeer extends BaseassetPeer
 		return self::doSelect($c);
 	}
 	
-	public static function retreiveReadyByEntryIdAndTag($entryId, $tag)
-	{
-		$flavorAssets = self::retreiveReadyByEntryId($entryId);
-		self::filterByTag($flavorAssets, $tag);
-		return $flavorAssets;
-	}
-	
 	public static function retreiveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
 	{
 		$c = new Criteria();
