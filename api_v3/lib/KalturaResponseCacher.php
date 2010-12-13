@@ -206,6 +206,7 @@ class KalturaResponseCacher
 		}
 		catch(Exception $e){
 			KalturaLog::err($e->getMessage());
+			return false;
 		}
 		
 		if(!$ks)
