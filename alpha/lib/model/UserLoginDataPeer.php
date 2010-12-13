@@ -83,6 +83,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 
 	public static function resetUserPassword($email , $requested_password = null , $old_password = null, $new_email = null)
 	{		
+		// if email is null, no need to do any DB queries
+		if (!$email) {
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 		$loginData = UserLoginDataPeer::doSelectOne($c);
@@ -386,8 +391,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 				
 		$userQuota = $partner->getLoginUsersQuota();
-		// a negative $usersQuota means no restriction
-		if (!is_null($userQuota) && $userQuota > -1 && $userQuota <= $partner->getLoginUsersNumber()) {
+		// check if login users quota exceeded - value -1 means unlimited
+		if (is_null($userQuota) || $userQuota != -1 && $userQuota <= $partner->getLoginUsersNumber()) {
 			throw new kUserException('', kUserException::LOGIN_USERS_QUOTA_EXCEEDED);
 		}
 		

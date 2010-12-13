@@ -112,6 +112,7 @@ class UserService extends KalturaBaseUserService
 			
 			foreach ($otherKusers as $kuser) {
 				// update user (another kuser record)
+				$user->id = null;
 				$kuser = $user->toUpdatableObject($kuser);
 				$kuser->save();
 			}
@@ -198,9 +199,14 @@ class UserService extends KalturaBaseUserService
 	{
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	
-		if (!$dbUser)
+		if (!$dbUser) {
 			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+		}
 		
+		if ($dbUser->getPuserId() == kuserPeer::ROOT_ADMIN_PUSER_ID) {
+			throw new KalturaAPIException(APIErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+		}
+			
 		$dbUser->setStatus(KalturaUserStatus::DELETED);
 		$dbUser->save();
 		

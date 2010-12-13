@@ -275,5 +275,7 @@
 		const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA,Login data cannot be updated by this action";
 	
 		const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED,Same login id is already in use";
+		
+		const CANNOT_DELETE_ROOT_ADMIN_USER = "CANNOT_DELETE_ROOT_ADMIN_USER,Root admin user cannot be deleted";
 	}
 ?>
