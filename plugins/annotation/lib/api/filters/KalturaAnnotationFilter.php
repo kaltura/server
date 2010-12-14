@@ -16,11 +16,21 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 		if(!$annotationFilter)
 			$annotationFilter = new AnnotationFilter();
 			
-		if(isset($this->userIdEqual))
-			$this->userIdEqual = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, $this->userIdEqual);
+		if(isset($this->userIdEqual)){
+			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);
+			$this->userIdEqual = $dbKuser->getId();
+		}
+			
 		
-		if(isset($this->userIdIn))
-			$this->userIdIn = PuserKuserPeer::getKuserIdFromPuserIds(kCurrentContext::$ks_partner_id, explode(',', $this->userIdIn));
+		if(isset($this->userIdIn)){
+			$userIds = explode(",", $this->userIdIn);
+			foreach ($userIds as $userId){
+				$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+				$kuserIds = $dbKuser->getId().",";
+			}
+			
+			$this->userIdIn = $kuserIds;
+		}
 		
 		return parent::toObject($annotationFilter, $propsToSkip);
 	}

@@ -34,8 +34,23 @@ class kAnnotationManager implements kObjectDeletedEventConsumer
 	 */
 	protected function entryDeleted($entryId) 
 	{
-		//TODO - list all related to entryid and delete
-		
+		$c = new Criteria();
+		$c->add(AnnotationPeer::ENTRY_ID, $entryId);
+		$c->add(AnnotationPeer::STATUS, AnnotationStatus::ANNOTATION_STATUS_DELETED, Criteria::NOT_EQUAL);
+			
+		AnnotationPeer::setUseCriteriaFilter(false);
+		$annotations = AnnotationPeer::doSelect($c);
+		foreach($annotations as $annotation)
+		{
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($annotation));
+		}
+
+		$update = new Criteria();
+		$update->add(AnnotationPeer::STATUS, AnnotationStatus::ANNOTATION_STATUS_DELETED);
+			
+		$con = Propel::getConnection(AnnotationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+		BasePeer::doUpdate($c, $update, $con);
+
 	}
 
 }

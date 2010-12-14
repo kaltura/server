@@ -109,7 +109,6 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 			
 		if ($annotation->parentId !== 0)
 		{
-			KalturaLog::debug("annotation validateParentId - 0");
 			$dbParentAnnotation = AnnotationPeer::retrieveByPK($annotation->parentId);
 			if (!$dbParentAnnotation)
 				throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_NOT_FOUND, $annotation->parentId);
@@ -225,8 +224,18 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	{
 		if(is_null($dbAnnotation))
 			$dbAnnotation = new Annotation();
-			
+	
 		return parent::toObject($dbAnnotation, $propsToSkip);
+	}
+	
+	public function fromObject($dbAnnotation)
+	{
+		parent::fromObject($dbAnnotation);
+		
+		if($dbAnnotation->getKuserId() !== null){
+			$dbKuser = kuserPeer::retrieveByPK($dbAnnotation->getKuserId());
+			$this->userId = $dbKuser->getPuserId();
+		}
 	}
 
 

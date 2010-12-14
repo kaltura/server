@@ -87,17 +87,6 @@ class Annotation extends BaseAnnotation {
 		return false;	
 	}
 	
-	public function save(PropelPDO $con = null)
-	{
-		if(is_null($this->getKuserId()))
-		{
-			$kuserId = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, kCurrentContext::$uid);
-			$this->setKuserId($kuserId);
-		}
-				
-		return parent::save($con);
-	} // save()
-	
 	public function postUpdate(PropelPDO $con = null)
 	{
 		$objectDeleted = false;

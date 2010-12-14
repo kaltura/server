@@ -1,8 +1,9 @@
 <?php
 /**
- * Annotation service
+ * Annotation service - Video Annotation
  *
  * @service annotation
+ * @throws KalturaErrors::SERVICE_FORBIDDEN
  */
 class AnnotationService extends KalturaBaseService
 {	
@@ -11,10 +12,9 @@ class AnnotationService extends KalturaBaseService
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 		
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
-		
-		
-		//if(!ContentDistributionPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
-			//throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN); //TODO
+				
+		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
 	}
 	
 	/**
@@ -71,15 +71,13 @@ class AnnotationService extends KalturaBaseService
 			$annotation->validatePropertyMaxLength("text", AnnotationPeer::MAX_ANNOTATION_TEXT);
 		if($annotation->tags != null)
 			$annotation->validatePropertyMaxLength("tags", AnnotationPeer::MAX_ANNOTATION_TAGS);
-		//TODO - what about partner data? what to put there?
 
 		$dbAnnotation = $annotation->toInsertableObject();
 		$dbAnnotation->setId($dbAnnotation->getUniqueAnnotationId());
 		$dbAnnotation->setPartnerId($this->getPartnerId());
 		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_READY); 
 		$dbAnnotation->setKuserId($this->getKuser()->getId()); 
-			
-		
+					
 		$created = $dbAnnotation->save();
 		if(!$created)
 			return null;
@@ -117,6 +115,7 @@ class AnnotationService extends KalturaBaseService
 	 * @action delete
 	 * @param string $id 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws AnnotationStatus::ANNOTATION_STATUS_DELETED
 	 */		
 	function deleteAction($id)
 	{
@@ -126,7 +125,6 @@ class AnnotationService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_DELETED);
-		//TODO - raise event
 		$dbAnnotation->save();
 	}
 	
@@ -168,7 +166,6 @@ class AnnotationService extends KalturaBaseService
 		$dbAnnotation = $annotation->toUpdatableObject($dbAnnotation);
 				
 		$dbAnnotation->setKuserId($this->getKuser()->getId()); 
-		//TODO - return in the retured object - puser
 		$dbAnnotation->save();
 		
 		$annotation->fromObject($dbAnnotation);

@@ -15,4 +15,15 @@
 class AnnotationPeer extends BaseAnnotationPeer {
 	const MAX_ANNOTATION_TEXT = 32700;
 	const MAX_ANNOTATION_TAGS = 255;
+	
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria();
+		$c->addAnd(AnnotationPeer::STATUS, AnnotationStatus::ANNOTATION_STATUS_READY);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 } // AnnotationPeer

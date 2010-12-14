@@ -97,10 +97,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	protected $kuser_id;
 
 	/**
-	 * The value for the partner_data field.
+	 * The value for the custom_data field.
 	 * @var        string
 	 */
-	protected $partner_data;
+	protected $custom_data;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -321,13 +321,13 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [partner_data] column value.
+	 * Get the [custom_data] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getPartnerData()
+	public function getCustomData()
 	{
-		return $this->partner_data;
+		return $this->custom_data;
 	}
 
 	/**
@@ -682,27 +682,24 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	} // setKuserId()
 
 	/**
-	 * Set the value of [partner_data] column.
+	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
-	public function setPartnerData($v)
+	public function setCustomData($v)
 	{
-		if(!isset($this->oldColumnsValues[AnnotationPeer::PARTNER_DATA]))
-			$this->oldColumnsValues[AnnotationPeer::PARTNER_DATA] = $this->partner_data;
-
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->partner_data !== $v) {
-			$this->partner_data = $v;
-			$this->modifiedColumns[] = AnnotationPeer::PARTNER_DATA;
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = AnnotationPeer::CUSTOM_DATA;
 		}
 
 		return $this;
-	} // setPartnerData()
+	} // setCustomData()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -749,7 +746,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$this->end_time = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->status = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->partner_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -959,6 +956,8 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -968,7 +967,9 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1197,7 +1198,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 				return $this->getKuserId();
 				break;
 			case 13:
-				return $this->getPartnerData();
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1233,7 +1234,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$keys[10] => $this->getEndTime(),
 			$keys[11] => $this->getStatus(),
 			$keys[12] => $this->getKuserId(),
-			$keys[13] => $this->getPartnerData(),
+			$keys[13] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1260,7 +1261,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AnnotationPeer::END_TIME)) $criteria->add(AnnotationPeer::END_TIME, $this->end_time);
 		if ($this->isColumnModified(AnnotationPeer::STATUS)) $criteria->add(AnnotationPeer::STATUS, $this->status);
 		if ($this->isColumnModified(AnnotationPeer::KUSER_ID)) $criteria->add(AnnotationPeer::KUSER_ID, $this->kuser_id);
-		if ($this->isColumnModified(AnnotationPeer::PARTNER_DATA)) $criteria->add(AnnotationPeer::PARTNER_DATA, $this->partner_data);
+		if ($this->isColumnModified(AnnotationPeer::CUSTOM_DATA)) $criteria->add(AnnotationPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1339,7 +1340,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		$copyObj->setKuserId($this->kuser_id);
 
-		$copyObj->setPartnerData($this->partner_data);
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1420,4 +1421,121 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseAnnotation
