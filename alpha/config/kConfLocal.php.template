@@ -110,6 +110,7 @@ class kConfLocal
 		//self::$map['default_plugins'][] = "QuickTimeToolsPlugin";
 		//self::$map['default_plugins'][] = "FastStartPlugin";
 		//self::$map['default_plugins'][] = "ContentDistributionPlugin";
+		//self::$map['default_plugins'][] = "AnnotationPlugin"; 
 		
 }
 
