@@ -60,7 +60,7 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'filters'		=> array('StringTrim'),
 		));
 				
-		$this->addElement('checkbox', 'def_thumb_offset', array(
+		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));
@@ -105,6 +105,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 		$this->addElement('checkbox', 'enable_metadata', array(
 			'label'	  => 'Metadata',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_metadata'))),
+		));
+		
+		$this->addElement('checkbox', 'enable_content_distribution', array(
+			'label'	  => 'Content Distribution',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_content_distribution'))),
 		));
 		
 		$this->addElement('checkbox', 'enable_audit_trail', array(

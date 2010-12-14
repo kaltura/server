@@ -239,6 +239,9 @@ class PartnerController extends Zend_Controller_Action
 			if (!$moduls->metadata)
 				$form->getElement('enable_metadata')->setAttrib('disabled',true);
 				
+			if (!$moduls->contentDistribution)
+				$form->getElement('enable_content_distribution')->setAttrib('disabled',true);
+				
 			if (!$moduls->auditTrail)
 				$form->getElement('enable_audit_trail')->setAttrib('disabled',true);
 		}
