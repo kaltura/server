@@ -150,6 +150,18 @@ KTestMe.prototype = {
 		
 		// find all the enabled fields
 		var params = [];
+		
+		jQuery(".object").each(function(i, item) {
+			if (jQuery(item).find(".object-name").size() > 0 && jQuery(item).find(".object-type").size() > 0)
+			{
+				var name = jQuery(item).find(".object-name").text().trim();
+				name += ":objectType";
+				var value = jQuery(item).find(".object-type").val();
+
+				params[name] = value;
+			}
+		});
+
 		jQuery(".param").each(function(i, item) {
 			if (jQuery(item).find("input:checkbox:checked").size() > 0)
 			{
