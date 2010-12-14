@@ -113,6 +113,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $enableAuditTrail;
 	
 	/**
+	 * @var bool
+	 */
+	public $enableAnnotation;
+	
+	/**
 	 * @var int
 	 */
 	public $defThumbOffset;
@@ -141,6 +146,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"kmcVersion",
 		"enableAnalyticsTab",
 		"enableSilverLight",
+		"enableAnnotation",
 		"enableVast",
 		"enable508Players",
 		"defThumbOffset",
@@ -164,6 +170,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			
 		if(class_exists('AuditPlugin'))
 			$this->enableAuditTrail = $source_object->getPluginEnabled(AuditPlugin::getPluginName());
+		
+		if(class_exists('AnnotationPlugin'))
+			$this->enableAnnotation = $source_object->getPluginEnabled(AnnotationPlugin::getPluginName());
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -178,7 +187,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			
 		if(class_exists('AuditPlugin'))
 			$object_to_fill->setPluginEnabled(AuditPlugin::getPluginName(), $this->enableAuditTrail);
-			
+		
+		if(class_exists('AnnotationPlugin'))
+			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
+				
 		return $object_to_fill;
 	}
 }
