@@ -14,21 +14,22 @@ CREATE TABLE `annotation`
 (
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`id` VARCHAR(255)  NOT NULL,
-	`parent_id` INTEGER,
+	`parent_id` VARCHAR(255),
 	`entry_id` VARCHAR(31)  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`updated_at` DATETIME  NOT NULL,
 	`text` TEXT,
-	`tag` VARCHAR(255),
-	`start_time` TIME,
-	`end_time` TIME,
+	`tags` VARCHAR(255),
+	`start_time` INTEGER,
+	`end_time` INTEGER,
 	`status` TINYINT  NOT NULL,
 	`kuser_id` INTEGER,
 	`partner_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
-	KEY `session_entry_index`(`partner_id`, `parent_id`, `entry_id`)
+	KEY `parent_entry_index`(`partner_id`, `parent_id`, `entry_id`),
+	KEY `int_id_index`(`int_id`)
 )Type=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier

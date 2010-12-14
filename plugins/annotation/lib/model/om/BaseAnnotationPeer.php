@@ -54,8 +54,8 @@ abstract class BaseAnnotationPeer {
 	/** the column name for the TEXT field */
 	const TEXT = 'annotation.TEXT';
 
-	/** the column name for the TAG field */
-	const TAG = 'annotation.TAG';
+	/** the column name for the TAGS field */
+	const TAGS = 'annotation.TAGS';
 
 	/** the column name for the START_TIME field */
 	const START_TIME = 'annotation.START_TIME';
@@ -88,10 +88,10 @@ abstract class BaseAnnotationPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('IntId', 'Id', 'ParentId', 'EntryId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Text', 'Tag', 'StartTime', 'EndTime', 'Status', 'KuserId', 'PartnerData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('intId', 'id', 'parentId', 'entryId', 'partnerId', 'createdAt', 'updatedAt', 'text', 'tag', 'startTime', 'endTime', 'status', 'kuserId', 'partnerData', ),
-		BasePeer::TYPE_COLNAME => array (self::INT_ID, self::ID, self::PARENT_ID, self::ENTRY_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::TEXT, self::TAG, self::START_TIME, self::END_TIME, self::STATUS, self::KUSER_ID, self::PARTNER_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('int_id', 'id', 'parent_id', 'entry_id', 'partner_id', 'created_at', 'updated_at', 'text', 'tag', 'start_time', 'end_time', 'status', 'kuser_id', 'partner_data', ),
+		BasePeer::TYPE_PHPNAME => array ('IntId', 'Id', 'ParentId', 'EntryId', 'PartnerId', 'CreatedAt', 'UpdatedAt', 'Text', 'Tags', 'StartTime', 'EndTime', 'Status', 'KuserId', 'PartnerData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('intId', 'id', 'parentId', 'entryId', 'partnerId', 'createdAt', 'updatedAt', 'text', 'tags', 'startTime', 'endTime', 'status', 'kuserId', 'partnerData', ),
+		BasePeer::TYPE_COLNAME => array (self::INT_ID, self::ID, self::PARENT_ID, self::ENTRY_ID, self::PARTNER_ID, self::CREATED_AT, self::UPDATED_AT, self::TEXT, self::TAGS, self::START_TIME, self::END_TIME, self::STATUS, self::KUSER_ID, self::PARTNER_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('int_id', 'id', 'parent_id', 'entry_id', 'partner_id', 'created_at', 'updated_at', 'text', 'tags', 'start_time', 'end_time', 'status', 'kuser_id', 'partner_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
@@ -102,10 +102,10 @@ abstract class BaseAnnotationPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('IntId' => 0, 'Id' => 1, 'ParentId' => 2, 'EntryId' => 3, 'PartnerId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Text' => 7, 'Tag' => 8, 'StartTime' => 9, 'EndTime' => 10, 'Status' => 11, 'KuserId' => 12, 'PartnerData' => 13, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('intId' => 0, 'id' => 1, 'parentId' => 2, 'entryId' => 3, 'partnerId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'text' => 7, 'tag' => 8, 'startTime' => 9, 'endTime' => 10, 'status' => 11, 'kuserId' => 12, 'partnerData' => 13, ),
-		BasePeer::TYPE_COLNAME => array (self::INT_ID => 0, self::ID => 1, self::PARENT_ID => 2, self::ENTRY_ID => 3, self::PARTNER_ID => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::TEXT => 7, self::TAG => 8, self::START_TIME => 9, self::END_TIME => 10, self::STATUS => 11, self::KUSER_ID => 12, self::PARTNER_DATA => 13, ),
-		BasePeer::TYPE_FIELDNAME => array ('int_id' => 0, 'id' => 1, 'parent_id' => 2, 'entry_id' => 3, 'partner_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'text' => 7, 'tag' => 8, 'start_time' => 9, 'end_time' => 10, 'status' => 11, 'kuser_id' => 12, 'partner_data' => 13, ),
+		BasePeer::TYPE_PHPNAME => array ('IntId' => 0, 'Id' => 1, 'ParentId' => 2, 'EntryId' => 3, 'PartnerId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Text' => 7, 'Tags' => 8, 'StartTime' => 9, 'EndTime' => 10, 'Status' => 11, 'KuserId' => 12, 'PartnerData' => 13, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('intId' => 0, 'id' => 1, 'parentId' => 2, 'entryId' => 3, 'partnerId' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'text' => 7, 'tags' => 8, 'startTime' => 9, 'endTime' => 10, 'status' => 11, 'kuserId' => 12, 'partnerData' => 13, ),
+		BasePeer::TYPE_COLNAME => array (self::INT_ID => 0, self::ID => 1, self::PARENT_ID => 2, self::ENTRY_ID => 3, self::PARTNER_ID => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::TEXT => 7, self::TAGS => 8, self::START_TIME => 9, self::END_TIME => 10, self::STATUS => 11, self::KUSER_ID => 12, self::PARTNER_DATA => 13, ),
+		BasePeer::TYPE_FIELDNAME => array ('int_id' => 0, 'id' => 1, 'parent_id' => 2, 'entry_id' => 3, 'partner_id' => 4, 'created_at' => 5, 'updated_at' => 6, 'text' => 7, 'tags' => 8, 'start_time' => 9, 'end_time' => 10, 'status' => 11, 'kuser_id' => 12, 'partner_data' => 13, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
 	);
 
@@ -184,7 +184,7 @@ abstract class BaseAnnotationPeer {
 		$criteria->addSelectColumn(AnnotationPeer::CREATED_AT);
 		$criteria->addSelectColumn(AnnotationPeer::UPDATED_AT);
 		$criteria->addSelectColumn(AnnotationPeer::TEXT);
-		$criteria->addSelectColumn(AnnotationPeer::TAG);
+		$criteria->addSelectColumn(AnnotationPeer::TAGS);
 		$criteria->addSelectColumn(AnnotationPeer::START_TIME);
 		$criteria->addSelectColumn(AnnotationPeer::END_TIME);
 		$criteria->addSelectColumn(AnnotationPeer::STATUS);

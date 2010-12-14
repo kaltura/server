@@ -13,14 +13,11 @@ class KalturaAnnotationBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
-		"statusEqual" => "_eq_status",
-		"statusIn" => "_in_status",
 		"entryIdEqual" => "_eq_entry_id",
-		"entryIdIn" => "_in_entry_id",
-		"partnerIdEqual" => "_eq_partner_id",
-		"requestIdEqual" => "_eq_request_id",
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
+		"parentIdEqual" => "_eq_parent_id",
+		"parentIdIn" => "_in_parent_id",
 	);
 
 	private $order_by_map = array
@@ -44,7 +41,7 @@ class KalturaAnnotationBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
 	public $idEqual;
 
@@ -79,20 +76,6 @@ class KalturaAnnotationBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaAnnotationStatus
-	 */
-	public $statusEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $statusIn;
-
-	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $entryIdEqual;
@@ -102,14 +85,14 @@ class KalturaAnnotationBaseFilter extends KalturaFilter
 	 * 
 	 * @var string
 	 */
-	public $entryIdIn;
-
+	public $parentIdEqual;
+	
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
-	public $partnerIdEqual;
+	public $parentIdIn;
 
 	/**
 	 * 

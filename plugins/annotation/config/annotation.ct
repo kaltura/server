@@ -20,16 +20,8 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-annotation.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotation.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotation.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |
-annotation.add						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotation.get						|			|1		|1	|1		|2		|1		|r	|		|	|   |
-
-annotationsession.update			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotationsession.delete			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotationsession.list				|			|1		|1	|1		|2		|1		|r	|		|	|   |
-annotationsession.add				|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotationsession.get				|			|1		|1	|1		|2		|1		|r	|		|	|   |
-annotationsession.publish			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-annotationsession.AppendAnnotation	|			|1		|1	|1		|2		|1		|rw	|		|	|   |
+annotation.update					|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
+annotation.delete					|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
+annotation.list						|			|1,2		|1	|1		|1		|1		|r	|		|	|   |
+annotation.add						|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
+annotation.get						|			|1,2		|1	|1		|1		|1		|r	|		|	|   |

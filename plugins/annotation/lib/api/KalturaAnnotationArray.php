@@ -6,7 +6,7 @@ class KalturaAnnotationArray extends KalturaTypedArray
 		$newArr = new KalturaAnnotationArray();
 		if ($arr == null)
 			return $newArr;
-
+		
 		foreach ($arr as $obj)
 		{
     		$nObj = new KalturaAnnotation();

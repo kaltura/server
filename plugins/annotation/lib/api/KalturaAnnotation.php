@@ -1,13 +1,25 @@
 <?php
 class KalturaAnnotation extends KalturaObject implements IFilterable 
 {
-	//TODO
 	/**
 	 * @var int
 	 * @filter eq
 	 * @readonly
 	 */
 	public $id;
+	
+	/**
+	 * @var string
+	 * @filter eq
+	 * 
+	 */
+	public $entryId;
+	
+	/**
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $parentId;
 	
 	/**
 	 * @var int
@@ -24,48 +36,47 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	public $updatedAt;
 	
 	/**
-	 * @var KalturaAnnotationStatus
-	 * @filter eq,in
-	 * @readonly
+	 * @var string
 	 */
-	public $status;
+	public $text;
+	
+	/**
+	 * @var string
+	 */
+	public $tags;
+	
 
+	/**
+	 * @var int 
+	 */
+	public $startTime;
+	
+	/**
+	 * @var int 
+	 */
+	public $endTime;
+	
 	/**
 	 * @var string
 	 * @filter eq,in
-	 */
-	public $entryId;
-
-	/**
-	 * @var int
-	 * @filter eq,in
 	 * @readonly
-	 */
-	public $partnerId;
-
-
-	/**
-	 * @var string
-	 * @filter eq,in
 	 */
 	public $userId;
 
-	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $data;
+	
 	
 	private static $map_between_objects = array
-	( //TODO
+	(
 		"id",
+		"parentId",
+		"entryId",
 		"createdAt",
 		"updatedAt",
-		"status",
-		"entryId",
-		"partnerId",
-		"userId" => "puserId", //TODO - what will be the name of user?
-		"data",
+		"text",
+		"tags",
+		"startTime",
+		"endTime",
+		"userId" => "puserId",
 	);
 	
 	public function getMapBetweenObjects()
@@ -83,6 +94,128 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 		return array();
 	}
 	
+	/*
+	 * @param KalturaAnnotation $annotation
+	 * @param string $annotationId
+	 * @throw KalturaAPIException - when parent annotation doesn't belong to the same entry, or parent annotation
+	 * doesn't belong to the same entry
+	 */
+	public function validateParentId(KalturaAnnotation $annotation, $annotationId = null)
+	{
+		if ($annotation->parentId === null || $annotation->parentId === "")
+		{
+			$annotation->parentId = 0;
+		}
+			
+		if ($annotation->parentId !== 0)
+		{
+			KalturaLog::debug("annotation validateParentId - 0");
+			$dbParentAnnotation = AnnotationPeer::retrieveByPK($annotation->parentId);
+			if (!$dbParentAnnotation)
+				throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_NOT_FOUND, $annotation->parentId);
+			
+			if($annotationId !== null){ // update
+				$dbAnnotation = AnnotationPeer::retrieveByPK($annotationId);
+				if(!$dbAnnotation)
+					throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $annotationId);
+				 
+				if($dbAnnotation->isOffspring($annotation->parentId))
+					throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_IS_OFFSPRING, $annotation->parentId, $dbAnnotation->getId());
+			}
+			
+			if ($dbParentAnnotation->getEntryId() != $annotation->entryId)
+				throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
+		}
+	}
+	
+	/*
+	 * @param KalturaAnnotation $annotation
+	 * @param string $annotationId
+	 * @throw KalturaAPIException
+	 */
+	public function validateEntryId(KalturaAnnotation $annotation, $annotationId = null)
+	{	
+		$dbEntry = entryPeer::retrieveByPK($annotation->entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $annotation->entryId);
+			
+		if($annotationId !== null){ // update
+			$dbAnnotation = AnnotationPeer::retrieveByPK($annotationId);
+			if(!$dbAnnotation)
+				throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $annotationId);
+				
+			if($annotation->entryId !== null && $annotation->entryId != $dbAnnotation->getEntryId())
+				throw new KalturaAPIException(KalturaAnnotationErrors::CANNOT_UPDATE_ENTRY_ID);
+		}
+	}
+	
+	/*
+	 * @param KalturaAnnotation $annotation
+	 * @param string $annotationId
+	 * @throw KalturaAPIException
+	 */
+	public function validateEndTime(KalturaAnnotation $annotation, $annotationId = null)
+	{
+		if(($annotation->startTime === null) &&($annotation->endTime !== null))
+				throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_WITHOUT_START_TIME);
+		
+		if ($annotation->endTime === null)
+			$annotation->endTime = $annotation->startTime;
+			
+		if($annotation->endTime < $annotation->startTime)
+			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_CANNOT_BE_LESS_THEN_START_TIME, $annotation->parentId);
+		
+		if($annotationId !== null){ //update
+			$dbAnnotation = AnnotationPeer::retrieveByPK($annotationId);
+			if(!$dbAnnotation)
+				throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $annotationId);
+				
+			$dbEntry = entryPeer::retrieveByPK($dbAnnotation->getEntryId());
+		}
+		else //add
+		{ 
+			$dbEntry = entryPeer::retrieveByPK($annotation->entryId);
+			if (!$dbEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND,$annotation->entryId);
+		}
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $annotation->entryId);
+		
+		if($dbEntry->getDuration() < $annotation->endTime)
+			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $annotation->endTime, $dbEntry->getDuration());	
+	}
+	
+	/*
+	 * @param KalturaAnnotation $annotation
+	 * @param string $annotationId
+	 * @throw KalturaAPIException
+	 */
+	public function validateStartTime(KalturaAnnotation $annotation, $annotationId = null)
+	{	
+		if ($annotation->startTime === null)
+			$annotation->startTime = 0;
+		
+		if($annotation->startTime < 0)
+			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_CANNOT_BE_LESS_THAN_0);
+		
+		if($annotationId !== null){ //update
+			$dbAnnotation = AnnotationPeer::retrieveByPK($annotationId);
+			if(!$dbAnnotation)
+				throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $annotationId);
+				
+			$dbEntry = entryPeer::retrieveByPK($dbAnnotation->getEntryId());
+		}
+		else //add
+		{ 
+			$dbEntry = entryPeer::retrieveByPK($annotation->entryId);
+			if (!$dbEntry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $annotation->entryId);
+		}
+		
+		if($dbEntry->getDuration() < $annotation->startTime)
+			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_IS_BIGGER_THEN_ENTRY_END_TIME, $annotation->startTime, $dbEntry->getDuration());
+	}
+	
 	/**
 	 * @param Annotation $dbAnnotation
 	 * @param array $propsToSkip
@@ -96,20 +229,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 		return parent::toObject($dbAnnotation, $propsToSkip);
 	}
 
-	/**
-	 * @param Annotation $dbAnnotation
-	 */
-	public function fromObject($dbAnnotation)
-	{
-		parent::fromObject($dbAnnotation);
-		
-		$dbData = $dbAnnotation->getData();
-		$this->data = new KalturaAnnotation();
-		
-		if($this->data && $dbData)
-			$this->data->fromObject($dbData);
-	}
-	
+
 	/**
 	 * @param Annotation $dbAnnotation
 	 * @param array $propsToSkip
@@ -117,6 +237,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	 */
 	public function toInsertableObject($dbAnnotation = null, $propsToSkip = array())
 	{
+		
 		if(is_null($dbAnnotation))
 			$dbAnnotation = new Annotation();
 			

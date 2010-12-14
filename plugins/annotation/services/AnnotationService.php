@@ -5,7 +5,17 @@
  * @service annotation
  */
 class AnnotationService extends KalturaBaseService
-{
+{	
+	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
+	{
+		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		
+		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
+		
+		
+		//if(!ContentDistributionPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
+			//throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN); //TODO
+	}
 	
 	/**
 	 * List annotation objects by filter and pager
@@ -17,25 +27,28 @@ class AnnotationService extends KalturaBaseService
 	 */
 	function listAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter)
-			$filter = new KalturaAnnotationFilter;
-			
-		$annotationFilter = $filter->toObject();
+		kalturalog::debug("annotation service listAction");
 		
+		if (!$filter)
+			$filter = new KalturaAnnotationFilter();
+			
 		$c = new Criteria();
+		$c->add(AnnotationPeer::STATUS,AnnotationStatus::ANNOTATION_STATUS_READY);
+		
+		$annotationFilter = new AnnotationFilter();
+		$filter->toObject($annotationFilter);
+		
 		$annotationFilter->attachToCriteria($c);
 		$count = AnnotationPeer::doCount($c);
 		
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$pager->attachToCriteria($c);
+		if ($pager)
+			$pager->attachToCriteria($c);
 		$list = AnnotationPeer::doSelect($c);
 		
 		$response = new KalturaAnnotationListResponse();
 		$response->objects = KalturaAnnotationArray::fromDbArray($list);
 		$response->totalCount = $count;
-		
+	
 		return $response;
 	}
 	
@@ -48,16 +61,26 @@ class AnnotationService extends KalturaBaseService
 	 */
 	function addAction(KalturaAnnotation $annotation)
 	{
-		//TODO
+		kalturalog::debug("annotation service addAction");
 		$annotation->validatePropertyNotNull("entryId");
-		$annotation->validatePropertyNotNull("start_time");
-		$annotation->validatePropertyMaxLength("data", 1000); //TODO - WHAT IS THE MAX LENGTH
-		
+		$annotation->validateParentId($annotation);
+		$annotation->validateEntryId($annotation);
+		$annotation->validateEndTime($annotation);
+		$annotation->validateStartTime($annotation);		
+		if($annotation->text != null)
+			$annotation->validatePropertyMaxLength("text", AnnotationPeer::MAX_ANNOTATION_TEXT);
+		if($annotation->tags != null)
+			$annotation->validatePropertyMaxLength("tags", AnnotationPeer::MAX_ANNOTATION_TAGS);
+		//TODO - what about partner data? what to put there?
+
 		$dbAnnotation = $annotation->toInsertableObject();
+		$dbAnnotation->setId($dbAnnotation->getUniqueAnnotationId());
 		$dbAnnotation->setPartnerId($this->getPartnerId());
-		$dbAnnotation->setStatus(Annotation::ANNOTATION_STATUS_READY);
+		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_READY); 
+		$dbAnnotation->setKuserId($this->getKuser()->getId()); 
+			
 		
-		$created = $dbAnnotation->save(); //TODO SAVE()
+		$created = $dbAnnotation->save();
 		if(!$created)
 			return null;
 		
@@ -71,7 +94,7 @@ class AnnotationService extends KalturaBaseService
 	 * Retrieve an Annotation object by id
 	 * 
 	 * @action get
-	 * @param int $id 
+	 * @param string $id 
 	 * @return KalturaAnnotation
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
@@ -89,41 +112,63 @@ class AnnotationService extends KalturaBaseService
 	}
 	
 	/**
-	 * delete annotation by id
+	 * delete annotation by id, and delete al childs annotations
 	 * 
 	 * @action delete
-	 * @param int $id 
+	 * @param string $id 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
 	function deleteAction($id)
 	{
+		kalturalog::debug("annotation service deleteAction");
 		$dbAnnotation = AnnotationPeer::retrieveByPK( $id );
-		
 		if(!$dbAnnotation)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-			
-		$dbAnnotation->setStatus(Annotation::ANNOTATION_STATUS_DELETED);
-		$dbAnnotation->save(); //TODO SAVE()
+
+		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_DELETED);
+		//TODO - raise event
+		$dbAnnotation->save();
 	}
 	
 	/**
 	 * Update annotation by id 
 	 * 
 	 * @action update
-	 * @param int $annotationId
+	 * @param string $id
 	 * @param KalturaAnnotation $annotation
 	 * @return KalturaAnnotation
 	 */
-	function updateAction($annotationId, KalturaAnnotation $annotation)
+	function updateAction($id, KalturaAnnotation $annotation)
 	{
-		// TODO: validate object
-		$dbAnnotation = SystemUserPeer::retrieveByPK($annotationId);
+		kalturalog::debug("annotation service updateAction");
+
+		$dbAnnotation = AnnotationPeer::retrieveByPK($id);
+		
 		if (!$dbAnnotation)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $annotationId);
-			
-		//TODO - validate logic if needed before update.
-			
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		if($annotation->text !== null)
+			$annotation->validatePropertyMaxLength("text", AnnotationPeer::MAX_ANNOTATION_TEXT);
+		
+		if($annotation->tags !== null)
+			$annotation->validatePropertyMaxLength("tags", AnnotationPeer::MAX_ANNOTATION_TAGS);
+		
+		if($annotation->entryId !== null)
+			$annotation->validateEntryId($annotation, $id);
+		
+		if($annotation->parentId !== null)
+			$annotation->validateParentId($annotation, $id);
+		
+		if($annotation->startTime !== null)
+			$annotation->validateStartTime($annotation, $id);
+		
+		if($annotation->endTime !== null)
+			$annotation->validateEndTime($annotation, $id);
+					
 		$dbAnnotation = $annotation->toUpdatableObject($dbAnnotation);
+				
+		$dbAnnotation->setKuserId($this->getKuser()->getId()); 
+		//TODO - return in the retured object - puser
 		$dbAnnotation->save();
 		
 		$annotation->fromObject($dbAnnotation);

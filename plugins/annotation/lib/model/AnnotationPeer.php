@@ -13,5 +13,6 @@
  * @package    lib.model
  */
 class AnnotationPeer extends BaseAnnotationPeer {
-
+	const MAX_ANNOTATION_TEXT = 32700;
+	const MAX_ANNOTATION_TAGS = 255;
 } // AnnotationPeer

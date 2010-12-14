@@ -3,15 +3,15 @@
 	<table skipSql="false" abstract="false" name="annotation">
 		<column primaryKey="false" required="true"  lazyLoad="false" name="int_id" type="integer" autoIncrement="true" />
 		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar"  />
-		<column primaryKey="false" required="false" lazyLoad="false" name="parent_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="parent_id" type="varchar" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="entry_id" type="varchar" size="31" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="text" type="longvarchar" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="tag" type="varchar" size="255" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="start_time" type="time" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="end_time" type="time" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="tags" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="start_time" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="end_time" type="integer" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="kuser_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_data" type="longvarchar"/>
@@ -19,10 +19,13 @@
 			<index-column name="partner_id" />
 			<index-column name="entry_id" />
 		</index>
-		<index name="session_entry_index">
+		<index name="parent_entry_index">
 			<index-column name="partner_id" />
 			<index-column name="parent_id" />
 			<index-column name="entry_id" />
+		</index>
+		<index name="int_id_index">
+			<index-column name="int_id" />
 		</index>
 	</table>
 </database>

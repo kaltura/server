@@ -32,7 +32,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the parent_id field.
-	 * @var        int
+	 * @var        string
 	 */
 	protected $parent_id;
 
@@ -67,20 +67,20 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	protected $text;
 
 	/**
-	 * The value for the tag field.
+	 * The value for the tags field.
 	 * @var        string
 	 */
-	protected $tag;
+	protected $tags;
 
 	/**
 	 * The value for the start_time field.
-	 * @var        string
+	 * @var        int
 	 */
 	protected $start_time;
 
 	/**
 	 * The value for the end_time field.
-	 * @var        string
+	 * @var        int
 	 */
 	protected $end_time;
 
@@ -153,7 +153,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	/**
 	 * Get the [parent_id] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
 	public function getParentId()
 	{
@@ -271,83 +271,33 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [tag] column value.
+	 * Get the [tags] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getTag()
+	public function getTags()
 	{
-		return $this->tag;
+		return $this->tags;
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [start_time] column value.
+	 * Get the [start_time] column value.
 	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 * @return     int
 	 */
-	public function getStartTime($format = '%X')
+	public function getStartTime()
 	{
-		if ($this->start_time === null) {
-			return null;
-		}
-
-
-
-		try {
-			$dt = new DateTime($this->start_time);
-		} catch (Exception $x) {
-			throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->start_time, true), $x);
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
+		return $this->start_time;
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [end_time] column value.
+	 * Get the [end_time] column value.
 	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 * @return     int
 	 */
-	public function getEndTime($format = '%X')
+	public function getEndTime()
 	{
-		if ($this->end_time === null) {
-			return null;
-		}
-
-
-
-		try {
-			$dt = new DateTime($this->end_time);
-		} catch (Exception $x) {
-			throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->end_time, true), $x);
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
+		return $this->end_time;
 	}
 
 	/**
@@ -429,7 +379,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [parent_id] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
 	public function setParentId($v)
@@ -438,7 +388,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[AnnotationPeer::PARENT_ID] = $this->parent_id;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
 		if ($this->parent_id !== $v) {
@@ -617,33 +567,32 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	} // setText()
 
 	/**
-	 * Set the value of [tag] column.
+	 * Set the value of [tags] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
-	public function setTag($v)
+	public function setTags($v)
 	{
-		if(!isset($this->oldColumnsValues[AnnotationPeer::TAG]))
-			$this->oldColumnsValues[AnnotationPeer::TAG] = $this->tag;
+		if(!isset($this->oldColumnsValues[AnnotationPeer::TAGS]))
+			$this->oldColumnsValues[AnnotationPeer::TAGS] = $this->tags;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->tag !== $v) {
-			$this->tag = $v;
-			$this->modifiedColumns[] = AnnotationPeer::TAG;
+		if ($this->tags !== $v) {
+			$this->tags = $v;
+			$this->modifiedColumns[] = AnnotationPeer::TAGS;
 		}
 
 		return $this;
-	} // setTag()
+	} // setTags()
 
 	/**
-	 * Sets the value of [start_time] column to a normalized version of the date/time value specified.
+	 * Set the value of [start_time] column.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      int $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
 	public function setStartTime($v)
@@ -651,51 +600,22 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		if(!isset($this->oldColumnsValues[AnnotationPeer::START_TIME]))
 			$this->oldColumnsValues[AnnotationPeer::START_TIME] = $this->start_time;
 
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
+		if ($v !== null) {
+			$v = (int) $v;
 		}
 
-		if ( $this->start_time !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->start_time !== null && $tmpDt = new DateTime($this->start_time)) ? $tmpDt->format('H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->start_time = ($dt ? $dt->format('H:i:s') : null);
-				$this->modifiedColumns[] = AnnotationPeer::START_TIME;
-			}
-		} // if either are not null
+		if ($this->start_time !== $v) {
+			$this->start_time = $v;
+			$this->modifiedColumns[] = AnnotationPeer::START_TIME;
+		}
 
 		return $this;
 	} // setStartTime()
 
 	/**
-	 * Sets the value of [end_time] column to a normalized version of the date/time value specified.
+	 * Set the value of [end_time] column.
 	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
+	 * @param      int $v new value
 	 * @return     Annotation The current object (for fluent API support)
 	 */
 	public function setEndTime($v)
@@ -703,42 +623,14 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		if(!isset($this->oldColumnsValues[AnnotationPeer::END_TIME]))
 			$this->oldColumnsValues[AnnotationPeer::END_TIME] = $this->end_time;
 
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
+		if ($v !== null) {
+			$v = (int) $v;
 		}
 
-		if ( $this->end_time !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->end_time !== null && $tmpDt = new DateTime($this->end_time)) ? $tmpDt->format('H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->end_time = ($dt ? $dt->format('H:i:s') : null);
-				$this->modifiedColumns[] = AnnotationPeer::END_TIME;
-			}
-		} // if either are not null
+		if ($this->end_time !== $v) {
+			$this->end_time = $v;
+			$this->modifiedColumns[] = AnnotationPeer::END_TIME;
+		}
 
 		return $this;
 	} // setEndTime()
@@ -846,15 +738,15 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 			$this->int_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->parent_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->parent_id = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->entry_id = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->text = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->tag = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->start_time = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->end_time = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->tags = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->start_time = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->end_time = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->status = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
 			$this->partner_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
@@ -1290,7 +1182,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 				return $this->getText();
 				break;
 			case 8:
-				return $this->getTag();
+				return $this->getTags();
 				break;
 			case 9:
 				return $this->getStartTime();
@@ -1336,7 +1228,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$keys[5] => $this->getCreatedAt(),
 			$keys[6] => $this->getUpdatedAt(),
 			$keys[7] => $this->getText(),
-			$keys[8] => $this->getTag(),
+			$keys[8] => $this->getTags(),
 			$keys[9] => $this->getStartTime(),
 			$keys[10] => $this->getEndTime(),
 			$keys[11] => $this->getStatus(),
@@ -1363,7 +1255,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AnnotationPeer::CREATED_AT)) $criteria->add(AnnotationPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(AnnotationPeer::UPDATED_AT)) $criteria->add(AnnotationPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(AnnotationPeer::TEXT)) $criteria->add(AnnotationPeer::TEXT, $this->text);
-		if ($this->isColumnModified(AnnotationPeer::TAG)) $criteria->add(AnnotationPeer::TAG, $this->tag);
+		if ($this->isColumnModified(AnnotationPeer::TAGS)) $criteria->add(AnnotationPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(AnnotationPeer::START_TIME)) $criteria->add(AnnotationPeer::START_TIME, $this->start_time);
 		if ($this->isColumnModified(AnnotationPeer::END_TIME)) $criteria->add(AnnotationPeer::END_TIME, $this->end_time);
 		if ($this->isColumnModified(AnnotationPeer::STATUS)) $criteria->add(AnnotationPeer::STATUS, $this->status);
@@ -1437,7 +1329,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		$copyObj->setText($this->text);
 
-		$copyObj->setTag($this->tag);
+		$copyObj->setTags($this->tags);
 
 		$copyObj->setStartTime($this->start_time);
 
