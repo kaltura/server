@@ -44,6 +44,7 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	/**
 	 * @var KalturaGenericDistributionProviderStatus
 	 * @filter eq,in
+	 * @readonly
 	 */
 	public $status;
 
@@ -63,12 +64,12 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	public $requiredFlavorParamsIds;
 
 	/**
-	 * @var string
+	 * @var KalturaDistributionThumbDimensionsArray
 	 */
 	public $optionalThumbDimensions;
 
 	/**
-	 * @var string
+	 * @var KalturaDistributionThumbDimensionsArray
 	 */
 	public $requiredThumbDimensions;
 
@@ -96,8 +97,6 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		'name',
 		'optionalFlavorParamsIds',
 		'requiredFlavorParamsIds',
-		'optionalThumbDimensions',
-		'requiredThumbDimensions',
 		'editableFields',
 		'mandatoryFields',
 	);
@@ -116,7 +115,33 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		$object->setUpdateRequiredEntryFields($this->updateRequiredEntryFields);
 		$object->setUpdateRequiredMetadataXpaths($this->updateRequiredMetadataXPaths);
 		
+		if($this->optionalThumbDimensions)
+		{
+			$thumbDimensions = array();
+			foreach($this->optionalThumbDimensions as $thumbDimension)
+				$thumbDimensions[] = $thumbDimension->toObject();
+				
+			$object->setOptionalThumbDimensionsObjects($thumbDimensions);
+		}
+	
+		
+		if($this->requiredThumbDimensions)
+		{
+			$thumbDimensions = array();
+			foreach($this->requiredThumbDimensions as $thumbDimension)
+				$thumbDimensions[] = $thumbDimension->toObject();
+
+			$object->setRequiredThumbDimensionsObjects($thumbDimensions);
+		}
 		return $object;		
+	}
+
+	public function fromObject($sourceObject)
+	{
+		parent::fromObject($sourceObject);
+		
+		$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
+		$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
 	}
 		 
 	public function getMapBetweenObjects()

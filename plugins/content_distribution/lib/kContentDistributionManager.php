@@ -255,7 +255,7 @@ class kContentDistributionManager
 		}
 		$entryDistribution->setThumbAssetIds($thumbAssetsIds);
 		
-		$validationErrors = $distributionProfile->validate($entryDistribution, DistributionAction::SUBMIT);
+		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 		$entryDistribution->setValidationErrors($validationErrors);
 		if(count($validationErrors))
 			KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");

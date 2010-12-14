@@ -14,7 +14,10 @@
  */
 class GenericDistributionProviderActionPeer extends BaseGenericDistributionProviderActionPeer 
 {
-	public function setInstanceCriteriaFilter ()
+	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
 	{
 		if ( self::$s_criteria_filter == null )
 			self::$s_criteria_filter = new criteriaFilter ();

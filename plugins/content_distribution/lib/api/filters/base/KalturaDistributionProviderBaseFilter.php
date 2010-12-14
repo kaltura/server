@@ -8,8 +8,6 @@ class KalturaDistributionProviderBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
-		"typeEqual" => "_eq_type",
-		"typeIn" => "_in_type",
 	);
 
 	private $order_by_map = array

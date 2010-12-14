@@ -3,7 +3,10 @@ class GenericDistributionProfilePeer extends DistributionProfilePeer
 {
 	const OM_CLASS = 'GenericDistributionProfile';
 
-	public function setInstanceCriteriaFilter ()
+	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
 	{
 		if ( self::$s_criteria_filter == null )
 			self::$s_criteria_filter = new criteriaFilter ();

@@ -40,7 +40,7 @@ class DistributionProfileService extends KalturaBaseService
 		$dbDistributionProfile->setPartnerId($this->getPartnerId());
 		$dbDistributionProfile->save();
 		
-		$distributionProfile = new KalturaDistributionProfile();
+		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
 		$distributionProfile->fromObject($dbDistributionProfile);
 		return $distributionProfile;
 	}
@@ -59,7 +59,7 @@ class DistributionProfileService extends KalturaBaseService
 		if (!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $id);
 			
-		$distributionProfile = new KalturaDistributionProfile();
+		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
 		$distributionProfile->fromObject($dbDistributionProfile);
 		return $distributionProfile;
 	}
@@ -85,7 +85,7 @@ class DistributionProfileService extends KalturaBaseService
 		$distributionProfile->toUpdatableObject($dbDistributionProfile);
 		$dbDistributionProfile->save();
 		
-		$distributionProfile = new KalturaDistributionProfile();
+		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
 		$distributionProfile->fromObject($dbDistributionProfile);
 		return $distributionProfile;
 	}

@@ -7,8 +7,6 @@ class GenericDistributionProviderFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
-			"_eq_type",
-			"_in_type",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",

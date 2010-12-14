@@ -25,7 +25,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 	 */
 	function addAction(KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
 	{
-		$genericDistributionProviderAction->validatePropertyMinLength("name", 1);
+		$genericDistributionProviderAction->validatePropertyNotNull("genericDistributionProviderId");
 		
 		$dbGenericDistributionProviderAction = new GenericDistributionProviderAction();
 		$genericDistributionProviderAction->toObject($dbGenericDistributionProviderAction);

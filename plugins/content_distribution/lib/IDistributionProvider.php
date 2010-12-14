@@ -2,6 +2,12 @@
 interface IDistributionProvider
 {
 	/**
+	 * value from enum DistributionProviderType
+	 * @return int
+	 */
+	public function getType();
+	
+	/**
 	 * indicates if this provider enables media removal.
 	 * @return bool
 	 */

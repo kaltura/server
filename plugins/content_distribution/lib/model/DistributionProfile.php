@@ -30,6 +30,9 @@ abstract class DistributionProfile extends BaseDistributionProfile
 		if($requiredThumbDimensionsStr)
 			$requiredThumbDimensions = unserialize($requiredThumbDimensionsStr);
 			
+		if(!$requiredThumbDimensions)
+			return array();
+			
 		return $requiredThumbDimensions;
 	}
 	
@@ -53,6 +56,9 @@ abstract class DistributionProfile extends BaseDistributionProfile
 		
 		if($optionalThumbDimensionsStr)
 			$optionalThumbDimensions = unserialize($optionalThumbDimensionsStr);
+			
+		if(!$optionalThumbDimensions)
+			return array();
 			
 		return $optionalThumbDimensions;
 	}
@@ -108,7 +114,7 @@ abstract class DistributionProfile extends BaseDistributionProfile
 	 * @param int $action enum from DistributionAction
 	 * @return array<kDistributionValidationError>
 	 */
-	public function validate(EntryDistribution $entryDistribution, $action)
+	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		$validationErrors = array();
 		

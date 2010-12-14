@@ -2,12 +2,6 @@
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 {
 	/**
-	 * @var string
-	 */
-	public $requiredThumbDimensions;
-	
-	
-	/**
 	 * @var int
 	 */
 	public $genericProviderId;	
@@ -47,7 +41,6 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	 */
 	private static $map_between_objects = array 
 	(
-		'requiredThumbDimensions',
 		'genericProviderId',	
 		'protocol',
 		'serverUrl',

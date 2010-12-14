@@ -19,7 +19,10 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 		DistributionProviderType::GENERIC => GenericDistributionProfilePeer::OM_CLASS,
 	);
 
-	public function setInstanceCriteriaFilter ()
+	/**
+	 * Creates default criteria filter
+	 */
+	public static function setDefaultCriteriaFilter()
 	{
 		if ( self::$s_criteria_filter == null )
 			self::$s_criteria_filter = new criteriaFilter ();
@@ -54,6 +57,13 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function getOMClass($row, $colnum)
+	{
+		$class = self::getOMClassImpl($row, $colnum);
+		KalturaLog::debug("Loads object [$class]");
+		return $class;
+	}
+
+	private static function getOMClassImpl($row, $colnum)
 	{
 		if($row)
 		{

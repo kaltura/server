@@ -27,7 +27,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 	 * @param int $sub_type
 	 * @throws string
 	 */
-	private static function getFileSyncVersion($sub_type)
+	private function getFileSyncVersion($sub_type)
 	{
 		switch($sub_type)
 		{
@@ -67,7 +67,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 		self::validateFileSyncSubType($sub_type);
 		
 		if(!$version)
-			$version = self::getFileSyncversion($sub_type);
+			$version = $this->getFileSyncversion($sub_type);
 		
 		$key = new FileSyncKey();
 		$key->object_type = ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION);
@@ -87,7 +87,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 		self::validateFileSyncSubType ( $sub_type );
 		
 		if(!$version)
-			$version = self::getFileSyncversion($sub_type);
+			$version = $this->getFileSyncversion($sub_type);
 		
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
 		$path =  "/content/distribution/generic/$dir/" . $this->generateFileName($sub_type, $version);
@@ -103,7 +103,7 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 		self::validateFileSyncSubType($sub_type);
 		
 		if(!$version)
-			$version = self::getFileSyncversion($sub_type);
+			$version = $this->getFileSyncversion($sub_type);
 	
 		$extension = 'txt';
 		switch($sub_type)

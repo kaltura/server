@@ -16,26 +16,42 @@ pg = 	partner group
 kn = 	kaltura network
 mip =	match ip - enables the ip match mecahnism for better in-site only security
 tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
-------------------------------------------------------------------------------------------------
-name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
-------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+name																		|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-metadataprofile.list				|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.add					|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.addfromfile			|			|2		|1	|1		|2		|1		|	|		|	|   |metadata
-metadataprofile.delete				|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.get					|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.update				|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.updatedefinitionfromfile|		|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.updateviewsfromfile	|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadataprofile.listfields			|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
+distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 
+distributionprofile.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+distributionprofile.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+distributionprofile.update													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 
-metadata.list						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.add						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.addfromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.addfromurl					|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.delete						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.get						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.update						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
-metadata.updatefromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
+entrydistribution.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.update													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.submitadd													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+
+genericdistributionprovider.add												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovider.get												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovider.update											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovider.delete											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovider.list											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+
+genericdistributionprovideraction.add										|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addmrsstransform							|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addmrsstransformfromfile					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addmrssvalidate							|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addmrssvalidatefromfile					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addresultstransform						|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.addresultstransformfromfile				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.get										|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.update									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.delete									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+genericdistributionprovideraction.list										|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution

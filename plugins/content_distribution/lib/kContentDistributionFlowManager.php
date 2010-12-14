@@ -741,7 +741,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if(!$distributionProfile)
 				continue;
 				
-			$validationErrors = $distributionProfile->validate($entryDistribution, DistributionAction::SUBMIT);
+			$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 			$entryDistribution->setValidationErrors($validationErrors);
 			$entryDistribution->save();
 			
