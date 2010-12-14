@@ -174,7 +174,7 @@ class kXml
 					}
 				}
 			}
-			else // object is Kaltura object
+			else // object is Kaltura object base
 			{
 				//TODO: serialize the kaltura object into XML.
 				$reflector = new ReflectionClass($data->dataObject);
@@ -183,10 +183,12 @@ class kXml
 				{
 					$value = $property->getValue($data->dataObject);
 					$propertyName = $property->getName();
+					$propertyValueType = gettype($value);
 					
 					if(!is_array($value))
 					{
 						$node = $xml->createElement($propertyName, $value);
+						$node->setAttribute("type", $propertyValueType);
 						$rootNode->appendChild($node);
 					}
 					else
@@ -197,6 +199,7 @@ class kXml
 						foreach ($value as $key => $singleValue)
 						{
 							$node = $xml->createElement($propertyName, $singleValue);
+							$node->setAttribute("type", $propertyValueType);
 							$node->setAttribute("key", $key);
 							$arrayNode->appendChild($node);
 						}
@@ -219,11 +222,6 @@ class kXml
 		return $xml;
 	}
 
-	private static function propelObjectToXml(BaseObject $data)
-	{
-		throw new Exception("Please use objectToXml method");
-	}
-	
 	/**
 	 * Gets a xml based data and returns a new unit test data object with those values
 	 * @param SimpleXMLElement $xml
@@ -241,8 +239,11 @@ class kXml
 		
 		if(class_exists($objectInstace->type))
 		{
-			foreach ($xml->children() as $childKey => $childValue)
+			foreach ($xml->children() as $child)
 			{
+				$childKey = $child->getName();
+				$childValue = (string)$child;
+				$childValueType = (string)$child["type"];
 				try
 				{
 					//TODO: handle fields which are arrays (currently handled hard coded)
@@ -250,18 +251,18 @@ class kXml
 					{
 						$arrayValue = array();
 						
-						foreach ($childValue as $singleElementKey => $singleElementValue)
+						foreach ($child->children() as $singleElementKey => $singleElementValue)
 						{
 							$key = (string)$singleElementValue["key"];
 							$arrayValue[$key] = (string)$singleElementValue;
 							$arrayKey = $singleElementKey;
 						}
 						
-						kXml::setPropertyValue(&$objectInstace->objectData, $arrayKey, $arrayValue);
+						kXml::setPropertyValue(&$objectInstace->dataObject, $arrayKey, $arrayValue, $childValueType);
 					}
 	 				else 
 	 				{
-	 					kXml::setPropertyValue(&$objectInstace->objectData, $childKey, $childValue);
+	 					kXml::setPropertyValue(&$objectInstace->dataObject, $childKey, $childValue, $childValueType);
 	 				}
 				}	
 				catch (Exception $e)
@@ -287,19 +288,22 @@ class kXml
 	 * @param $fieldName
 	 * @param unknown_type $fieldValue
 	 */
-	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue)
+	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue, $fieldValueType)
 	{
+		//set the object to this value
 		if($objectInstace instanceof BaseObject)
 		{
 			$objectInstace->setByName($fieldName, $fieldValue);
 		}
-		else if($objectInstace instanceof KalturaObject)
+		else if($objectInstace instanceof KalturaObjectBase)
 		{
-			$objectInstace->$fieldName = (string)$fieldValue;
+			$objectInstace->$fieldName = $fieldValue;
 		}
 		else
 		{
-			$objectInstace = (string)$fieldValue;
+			//Set the attribute to its right type
+			settype($fieldValue, $fieldValueType);
+			$objectInstace = $fieldValue;
 		}
 	} 
 	
