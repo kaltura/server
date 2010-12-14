@@ -1,6 +1,6 @@
 <?php
 
-require_once('tests/unit_test/bootstrap.php');
+require_once(dirname(__FILE__) . '/../bootstrap.php');
 
 /**
  * Responsible for importing objects from kaltura DB 
@@ -37,7 +37,7 @@ class UnitTestDataGenerator
    	 * @param string $objectType
    	 * @return BaseObject - returns the propel object from the DB
    	 */
-   	function getUnitTestDataObject(UnitTestDataObject $unitTestObjectIdentifier)
+   	private function getUnitTestDataObject(UnitTestDataObject $unitTestObjectIdentifier)
    	{
    		$unitTestDataObject = new UnitTestDataObject($unitTestObjectIdentifier->type, $unitTestObjectIdentifier->additionalData, $unitTestObjectIdentifier->dataObject);
    		
@@ -59,7 +59,10 @@ class UnitTestDataGenerator
 	   		{
 	   			$partnerId = $unitTestObjectIdentifier->additionalData["partnerId"];
 	   			$secret = $unitTestObjectIdentifier->additionalData["secret"];
-	   			$unitTestDataObject->dataObject = $this->getAPIObject($objectInstance, $objectId, $partnerId, $secret);
+	   			$serviceUrl = $unitTestObjectIdentifier->additionalData["serviceUrl"];
+	   			$service = $unitTestObjectIdentifier->additionalData["service"];
+	   			
+	   			$unitTestDataObject->dataObject = $this->getAPIObject($objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service);
 	   		}
 	   		else // normal objects types like string and int 
 	   		{
@@ -78,25 +81,29 @@ class UnitTestDataGenerator
 	   	
 	/**
 	 * 
-	 * Gets an API object from the DB (not using t$confighe API methods because of the KS)
+	 * Gets an API object from the API - using a client session and KS also using the action get from this service on the object id
 	 * 
 	 * @param KalturaObjectBase $objectInstance
 	 * @param string $objectId
+	 * @param int $partnerId
+	 * @param string $secret
+	 * @param string $serviceUrl
+	 * @param string $service
 	 * @throws KalturaAPIException
 	 */
-	public function getAPIObject(KalturaObjectBase $objectInstance, $objectId, $partnerId, $secret)
+	private function getAPIObject(KalturaObjectBase $objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service)
 	{
 		//here we create the KS and get the data from the API calls
 		//TODO: how to get the right service from the $objectInstace or type or more info is needed?
 		
 		$config = new KalturaConfiguration((int)$partnerId);
-//		$config->serviceUrl = 'http://www.kaltura.com';
+		$config->serviceUrl = $serviceUrl;
 		$client = new KalturaClient($config);
 		$ks = $client->session->start($secret, null, KalturaSessionType::ADMIN, (int)$partnerId, null, null);
 		$client->setKs($ks);
 		
 		$entryId = $objectId;
-		$result = $client->media->get($entryId);
+		$result = $client->$service->get($entryId);
 		
 		return $result;
 	}
@@ -108,7 +115,7 @@ class UnitTestDataGenerator
 	 * @param string $objectId
 	 * @throws Exception
 	 */
-	public function getPropelObject(BaseObject $objectInstance, string $objectId)
+	private function getPropelObject(BaseObject $objectInstance, $objectId)
 	{
 		if(method_exists($objectInstance, 'getPeer'))
 	   	{
@@ -126,11 +133,11 @@ class UnitTestDataGenerator
    		 return $kalturaObject;
 	}
 		
-	   	/**
-	   	 * 
-   	 	 * Creates a test file from the given TestDataFile object
-	   	 * @param TestDataFile $testDataFile
-	   	 */
+	/**
+	 * 
+   	 * Creates a test file from the given TestDataFile object
+	 * @param TestDataFile $testDataFile
+	 */
 	private function createTestFile($testDataFile)
 	{
 		//1. Create the new unit test data file  
@@ -186,7 +193,7 @@ class UnitTestDataGenerator
 	 * Creates the Tests data files 
 	 * @retrun None, creates the tests data files (according to the config file data)
 	 */
-  	function createTestFiles()
+  	public function createTestFiles()
   	{
 		//For each test found at the config fiel we need to create the test file
 		foreach ($this->generatorConfigFile->testFiles as $testFile)

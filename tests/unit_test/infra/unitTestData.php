@@ -1,7 +1,6 @@
 <?php
 
-	chdir(dirname(__FILE__));
-	require_once('../bootstrap.php');
+	require_once(dirname(__FILE__) . '/../bootstrap.php');
 	
 	/**
 	 * 
@@ -70,6 +69,9 @@
 					
 					//Add the test description
 					$unitTestData->description = trim((string)$xmlUnitTestData->Description);
+					
+					//The unit test header
+					$unitTestData->header = trim((string)$xmlUnitTestData->Header);
 					
 					//For each input create the needed Kaltura object identifier
 					foreach ($xmlUnitTestData->Inputs->Input as $input)
@@ -308,7 +310,7 @@
 			{
 				$objectId = $object->getByName("Id");	
 			}
-			else if ($object instanceof KalturaObject || $object instanceof KalturaObjectBase)
+			else if ($object instanceof KalturaObjectBase)
 			{
 				//TODO: check if all kaltura objects are supported
 				$reflector = new ReflectionObject($object);
@@ -335,7 +337,7 @@
 			{
 				$objectType = get_class($object);	
 			}
-			else if ($object instanceof KalturaObject || $object instanceof KalturaObjectBase)
+			else if ($object instanceof KalturaObjectBase)
 			{
 				//TODO: check if all kaltura objects are supported
 				$objectType = get_class($object);
@@ -366,6 +368,13 @@
 		
 		/**
 		 * 
+		 * The test header 
+		 * @var unknown_type
+		 */
+		public $header;
+		
+		/**
+		 * 
 		 * The Test input
 		 * @var unknown_type
 		 */
@@ -381,8 +390,8 @@
 	
 	/**
 	 * 
-	 * Represent all propel object identifiers
-	 * needed so we can get the object from the DB / API
+	 * Represent all unit tests objects identifiers
+	 * Holds all the data from the data xml
 	 * @author Roni
 	 *
 	 */

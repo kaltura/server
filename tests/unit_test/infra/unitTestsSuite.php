@@ -1,6 +1,6 @@
 <?php
 
-require_once '../bootstrap.php';
+require_once (dirname(__FILE__) . '/../bootstrap.php');
 
 /**
  * Static test suite.

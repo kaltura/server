@@ -3,9 +3,9 @@
   <Description>a test data file for the media service (testUploadAction)</Description>
   <UnitTestsData>
     <UnitTestData>
-      <Description>test data 1 - regular file</Description>
+      <Description>tests the media service add from token action (via upload + add from token)</Description>
       <Inputs>
-        <Input type="file" value="C:\Users\Public\Videos\Sample Videos\Wildlife.wmv" partnerId="407081" secret="021e6b694af8004ed2ef890e5664ae24"/>
+        <Input type="string" value="C:\Users\Public\Videos\Sample Videos\Logo_Black.flv" partnerId="407081" secret="021e6b694af8004ed2ef890e5664ae24" serviceUrl="www.kaltura.com" service="media"/>
       </Inputs>
       <OutputReferences/>
     </UnitTestData>

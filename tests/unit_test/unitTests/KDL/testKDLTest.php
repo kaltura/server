@@ -1,8 +1,6 @@
 <?php
 
-	chdir(dirname(__FILE__));
-	require_once( '../../bootstrap.php');
-	chdir(dirname(__FILE__));
+	require_once(dirname(__FILE__) . '/../../bootstrap.php');
 	
 	/**
 	 * The KDl unit test case
@@ -10,22 +8,22 @@
 	 * @author Roni
 	 *
 	 */
-	class KDLUnitTest extends unitTestBase
+	class KDLUnitTest extends UnitTestBase
 	{
 		/**
 		 * 
 		 * Test the KDL - WrapCDLGenerateTargetFlavors() method
 		 * @dataProvider providerCDLGenerateTargetFlavors
 		 */
-		public function testKDLWrapCDLGenerateTargetFlavors($flavorList, $mediaInfo, $flavorParamsOutput)
+		public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 		{
 			
 			//returns KDLWrap
 			$result = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavorList));
 
-			$this->validErrorFields = array("CreatedAt", "UpdatedAt", "Id", "PartnerId", "EntryId", "FlavorAssetId", "DeletedAt");
+			$validErrorFields = array("CreatedAt", "UpdatedAt", "Id", "PartnerId", "EntryId", "FlavorAssetId", "DeletedAt");
 			
-			$isEqual = parent::comparePropelObjectsByFeilds($flavorParamsOutput, reset($result->_targetList));
+			$isEqual = parent::comparePropelObjectsByFields($flavorParamsOutput, reset($result->_targetList), $validErrorFields);
 		
 			$this->assertEquals(true, $isEqual);
 			
@@ -59,10 +57,23 @@
 		 */
 		public function providerCDLGenerateTargetFlavors()
 		{
-			//TODO: from where to get the data file path.
-//			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/RealTest1.Data"
-			$inputs = parent::provider(dirname(__FILE__) . "/tests_data/RealTest1.Data");
-			return $inputs; 
+			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/tests_data/RealTest1.Data");
+			
+			//The actual input for the tests
+			$inputsForTest = array();
+			
+			foreach ($inputsAsUnitTestObjects as $input)
+			{
+				$testParameters = array();
+				foreach ($input as $singleParameter)
+				{
+					 $testParameters[] = $singleParameter->dataObject;
+				}
+				
+				$inputsForTest[] = $testParameters;
+			}
+			
+			return $inputsForTest; 
 		}
 	
 		/**
@@ -71,11 +82,22 @@
 		 */
 		public function providerCDLValidateProduct()
 		{
-//			$inputs = parent::provider("C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/RealTest2.Data");
-			$inputs = parent::provider(dirname(__FILE__) . "/tests_data/RealTest2.Data");
-			return $inputs;
+			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/tests_data/RealTest2.Data");
+			
+			//The actual input for the tests
+			$inputsForTest = array();
+			
+			foreach ($inputsAsUnitTestObjects as $input)
+			{
+				$testParameters = array();
+				foreach ($input as $singleParameter)
+				{
+					 $testParameters[] = $singleParameter->dataObject;
+				}
+				
+				$inputsForTest[] = $testParameters;
+			}
+			
+			return $inputsForTest; 
 		}
-		
-	}			
-
-?>
+	}

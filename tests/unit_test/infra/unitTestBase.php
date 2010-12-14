@@ -1,7 +1,6 @@
 <?php
 
-chdir(dirname(__FILE__));
-require_once ('../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap.php');
 
 //TODO: What will be our interface for the unit tests?
 interface IUnitTest
@@ -15,15 +14,9 @@ interface IUnitTest
  * @author Roni
  *
  */
-class unitTestBase extends PHPUnit_Framework_TestCase 
+class UnitTestBase extends PHPUnit_Framework_TestCase 
 {
-	/**
-	 * 
-	 * The feilds that are ok to be invalid such as UpdatedAt / CreatedAt (skipped fields)
-	 * @var array<string> the feilds names
-	 */
-	public $validErrorFields = array();
-	
+		
 	/**
 	 * 
 	 * The unit test data provider (gets the data for the different unit tests)
@@ -80,7 +73,7 @@ class unitTestBase extends PHPUnit_Framework_TestCase
 	 * @param BaseObject $newResult
 	 * @return bool, if the objects are equal
 	 */
-	public function comparePropelObjectsByFeilds($outputReference, $newResult)
+	public function comparePropelObjectsByFields($outputReference, $newResult, $validErrorFields)
 	{
 		//Gets the data peer of the object (used to geting all the obejct feilds)
 		$dataPeer = $outputReference->getPeer(); 
@@ -94,7 +87,7 @@ class unitTestBase extends PHPUnit_Framework_TestCase
 		foreach ($fields as $field)
 		{
 			//If the field is inthe valid error list then we skip him 
-			if(in_array($field, $this->validErrorFields))
+			if(in_array($field, $validErrorFields))
 			{
 				continue;
 			}
@@ -132,4 +125,32 @@ class unitTestBase extends PHPUnit_Framework_TestCase
 	}
 }
 
-?>
+/**
+ * 
+ * Represents the base class for api_v3 unit tests
+ * @author Roni
+ *
+ */
+class Api_v3UnitTest extends UnitTestBase
+{
+	/**
+	 * 
+	 * Gets the parameters for creating a new kaltura client and returns the new client
+	 * @param int $partnerId
+	 * @param string $secret
+	 * @param string $configServiceUrl
+	 * @return KalturaClient - a new api client 
+	 */
+	public function getClient($partnerId, $secret, $configServiceUrl)
+	{
+		$config = new KalturaConfiguration((int)$partnerId);
+
+		//Add the server url (into the test additional data)
+		$config->serviceUrl = $configServiceUrl;
+		$client = new KalturaClient($config);
+		$ks = $client->session->start($secret, null, KalturaSessionType::ADMIN, (int)$partnerId, null, null);
+		$client->setKs($ks);
+		
+		return $client;
+	}
+}

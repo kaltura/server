@@ -12,6 +12,14 @@ require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
 
 define("KALTURA_UNIT_TEST_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."tests".DIRECTORY_SEPARATOR."unit_test");
 
+//Unit Test Project files (used in the zend phpunit library notneeded for the command line)
+require_once ('/PHPUnit/Framework.php');
+
+//Absolute path with a var (good for all systems as we are using KALTURA_ROOT_PATH)
+require_once (dirname(__FILE__). '/unitTestDataGenerator/unitTestDataGenerator.php');
+require_once (dirname(__FILE__). '/infra/unitTestData.php');
+require_once (dirname(__FILE__). '/infra/unitTestBase.php');
+
 // Autoloader
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "config", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
@@ -26,10 +34,4 @@ date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_Y
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
-//Unit Test Project files (used in the zend phpunit library notneeded for the command line)
-require_once ('/PHPUnit/Framework.php');
 
-//Absolute path with a var (good for all systems as we are using KALTURA_ROOT_PATH)
-require_once (dirname(__FILE__). '/unitTestDataGenerator/unitTestDataGenerator.php');
-require_once (dirname(__FILE__). '/infra/unitTestData.php');
-require_once (dirname(__FILE__). '/infra/unitTestBase.php');
