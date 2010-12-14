@@ -105,6 +105,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var bool
 	 */
+	public $enableContentDistribution;
+	
+	/**
+	 * @var bool
+	 */
 	public $enableAuditTrail;
 	
 	/**
@@ -154,6 +159,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if(class_exists('MetadataPlugin'))
 			$this->enableMetadata = $source_object->getPluginEnabled(MetadataPlugin::getPluginName());
 			
+		if(class_exists('ContentDistributionPlugin'))
+			$this->enableContentDistribution = $source_object->getPluginEnabled(ContentDistributionPlugin::getPluginName());
+			
 		if(class_exists('AuditPlugin'))
 			$this->enableAuditTrail = $source_object->getPluginEnabled(AuditPlugin::getPluginName());
 	}
@@ -164,6 +172,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		if(class_exists('MetadataPlugin'))
 			$object_to_fill->setPluginEnabled(MetadataPlugin::getPluginName(), $this->enableMetadata);
+			
+		if(class_exists('ContentDistributionPlugin'))
+			$object_to_fill->setPluginEnabled(ContentDistributionPlugin::getPluginName(), $this->enableContentDistribution);
 			
 		if(class_exists('AuditPlugin'))
 			$object_to_fill->setPluginEnabled(AuditPlugin::getPluginName(), $this->enableAuditTrail);
