@@ -186,4 +186,24 @@ filesyncimportbatch.getexclusivealmostdonefilesyncimportjobs		|	|2		|1	|0		|0		|
 virusscanbatch.updateexclusivevirusscanjob  |	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 virusscanbatch.freeexclusivevirusscanjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
 virusscanbatch.getexclusivevirusscanjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |batch
+
+
+contentdistributionbatch.getexclusivedistributionsubmitjobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.updateexclusivedistributionsubmitjob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.freeexclusivedistributionsubmitjob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivealmostdonedistributionsubmitjobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivedistributionupdatejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.updateexclusivedistributionupdatejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.freeexclusivedistributionupdatejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivealmostdonedistributionupdatejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivedistributiondeletejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.updateexclusivedistributiondeletejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.freeexclusivedistributiondeletejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivealmostdonedistributiondeletejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivedistributionfetchreportjobs			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.updateexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.freeexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.getexclusivealmostdonedistributionfetchreportjobs	|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+contentdistributionbatch.createrequiredjobs									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+
 ---------------------------------------------------------------------------------------------------
