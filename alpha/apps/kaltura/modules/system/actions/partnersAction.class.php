@@ -41,6 +41,9 @@ class partnersAction extends kalturaSystemAction
 			if(class_exists('AuditPlugin'))
 				$partner->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
 			
+			if(class_exists('AnnotationPlugin'))
+				$partner->setPluginEnabled(AnnotationPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAnnotation']);
+			
 			if(class_exists('VirusScanPlugin'))
 				$partner->setPluginEnabled(VirusScanPlugin::PLUGIN_NAME, $_REQUEST['partner_enableVirusScan']);
 			
