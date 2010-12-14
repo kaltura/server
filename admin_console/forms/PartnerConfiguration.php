@@ -117,6 +117,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_audit_trail'))),
 		));
 		
+		$this->addElement('checkbox', 'enable_annotation', array(
+			'label'	  => 'Aannotation',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_annotation'))),
+		));
+		
 		$this->addElement('checkbox', 'enable_analytics_tab', array(
 			'label'	  => 'Analytics tab',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_analytics_tab'))),
