@@ -158,6 +158,11 @@ class KalturaBatchJobType
 	const FILESYNC_IMPORT = "29";
 	const CAPTURE_THUMB = "30";
 	const VIRUS_SCAN = "virusScan.VirusScan";
+	const DISTRIBUTION_SUBMIT = "contentDistribution.DistributionSubmit";
+	const DISTRIBUTION_UPDATE = "contentDistribution.DistributionUpdate";
+	const DISTRIBUTION_DELETE = "contentDistribution.DistributionDelete";
+	const DISTRIBUTION_FETCH_REPORT = "contentDistribution.DistributionFetchReport";
+	const DISTRIBUTION_SYNC = "contentDistribution.DistributionSync";
 }
 
 class KalturaBitRateMode
@@ -255,8 +260,6 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -4091,112 +4094,6 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaCommercialUseType
-	 */
-	public $commercialUseEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageLessThanOrEqual = null;
-
-
-}
-
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -6738,6 +6635,79 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -7486,6 +7456,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 * @var bool
 	 */
 	public $enableAuditTrail = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableAnnotation = null;
 
 	/**
 	 * 
