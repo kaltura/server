@@ -290,6 +290,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				}
 			}
 			
+			if(count($fileAttributesNames) > 1)
+				continue;
+				
 			$const_props = substr($const_props , 0 , -1);
 			
 			$str = "package com.kaltura.commands." .  $xml->attributes()->name  . "\n";
@@ -349,7 +352,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				if($prop->getName() == "param" && $prop->attributes()->type == "file")
 					$fileAttributesNames[] = $prop->attributes()->name;
 			}
-			
+			if(count($fileAttributesNames) > 1)
+				continue;			
 			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
 			$str .= "{\n"; 
