@@ -163,8 +163,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$keys_values_creator .= "			var valueArr : Array = new Array();\n";
 			$keys_values_creator .= "			var keyValArr : Array = new Array();\n";
 			
-			$isFileCall = false;
-			$fileAttributeName = null;
+			$fileAttributesNames = array();
 			
 			foreach($child->children() as $prop)
 			{
@@ -253,8 +252,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$keys_values_creator .= "			valueArr = valueArr.concat( keyValArr[1] );\n";
 						break;
 						case "file" :
-							$isFileCall = true;
-							$fileAttributeName = $prop->attributes()->name;
+							$fileAttributesNames[] = $prop->attributes()->name;
 							 
 							$const_props .= $prop->attributes()->name . " : FileReference";
 							if($prop->attributes()->optional == "1")	
@@ -299,20 +297,23 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= $imports;
 			$str .= "	import com.kaltura.delegates." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate;\n";
 			
-			if(!$isFileCall)
-			$str .= "	import com.kaltura.net.KalturaCall;\n";
+			if(!count($fileAttributesNames))
+				$str .= "	import com.kaltura.net.KalturaCall;\n";
 				
 			$str .= "\n";
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . " " ;
 			
-			if($isFileCall)
+			if(count($fileAttributesNames))
 				$str .= "extends KalturaFileCall\n" ;
 			else
 				$str .= "extends KalturaCall\n" ;
 				
 			$str .= "	{\n";
-			if($isFileCall)
-			$str .= "		public var " . $fileAttributeName . ":FileReference;\n";
+			
+			if(count($fileAttributesNames))
+				foreach($fileAttributesNames as $fileAttributeName)
+					$str .= "		public var " . $fileAttributeName . ":FileReference;\n";
+					
 			else
 			$str .= "		public var filterFields : String;\n";
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
@@ -342,15 +343,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
-			$isFileCall = false;
-			$fileAttributeName = null;
+			$fileAttributesNames = array();
 			foreach($child->children() as $prop)
 			{
 				if($prop->getName() == "param" && $prop->attributes()->type == "file")
-				{
-					$isFileCall = true;
-					$fileAttributeName = $prop->attributes()->name;
-				}
+					$fileAttributesNames[] = $prop->attributes()->name;
 			}
 			
 			
@@ -360,7 +357,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	import com.kaltura.config.KalturaConfig;\n";
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
 			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n";
-			if($isFileCall)
+			if(count($fileAttributesNames))
 			{
 				$str .= "	import com.kaltura.errors.KalturaError;\n";
 				$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n\n";
@@ -373,7 +370,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "\n"; 
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate extends WebDelegateBase\n" ;
 			$str .= "	{\n";
-			if($isFileCall)
+			if(count($fileAttributesNames))
 			$str .= "		protected var mrloader:MultipartURLLoader;\n\n";
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate(call:KalturaCall, config:KalturaConfig)\n";
 			$str .= "		{\n";
@@ -419,7 +416,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				break;
 			}
 			
-			if($isFileCall)
+			if(count($fileAttributesNames))
 			{
 				$str .= "		override protected function sendRequest():void {\n";
 				$str .= "			//construct the loader\n";
@@ -428,9 +425,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "			//create the service request for normal calls\n";
 				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
 				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
-				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
+				foreach($fileAttributesNames as $fileAttributeName)
+					$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
 				$str .= "			var urlRequest:URLRequest = new URLRequest(req);\n";
-				$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+				
+				foreach($fileAttributesNames as $fileAttributeName)
+					$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+					
 				$str .= "		}\n\n";
 				
 				$str .= "		// Event Handlers\n";
