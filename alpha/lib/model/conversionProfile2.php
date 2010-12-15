@@ -81,4 +81,21 @@ class conversionProfile2 extends BaseconversionProfile2
 		parent::copyInto($copyObj, $deepCopy);
 		$copyObj->setIsDefault($this->getIsDefault());
 	}
+	
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this conversionProfile2 is new, it will return
+	 * an empty collection; or if this conversionProfile2 has previously
+	 * been saved, it will retrieve related flavorParamsConversionProfiles from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in conversionProfile2.
+	 */
+	public function getflavorParamsConversionProfilesJoinflavorParams($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		return $this->getflavorParamsConversionProfilesJoinassetParams($criteria, $con, $join_behavior);
+	}
+	
 }
