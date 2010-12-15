@@ -36,7 +36,11 @@ return array(
 	'KalturaBatchJobType::FILESYNC_IMPORT' => 'Filesync Import',
 	'KalturaBatchJobType::VIRUS_SCAN' => 'Virus Scan',
 	'KalturaBatchJobType::CAPTURE_THUMB' => 'Capture Thumbnail',
-
+	'KalturaBatchJobType::DISTRIBUTION_SUBMIT' => 'Distribution Submit',
+	'KalturaBatchJobType::DISTRIBUTION_UPDATE' => 'Distribution Update',
+	'KalturaBatchJobType::DISTRIBUTION_DELETE' => 'Distribution Delete',
+	'KalturaBatchJobType::DISTRIBUTION_FETCH_REPORT' => 'Distribution Fetch Report',
+	'KalturaBatchJobType::DISTRIBUTION_SYNC' => 'Distribution Sync',
 
 	'KalturaConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'KalturaConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
