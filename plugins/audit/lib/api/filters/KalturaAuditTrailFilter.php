@@ -5,6 +5,26 @@
  */
 class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 {
+	private $map_between_objects = array
+	(
+		"auditObjectTypeEqual" => "_eq_object_type",
+		"auditObjectTypeIn" => "_in_object_type",
+	);
+
+	private $order_by_map = array
+	(
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+	}
+
+	public function getOrderByMap()
+	{
+		return array_merge(parent::getOrderByMap(), $this->order_by_map);
+	}
+	
 	/**
 	 * @param AuditTrailFilter $auditTrailFilter
 	 * @param array $propsToSkip
