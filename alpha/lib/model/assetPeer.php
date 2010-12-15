@@ -208,15 +208,17 @@ class assetPeer extends BaseassetPeer
 	}
 
 	/**
+	 * @param string $entryId
 	 * @param array $paramsIds
 	 * @param $con
 	 * 
 	 * @return array
 	 */
-	public static function getReadyIdsByParamsIds(array $paramsIds, $con = null)
+	public static function getReadyIdsByParamsIds($entryId, array $paramsIds, $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->addSelectColumn(assetPeer::ID);
+		$criteria->add(assetPeer::ENTRY_ID, $entryId);
 		$criteria->add(assetPeer::STATUS, asset::FLAVOR_ASSET_STATUS_READY);
 		$criteria->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 
