@@ -111,7 +111,9 @@ class KalturaFilter extends KalturaObject
 		if(is_object($this->advancedSearch) && $this->advancedSearch instanceof KalturaSearchItem)
 		{
 //			KalturaLog::debug("Advanced Search [" . print_r($this->advancedSearch, true) . "]");
-			$object_to_fill->setAdvancedSearch($this->advancedSearch->toObject());
+			$advancedSearch = $this->advancedSearch->toObject();
+			if($advancedSearch)
+				$object_to_fill->setAdvancedSearch($advancedSearch);
 		}
 			
 		return $object_to_fill;		
