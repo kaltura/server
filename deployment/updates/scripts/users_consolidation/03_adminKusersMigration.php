@@ -114,7 +114,7 @@ while(count($users))
 			$new_kuser->setStatus(kuser::KUSER_STATUS_ACTIVE);
 			$new_kuser->setIcon($user->getIcon());
 			$new_kuser->setPicture($user->getPicture());
-			$new_kuser->setPuserId(kuserPeer::ROOT_ADMIN_PUSER_ID);
+			$new_kuser->setPuserId('__ADMIN__'.$user->getId());
 			$new_kuser->setIsAdmin(true);
 			if ($new_kuser->getPartnerId() == $admin_console_partner_id) {
 				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
