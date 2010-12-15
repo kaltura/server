@@ -41,7 +41,7 @@ DbManager::initialize();
 
 // stores the last handled admin kuser id, helps to restore in case of crash
 $lastPartnerFile = 'last_partner';
-$lastPartner = 0;
+$lastPartner = -10;
 if(file_exists($lastPartnerFile)) {
 	$lastPartner = file_get_contents($lastPartnerFile);
 	KalturaLog::log('last partner file already exists with value - '.$lastPartner);
@@ -66,6 +66,9 @@ while(count($partners))
 		KalturaLog::log('-- partner id ' . $lastPartner);
 		
 		$partner->setLoginUsersQuota($defaultLoginUsersQuota);
+		if ($partner->getId() == -2) {
+			$partner->setLoginUsersQuota(-1);
+		}
 		
 		if (!$dryRun) {
 			KalturaLog::log('SAVED - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getLoginUsersQuota());

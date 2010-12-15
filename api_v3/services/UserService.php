@@ -20,14 +20,14 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * @throws KalturaErrors::DUPLICATE_USER_BY_ID
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
-	 * @throws KalturaErrors::ADMIN_USER_PASSWORD_MISSING
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 * @throws KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 */
 	function addAction(KalturaUser $user)
-	{		
+	{				
 		$user->validatePropertyNotNull("id");
 		
 		if ($user instanceof KalturaAdminUser) {
@@ -64,6 +64,9 @@ class UserService extends KalturaBaseUserService
 			}
 			else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
 				throw new KalturaAPIException(KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
+			}
+			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
 			}
 			throw $e;			
 		}

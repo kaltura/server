@@ -350,6 +350,7 @@ class kuserPeer extends BasekuserPeer
 	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 */
 	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true)
 	{
