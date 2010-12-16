@@ -70,13 +70,26 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				    'controller' => 'plugin',
 					'action' => get_class($pluginAdminConsolePage)));
 			
+			$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
+			$menuPage = null;
+			
 			if($pluginAdminConsolePage->getNavigationRootLabel())
 			{
-				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
 				$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationRootLabel());
-				if($menuPage)
-					$subMenuPage->setParent($menuPage);
+				
+				if(!$menuPage)
+				{
+					$navigation->addPage(array(
+						'label' => $pluginAdminConsolePage->getNavigationRootLabel(),
+					    'controller' => 'plugin',
+						'action' => get_class($pluginAdminConsolePage)));
+					
+					$menuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationRootLabel());
+				}
 			}
+				
+			if($menuPage)
+				$subMenuPage->setParent($menuPage);
 		}
 		
 		$this->checkAclForNavigation($navigation);
