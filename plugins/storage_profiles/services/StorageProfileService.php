@@ -129,7 +129,7 @@ class StorageProfileService extends KalturaBaseService
 			$storageProfile->status = KalturaStorageProfileStatus::DISABLED;
 			
 		$dbStorageProfile = $storageProfile->toInsertableObject();
-		$dbStorageProfile->setPartnerId($this->getPartnerId());
+		$dbStorageProfile->setPartnerId($this->impersonatedPartnerId);
 		$dbStorageProfile->save();
 		
 		$storageProfile->fromObject($dbStorageProfile);
