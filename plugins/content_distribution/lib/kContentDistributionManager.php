@@ -14,6 +14,9 @@ class kContentDistributionManager
 		$entryDistribution = self::createEntryDistribution($entry, $distributionProfile);
 		$entryDistribution->save();
 		
+		if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+			$submit = true;
+			
 		if($submit)
 			self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 			
@@ -222,11 +225,14 @@ class kContentDistributionManager
 		$entryDistribution->setSunrise($entry->getStartDate(null));
 		$entryDistribution->setSunset($entry->getEndDate(null));
 		
-		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIds();
-		$optionalFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIds();
-		$flavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds(array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds));
-		
-		$entryDistribution->setFlavorAssetIds($flavorAssetIds);
+		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
+		$optionalFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
+		$flavorParamsIds = array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds);
+		if(is_array($flavorParamsIds))
+		{
+			$flavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
+			$entryDistribution->setFlavorAssetIds($flavorAssetIds);
+		}
 		
 		$thumbDimensions = $distributionProfile->getThumbDimensionsObjects();
 		$thumbDimensionsWithKeys = array();
@@ -256,7 +262,7 @@ class kContentDistributionManager
 		$entryDistribution->setThumbAssetIds($thumbAssetsIds);
 		
 		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-		$entryDistribution->setValidationErrors($validationErrors);
+		$entryDistribution->setValidationErrorsArray($validationErrors);
 		if(count($validationErrors))
 			KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
 

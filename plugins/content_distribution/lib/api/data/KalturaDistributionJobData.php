@@ -84,7 +84,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		}
 		
 		$providerData = $sourceObject->getProviderData();
-		$providerType = $this->getProviderType();
+		$providerType = $sourceObject->getProviderType();
 		if($providerType && $providerData && $providerData instanceof kDistributionJobProviderData)
 		{
 			if($providerType == KalturaDistributionProviderType::GENERIC)

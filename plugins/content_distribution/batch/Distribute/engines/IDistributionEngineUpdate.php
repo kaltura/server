@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineUpdate
+interface IDistributionEngineUpdate extends IDistributionEngine
 {
 	/**
 	 * updates media or metadata.

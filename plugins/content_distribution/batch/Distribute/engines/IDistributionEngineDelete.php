@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineDelete
+interface IDistributionEngineDelete extends IDistributionEngine
 {
 	/**
 	 * removes media.

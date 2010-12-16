@@ -87,7 +87,6 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	 * Entry distribution publish time as Unix timestamp (In seconds)
 	 * 
 	 * @var int
-	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $sunrise;
@@ -96,46 +95,52 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	 * Entry distribution un-publish time as Unix timestamp (In seconds)
 	 * 
 	 * @var int
-	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $sunset;
 
 	/**
 	 * The id as returned from the distributed destination
+	 * @readonly
 	 * @var string
 	 */
 	public $remoteId;
 
 	/**
 	 * The plays as retrieved from the remote destination reports
+	 * @readonly
 	 * @var int
 	 */
 	public $plays;
 
 	/**
 	 * The views as retrieved from the remote destination reports
+	 * @readonly
 	 * @var int
 	 */
 	public $views;
 
 	/**
 	 * @var KalturaDistributionValidationErrorArray
+	 * @readonly
 	 */
 	public $validationErrors;
 
 	/**
 	 * @var KalturaDistributionErrorType
+	 * @readonly
 	 */
 	public $errorType;
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $errorNumber;
 
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $errorDescription;
 	
@@ -183,7 +188,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			foreach($this->validationErrors as $validationError)
 				$validationErrorsArray[] = $validationError->toObject();
 				
-			$dbObject->setValidationErrors($validationErrorsArray);
+			$dbObject->setValidationErrorsArray($validationErrorsArray);
 		}
 
 		return $dbObject;

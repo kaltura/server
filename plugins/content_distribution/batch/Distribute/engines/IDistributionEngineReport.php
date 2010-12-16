@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineReport
+interface IDistributionEngineReport extends IDistributionEngine
 {
 	/**
 	 * retrieves statistics.

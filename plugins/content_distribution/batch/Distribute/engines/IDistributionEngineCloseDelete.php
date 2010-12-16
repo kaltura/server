@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineCloseDelete
+interface IDistributionEngineCloseDelete extends IDistributionEngine
 {
 	/**
 	 * check for deletion closure in case the deletion is asynchronous.

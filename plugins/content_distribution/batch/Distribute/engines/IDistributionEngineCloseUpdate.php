@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineCloseUpdate
+interface IDistributionEngineCloseUpdate extends IDistributionEngine
 {
 	/**
 	 * check for update closure in case the update is asynchronous.

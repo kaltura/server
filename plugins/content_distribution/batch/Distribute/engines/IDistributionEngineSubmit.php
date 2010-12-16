@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineSubmit
+interface IDistributionEngineSubmit extends IDistributionEngine
 {
 	/**
 	 * sends media to external system.

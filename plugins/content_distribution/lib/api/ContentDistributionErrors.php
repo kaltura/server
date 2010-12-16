@@ -5,6 +5,8 @@ class ContentDistributionErrors extends KalturaErrors
 	
 	const DISTRIBUTION_PROFILE_NOT_FOUND = "DISTRIBUTION_PROFILE_NOT_FOUND,Distrbution profile not found [%s]";
 	
+	const ENTRY_DISTRIBUTION_ALREADY_EXISTS = "ENTRY_DISTRIBUTION_ALREADY_EXISTS,Entry distrbution already exists for entry id [%s] and profile id [%s]";
+	
 	const ENTRY_DISTRIBUTION_NOT_FOUND = "ENTRY_DISTRIBUTION_NOT_FOUND,Entry distrbution not found [%s]";
 	
 	const GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND = "GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND,Generic distrbution provider not found [%s]";

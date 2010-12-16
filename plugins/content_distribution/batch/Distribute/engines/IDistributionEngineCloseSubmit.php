@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineCloseSubmit
+interface IDistributionEngineCloseSubmit extends IDistributionEngine
 {
 	/**
 	 * check for submission closure in case the submission is asynchronous.

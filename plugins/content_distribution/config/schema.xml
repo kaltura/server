@@ -16,8 +16,8 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="auto_create_thumb" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="optional_flavor_params_ids" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="required_flavor_params_ids" type="varchar" size="127" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="optional_thumb_dimensions" type="varchar" size="255" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="required_thumb_dimensions" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="optional_thumb_dimensions" type="varchar" size="2048" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="required_thumb_dimensions" type="varchar" size="2048" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
 		<index name="partner_id">
 			<index-column name="partner_id" />
@@ -75,8 +75,8 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="optional_flavor_params_ids" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="required_flavor_params_ids" type="varchar" size="127" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="optional_thumb_dimensions" type="varchar" size="255" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="required_thumb_dimensions" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="optional_thumb_dimensions" type="varchar" size="2048" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="required_thumb_dimensions" type="varchar" size="2048" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="editable_fields" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="mandatory_fields" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar"/>

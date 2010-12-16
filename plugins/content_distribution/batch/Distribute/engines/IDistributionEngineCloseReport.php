@@ -1,5 +1,5 @@
 <?php
-interface IDistributionEngineCloseReport
+interface IDistributionEngineCloseReport extends IDistributionEngine
 {
 	/**
 	 * check for report fetching closure in case the fething is asynchronous.
