@@ -12,9 +12,13 @@ abstract class KalturaBaseService
 	private $ks = null;
 	
 	/**
-	 * @var KalturaPartner
+	 * @var Partner
 	 */
 	private $partner = null;
+	
+	/**
+	 * @var kuser
+	 */
 	private $kuser = null;
 
 	/**
@@ -26,6 +30,8 @@ abstract class KalturaBaseService
 	protected $private_partner_data = null; /// will be used internally and from the actual services for setting the
 	
 	private $apply_specific_partner = null;
+	
+	protected $impersonatedPartnerId = null;
 	
 	public function __construct()
 	{
@@ -42,6 +48,8 @@ abstract class KalturaBaseService
 	// TODO - no need to set the service_name - it should be known to the service !
 	public function initService ( $partner_id , $puser_id , $ks_str , $service_name , $action )
 	{
+		$this->impersonatedPartnerId = $partner_id;
+		
 		myPartnerUtils::resetAllFilters();
 		$arr = list ( $partner_id , $uid , $private_partner_data ) = $this->validateTicketSetPartner ( $partner_id , $puser_id , $ks_str , $service_name , $action);
 		$this->private_partner_data = $private_partner_data;
