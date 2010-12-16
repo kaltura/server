@@ -214,6 +214,49 @@ class ThumbAssetService extends KalturaBaseService
 	}
 
 	/**
+	 * @action generate
+	 * @param string $entryId
+	 * @param KalturaThumbParams $thumbParams
+	 * @return int job id
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
+	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
+	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
+	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 */
+	public function generateAction($entryId, KalturaThumbParams $thumbParams)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		if ($entry->getType() != entryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
+		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
+			
+		$validStatuses = array(
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::PRECONVERT,
+			entryStatus::READY,
+		);
+		
+		if (!in_array($entry->getStatus(), $validStatuses))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
+			
+		$destThumbParams = new thumbParams();
+		$thumbParams->toUpdatableObject($destThumbParams);
+
+		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		if($job)
+			return $job->getId();
+			
+		return null;
+	}
+
+	/**
 	 * @action regenerate
 	 * @param string $thumbAssetId
 	 * @return int job id

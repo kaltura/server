@@ -62,6 +62,13 @@ class KalturaThumbParams extends KalturaAssetParams
 	 */
 	public $backgroundColor = 0;
 	
+	/**
+	 * Id of the flavor params or the thumbnail params to be used as source for the thumbnail creation
+	 * @var int
+	 */
+	public $sourceParamsId = 0;
+	
+	
 //	Maybe support will be added in the future
 //	
 //	/**
@@ -89,6 +96,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		"scaleWidth",
 		"scaleHeight",
 		"backgroundColor",
+		"sourceParamsId",
 	
 //		Maybe support will be added in the future
 //		"cropProvider",
