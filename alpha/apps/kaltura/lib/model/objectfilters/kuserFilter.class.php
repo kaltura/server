@@ -30,6 +30,8 @@ class kuserFilter extends baseObjectFilter
 				"_lte_puser_id" ,
 				"_eq_id",
 				"_in_id",
+				"_eq_status",
+				"_in_status",
 				"_gte_id" , 
 				"_lte_id" ,
 				"_notin_id",
