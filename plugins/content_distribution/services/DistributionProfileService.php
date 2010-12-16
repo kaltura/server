@@ -138,4 +138,49 @@ class DistributionProfileService extends KalturaBaseService
 	
 		return $response;
 	}	
+	
+	/**
+	 * @action listByPartner
+	 * @param KalturaPartnerFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaDistributionProfileListResponse
+	 */
+	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$c = new Criteria();
+		
+		if (!is_null($filter))
+		{
+			
+			$partnerFilter = new partnerFilter();
+			$filter->toObject($partnerFilter);
+			$partnerFilter->set('_gt_id', 0);
+			
+			$partnerCriteria = new Criteria();
+			$partnerFilter->attachToCriteria($partnerCriteria);
+			$partnerCriteria->setLimit(1000);
+			$partnerCriteria->clearSelectColumns();
+			$partnerCriteria->addSelectColumn(PartnerPeer::ID);
+			$stmt = PartnerPeer::doSelectStmt($partnerCriteria);
+			
+			if($stmt->rowCount() < 1000) // otherwise, it's probably all partners
+			{
+				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				$c->add(DistributionProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
+			}
+		}
+			
+		if (is_null($pager))
+			$pager = new KalturaFilterPager();
+		
+		$totalCount = DistributionProfilePeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = DistributionProfilePeer::doSelect($c);
+		$newList = KalturaDistributionProfileArray::fromDbArray($list);
+		
+		$response = new KalturaDistributionProfileListResponse();
+		$response->totalCount = $totalCount;
+		$response->objects = $newList;
+		return $response;
+	}
 }

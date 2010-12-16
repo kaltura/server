@@ -8,6 +8,11 @@ interface IDistributionProvider
 	public function getType();
 	
 	/**
+	 * @return string
+	 */
+	public function getName();
+	
+	/**
 	 * indicates if this provider enables media removal.
 	 * @return bool
 	 */

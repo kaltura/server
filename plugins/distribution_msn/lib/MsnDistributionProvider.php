@@ -29,6 +29,14 @@ class MsnDistributionProvider implements IDistributionProvider
 	{
 		return MsnDistributionProviderType::get()->coreValue(MsnDistributionProviderType::MSN);
 	}
+	
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'MSN';
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::isDeleteEnabled()

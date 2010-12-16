@@ -32,6 +32,6 @@ class MsnDistributionProviderType extends KalturaDistributionProviderType
 	
 	public function getPluginName()
 	{
-		return DistributionMsnPlugin::getPluginName();
+		return MsnDistributionPlugin::getPluginName();
 	}
 }

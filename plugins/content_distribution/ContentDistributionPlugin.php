@@ -211,11 +211,12 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getAdminConsolePages()
 	{
 		$pages = array();
+		
 		$pages[] = new GenericDistributionProvidersListAction();
 		$pages[] = new GenericDistributionProviderConfigureAction();
 		$pages[] = new GenericDistributionProviderDeleteAction();
 		
-//		$pages[] = new DistributionProfileListAction();
+		$pages[] = new DistributionProfileListAction();
 
 		return $pages;
 	}

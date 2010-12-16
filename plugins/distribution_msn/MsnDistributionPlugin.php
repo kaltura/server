@@ -1,7 +1,7 @@
 <?php
 class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
-	const PLUGIN_NAME = 'distributionMsn';
+	const PLUGIN_NAME = 'msnDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
