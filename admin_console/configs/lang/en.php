@@ -205,6 +205,9 @@ return array(
 	'KalturaStorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',
 	'KalturaStorageServePriority::EXTERNAL_FIRST' => 'External Storage First',
 
+	'KalturaDistributionProfileStatus::ENABLED' => 'Enabled',
+	'KalturaDistributionProfileStatus::DISABLED' => 'Disabled',
+
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
 	'partner not found' => 'Publisher not found',
