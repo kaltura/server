@@ -105,8 +105,11 @@ genericdistributionprovideraction.addmrssvalidatefromfile					|			|2		|1	|0		|0	
 genericdistributionprovideraction.addresultstransform						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.addresultstransformfromfile				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.get										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+genericdistributionprovideraction.getbyproviderid							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.update									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+genericdistributionprovideraction.updatebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.delete									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+genericdistributionprovideraction.deletebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.list										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 
 ---------------------------------------------------------------------------------------------------
