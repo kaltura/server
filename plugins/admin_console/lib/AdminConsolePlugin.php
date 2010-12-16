@@ -1,5 +1,5 @@
 <?php
-class AdminConsolePlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices
+class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'adminConsole';
 	

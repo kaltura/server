@@ -17,4 +17,9 @@ abstract class KalturaPlugin implements IKalturaPlugin
 		
 		return false;
 	}
+	
+	public static function getPluginPermissionName()
+	{
+		return strtoupper(self::getPluginName() .'_PLUGIN_USAGE');
+	}
 }

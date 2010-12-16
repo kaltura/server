@@ -1,6 +1,6 @@
 <?php
 
-class DocumentPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers
+class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
