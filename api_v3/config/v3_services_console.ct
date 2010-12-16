@@ -90,6 +90,7 @@ distributionprofile.get														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|conte
 distributionprofile.update													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+distributionprofile.listbypartner											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 
 genericdistributionprovider.add												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovider.get												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
