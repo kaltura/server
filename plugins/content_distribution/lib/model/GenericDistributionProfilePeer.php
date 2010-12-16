@@ -31,7 +31,7 @@ class GenericDistributionProfilePeer extends DistributionProfilePeer
 
 		$distributionProfiles = DistributionProfilePeer::doSelect($criteria, $con);
 		foreach($distributionProfiles as $key => $distributionProfile)
-			if($distributionProfiles->getGenericProviderId() != $providerId)
+			if($distributionProfile->getGenericProviderId() != $providerId)
 				unset($distributionProfiles[$key]);
 				
 		return $distributionProfiles;

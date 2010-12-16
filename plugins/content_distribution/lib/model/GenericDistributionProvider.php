@@ -130,7 +130,14 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 		$requiredThumbDimensions = array();
 		
 		if($requiredThumbDimensionsStr)
-			$requiredThumbDimensions = unserialize($requiredThumbDimensionsStr);
+		{
+			try{
+				$requiredThumbDimensions = unserialize($requiredThumbDimensionsStr);
+			}
+			catch(Exception $e){
+				KalturaLog::err("Unable to unserialize [$requiredThumbDimensionsStr]");
+			}
+		}
 			
 		if(!$requiredThumbDimensions)
 			return array();
@@ -157,7 +164,14 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 		$optionalThumbDimensions = array();
 		
 		if($optionalThumbDimensionsStr)
-			$optionalThumbDimensions = unserialize($optionalThumbDimensionsStr);
+		{
+			try{
+				$optionalThumbDimensions = unserialize($optionalThumbDimensionsStr);
+			}
+			catch(Exception $e){
+				KalturaLog::err("Unable to unserialize [$optionalThumbDimensionsStr]");
+			}
+		}
 			
 		if(!$optionalThumbDimensions)
 			return array();

@@ -28,7 +28,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$genericDistributionProviderAction->validatePropertyNotNull("genericDistributionProviderId");
 		
 		$dbGenericDistributionProviderAction = new GenericDistributionProviderAction();
-		$genericDistributionProviderAction->toObject($dbGenericDistributionProviderAction);
+		$genericDistributionProviderAction->toInsertableObject($dbGenericDistributionProviderAction);
 		$dbGenericDistributionProviderAction->setPartnerId($this->getPartnerId());			
 		$dbGenericDistributionProviderAction->setStatus(GenericDistributionProviderStatus::ACTIVE);
 		$dbGenericDistributionProviderAction->save();

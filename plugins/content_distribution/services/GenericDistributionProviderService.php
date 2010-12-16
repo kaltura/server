@@ -10,7 +10,8 @@ class GenericDistributionProviderService extends KalturaBaseService
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
 
-		myPartnerUtils::addPartnerToCriteria(new GenericDistributionProviderPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
+			myPartnerUtils::addPartnerToCriteria(new GenericDistributionProviderPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!ContentDistributionPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
@@ -28,8 +29,8 @@ class GenericDistributionProviderService extends KalturaBaseService
 		$genericDistributionProvider->validatePropertyMinLength("name", 1);
 		
 		$dbGenericDistributionProvider = new GenericDistributionProvider();
-		$genericDistributionProvider->toObject($dbGenericDistributionProvider);
-		$dbGenericDistributionProvider->setPartnerId($this->getPartnerId());			
+		$genericDistributionProvider->toInsertableObject($dbGenericDistributionProvider);
+		$dbGenericDistributionProvider->setPartnerId($this->impersonatedPartnerId);			
 		$dbGenericDistributionProvider->setStatus(GenericDistributionProviderStatus::ACTIVE);
 		$dbGenericDistributionProvider->save();
 		
@@ -97,7 +98,7 @@ class GenericDistributionProviderService extends KalturaBaseService
 		if (!$dbGenericDistributionProvider)
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND, $id);
 
-		if ($dbGenericDistributionProvider->getIsDefault())
+		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID && $dbGenericDistributionProvider->getIsDefault())
 			throw new KalturaAPIException(ContentDistributionErrors::CANNOT_DELETE_DEFAULT_DISTRIBUTION_PROVIDER);
 			
 		$dbGenericDistributionProvider->setStatus(GenericDistributionProviderStatus::DELETED);

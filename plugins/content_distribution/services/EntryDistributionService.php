@@ -22,14 +22,29 @@ class EntryDistributionService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaEntryDistribution $entryDistribution
 	 * @return KalturaEntryDistribution
+	 * @throws ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND
+	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_ALREADY_EXISTS
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
 	function addAction(KalturaEntryDistribution $entryDistribution)
 	{
 		$entryDistribution->validatePropertyNotNull("entryId");
 		$entryDistribution->validatePropertyNotNull("distributionProfileId");
 					
-		$dbEntryDistribution = new EntryDistribution();
-		$entryDistribution->toObject($dbEntryDistribution);
+		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->distributionProfileId);
+		if (!$dbDistributionProfile)
+			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $entryDistribution->distributionProfileId);
+		
+		$dbEntry = entryPeer::retrieveByPK($entryDistribution->entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryDistribution->entryId);
+		
+		$dbEntryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entryDistribution->entryId, $entryDistribution->distributionProfileId);
+		if($dbEntryDistribution)
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_ALREADY_EXISTS, $entryDistribution->entryId, $entryDistribution->distributionProfileId);
+		
+		$dbEntryDistribution = kContentDistributionManager::addEntryDistribution($dbEntry, $dbDistributionProfile);
+		$entryDistribution->toInsertableObject($dbEntryDistribution);
 		$dbEntryDistribution->setPartnerId($this->getPartnerId());
 		$dbEntryDistribution->setStatus(EntryDistributionStatus::PENDING);
 		$dbEntryDistribution->save();
@@ -140,7 +155,7 @@ class EntryDistributionService extends KalturaBaseService
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
 	 * @throws ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND
 	 */
-	function submitAddAction($id, $submitWhenReady)
+	function submitAddAction($id, $submitWhenReady = false)
 	{
 		$dbEntryDistribution = EntryDistributionPeer::retrieveByPK($id);
 		if (!$dbEntryDistribution)

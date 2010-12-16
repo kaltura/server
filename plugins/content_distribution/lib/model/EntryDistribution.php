@@ -36,11 +36,17 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable
 		$validationErrors = parent::getValidationErrors();
 		if(!$validationErrors)
 			return array();
-			
-		return unserialize($validationErrors);
+	
+		try{
+			return unserialize($validationErrors);
+		}
+		catch(Exception $e){
+			KalturaLog::err("Unable to unserialize [$validationErrors]");
+		}
+		return array();
 	}
 
-	public function setValidationErrors(array $v)
+	public function setValidationErrorsArray(array $v)
 	{
 		return parent::setValidationErrors(serialize($v));
 	}

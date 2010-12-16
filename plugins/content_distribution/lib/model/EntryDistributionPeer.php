@@ -41,4 +41,22 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 
 		return EntryDistributionPeer::doSelect($criteria, $con);
 	}
+
+	
+	/**
+	 * Retrieve single EntryDistribution object by entry id and profile id.
+	 *
+	 * @param      string $entryId
+	 * @param      int $distributionProfileId
+	 * @param      PropelPDO $con the connection to use
+	 * @return     EntryDistribution
+	 */
+	public static function retrieveByEntryAndProfileId($entryId, $distributionProfileId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryId);
+		$criteria->add(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, $distributionProfileId);
+
+		return EntryDistributionPeer::doSelectOne($criteria, $con);
+	}
 } // EntryDistributionPeer

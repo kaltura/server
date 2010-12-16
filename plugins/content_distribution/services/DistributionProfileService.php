@@ -36,7 +36,7 @@ class DistributionProfileService extends KalturaBaseService
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROVIDER_NOT_FOUND, $distributionProfile->providerType);
 			
-		$distributionProfile->toObject($dbDistributionProfile);
+		$distributionProfile->toInsertableObject($dbDistributionProfile);
 		$dbDistributionProfile->setPartnerId($this->getPartnerId());
 		$dbDistributionProfile->save();
 		
