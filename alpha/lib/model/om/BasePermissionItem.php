@@ -659,6 +659,9 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
 
+			if ($this->isNew() ) {
+				$this->modifiedColumns[] = PermissionItemPeer::ID;
+			}
 
 			// If this object has been modified, then save it to the database.
 			if ($this->isModified()) {
@@ -667,6 +670,8 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
+
+					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
 				} else {
@@ -1073,29 +1078,29 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 	{
 		$criteria = new Criteria(PermissionItemPeer::DATABASE_NAME);
 
-		$criteria->add(PermissionItemPeer::TYPE, $this->type);
+		$criteria->add(PermissionItemPeer::ID, $this->id);
 
 		return $criteria;
 	}
 
 	/**
 	 * Returns the primary key for this object (row).
-	 * @return     string
+	 * @return     int
 	 */
 	public function getPrimaryKey()
 	{
-		return $this->getType();
+		return $this->getId();
 	}
 
 	/**
-	 * Generic method to set the primary key (type column).
+	 * Generic method to set the primary key (id column).
 	 *
-	 * @param      string $key Primary key.
+	 * @param      int $key Primary key.
 	 * @return     void
 	 */
 	public function setPrimaryKey($key)
 	{
-		$this->setType($key);
+		$this->setId($key);
 	}
 
 	/**

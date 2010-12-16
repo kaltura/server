@@ -1928,8 +1928,7 @@ CREATE TABLE `permission_item`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
-	PRIMARY KEY (`type`),
-	INDEX `I_referenced_permission_to_permission_item_FK_2_1` (`id`)
+	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------
