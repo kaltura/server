@@ -111,7 +111,20 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
-			
+	
+		if($baseClass == 'ISyncableFile' && isset($constructorArgs['objectId']))
+		{
+			$objectId = $constructorArgs['objectId'];
+
+			if($enumValue == ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
+			{
+				GenericDistributionProviderActionPeer::setUseCriteriaFilter(false);
+				$object = GenericDistributionProviderActionPeer::retrieveByPK($objectId);
+				GenericDistributionProviderActionPeer::setUseCriteriaFilter(true);
+				return $object;
+			}
+		}
+		
 		if($baseClass == 'kJobData')
 		{
 			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
@@ -155,7 +168,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
-	
+			
+		if($baseClass == 'ISyncableFile')
+		{
+			if($enumValue == ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
+				return 'GenericDistributionProviderAction';
+		}
+		
 		if($baseClass == 'kJobData')
 		{
 			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))

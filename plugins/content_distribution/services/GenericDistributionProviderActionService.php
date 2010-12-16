@@ -22,14 +22,19 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction
 	 * @return KalturaGenericDistributionProviderAction
+	 * @throws ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND
 	 */
 	function addAction(KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
 	{
 		$genericDistributionProviderAction->validatePropertyNotNull("genericDistributionProviderId");
 		
+		$dbGenericDistributionProvider = GenericDistributionProviderPeer::retrieveByPK($genericDistributionProviderAction->genericDistributionProviderId);
+		if (!$dbGenericDistributionProvider)
+			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND, $genericDistributionProviderAction->genericDistributionProviderId);
+			
 		$dbGenericDistributionProviderAction = new GenericDistributionProviderAction();
 		$genericDistributionProviderAction->toInsertableObject($dbGenericDistributionProviderAction);
-		$dbGenericDistributionProviderAction->setPartnerId($this->getPartnerId());			
+		$dbGenericDistributionProviderAction->setPartnerId($dbGenericDistributionProvider->getPartnerId());			
 		$dbGenericDistributionProviderAction->setStatus(GenericDistributionProviderStatus::ACTIVE);
 		$dbGenericDistributionProviderAction->save();
 		
@@ -235,6 +240,51 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		return $genericDistributionProviderAction;
 	}
 	
+	
+	/**
+	 * Get Generic Distribution Provider Action by provider id
+	 * 
+	 * @action getByProviderId
+	 * @param int $genericDistributionProviderId
+	 * @param KalturaDistributionAction $actionType
+	 * @return KalturaGenericDistributionProviderAction
+	 * @throws ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND
+	 */
+	function getByProviderIdAction($genericDistributionProviderId, $actionType)
+	{
+		$dbGenericDistributionProviderAction = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($genericDistributionProviderId, $actionType);
+		if (!$dbGenericDistributionProviderAction)
+			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $genericDistributionProviderId);
+	
+		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		return $genericDistributionProviderAction;
+	}
+	
+	/**
+	 * Update Generic Distribution Provider Action by provider id
+	 * 
+	 * @action updateByProviderId
+	 * @param int $genericDistributionProviderId
+	 * @param KalturaDistributionAction $actionType
+	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction
+	 * @return KalturaGenericDistributionProviderAction
+	 * @throws ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND
+	 */
+	function updateByProviderIdAction($genericDistributionProviderId, $actionType, KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
+	{
+		$dbGenericDistributionProviderAction = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($genericDistributionProviderId, $actionType);
+		if (!$dbGenericDistributionProviderAction)
+			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $genericDistributionProviderId);
+	
+		$genericDistributionProviderAction->toUpdatableObject($dbGenericDistributionProviderAction);
+		$dbGenericDistributionProviderAction->save();
+		
+		$genericDistributionProviderAction = new KalturaGenericDistributionProviderAction();
+		$genericDistributionProviderAction->fromObject($dbGenericDistributionProviderAction);
+		return $genericDistributionProviderAction;
+	}
+	
 	/**
 	 * Update Generic Distribution Provider Action by id
 	 * 
@@ -250,9 +300,6 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		if (!$dbGenericDistributionProviderAction)
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $id);
 		
-		if ($genericDistributionProviderAction->name !== null)
-			$genericDistributionProviderAction->validatePropertyMinLength("name", 1);
-			
 		$genericDistributionProviderAction->toUpdatableObject($dbGenericDistributionProviderAction);
 		$dbGenericDistributionProviderAction->save();
 		
@@ -273,6 +320,24 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		$dbGenericDistributionProviderAction = GenericDistributionProviderActionPeer::retrieveByPK($id);
 		if (!$dbGenericDistributionProviderAction)
 			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $id);
+
+		$dbGenericDistributionProviderAction->setStatus(GenericDistributionProviderStatus::DELETED);
+		$dbGenericDistributionProviderAction->save();
+	}
+	
+	/**
+	 * Delete Generic Distribution Provider Action by provider id
+	 * 
+	 * @action deleteByProviderId
+	 * @param int $genericDistributionProviderId
+	 * @param KalturaDistributionAction $actionType
+	 * @throws ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND
+	 */
+	function deleteByProviderIdAction($genericDistributionProviderId, $actionType)
+	{
+		$dbGenericDistributionProviderAction = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($genericDistributionProviderId, $actionType);
+		if (!$dbGenericDistributionProviderAction)
+			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND, $genericDistributionProviderId);
 
 		$dbGenericDistributionProviderAction->setStatus(GenericDistributionProviderStatus::DELETED);
 		$dbGenericDistributionProviderAction->save();
