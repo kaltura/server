@@ -1,0 +1,41 @@
+
+<?php if($this->errMessage): ?>
+<div class="error"><?php echo $this->errMessage ?></div>
+<?php endif; ?>
+
+<?php echo $this->form ?>
+<script type="text/javascript">
+
+var newThumbDimensionsIndex = 0;
+
+function newThumbDimensions() {
+	var newThumbDimensionsTemplate = jQuery(".newThumbDimensions:last");
+	var newThumbDimensionsForm = newThumbDimensionsTemplate.clone();
+	newThumbDimensionsForm.removeClass("newThumbDimensions");
+	newThumbDimensionsForm.find('[name="dimensionsWidth"]').attr('name', 'dimensionsWidth[' + newThumbDimensionsIndex + ']');
+	newThumbDimensionsForm.find('[name="dimensionsHeight"]').attr('name', 'dimensionsHeight[' + newThumbDimensionsIndex + ']');
+	newThumbDimensionsForm.find('[name="dimensionsRequired"]').attr('name', 'dimensionsRequired[' + newThumbDimensionsIndex + ']');
+	newThumbDimensionsTemplate.after(newThumbDimensionsForm);
+	newThumbDimensionsForm.show();
+
+	newThumbDimensionsIndex++;
+}
+
+function removeThumbDimensions(index){
+	jQuery(".thumbDimensions_" + index).remove();
+}
+
+function actionEnabledChanged(action){
+	var enabled = jQuery(".actionEnabled-" + action + " :checked").size();
+	var fields = jQuery(".action-fields-" + action);
+	if(enabled)
+		fields.show();
+	else
+		fields.hide();
+}
+
+jQuery(function() {
+});
+
+
+</script>

@@ -1,0 +1,191 @@
+
+<p><?php echo $this->translate('provider-list intro text'); ?></p>
+
+<?php echo $this->newForm; ?>
+<div id="results" class="clear">
+	<h2>Results <span>(<?php echo $this->paginator->getItemsCount(); ?> generic providers)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Publisher ID'); ?></th>
+				<th><?php echo $this->translate('Is Default'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* KalturaGenericDistributionProvider */ $provider): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $provider->id; ?></td>
+				<td><?php echo $provider->partnerId; ?></td>
+				<td><?php echo $provider->isDefault; ?></td>
+				<td><?php echo $provider->name; ?></td>
+				<td><?php $d = (new Zend_Date($provider->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $provider->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+						<option value="remove"><?php echo $this->translate('Remove'); ?></option>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
+
+jQuery('#filter_type').change();
+
+function doAction(action, providerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function configure(providerId) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProviderConfigureAction', 'provider_id' => '')); ?>' + providerId;
+	
+	jQuery('#provider-configure-dialog').remove();
+	var dialogDiv = jQuery('<div id="provider-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 550,
+		height: 600,
+		title: '<?php echo $this->translate('Provider Specific Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmGenericProviderConfig').submit();
+				jQuery(this).dialog('close');
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery('#frmPaginator1').submit();
+		}	
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess);
+		}
+	);
+}
+
+function remove(providerId)
+{
+	var ok = confirm('<?php echo $this->translate('are you sure delete the provider?'); ?>');
+	if (!ok)
+		return;
+	
+	var callback = function() {
+		alert('<?php echo $this->translate('provider was removed');?>');
+	}
+
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProviderDeleteAction', 'provider_id' => '')); ?>' + providerId;
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+			{
+				this.error(result);
+				return;
+			}
+
+			alert('<?php echo $this->translate('provider was deleted');?>');
+
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function(result) {
+			alert('<?php echo $this->translate('an error occured'); ?>: ' + result);
+		}
+	});
+}
+
+var dialogDiv;
+function newGenericProvider() {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProviderConfigureAction')); ?>';
+	
+	jQuery('#partner-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 550,
+		height: 600,
+		title: '<?php echo $this->translate('Generic provider Specific Setup Configuration'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmGenericProviderConfig').submit();
+				jQuery(this).dialog('close');
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery('#frmPaginator1').submit();
+		}	
+	});	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess); 
+		}
+	);
+}
+
+function newGenericProviderSuccess(html) {
+	if (jQuery(html).parent().find('#frmGenericProviderConfig').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+	}
+	else
+	{
+		jQuery('#frmGenericProviderConfig').replaceWith(html);
+		jQuery('#frmGenericProviderConfig').ajaxForm(newGenericProviderSuccess);
+	}
+}
+jQuery(function() {
+});
+
+</script>

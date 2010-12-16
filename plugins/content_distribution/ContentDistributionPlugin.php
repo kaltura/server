@@ -1,5 +1,5 @@
 <?php
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -187,5 +187,17 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		}
 		
 		return null;
+	}
+	
+	public static function getAdminConsolePages()
+	{
+		$pages = array();
+		$pages[] = new GenericDistributionProvidersListAction();
+		$pages[] = new GenericDistributionProviderConfigureAction();
+		$pages[] = new GenericDistributionProviderDeleteAction();
+		
+//		$pages[] = new DistributionProfileListAction();
+
+		return $pages;
 	}
 }
