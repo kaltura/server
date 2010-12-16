@@ -155,7 +155,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	 */
 	public function validateEndTime(KalturaAnnotation $annotation, $annotationId = null)
 	{
-		if(($annotation->startTime === null) &&($annotation->endTime !== null))
+		if(($annotation->startTime === null) && ($annotation->endTime !== null))
 				throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_WITHOUT_START_TIME);
 		
 		if ($annotation->endTime === null)
@@ -180,8 +180,8 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $annotation->entryId);
 		
-		if($dbEntry->getDuration() < $annotation->endTime)
-			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $annotation->endTime, $dbEntry->getDuration());	
+		if($dbEntry->getLengthInMsecs() < $annotation->endTime)
+			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $annotation->endTime, $dbEntry->getLengthInMsecs());	
 	}
 	
 	/*
@@ -211,8 +211,8 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $annotation->entryId);
 		}
 		
-		if($dbEntry->getDuration() < $annotation->startTime)
-			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_IS_BIGGER_THEN_ENTRY_END_TIME, $annotation->startTime, $dbEntry->getDuration());
+		if($dbEntry->getLengthInMsecs() < $annotation->startTime)
+			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_IS_BIGGER_THEN_ENTRY_END_TIME, $annotation->startTime, $dbEntry->getLengthInMsecs());
 	}
 	
 	/**

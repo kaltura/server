@@ -65,8 +65,8 @@ class AnnotationService extends KalturaBaseService
 		$annotation->validatePropertyNotNull("entryId");
 		$annotation->validateParentId($annotation);
 		$annotation->validateEntryId($annotation);
-		$annotation->validateEndTime($annotation);
-		$annotation->validateStartTime($annotation);		
+		$annotation->validateStartTime($annotation);
+		$annotation->validateEndTime($annotation);				
 		if($annotation->text != null)
 			$annotation->validatePropertyMaxLength("text", AnnotationPeer::MAX_ANNOTATION_TEXT);
 		if($annotation->tags != null)
