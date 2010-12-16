@@ -2,7 +2,7 @@
 class KalturaAnnotation extends KalturaObject implements IFilterable 
 {
 	/**
-	 * @var int
+	 * @var string
 	 * @filter eq
 	 * @readonly
 	 */
