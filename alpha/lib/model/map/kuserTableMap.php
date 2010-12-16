@@ -104,6 +104,7 @@ class kuserTableMap extends TableMap {
     $this->addRelation('moderationFlagRelatedByKuserId', 'moderationFlag', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
     $this->addRelation('moderationFlagRelatedByFlaggedKuserId', 'moderationFlag', RelationMap::ONE_TO_MANY, array('id' => 'flagged_kuser_id', ), null, null);
     $this->addRelation('UploadToken', 'UploadToken', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
+    $this->addRelation('KuserToUserRole', 'KuserToUserRole', RelationMap::ONE_TO_MANY, array('id' => 'kuser_id', ), null, null);
 	} // buildRelations()
 
 } // kuserTableMap
