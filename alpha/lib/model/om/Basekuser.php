@@ -437,6 +437,16 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	private $lastUploadTokenCriteria = null;
 
 	/**
+	 * @var        array KuserToUserRole[] Collection to store aggregation of KuserToUserRole objects.
+	 */
+	protected $collKuserToUserRoles;
+
+	/**
+	 * @var        Criteria The criteria used to select the current contents of collKuserToUserRoles.
+	 */
+	private $lastKuserToUserRoleCriteria = null;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -2422,6 +2432,9 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$this->collUploadTokens = null;
 			$this->lastUploadTokenCriteria = null;
 
+			$this->collKuserToUserRoles = null;
+			$this->lastKuserToUserRoleCriteria = null;
+
 		} // if (deep)
 	}
 
@@ -2650,6 +2663,14 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 			if ($this->collUploadTokens !== null) {
 				foreach ($this->collUploadTokens as $referrerFK) {
+					if (!$referrerFK->isDeleted()) {
+						$affectedRows += $referrerFK->save($con);
+					}
+				}
+			}
+
+			if ($this->collKuserToUserRoles !== null) {
+				foreach ($this->collKuserToUserRoles as $referrerFK) {
 					if (!$referrerFK->isDeleted()) {
 						$affectedRows += $referrerFK->save($con);
 					}
@@ -2936,6 +2957,14 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 
 				if ($this->collUploadTokens !== null) {
 					foreach ($this->collUploadTokens as $referrerFK) {
+						if (!$referrerFK->validate($columns)) {
+							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+						}
+					}
+				}
+
+				if ($this->collKuserToUserRoles !== null) {
+					foreach ($this->collKuserToUserRoles as $referrerFK) {
 						if (!$referrerFK->validate($columns)) {
 							$failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
 						}
@@ -3712,6 +3741,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			foreach ($this->getUploadTokens() as $relObj) {
 				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
 					$copyObj->addUploadToken($relObj->copy($deepCopy));
+				}
+			}
+
+			foreach ($this->getKuserToUserRoles() as $relObj) {
+				if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+					$copyObj->addKuserToUserRole($relObj->copy($deepCopy));
 				}
 			}
 
@@ -6065,6 +6100,207 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Clears out the collKuserToUserRoles collection (array).
+	 *
+	 * This does not modify the database; however, it will remove any associated objects, causing
+	 * them to be refetched by subsequent calls to accessor method.
+	 *
+	 * @return     void
+	 * @see        addKuserToUserRoles()
+	 */
+	public function clearKuserToUserRoles()
+	{
+		$this->collKuserToUserRoles = null; // important to set this to NULL since that means it is uninitialized
+	}
+
+	/**
+	 * Initializes the collKuserToUserRoles collection (array).
+	 *
+	 * By default this just sets the collKuserToUserRoles collection to an empty array (like clearcollKuserToUserRoles());
+	 * however, you may wish to override this method in your stub class to provide setting appropriate
+	 * to your application -- for example, setting the initial array to the values stored in database.
+	 *
+	 * @return     void
+	 */
+	public function initKuserToUserRoles()
+	{
+		$this->collKuserToUserRoles = array();
+	}
+
+	/**
+	 * Gets an array of KuserToUserRole objects which contain a foreign key that references this object.
+	 *
+	 * If this collection has already been initialized with an identical Criteria, it returns the collection.
+	 * Otherwise if this kuser has previously been saved, it will retrieve
+	 * related KuserToUserRoles from storage. If this kuser is new, it will return
+	 * an empty collection or the current collection, the criteria is ignored on a new object.
+	 *
+	 * @param      PropelPDO $con
+	 * @param      Criteria $criteria
+	 * @return     array KuserToUserRole[]
+	 * @throws     PropelException
+	 */
+	public function getKuserToUserRoles($criteria = null, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collKuserToUserRoles === null) {
+			if ($this->isNew()) {
+			   $this->collKuserToUserRoles = array();
+			} else {
+
+				$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+				KuserToUserRolePeer::addSelectColumns($criteria);
+				$this->collKuserToUserRoles = KuserToUserRolePeer::doSelect($criteria, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return the collection.
+
+
+				$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+				KuserToUserRolePeer::addSelectColumns($criteria);
+				if (!isset($this->lastKuserToUserRoleCriteria) || !$this->lastKuserToUserRoleCriteria->equals($criteria)) {
+					$this->collKuserToUserRoles = KuserToUserRolePeer::doSelect($criteria, $con);
+				}
+			}
+		}
+		$this->lastKuserToUserRoleCriteria = $criteria;
+		return $this->collKuserToUserRoles;
+	}
+
+	/**
+	 * Returns the number of related KuserToUserRole objects.
+	 *
+	 * @param      Criteria $criteria
+	 * @param      boolean $distinct
+	 * @param      PropelPDO $con
+	 * @return     int Count of related KuserToUserRole objects.
+	 * @throws     PropelException
+	 */
+	public function countKuserToUserRoles(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		} else {
+			$criteria = clone $criteria;
+		}
+
+		if ($distinct) {
+			$criteria->setDistinct();
+		}
+
+		$count = null;
+
+		if ($this->collKuserToUserRoles === null) {
+			if ($this->isNew()) {
+				$count = 0;
+			} else {
+
+				$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+				$count = KuserToUserRolePeer::doCount($criteria, false, $con);
+			}
+		} else {
+			// criteria has no effect for a new object
+			if (!$this->isNew()) {
+				// the following code is to determine if a new query is
+				// called for.  If the criteria is the same as the last
+				// one, just return count of the collection.
+
+
+				$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+				if (!isset($this->lastKuserToUserRoleCriteria) || !$this->lastKuserToUserRoleCriteria->equals($criteria)) {
+					$count = KuserToUserRolePeer::doCount($criteria, false, $con);
+				} else {
+					$count = count($this->collKuserToUserRoles);
+				}
+			} else {
+				$count = count($this->collKuserToUserRoles);
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Method called to associate a KuserToUserRole object to this object
+	 * through the KuserToUserRole foreign key attribute.
+	 *
+	 * @param      KuserToUserRole $l KuserToUserRole
+	 * @return     void
+	 * @throws     PropelException
+	 */
+	public function addKuserToUserRole(KuserToUserRole $l)
+	{
+		if ($this->collKuserToUserRoles === null) {
+			$this->initKuserToUserRoles();
+		}
+		if (!in_array($l, $this->collKuserToUserRoles, true)) { // only add it if the **same** object is not already associated
+			array_push($this->collKuserToUserRoles, $l);
+			$l->setkuser($this);
+		}
+	}
+
+
+	/**
+	 * If this collection has already been initialized with
+	 * an identical criteria, it returns the collection.
+	 * Otherwise if this kuser is new, it will return
+	 * an empty collection; or if this kuser has previously
+	 * been saved, it will retrieve related KuserToUserRoles from storage.
+	 *
+	 * This method is protected by default in order to keep the public
+	 * api reasonable.  You can provide public methods for those you
+	 * actually need in kuser.
+	 */
+	public function getKuserToUserRolesJoinUserRole($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+	{
+		if ($criteria === null) {
+			$criteria = new Criteria(kuserPeer::DATABASE_NAME);
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collKuserToUserRoles === null) {
+			if ($this->isNew()) {
+				$this->collKuserToUserRoles = array();
+			} else {
+
+				$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+				$this->collKuserToUserRoles = KuserToUserRolePeer::doSelectJoinUserRole($criteria, $con, $join_behavior);
+			}
+		} else {
+			// the following code is to determine if a new query is
+			// called for.  If the criteria is the same as the last
+			// one, just return the collection.
+
+			$criteria->add(KuserToUserRolePeer::KUSER_ID, $this->id);
+
+			if (!isset($this->lastKuserToUserRoleCriteria) || !$this->lastKuserToUserRoleCriteria->equals($criteria)) {
+				$this->collKuserToUserRoles = KuserToUserRolePeer::doSelectJoinUserRole($criteria, $con, $join_behavior);
+			}
+		}
+		$this->lastKuserToUserRoleCriteria = $criteria;
+
+		return $this->collKuserToUserRoles;
+	}
+
+	/**
 	 * Resets all collections of referencing foreign keys.
 	 *
 	 * This method is a user-space workaround for PHP's inability to garbage collect objects
@@ -6141,6 +6377,11 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 					$o->clearAllReferences($deep);
 				}
 			}
+			if ($this->collKuserToUserRoles) {
+				foreach ((array) $this->collKuserToUserRoles as $o) {
+					$o->clearAllReferences($deep);
+				}
+			}
 		} // if ($deep)
 
 		$this->collkshows = null;
@@ -6156,6 +6397,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$this->collmoderationFlagsRelatedByKuserId = null;
 		$this->collmoderationFlagsRelatedByFlaggedKuserId = null;
 		$this->collUploadTokens = null;
+		$this->collKuserToUserRoles = null;
 	}
 
 	/* ---------------------- CustomData functions ------------------------- */
