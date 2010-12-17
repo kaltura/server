@@ -7,6 +7,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var string
+	 * @filter eq,in,order
 	 */
 	public $id;
 
@@ -90,6 +91,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaUserStatus
+	 * @filter eq,in
 	 */
 	public $status;
 
