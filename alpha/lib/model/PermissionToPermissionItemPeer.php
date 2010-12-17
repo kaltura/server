@@ -12,6 +12,22 @@
  *
  * @package    lib.model
  */
-class PermissionToPermissionItemPeer extends BasePermissionToPermissionItemPeer {
+class PermissionToPermissionItemPeer extends BasePermissionToPermissionItemPeer
+{
 
+	/**
+	 * Get objects by permission name and permission item ID
+	 * @param string $permissionName
+	 * @param int $permissionItemId
+	 * @return array Array of selected PermissionToPermissionItem Objects
+	 */
+	public static function getByPermissionNameAndItemId($permissionName, $permissionItemId)
+	{
+		$c = new Criteria();
+		$c->addAnd(self::PERMISSION_NAME,    $permissionName,   Criteria::EQUAL);
+		$c->addAnd(self::PERMISSION_ITEM_ID, $permissionItemId, Criteria::EQUAL);
+		return self::doSelect($c);
+	}
+	
+	
 } // PermissionToPermissionItemPeer

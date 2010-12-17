@@ -12,6 +12,22 @@
  *
  * @package    lib.model
  */
-class UserRole extends BaseUserRole {
+class UserRole extends BaseUserRole
+{
+	/**
+	 * Copy current role to the given partner.
+	 * @param int $partnerId
+	 */
+	public function copyToPartner($partnerId)
+	{
+		$newRole = new UserRole();
+		$newRole->setName($this->getName());
+		$newRole->setDescription($this->getDescription());
+		$newRole->setStatus($this->getStatus());
+		$newRole->setPermissionNames($this->getPermissionNames());
+		$newRole->setCustomData($this->getCustomData());
+		$newRole->setPartnerId($partnerId); // set new partner id
+		$newRole->save();
+	}
 
 } // UserRole

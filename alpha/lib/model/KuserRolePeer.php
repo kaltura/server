@@ -2,7 +2,7 @@
 
 
 /**
- * Skeleton subclass for representing a row from the 'kuser_to_user_role' table.
+ * Skeleton subclass for performing query and update operations on the 'kuser_role' table.
  *
  * 
  *
@@ -12,7 +12,6 @@
  *
  * @package    lib.model
  */
-class KuserToUserRole extends BaseKuserToUserRole {
+class KuserRolePeer extends BaseKuserRolePeer {
 
-
-} // KuserToUserRole
+} // KuserRolePeer
