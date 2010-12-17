@@ -277,5 +277,11 @@
 		const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED,Same login id is already in use";
 		
 		const CANNOT_DELETE_ROOT_ADMIN_USER = "CANNOT_DELETE_ROOT_ADMIN_USER,Root admin user cannot be deleted";
+		
+		const ROLE_ID_MISSING = "ROLE_ID_MISSING,User must have an associated role";
+		
+		const ONLY_ONE_ROLE_PER_USER_ALLOWED = "ONLY_ONE_ROLE_PER_USER_ALLOWED,User cannot have more than one role";
+		
+		const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN,Root admin user cannot be set to not admin";
 	}
 ?>
