@@ -1099,6 +1099,23 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+ 		
+ 		self::copyUserRoles($fromPartner, $toPartner);
+ 	}
+ 	
+	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
+ 	{
+ 		KalturaLog::log('copyUserRoles - Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+ 		UserRolePeer::setUseCriteriaFilter ( false );
+ 		$c = new Criteria();
+ 		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId());
+ 		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
+ 		$roles = UserRolePeer::doSelect($c);
+ 		UserRolePeer::setUseCriteriaFilter ( true );
+ 		foreach($roles as $role)
+ 		{
+ 			$role->copyToPartner($toPartner->getId());
+ 		}
  	}
  	
  	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType)
