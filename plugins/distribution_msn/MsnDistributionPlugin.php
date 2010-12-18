@@ -50,30 +50,46 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'IDistributionEngineCloseDelete' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineCloseReport' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineCloseSubmit' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineCloseUpdate' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineDelete' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineReport' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineSubmit' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-				
-		if($baseClass == 'IDistributionEngineUpdate' && $enumValue == MsnDistributionProviderType::MSN)
-			return new MsnDistributionEngine();
-	
+		// client side apps like batch and admin console
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::MSN)
+		{
+			if($baseClass == 'IDistributionEngineCloseDelete')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineCloseReport')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineCloseSubmit')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineCloseUpdate')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineDelete')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineReport')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineSubmit')
+				return new MsnDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineUpdate')
+				return new MsnDistributionEngine();
+		
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+			{
+				$reflect = new ReflectionClass('Form_MsnProfileConfiguration');
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
+		
+			if($baseClass == 'KalturaDistributionProfile')
+				return new KalturaMsnDistributionProfile();
+		
+			if($baseClass == 'KalturaDistributionJobProviderData')
+				return new KalturaMsnDistributionJobProviderData();
+		}
+		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
@@ -81,13 +97,13 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == MsnDistributionProviderType::get()->coreValue(MsnDistributionProviderType::MSN))
 		{
 			$reflect = new ReflectionClass('KalturaMsnDistributionJobProviderData');
-			return $reflect->newInstance($constructorArgs);
+			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
 		if($baseClass == 'kDistributionJobProviderData' && $enumValue == MsnDistributionProviderType::get()->apiValue(MsnDistributionProviderType::MSN))
 		{
 			$reflect = new ReflectionClass('kMsnDistributionJobProviderData');
-			return $reflect->newInstance($constructorArgs);
+			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
 		if($baseClass == 'KalturaDistributionProfile' && $enumValue == MsnDistributionProviderType::get()->coreValue(MsnDistributionProviderType::MSN))
@@ -106,30 +122,43 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'IDistributionEngineCloseDelete' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineCloseReport' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineCloseSubmit' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineCloseUpdate' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineDelete' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineReport' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineSubmit' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-				
-		if($baseClass == 'IDistributionEngineUpdate' && $enumValue == MsnDistributionProviderType::MSN)
-			return 'MsnDistributionEngine';
-	
+		// client side apps like batch and admin console
+		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::MSN)
+		{
+			if($baseClass == 'IDistributionEngineCloseDelete')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseReport')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseSubmit')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineCloseUpdate')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineDelete')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineReport')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineSubmit')
+				return 'MsnDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineUpdate')
+				return 'MsnDistributionEngine';
+		
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_MsnProfileConfiguration';
+		
+			if($baseClass == 'KalturaDistributionProfile')
+				return 'KalturaMsnDistributionProfile';
+		
+			if($baseClass == 'KalturaDistributionJobProviderData')
+				return 'KalturaMsnDistributionJobProviderData';
+		}
+		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;

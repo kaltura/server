@@ -32,7 +32,8 @@ class DistributionProfileService extends KalturaBaseService
 		if(is_null($distributionProfile->status))
 			$distributionProfile->status = KalturaDistributionProfileStatus::DISABLED;
 		
-		$dbDistributionProfile = DistributionProfilePeer::createDistributionProfile($distributionProfile->providerType);
+		$providerType = KalturaDistributionProviderType::getCoreValue($distributionProfile->providerType);
+		$dbDistributionProfile = DistributionProfilePeer::createDistributionProfile($providerType);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROVIDER_NOT_FOUND, $distributionProfile->providerType);
 			
@@ -83,6 +84,29 @@ class DistributionProfileService extends KalturaBaseService
 			$distributionProfile->validatePropertyMinLength("name", 1);
 			
 		$distributionProfile->toUpdatableObject($dbDistributionProfile);
+		$dbDistributionProfile->save();
+		
+		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());
+		$distributionProfile->fromObject($dbDistributionProfile);
+		return $distributionProfile;
+	}
+	
+	/**
+	 * Update Distribution Profile status by id
+	 * 
+	 * @action updateStatus
+	 * @param int $id
+	 * @param KalturaDistributionProfileStatus $status
+	 * @return KalturaDistributionProfile
+	 * @throws ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND
+	 */
+	function updateStatusAction($id, $status)
+	{
+		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($id);
+		if (!$dbDistributionProfile)
+			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $id);
+		
+		$dbDistributionProfile->setStatus($status);
 		$dbDistributionProfile->save();
 		
 		$distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($dbDistributionProfile->getProviderType());

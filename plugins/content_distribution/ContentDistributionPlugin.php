@@ -217,6 +217,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		$pages[] = new GenericDistributionProviderDeleteAction();
 		
 		$pages[] = new DistributionProfileListAction();
+		$pages[] = new DistributionProfileConfigureAction();
+		$pages[] = new DistributionProfileUpdateStatusAction();
 
 		return $pages;
 	}

@@ -1,9 +1,9 @@
 <?php
-class GenericDistributionProviderDeleteAction extends KalturaAdminConsolePlugin
+class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()
 	{
-		$this->action = 'deleteGenericDistributionProvider';
+		$this->action = 'updateStatusDistributionProfile';
 	}
 	
 	/**
@@ -22,12 +22,14 @@ class GenericDistributionProviderDeleteAction extends KalturaAdminConsolePlugin
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('viewRenderer')->setNoRender();
-		$providerId = $this->_getParam('provider_id');
+		$profileId = $this->_getParam('profile_id');
+		$status = $this->_getParam('status');
+		KalturaLog::debug("profileId: $profileId, status: $status");
 		$client = Kaltura_ClientHelper::getClient();
 		
 		try
 		{
-			$client->genericDistributionProvider->delete($providerId);
+			$client->distributionProfile->updateStatus($profileId, $status);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		}
 		catch(Exception $e)

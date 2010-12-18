@@ -35,6 +35,11 @@
 					<select class="options" onchange="doAction(this.value, <?php echo $profile->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+						<?php if($profile->status == KalturaDistributionProfileStatus::ENABLED): ?>
+							<option value="disableProfile"><?php echo $this->translate('Disable'); ?></option>
+						<?php else: ?>
+							<option value="enableProfile"><?php echo $this->translate('Enable'); ?></option>
+						<?php endif; ?>
 						<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 					</select>
 				</td>
@@ -63,7 +68,7 @@ jQuery('#filter_type').change(function() {
 
 jQuery('#filter_type').change();
 
-function doAction(action, providerId) {
+function doAction(action, profileId) {
 	if (action && eval('typeof ' + action) == 'function')
 	{
 		f = eval(action);
@@ -73,8 +78,8 @@ function doAction(action, providerId) {
 	jQuery('select.options').val('');
 }
 
-function configure(providerId) {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'provider_id' => '')); ?>' + providerId;
+function configure(profileId) {
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'profile_id' => '')); ?>' + profileId;
 	
 	jQuery('#provider-configure-dialog').remove();
 	var dialogDiv = jQuery('<div id="provider-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
@@ -85,7 +90,7 @@ function configure(providerId) {
 		resizable: false,
 		width: 600,
 		height: 600,
-		title: '<?php echo $this->translate('Provider Specific Setup Configuration'); ?>',
+		title: '<?php echo $this->translate('Profile Setup Configuration'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
@@ -93,6 +98,7 @@ function configure(providerId) {
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			}
 		},
 		close: function() {
@@ -109,17 +115,47 @@ function configure(providerId) {
 	);
 }
 
-function remove(providerId)
+function disableProfile(profileId){
+	updateStatus(
+		profileId, 
+		<?php echo KalturaDistributionProfileStatus::DISABLED; ?>, 
+		function() {
+			alert('<?php echo $this->translate('profile was disabled');?>');
+		}
+	);
+}
+
+function enableProfile(profileId){
+	updateStatus(
+		profileId, 
+		<?php echo KalturaDistributionProfileStatus::ENABLED; ?>, 
+		function() {
+			alert('<?php echo $this->translate('profile was enabled');?>');
+		}
+	);
+}
+
+function remove(profileId)
 {
-	var ok = confirm('<?php echo $this->translate('are you sure delete the provider?'); ?>');
+	var ok = confirm('<?php echo $this->translate('are you sure delete the profile?'); ?>');
 	if (!ok)
 		return;
-	
-	var callback = function() {
-		alert('<?php echo $this->translate('provider was removed');?>');
-	}
 
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileDeleteAction', 'provider_id' => '')); ?>' + providerId;
+	updateStatus(
+		profileId, 
+		<?php echo KalturaDistributionProfileStatus::DELETED; ?>, 
+		function() {
+			alert('<?php echo $this->translate('profile was removed');?>');
+		}
+	);
+}
+
+function updateStatus(profileId, status, callback)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileUpdateStatusAction', 'profile_id' => 'PROFILE_ID', 'status' => 'STATUS')); ?>';
+	url = url.replace('PROFILE_ID', profileId);
+	url = url.replace('STATUS', status);
+	
 	jQuery.ajax({
 		url: url,
 		dataType: 'json',
@@ -130,7 +166,10 @@ function remove(providerId)
 				return;
 			}
 
-			alert('<?php echo $this->translate('provider was deleted');?>');
+			if (callback && (typeof callback == 'function'))
+			{
+				callback.apply(this);
+			}
 
 			jQuery('#frmPaginator1').submit();
 		},
@@ -142,12 +181,12 @@ function remove(providerId)
 
 var dialogDiv;
 function newDistributionProfile(partnerId, providerType) {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'partnerId' => 'PARTNERID', 'providerType' => 'PROVIDERTYPE')); ?>';
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'partner_id' => 'PARTNERID', 'provider_type' => 'PROVIDERTYPE')); ?>';
 	url = url.replace('PARTNERID', partnerId);
 	url = url.replace('PROVIDERTYPE', providerType);
 	
 	jQuery('#partner-configure-dialog').remove();
-	dialogDiv = jQuery('<div id="storage-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	dialogDiv = jQuery('<div id="profile-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
 		bgiframe: true,
@@ -155,7 +194,7 @@ function newDistributionProfile(partnerId, providerType) {
 		resizable: false,
 		width: 600,
 		height: 600,
-		title: '<?php echo $this->translate('Generic provider Specific Setup Configuration'); ?>',
+		title: '<?php echo $this->translate('Profile Setup Configuration'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
@@ -163,6 +202,7 @@ function newDistributionProfile(partnerId, providerType) {
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			}
 		},
 		close: function() {

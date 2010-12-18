@@ -2,6 +2,7 @@
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 {
 	/**
+	 * @insertonly
 	 * @var int
 	 */
 	public $genericProviderId;	
