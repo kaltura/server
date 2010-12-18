@@ -338,6 +338,7 @@ class KalturaDistributionProviderOrderBy
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const MSN = "msnDistribution.MSN";
 }
 
 class KalturaDocumentType
@@ -6203,20 +6204,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
 	 * @var int
 	 */
 	public $partnerIdEqual = null;
@@ -6262,20 +6249,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUserStatus
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
 
 	/**
 	 * 
@@ -13731,6 +13704,20 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function updateStatus($id, $status)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "status", $status);
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "updateStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfile");
+		return $resultObject;
+	}
+
 	function delete($id)
 	{
 		$kparams = array();
@@ -13752,6 +13739,22 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 		if ($pager !== null)
 			$this->client->addParam($kparams, "pager", $pager->toParams());
 		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfileListResponse");
+		return $resultObject;
+	}
+
+	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "listByPartner", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
