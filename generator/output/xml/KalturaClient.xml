@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1292520988">
-  <!-- Generated on date 16/12/10 17:36:28 -->
+<xml apiVersion="3.1.1" generatedDate="1292665765">
+  <!-- Generated on date 18/12/10 09:49:25 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -325,6 +325,7 @@
     <enum name="KalturaDistributionProviderOrderBy" enumType="string"/>
     <enum name="KalturaDistributionProviderType" enumType="string">
       <const name="GENERIC" value="1"/>
+      <const name="MSN" value="msnDistribution.MSN"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -2029,8 +2030,6 @@
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserBaseFilter" abstract="1" base="KalturaFilter">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameLike" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2038,8 +2037,6 @@
       <property name="emailStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="statusEqual" type="int" enumType="KalturaUserStatus" readOnly="0" insertOnly="0" description=""/>
-      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="isAdminEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
@@ -5665,12 +5662,22 @@
         <param name="distributionProfile" type="KalturaDistributionProfile" optional="0" description="&#13;"/>
         <result type="KalturaDistributionProfile"/>
       </action>
+      <action name="updateStatus" description="Update Distribution Profile status by id&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <param name="status" type="int" enumType="KalturaDistributionProfileStatus" optional="0" description="&#13;"/>
+        <result type="KalturaDistributionProfile"/>
+      </action>
       <action name="delete" description="Delete Distribution Profile by id&#10;">
         <param name="id" type="int" optional="0" description="&#13;"/>
         <result/>
       </action>
       <action name="list" description="List all distribution providers&#10;">
         <param name="filter" type="KalturaDistributionProfileFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaDistributionProfileListResponse"/>
+      </action>
+      <action name="listByPartner" description="">
+        <param name="filter" type="KalturaPartnerFilter" optional="1" default="null" description="&#13;"/>
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
         <result type="KalturaDistributionProfileListResponse"/>
       </action>
