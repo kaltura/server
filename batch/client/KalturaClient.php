@@ -317,6 +317,7 @@ class KalturaDistributionProfileStatus
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const MSN = "msnDistribution.MSN";
 }
 
 class KalturaDurationType
@@ -911,13 +912,6 @@ class KalturaUserOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
-}
-
-class KalturaUserStatus
-{
-	const BLOCKED = 0;
-	const ACTIVE = 1;
-	const DELETED = 2;
 }
 
 class KalturaVideoCodec
@@ -6897,20 +6891,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
 	 * @var int
 	 */
 	public $partnerIdEqual = null;
@@ -6956,20 +6936,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $tagsMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUserStatus
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
 
 	/**
 	 * 
