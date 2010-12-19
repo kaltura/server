@@ -91,4 +91,13 @@ class kCurrentContext
 			
 		return '';
 	}
+	
+	public static function isApiV3BootstrapLoaded()
+	{		
+		if (defined("KALTURA_API_V3")) {
+			return true;
+		}
+		
+		return false;
+	}
 }
