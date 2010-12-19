@@ -52,7 +52,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		&& $source->_video && $source->_video->_dar
 		&& abs($source->_video->GetPAR()-$source->_video->_dar)>0.01) {
 			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") can not process the (".$sourcePart->_id."/".$sourcePart->_format. ").";
-				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, ($medSetSec->_id."/".$medSetSec->_format));
+				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "non square pixels");
 			return true;
 		}
 			
@@ -79,7 +79,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		}
 		
 		/*
-		 * Non of non Mac transcoders should mess up with QT/WMV/WMA
+		 * Non Mac transcoders should not mess up with QT/WMV/WMA
 		 * 
 		 */
 		$qt_wmv_list = array("wmv1","wmv2","wmv3","wvc1","wmva","wma1","wma2","wmapro");
