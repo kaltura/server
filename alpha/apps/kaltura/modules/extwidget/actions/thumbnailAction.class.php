@@ -283,8 +283,8 @@ class thumbnailAction extends sfAction
 		{
 			try
 			{
-			$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
-			$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices  );
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality,
+				$src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices  );
 			}
 			catch(Exception $ex)
 			{
