@@ -99,10 +99,7 @@ class thumbnailAction extends sfAction
 					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
 					kFile::dumpFile($thumb_full_path);
 				}
-			}
-			
-			KalturaLog::debug("im here !!!: " . $upload_token_id);
-			
+			}			
 		}
 		
 		$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
