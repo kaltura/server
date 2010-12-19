@@ -21,13 +21,4 @@ class KalturaGoogleVideoSyndicationFeed extends KalturaBaseSyndicationFeed
 	{
 		$this->type = KalturaSyndicationFeedType::GOOGLE_VIDEO;
 	}
-        
-        public function fromObject($source_object)
-        {
-            parent::fromObject($source_object);
-            if(isset($this->id) && $this->id)
-            {
-                $this->feedUrl = 'http://'.kConf::get('www_host').'/api_v3/getFeed.php?feedId='.$this->id;
-            }
-        }
 }

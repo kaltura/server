@@ -7,13 +7,13 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $id;
-        
-        /**
-         *
-         * @var string
-         * @readonly
-         */
-        public $feedUrl;
+	
+	/**
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $feedUrl;
 	
 	/**
 	 * @var int
@@ -22,9 +22,9 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	public $partnerId;
 	
 	/**
-         * link a playlist that will set what content the feed will include
-         * if empty, all content will be included in feed
-         * 
+	 * link a playlist that will set what content the feed will include
+	 * if empty, all content will be included in feed
+	 * 
 	 * @var string
 	 * @filter order
 	 */
@@ -71,7 +71,7 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 * @filter order
 	 */
 	public $createdAt;
-
+	
 	/**
 	 * allow_embed tells google OR yahoo weather to allow embedding the video on google OR yahoo video results
 	 * or just to provide a link to the landing page.
@@ -88,48 +88,32 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 * @var int
 	 */
 	public $playerUiconfId;
-        
-        /**
-         *
-         * @var int
-         */
-        public $flavorParamId;
-        
-        /**
-         *
-         * @var bool
-         */
-        public $transcodeExistingContent;
-        
-        /**
-         *
-         * @var bool
-         */
-        public $addToDefaultConversionProfile;
-        
-        /**
-         *
-         * @var string
-         */
-        public $categories;
-        
-	private static $mapBetweenObjects = array
-	(
-		"id",
-		"partnerId",
-		"playlistId",
-		"name",
-		"status",
-		"type",
-		"landingPage",
-		"createdAt",
-		"playerUiconfId",
-		"allowEmbed",
-                "flavorParamId",
-                "transcodeExistingContent",
-                "addToDefaultConversionProfile",
-                "categories",
-	);
+	
+	/**
+	 *
+	 * @var int
+	 */
+	public $flavorParamId;
+	
+	/**
+	 *
+	 * @var bool
+	 */
+	public $transcodeExistingContent;
+	
+	/**
+	 *
+	 * @var bool
+	 */
+	public $addToDefaultConversionProfile;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	public $categories;
+	
+	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories");
 	
 	public function getMapBetweenObjects()
 	{
@@ -148,11 +132,22 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	
 	public function validatePlaylistId()
 	{
-		if (!$this->playlistId) // we allow empty playlistID. this means all content
+		if(! $this->playlistId) // we allow empty playlistID. this means all content
 			return;
 		
 		$playlistEntry = entryPeer::retrieveByPK($this->playlistId);
-		if(!$playlistEntry)
+		if(! $playlistEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->playlistId);
-	}	
+	}
+	
+	public function fromObject($source_object)
+	{
+		parent::fromObject($source_object);
+		if(isset($this->id) && $this->id)
+		{
+			$this->feedUrl = 'http://' . kConf::get('www_host') . '/api_v3/getFeed.php?feedId=' . $this->id;
+			if($this->partnerId)
+				$this->feedUrl .= '&partnerId=' . $this->partnerId;
+		}
+	}
 }

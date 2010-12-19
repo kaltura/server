@@ -45,10 +45,6 @@ class KalturaTubeMogulSyndicationFeed extends KalturaBaseSyndicationFeed
                 $strCategories[] = $this->getCategoryName($category);
             }
             $this->categories = implode(',', $strCategories);
-            if(isset($this->id) && $this->id)
-            {
-                $this->feedUrl = 'http://'.kConf::get('www_host').'/api_v3/getFeed.php?feedId='.$this->id;
-            }
         }
         
         private static $mapCategories = array(
