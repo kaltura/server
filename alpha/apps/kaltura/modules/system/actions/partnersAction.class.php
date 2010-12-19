@@ -28,7 +28,7 @@ class partnersAction extends kalturaSystemAction
 				"mergeEntryLists" , "allowLks" , "allowAnonymousRanking", "isFirstLogin", "matchIp", "host", "cdnHost", "rtmpUrl" , "defThumbOffset" ,
 				"landingPage" , "userLandingPage", "status" , "serviceConfigId", "partnerPackage", "moderateContent" , "currentConversionProfileType" , "monitorUsage",
 				"templatePartnerId", "addEntryMaxFiles" , "defaultConversionProfileId", "partnerGroupType", "partnerParentId", "enableAnalyticsTab",
-				"liveStreamEnabled", "storageServePriority", "storageDeleteFromKaltura", "enableSilverLight", "partnerSpecificServices", "partnerSpecificServices", "enabledPlugins",
+				"liveStreamEnabled", "storageServePriority", "storageDeleteFromKaltura", "enableSilverLight", "partnerSpecificServices", "partnerSpecificServices",
 				"enable508Players", "enableVast", "appStudioExampleEntry", "appStudioExamplePlayList0", "appStudioExamplePlayList1", "delivryBlockCountries", "deliveryRestrictions",
 				"maxLoginAttempts", "loginBlockPeriod", "numPrevPassToKeep", "passReplaceFreq", "passResetUrlPrefix");
 			$allowed_params = array_merge ( $pw->getUpdateableFields() , $extra_fields );	
