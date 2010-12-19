@@ -54,7 +54,20 @@ abstract class kFileTransferMgr
 	// user's starting directory
 	protected $start_dir;
 
+	/**
+	 * returned value from put and get commands
+	 * @var mixed
+	 */
+	protected $results;
 
+
+	/**
+	 * @return the $results
+	 */
+	public function getResults()
+	{
+		return $this->results;
+	}
 
 	/*********************************************************************************************/
 	/* Abstract functions that should be implemented in all classes extending 'kFileTransferMgr'.
@@ -102,7 +115,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return true / false according to success
 	 */
-	abstract protected function doPutFile($remote_file, $local_file, $ftp_mode);
+	abstract protected function doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null);
 
 	/**
 	 * Should download the fiven 'remote_file' from the server as 'local_file'
@@ -194,6 +207,10 @@ abstract class kFileTransferMgr
 
 			case kFileTransferMgrType::SFTP:
 				return new sftpMgr();
+
+			case kFileTransferMgrType::HTTP:
+			case kFileTransferMgrType::HTTPS:
+				return new httpMgr();
 		}
 
 		return null;
@@ -297,7 +314,7 @@ abstract class kFileTransferMgr
 	 *
 	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR
 	 */
-	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY)
+	public function putFile ($remote_file, $local_file, $overwrite = false, $ftp_mode = FTP_BINARY, $http_field_name = null, $http_file_name = null)
 	{
 		KalturaLog::debug("Puts file [$remote_file] from local [$local_file] overwrite [$overwrite]");
 		
@@ -339,8 +356,10 @@ abstract class kFileTransferMgr
 		}
 
 		// try to upload file
-		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode));
+		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name, $http_file_name));
 
+		$this->results = $res;
+		
 		// check response
 		if ( !$res ) {
 			$last_error = error_get_last();
@@ -379,6 +398,8 @@ abstract class kFileTransferMgr
 		// try to download file
 		$res = @($this->doGetFile($remote_file, $local_file, $ftp_mode));
 
+		$this->results = $res;
+		
 		// check response
 		if ( ! $res ) {
 			$last_error = error_get_last();
