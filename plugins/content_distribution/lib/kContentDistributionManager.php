@@ -30,7 +30,7 @@ class kContentDistributionManager
 	 */
 	public static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
- 		$jobData = new kDistributionJobData();
+ 		$jobData = new kDistributionSubmitJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
  		
@@ -51,7 +51,7 @@ class kContentDistributionManager
 	 */
 	public static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
- 		$jobData = new kDistributionJobData();
+ 		$jobData = new kDistributionUpdateJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());
@@ -73,7 +73,7 @@ class kContentDistributionManager
 	 */
 	public static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
- 		$jobData = new kDistributionJobData();
+ 		$jobData = new kDistributionDeleteJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());

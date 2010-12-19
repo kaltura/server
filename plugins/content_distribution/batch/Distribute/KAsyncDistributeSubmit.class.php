@@ -64,8 +64,8 @@ class KAsyncDistributeSubmit extends KAsyncDistribute
 	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::execute()
 	 */
-	protected function execute()
+	protected function execute(KalturaDistributionJobData $data)
 	{
-		return $this->engine->submit();
+		return $this->engine->submit($data);
 	}
 }

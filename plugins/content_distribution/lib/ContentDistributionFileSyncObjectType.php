@@ -6,6 +6,8 @@
 class ContentDistributionFileSyncObjectType extends KalturaFileSyncObjectType
 {
 	const GENERIC_DISTRIBUTION_ACTION = 'GenericDistributionAction';
+	const ENTRY_DISTRIBUTION = 'EntryDistribution';
+	const DISTRIBUTION_PROFILE = 'DistributionProfile';
 	
 	/**
 	 * @var ContentDistributionFileSyncObjectType

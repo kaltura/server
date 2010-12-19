@@ -38,7 +38,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->submit, $data->providerData);
 	}
 
 	/**
@@ -49,23 +49,32 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 * @throws kFileTransferMgrException
 	 * @return boolean true if finished, false if will be finished asynchronously
 	 */
-	public function handleAction(KalturaDistributionJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionJobProviderData $providerData)
+	public function handleAction(KalturaDistributionJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
 	{
 		if(!$providerData->xml)
 			throw new Exception("XML data not supplied");
 		
 		$fileName = uniqid() . '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
-		$destFile = $distributionProfile->serverPath . '/' . $fileName;
+		$destFile = $distributionProfileAction->serverPath;
+			
+		if($distributionProfileAction->protocol != KalturaDistributionProtocol::HTTP && $distributionProfileAction->protocol != KalturaDistributionProtocol::HTTPS)
+		{
+			$destFile .= '/' . $fileName;
+		}
+		
 		file_put_contents($srcFile, $providerData->xml);
 		KalturaLog::debug("XML written to file [$srcFile]");
 		
-		$fileTransferMgr = kFileTransferMgr::getInstance($distributionProfile->protocol);
+		$fileTransferMgr = kFileTransferMgr::getInstance($distributionProfileAction->protocol);
 		if(!$fileTransferMgr)
-			throw new Exception("File transfer manager type [$distributionProfile->protocol] not supported");
+			throw new Exception("File transfer manager type [$distributionProfileAction->protocol] not supported");
 			
-		$fileTransferMgr->login($distributionProfile->serverUrl, $distributionProfile->username, $distributionProfile->password, null, $distributionProfile->ftpPassiveMode);
-		$fileTransferMgr->putFile($destFile, $srcFile, true);
+		$fileTransferMgr->login($distributionProfileAction->serverUrl, $distributionProfileAction->username, $distributionProfileAction->password, null, $distributionProfileAction->ftpPassiveMode);
+		$fileTransferMgr->putFile($destFile, $srcFile, true, FTP_BINARY, $distributionProfileAction->httpFieldName, $distributionProfileAction->httpFileName);
+		
+//		TODO - parse http response and set the remoteId
+//		$data->remoteId = $remoteId
 		
 		return true;
 	}
@@ -89,7 +98,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->delete, $data->providerData);
 	}
 
 	/* (non-PHPdoc)
@@ -135,7 +144,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->update, $data->providerData);
 	}
 
 }

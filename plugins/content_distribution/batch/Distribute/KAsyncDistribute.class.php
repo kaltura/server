@@ -28,7 +28,7 @@ abstract class KAsyncDistribute extends KBatchBase
 	 * Throw detailed exceptions for any failure 
 	 * @return bool true if job is closed, false for almost done
 	 */
-	abstract protected function execute();
+	abstract protected function execute(KalturaDistributionJobData $data);
 	
 	public function run($jobs = null)
 	{
@@ -69,11 +69,11 @@ abstract class KAsyncDistribute extends KBatchBase
 				return $job;
 			}
 						
-			$closed = $this->execute();
+			$closed = $this->execute($data);
 			if($closed)
-				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
+				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
 			 			
-			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE, $data);
 		}
 		catch(Exception $ex)
 		{
