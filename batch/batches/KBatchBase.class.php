@@ -547,7 +547,7 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	 * @param int $errNumber
 	 * @param string $msg
 	 * @param int $status
-	 * @param unknown_type $data
+	 * @param KalturaJobData $data
 	 * @return KalturaBatchJob
 	 */
 	protected function closeJob(KalturaBatchJob $job, $errType, $errNumber, $msg, $status, $data = null)
