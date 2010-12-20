@@ -97,7 +97,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	public function objectAdded(BaseObject $object)
 	{
 		// virus scan only works in api_v3 context because it uses dynamic enums
-		if (!VirusScanPlugin::isApiV3()) {
+		if (!kCurrentContext::isApiV3BootstrapLoaded()) {
 			return true;
 		}
 		
@@ -127,7 +127,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
 		// virus scan only works in api_v3 context because it uses dynamic enums
-		if (!VirusScanPlugin::isApiV3()) {
+		if (!kCurrentContext::isApiV3BootstrapLoaded()) {
 			return true;
 		}
 		
