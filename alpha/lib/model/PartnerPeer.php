@@ -15,6 +15,8 @@ class PartnerPeer extends BasePartnerPeer
 
 	const EXPIRY_FOR_NULL = 120;
 	const EXPIRY_FOR_NON_NULL = 300;
+	
+	const GLOBAL_PARTNER = 0;
 	/*
 		Will retrieve the partner object in one of 2 ways:
 		1. if pk in a number - will use the original  retrieveByPK
