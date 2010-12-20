@@ -118,8 +118,8 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 				if(!$dbAnnotation)
 					throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $annotationId);
 				 
-				if($dbAnnotation->isOffspring($annotation->parentId))
-					throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_IS_OFFSPRING, $annotation->parentId, $dbAnnotation->getId());
+				if($dbAnnotation->isDescendant($annotation->parentId))
+					throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_IS_DESCENDANT, $annotation->parentId, $dbAnnotation->getId());
 			}
 			
 			if ($dbParentAnnotation->getEntryId() != $annotation->entryId)
