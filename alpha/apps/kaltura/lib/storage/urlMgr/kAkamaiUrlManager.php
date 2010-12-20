@@ -136,7 +136,8 @@ class kAkamaiUrlManager extends kUrlManager
 			$window = $this->params['http_auth_seconds'];
 			$param = $this->params['http_auth_param'];
 			$salt = $this->params['http_auth_salt'];
-			$url = $this->urlauth_gen_url("/s".$url, $param, $window, $salt, null, null);
+			$root_dir = $this->params['http_auth_root_dir'];
+			$url = $this->urlauth_gen_url($root_dir.$url, $param, $window, $salt, null, null);
 		}
 
 		return $url;
