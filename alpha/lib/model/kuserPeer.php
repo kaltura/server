@@ -382,7 +382,9 @@ class kuserPeer extends BasekuserPeer
 			$user->setFirstName($user->getPuserId());
 		}
 		
-		$user->setStatus(KalturaUserStatus::ACTIVE);
+		if (is_null($user->getStatus())) {
+			$user->setStatus(KalturaUserStatus::ACTIVE);
+		}
 		
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password) {
