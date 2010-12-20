@@ -92,7 +92,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					$dataInts[$field] = $object->$getter();
 					break;
 					
-				case IIndexable::FIELD_TYPE_STRING:
+				case IIndexable::FIELD_TYPE_DATETIME:
 					$dataTimes[$field] = $object->$getter(null);
 					break;
 			}
