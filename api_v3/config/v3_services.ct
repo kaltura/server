@@ -388,4 +388,14 @@ uploadtoken.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |
 
 xinternal.xaddbulkdownload			|			|2		|1	|1		|2		|1		|	|		|	|   |
 
+userrole.add						|			|2		|1	|0		|0		|1		|	|		|	|   |
+userrole.delete			    		|			|2		|1	|0		|0		|1		|	|		|	|   |
+userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |
+userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |
+userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |
+
+permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |
+permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |
+
+
 ---------------------------------------------------------------------------------------------------
