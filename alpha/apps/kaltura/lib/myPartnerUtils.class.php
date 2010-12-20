@@ -1079,13 +1079,6 @@ class myPartnerUtils
  	
  	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner)
  	{
- 		$toPartner->setEnabledPlugins($fromPartner->getEnabledPlugins());
- 		$toPartner->setEnabledServices($fromPartner->getEnabledServices());
- 		$toPartner->setEnableAnalyticsTab($fromPartner->getEnableAnalyticsTab());
- 		$toPartner->setEnableSilverLight($fromPartner->getEnableSilverLight());
- 		$toPartner->setEnableVast($fromPartner->getEnableVast());
- 		$toPartner->setEnable508Players($fromPartner->getEnable508Players());
- 		$toPartner->setLiveStreamEnabled($fromPartner->getLiveStreamEnabled());
  		$toPartner->setLoginUsersQuota($fromPartner->getLoginUsersQuota());
  		$toPartner->save();
  		
@@ -1101,6 +1094,7 @@ class myPartnerUtils
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
  		
  		self::copyUserRoles($fromPartner, $toPartner);
+ 		self::copyPermissions($fromPartner, $toPartner);
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
@@ -1108,13 +1102,30 @@ class myPartnerUtils
  		KalturaLog::log('copyUserRoles - Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
  		UserRolePeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
- 		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId());
+ 		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
  		$c->addDescendingOrderByColumn(UserRolePeer::CREATED_AT);
  		$roles = UserRolePeer::doSelect($c);
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
- 			$role->copyToPartner($toPartner->getId());
+ 			$newRole = $role->copyToPartner($toPartner->getId());
+ 			$newRole->save();
+ 		}
+ 	}
+ 	
+	public static function copyPermissions(Partner $fromPartner, Partner $toPartner)
+ 	{
+ 		KalturaLog::log('copyPermissions - Copying permissions from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+ 		PermissionPeer::setUseCriteriaFilter ( false );
+ 		$c = new Criteria();
+ 		$c->addAnd(PermissionPeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
+ 		$c->addDescendingOrderByColumn(PermissionPeer::CREATED_AT);
+ 		$permissions = PermissionPeer::doSelect($c);
+ 		PermissionPeer::setUseCriteriaFilter ( true );
+ 		foreach($permissions as $permission)
+ 		{
+ 			$newPermission = $permission->copyToPartner($toPartner->getId());
+ 			$newPermission->save();
  		}
  	}
  	

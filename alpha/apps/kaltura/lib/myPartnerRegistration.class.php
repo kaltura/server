@@ -234,6 +234,7 @@ class myPartnerRegistration
 
 		$kuser->setPartnerId($newPartner->getId());
 		$kuser->setIsAdmin(true);
+		$kuser->setIsRootUser(true);
 		$kuser->setPuserId(kuserPeer::ROOT_ADMIN_PUSER_ID);
 
 		$kuser = kuserPeer::addUser($kuser, $password, false); //this also saves the kuser and adds a user_login_data record

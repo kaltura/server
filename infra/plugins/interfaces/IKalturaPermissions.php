@@ -6,4 +6,5 @@ interface IKalturaPermissions extends IKalturaBase
 	 * @return bool
 	 */
 	public static function isAllowedPartner($partnerId);
+	
 }
