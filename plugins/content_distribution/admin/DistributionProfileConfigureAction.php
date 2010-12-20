@@ -79,14 +79,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 				{
 					$form->populate($request->getPost());
 					$distributionProfile = $form->getObject($profileClass, $request->getPost());
-
-					// reset readonly attributes
-					$distributionProfile->id = null;
-					$distributionProfile->partnerId = null;
-					$distributionProfile->createdAt = null;
-					$distributionProfile->updatedAt = null;
-					$distributionProfile->providerType = null;
-					
+					$form->resetUnUpdatebleAttributes($distributionProfile);
 					$this->client->distributionProfile->update($profileId, $distributionProfile);
 				}
 				else

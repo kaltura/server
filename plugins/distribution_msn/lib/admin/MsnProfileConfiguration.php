@@ -1,13 +1,6 @@
 <?php 
 class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 {
-	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
-	{
-		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
-		
-		return $object;
-	}
-	
 	protected function addProviderElements()
 	{
 		$element = new Zend_Form_Element_Hidden('providerElements');

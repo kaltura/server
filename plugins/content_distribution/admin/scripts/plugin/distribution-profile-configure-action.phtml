@@ -25,7 +25,20 @@ function removeThumbDimensions(index){
 	jQuery(".thumbDimensions_" + index).remove();
 }
 
+function actionEnabledChanged(action){
+	var enabled = jQuery("." + action + "-enabled").find(':selected').val();
+	var fields = jQuery(".action-fields-" + action);
+	if(enabled == <?php echo KalturaDistributionProfileActionStatus::DISABLED; ?>)
+		fields.hide();
+	else
+		fields.show();
+}
+
 jQuery(function() {
+	actionEnabledChanged("submit");
+	actionEnabledChanged("update");
+	actionEnabledChanged("delete");
+	actionEnabledChanged("report");
 });
 
 </script>

@@ -14,6 +14,16 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 	
 	abstract protected function addProviderElements();
 	
+	public function resetUnUpdatebleAttributes(KalturaDistributionProfile $distributionProfile)
+	{
+		// reset readonly attributes
+		$distributionProfile->id = null;
+		$distributionProfile->partnerId = null;
+		$distributionProfile->createdAt = null;
+		$distributionProfile->updatedAt = null;
+		$distributionProfile->providerType = null;
+	}
+	
 	public function init()
 	{
 		// Set the method for the display form to POST
@@ -46,5 +56,40 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		));
 		
 		$this->addProviderElements();
+		$this->addProfileAction('submit');
+		$this->addProfileAction('update');
+		$this->addProfileAction('delete');
+		$this->addProfileAction('report');
+	}
+	
+	/**
+	 * @param string $action
+	 * @return Zend_Form_DisplayGroup
+	 */
+	protected function addProfileAction($action)
+	{
+		$this->addElement('select', "{$action}_enabled", array(
+			'label'	  =>  'Enabled',
+			'onchange'		=> "actionEnabledChanged('$action')",
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'prepend')), array('HtmlTag',  array('tag' => 'dt', 'class' => "action-enabled $action-enabled")))
+		));
+		
+		$element = $this->getElement("{$action}_enabled");
+		$element->addMultiOption(KalturaDistributionProfileActionStatus::DISABLED, 'Disabled');
+		$element->addMultiOption(KalturaDistributionProfileActionStatus::MANUAL, 'Manual');
+		$element->addMultiOption(KalturaDistributionProfileActionStatus::AUTOMATIC, 'Automatic');
+			
+		$this->addDisplayGroup(
+			array(
+				"{$action}_enabled", 
+			), 
+			"{$action}_action_group",
+			array(
+				'legend' => ucfirst($action) . ' Action',
+				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag', array('class' => "{$action}-action-group"))),
+			)
+		);
+		
+		return $this->getDisplayGroup("{$action}_action_group");
 	}
 }

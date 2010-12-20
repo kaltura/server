@@ -181,6 +181,11 @@ function updateStatus(profileId, status, callback)
 
 var dialogDiv;
 function newDistributionProfile(partnerId, providerType) {
+	if(!partnerId.length || isNaN(partnerId)){
+		alert('<?php echo $this->translate('partner id not supplied'); ?>');
+		return;
+	}
+	
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'partner_id' => 'PARTNERID', 'provider_type' => 'PROVIDERTYPE')); ?>';
 	url = url.replace('PARTNERID', partnerId);
 	url = url.replace('PROVIDERTYPE', providerType);

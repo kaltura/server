@@ -23,9 +23,12 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
+		$filterInput = $request->getParam('filter_input');
+		if(!strlen($filterInput))
+			return null;
+			
 		$filter = new KalturaProfesionalServicesPartnerFilter();
 		$filterType = $request->getParam('filter_type');
-		$filterInput = $request->getParam('filter_input');
 		if ($filterType == 'byid')
 		{
 			$filter->idIn = $filterInput;
@@ -37,11 +40,6 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 			elseif ($filterType == 'free' && $filterInput)
 				$filter->partnerNameDescriptionWebsiteAdminNameAdminEmailLike = $filterInput;
 		}
-		$statuses = array();
-		$statuses[] = KalturaPartnerStatus::ACTIVE;
-		$statuses[] = KalturaPartnerStatus::BLOCKED;
-		$filter->statusIn = implode(',', $statuses);
-		$filter->orderBy = KalturaPartnerOrderBy::ID_DESC;
 		return $filter;
 	}
 	

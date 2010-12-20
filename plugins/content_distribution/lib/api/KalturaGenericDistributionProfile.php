@@ -57,6 +57,9 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 			
 		foreach(self::$actions as $action)
 		{
+			if(!$this->$action)
+				continue;
+				
 			$typeReflector = KalturaTypeReflectorCacher::get(get_class($this->$action));
 			
 			foreach ( $this->$action->getMapBetweenObjects() as $this_prop => $object_prop )
@@ -98,6 +101,9 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 		
 		foreach(self::$actions as $action)
 		{
+			if(!$this->$action)
+				$this->$action = new KalturaGenericDistributionProfileAction();
+				
 			$reflector = KalturaTypeReflectorCacher::get(get_class($this->$action));
 			$properties = $reflector->getProperties();
 			
@@ -112,7 +118,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	            $getter_callback = array ( $object ,"get{$object_prop}"  );
 	            if (is_callable($getter_callback))
 	            {
-	                $value = call_user_func($getter_callback);
+	                $value = call_user_func($getter_callback, $action);
 	                if($properties[$this_prop]->isDynamicEnum())
 	                	$value = kPluginableEnumsManager::coreToApi($properties[$this_prop]->getType(), $value);
 	                	
@@ -121,11 +127,6 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	            else
 	            { 
 	            	KalturaLog::alert("getter for property [$object_prop] was not found on object class [" . get_class($object) . "]");
-	            }
-	                
-	            if (in_array($this_prop, array("createdAt", "updatedAt")))
-	            {
-	                $this->$action->$this_prop = call_user_func_array($getter_callback, array($action));
 	            }
 			}
 		}
