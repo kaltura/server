@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaPermissionName extends KalturaDynamicEnum implements permissionName
+class KalturaPermissionName extends KalturaDynamicEnum implements PermissionName
 {
 	// see permissionName interface
 	
