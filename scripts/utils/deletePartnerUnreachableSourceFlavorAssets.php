@@ -36,34 +36,31 @@ if(!$partner)
 }
 
 $c = new Criteria();
-$c->add(entryPeer::PARTNER_ID, $partner_id);
-$c->setLimit(200);
+$c->add(flavorAssetPeer::PARTNER_ID, $partner_id);
+$c->add(flavorAssetPeer::IS_ORIGINAL, true);
+$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-$entries = entryPeer::doSelect($c, $con);
+$flavorAssets = flavorAssetPeer::doSelect($c, $con);
 $changedEntriesCounter = 0;
 
-while (count($entries))
+foreach ($flavorAssets as $flavorAsset)
 {
-	foreach ($entries as $entry)
+	$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+	$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
+	if (!is_null($entry_data_path) && !file_exists($entry_data_path))
 	{
-		$flavorAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-		if (!is_null($flavorAsset))
-		{
-			$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
-			if (!is_null($entry_data_path) && !file_exists($entry_data_path))
-			{
-				echo "changed flavor asset to status deleted for entry: ".$entry->getId(). PHP_EOL;
-			//	$flavorAsset->delete();
-			//	$flavorAsset->save();
-				$changedEntriesCounter++;
-			}
-		}	
+		echo 'changed flavor asset to status deleted for entry: ' . $flavorAsset->getEntryId() . PHP_EOL;
+	//	$flavorAsset->delete();
+	//	$flavorAsset->save();
+		$changedEntriesCounter++;
 	}
-	entryPeer::clearInstancePool();
-	$entries = entryPeer::doSelect($c, $con);
+	
+	echo $flavorAsset->getEntryId() . PHP_EOL;
 }
+entryPeer::clearInstancePool();
+$entries = entryPeer::doSelect($c, $con);
+
 
 echo "Done. {$changedEntriesCounter} unreachable source flavor asset where deleted";
 
