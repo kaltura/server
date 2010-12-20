@@ -179,6 +179,17 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $loginEnabled;
+	
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $isRootAdmin;
+	
+	/**
+	 * @var string
+	 */
+	public $roleIds;
 
 	
 
@@ -208,6 +219,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"lastLoginTime",
 		"statusUpdatedAt",
 		"deletedAt",
+		"isRootAdmin" => "isRootUser",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -230,7 +242,10 @@ class KalturaUser extends KalturaObject implements IFilterable
 			$dbObject->setFirstName($firstName);
 			$dbObject->setLastName($lastName);
 		}
-
+		
+		// copy role IDs
+		$dbObject->setUserRoles($this->roleIds);
+		
 		return $dbObject;		
 	}
 	
@@ -245,6 +260,10 @@ class KalturaUser extends KalturaObject implements IFilterable
 		// this is for backward compatibility
 		$this->fullName = $sourceObject->getFullName();
 		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
+		
+		// copy user role IDs
+		$itemIdsArray = $sourceObject->getUserRoleIds();
+		$this->roleIds = implode(',', $itemIdsArray);
 	}
 	
 	public function getExtraFilters()

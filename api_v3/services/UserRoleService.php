@@ -35,6 +35,14 @@ class UserRoleService extends KalturaBaseService
 		if (!$userRole->status) {
 			$userRole->status = KalturaUserRoleStatus::ACTIVE;
 		}
+		
+		try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
+		catch (kPermissionException $e) {
+			$code = $e->getCode();
+			if ($code == kPermissionException::PERMISSION_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_NOT_FOUND, $e->getMessage());
+			}
+		}
 							
 		$dbUserRole = $userRole->toInsertableObject();
 		$dbUserRole->setPartnerId($this->getPartnerId());
@@ -86,6 +94,14 @@ class UserRoleService extends KalturaBaseService
 	
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
+		}
+		
+		try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
+		catch (kPermissionException $e) {
+			$code = $e->getCode();
+			if ($code == kPermissionException::PERMISSION_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_NOT_FOUND, $e->getMessage());
+			}
 		}
 		
 		$dbUserRole = $userRole->toUpdatableObject($dbUserRole);
@@ -156,5 +172,31 @@ class UserRoleService extends KalturaBaseService
 		$response->totalCount = $count;
 		
 		return $response;
+	}
+	
+	/**
+	 * Clone role
+	 * 
+	 * @action clone
+	 * @param int $userRoleId
+	 * @return KalturaUserRole
+	 * 
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	public function cloneAction($userRoleId)
+	{
+		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
+	
+		if (!$dbUserRole || $dbUserRole->getPartnerId() != $this->getPartnerId()) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
+		}
+		
+		$newDbRole = $dbUserRole->copyToPartner($this->partnerId);
+		$newDbRole->save();
+		
+		$userRole = new KalturaUserRole();
+		$userRole->fromObject($newDbRole);
+		
+		return $userRole;
 	}
 }

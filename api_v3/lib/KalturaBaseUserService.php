@@ -124,6 +124,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::PASSWORD_EXPIRED
 	 * @thrown KalturaErrors::INVALID_PARTNER_ID
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
+	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
 	{
@@ -163,7 +164,9 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::WRONG_PASSWORD) {
 				throw new KalturaAPIException(KalturaErrors::USER_WRONG_PASSWORD);
 			}
-						
+			else if ($code == kUserException::USER_IS_BLOCKED) {
+				throw new KalturaAPIException(KalturaErrors::USER_IS_BLOCKED);
+			}						
 			throw new $e;
 		}
 		if (!$user) {

@@ -35,7 +35,7 @@ class UserService extends KalturaBaseUserService
 		}
 		
 		$user->partnerId = $this->getPartnerId();
-		
+				
 		$dbUser = null;
 		$dbUser = $user->toObject($dbUser);
 		
@@ -70,6 +70,17 @@ class UserService extends KalturaBaseUserService
 			}
 			throw $e;			
 		}
+		catch (kPermissionException $e)
+		{
+			$code = $e->getCode();
+			if ($code == kPermissionException::ROLE_ID_MISSING) {
+				throw new KalturaAPIException(KalturaErrors::ROLE_ID_MISSING);
+			}
+			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
+				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
+			}
+			throw $e;
+		}	
 			
 		$newUser = new KalturaUser();
 		$newUser->fromObject($dbUser);
@@ -95,12 +106,29 @@ class UserService extends KalturaBaseUserService
 		
 		if (!$dbUser)
 			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
-			
-		if (!$dbUser->getIsAdmin() && $user->isAdmin && !$dbUser->getLoginDataId()) {
-			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+
+		if ($dbUser->getIsAdmin() && !$user->isAdmin) {
+			throw new KalturaAPIException(APIErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
-								
-		// update user
+			
+		try {
+			if (!is_null($user->roleIds)) {
+				UserRolePeer::testValidRolesForUser($user->roleIds);
+			}
+		}
+		catch (kPermissionException $e)
+		{
+			$code = $e->getCode();
+			if ($code == kPermissionException::ROLE_ID_MISSING) {
+				throw new KalturaAPIException(KalturaErrors::ROLE_ID_MISSING);
+			}
+			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
+				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
+			}
+		}
+		
+		
+		// update user	
 		$dbUser = $user->toUpdatableObject($dbUser);
 		$dbUser->save();
 		
@@ -205,12 +233,17 @@ class UserService extends KalturaBaseUserService
 		if (!$dbUser) {
 			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
 		}
-		
-		if ($dbUser->getPuserId() == kuserPeer::ROOT_ADMIN_PUSER_ID) {
-			throw new KalturaAPIException(APIErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+					
+		try {
+			$dbUser->setStatus(KalturaUserStatus::DELETED);
 		}
-			
-		$dbUser->setStatus(KalturaUserStatus::DELETED);
+		catch (kUserException $e) {
+			$code = $e->getCode();
+			if ($code == kUserException::CANNOT_DELETE_ROOT_ADMIN_USER) {
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+			}
+			throw $e;			
+		}	
 		$dbUser->save();
 		
 		$user = new KalturaUser();
@@ -289,6 +322,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::INVALID_PARTNER_ID
+	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
 	public function loginAction($partnerId, $userId, $password, $expiry = 86400, $privileges = '*')
 	{
@@ -314,6 +348,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
 	 * @throws KalturaErrors::INVALID_PARTNER_ID
+	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
 	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
 	{

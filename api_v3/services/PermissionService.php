@@ -38,10 +38,18 @@ class PermissionService extends KalturaBaseService
 		if (!$permission->status) {
 			$permission->status = KalturaPermissionStatus::ACTIVE;
 		}
-							
+											
 		$dbPermission = $permission->toInsertableObject();
 		$dbPermission->setPartnerId($this->getPartnerId());
-		$dbPermission->save();
+		
+		try { PermissionPeer::addToPartner($dbPermission, $this->getPartnerId()); }
+		catch (kPermissionException $e) {
+			$code = $e->getCode();
+			if ($code === kPermissionException::PERMISSION_ALREADY_EXISTS) {
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_ALREADY_EXISTS, $permission->getName(), $this->getPartnerId());
+			}
+			throw $e;
+		}
 		
 		$permission = new KalturaPermission();
 		$permission->fromObject($dbPermission);
@@ -53,17 +61,17 @@ class PermissionService extends KalturaBaseService
 	 * Retrieve a KalturaPermission object by ID
 	 * 
 	 * @action get
-	 * @param int $permissionId 
+	 * @param string $permissionName 
 	 * @return KalturaPermission
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
-	public function getAction($permissionId)
+	public function getAction($permissionName)
 	{
-		$dbPermission = PermissionPeer::retrieveByPK($permissionId);
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId(), PartnerPeer::GLOBAL_PARTNER));
 		
 		if (!$dbPermission) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
 		}
 			
 		$permission = new KalturaPermission();
@@ -77,18 +85,18 @@ class PermissionService extends KalturaBaseService
 	 * Update an existing KalturaPermission object
 	 * 
 	 * @action update
-	 * @param int $permissionId
+	 * @param string $permissionName
 	 * @param KalturaPermission $permission
 	 * @return KalturaPermission
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */	
-	public function updateAction($permissionId, KalturaPermission $permission)
+	public function updateAction($permissionName, KalturaPermission $permission)
 	{
-		$dbPermission = PermissionPeer::retrieveByPK($permissionId);
-	
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId()));
+		
 		if (!$dbPermission) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
 		}
 		
 		$dbPermission = $permission->toUpdatableObject($dbPermission);
@@ -104,17 +112,17 @@ class PermissionService extends KalturaBaseService
 	 * Mark the KalturaPermission object as deleted
 	 * 
 	 * @action delete
-	 * @param int $permissionId 
+	 * @param string $permissionName 
 	 * @return KalturaPermission
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
-	public function deleteAction($permissionId)
+	public function deleteAction($permissionName)
 	{
-		$dbPermission = PermissionPeer::retrieveByPK($permissionId);
-	
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId()));
+		
 		if (!$dbPermission) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
 		}
 		
 		$dbPermission->setStatus(KalturaPermissionStatus::DELETED);
