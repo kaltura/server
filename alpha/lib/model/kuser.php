@@ -877,7 +877,6 @@ class kuser extends Basekuser
 				$this->addUserRole($id, false);
 			}
 		}
-		$this->save();
 	}
 	
 	
