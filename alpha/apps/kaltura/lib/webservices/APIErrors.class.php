@@ -283,5 +283,11 @@
 		const ONLY_ONE_ROLE_PER_USER_ALLOWED = "ONLY_ONE_ROLE_PER_USER_ALLOWED,User cannot have more than one role";
 		
 		const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN,Root admin user cannot be set to not admin";
+	
+		const PERMISSION_NOT_FOUND = "PERMISSION_NOT_FOUND,%s";
+		
+		const PERMISSION_ALREADY_EXISTS = "PERMISSION_ALREADY_EXISTS,Permission [%s] already exists for partner [%s]";
+	
+		const USER_IS_BLOCKED = "USER_IS_BLOCKED,User is blocked";
 	}
 ?>

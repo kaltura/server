@@ -21,6 +21,8 @@ class kUserException extends kCoreException
 	
 	const USER_NOT_FOUND = 'USER_NOT_FOUND';
 	
+	const USER_IS_BLOCKED = 'USER_IS_BLOCKED';
+	
 	const LOGIN_USERS_QUOTA_EXCEEDED = 'LOGIN_USERS_QUOTA_EXCEEDED';
 	
 	const INVALID_EMAIL = 'INVALID_EMAIL';
