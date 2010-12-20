@@ -457,13 +457,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "			//create the service request for normal calls\n";
 				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
 				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
-				$str .= "			if ((call as ThumbAssetAddFromImage).$fileAttributeName is FileReference) {\n";
+				$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
 				$str .= "				(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
 				$str .= "				var urlRequest:URLRequest = new URLRequest(req);\n";
 				$str .= "				((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as FileReference).upload(urlRequest,\"" . $fileAttributeName . "\");\n";
 				$str .= "			}\n";
 				$str .= "			else{\n";
-				$str .= "				mrloader.addFile(((call as ThumbAssetAddFromImage).$fileAttributeName as ByteArray), UIDUtil.createUID(), '$fileAttributeName');	\n";
+				$str .= "				mrloader.addFile(((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as ByteArray), UIDUtil.createUID(), '$fileAttributeName');	\n";
 				$str .= "				mrloader.dataFormat = URLLoaderDataFormat.TEXT;\n";
 				$str .= "				mrloader.load(req);\n";
 				$str .= "			}\n";
