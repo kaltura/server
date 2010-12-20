@@ -51,17 +51,10 @@ foreach ($flavorAssets as $flavorAsset)
 	if (!is_null($entry_data_path) && !file_exists($entry_data_path))
 	{
 		echo 'changed flavor asset to status deleted for entry: ' . $flavorAsset->getEntryId() . PHP_EOL;
-	//	$flavorAsset->delete();
-	//	$flavorAsset->save();
+		$flavorAsset->delete();
+		$flavorAsset->save();
 		$changedEntriesCounter++;
 	}
-	
-	echo $flavorAsset->getEntryId() . PHP_EOL;
 }
-entryPeer::clearInstancePool();
-$entries = entryPeer::doSelect($c, $con);
 
-
-echo "Done. {$changedEntriesCounter} unreachable source flavor asset where deleted";
-
-
+echo "Done. {$changedEntriesCounter} unreachable source flavor asset where deleted" . PHP_EOL;
