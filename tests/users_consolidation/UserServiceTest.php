@@ -9,13 +9,13 @@ require_once(KALTURA_CLIENT_PATH);
  */
 class UserServiceTest extends PHPUnit_Framework_TestCase {
 	
-	const TEST_PARTNER_ID = 116;
-	const TEST_ADMIN_SECRET = 'adminsecret116';
-	const TEST_USER_SECRET = 'usersecret116';
+	const TEST_PARTNER_ID = null;
+	const TEST_ADMIN_SECRET = null;
+	const TEST_USER_SECRET = null;
 	
-	const TEST_PARTNER_ID_2 = 318;
-	const TEST_ADMIN_SECRET_2 = 'adminsecret318';
-	const TEST_USER_SECRET_2 = 'usersecret318';
+	const TEST_PARTNER_ID_2 = null;
+	const TEST_ADMIN_SECRET_2 = null;
+	const TEST_USER_SECRET_2 = null;
 
 	private $createdDbObjects = array();
 	
@@ -51,6 +51,14 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
+		
+		if ( !self::TEST_PARTNER_ID   || !self::TEST_PARTNER_ID_2   ||
+		     !self::TEST_ADMIN_SECRET || !self::TEST_ADMIN_SECRET_2 ||
+		     !self::TEST_USER_SECRET  || !self::TEST_USER_SECRET_2    )
+		     {
+		     	die('Test partners were not defined - quitting test!');
+		     }
+		
 		parent::setUp ();
 		$this->client = $this->getClient(self::TEST_PARTNER_ID);
 		$this->client2 = $this->getClient(self::TEST_PARTNER_ID_2);
@@ -904,6 +912,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		//TODO: test failure to login with wrong email or password
 		
 		//TODO: test right type of ks is returned
+		
+		//TODO: test cannot login as blocked user
 	}
 	
 	/**
@@ -922,6 +932,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		//TODO: test failure to login with wrong email or password
 		
 		//TODO: test right type of ks is returned
+		
+		//TODO: test cannot login as blocked user
 	
 	}
 	
