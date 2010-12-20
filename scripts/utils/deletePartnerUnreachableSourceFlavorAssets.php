@@ -50,9 +50,18 @@ foreach ($flavorAssets as $flavorAsset)
 	$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
 	if (!is_null($entry_data_path) && !file_exists($entry_data_path))
 	{
-		echo 'changed flavor asset to status deleted for entry: ' . $flavorAsset->getEntryId() . PHP_EOL;
-		$flavorAsset->delete();
+		echo 'changed source flavor asset to status deleted for entry: ' . $flavorAsset->getEntryId() .
+			' and for flavor id ' . $flavorAsset->getId() . PHP_EOL;
+		// set the status of the flavor asset to deleted and set deleted time (taken from flavorAssetService)
+		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$flavorAsset->setDeletedAt(time());
 		$flavorAsset->save();
+		$entry = $flavorAsset->getEntry();
+		if ($entry)
+		{
+			$entry->removeFlavorParamsId($flavorAsset->getFlavorParamsId());
+			$entry->save();
+		}
 		$changedEntriesCounter++;
 	}
 }
