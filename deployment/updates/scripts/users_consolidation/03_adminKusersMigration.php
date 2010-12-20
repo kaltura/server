@@ -102,6 +102,7 @@ while(count($users))
 				$kuser->setLastName($lastName);
 				$kuser->setEmail($user->getEmail());
 				$kuser->setIsAdmin(true);
+				$kuser->setIsRootUser(true);
 			}
 		}
 		else
@@ -116,6 +117,7 @@ while(count($users))
 			$new_kuser->setPicture($user->getPicture());
 			$new_kuser->setPuserId('__ADMIN__'.$user->getId());
 			$new_kuser->setIsAdmin(true);
+			$new_kuser->setIsRootUser(true);
 			if ($new_kuser->getPartnerId() == $admin_console_partner_id) {
 				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
 				$partnerData->isPrimary = null;
