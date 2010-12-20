@@ -146,7 +146,6 @@ while(count($partners))
 				
 		
 		if (!$dryRun) {
-			KalturaLog::log('SAVED - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getLoginUsersQuota());
 			foreach($newPermissions as $permission) {
 				KalturaLog::log('SAVING new permission for partner ['.$partner->getId().']:');
 				
