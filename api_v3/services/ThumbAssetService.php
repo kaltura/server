@@ -217,6 +217,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @action generate
 	 * @param string $entryId
 	 * @param KalturaThumbParams $thumbParams
+	 * @param string $sourceAssetId id of the source asset (flavor or thumbnail) to be used as source for the thumbnail generation
 	 * @return int job id
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
@@ -226,7 +227,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
 	 */
-	public function generateAction($entryId, KalturaThumbParams $thumbParams)
+	public function generateAction($entryId, KalturaThumbParams $thumbParams, $sourceAssetId = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
@@ -234,6 +235,7 @@ class ThumbAssetService extends KalturaBaseService
 			
 		if ($entry->getType() != entryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
+			
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
 			
@@ -249,7 +251,7 @@ class ThumbAssetService extends KalturaBaseService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, $sourceAssetId);
 		if($job)
 			return $job->getId();
 			
