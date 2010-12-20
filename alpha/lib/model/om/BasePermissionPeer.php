@@ -466,7 +466,7 @@ abstract class BasePermissionPeer {
 	{
 		if (Propel::isInstancePoolingEnabled()) {
 			if ($key === null) {
-				$key = (string) $obj->getName();
+				$key = (string) $obj->getId();
 			} // if key === null
 			self::$instances[$key] = $obj;
 		}
@@ -486,7 +486,7 @@ abstract class BasePermissionPeer {
 	{
 		if (Propel::isInstancePoolingEnabled() && $value !== null) {
 			if (is_object($value) && $value instanceof Permission) {
-				$key = (string) $value->getName();
+				$key = (string) $value->getId();
 			} elseif (is_scalar($value)) {
 				// assume we've been passed a primary key
 				$key = (string) $value;
@@ -550,10 +550,10 @@ abstract class BasePermissionPeer {
 	public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
 	{
 		// If the PK cannot be derived from the row, return NULL.
-		if ($row[$startcol + 2] === null) {
+		if ($row[$startcol] === null) {
 			return null;
 		}
-		return (string) $row[$startcol + 2];
+		return (string) $row[$startcol];
 	}
 
 	/**
@@ -648,6 +648,10 @@ abstract class BasePermissionPeer {
 			$criteria = $values->buildCriteria(); // build Criteria from Permission object
 		}
 
+		if ($criteria->containsKey(PermissionPeer::ID) && $criteria->keyContainsValue(PermissionPeer::ID) ) {
+			throw new PropelException('Cannot insert a value for auto-increment primary key ('.PermissionPeer::ID.')');
+		}
+
 
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
@@ -686,8 +690,8 @@ abstract class BasePermissionPeer {
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 
-			$comparison = $criteria->getComparison(PermissionPeer::NAME);
-			$selectCriteria->add(PermissionPeer::NAME, $criteria->remove(PermissionPeer::NAME), $comparison);
+			$comparison = $criteria->getComparison(PermissionPeer::ID);
+			$selectCriteria->add(PermissionPeer::ID, $criteria->remove(PermissionPeer::ID), $comparison);
 
 		} else { // $values is Permission object
 			$criteria = $values->buildCriteria(); // gets full criteria
@@ -760,7 +764,7 @@ abstract class BasePermissionPeer {
 			$criteria = $values->buildPkeyCriteria();
 		} else { // it's a primary key, or an array of pks
 			$criteria = new Criteria(self::DATABASE_NAME);
-			$criteria->add(PermissionPeer::NAME, (array) $values, Criteria::IN);
+			$criteria->add(PermissionPeer::ID, (array) $values, Criteria::IN);
 			// invalidate the cache for this object(s)
 			foreach ((array) $values as $singleval) {
 				PermissionPeer::removeInstanceFromPool($singleval);
@@ -827,7 +831,7 @@ abstract class BasePermissionPeer {
 	/**
 	 * Retrieve a single object by pkey.
 	 *
-	 * @param      string $pk the primary key.
+	 * @param      int $pk the primary key.
 	 * @param      PropelPDO $con the connection to use
 	 * @return     Permission
 	 */
@@ -839,7 +843,7 @@ abstract class BasePermissionPeer {
 		}
 
 		$criteria = new Criteria(PermissionPeer::DATABASE_NAME);
-		$criteria->add(PermissionPeer::NAME, $pk);
+		$criteria->add(PermissionPeer::ID, $pk);
 
 		$v = PermissionPeer::doSelect($criteria, $con);
 
@@ -861,7 +865,7 @@ abstract class BasePermissionPeer {
 			$objs = array();
 		} else {
 			$criteria = new Criteria(PermissionPeer::DATABASE_NAME);
-			$criteria->add(PermissionPeer::NAME, $pks, Criteria::IN);
+			$criteria->add(PermissionPeer::ID, $pks, Criteria::IN);
 			$objs = PermissionPeer::doSelect($criteria, $con);
 		}
 		return $objs;

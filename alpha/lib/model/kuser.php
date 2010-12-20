@@ -677,9 +677,14 @@ class kuser extends Basekuser
 	/**
 	 * Set status and statusUpdatedAt fields
 	 * @see Basekuser::setStatus()
+	 * @throws kUserException::CANNOT_DELETE_ROOT_ADMIN_USER
 	 */
 	public function setStatus($status)
 	{
+		if ($status == kuser::KUSER_STATUS_DELETED && $this->getIsRootUser()) {
+			throw new kUserException('', kUserException::CANNOT_DELETE_ROOT_ADMIN_USER);
+		}
+		
 		parent::setStatus($status);
 		$this->setStatusUpdatedAt(time());
 		if ($status == kuser::KUSER_STATUS_DELETED) {
@@ -778,5 +783,117 @@ class kuser extends Basekuser
 		$this->save();
 		return true;
 	}
+	
+	public function setIsRootUser($isRootUser)
+	{
+		$this->putInCustomData('is_root_user', $$isRootUser);
+	}
+	
+	public function getIsRootUser()
+	{
+		return $this->getFromCustomData('is_root_user');
+	}
+	
+	// ----------------------------------------
+	// -- start of user role handling functions
+	// ----------------------------------------
+	
+	/**
+	 * Add a user role to the current kuser
+	 * @param int $userRoleId
+	 * @throws kPermissionException::PERMISSION_ITEM_NOT_FOUND
+	 */
+	public function addUserRole($userRoleId, $save = true)
+	{
+		// check if user role item exists
+		$userRole = UserRolePeer::retrieveByPK($userRoleId);
+		if (!$userRole) {
+			throw new kPermissionException("A user role with ID [$userRoleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+		}
+		
+		// check if role is already associated to the current kuser
+		$kuserToRole = KuserToUserRolePeer::getByKuserAndUserRoleIds($this->getId(), $userRoleId);
+		if ($kuserToRole) {
+			KalturaLog::notice('Kuser with ID ['.$this->getId().'] is already associated with role id ['.$userRoleId.']');
+			return true;
+		}
+		
+		// add role to current kuser
+		$kuserToRole = new KuserToUserRole();
+		$kuserToRole->setUserRole($userRole);
+		$this->addKuserToUserRole($kuserToRole);
+		if ($save) {
+			$this->save();
+		}
+		return true;
+	}
+	
+	/**
+	 * @return array Array of role IDs associated to the current kuser
+	 */
+	public function getUserRoleIds()
+	{
+		$ids = array();
+		$items = $this->getKuserToUserRoles();
+		if (!$items) {
+			return null;
+		}		
+		foreach ($items as $item) {
+			$ids[] = $item->getUserRoleId();
+		}
+		return $ids;
+	}
+
+	/**
+	 * Remove the given user role from the current kuser
+	 * @param int $permissionItemId
+	 */
+	public function removeUserRole($userRoleId)
+	{		
+		// check if role is already associated to the kuser
+		$kuserToRole = KuserToUserRolePeer::getByKuserAndUserRoleIds($this->getId(), $userRoleId);
+		if (!$kuserToRole) {
+			KalturaLog::notice('Kuser with id ['.$this->getId().'] is not associated with rolw id ['.$userRoleId.']');
+			return true;
+		}
+		
+		// delete association between kuser and role
+		$kuserToRole->delete();
+	}
+	
+
+	/**
+	 * Set the roles of the current kuser
+	 * @param string $idsString A comma seperated string of user role IDs
+	 */
+	public function setUserRoles($idsString)
+	{
+		$this->deleteAllUserRoles();
+		$ids = explode(',', trim($idsString));
+		
+		foreach ($ids as $id)
+		{
+			if (!is_null($id) && $id != '') {
+				$this->addUserRole($id, false);
+			}
+		}
+		$this->save();
+	}
+	
+	
+	/**
+	 * Delete all user roles from the current kuser
+	 */
+	private function deleteAllUserRoles()
+	{
+		$c = new Criteria();
+		$c->add(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
+		KuserToUserRolePeer::doDelete($c);
+	}
+	
+	
+	// --------------------------------------
+	// -- end of user role handling functions
+	// --------------------------------------
 			
 }

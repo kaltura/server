@@ -38,7 +38,11 @@ class PermissionItemTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('TYPE', 'Type', 'VARCHAR', true, 100, null);
-		$this->addColumn('VALUE', 'Value', 'LONGVARCHAR', true, null, null);
+		$this->addColumn('PARAM_1', 'Param1', 'VARCHAR', true, 100, null);
+		$this->addColumn('PARAM_2', 'Param2', 'VARCHAR', true, 100, null);
+		$this->addColumn('PARAM_3', 'Param3', 'VARCHAR', true, 100, null);
+		$this->addColumn('PARAM_4', 'Param4', 'VARCHAR', true, 100, null);
+		$this->addColumn('PARAM_5', 'Param5', 'VARCHAR', true, 100, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

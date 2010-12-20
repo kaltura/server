@@ -382,9 +382,6 @@ class Partner extends BasePartner
 	}
 
 	
-	public function getEnabledServices()	{		return $this->getFromCustomData( "enabledServices" , null, false  );	}
-	public function setEnabledServices( $v )	{		return $this->putInCustomData( "enabledServices", $v );	}	
-	
 	public function getAllowAnonymousRanking()	{		return $this->getFromCustomData( "allowAnonymousRanking" , null, false  );	}
 	public function setAllowAnonymousRanking( $v )	{		return $this->putInCustomData( "allowAnonymousRanking", $v );	}
 	
@@ -424,7 +421,6 @@ class Partner extends BasePartner
 	public function getTemplatePartnerId() { return $this->getFromCustomData("templatePartnerId", null, 0); }
 	public function setTemplatePartnerId( $v ) { $this->putInCustomData("templatePartnerId", (int)$v); } 
 	
-
 	public function getLicensedJWPlayer() { return $this->getFromCustomData("licensedJWPlayer", null, 0); }
 	public function setLicensedJWPlayer( $v ) { $this->putInCustomData("licensedJWPlayer", (int)$v); } 
 
@@ -440,30 +436,12 @@ class Partner extends BasePartner
 	public function getMaxBulkSize() { return $this->getFromCustomData("maxBulk", null, null); }
 	public function setMaxBulkSize( $v ) { $this->putInCustomData("maxBulk", (int)$v); } 
 
-	public function getLiveStreamEnabled() { return $this->getFromCustomData("liveEnabled", null, 0); }
-	public function setLiveStreamEnabled( $v ) { $this->putInCustomData("liveEnabled", (int)$v); } 
-	
 	public function getStorageServePriority() { return $this->getFromCustomData("storageServePriority", null, 0); }
 	public function setStorageServePriority( $v ) { $this->putInCustomData("storageServePriority", (int)$v); } 
 	
 	public function getStorageDeleteFromKaltura() { return $this->getFromCustomData("storageDeleteFromKaltura", null, 0); }
 	public function setStorageDeleteFromKaltura( $v ) { $this->putInCustomData("storageDeleteFromKaltura", (int)$v); } 
 	
-	public function getEnableAnalyticsTab() { return $this->getFromCustomData("enableAnalyticsTab", null, 0); }
-	public function setEnableAnalyticsTab( $v ) { $this->putInCustomData("enableAnalyticsTab", $v); } 
-
-	public function getEnableSilverLight() { return $this->getFromCustomData("enableSilverLight", null, 0); }
-	public function setEnableSilverLight( $v ) { $this->putInCustomData("enableSilverLight", $v); }
-	
-	public function getEnableVast() { return $this->getFromCustomData("enableVast", null, 0); }
-	public function setEnableVast( $v ) { $this->putInCustomData("enableVast", $v); }
-	
-	public function getEnable508Players() { return $this->getFromCustomData("enable508Players", null, 0); }
-	public function setEnable508Players( $v ) { $this->putInCustomData("enable508Players", $v); }
-	
-	public function getEnabledPlugins() { return $this->getFromCustomData("enabledPlugins", null, 0); }
-	public function setEnabledPlugins( $v ) { $this->putInCustomData("enabledPlugins", $v); }
-
 	public function getAppStudioExampleEntry() { return $this->getFromCustomData("appStudioExampleEntry", null); }
 	public function setAppStudioExampleEntry( $v ) { $this->putInCustomData("appStudioExampleEntry", $v); } 
 	
@@ -480,26 +458,7 @@ class Partner extends BasePartner
 	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
 	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
 	public function setDeliveryRestrictions( $v ) { $this->putInCustomData("deliveryRestrictions", $v); }
-	
-	public function getPluginEnabled($pluginNmae) 
-	{ 
-		$enabledPlugins = $this->getFromCustomData("enabledPlugins", null, 0);
-		if($enabledPlugins && is_array($enabledPlugins) && isset($enabledPlugins[$pluginNmae]))
-			return (bool) $enabledPlugins[$pluginNmae];
 			
-		return false;
-	}
-	
-	public function setPluginEnabled($pluginNmae, $enabled) 
-	{ 
-		$enabledPlugins = $this->getFromCustomData("enabledPlugins", null, 0);
-		if(!is_array($enabledPlugins))
-			$enabledPlugins = array();
-			
-		$enabledPlugins[$pluginNmae] = (bool)$enabled;
-		$this->putInCustomData("enabledPlugins", $enabledPlugins); 
-	} 
-	
 	public function lockCategories()
 	{
 		$this->setCategoriesLockTime(time());
@@ -568,7 +527,6 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('max_login_attempts', $maxAttempts, null);
 	}
-	
 	
 	
 	public function getLoginBlockPeriod()
@@ -644,5 +602,90 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('pass_reset_url_prefix');
 	}
 	
+	// ------------------------------------
+	// -- start of enabled special features
+	// ------------------------------------
+	
+	// plugins
+	public function getPluginEnabled($pluginName) 
+	{ 
+		$permission =  PermissionPeer::isAllowedPlugin($pluginName, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setPluginEnabled($pluginName, $enabled) 
+	{ 
+		if ($enabled) {
+			PermissionPeer::enablePlugin($pluginName, $this->getId());
+		}
+		else {
+			PermissionPeer::disablePlugin($pluginName, $this->getId());
+		}
+	} 
+	
+	// analytics tab
+	public function getEnableAnalyticsTab() {
+		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_ANALYTICS_TAB, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setEnableAnalyticsTab( $v ) {
+		$this->setEnabledService($v, PermissionName::FEATURE_ANALYTICS_TAB);
+	}
+	
+	
+	// silverlight
+	public function getEnableSilverLight() {
+		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_SILVERLIGHT, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setEnableSilverLight( $v ) {
+		$this->setEnabledService($v, PermissionName::FEATURE_SILVERLIGHT);
+	}
+	
+	// vast
+	public function getEnableVast() {
+		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_VAST, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setEnableVast( $v ) {
+		$this->setEnabledService($v, PermissionName::FEATURE_VAST);
+	}
+	
+	// 508 players
+	public function getEnable508Players() {
+		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_508_PLAYERS, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setEnable508Players( $v ) {
+		$this->setEnabledService($v, PermissionName::FEATURE_508_PLAYERS);
+	}
+	
+	// live stream
+	public function getLiveStreamEnabled() {
+		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_LIVE_STREAM, $this->getId());
+		return $permission ? true : false;
+	}
+	
+	public function setLiveStreamEnabled( $v ) {
+		$this->setEnabledService($v, PermissionName::FEATURE_LIVE_STREAM);
+	}
+	
+	private function setEnabledService($enabled, $permissionName)
+	{
+		if ($enabled) {
+			PermissionPeer::enableForPartner($permissionName, permissionType::SPECIAL_FEATURE, $this->getId());
+		}
+		else {
+			PermissionPeer::disableForPartner($permissionName, $this->getId());
+		}
+	}
+	
+	// ----------------------------------
+	// -- end of enabled special features
+	// ----------------------------------
 	
 }

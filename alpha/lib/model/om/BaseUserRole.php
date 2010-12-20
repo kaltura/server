@@ -25,6 +25,12 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	protected $id;
 
 	/**
+	 * The value for the str_id field.
+	 * @var        string
+	 */
+	protected $str_id;
+
+	/**
 	 * The value for the name field.
 	 * @var        string
 	 */
@@ -118,6 +124,16 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * Get the [str_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getStrId()
+	{
+		return $this->str_id;
 	}
 
 	/**
@@ -282,6 +298,29 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setId()
+
+	/**
+	 * Set the value of [str_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UserRole The current object (for fluent API support)
+	 */
+	public function setStrId($v)
+	{
+		if(!isset($this->oldColumnsValues[UserRolePeer::STR_ID]))
+			$this->oldColumnsValues[UserRolePeer::STR_ID] = $this->str_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->str_id !== $v) {
+			$this->str_id = $v;
+			$this->modifiedColumns[] = UserRolePeer::STR_ID;
+		}
+
+		return $this;
+	} // setStrId()
 
 	/**
 	 * Set the value of [name] column.
@@ -549,14 +588,15 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->permission_names = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->str_id = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+			$this->description = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->permission_names = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -566,7 +606,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 10; // 10 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserRole object", $e);
@@ -996,27 +1036,30 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getName();
+				return $this->getStrId();
 				break;
 			case 2:
-				return $this->getDescription();
+				return $this->getName();
 				break;
 			case 3:
-				return $this->getPartnerId();
+				return $this->getDescription();
 				break;
 			case 4:
-				return $this->getStatus();
+				return $this->getPartnerId();
 				break;
 			case 5:
-				return $this->getPermissionNames();
+				return $this->getStatus();
 				break;
 			case 6:
-				return $this->getCreatedAt();
+				return $this->getPermissionNames();
 				break;
 			case 7:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 8:
+				return $this->getUpdatedAt();
+				break;
+			case 9:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1041,14 +1084,15 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		$keys = UserRolePeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getName(),
-			$keys[2] => $this->getDescription(),
-			$keys[3] => $this->getPartnerId(),
-			$keys[4] => $this->getStatus(),
-			$keys[5] => $this->getPermissionNames(),
-			$keys[6] => $this->getCreatedAt(),
-			$keys[7] => $this->getUpdatedAt(),
-			$keys[8] => $this->getCustomData(),
+			$keys[1] => $this->getStrId(),
+			$keys[2] => $this->getName(),
+			$keys[3] => $this->getDescription(),
+			$keys[4] => $this->getPartnerId(),
+			$keys[5] => $this->getStatus(),
+			$keys[6] => $this->getPermissionNames(),
+			$keys[7] => $this->getCreatedAt(),
+			$keys[8] => $this->getUpdatedAt(),
+			$keys[9] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1084,27 +1128,30 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setName($value);
+				$this->setStrId($value);
 				break;
 			case 2:
-				$this->setDescription($value);
+				$this->setName($value);
 				break;
 			case 3:
-				$this->setPartnerId($value);
+				$this->setDescription($value);
 				break;
 			case 4:
-				$this->setStatus($value);
+				$this->setPartnerId($value);
 				break;
 			case 5:
-				$this->setPermissionNames($value);
+				$this->setStatus($value);
 				break;
 			case 6:
-				$this->setCreatedAt($value);
+				$this->setPermissionNames($value);
 				break;
 			case 7:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 8:
+				$this->setUpdatedAt($value);
+				break;
+			case 9:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1132,14 +1179,15 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		$keys = UserRolePeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setPermissionNames($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
+		if (array_key_exists($keys[1], $arr)) $this->setStrId($arr[$keys[1]]);
+		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setPermissionNames($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
 	}
 
 	/**
@@ -1152,6 +1200,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		$criteria = new Criteria(UserRolePeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(UserRolePeer::ID)) $criteria->add(UserRolePeer::ID, $this->id);
+		if ($this->isColumnModified(UserRolePeer::STR_ID)) $criteria->add(UserRolePeer::STR_ID, $this->str_id);
 		if ($this->isColumnModified(UserRolePeer::NAME)) $criteria->add(UserRolePeer::NAME, $this->name);
 		if ($this->isColumnModified(UserRolePeer::DESCRIPTION)) $criteria->add(UserRolePeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(UserRolePeer::PARTNER_ID)) $criteria->add(UserRolePeer::PARTNER_ID, $this->partner_id);
@@ -1213,6 +1262,8 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	 */
 	public function copyInto($copyObj, $deepCopy = false)
 	{
+
+		$copyObj->setStrId($this->str_id);
 
 		$copyObj->setName($this->name);
 

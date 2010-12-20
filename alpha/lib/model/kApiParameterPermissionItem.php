@@ -4,32 +4,32 @@ class kApiParameterPermissionItem extends PermissionItem
 	
 	public function getObject()
 	{
-		return $this->getFromValue('object');
+		return $this->getParam1();
 	}
 	
 	public function setObject($object)
 	{
-		$this->setInValue('object', $object);
+		$this->setParam1($object);
 	}
 	
 	public function getParameter()
 	{
-		return $this->getFromValue('parameter');
+		return $this->getParam2();
 	}
 	
 	public function setParameter($parameter)
 	{
-		$this->setInValue('parameter', $parameter);
+		$this->setParam2($parameter);
 	}
 	
 	public function getAction()
 	{
-		return $this->getFromValue('action');
+		return $this->getParam3();
 	}
 	
 	public function setAction($action)
 	{
-		$this->setInValue('action', $action);
+		$this->setParam3($action);
 	}
 		
 }

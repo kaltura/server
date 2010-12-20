@@ -351,6 +351,8 @@ class kuserPeer extends BasekuserPeer
 	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
+	 * @throws kPermissionException::ROLE_ID_MISSING
+	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
 	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true)
 	{
@@ -363,7 +365,14 @@ class kuserPeer extends BasekuserPeer
 		if ($existingUser) {
 			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
 		}
-
+		
+		// check if roles are valid - may throw exceptions
+		if (!$user->getUserRoleIds()) {
+			// assign default role according to user type admin / normal
+			$userRole = UserRolePeer::getDefaultRoleForUser($user);
+			$user->setUserRoles($userRole->getId());
+		}
+		UserRolePeer::testValidRolesForUser($user->getUserRoleIds());
 		
 		if($user->getScreenName() === null) {
 			$user->setScreenName($user->getPuserId());

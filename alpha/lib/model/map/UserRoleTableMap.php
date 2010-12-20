@@ -37,6 +37,7 @@ class UserRoleTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addColumn('STR_ID', 'StrId', 'VARCHAR', true, 100, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);

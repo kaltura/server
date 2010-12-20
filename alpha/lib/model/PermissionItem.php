@@ -20,44 +20,5 @@ class PermissionItem extends BasePermissionItem
 	public function __construct()
 	{
 		$this->setType(get_class($this));
-	}	
-	
-	public function getFromValue($name)
-	{
-		$curValue = $this->getValue();
-		if (!isset($curValue[$name])) {
-			return null;
-		}
-		return $curValue[$name];
-	}
-	
-	public function setInValue($key, $value)
-	{
-		$curValue = $this->getValue();
-		$curValue[$key] = $value;
-		$this->setValue($curValue);
-	}
-	
-	
-	public function getValue()
-	{
-		$value = parent::getValue();
-		if (!$value) {
-			return array();
-		}
-		else {
-			return unserialize($value);
-		}
-	}
-	
-	public function setValue($value_object)
-	{
-		if (!$value_object) {
-			parent::setValue(null);
-		}
-		else {
-			parent::setValue(serialize($value_object));
-		}
-	}
-	
+	}		
 } // PermissionItem

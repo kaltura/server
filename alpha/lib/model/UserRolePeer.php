@@ -21,12 +21,8 @@ class UserRolePeer extends BaseUserRolePeer
 	 * @throws kPermissionException::ROLE_ID_MISSING
 	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
-	public function testValidRolesForUser($idsString)
+	public static function testValidRolesForUser($idsString)
 	{
-		//TODO: remove return true
-		return true;
-		
-		
 		$ids = explode(',', trim($idsString));
 		
 		if (count($ids) <= 0)
@@ -40,6 +36,24 @@ class UserRolePeer extends BaseUserRolePeer
 		}
 		
 		return true;
+	}
+	
+	
+	public static function getByStrId($strId)
+	{
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::STR_ID, $strId, Criteria::EQUAL);
+		return UserRolePeer::doSelectOne($c);
+	}
+	
+	public static function getDefaultRoleForUser(kuser $user)
+	{
+		if ($user->getIsAdmin()) {
+			return UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
+		}
+		else {
+			return UserRolePeer::getByStrId(UserRoleId::BASE_USER_SESSION_ROLE);
+		}
 	}
 
 } // UserRolePeer

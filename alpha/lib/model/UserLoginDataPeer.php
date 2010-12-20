@@ -335,20 +335,30 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 		if (!$kuser || $kuser->getStatus() != kuser::KUSER_STATUS_ACTIVE)
 		{
-			$kuser = null;
+			
 			
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
-				throw new kUserException('', kUserException::USER_NOT_FOUND);
+				if ($kuser && $kuser->getStatus() == kuser::KUSER_STATUS_SUSPENDED) {
+					throw new kUserException('', kUserException::USER_IS_BLOCKED);
+				}
+				else {
+					throw new kUserException('', kUserException::USER_NOT_FOUND);
+				}
 			}
+			
+			$kuser = null;
 			
 			// if no specific partner was request, but last logged in partner is not available, login to first found partner
 			$c = new Criteria();
 			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId());
-			$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_ACTIVE, Criteria::EQUAL);
+			$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
 			$kuser = kuserPeer::doSelectOne($c);
 			
-			if (!$kuser) {
+			if ($kuser && $kuser->getStatus() == kuser::KUSER_STATUS_SUSPENDED) {
+				throw new kUserException('', kUserException::USER_IS_BLOCKED);
+			}
+			else {
 				throw new kUserException('', kUserException::USER_NOT_FOUND);
 			}
 		}

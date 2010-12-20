@@ -1159,7 +1159,9 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	public function getPermission(PropelPDO $con = null)
 	{
 		if ($this->aPermission === null && (($this->permission_name !== "" && $this->permission_name !== null))) {
-			$this->aPermission = PermissionPeer::retrieveByPk($this->permission_name);
+			$c = new Criteria(PermissionPeer::DATABASE_NAME);
+			$c->add(PermissionPeer::NAME, $this->permission_name);
+			$this->aPermission = PermissionPeer::doSelectOne($c, $con);
 			/* The following can be used additionally to
 			   guarantee the related object contains a reference
 			   to this object.  This level of coupling may, however, be

@@ -25,7 +25,7 @@ abstract class BasePermissionItemPeer {
 	const TM_CLASS = 'PermissionItemTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 7;
+	const NUM_COLUMNS = 11;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -36,8 +36,20 @@ abstract class BasePermissionItemPeer {
 	/** the column name for the TYPE field */
 	const TYPE = 'permission_item.TYPE';
 
-	/** the column name for the VALUE field */
-	const VALUE = 'permission_item.VALUE';
+	/** the column name for the PARAM_1 field */
+	const PARAM_1 = 'permission_item.PARAM_1';
+
+	/** the column name for the PARAM_2 field */
+	const PARAM_2 = 'permission_item.PARAM_2';
+
+	/** the column name for the PARAM_3 field */
+	const PARAM_3 = 'permission_item.PARAM_3';
+
+	/** the column name for the PARAM_4 field */
+	const PARAM_4 = 'permission_item.PARAM_4';
+
+	/** the column name for the PARAM_5 field */
+	const PARAM_5 = 'permission_item.PARAM_5';
 
 	/** the column name for the TAGS field */
 	const TAGS = 'permission_item.TAGS';
@@ -67,11 +79,11 @@ abstract class BasePermissionItemPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'Value', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'value', 'tags', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::VALUE, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'value', 'tags', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'Param1', 'Param2', 'Param3', 'Param4', 'Param5', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'param1', 'param2', 'param3', 'param4', 'param5', 'tags', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::PARAM_1, self::PARAM_2, self::PARAM_3, self::PARAM_4, self::PARAM_5, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'param_1', 'param_2', 'param_3', 'param_4', 'param_5', 'tags', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -81,11 +93,11 @@ abstract class BasePermissionItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'Value' => 2, 'Tags' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'CustomData' => 6, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'value' => 2, 'tags' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'customData' => 6, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::VALUE => 2, self::TAGS => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::CUSTOM_DATA => 6, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'value' => 2, 'tags' => 3, 'created_at' => 4, 'updated_at' => 5, 'custom_data' => 6, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'Param1' => 2, 'Param2' => 3, 'Param3' => 4, 'Param4' => 5, 'Param5' => 6, 'Tags' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'CustomData' => 10, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'param1' => 2, 'param2' => 3, 'param3' => 4, 'param4' => 5, 'param5' => 6, 'tags' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'customData' => 10, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::PARAM_1 => 2, self::PARAM_2 => 3, self::PARAM_3 => 4, self::PARAM_4 => 5, self::PARAM_5 => 6, self::TAGS => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::CUSTOM_DATA => 10, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'param_1' => 2, 'param_2' => 3, 'param_3' => 4, 'param_4' => 5, 'param_5' => 6, 'tags' => 7, 'created_at' => 8, 'updated_at' => 9, 'custom_data' => 10, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
 	);
 
 	/**
@@ -157,7 +169,11 @@ abstract class BasePermissionItemPeer {
 	{
 		$criteria->addSelectColumn(PermissionItemPeer::ID);
 		$criteria->addSelectColumn(PermissionItemPeer::TYPE);
-		$criteria->addSelectColumn(PermissionItemPeer::VALUE);
+		$criteria->addSelectColumn(PermissionItemPeer::PARAM_1);
+		$criteria->addSelectColumn(PermissionItemPeer::PARAM_2);
+		$criteria->addSelectColumn(PermissionItemPeer::PARAM_3);
+		$criteria->addSelectColumn(PermissionItemPeer::PARAM_4);
+		$criteria->addSelectColumn(PermissionItemPeer::PARAM_5);
 		$criteria->addSelectColumn(PermissionItemPeer::TAGS);
 		$criteria->addSelectColumn(PermissionItemPeer::CREATED_AT);
 		$criteria->addSelectColumn(PermissionItemPeer::UPDATED_AT);

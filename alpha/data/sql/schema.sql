@@ -1885,9 +1885,10 @@ CREATE TABLE `permission`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
-	PRIMARY KEY (`name`),
+	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
-	KEY `id_index`(`id`)
+	KEY `name_index`(`name`),
+	KEY `name_partner_id_index`(`name`, `partner_id`)
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------
@@ -1900,6 +1901,7 @@ DROP TABLE IF EXISTS `user_role`;
 CREATE TABLE `user_role`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`str_id` VARCHAR(100)  NOT NULL,
 	`name` VARCHAR(100)  NOT NULL,
 	`description` TEXT,
 	`partner_id` INTEGER  NOT NULL,
@@ -1923,7 +1925,11 @@ CREATE TABLE `permission_item`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`type` VARCHAR(100)  NOT NULL,
-	`value` TEXT  NOT NULL,
+	`param_1` VARCHAR(100)  NOT NULL,
+	`param_2` VARCHAR(100)  NOT NULL,
+	`param_3` VARCHAR(100)  NOT NULL,
+	`param_4` VARCHAR(100)  NOT NULL,
+	`param_5` VARCHAR(100)  NOT NULL,
 	`tags` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,

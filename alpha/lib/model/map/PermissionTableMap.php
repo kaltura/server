@@ -36,9 +36,9 @@ class PermissionTableMap extends TableMap {
 		$this->setPackage('lib.model');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addColumn('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, null);
-		$this->addPrimaryKey('NAME', 'Name', 'VARCHAR', true, 100, null);
+		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
 		$this->addColumn('FRIENDLY_NAME', 'FriendlyName', 'VARCHAR', false, 100, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);

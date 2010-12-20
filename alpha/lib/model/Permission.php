@@ -109,4 +109,22 @@ class Permission extends BasePermission
 		PermissionToPermissionItemPeer::doDelete($c);
 	}
 	
+	/**
+	 * Copy current permission to the given partner.
+	 * @param int $partnerId
+	 */
+	public function copyToPartner($partnerId)
+	{
+		$permission = new Permission();
+		$permission->setName($this->getName());
+		$permission->setFriendlyName($this->getFriendlyName());
+		$permission->setDescription($this->getDescription());
+		$permission->setStatus($this->getStatus());
+		$permission->setTags($this->getTags());
+		$permission->setType($this->getType());
+		$permission->setCustomData($this->getCustomData());
+		$permission->setPartnerId($partnerId); // set new partner id
+		return $permission;
+	}
+	
 } // Permission

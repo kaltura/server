@@ -4,31 +4,22 @@ class kApiActionPermissionItem extends PermissionItem
 	
 	public function getService()
 	{
-		return $this->getFromValue('service');
+		return $this->getParam1();
 	}
 	
 	public function setService($service)
 	{
-		$this->setInValue('service', $service);
+		$this->setParam1($service);
 	}
 	
 	public function getAction()
 	{
-		return $this->getFromValue('action');
+		return $this->getParam2();
 	}
 	
 	public function setAction($action)
 	{
-		$this->setInValue('action', $action);
+		$this->setParam2($action);
 	}
 	
-	public function getPartnerGroup()
-	{
-		return $this->getFromValue('partner_group');
-	}
-	
-	public function setPartnerGroup($group)
-	{
-		$this->setInValue('partner_group', $group);
-	}		
 }
