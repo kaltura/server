@@ -1,14 +1,32 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1292665765">
-  <!-- Generated on date 18/12/10 09:49:25 -->
+<xml apiVersion="3.1.1" generatedDate="1292836511">
+  <!-- Generated on date 20/12/10 11:15:11 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
     <enum name="KalturaAdminUserOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
+    <enum name="KalturaApiActionPermissionItemOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaApiParameterPermissionItemOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
     </enum>
     <enum name="KalturaAssetParamsOrderBy" enumType="string"/>
     <enum name="KalturaAssetParamsOutputOrderBy" enumType="string"/>
@@ -260,8 +278,6 @@
       <const name="PDF_CREATOR" value="202"/>
       <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
       <const name="FAST_START" value="fastStart.FastStart"/>
-      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
-      <const name="AVIDEMUX" value="avidemux.Avidemux"/>
     </enum>
     <enum name="KalturaConversionProfileOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -325,7 +341,6 @@
     <enum name="KalturaDistributionProviderOrderBy" enumType="string"/>
     <enum name="KalturaDistributionProviderType" enumType="string">
       <const name="GENERIC" value="1"/>
-      <const name="MSN" value="msnDistribution.MSN"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -845,6 +860,111 @@
       <const name="BLACKBOARD" value="107"/>
       <const name="SAKAI" value="108"/>
     </enum>
+    <enum name="KalturaPermissionItemOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaPermissionName" enumType="string">
+      <const name="FEATURE_ANALYTICS_TAB" value="FEATURE_ANALYTICS_TAB"/>
+      <const name="FEATURE_508_PLAYERS" value="FEATURE_508_PLAYERS"/>
+      <const name="FEATURE_LIVE_STREAM" value="FEATURE_LIVE_STREAM"/>
+      <const name="FEATURE_VAST" value="FEATURE_VAST"/>
+      <const name="FEATURE_SILVERLIGHT" value="FEATURE_SILVERLIGHT"/>
+      <const name="USER_SESSION_PERMISSION" value="BASE_USER_SESSION_PERMISSION"/>
+      <const name="NO_SESSION_PERMISSION" value="NO_SESSION_PERMISSION"/>
+      <const name="BASE_BATCH_SYSTEM_PERMISSION" value="BASE_BATCH_SYSTEM_PERMISSION"/>
+      <const name="CONTENT_INGEST_UPLOAD" value="CONTENT_INGEST_UPLOAD"/>
+      <const name="CONTENT_INGEST_BULK_UPLOAD" value="CONTENT_INGEST_BULK_UPLOAD"/>
+      <const name="CONTENT_INGEST_FEED" value="CONTENT_INGEST_FEED"/>
+      <const name="CONTENT_MANAGE_MIX" value="CONTENT_MANAGE_MIX"/>
+      <const name="CONTENT_MANAGE_BASE" value="CONTENT_MANAGE_BASE"/>
+      <const name="CONTENT_MANAGE_METADATA" value="CONTENT_MANAGE_METADATA"/>
+      <const name="CONTENT_MANAGE_ASSIGN_CATEGORIES" value="CONTENT_MANAGE_ASSIGN_CATEGORIES"/>
+      <const name="CONTENT_MANAGE_THUMBNAIL" value="CONTENT_MANAGE_THUMBNAIL"/>
+      <const name="CONTENT_MANAGE_SCHEDULE" value="CONTENT_MANAGE_SCHEDULE"/>
+      <const name="CONTENT_MANAGE_ACCESS_CONTROL" value="CONTENT_MANAGE_ACCESS_CONTROL"/>
+      <const name="CONTENT_MANAGE_CUSTOM_DATA" value="CONTENT_MANAGE_CUSTOM_DATA"/>
+      <const name="CONTENT_MANAGE_DELETE" value="CONTENT_MANAGE_DELETE"/>
+      <const name="CONTENT_MANAGE_RECONVERT" value="CONTENT_MANAGE_RECONVERT"/>
+      <const name="CONTENT_MANAGE_EDIT_CATEGORIES" value="CONTENT_MANAGE_EDIT_CATEGORIES"/>
+      <const name="CONTENT_MANAGE_ANNOTATION" value="CONTENT_MANAGE_ANNOTATION"/>
+      <const name="CONTENT_MANAGE_SHARE" value="CONTENT_MANAGE_SHARE"/>
+      <const name="LIVE_STREAM_BASE" value="LIVE_STREAM_BASE"/>
+      <const name="LIVE_STREAM_ADD" value="CONTENT_MANAGE_ADD_LIVE"/>
+      <const name="LIVE_STREAM_UPDATE" value="CONTENT_MANAGE_UPDATE_LIVE"/>
+      <const name="CONTENT_MODERATE_BASE" value="CONTENT_MODERATE_BASE"/>
+      <const name="CONTENT_MODERATE_METADATA" value="CONTENT_MODERATE_METADATA"/>
+      <const name="PLAYLIST_BASE" value="PLAYLIST_BASE"/>
+      <const name="PLAYLIST_ADD" value="PLAYLIST_ADD"/>
+      <const name="PLAYLIST_UPDATE" value="PLAYLIST_UPDATE"/>
+      <const name="PLAYLIST_DELETE" value="PLAYLIST_DELETE"/>
+      <const name="SYNDICATION_BASE" value="SYNDICATION_BASE"/>
+      <const name="SYNDICATION_ADD" value="SYNDICATION_ADD"/>
+      <const name="SYNDICATION_UPDATE" value="SYNDICATION_UPDATE"/>
+      <const name="SYNDICATION_DELETE" value="SYNDICATION_DELETE"/>
+      <const name="STUDIO_BASE" value="STUDIO_BASE"/>
+      <const name="STUDIO_ADD_UICONF" value="STUDIO_ADD_UICONF"/>
+      <const name="STUDIO_UPDATE_UICONF" value="STUDIO_UPDATE_UICONF"/>
+      <const name="STUDIO_DELETE_UICONF" value="STUDIO_DELETE_UICONF"/>
+      <const name="ACCOUNT_BASE" value="ACCOUNT_BASE"/>
+      <const name="ACCOUNT_UPDATE_SETTINGS" value="ACCOUNT_UPDATE_SETTINGS"/>
+      <const name="INTEGRATION_BASE" value="INTEGRATION_BASE"/>
+      <const name="INTEGRATION_UPDATE_SETTINGS" value="INTEGRATION_UPDATE_SETTINGS"/>
+      <const name="ACCESS_CONTROL_BASE" value="ACCESS_CONTROL_BASE"/>
+      <const name="ACCESS_CONTROL_ADD" value="ACCESS_CONTROL_ADD"/>
+      <const name="ACCESS_CONTROL_UPDATE" value="ACCESS_CONTROL_UPDATE"/>
+      <const name="ACCESS_CONTROL_DELETE" value="ACCESS_CONTROL_DELETE"/>
+      <const name="TRANSCODING_BASE" value="TRANSCODING_BASE"/>
+      <const name="TRANSCODING_ADD" value="TRANSCODING_ADD"/>
+      <const name="TRANSCODING_UPDATE" value="TRANSCODING_UPDATE"/>
+      <const name="TRANSCODING_DELETE" value="TRANSCODING_DELETE"/>
+      <const name="CUSTOM_DATA_PROFILE_BASE" value="CUSTOM_DATA_PROFILE_BASE"/>
+      <const name="CUSTOM_DATA_PROFILE_ADD" value="CUSTOM_DATA_PROFILE_ADD"/>
+      <const name="CUSTOM_DATA_PROFILE_UPDATE" value="CUSTOM_DATA_PROFILE_UPDATE"/>
+      <const name="CUSTOM_DATA_PROFILE_DELETE" value="CUSTOM_DATA_PROFILE_DELETE"/>
+      <const name="ADMIN_BASE" value="ADMIN_BASE"/>
+      <const name="ADMIN_USER_ADD" value="ADMIN_USER_ADD"/>
+      <const name="ADMIN_USER_UPDATE" value="ADMIN_USER_UPDATE"/>
+      <const name="ADMIN_USER_DELETE" value="ADMIN_USER_DELETE"/>
+      <const name="ADMIN_ROLE_ADD" value="ADMIN_ROLE_ADD"/>
+      <const name="ADMIN_ROLE_UPDATE" value="ADMIN_ROLE_UPDATE"/>
+      <const name="ADMIN_ROLE_DELETE" value="ADMIN_ROLE_DELETE"/>
+      <const name="ADMIN_PUBLISHER_MANAGE" value="ADMIN_PUBLISHER_MANAGE"/>
+      <const name="ANALYTICS_BASE" value="ANALYTICS_BASE"/>
+      <const name="ADVERTISING_BASE" value="ADVERTISING_BASE"/>
+      <const name="ADVERTISING_UPDATE_SETTINGS" value="ADVERTISING_UPDATE_SETTINGS"/>
+      <const name="PLAYLIST_EMBED_CODE" value="PLAYLIST_EMBED_CODE"/>
+      <const name="STUDIO_BRAND_UICONF" value="STUDIO_BRAND_UICONF"/>
+      <const name="STUDIO_SELECT_CONTENT" value="STUDIO_SELECT_CONTENT"/>
+      <const name="CONTENT_MANAGE_EMBED_CODE" value="CONTENT_MANAGE_EMBED_CODE"/>
+      <const name="ADMIN_WHITE_BRANDING" value="ADMIN_WHITE_BRANDING"/>
+    </enum>
+    <enum name="KalturaPermissionOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
+      <const name="NAME_ASC" value="+name"/>
+      <const name="NAME_DESC" value="-name"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaPermissionStatus" enumType="int">
+      <const name="ACTIVE" value="1"/>
+      <const name="BLOCKED" value="2"/>
+      <const name="DELETED" value="3"/>
+    </enum>
+    <enum name="KalturaPermissionType" enumType="int">
+      <const name="API_ACCESS" value="1"/>
+      <const name="SPECIAL_FEATURE" value="2"/>
+      <const name="PLUGIN" value="3"/>
+      <const name="PARTNER_GROUP" value="4"/>
+      <const name="EXTERNAL" value="99"/>
+    </enum>
     <enum name="KalturaPlayableEntryOrderBy" enumType="string">
       <const name="PLAYS_ASC" value="+plays"/>
       <const name="PLAYS_DESC" value="-plays"/>
@@ -1153,8 +1273,25 @@
       <const name="DELETED" value="5"/>
     </enum>
     <enum name="KalturaUserOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
+    <enum name="KalturaUserRoleOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
+      <const name="NAME_ASC" value="+name"/>
+      <const name="NAME_DESC" value="-name"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaUserRoleStatus" enumType="int">
+      <const name="ACTIVE" value="1"/>
+      <const name="BLOCKED" value="2"/>
+      <const name="DELETED" value="3"/>
     </enum>
     <enum name="KalturaUserStatus" enumType="int">
       <const name="BLOCKED" value="0"/>
@@ -1330,6 +1467,8 @@
       <property name="statusUpdatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="deletedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="loginEnabled" type="bool" readOnly="1" insertOnly="0" description=""/>
+      <property name="isRootAdmin" type="bool" readOnly="1" insertOnly="0" description=""/>
+      <property name="roleIds" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAdminUser" base="KalturaUser"/>
     <class name="KalturaDynamicEnum"/>
@@ -1796,6 +1935,7 @@
       <property name="adminSecret" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="cmsPassword" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="allowMultiNotification" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="loginUsersQuota" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaPartnerUsage">
       <property name="hostingGB" type="float" readOnly="1" insertOnly="0" description=""/>
@@ -1804,6 +1944,71 @@
       <property name="usageGB" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="reachedLimitDate" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="usageGraph" type="string" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermissionItem" abstract="1">
+      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="type" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermissionItemBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="typeEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="typeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermissionItemFilter" base="KalturaPermissionItemBaseFilter"/>
+    <class name="KalturaPremissionItemListResponse">
+      <property name="objects" type="array" arrayType="KalturaPermissionItem" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermission">
+      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="type" type="int" enumType="KalturaPermissionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="friendlyName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaPermissionStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="dependsOnPermissionNames" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="permissionItemsIds" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermissionBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="typeEqual" type="int" enumType="KalturaPermissionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="typeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="friendlyNameLike" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="descriptionLike" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaPermissionStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dependsOnPermissionNamesMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dependsOnPermissionNamesMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaPermissionFilter" base="KalturaPermissionBaseFilter"/>
+    <class name="KalturaPermissionListResponse">
+      <property name="objects" type="array" arrayType="KalturaPermission" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaMediaEntryFilterForPlaylist" base="KalturaMediaEntryFilter">
       <property name="limit" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2029,7 +2234,41 @@
       <property name="objects" type="array" arrayType="KalturaUploadToken" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaUserRole">
+      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaUserRoleStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="permissionNames" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaUserRoleBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="descriptionLike" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaUserRoleStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="permissionNamesMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="permissionNamesMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaUserRoleFilter" base="KalturaUserRoleBaseFilter"/>
+    <class name="KalturaUserRoleListResponse">
+      <property name="objects" type="array" arrayType="KalturaUserRole" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaUserBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameLike" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2037,13 +2276,13 @@
       <property name="emailStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaUserStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="isAdminEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserFilter" base="KalturaUserBaseFilter">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="loginEnabledEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserListResponse">
@@ -2740,7 +2979,6 @@
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="isDefault" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="status" type="int" enumType="KalturaGenericDistributionProviderStatus" readOnly="1" insertOnly="0" description=""/>
-      <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="optionalFlavorParamsIds" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="requiredFlavorParamsIds" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="optionalThumbDimensions" type="array" arrayType="KalturaDistributionThumbDimensions" readOnly="0" insertOnly="0" description=""/>
@@ -2869,6 +3107,10 @@
     <class name="KalturaTubeMogulSyndicationFeedFilter" base="KalturaTubeMogulSyndicationFeedBaseFilter"/>
     <class name="KalturaYahooSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
     <class name="KalturaYahooSyndicationFeedFilter" base="KalturaYahooSyndicationFeedBaseFilter"/>
+    <class name="KalturaApiActionPermissionItemBaseFilter" abstract="1" base="KalturaPermissionItemFilter"/>
+    <class name="KalturaApiActionPermissionItemFilter" base="KalturaApiActionPermissionItemBaseFilter"/>
+    <class name="KalturaApiParameterPermissionItemBaseFilter" abstract="1" base="KalturaPermissionItemFilter"/>
+    <class name="KalturaApiParameterPermissionItemFilter" base="KalturaApiParameterPermissionItemBaseFilter"/>
     <class name="KalturaAssetParamsOutput" base="KalturaAssetParams">
       <property name="assetParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="assetParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2878,6 +3120,15 @@
     </class>
     <class name="KalturaMediaFlavorParams" base="KalturaFlavorParams"/>
     <class name="KalturaMediaFlavorParamsOutput" base="KalturaFlavorParamsOutput"/>
+    <class name="KalturaApiActionPermissionItem" base="KalturaPermissionItem">
+      <property name="service" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="action" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaApiParameterPermissionItem" base="KalturaPermissionItem">
+      <property name="object" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parameter" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="action" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaGoogleVideoSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="adultContent" type="string" enumType="KalturaGoogleSyndicationFeedAdultValues" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -3595,6 +3846,54 @@
         <result type="KalturaPartnerUsage"/>
       </action>
     </service>
+    <service id="permissionitem" name="permissionItem" description="PermissionItem service lets you create and manage permission items&#13;">
+      <action name="add" description="Allows you to add a new KalturaPermissionItem object&#10;">
+        <param name="permissionItem" type="KalturaPermissionItem" optional="0" description="&#13;"/>
+        <result type="KalturaPermissionItem"/>
+      </action>
+      <action name="get" description="Retrieve a KalturaPermissionItem object by ID&#10;">
+        <param name="permissionItemId" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaPermissionItem"/>
+      </action>
+      <action name="update" description="Update an existing KalturaPermissionItem object&#10;">
+        <param name="permissionItemId" type="int" optional="0" description="&#13;"/>
+        <param name="permissionItem" type="KalturaPermissionItem" optional="0" description="Id&#13;"/>
+        <result type="KalturaPermissionItem"/>
+      </action>
+      <action name="delete" description="Mark the KalturaPermissionItem object as deleted&#10;">
+        <param name="permissionItemId" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaPermissionItem"/>
+      </action>
+      <action name="list" description="List KalturaPermissionItem objects&#10;">
+        <param name="filter" type="KalturaPermissionItemFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaPremissionItemListResponse"/>
+      </action>
+    </service>
+    <service id="permission" name="permission" description="Permission service lets you create and manage user permissions&#13;">
+      <action name="add" description="Allows you to add a new KalturaPermission object&#10;">
+        <param name="permission" type="KalturaPermission" optional="0" description="&#13;"/>
+        <result type="KalturaPermission"/>
+      </action>
+      <action name="get" description="Retrieve a KalturaPermission object by ID&#10;">
+        <param name="permissionName" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaPermission"/>
+      </action>
+      <action name="update" description="Update an existing KalturaPermission object&#10;">
+        <param name="permissionName" type="string" optional="0" description="&#13;"/>
+        <param name="permission" type="KalturaPermission" optional="0" description="Name&#13;"/>
+        <result type="KalturaPermission"/>
+      </action>
+      <action name="delete" description="Mark the KalturaPermission object as deleted&#10;">
+        <param name="permissionName" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaPermission"/>
+      </action>
+      <action name="list" description="List KalturaPermission objects&#10;">
+        <param name="filter" type="KalturaPermissionFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaPermissionListResponse"/>
+      </action>
+    </service>
     <service id="playlist" name="playlist" description="Playlist service lets you create,manage and play your playlists&#10;Playlists could be static (containing a fixed list of entries) or dynamic (baseed on a filter)&#13;">
       <action name="add" description="Add new playlist&#10;Note that all entries used in a playlist will become public and may appear in KalturaNetwork&#10;">
         <param name="playlist" type="KalturaPlaylist" optional="0" description="&#13;"/>
@@ -3924,6 +4223,34 @@
         <param name="filter" type="KalturaUploadTokenFilter" optional="1" default="null" description="&#13;"/>
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
         <result type="KalturaUploadTokenListResponse"/>
+      </action>
+    </service>
+    <service id="userrole" name="userRole" description="UserRole service lets you create and manage user permissions&#13;">
+      <action name="add" description="Allows you to add a new KalturaUserRole object&#10;">
+        <param name="userRole" type="KalturaUserRole" optional="0" description=""/>
+        <result type="KalturaUserRole"/>
+      </action>
+      <action name="get" description="Retrieve a KalturaUserRole object by ID&#10;">
+        <param name="userRoleId" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaUserRole"/>
+      </action>
+      <action name="update" description="Update an existing KalturaUserRole object&#10;">
+        <param name="userRoleId" type="int" optional="0" description="&#13;"/>
+        <param name="userRole" type="KalturaUserRole" optional="0" description="Id&#13;"/>
+        <result type="KalturaUserRole"/>
+      </action>
+      <action name="delete" description="Mark the KalturaUserRole object as deleted&#10;">
+        <param name="userRoleId" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaUserRole"/>
+      </action>
+      <action name="list" description="List permission items&#10;">
+        <param name="filter" type="KalturaUserRoleFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaUserRoleListResponse"/>
+      </action>
+      <action name="clone" description="Clone role&#10;">
+        <param name="userRoleId" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaUserRole"/>
       </action>
     </service>
     <service id="user" name="user" description="Manage partner users on Kaltura's side&#10;The userId in kaltura is the unique Id in the partner's system, and the [partnerId,Id] couple are unique key in kaltura's DB&#13;">
