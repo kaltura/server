@@ -154,6 +154,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		foreach($xml->children() as $child)
 		{
 			$const_props = "";
+			$const_doc_params = array();
 			$imports = "";
 			$check_init = "";
 			$add_check_init = false;
@@ -167,11 +168,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 			foreach($child->children() as $prop)
 			{
+				$const_doc_param = $prop->attributes()->name;
 				if($prop->getName() == "param" )
 				{
 					switch($prop->attributes()->type)
 					{
 						case "string": 
+							$const_doc_param .= ' String';
 							$const_props .= $prop->attributes()->name . " : String";
 							if($prop->attributes()->optional == "1")
 							{
@@ -182,11 +185,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}
 							$const_props .= ",";			
 							
-							$keys_values_creator .= "			keyArr.push( '" . $prop->attributes()->name . "' );\n";
-							$keys_values_creator .= "			valueArr.push( " . $prop->attributes()->name . " );\n";	
+							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";	
 
 						break;
 						case "float" :
+							$const_doc_param .= ' Number';
 							$const_props .= $prop->attributes()->name . " : Number";
 							if($prop->attributes()->optional == "1")
 							{
@@ -200,11 +204,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}	
 							$const_props .= ",";	
 
-							$keys_values_creator .= "			keyArr.push( '" . $prop->attributes()->name . "' );\n";
-							$keys_values_creator .= "			valueArr.push( " . $prop->attributes()->name . " );\n";	
+							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";	
 
 						break;
 						case "int": 
+							$const_doc_param .= ' int';
 							$const_props .= $prop->attributes()->name . " : int";	
 							if($prop->attributes()->optional == "1")
 							{	
@@ -215,11 +220,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}
 							$const_props .= ",";	
 
-							$keys_values_creator .= "			keyArr.push( '" . $prop->attributes()->name . "' );\n";
-							$keys_values_creator .= "			valueArr.push( " . $prop->attributes()->name . " );\n";	
+							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";	
 							
 						break;
 						case "bool" : 
+							$const_doc_param .= ' Boolean';
 							$const_props .= $prop->attributes()->name . " : Boolean";
 							if($prop->attributes()->optional == "1")	
 							{
@@ -230,11 +236,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}
 							$const_props .= ",";
 							
-							$keys_values_creator .= "			keyArr.push( '" . $prop->attributes()->name . "' );\n";
-							$keys_values_creator .= "			valueArr.push( " . $prop->attributes()->name . " );\n";
+							$keys_values_creator .= "			keyArr.push('" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			valueArr.push(" . $prop->attributes()->name . ");\n";
 								
 						break;
 						case "array" :
+							$const_doc_param .= ' Array';
 							$const_props .= $prop->attributes()->name . " : Array";
 							if($prop->attributes()->optional == "1")
 							{	
@@ -248,13 +255,14 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}
 							$const_props .= ",";	 
 							$keys_values_creator .= " 			keyValArr = extractArray(" . $prop->attributes()->name . ",'" . $prop->attributes()->name . "');\n";
-							$keys_values_creator .= "			keyArr = keyArr.concat( keyValArr[0] );\n";
-							$keys_values_creator .= "			valueArr = valueArr.concat( keyValArr[1] );\n";
+							$keys_values_creator .= "			keyArr = keyArr.concat(keyValArr[0]);\n";
+							$keys_values_creator .= "			valueArr = valueArr.concat(keyValArr[1]);\n";
 						break;
 						case "file" :
+							$const_doc_param .= ' Object - FileReference or ByteArray';
 							$fileAttributesNames[] = $prop->attributes()->name;
 							 
-							$const_props .= $prop->attributes()->name . " : FileReference";
+							$const_props .= $prop->attributes()->name . " : Object";
 							if($prop->attributes()->optional == "1")	
 							{
 								$add_check_init = true;
@@ -269,6 +277,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 								
 						break;
 						default: //is Object	
+							$const_doc_param .= ' ' . $prop->attributes()->type;
 							$const_props .= $prop->attributes()->name . " : " . $prop->attributes()->type;
 							if($prop->attributes()->optional == "1")
 							{	
@@ -281,12 +290,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 									$const_props .= "=null";
 							}
 							$const_props .= ",";	
-							$imports .=  "	import com.kaltura.vo." .  $this->toUpperCamaleCase( $prop->attributes()->type ) . ";\n"; 
-							$keys_values_creator .= " 			keyValArr = kalturaObject2Arrays(" . $prop->attributes()->name . ",'" . $prop->attributes()->name . "');\n";
-							$keys_values_creator .= "			keyArr = keyArr.concat( keyValArr[0] );\n";
-							$keys_values_creator .= "			valueArr = valueArr.concat( keyValArr[1] );\n";
+							$imports .=  "	import com.kaltura.vo." .  $this->toUpperCamaleCase($prop->attributes()->type) . ";\n"; 
+							$keys_values_creator .= " 			keyValArr = kalturaObject2Arrays(" . $prop->attributes()->name . ", '" . $prop->attributes()->name . "');\n";
+							$keys_values_creator .= "			keyArr = keyArr.concat(keyValArr[0]);\n";
+							$keys_values_creator .= "			valueArr = valueArr.concat(keyValArr[1]);\n";
 						break;
 					}
+					$const_doc_params[] = $const_doc_param;
 				}
 			}
 			
@@ -314,11 +324,20 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	{\n";
 			
 			if(count($fileAttributesNames))
+			{
 				foreach($fileAttributesNames as $fileAttributeName)
-					$str .= "		public var " . $fileAttributeName . ":FileReference;\n";
-					
+					$str .= "		public var " . $fileAttributeName . ":Object;\n\n";
+			}
 			else
-			$str .= "		public var filterFields : String;\n";
+			{
+				$str .= "		public var filterFields : String;\n";
+			}
+			
+			$str .= "		/**\n";
+			foreach($const_doc_params as $const_doc_param)
+			$str .= "		 * @param $const_doc_param\n";
+			$str .= "		 **/\n";
+			
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
 			$str .= "		{\n";
 			if($add_check_init)
@@ -326,13 +345,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "			service= '" . $xml->attributes()->id . "';\n";
 			$str .= "			action= '" . $child->attributes()->name . "';\n";
 			$str .=	$keys_values_creator;
-			$str .= "			applySchema( keyArr , valueArr );\n";
+			$str .= "			applySchema(keyArr, valueArr);\n";
 
 			$str .= "		}\n\n";
 			
 			$str .= "		override public function execute() : void\n";
 			$str .= "		{\n";
-			$str .= "			setRequestArgument('filterFields',filterFields);\n";
+			$str .= "			setRequestArgument('filterFields', filterFields);\n";
 			$str .= "			delegate = new " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . "Delegate( this , config );\n";
 			$str .= "		}\n";
 			$str .= "	}\n";
@@ -357,7 +376,6 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
 			$str .= "{\n"; 
-			$str .= "	import flash.utils.getDefinitionByName;\n\n";
 			$str .= "	import com.kaltura.config.KalturaConfig;\n";
 			$str .= "	import com.kaltura.net.KalturaCall;\n";
 			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n";
@@ -365,11 +383,19 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			{
 				$str .= "	import com.kaltura.errors.KalturaError;\n";
 				$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n\n";
+				
+				$str .= "	import ru.inspirit.net.MultipartURLLoader;\n";
+				
+				$str .= "	import mx.utils.UIDUtil;\n\n";
+				
 				$str .= "	import flash.events.DataEvent;\n";
 				$str .= "	import flash.events.Event;\n";
-				$str .= "	import flash.net.URLRequest;\n\n";
-				$str .= "	import ru.inspirit.net.MultipartURLLoader;\n";
+				$str .= "	import flash.net.URLRequest;\n";
+				$str .= "	import flash.net.FileReference;\n";
+				$str .= "	import flash.net.URLLoaderDataFormat;\n";
+				$str .= "	import flash.utils.ByteArray;\n";
 			}
+			$str .= "	import flash.utils.getDefinitionByName;\n";
 			
 			$str .= "\n"; 
 			$str .= "	public class " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "Delegate extends WebDelegateBase\n" ;
@@ -389,13 +415,13 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				case "bool":
 				case "float" :
 				case "string": 
-					$str .= "		override public function parse( result : XML ) : *\n";
+					$str .= "		override public function parse(result:XML) : *\n";
 					$str .= "		{\n";
 					$str .= "			return result.result.toString();\n"; 
 					$str .= "		}\n\n";
 				break;
 				case "array":
-					$str .= "		override public function parse( result : XML ) : *\n";
+					$str .= "		override public function parse(result:XML) : *\n";
 					$str .= "		{\n";
 					$str = $this->addImport2String( "	import com.kaltura.core.KClassFactory" , $str );
 					if( $child->result->attributes()->arrayType )
@@ -422,6 +448,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 			if(count($fileAttributesNames))
 			{
+				$fileAttributeName = reset($fileAttributesNames);
+				
 				$str .= "		override protected function sendRequest():void {\n";
 				$str .= "			//construct the loader\n";
 				$str .= "			createURLLoader();\n";
@@ -429,13 +457,16 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "			//create the service request for normal calls\n";
 				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
 				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
-				foreach($fileAttributesNames as $fileAttributeName)
-					$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
-				$str .= "			var urlRequest:URLRequest = new URLRequest(req);\n";
-				
-				foreach($fileAttributesNames as $fileAttributeName)
-					$str .= "			(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ")." . $fileAttributeName . ".upload(urlRequest,\"" . $fileAttributeName . "\");\n";
-					
+				$str .= "			if ((call as ThumbAssetAddFromImage).$fileAttributeName is FileReference) {\n";
+				$str .= "				(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
+				$str .= "				var urlRequest:URLRequest = new URLRequest(req);\n";
+				$str .= "				((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as FileReference).upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+				$str .= "			}\n";
+				$str .= "			else{\n";
+				$str .= "				mrloader.addFile(((call as ThumbAssetAddFromImage).$fileAttributeName as ByteArray), UIDUtil.createUID(), '$fileAttributeName');	\n";
+				$str .= "				mrloader.dataFormat = URLLoaderDataFormat.TEXT;\n";
+				$str .= "				mrloader.load(req);\n";
+				$str .= "			}\n";
 				$str .= "		}\n\n";
 				
 				$str .= "		// Event Handlers\n";
