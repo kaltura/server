@@ -47,6 +47,9 @@ class KalturaDispatcher
 		TrackEntryPeer::clearInstancePool();
 		uiConfPeer::clearInstancePool();
 		UploadTokenPeer::clearInstancePool();
+		
+		// TODO clear default filters
+		// TODO call all memory cleaner plugins
 	}
 	
 	public function dispatch($service, $action, $params = array()) 
