@@ -162,7 +162,7 @@ class PermissionPeer extends BasePermissionPeer
 		$permissionName = self::getPermissionNameFromPluginName($pluginName);
 		$friendlyName = $pluginName .' plugin permission';
 		$description = 'Permission to use '.$pluginName.' plugin';
-		return self::enableForPartner($permissionName, permissionType::PLUGIN, $partnerId, $friendlyName, $description);
+		return self::enableForPartner($permissionName, PermissionType::PLUGIN, $partnerId, $friendlyName, $description);
 	}
 	
 	public static function disablePlugin($pluginName, $partnerId)

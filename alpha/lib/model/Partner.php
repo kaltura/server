@@ -625,7 +625,7 @@ class Partner extends BasePartner
 	
 	// analytics tab
 	public function getEnableAnalyticsTab() {
-		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_ANALYTICS_TAB, $this->getId());
+		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_TAB, $this->getId());
 		return $permission ? true : false;
 	}
 	
@@ -636,7 +636,7 @@ class Partner extends BasePartner
 	
 	// silverlight
 	public function getEnableSilverLight() {
-		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_SILVERLIGHT, $this->getId());
+		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SILVERLIGHT, $this->getId());
 		return $permission ? true : false;
 	}
 	
@@ -646,7 +646,7 @@ class Partner extends BasePartner
 	
 	// vast
 	public function getEnableVast() {
-		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_VAST, $this->getId());
+		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_VAST, $this->getId());
 		return $permission ? true : false;
 	}
 	
@@ -656,7 +656,7 @@ class Partner extends BasePartner
 	
 	// 508 players
 	public function getEnable508Players() {
-		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_508_PLAYERS, $this->getId());
+		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_508_PLAYERS, $this->getId());
 		return $permission ? true : false;
 	}
 	
@@ -666,7 +666,7 @@ class Partner extends BasePartner
 	
 	// live stream
 	public function getLiveStreamEnabled() {
-		$permission = PermissionPeer::isValidForPartner(permissionName::FEATURE_LIVE_STREAM, $this->getId());
+		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM, $this->getId());
 		return $permission ? true : false;
 	}
 	
@@ -677,7 +677,7 @@ class Partner extends BasePartner
 	private function setEnabledService($enabled, $permissionName)
 	{
 		if ($enabled) {
-			PermissionPeer::enableForPartner($permissionName, permissionType::SPECIAL_FEATURE, $this->getId());
+			PermissionPeer::enableForPartner($permissionName, PermissionType::SPECIAL_FEATURE, $this->getId());
 		}
 		else {
 			PermissionPeer::disableForPartner($permissionName, $this->getId());
