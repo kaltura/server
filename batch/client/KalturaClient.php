@@ -9,8 +9,30 @@ class KalturaAccessControlOrderBy
 
 class KalturaAdminUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaApiActionPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaApiParameterPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 }
 
 class KalturaAssetParamsOrderBy
@@ -260,8 +282,6 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
-	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
-	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -317,7 +337,6 @@ class KalturaDistributionProfileStatus
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
-	const MSN = "msnDistribution.MSN";
 }
 
 class KalturaDurationType
@@ -725,6 +744,121 @@ class KalturaPartnerType
 	const SAKAI = 108;
 }
 
+class KalturaPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaPermissionName
+{
+	const FEATURE_ANALYTICS_TAB = "FEATURE_ANALYTICS_TAB";
+	const FEATURE_508_PLAYERS = "FEATURE_508_PLAYERS";
+	const FEATURE_LIVE_STREAM = "FEATURE_LIVE_STREAM";
+	const FEATURE_VAST = "FEATURE_VAST";
+	const FEATURE_SILVERLIGHT = "FEATURE_SILVERLIGHT";
+	const USER_SESSION_PERMISSION = "BASE_USER_SESSION_PERMISSION";
+	const NO_SESSION_PERMISSION = "NO_SESSION_PERMISSION";
+	const BASE_BATCH_SYSTEM_PERMISSION = "BASE_BATCH_SYSTEM_PERMISSION";
+	const CONTENT_INGEST_UPLOAD = "CONTENT_INGEST_UPLOAD";
+	const CONTENT_INGEST_BULK_UPLOAD = "CONTENT_INGEST_BULK_UPLOAD";
+	const CONTENT_INGEST_FEED = "CONTENT_INGEST_FEED";
+	const CONTENT_MANAGE_MIX = "CONTENT_MANAGE_MIX";
+	const CONTENT_MANAGE_BASE = "CONTENT_MANAGE_BASE";
+	const CONTENT_MANAGE_METADATA = "CONTENT_MANAGE_METADATA";
+	const CONTENT_MANAGE_ASSIGN_CATEGORIES = "CONTENT_MANAGE_ASSIGN_CATEGORIES";
+	const CONTENT_MANAGE_THUMBNAIL = "CONTENT_MANAGE_THUMBNAIL";
+	const CONTENT_MANAGE_SCHEDULE = "CONTENT_MANAGE_SCHEDULE";
+	const CONTENT_MANAGE_ACCESS_CONTROL = "CONTENT_MANAGE_ACCESS_CONTROL";
+	const CONTENT_MANAGE_CUSTOM_DATA = "CONTENT_MANAGE_CUSTOM_DATA";
+	const CONTENT_MANAGE_DELETE = "CONTENT_MANAGE_DELETE";
+	const CONTENT_MANAGE_RECONVERT = "CONTENT_MANAGE_RECONVERT";
+	const CONTENT_MANAGE_EDIT_CATEGORIES = "CONTENT_MANAGE_EDIT_CATEGORIES";
+	const CONTENT_MANAGE_ANNOTATION = "CONTENT_MANAGE_ANNOTATION";
+	const CONTENT_MANAGE_SHARE = "CONTENT_MANAGE_SHARE";
+	const LIVE_STREAM_BASE = "LIVE_STREAM_BASE";
+	const LIVE_STREAM_ADD = "CONTENT_MANAGE_ADD_LIVE";
+	const LIVE_STREAM_UPDATE = "CONTENT_MANAGE_UPDATE_LIVE";
+	const CONTENT_MODERATE_BASE = "CONTENT_MODERATE_BASE";
+	const CONTENT_MODERATE_METADATA = "CONTENT_MODERATE_METADATA";
+	const PLAYLIST_BASE = "PLAYLIST_BASE";
+	const PLAYLIST_ADD = "PLAYLIST_ADD";
+	const PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
+	const PLAYLIST_DELETE = "PLAYLIST_DELETE";
+	const SYNDICATION_BASE = "SYNDICATION_BASE";
+	const SYNDICATION_ADD = "SYNDICATION_ADD";
+	const SYNDICATION_UPDATE = "SYNDICATION_UPDATE";
+	const SYNDICATION_DELETE = "SYNDICATION_DELETE";
+	const STUDIO_BASE = "STUDIO_BASE";
+	const STUDIO_ADD_UICONF = "STUDIO_ADD_UICONF";
+	const STUDIO_UPDATE_UICONF = "STUDIO_UPDATE_UICONF";
+	const STUDIO_DELETE_UICONF = "STUDIO_DELETE_UICONF";
+	const ACCOUNT_BASE = "ACCOUNT_BASE";
+	const ACCOUNT_UPDATE_SETTINGS = "ACCOUNT_UPDATE_SETTINGS";
+	const INTEGRATION_BASE = "INTEGRATION_BASE";
+	const INTEGRATION_UPDATE_SETTINGS = "INTEGRATION_UPDATE_SETTINGS";
+	const ACCESS_CONTROL_BASE = "ACCESS_CONTROL_BASE";
+	const ACCESS_CONTROL_ADD = "ACCESS_CONTROL_ADD";
+	const ACCESS_CONTROL_UPDATE = "ACCESS_CONTROL_UPDATE";
+	const ACCESS_CONTROL_DELETE = "ACCESS_CONTROL_DELETE";
+	const TRANSCODING_BASE = "TRANSCODING_BASE";
+	const TRANSCODING_ADD = "TRANSCODING_ADD";
+	const TRANSCODING_UPDATE = "TRANSCODING_UPDATE";
+	const TRANSCODING_DELETE = "TRANSCODING_DELETE";
+	const CUSTOM_DATA_PROFILE_BASE = "CUSTOM_DATA_PROFILE_BASE";
+	const CUSTOM_DATA_PROFILE_ADD = "CUSTOM_DATA_PROFILE_ADD";
+	const CUSTOM_DATA_PROFILE_UPDATE = "CUSTOM_DATA_PROFILE_UPDATE";
+	const CUSTOM_DATA_PROFILE_DELETE = "CUSTOM_DATA_PROFILE_DELETE";
+	const ADMIN_BASE = "ADMIN_BASE";
+	const ADMIN_USER_ADD = "ADMIN_USER_ADD";
+	const ADMIN_USER_UPDATE = "ADMIN_USER_UPDATE";
+	const ADMIN_USER_DELETE = "ADMIN_USER_DELETE";
+	const ADMIN_ROLE_ADD = "ADMIN_ROLE_ADD";
+	const ADMIN_ROLE_UPDATE = "ADMIN_ROLE_UPDATE";
+	const ADMIN_ROLE_DELETE = "ADMIN_ROLE_DELETE";
+	const ADMIN_PUBLISHER_MANAGE = "ADMIN_PUBLISHER_MANAGE";
+	const ANALYTICS_BASE = "ANALYTICS_BASE";
+	const ADVERTISING_BASE = "ADVERTISING_BASE";
+	const ADVERTISING_UPDATE_SETTINGS = "ADVERTISING_UPDATE_SETTINGS";
+	const PLAYLIST_EMBED_CODE = "PLAYLIST_EMBED_CODE";
+	const STUDIO_BRAND_UICONF = "STUDIO_BRAND_UICONF";
+	const STUDIO_SELECT_CONTENT = "STUDIO_SELECT_CONTENT";
+	const CONTENT_MANAGE_EMBED_CODE = "CONTENT_MANAGE_EMBED_CODE";
+	const ADMIN_WHITE_BRANDING = "ADMIN_WHITE_BRANDING";
+}
+
+class KalturaPermissionOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaPermissionStatus
+{
+	const ACTIVE = 1;
+	const BLOCKED = 2;
+	const DELETED = 3;
+}
+
+class KalturaPermissionType
+{
+	const API_ACCESS = 1;
+	const SPECIAL_FEATURE = 2;
+	const PLUGIN = 3;
+	const PARTNER_GROUP = 4;
+	const EXTERNAL = 99;
+}
+
 class KalturaPlayableEntryOrderBy
 {
 	const PLAYS_ASC = "+plays";
@@ -910,8 +1044,36 @@ class KalturaUploadTokenStatus
 
 class KalturaUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaUserRoleOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaUserRoleStatus
+{
+	const ACTIVE = 1;
+	const BLOCKED = 2;
+	const DELETED = 3;
+}
+
+class KalturaUserStatus
+{
+	const BLOCKED = 0;
+	const ACTIVE = 1;
+	const DELETED = 2;
 }
 
 class KalturaVideoCodec
@@ -4864,6 +5026,14 @@ class KalturaPartner extends KalturaObjectBase
 	 */
 	public $allowMultiNotification = null;
 
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $loginUsersQuota = null;
+
 
 }
 
@@ -6891,6 +7061,20 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $partnerIdEqual = null;
@@ -6940,6 +7124,20 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var KalturaUserStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual = null;
@@ -6963,20 +7161,6 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 
 class KalturaUserFilter extends KalturaUserBaseFilter
 {
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
 	/**
 	 * 
 	 *
@@ -7420,6 +7604,371 @@ abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicat
 }
 
 class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaPermissionItemBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
+{
+
+}
+
+abstract class KalturaApiActionPermissionItemBaseFilter extends KalturaPermissionItemFilter
+{
+
+}
+
+class KalturaApiActionPermissionItemFilter extends KalturaApiActionPermissionItemBaseFilter
+{
+
+}
+
+abstract class KalturaApiParameterPermissionItemBaseFilter extends KalturaPermissionItemFilter
+{
+
+}
+
+class KalturaApiParameterPermissionItemFilter extends KalturaApiParameterPermissionItemBaseFilter
+{
+
+}
+
+abstract class KalturaPermissionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionType
+	 */
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $friendlyNameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $descriptionLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dependsOnPermissionNamesMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dependsOnPermissionNamesMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaPermissionFilter extends KalturaPermissionBaseFilter
+{
+
+}
+
+abstract class KalturaUserRoleBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $descriptionLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserRoleStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $permissionNamesMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $permissionNamesMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaUserRoleFilter extends KalturaUserRoleBaseFilter
 {
 
 }
