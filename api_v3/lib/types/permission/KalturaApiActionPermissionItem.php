@@ -14,11 +14,6 @@ class KalturaApiActionPermissionItem extends KalturaPermissionItem
 	 */
 	public $action;
 	
-	/**
-	 * @var string
-	 */
-	public $partnerGroup;
-
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -26,7 +21,6 @@ class KalturaApiActionPermissionItem extends KalturaPermissionItem
 	private static $map_between_objects = array(
 		'service',
 		'action',
-		'partnerGroup',
 	 );
 		 
 	 
