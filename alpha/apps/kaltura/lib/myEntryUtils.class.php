@@ -769,7 +769,11 @@ class myEntryUtils
 						// try the best playable
 						$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
 					}
-					
+					if (is_null($flavorAsset))
+					{
+						// if no READY ORIGINAL entry is available, try to retreive a non-READY ORIGINAL entry
+						$flavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($entry->getId());
+					}	
 					if (is_null($flavorAsset))
 						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
