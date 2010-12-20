@@ -1,6 +1,6 @@
 <?php
 
-$dryRun = false; //TODO: change for real run
+$dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 
