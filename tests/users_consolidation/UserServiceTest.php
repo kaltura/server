@@ -195,6 +195,20 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		return $createdUser;
 	}
 	
+	
+	private function checkException($exceptionThrown, $code = null, $message = null)
+	{
+		if (!$exceptionThrown) {
+			$this->fail('No exception was thrown');
+		}
+		if ($code && $exceptionThrown->getCode() != $code) {
+			$this->fail('Exception thrown with code ['.$exceptionThrown->getCode().'] instead of ['.$code.']');
+		}
+		if ($message && $exceptionThrown->getMessage() != $message) {
+			$this->fail('Exception thrown with message ['.$exceptionThrown->getMessage().'] instead of ['.$message.']');
+		}
+	}
+	
 
 	
 	/**
@@ -302,27 +316,27 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 			return;
 		}
 		
-		$this->dummyPartner->setLoginUsersQuota(3);
-		$this->dummyPartner->save();
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser = $this->createUser(true, false, __FUNCTION__);
 		$newUser2 = $this->createUser(true, true, __FUNCTION__);
 		$newUser3 = $this->createUser(true, false, __FUNCTION__);
 		$newUser4 = $this->createUser(true, true, __FUNCTION__);
+		
+		// try to add more users than the partner's quota
+		$this->dummyPartner->setLoginUsersQuota(3);
+		$this->dummyPartner->save();
 		$this->assertType('KalturaUser', $this->addUser($newUser));
 		$this->assertType('KalturaUser', $this->addUser($newUser2));
+		
+		$exceptionThrown = false;
 		try { $this->client->user->add($newUser3); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'LOGIN_USERS_QUOTA_EXCEEDED') {
-				$this->fail('Expected exception [LOGIN_USERS_QUOTA_EXCEEDED] was not returned from user->add for adding normal user');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
+	
+		$exceptionThrown = false;
 		try { $this->addUser($newUser4); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'LOGIN_USERS_QUOTA_EXCEEDED') {
-				$this->fail('Expected exception [LOGIN_USERS_QUOTA_EXCEEDED] was not returned from user->add for adding admin user');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
 		
 		$this->dummyPartner->setLoginUsersQuota(4);
 		$this->dummyPartner->save();
@@ -340,24 +354,20 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		// test failure to add user with user ks
 		$this->startSession(KalturaSessionType::USER, null);
 		$newUser = $this->createUser(false, false, __FUNCTION__);
+		$exceptionThrown = false;
 		try { $createdUser = $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_KS') {
-				$this->fail('Expected exception [INVALID_KS] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_KS');
 		
 		// test failure to add same user ID twice
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser = $this->createUser(false, false, __FUNCTION__);
 		$this->assertType('KalturaUser', $this->addUser($newUser));
 		$newUser->firstName = 'test add same puserId twice';
+		$exceptionThrown = false;
 		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'DUPLICATE_USER_BY_ID') {
-				$this->fail('Expected exception [DUPLICATE_USER_BY_ID] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'DUPLICATE_USER_BY_ID');
 		
 		// test failure adding same login id twice
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -365,53 +375,45 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertType('KalturaUser', $this->addUser($newUser));
 		$newUser->firstName = 'test failure adding same login id twice';
 		$newUser->id = uniqid();
+		$exceptionThrown = false;
 		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'DUPLICATE_USER_BY_LOGIN_ID') {
-				$this->fail('Expected exception [DUPLICATE_USER_BY_LOGIN_ID] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'DUPLICATE_USER_BY_LOGIN_ID');
+		
 		// same test with admin user
 		$newUser->id = uniqid();
 		$newUser->isAdmin = true;
+		$exceptionThrown = false;
 		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'DUPLICATE_USER_BY_LOGIN_ID') {
-				$this->fail('Expected exception [DUPLICATE_USER_BY_LOGIN_ID] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'DUPLICATE_USER_BY_LOGIN_ID');	
 		
-		//test failure adding an admin user with no password
-		$this->startSession(KalturaSessionType::ADMIN, null);
-		$newUser = $this->createUser(false, true, __FUNCTION__);
-		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'ADMIN_USER_PASSWORD_MISSING') {
-				$this->fail('Expected exception [ADMIN_USER_PASSWORD_MISSING] was not returned from user->add');
-			}
-		}
-		
-		// test failure adding an admin user with password but no email or invalid email
+		// test failure adding an admin user with password but no email
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser = $this->createUser(true, true, __FUNCTION__);
 		$newUser->email = null;
+		$exceptionThrown = false;
 		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_FIELD_VALUE') {
-				$this->fail('Expected exception [INVALID_FIELD_VALUE] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_FIELD_VALUE');
 		
-		// test failure adding an admin user with password but no email or invalid email
+		// test failure adding an admin user with password but invalid email
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser = $this->createUser(true, true, __FUNCTION__);
 		$newUser->email = uniqid();
+		$exceptionThrown = false;
 		try { $this->addUser($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_FIELD_VALUE') {
-				$this->fail('Expected exception [INVALID_FIELD_VALUE] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_FIELD_VALUE');
+		
+		// test failure adding a user with an invalid password
+		$this->startSession(KalturaSessionType::ADMIN, null);
+		$newUser = $this->createUser(true, true, __FUNCTION__);
+		$newUser->password = 'aaaa';
+		$exceptionThrown = false;
+		try { $this->addUser($newUser); }
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'PASSWORD_STRUCTURE_INVALID');
 	}
 	
 	public function testUserMultiplePartners()
@@ -497,12 +499,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertType('KalturaUser', $createdUser1);
 		$this->assertEquals(self::TEST_PARTNER_ID, $createdUser1->partnerId);
 		$newUser->password = UserLoginDataPeer::generateNewPassword();
+		$exceptionThrown = false;
 		try { $this->addUser2($newUser); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'USER_EXISTS_WITH_DIFFERENT_PASSWORD') {
-				$this->fail('Expected exception [USER_EXISTS_WITH_DIFFERENT_PASSWORD] was not returned from user->add');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'USER_EXISTS_WITH_DIFFERENT_PASSWORD');
 	}
 	
 	
@@ -571,12 +571,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertType('KalturaUser', $this->addUser($newUser));
 		$newUser2 = new KalturaUser();
 		$newUser2->password = uniqid();
+		$exceptionThrown = false;
 		try { $this->client->user->update($newUser->id, $newUser2); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'PROPERTY_VALIDATION_NOT_UPDATABLE') {
-				$this->fail('Expected exception [PROPERTY_VALIDATION_NOT_UPDATABLE] was not returned from user->update');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'PROPERTY_VALIDATION_NOT_UPDATABLE');
 		
 		// try to update isAdmin with user ks
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -585,12 +583,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->startSession(KalturaSessionType::USER, null);
 		$newUser2 = new KalturaUser();
 		$newUser2->isAdmin = true;
+		$exceptionThrown = false;
 		try { $this->client->user->update($newUser->id, $newUser2); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_KS') {
-				$this->fail('Expected exception [INVALID_KS] was not returned from user->update');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_KS');
 		
 		//try to update email/first_name/last_name for user in all partners
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -681,12 +677,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		
 		// try to delete with user ks - should fail
 		$this->startSession(KalturaSessionType::USER, null);
+		$exceptionThrown = false;
 		try { $this->client->user->delete($newUser->id); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_KS') {
-				$this->fail('Expected exception [INVALID_KS] was not returned from user->delete');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_KS');
 		
 		// check that can get user
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -699,12 +693,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(KalturaUserStatus::DELETED, $deletedUser->status);
 		
 		// delete user -> check no get
+		$exceptionThrown = false;
 		try { $this->client->user->get($newUser->id); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_USER_ID') {
-				$this->fail('Expected exception [INVALID_USER_ID] was not returned from user->get');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_USER_ID');
 		
 		// delete user -> check no list with and without filter
 		$userList = $this->client->user->listAction();
@@ -739,12 +731,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$deletedUser = $this->client->user->delete($newUser->id);
 		$this->assertEquals(KalturaUserStatus::DELETED, $deletedUser->status);
 		
+		$exceptionThrown = false;
 		try { $this->client->user->get($newUser->id); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'INVALID_USER_ID') {
-				$this->fail('Expected exception [INVALID_USER_ID] was not returned from user->get');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'INVALID_USER_ID');
 		
 		$getUser2 = $this->client2->user->get($newUser->id);
 		$this->assertEquals($createdUser2, $getUser2);
@@ -946,12 +936,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$newUser2 = $this->createUser(true, true, __FUNCTION__);
 		$addedUser1 = $this->addUser($newUser1);
 		$addedUser2 = $this->addUser($newUser2);
+		$exceptionThrown = false;
 		try { $this->client->user->updateLoginData($newUser2->email, $newUser2->password, $newUser1->email, UserLoginDataPeer::generateNewPassword()); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'LOGIN_ID_ALREADY_USED') {
-				$this->fail('Expected exception [LOGIN_ID_ALREADY_USED] was not returned from user->updateLoginData');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'LOGIN_ID_ALREADY_USED');
 		
 		// update and try to login with the new data
 		$newUser3 = $this->createUser(true, false);
@@ -1019,24 +1007,21 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($addedUser1->partnerId, $ks->partner_id);
 		
 		// check failure to enable already enabled user
+		$exceptionThrown = false;
 		try { $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'USER_LOGIN_ALREADY_ENABLED') {
-				$this->fail('Expected exception [USER_LOGIN_ALREADY_ENABLED] was not returned from user->enableLogin');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'USER_LOGIN_ALREADY_ENABLED');
+		
 		
 		// check that cannot enable when partner exceeded login users quota
 		$this->dummyPartner->setLoginUsersQuota(1);
 		$newUser1 = $this->createUser(false, false, __FUNCTION__);
 		$addedUser1 = $this->addUser($newUser1);
 		$loginUser = $this->createUser(true, false, __FUNCTION__);
+		$exceptionThrown = false;
 		try { $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'LOGIN_USERS_QUOTA_EXCEEDED') {
-				$this->fail('Expected exception [LOGIN_USERS_QUOTA_EXCEEDED] was not returned from user->enableLogin');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
 		
 	}
 	
@@ -1063,21 +1048,16 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertType('KalturaUser', $disabledUser);
 		$this->assertEquals($newUser1->id, $disabledUser->id);
 		
+		$exceptionThrown = false;
 		try { $newClient->user->loginByLoginId($newUser1->email, $newUser1->password); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'USER_NOT_FOUND') {
-				$this->fail('Expected exception [USER_NOT_FOUND] was not returned from user->disableLogin');
-			}
-		}
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'USER_NOT_FOUND');
 		
 		// check failure to disable already disabled user
+		$exceptionThrown = false;
 		try { $this->client->user->disableLogin($newUser1->id); }
-		catch (Exception $e) {
-			if ($e->getCode() != 'USER_LOGIN_ALREADY_DISABLED') {
-				$this->fail('Expected exception [USER_LOGIN_ALREADY_DISABLED] was not returned from user->disableLogin');
-			}
-		}
-		
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'USER_LOGIN_ALREADY_DISABLED');
 	}
 
 }
