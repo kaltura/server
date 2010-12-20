@@ -81,7 +81,7 @@
 											   KDLVideoTarget::WMV3, KDLVideoTarget::WVC1A,
 											   KDLVideoTarget::VP8,
 											   "h264", "h.264", "x264", "avc1", "wvc1",
-											   "avc", "wmv3", "wmva", "rv40");
+											   "avc", "wmv3", "wmva", "rv40", "realvideo4", "rv30", "realvideo3");
 											   		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;
