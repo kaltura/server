@@ -9,6 +9,6 @@ class KalturaAnnotationErrors extends KalturaErrors
 	const START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME = "START_TIME_IS_BIGGER_THEN_ENTRY_END_TIME,start time of the annotation [%s] cannot be bigger than entry end time [%s]";
 	const END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME = "END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME,end time of the annotation [%s] cannot be bigger than entry end time [%s]";
 	const START_TIME_CANNOT_BE_LESS_THAN_0 = "START_TIME_CANNOT_BE_LESS_THAN_0,start time cannot be less than 0";
-	const PARENT_ANNOTATION_IS_OFFSPRING = "PARENT_ANNOTATION_IS_OFFSPRING,parent annotation [%s] is a child or a sub child of this annotation [%s] and therefor cannot be a parent";
+	const PARENT_ANNOTATION_IS_DESCENDANT = "PARENT_ANNOTATION_IS_DESCENDANT,parent annotation [%s] is a child or a sub child of this annotation [%s] and therefor cannot be a parent";
 	const CANNOT_UPDATE_ENTRY_ID = "CANNOT_UPDATE_ENTRY_ID,cannot update annotation's entry id";
 }
