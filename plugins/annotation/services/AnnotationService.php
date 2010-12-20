@@ -110,7 +110,7 @@ class AnnotationService extends KalturaBaseService
 	}
 	
 	/**
-	 * delete annotation by id, and delete al childs annotations
+	 * delete annotation by id, and delete all children annotations
 	 * 
 	 * @action delete
 	 * @param string $id 

@@ -21,8 +21,8 @@ class kAnnotationManager implements kObjectDeletedEventConsumer
 	 */
 	protected function annotationDeleted(Annotation $annotation) 
 	{
-		$childs = $annotation->getChilds();
-		foreach($childs as $child)
+		$children = $annotation->getChildren();
+		foreach($children as $child)
 		{
 			$child->setStatus($annotation->getStatus());
 			$child->save();

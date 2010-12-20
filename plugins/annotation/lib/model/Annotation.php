@@ -14,7 +14,7 @@
  */
 class Annotation extends BaseAnnotation {
 
-	public function getChilds()
+	public function getChildren()
 	{
 		if ($this->isNew())
 			return array();
@@ -35,22 +35,9 @@ class Annotation extends BaseAnnotation {
 		return $this->setKuserId(PuserKuserPeer::getKuserIdFromPuserId($this->getPartnerId(), $v));
 	} 
 	
-	/*
-	 * @param $status - Annotation::ANNOTATION_STATUS
-	 * 
+	/**
+	 * generate unique string id for annotation
 	 */
-	public function setStatusToThisAndToAllChilds($status)
-	{
-		parent::setStatus($status);
-		
-		$childs = $this->getChilds();
-		foreach($childs as $child)
-		{
-			$child->setStatus($status);
-			$child->save();
-		}
-	}
-
 	public function getUniqueAnnotationId()
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
@@ -69,18 +56,18 @@ class Annotation extends BaseAnnotation {
 	}
 	
 	/**
-	 * return true is annotationId is an offspring or itself
-	 * @param string $offspringAnnotationId
+	 * return true is annotationId is an descendant  or itself
+	 * @param string $descendantAnnotationId
 	 */
-	public function isOffspring($offspringAnnotationId = null)
+	public function isDescendant($descendantAnnotationId = null)
 	{
-		if($this->id == $offspringAnnotationId)
+		if($this->id == $descendantAnnotationId)
 				return true;
 				
-		$childs = $this->getChilds();
-		foreach($childs as $child)
+		$children = $this->getChildren();
+		foreach($children as $child)
 		{
-			if ($child->isOffspring($offspringAnnotationId))
+			if ($children->isDescendant($descendantAnnotationId))
 				return true;
 		}
 		
