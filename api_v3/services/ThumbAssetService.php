@@ -251,7 +251,7 @@ class ThumbAssetService extends KalturaBaseService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, $sourceAssetId);
+		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId);
 		if($job)
 			return $job->getId();
 			
