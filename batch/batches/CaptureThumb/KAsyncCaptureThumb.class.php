@@ -93,7 +93,7 @@ class KAsyncCaptureThumb extends KBatchBase
 				else
 				{
 					// already exists but not a directory 
-					KalutraLog::err("Cannot create temp thumbnail directory [$rootPath] due to an error. Please fix and restart");
+					KalturaLog::err("Cannot create temp thumbnail directory [$rootPath] due to an error. Please fix and restart");
 					die();
 				}
 			}
@@ -115,7 +115,7 @@ class KAsyncCaptureThumb extends KBatchBase
 			}
 			else 
 			{
-				KalutraLog::info("Source file is already an image");
+				KalturaLog::info("Source file is already an image");
 			}
 			
 			$uniqid = uniqid('thumb_');
