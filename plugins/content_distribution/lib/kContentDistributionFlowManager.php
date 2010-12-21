@@ -426,7 +426,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		KalturaLog::debug("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
 		
 		$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($xmlPath);
+		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		if(!$xmlPath)
 		{
 			KalturaLog::debug("Entry metadata xml not found");
@@ -439,7 +439,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($previousVersion)
 		{
 			$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion);
-			$xmlPath = kFileSyncUtils::getLocalFilePathForKey($xmlPath);
+			$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($xmlPath)
 			{
 				$previousXml = new DOMDocument();

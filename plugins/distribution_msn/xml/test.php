@@ -28,17 +28,26 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
+kCurrentContext::$ps_vesion = 'ps3';
+
 if($argc < 2)
 {
 	echo "Entry id must be supplied as attribute\n";
 	exit;
 }
 $entryId = $argv[1];
+$config = array();
+foreach($argv as $arg)
+{
+	$matches = null;
+	if(preg_match('/(.*)=(.*)/', $arg, $matches))
+		$config[$matches[1]] = $matches[2];
+}
 
 $entry = entryPeer::retrieveByPK($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 
-//file_put_contents('entry.xml', $mrss);
+file_put_contents('entry.xml', $mrss);
 //exit;
 
 if(!$mrss)
@@ -52,7 +61,25 @@ $xslPath = dirname(__FILE__) . '/submit.xsl';
 $xsl = new DOMDocument();
 $xsl->load($xslPath);
 
+$varNodes = $xsl->getElementsByTagName('variable');
+foreach($varNodes as $varNode)
+{
+	$nameAttr = $varNode->attributes->getNamedItem('name');
+	if(!$nameAttr)
+		continue;
+		
+	$name = $nameAttr->value;
+	if($name && isset($config[$name]))
+	{
+		$varNode->textContent = $config[$name];
+		$varNode->appendChild($xsl->createTextNode($config[$name]));
+		KalturaLog::debug("Set config $name to [" . $config[$name] . "]");
+	}
+}
+file_put_contents('out.xsl', $xsl->saveXML());
+
 $proc = new XSLTProcessor;
+$proc->registerPHPFunctions();
 $proc->importStyleSheet($xsl);
 
 $xml = $proc->transformToDoc($xml);
@@ -65,4 +92,6 @@ if(!$xml)
 
 file_put_contents('out.xml', $xml->saveXML());
 echo $xml->saveXML();
+
+echo time() . "\n";
 

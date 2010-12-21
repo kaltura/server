@@ -40,11 +40,27 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 	 */
 	public function contributeDistribution(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
+		$distributionsProvider = null;
+		$distributionsProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		if($distributionsProfile)
+			$distributionsProvider = $distributionsProfile->getProvider();
+		
 		$distribution = $mrss->addChild('distribution');
 		$distribution->addAttribute('entryDistributionId', $entryDistribution->getId());
 		$distribution->addAttribute('distributionProfileId', $entryDistribution->getDistributionProfileId());
-		$distribution->addChild('sunrise', $entryDistribution->getSunrise());
-		$distribution->addChild('sunset', $entryDistribution->getSunset());
+		
+		if($distributionsProvider)
+			$distribution->addAttribute('provider', $distributionsProvider->getName());
+			
+		if($entryDistribution->getRemoteId())
+			$distribution->addChild('remoteId', $entryDistribution->getRemoteId());
+			
+		if($entryDistribution->getSunrise(null))
+			$distribution->addChild('sunrise', $entryDistribution->getSunrise(null));
+			
+		if($entryDistribution->getSunset(null))
+			$distribution->addChild('sunset', $entryDistribution->getSunset(null));
+			
 		$distribution->addChild('flavorAssetIds', $entryDistribution->getFlavorAssetIds());
 		$distribution->addChild('thumbAssetIds', $entryDistribution->getThumbAssetIds());
 	}

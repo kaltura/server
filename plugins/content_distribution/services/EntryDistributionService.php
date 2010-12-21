@@ -28,6 +28,7 @@ class EntryDistributionService extends KalturaBaseService
 	 */
 	function addAction(KalturaEntryDistribution $entryDistribution)
 	{
+		KalturaLog::debug('entryDistribution before all: ' . print_r($entryDistribution, true));
 		$entryDistribution->validatePropertyNotNull("entryId");
 		$entryDistribution->validatePropertyNotNull("distributionProfileId");
 					
@@ -43,7 +44,9 @@ class EntryDistributionService extends KalturaBaseService
 		if($dbEntryDistribution)
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_ALREADY_EXISTS, $entryDistribution->entryId, $entryDistribution->distributionProfileId);
 		
+		KalturaLog::debug('entryDistribution before add: ' . print_r($entryDistribution, true));
 		$dbEntryDistribution = kContentDistributionManager::addEntryDistribution($dbEntry, $dbDistributionProfile);
+		KalturaLog::debug('entryDistribution before insert: ' . print_r($entryDistribution, true));
 		$entryDistribution->toInsertableObject($dbEntryDistribution);
 		$dbEntryDistribution->setPartnerId($this->getPartnerId());
 		$dbEntryDistribution->setStatus(EntryDistributionStatus::PENDING);

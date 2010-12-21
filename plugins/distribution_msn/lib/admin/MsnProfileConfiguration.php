@@ -22,5 +22,35 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			'label'			=> 'Domain:',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'cs_id', array(
+			'label'			=> 'CS ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'source', array(
+			'label'			=> 'Source:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'metadata_profile_id', array(
+			'label'			=> 'Metadata Profile ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'mov_flavor_params_id', array(
+			'label'			=> 'MOV Flavor Params ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'flv_flavor_params_id', array(
+			'label'			=> 'FLV Flavor Params ID:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'wmv_flavor_params_id', array(
+			'label'			=> 'WMV Flavor Params ID:',
+			'filters'		=> array('StringTrim'),
+		));
 	}
 }

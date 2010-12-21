@@ -1,44 +1,92 @@
 <?php
 class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
+	/**
+	 * @var string
+	 */
+	public $xml;
+	
+	/**
+	 * @var string
+	 */
+	public $csId;
+	/**
+	 * @var string
+	 */
+	public $source;
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
+	/**
+	 * @var string
+	 */
+	public $movFlavorAssetId;
+	/**
+	 * @var string
+	 */
+	public $flvFlavorAssetId;
+	/**
+	 * @var string
+	 */
+	public $wmvFlavorAssetId;
+	/**
+	 * @var string
+	 */
+	public $thumbAssetId;
+	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 		if(!$distributionJobData)
 			return;
 			
+		if(!($distributionJobData->distributionProfile instanceof KalturaMsnDistributionProfile))
+			return;
+			
+		$this->csId = $distributionJobData->distributionProfile->csId;
+		$this->source = $distributionJobData->distributionProfile->source;
+		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
+		
+		$movFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->movFlavorParamsId);
+		if($movFlavorAsset)
+			$this->movFlavorAssetId = $movFlavorAsset->getId();
+		
+		$flvFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->flvFlavorParamsId);
+		if($flvFlavorAsset)
+			$this->flvFlavorAssetId = $flvFlavorAsset->getId();
+		
+		$wmvFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->wmvFlavorParamsId);
+		if($wmvFlavorAsset)
+			$this->wmvFlavorAssetId = $wmvFlavorAsset->getId();
+		
+		$thumbAssets = thumbAssetPeer::retrieveByPKs($distributionJobData->entryDistribution->thumbAssetIds);
+		if(count($thumbAssets))
+			$this->thumbAssetId = reset($thumbAssets)->getId();
+			
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
-			$this->generateSubmitXML($distributionJobData);
+			$this->xml = MsnDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId);
 			
-//		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
-//		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
+		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
+			$this->xml = MsnDistributionProvider::generateDeleteXML($distributionJobData->entryDistribution->entryId, $distributionJobData->remoteId);
+			
+		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
+			$this->xml = MsnDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $distributionJobData->remoteId);
 	}
-			
-	public function generateSubmitXML(KalturaDistributionJobData $distributionJobData)
+		
+	private static $map_between_objects = array
+	(
+		"xml" ,
+		"csId" ,
+		"source" ,
+		"metadataProfileId" ,
+		"movFlavorAssetId" ,
+		"flvFlavorAssetId" ,
+		"wmvFlavorAssetId" ,
+		"thumbAssetId" ,
+	);
+
+	public function getMapBetweenObjects ( )
 	{
-		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
-		$mrss = kMrssManager::getEntryMrss($entry);
-		if(!$mrss)
-			return;
-			
-		$xml = new DOMDocument();
-		if(!$xml->loadXML($mrss))
-			return;
-		
-		$xslPath = dirname(__FILE__) . '/../../xml/submit.xsl';
-		$xsl = new DOMDocument();
-		$xsl->load($xslPath);
-		
-		$proc = new XSLTProcessor;
-		$proc->importStyleSheet($xsl);
-		
-		$xml = $proc->transformToDoc($xml);
-		if(!$xml)
-			return;
-			
-		$xsdPath = dirname(__FILE__) . '/../../xml/submit.xsd';
-		if($xsdPath && !$xml->schemaValidate($xsdPath))		
-			return;
-		
-		$this->xml = $xml->saveXML();
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 }

@@ -9,7 +9,12 @@ class kGenericDistributionJobProviderData extends kDistributionJobProviderData
 	/**
 	 * @var string
 	 */
-	private $resultParse;
+	private $resultParseData;
+	
+	/**
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	private $resultParserType;
 
 	public function __construct(kDistributionJobData $distributionJobData = null)
 	{
@@ -25,26 +30,42 @@ class kGenericDistributionJobProviderData extends kDistributionJobProviderData
 	}
 
 	/**
-	 * @return the $resultParse
-	 */
-	public function getResultParse()
-	{
-		return $this->resultParse;
-	}
-
-	/**
 	 * @param string $xml
 	 */
 	public function setXml($xml)
 	{
 		$this->xml = $xml;
 	}
+	
+	/**
+	 * @return the $resultParseData
+	 */
+	public function getResultParseData()
+	{
+		return $this->resultParseData;
+	}
 
 	/**
-	 * @param string $resultParse
+	 * @return the $resultParserType
 	 */
-	public function setResultParse($resultParse)
+	public function getResultParserType()
 	{
-		$this->resultParse = $resultParse;
+		return $this->resultParserType;
+	}
+
+	/**
+	 * @param string $resultParseData
+	 */
+	public function setResultParseData($resultParseData)
+	{
+		$this->resultParseData = $resultParseData;
+	}
+
+	/**
+	 * @param KalturaGenericDistributionProviderParser $resultParserType
+	 */
+	public function setResultParserType($resultParserType)
+	{
+		$this->resultParserType = $resultParserType;
 	}
 }

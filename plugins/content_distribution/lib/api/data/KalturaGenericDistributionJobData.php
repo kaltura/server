@@ -91,4 +91,16 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			
 		$this->resultParserType = $genericProviderAction->getResultsParser();
 	}
+		
+	private static $map_between_objects = array
+	(
+		"xml" ,
+		"resultParseData" ,
+		"resultParserType" ,
+	);
+
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
 }

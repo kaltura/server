@@ -16,6 +16,37 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 	 */
 	public $domain;
 	
+	/**
+	 * @var string
+	 */
+	public $csId;
+	
+	/**
+	 * @var string
+	 */
+	public $source;
+	
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
+	
+	/**
+	 * @var int
+	 */
+	public $movFlavorParamsId;
+	
+	/**
+	 * @var int
+	 */
+	public $flvFlavorParamsId;
+	
+	/**
+	 * @var int
+	 */
+	public $wmvFlavorParamsId;
+		
+			
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -24,6 +55,12 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 		'username',
 		'password',
 		'domain',
+		'csId',
+		'source',
+		'metadataProfileId',
+		'movFlavorParamsId',
+		'flvFlavorParamsId',
+		'wmvFlavorParamsId',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -182,14 +182,14 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			
 		parent::toObject($dbObject, $skip);
 		
-		if($this->validationErrors)
-		{
-			$validationErrorsArray = array();
-			foreach($this->validationErrors as $validationError)
-				$validationErrorsArray[] = $validationError->toObject();
-				
-			$dbObject->setValidationErrorsArray($validationErrorsArray);
-		}
+//		if($this->validationErrors)
+//		{
+//			$validationErrorsArray = array();
+//			foreach($this->validationErrors as $validationError)
+//				$validationErrorsArray[] = $validationError->toObject();
+//				
+//			$dbObject->setValidationErrorsArray($validationErrorsArray);
+//		}
 
 		return $dbObject;
 	}
