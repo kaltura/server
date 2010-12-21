@@ -332,7 +332,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function createRequiredJobsAction()
 	{
-		// TODO
+		// TODO read from sphinx the dirty records and create jobs
 	}
 	
 // --------------------------------- Distribution Synchronizer functions 	--------------------------------- //
