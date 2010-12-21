@@ -1,0 +1,1 @@
+ALTER TABLE  `file_sync` CHANGE  `object_type`  `object_type` INT( 4 ) NULL DEFAULT NULL;
