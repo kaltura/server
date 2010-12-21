@@ -65,17 +65,17 @@ while(count($partners))
 		$lastPartner = $partner->getId();
 		KalturaLog::log('-- partner id ' . $lastPartner);
 		
-		$partner->setLoginUsersQuota($defaultLoginUsersQuota);
+		$partner->setAdminLoginUsersQuota($defaultLoginUsersQuota);
 		if ($partner->getId() == -2) {
-			$partner->setLoginUsersQuota(-1);
+			$partner->setAdminLoginUsersQuota(-1);
 		}
 		
 		if (!$dryRun) {
-			KalturaLog::log('SAVED - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getLoginUsersQuota());
+			KalturaLog::log('SAVED - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getAdminLoginUsersQuota());
 			$partner->save();			
 		}
 		else {
-			KalturaLog::log('DRY RUN only - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getLoginUsersQuota());	
+			KalturaLog::log('DRY RUN only - partner ['.$partner->getId().'] set with login users quota value of '.$partner->getAdminLoginUsersQuota());	
 		}		
 				
 		file_put_contents($lastPartnerFile, $lastPartner);

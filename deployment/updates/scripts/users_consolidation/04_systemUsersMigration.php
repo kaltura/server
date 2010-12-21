@@ -71,10 +71,10 @@ while(count($users))
 		$new_kuser->setLastName($user->getLastName());
 		
 		if ($user->getStatus() == SystemUser::SYSTEM_USER_ACTIVE) {
-			$new_kuser->setStatus(kuser::KUSER_STATUS_ACTIVE);
+			$new_kuser->setStatus(KuserStatus::ACTIVE);
 		}
 		else {
-			$new_kuser->setStatus(kuser::KUSER_STATUS_SUSPENDED);
+			$new_kuser->setStatus(KuserStatus::BLOCKED);
 		}
 		
 		$new_kuser->setPuserId($user->getEmail());

@@ -22,7 +22,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
-	 * @throws KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 */
@@ -59,8 +59,8 @@ class UserService extends KalturaBaseUserService
 			else if ($code == kUserException::INVALID_PARTNER) {
 				throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID);
 			}
-			else if ($code == kUserException::LOGIN_USERS_QUOTA_EXCEEDED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED);
+			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
+				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
 				throw new KalturaAPIException(KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
@@ -430,11 +430,11 @@ class UserService extends KalturaBaseUserService
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
 	 * @throws KalturaErrors::USER_NOT_FOUND
-	 * @throws KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 * @throws KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD
-	 * @throws KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 *
 	 */	
 	public function enableLoginAction($userId, $loginId, $password)
@@ -443,6 +443,7 @@ class UserService extends KalturaBaseUserService
 		{
 			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 			$user->enableLogin($loginId, $password);
+			$user->save();
 		}
 		catch (Exception $e)
 		{
@@ -456,8 +457,8 @@ class UserService extends KalturaBaseUserService
 			else if ($code == kUserException::INVALID_PARTNER) {
 				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 			}
-			else if ($code == kUserException::LOGIN_USERS_QUOTA_EXCEEDED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED);
+			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
+				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
@@ -468,8 +469,8 @@ class UserService extends KalturaBaseUserService
 			else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
 				throw new KalturaAPIException(KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
 			}
-			else if ($code == kUserException::LOGIN_USERS_QUOTA_EXCEEDED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_USERS_QUOTA_EXCEEDED);
+			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
+				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			throw $e;
 		}

@@ -112,7 +112,7 @@ while(count($users))
 			$new_kuser->setPartnerId($user->getPartnerId());
 			$new_kuser->setFirstName($firstName);
 			$new_kuser->setLastName($lastName);
-			$new_kuser->setStatus(kuser::KUSER_STATUS_ACTIVE);
+			$new_kuser->setStatus(KuserStatus::ACTIVE);
 			$new_kuser->setIcon($user->getIcon());
 			$new_kuser->setPicture($user->getPicture());
 			$new_kuser->setPuserId('__ADMIN__'.$user->getId());

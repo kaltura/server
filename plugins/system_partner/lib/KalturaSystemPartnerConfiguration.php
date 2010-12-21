@@ -125,7 +125,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $loginUsersQuota;
+	public $adminLoginUsersQuota;
 	
 	private static $map_between_objects = array
 	(
@@ -150,7 +150,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"enableVast",
 		"enable508Players",
 		"defThumbOffset",
-		"loginUsersQuota",
+		"adminLoginUsersQuota",
 	);
 
 	public function getMapBetweenObjects()

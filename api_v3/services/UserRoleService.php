@@ -65,7 +65,13 @@ class UserRoleService extends KalturaBaseService
 	 */		
 	public function getAction($userRoleId)
 	{
-		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::PARTNER_ID, array (0, $this->getPartnerId()), Criteria::IN);
+		$c->addAnd(UserRolePeer::ID, $userRoleId);
+		
+		UserRolePeer::setUseCriteriaFilter(false);
+		$dbUserRole = UserRolePeer::doSelectOne($c);
+		UserRolePeer::setUseCriteriaFilter(true);
 		
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);

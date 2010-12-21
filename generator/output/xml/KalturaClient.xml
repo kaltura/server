@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1292836511">
-  <!-- Generated on date 20/12/10 11:15:11 -->
+<xml apiVersion="3.1.1" generatedDate="1292946554">
+  <!-- Generated on date 21/12/10 17:49:14 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
     <enum name="KalturaAdminUserOrderBy" enumType="string">
-      <const name="ID_ASC" value="+id"/>
-      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
@@ -1273,8 +1271,6 @@
       <const name="DELETED" value="5"/>
     </enum>
     <enum name="KalturaUserOrderBy" enumType="string">
-      <const name="ID_ASC" value="+id"/>
-      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
@@ -1935,7 +1931,7 @@
       <property name="adminSecret" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="cmsPassword" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="allowMultiNotification" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="loginUsersQuota" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="adminLoginUsersQuota" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaPartnerUsage">
       <property name="hostingGB" type="float" readOnly="1" insertOnly="0" description=""/>
@@ -2267,8 +2263,6 @@
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserBaseFilter" abstract="1" base="KalturaFilter">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameLike" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="screenNameStartsWith" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2283,6 +2277,8 @@
       <property name="isAdminEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserFilter" base="KalturaUserBaseFilter">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="loginEnabledEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaUserListResponse">
@@ -2713,7 +2709,7 @@
       <property name="enableAuditTrail" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableAnnotation" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="defThumbOffset" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="loginUsersQuota" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="adminLoginUsersQuota" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSystemPartnerPackage">
       <property name="id" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -4098,6 +4094,7 @@
       <action name="generate" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <param name="thumbParams" type="KalturaThumbParams" optional="0" description="&#13;"/>
+        <param name="sourceAssetId" type="string" optional="1" default="" description="id of the source asset (flavor or thumbnail) to be used as source for the thumbnail generation&#13;"/>
         <result type="int"/>
       </action>
       <action name="regenerate" description="">

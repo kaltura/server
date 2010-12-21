@@ -109,10 +109,10 @@ class TestSystemUserMigration extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->systemUser->getName(), $this->kuser->getScreenName(), 'screen_name for '.$this->getParams());
 		$this->assertEquals($this->systemUser->getName(), $this->kuser->getFullName(), 'full_name for '.$this->getParams());
 		if ($this->systemUser->getStatus == systemUser::SYSTEM_USER_ACTIVE) {
-			$this->assertEquals(kuser::KUSER_STATUS_ACTIVE, $this->kuser->getStatus(), 'status '.$this->getParams());
+			$this->assertEquals(KuserStatus::ACTIVE, $this->kuser->getStatus(), 'status '.$this->getParams());
 		}
 		else {
-			$this->assertEquals(kuser::KUSER_STATUS_SUSPENDED, $this->kuser->getStatus(), 'status '.$this->getParams());
+			$this->assertEquals(KuserStatus::BLOCKED, $this->kuser->getStatus(), 'status '.$this->getParams());
 		}
 		$this->assertEquals($this->systemUser->getDeletedAt(), $this->kuser->getDeletedAt(), 'deleted_at '.$this->getParams());
 		$partnerData = unserialize($this->kuser->getPartnerData());
