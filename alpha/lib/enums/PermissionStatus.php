@@ -1,6 +1,6 @@
 <?php
 
-interface PermissionStatus
+interface PermissionStatus extends BaseEnum
 {
 	const ACTIVE  = 1;
 	const BLOCKED = 2;

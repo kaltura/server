@@ -1,5 +1,5 @@
 <?php
-interface PermissionType
+interface PermissionType extends BaseEnum
 {
 	const API_ACCESS       = '1';
 	const SPECIAL_FEATURE  = '2';

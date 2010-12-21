@@ -1,5 +1,5 @@
 <?php
-interface UserRoleStatus
+interface UserRoleStatus extends BaseEnum
 {
 	const ACTIVE  = 1;
 	const BLOCKED = 2;

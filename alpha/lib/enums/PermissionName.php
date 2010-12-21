@@ -103,7 +103,7 @@ interface PermissionName extends BaseEnum
 	const STUDIO_BRAND_UICONF = 'STUDIO_BRAND_UICONF';
 	const STUDIO_SELECT_CONTENT = 'STUDIO_SELECT_CONTENT';
 	const CONTENT_MANAGE_EMBED_CODE = 'CONTENT_MANAGE_EMBED_CODE';
-	
+
 	
 	// not valid yet
 	
