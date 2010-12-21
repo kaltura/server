@@ -111,6 +111,10 @@ class KAutoloader
 	static function setClassMapFilePath($path)
 	{
 		self::$_classMapFileLocation = $path;
+		$dirName = dirname($path);
+		if (!is_dir($dirName)) {
+			mkdir($dirName, 0777);
+		}
 	}
 	
 	/**
