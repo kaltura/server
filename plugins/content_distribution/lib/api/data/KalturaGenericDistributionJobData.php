@@ -13,7 +13,12 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 	/**
 	 * @var string
 	 */
-	public $resultParse;
+	public $resultParseData;
+	
+	/**
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	public $resultParserType;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -79,6 +84,8 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 		
 		$key = $genericProviderAction->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_RESULTS_TRANSFORMER);
 		if(kFileSyncUtils::fileSync_exists($key))
-			$this->resultParse = kFileSyncUtils::file_get_contents($key, true, false);
+			$this->resultParseData = kFileSyncUtils::file_get_contents($key, true, false);
+			
+		$this->resultParserType = $genericProviderAction->getResultsParser();
 	}
 }
