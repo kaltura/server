@@ -347,8 +347,8 @@ flavorasset.getdownloadurl			|			|2		|1	|1		|2		|1		|	|		|	|   |
 
 thumbasset.get						|			|1		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.getbyentryid				|			|1		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.servebyentryid 			|			|1		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.serve		 			|			|1		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.servebyentryid 			|			|0		|1	|0		|0		|1		|r	|		|	|	|
+thumbasset.serve		 			|			|0		|1	|0		|0		|1		|r	|		|	|	|
 thumbasset.setasdefault 			|			|2		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.generatebyentryid		|			|2		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.generate					|			|1		|1	|1		|2		|1		|	|		|	|   |
