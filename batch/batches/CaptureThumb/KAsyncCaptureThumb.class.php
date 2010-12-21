@@ -140,9 +140,13 @@ class KAsyncCaptureThumb extends KBatchBase
 			$job = $this->moveFile($job, $data);
 				
 			if($this->checkFileExists($job->data->thumbPath))
-				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
+			{
+				$updateData = new KalturaCaptureThumbJobData();
+				$updateData->thumbPath = $data->thumbPath;
+				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $updateData);
+			}
 			
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, $data);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FAILED, $data);
 		}
 		catch(Exception $ex)
 		{
