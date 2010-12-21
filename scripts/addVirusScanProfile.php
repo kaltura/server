@@ -4,6 +4,9 @@ error_reporting(E_ALL);
 require_once(dirname(__FILE__).'/../alpha/config/sfrootdir.php');
 require_once(dirname(__FILE__).'/../api_v3/bootstrap.php');
 
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
+
 /**************************************************
  * PLEASE CONFIGURE REQUIRED SETTINGS
  ***************************************************/
@@ -31,9 +34,6 @@ $entryFilter->typeEqual = KalturaEntryType::DOCUMENT; // FOR EXAMPLE
 /**************************************************
  * DON'T TOUCH THE FOLLOWING CODE
  ***************************************************/
-
-DbManager::setConfig(kConf::getDB());
-DbManager::initialize();
 
 if (!$partnerId)
 {
