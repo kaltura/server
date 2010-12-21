@@ -1079,7 +1079,7 @@ class myPartnerUtils
  	
  	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner)
  	{
- 		$toPartner->setLoginUsersQuota($fromPartner->getLoginUsersQuota());
+ 		$toPartner->setAdminLoginUsersQuota($fromPartner->getAdminLoginUsersQuota());
  		$toPartner->save();
  		
  		kEventsManager::raiseEvent(new kObjectCopiedEvent($fromPartner, $toPartner));

@@ -42,7 +42,7 @@ class kuserFilter extends baseObjectFilter
 			NULL
 		);
 			
-		$this->allowed_order_fields = array("id, created_at");
+		$this->allowed_order_fields = array("puser_id, created_at");
 	}
 
 	public function describe() 

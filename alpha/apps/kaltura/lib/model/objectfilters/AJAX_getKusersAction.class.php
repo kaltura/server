@@ -15,7 +15,7 @@ class AJAX_getKusersAction extends AJAX_getObjectsAction
 	{
 /*		
 		$c->addAnd ( kuserPeer::ID , kuser::MINIMUM_ID_TO_DISPLAY , Criteria::GREATER_THAN );
-		$c->addAnd ( kuserPeer::STATUS , kuser::KUSER_STATUS_ACTIVE );
+		$c->addAnd ( kuserPeer::STATUS , KuserStatus::ACTIVE );
 
 		// always filter out all those partner_ids that are not null  
 		$c->addAnd ( kuserPeer::PARTNER_ID, myPartnerUtils::PUBLIC_PARTNER_INDEX , Criteria::LESS_EQUAL );

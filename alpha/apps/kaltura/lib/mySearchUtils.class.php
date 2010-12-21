@@ -182,7 +182,7 @@ class mySearchUtils
 				if ( $obj instanceof kuser )
 				{
 					// if the status is not
-					self::setRes ( $res , $obj->getStatus() == kuser::KUSER_STATUS_ACTIVE );
+					self::setRes ( $res , $obj->getStatus() == KuserStatus::ACTIVE );
 				}
 				elseif ( $obj instanceof kshow )
 				{

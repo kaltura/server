@@ -266,11 +266,11 @@
 		
 		const ADMIN_USER_PASSWORD_MISSING = "ADMIN_USER_PASSWORD_MISSING,Admin user must have a password";
 		
-		const LOGIN_USERS_QUOTA_EXCEEDED = "LOGIN_USERS_QUOTA_EXCEEDED,Partner login users quota exceeded";
+		const ADMIN_LOGIN_USERS_QUOTA_EXCEEDED = "ADMIN_LOGIN_USERS_QUOTA_EXCEEDED,Partner login users quota exceeded";
 		
 		const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
 		
-		const USER_EXISTS_WITH_DIFFERENT_PASSWORD = "USER_EXISTS_WITH_DIFFERENT_PASSWORD,A user with the same login id but a different password already exists";
+		const USER_EXISTS_WITH_DIFFERENT_PASSWORD = "USER_EXISTS_WITH_DIFFERENT_PASSWORD,A user with the same login email but a different password already exists";
 	
 		const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA,Login data cannot be updated by this action";
 	
