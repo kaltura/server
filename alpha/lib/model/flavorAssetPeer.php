@@ -212,6 +212,6 @@ class flavorAssetPeer extends assetPeer
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		
-		return assetPeer::doSelect($c);
+		return self::doSelect($c);
 	}
 }
