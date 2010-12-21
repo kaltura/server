@@ -84,9 +84,62 @@ class adduserAction extends defPartnerservices2Action
 				}
 			}
 			
-			$kuser->setPartnerId( $partner_id );		
-			$kuser->save();
+			$kuser->setPartnerId( $partner_id );
+			$kuser->setPuserId($target_puser_id);
 			
+			try {
+				$kuser = kuserPeer::addUser($kuser);
+			}
+			catch (kUserException $e) {
+				$code = $e->getCode();
+				if ($code == kUserException::USER_ALREADY_EXISTS) {
+					$this->addException( APIErrors::DUPLICATE_USER_BY_ID, $kuser->getId() );
+					return null;
+				}
+				if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
+					$this->addException( APIErrors::DUPLICATE_USER_BY_LOGIN_ID , $kuser->getEmail());
+					return null;
+				}
+				else if ($code == kUserException::USER_ID_MISSING) {
+					$this->addException( APIErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'id' );
+					return null;
+				}
+				else if ($code == kUserException::INVALID_EMAIL) {
+					$this->addException( APIErrors::INVALID_FIELD_VALUE );
+					return null;
+				}
+				else if ($code == kUserException::INVALID_PARTNER) {
+					$this->addException( APIErrors::UNKNOWN_PARTNER_ID );
+					return null;
+				}
+				else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
+					$this->addException( APIErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED );
+					return null;
+				}
+				else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
+					$this->addException( APIErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD );
+					return null;
+				}
+				else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
+					$this->addException( APIErrors::PASSWORD_STRUCTURE_INVALID );
+					return null;
+				}
+				throw $e;			
+			}
+			catch (kPermissionException $e)
+			{
+				$code = $e->getCode();
+				if ($code == kPermissionException::ROLE_ID_MISSING) {
+					$this->addException( APIErrors::ROLE_ID_MISSING );
+					return null;
+				}
+				if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
+					$this->addException( APIErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED );
+					return null;
+				}
+				throw $e;
+			}	
+						
 			// now update the puser_kuser
 			$target_puser_kuser->setPuserName( $kuser->getScreenName() );
 			$target_puser_kuser->setKuserId( $kuser->getId() );

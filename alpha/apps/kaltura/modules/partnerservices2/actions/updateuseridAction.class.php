@@ -49,8 +49,9 @@ class updateuseridAction extends defPartnerservices2Action
 		}
 		
 		$new_puser_kuser = PuserKuserPeer::retrieveByPartnerAndUid($partner_id , null /* $subp_id */ , $new_user_id , true );
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $new_user_id);
 		
-		if ( $new_puser_kuser )
+		if ( $new_puser_kuser || $kuser)
 		{
 			$this->addError ( APIErrors::DUPLICATE_USER_BY_ID , $new_user_id );
 			return;
@@ -62,6 +63,8 @@ class updateuseridAction extends defPartnerservices2Action
 		PuserKuserPeer::removeFromCache($target_puser_kuser);
 		
 		$kuser = $target_puser_kuser->getKuser();
+		$kuser->setPuserId($target_puser_kuser->getPuserId());
+		$kuser->save();
 		
 		$wrapper = objectWrapperBase::getWrapperClass( $target_puser_kuser , objectWrapperBase::DETAIL_LEVEL_DETAILED);
 		$wrapper->removeFromCache( "PuserKuser" , $target_puser_kuser->getId() );

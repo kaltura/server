@@ -54,7 +54,17 @@ class deleteuserAction extends defPartnerservices2Action
 		{
 //			$this->addMsg ( "deleted_kuser" , objectWrapperBase::getWrapperClass( $kuser , objectWrapperBase::DETAIL_LEVEL_REGULAR ) );
 
-			$kuser->delete();
+			try {
+				$kuser->setStatus(KalturaUserStatus::DELETED);
+			}
+			catch (kUserException $e) {
+				$code = $e->getCode();
+				if ($code == kUserException::CANNOT_DELETE_ROOT_ADMIN_USER) {
+					$this->addException( APIErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+					return null;
+				}
+				throw $e;			
+			}	
 		}
 		$puser_kuser_to_delete->delete();
 
