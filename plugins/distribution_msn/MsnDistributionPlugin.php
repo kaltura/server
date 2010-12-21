@@ -56,9 +56,6 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 			if($baseClass == 'IDistributionEngineCloseDelete')
 				return new MsnDistributionEngine();
 					
-			if($baseClass == 'IDistributionEngineCloseReport')
-				return new MsnDistributionEngine();
-					
 			if($baseClass == 'IDistributionEngineCloseSubmit')
 				return new MsnDistributionEngine();
 					
@@ -126,9 +123,6 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		if (class_exists('KalturaClient') && $enumValue == KalturaDistributionProviderType::MSN)
 		{
 			if($baseClass == 'IDistributionEngineCloseDelete')
-				return 'MsnDistributionEngine';
-					
-			if($baseClass == 'IDistributionEngineCloseReport')
 				return 'MsnDistributionEngine';
 					
 			if($baseClass == 'IDistributionEngineCloseSubmit')

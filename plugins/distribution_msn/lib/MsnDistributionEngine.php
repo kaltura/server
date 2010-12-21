@@ -6,13 +6,12 @@ class MsnDistributionEngine extends DistributionEngine implements
 	IDistributionEngineDelete,
 	IDistributionEngineCloseUpdate,
 	IDistributionEngineCloseSubmit,
-	IDistributionEngineCloseReport,
 	IDistributionEngineCloseDelete
 {
-	private $defaultDomain = 'www.the.default.domain'; // TODO
+	private $defaultDomain = 'catalog.video.msn.com';
 	private $submitPath = '/admin/services/storevideoandfiles.aspx';
 	private $updatePath = '/admin/services/storevideoandfiles.aspx';
-	private $deletePath = '/admin/services/'; // TODO
+	private $deletePath = '/admin/services/storevideoandfiles.aspx'; // it's updating with end date to 5 days from now
 	private $fetchReportPath = '/admin/services/videobyuuid.aspx';
 	private $postFieldName = 'videoxml';
 	
@@ -51,18 +50,20 @@ class MsnDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
-		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
+		$data->remoteId = trim($results);
 		
 		return false;
 	}
 
 	/**
+	 * @param string $path
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaMsnDistributionProfile $distributionProfile
 	 * @param KalturaMsnDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
-	public function handleSubmit(KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
+	public function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
 		$domain = $this->defaultDomain;
 		if(!is_null($distributionProfile->domain))
@@ -71,7 +72,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
-		$url = "https://{$domain}{$this->submitPath}";
+		$url = "https://{$domain}{$path}";
 		
 		$ch = curl_init();
 
@@ -102,15 +103,58 @@ class MsnDistributionEngine extends DistributionEngine implements
 			throw new Exception($errDescription, $errNumber);
 		}
 		curl_close($ch);
-		
 		KalturaLog::debug("MSN HTTP response:\n$results\n");
-		$data->remoteId = trim($results);
+		return $results;
 	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseSubmit::closeSubmit()
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
+	{
+		$publishState = $this->fetchStatus($data);
+		switch($publishState)
+		{
+			case 'Published':
+				return true;
+				
+			case 'Error':
+				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
+				if($liveSiteErrorNodes->length)
+				{
+					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+					throw new Exception("MSN error: $errDescription");
+				}
+				throw new Exception('Unknows MSN error');
+				
+			// TODO - check with MSN what other statuses are available
+			
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @return string status
+	 */
+	public function fetchStatus(KalturaDistributionSubmitJobData $data)
+	{
+		$xml = $this->fetchXML($data);
+			
+		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
+		if($publishStateAttr)
+			return $publishStateAttr->value;
+				
+		return null;
+	}
+
+	/**
+	 * @param KalturaDistributionSubmitJobData $data
+	 * @throws Exception
+	 * @return DOMDocument
+	 */
+	public function fetchXML(KalturaDistributionSubmitJobData $data)
 	{
 		$domain = $this->defaultDomain;
 		if(!is_null($distributionProfile->domain))
@@ -150,19 +194,65 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 		
-		var_dump($results);
 		$xml = new DOMDocument();
-		if(!$xml->loadXML($results))
-			return false;
+		if($xml->loadXML($results))
+			return $xml;
 			
-		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
-		if(!$publishStateAttr)
-			return false;
-		$publishState = $publishStateAttr->value;
+		return null;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
+		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		
+		return false;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
+	{
+		$publishState = $this->fetchStatus($data);
 		switch($publishState)
 		{
-			case 'Published':
+//			case 'Deleted': // TODO - what is the right status after delete?
+//				return true;
+				
+			case 'Error':
+				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
+				if($liveSiteErrorNodes->length)
+				{
+					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+					throw new Exception("MSN error: $errDescription");
+				}
+				throw new Exception('Unknows MSN error');
+				
+			// TODO - check with MSN what other statuses are available
+			
+			default:
+				return false;
+		}
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
+	 */
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		$publishState = $this->fetchStatus($data);
+		switch($publishState)
+		{
+			case 'Published': // TODO - is that the right status after update?
 				return true;
 				
 			case 'Error':
@@ -182,43 +272,27 @@ class MsnDistributionEngine extends DistributionEngine implements
 	}
 
 	/* (non-PHPdoc)
-	 * @see IDistributionEngineDelete::delete()
-	 */
-	public function delete(KalturaDistributionDeleteJobData $data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseDelete::closeDelete()
-	 */
-	public function closeDelete(KalturaDistributionDeleteJobData $data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseReport::closeReport()
-	 */
-	public function closeReport(KalturaDistributionFetchReportJobData $data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseUpdate::closeUpdate()
-	 */
-	public function closeUpdate(KalturaDistributionUpdateJobData $data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-PHPdoc)
 	 * @see IDistributionEngineReport::fetchReport()
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		// TODO Auto-generated method stub
+		$xml = $this->fetchXML($data);
+			
+		$usageNodes = $xml->documentElement->getElementsByTagName('usageItem');
+		if(!$usageNodes->length)
+			throw new Exception('usageItem node not found in XML');
+			
+		$usageNode = $usageNodes->item(0);
+		
+		$usageAttr = $usageNode->attributes->getNamedItem('totalCount');
+		if($usageAttr)
+		{
+//			TODO - find out if that counter is for plays or for view
+//			$data->plays = $usageAttr->value;
+//			$data->views = $usageAttr->value;
+		}
+				
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -226,7 +300,15 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		// TODO Auto-generated method stub
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+		
+		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		
+		return false;
 	}
 
 }

@@ -67,7 +67,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		// TODO Not clear from the docs, will be decided in the dev process
+		return true;
 	}
 
 	/* (non-PHPdoc)
