@@ -98,18 +98,26 @@ class KAsyncCaptureThumb extends KBatchBase
 				}
 			}
 				
-			// creates the path
-			$uniqid = uniqid('thumb_');
-			$capturePath = realpath($rootPath) . "/$uniqid";
+			$capturePath = $mediaFile;
+			if($data->srcAssetType == KalturaAssetType::FLAVOR)
+			{
+				// creates the path
+				$uniqid = uniqid('thumb_');
+				$capturePath = realpath($rootPath) . "/$uniqid";
+					
+				// generates the thumbnail
+				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, $this->taskConfig->params->FFMpegCmd);
+				$created = $thumbMaker->createThumnail($data->thumbParamsOutput->videoOffset);
+				if(!$created || !file_exists($capturePath))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				
-			// generates the thumbnail
-			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, $this->taskConfig->params->FFMpegCmd);
-			$created = $thumbMaker->createThumnail($data->thumbParamsOutput->videoOffset);
-			if(!$created || !file_exists($capturePath))
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
+				$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING, 40);
+			}
+			else 
+			{
+				KalutraLog::info("Source file is already an image");
+			}
 			
-			$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING, 40);
-				
 			$uniqid = uniqid('thumb_');
 			$thumbPath = realpath($rootPath) . "/$uniqid";
 			
