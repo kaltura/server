@@ -200,15 +200,15 @@ class KalturaRequestDeserializer
 			}
 			else if ($property->isArray())
 			{
-				$arrayObj = new $type();
 				if (isset($params[$name]) && is_array($params[$name]))
 				{
+					$arrayObj = new $type();
 					foreach($params[$name] as $arrayItemParams)
 					{
 						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams);
 					}
+					$obj->$name = $arrayObj;
 				}
-				$obj->$name = $arrayObj;
 			}
 			else if ($property->isComplexType())
 			{
