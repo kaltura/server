@@ -25,6 +25,7 @@ class kMrssManager
 			return self::$mrssContributors;
 			
 		self::$mrssContributors = KalturaPluginManager::getPluginInstances('IKalturaMrssContributor');
+		return self::$mrssContributors;
 	}
 	
 	/**
@@ -67,6 +68,7 @@ class kMrssManager
 	{
 		$media = $mrss->addChild('media');
 		$media->addChild('mediaType', $entry->getMediaType());
+		$media->addChild('duration', $entry->getLengthInMsecs());
 		$media->addChild('conversionProfileId', $entry->getConversionProfileId());
 		$media->addChild('flavorParamsIds', $entry->getFlavorParamsIds());
 	}
@@ -111,34 +113,57 @@ class kMrssManager
 		
 	}
 
+	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key)
+	{
+		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+			return null;
+			
+		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
+			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
+				return null;
+				
+		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		if(!$fileSync)
+			return null;
+			
+		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+		if(!$storage)
+			return null;
+			
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
+		$urlManager->setFileExtension($asset->getFileExt());
+		$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+		
+		return $url;
+	}
+	
 	/**
-	 * @param flavorAsset $flavorAsset
+	 * @param asset $asset
 	 * @return string
 	 */
-	protected static function getFlavorAssetUrl(flavorAsset $flavorAsset)
+	protected static function getAssetUrl(asset $asset)
 	{
-		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
 			return null;
 	
-		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = $this->getExternalStorageUrl($partner, $flavorAsset, $syncKey);
+		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey);
 		if($externalStorageUrl)
 			return $externalStorageUrl;
 			
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 		
-		$this->protocol = StorageProfile::PLAY_FORMAT_HTTP;
-		$this->cdnHost = myPartnerUtils::getCdnHost($this->syndicationFeed->partnerId, $this->protocol);
+		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
 		
-		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
-		$urlManager->setDomain($this->cdnHost);
-		$url = $urlManager->getFlavorAssetUrl($flavorAsset);
-		$url = $this->cdnHost . $url;
+		$urlManager = kUrlManager::getUrlManagerByCdn($cdnHost);
+		$urlManager->setDomain($cdnHost);
+		$url = $urlManager->getAssetUrl($asset);
+		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
 			
-		return $this->protocol . '://' . $url;
+		return 'http://' . $url;
 	}
 	
 	/**
@@ -166,6 +191,7 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 		}
 		
+		$mrss->addChild('entryId', $entry->getId());
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('link', $link . $entry->getId());
 		$mrss->addChild('type', $entry->getType());
@@ -173,7 +199,10 @@ class kMrssManager
 		$mrss->addChild('userId', $entry->getPuserId(true));
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
-		$mrss->addChild('tags', self::stringToSafeXml($entry->getTags()));
+		$tags = $mrss->addChild('tags');
+		foreach(explode(',', $entry->getTags()) as $tag)
+			$tags->addChild('tag', self::stringToSafeXml($tag));
+			
 		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
 		$mrss->addChild('accessControlId', $entry->getAccessControlId());
 		
@@ -218,9 +247,12 @@ class kMrssManager
 		foreach($flavorAssets as $flavorAsset)
 		{
 			$content = $mrss->addChild('content');
-			$content->addAttribute('url', self::getFlavorAssetUrl($flavorAsset));
+			$content->addAttribute('url', self::getAssetUrl($flavorAsset));
 			$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 			$content->addAttribute('isSource', (bool) $flavorAsset->getIsOriginal());
+			$content->addAttribute('format', $flavorAsset->getContainerFormat());
+			if($flavorAsset->getFlavorParamsId())
+				$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
 			$content->addChild('tags', $flavorAsset->getTags());
 		}
 			
@@ -228,15 +260,19 @@ class kMrssManager
 		foreach($thumbAssets as $thumbAsset)
 		{
 			$thumbnail = $mrss->addChild('thumbnail');
-			$thumbnail->addAttribute('url', self::getFlavorAssetUrl($thumbAsset));
+			$thumbnail->addAttribute('url', self::getAssetUrl($thumbAsset));
 			$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
 			$thumbnail->addAttribute('isDefault', (bool) $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB));
+			$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
+			if($thumbAsset->getFlavorParamsId())
+				$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
 			$thumbnail->addChild('tags', $thumbAsset->getTags());
 		}
 		
 		$mrssContributors = self::getMrssContributors();
-		foreach($mrssContributors as $mrssContributor)
-			$mrssContributor->contribute($entry, $mrss);
+		if(count($mrssContributors))
+			foreach($mrssContributors as $mrssContributor)
+				$mrssContributor->contribute($entry, $mrss);
 		
 		return $mrss;
 	}
