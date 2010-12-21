@@ -345,15 +345,16 @@ flavorasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
 flavorasset.getflavorassetswithparams|			|2		|1	|1		|2		|1		|	|0,		|	|   |
 flavorasset.getdownloadurl			|			|2		|1	|1		|2		|1		|	|		|	|   |
 
-thumbasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.getbyentryid				|			|2		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.servebyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
-thumbasset.serve		 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |
+thumbasset.get						|			|1		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.getbyentryid				|			|1		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.servebyentryid 			|			|1		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.serve		 			|			|1		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.setasdefault 			|			|2		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.generatebyentryid		|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.generate					|			|1		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.regenerate				|			|2		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.addfromurl				|			|2		|1	|1		|2		|1		|	|		|	|   |
-thumbasset.addfromimage				|			|2		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.addfromurl				|			|1		|1	|1		|2		|1		|	|		|	|   |
+thumbasset.addfromimage				|			|1		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |
 thumbasset.deletebyentryid			|			|2		|1	|1		|2		|1		|	|		|	|   |
 
