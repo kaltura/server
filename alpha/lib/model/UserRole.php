@@ -14,6 +14,8 @@
  */
 class UserRole extends BaseUserRole
 {
+	const ALL_PARTNER_PERMISSIONS_WILDCARD = '*';
+	
 	/**
 	 * Copy current role to the given partner.
 	 * @param int $partnerId
@@ -28,6 +30,26 @@ class UserRole extends BaseUserRole
 		$newRole->setCustomData($this->getCustomData());
 		$newRole->setPartnerId($partnerId); // set new partner id
 		return $newRole;
+	}
+	
+	/**
+	 * Get the [permission_names] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPermissionNames()
+	{
+		$permissionNames = parent::getPermissionNames();
+		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD) {
+			$permissionNames = '';
+			$permissions = PermissionPeer::getAllValidForPartner(kCurrentContext::$partner_id, false);
+			foreach ($permissions as $permission)
+			{
+				$permissionNames .= $permission->getName().',';	
+			}
+			trim($permissionNames, ',');
+		}
+		return $permissionNames;
 	}
 	
 } // UserRole

@@ -30,7 +30,10 @@ class PermissionPeer extends BasePermissionPeer
 			// a user role can only contain API_ACCESS and EXTERNAL permission types - TODO should be changed to perPartner / perUser permissions
 			$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
 			
+			PermissionPeer::setUseCriteriaFilter(false);
 			$hasPermission = PermissionPeer::doSelectOne($c);
+			PermissionPeer::setUseCriteriaFilter(true);
+			
 			if (!$hasPermission || $hasPermission->getStatus() == PermissionStatus::DELETED) {
 				throw new kPermissionException('Permission ['.$permission.'] was not found for partner ['.$partnerId.']', kPermissionException::PERMISSION_NOT_FOUND);
 			}
@@ -43,7 +46,9 @@ class PermissionPeer extends BasePermissionPeer
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 		$c->addAnd(PermissionPeer::NAME, $permission->getName(), Criteria::EQUAL);
+		PermissionPeer::setUseCriteriaFilter(false);
 		$existingPermission = PermissionPeer::doSelectOne($c);
+		PermissionPeer::setUseCriteriaFilter(true);
 		if (!$existingPermission) {
 			$permission->save();
 			KalturaLog::log('Adding permission ['.$permission->getName().'] to partner ['.$partnerId.'].');
@@ -112,7 +117,7 @@ class PermissionPeer extends BasePermissionPeer
 	}
 	
 	
-	public static function isValidForPartner($permissionName, $partnerId)
+	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true)
 	{
 		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
 		if (!$permission) {
@@ -123,20 +128,23 @@ class PermissionPeer extends BasePermissionPeer
 		}
 		
 		// check if permissions depends on another permission which is not valid for partner
-		$dependsOn = trim($permission->getDependsOnPermissionNames());
-		$dependsOn = explode(',', $dependsOn);
-		$valid = true;
-		if ($dependsOn) {
-			foreach($dependsOn as $dependPermission) {
-				$dependPermission = trim($dependPermission);
-				if (!$dependPermission) {
-					continue;
+		if ($checkDependency)
+		{
+			$dependsOn = trim($permission->getDependsOnPermissionNames());
+			$dependsOn = explode(',', $dependsOn);
+			$valid = true;
+			if ($dependsOn) {
+				foreach($dependsOn as $dependPermission) {
+					$dependPermission = trim($dependPermission);
+					if (!$dependPermission) {
+						continue;
+					}
+					$valid = $valid && self::isValidForPartner($dependPermission, $partnerId);
 				}
-				$valid = $valid && self::isValidForPartner($dependPermission, $partnerId);
 			}
-		}
-		if (!$valid) {
-			return false;
+			if (!$valid) {
+				return false;
+			}
 		}
 		return $permission;
 	}
@@ -147,7 +155,9 @@ class PermissionPeer extends BasePermissionPeer
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
+		PermissionPeer::setUseCriteriaFilter(false);
 		$permission = PermissionPeer::doSelectOne($c);
+		PermissionPeer::setUseCriteriaFilter(true);
 		return $permission;
 	}
 	
@@ -176,5 +186,48 @@ class PermissionPeer extends BasePermissionPeer
 		return strtoupper($pluginName).'_PLUGIN_PERMISSION';
 	}
 	
+	public static function getAllValidForPartner($partnerId, $checkDependency = true)
+	{
+		$c = new Criteria();
+		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		PermissionPeer::setUseCriteriaFilter(false);
+		$allPermissions = PermissionPeer::doSelect($c);
+		PermissionPeer::setUseCriteriaFilter(true);
+		
+		while ($checkDependency)
+		{
+			$checkDependency = false;
+			$permissionNames = array();
+			foreach ($allPermissions as $permission)
+			{
+				// create an array of permission names to assist the check
+				$permissionNames[] = $permission->getName();
+			}
+			foreach ($allPermissions as $key => $permission)
+			{
+				$dependsOn = trim($permission->getDependsOnPermissionNames());
+				$dependsOn = explode(',', $dependsOn);
+				if ($dependsOn)
+				{
+					foreach($dependsOn as $dependPermission)
+					{
+						$dependPermission = trim($dependPermission);
+						if (!$dependPermission) {
+							// invalid text
+							continue;
+						}
+						if (!in_array($dependPermission, $permissionNames)) {
+							// current permission depends on a non existing permission
+							unset($allPermissions[$key]);
+							$checkDependency = true; // need to recheck because we have delete a permission
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return $allPermissions;
+	}	
 	
 } // PermissionPeer

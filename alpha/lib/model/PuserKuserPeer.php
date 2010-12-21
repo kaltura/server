@@ -90,7 +90,7 @@ class PuserKuserPeer extends BasePuserKuserPeer
 				$kuser->setPartnerId( $partner_id );
 				// set puserId for forward compatibility with PS3
 				$kuser->setPuserId( $puser_id );
-				$kuser->setStatus( kuser::KUSER_STATUS_ACTIVE ); // so he won't appear in the search
+				$kuser->setStatus( KuserStatus::ACTIVE ); // so he won't appear in the search
 				$kuser->save();
 				$kuser_id = $kuser->getId();
 			}

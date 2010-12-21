@@ -333,13 +333,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
-		if (!$kuser || $kuser->getStatus() != kuser::KUSER_STATUS_ACTIVE)
+		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE)
 		{
-			
-			
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
-				if ($kuser && $kuser->getStatus() == kuser::KUSER_STATUS_SUSPENDED) {
+				if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
 					throw new kUserException('', kUserException::USER_IS_BLOCKED);
 				}
 				else {
@@ -352,18 +350,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			// if no specific partner was request, but last logged in partner is not available, login to first found partner
 			$c = new Criteria();
 			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId());
-			$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+			$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 			$kuser = kuserPeer::doSelectOne($c);
 			
-			if ($kuser && $kuser->getStatus() == kuser::KUSER_STATUS_SUSPENDED) {
+			if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
 				throw new kUserException('', kUserException::USER_IS_BLOCKED);
 			}
-			else {
+			
+			if (!$kuser) {
 				throw new kUserException('', kUserException::USER_NOT_FOUND);
 			}
 		}
 		
-		$loginData->setLastLoginPartnerId($partnerId);
+		$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		$loginData->save();
 		
 		$kuser->setLastLoginTime(time());
@@ -383,13 +382,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	 *
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
-	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
-	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
-	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $checkPasswordStructure = true)
+	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true)
 	{
 		if (!kString::isEmailString($loginEmail)) {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
@@ -399,11 +398,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if (!$partner) {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
-				
-		$userQuota = $partner->getLoginUsersQuota();
-		// check if login users quota exceeded - value -1 means unlimited
-		if (is_null($userQuota) || $userQuota != -1 && $userQuota <= $partner->getLoginUsersNumber()) {
-			throw new kUserException('', kUserException::LOGIN_USERS_QUOTA_EXCEEDED);
+		
+		if ($isAdminUser)
+		{
+			$userQuota = $partner->getAdminLoginUsersQuota();
+			// check if login users quota exceeded - value -1 means unlimited
+			if (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $partner->getAdminLoginUsersNumber())) {
+				throw new kUserException('', kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
+			}
 		}
 		
 		$existingData = self::getByEmail($loginEmail);
@@ -479,7 +481,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, null, Criteria::NOT_EQUAL);
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
-		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		$countUsers = kuserPeer::doCount($c);
 		kuserPeer::setUseCriteriaFilter(true);
 		

@@ -42,10 +42,13 @@ class UserRolePeer extends BaseUserRolePeer
 	public static function getByStrId($strId)
 	{
 		$c = new Criteria();
+		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
 		$c->addAnd(UserRolePeer::STR_ID, $strId, Criteria::EQUAL);
+		UserRolePeer::setUseCriteriaFilter(false);
 		return UserRolePeer::doSelectOne($c);
+		UserRolePeer::setUseCriteriaFilter(true);
 	}
-	
+		
 	public static function getDefaultRoleForUser(kuser $user)
 	{
 		if ($user->getIsAdmin()) {

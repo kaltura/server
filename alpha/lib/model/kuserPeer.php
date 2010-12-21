@@ -20,7 +20,7 @@ class kuserPeer extends BasekuserPeer
 		}
 		
 		$c = new myCriteria(); 
-		$c->addAnd ( kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd ( kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
@@ -56,7 +56,7 @@ class kuserPeer extends BasekuserPeer
 	public static function getActiveKuserByPartnerAndUid($partner_id , $puser_id)
 	{
 		$c = new Criteria();
-		$c->add(self::STATUS, KalturaUserStatus::ACTIVE);
+		$c->add(self::STATUS, KuserStatus::ACTIVE);
 		$c->add(self::PARTNER_ID, $partner_id);
 		$c->add(self::PUSER_ID, $puser_id);
 		return self::doSelectOne($c);			
@@ -73,7 +73,7 @@ class kuserPeer extends BasekuserPeer
 			$kuser->setScreenName($puser_id);
 			$kuser->setFirstName($puser_id);
 			$kuser->setPartnerId($partner_id);
-			$kuser->setStatus(1); // KalturaUserStatus::ACTIVE
+			$kuser->setStatus(KuserStatus::ACTIVE);
 			$kuser->setIsAdmin($is_admin);
 			$kuser->save();
 		}
@@ -329,7 +329,7 @@ class kuserPeer extends BasekuserPeer
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
 		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId);
-		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		$kuser = self::doSelectOne($c);
 		if (!$kuser) {
 			return false;
@@ -347,7 +347,7 @@ class kuserPeer extends BasekuserPeer
 	 * @throws kUserException::USER_ALREADY_EXISTS
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
-	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
@@ -383,7 +383,7 @@ class kuserPeer extends BasekuserPeer
 		}
 		
 		if (is_null($user->getStatus())) {
-			$user->setStatus(KalturaUserStatus::ACTIVE);
+			$user->setStatus(KuserStatus::ACTIVE);
 		}
 		
 		// if password is set, user should be able to login to the system - add a user_login_data record

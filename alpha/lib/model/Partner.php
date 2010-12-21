@@ -573,22 +573,22 @@ class Partner extends BasePartner
 		$this->putInCustomData('password_replace_freq', $replaceFreq, null);
 	}
 	
-	public function setLoginUsersQuota($quota)
+	public function setAdminLoginUsersQuota($quota)
 	{
-		$this->putInCustomData('login_users_quota', $quota);
+		$this->putInCustomData('admin_login_users_quota', $quota);
 	}
 	
-	public function getLoginUsersQuota()
+	public function getAdminLoginUsersQuota()
 	{
-		return $this->getFromCustomData('login_users_quota');
+		return $this->getFromCustomData('admin_login_users_quota');
 	}
 	
-	public function getLoginUsersNumber()
+	public function getAdminLoginUsersNumber()
 	{
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PARTNER_ID, $this->getId());
-		$c->addAnd(kuserPeer::LOGIN_DATA_ID, null, Criteria::ISNOTNULL);
-		$c->addAnd(kuserPeer::STATUS, kuser::KUSER_STATUS_DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		return kuserPeer::doCount($c);
 	}
 	

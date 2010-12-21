@@ -20,11 +20,6 @@ class kuser extends Basekuser
 		
 	const KUSER_KALTURA = 0;
 	  
-	// enum for different status
-	const KUSER_STATUS_SUSPENDED = 0;
-	const KUSER_STATUS_ACTIVE = 1;
-	const KUSER_STATUS_DELETED = 2;	
-	
 	// different sort orders for browsing kswhos
 	const KUSER_SORT_MOST_VIEWED = 1;  
 	const KUSER_SORT_MOST_RECENT = 2;  
@@ -65,7 +60,7 @@ class kuser extends Basekuser
 	public function postUpdate(PropelPDO $con = null)
 	{
 		$objectDeleted = false;
-		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == self::KUSER_STATUS_DELETED) {
+		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == KuserStatus::DELETED) {
 			$objectDeleted = true;
 		}
 			
@@ -421,7 +416,7 @@ class kuser extends Basekuser
 	
 	public function disable ( $disable_all_content = false )
 	{
-		$this->setStatus ( self::KUSER_STATUS_SUSPENDED );
+		$this->setStatus ( KuserStatus::BLOCKED );
 	}
 
 	public function moderate ($new_moderation_status) 
@@ -456,7 +451,7 @@ class kuser extends Basekuser
 	// TODO - fix when we enable the blocking of users
 	public function getModerationStatus()
 	{
-//		if ( $this->getStatus() == self::KUSER_STATUS_SUSPENDED )
+//		if ( $this->getStatus() == KuserStatus::BLOCKED )
 //			return moderation::MODERATION_STATUS_BLOCK;
 		return moderation::MODERATION_STATUS_APPROVED;
 	}
@@ -681,13 +676,13 @@ class kuser extends Basekuser
 	 */
 	public function setStatus($status)
 	{
-		if ($status == kuser::KUSER_STATUS_DELETED && $this->getIsRootUser()) {
+		if ($status == KuserStatus::DELETED && $this->getIsRootUser()) {
 			throw new kUserException('', kUserException::CANNOT_DELETE_ROOT_ADMIN_USER);
 		}
 		
 		parent::setStatus($status);
 		$this->setStatusUpdatedAt(time());
-		if ($status == kuser::KUSER_STATUS_DELETED) {
+		if ($status == KuserStatus::DELETED) {
 			$this->setDeletedAt(time());
 		}
 	}
@@ -728,7 +723,9 @@ class kuser extends Basekuser
 	{
 		// full_name column is deprecated
 		KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated');
-		throw new Exception('Field [full_name] on object [kuser] is deprecated');
+		list($firstName, $lastName) = kString::nameSplit($v);
+		$this->setFirstName($firstName);
+		$this->setLastName($lastName);
 	}
 	
 	// -- end of deprecated functions
@@ -760,11 +757,11 @@ class kuser extends Basekuser
 	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
-	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
-	 * @throws kUserException::LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
 	public function enableLogin($loginId, $password, $checkPasswordStructure = true)
 	{
@@ -773,20 +770,19 @@ class kuser extends Basekuser
 			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_ENABLED);
 		}
 		
-		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $checkPasswordStructure);	
+		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure);	
 		if (!$loginData)
 		{
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
 		$this->setLoginDataId($loginData->getId());
-		$this->save();
-		return true;
+		return $this;
 	}
 	
 	public function setIsRootUser($isRootUser)
 	{
-		$this->putInCustomData('is_root_user', $$isRootUser);
+		$this->putInCustomData('is_root_user', $isRootUser);
 	}
 	
 	public function getIsRootUser()
@@ -841,7 +837,7 @@ class kuser extends Basekuser
 		foreach ($items as $item) {
 			$ids[] = $item->getUserRoleId();
 		}
-		return $ids;
+		return implode(',', $ids);
 	}
 
 	/**

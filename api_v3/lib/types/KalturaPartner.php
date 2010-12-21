@@ -179,14 +179,14 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @var int
 	 * @readonly
 	 */
-	public $loginUsersQuota;
+	public $adminLoginUsersQuota;
 	
 	private static $map_between_objects = array
 	(
 		"id" , "name", "website" => "url1" , "notificationUrl" => "url2" , "appearInSearch" , "createdAt" , "adminName" , "adminEmail" ,
 		"description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "phone" , "describeYourself" ,
 		"adultContent" , "defConversionProfileType" , "notify" , "status" , "allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" ,
-		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "loginUsersQuota",
+		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "adminLoginUsersQuota",
 	);
 	
 	public function getMapBetweenObjects ( )

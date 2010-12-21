@@ -7,7 +7,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var string
-	 * @filter eq,in,order
 	 */
 	public $id;
 
@@ -262,8 +261,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		$this->loginEnabled = !is_null($sourceObject->getLoginDataId());
 		
 		// copy user role IDs
-		$itemIdsArray = $sourceObject->getUserRoleIds();
-		$this->roleIds = implode(',', $itemIdsArray);
+		$this->roleIds = $sourceObject->getUserRoleIds();
 	}
 	
 	public function getExtraFilters()

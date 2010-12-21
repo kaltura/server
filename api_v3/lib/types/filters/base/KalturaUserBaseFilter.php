@@ -8,8 +8,6 @@ class KalturaUserBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
-		"idEqual" => "_eq_id",
-		"idIn" => "_in_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"screenNameLike" => "_like_screen_name",
 		"screenNameStartsWith" => "_likex_screen_name",
@@ -26,8 +24,6 @@ class KalturaUserBaseFilter extends KalturaFilter
 
 	private $order_by_map = array
 	(
-		"+id" => "+id",
-		"-id" => "-id",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 	);
@@ -41,20 +37,6 @@ class KalturaUserBaseFilter extends KalturaFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $idEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $idIn;
 
 	/**
 	 * 

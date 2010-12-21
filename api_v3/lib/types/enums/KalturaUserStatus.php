@@ -3,10 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaUserStatus extends KalturaEnum
+class KalturaUserStatus extends KalturaEnum implements KuserStatus
 {
-	const BLOCKED = 0;
-	const ACTIVE = 1;
-	const DELETED = 2;	
+	// see KuserStatus interface
 }
-?>
