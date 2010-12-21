@@ -27,12 +27,14 @@ class Annotation extends BaseAnnotation {
 	
 	public function getPuserId()
 	{
-		return PuserKuserPeer::getPuserIdFromKuserId($this->getPartnerId(), $this->getKuserId());
+		$kuser =  KuserPeer::retrieveByPK($this->getKuserId());
+		return $kuser->getPuserId();
 	} 
 	
 	public function setPuserId($v)
 	{
-		return $this->setKuserId(PuserKuserPeer::getKuserIdFromPuserId($this->getPartnerId(), $v));
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $v);
+		return $this->setKuserId($kuser->getId());
 	} 
 	
 	/**
