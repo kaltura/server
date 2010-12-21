@@ -72,11 +72,71 @@ class GenericDistributionEngine extends DistributionEngine implements
 			
 		$fileTransferMgr->login($distributionProfileAction->serverUrl, $distributionProfileAction->username, $distributionProfileAction->password, null, $distributionProfileAction->ftpPassiveMode);
 		$fileTransferMgr->putFile($destFile, $srcFile, true, FTP_BINARY, $distributionProfileAction->httpFieldName, $distributionProfileAction->httpFileName);
+		$results = $fileTransferMgr->getResults();
 		
-//		TODO - parse http response and set the remoteId
-//		$data->remoteId = $remoteId
+		if($results && is_string($results))
+		{
+			$parsedValues = $this->parseResults($results, $providerData->resultParserType, $providerData->resultParseData);
+			if(count($parsedValues))
+				list($data->remoteId) = $parsedValues;
+		}
 		
 		return true;
+	}
+
+	/**
+	 * @param string $results
+	 * @param KalturaGenericDistributionProviderParser $resultParserType
+	 * @param string $resultParseData
+	 * @return array of parsed values
+	 */
+	public function parseResults($results, $resultParserType, $resultParseData)
+	{
+		switch($resultParserType)
+		{
+			case KalturaGenericDistributionProviderParser::XSL;
+				$xml = new DOMDocument();
+				if(!$xml->loadXML($results))
+					return false;
+		
+				$xsl = new DOMDocument();
+				$xsl->loadXML($resultParseData);
+				
+				$proc = new XSLTProcessor;
+				$proc->importStyleSheet($xsl);
+				
+				$data = $proc->transformToDoc($xml);
+				if(!$data)
+					return false;
+					
+				return explode(',', $data);
+				
+			case KalturaGenericDistributionProviderParser::XPATH;
+				$xml = new DOMDocument();
+				if(!$xml->loadXML($results))
+					return false;
+		
+				$xpath = new DOMXpath($xml);
+				$elements = $xpath->query($resultParseData);
+				if(is_null($elements))
+					return false;
+					
+				$matches = array();
+				foreach ($elements as $element)
+					$matches[] = $element->textContent;
+					
+				return $matches;;
+				
+			case KalturaGenericDistributionProviderParser::REGEX;
+				$matches = array();
+				if(!preg_match("/$resultParseData/", $results, $matches))
+					return false;
+					
+				return array_shift($matches);
+				
+			default;
+				return false;
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -84,7 +144,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		// TODO Auto-generated method stub
+		// not supported
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -106,7 +167,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
-		// TODO Auto-generated method stub
+		// not supported
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -114,7 +176,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeReport(KalturaDistributionFetchReportJobData $data)
 	{
-		// TODO Auto-generated method stub
+		// not supported
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -122,7 +185,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		// TODO Auto-generated method stub
+		// not supported
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -130,7 +194,39 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		// TODO Auto-generated method stub
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaGenericDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaGenericDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
+		
+		return $this->handleFetchReport($data, $data->distributionProfile, $data->distributionProfile->report, $data->providerData);
+	}
+
+
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaGenericDistributionProfile $distributionProfile
+	 * @param KalturaGenericDistributionJobProviderData $providerData
+	 * @throws Exception
+	 * @throws kFileTransferMgrException
+	 * @return boolean true if finished, false if will be finished asynchronously
+	 */
+	public function handleFetchReport(KalturaDistributionFetchReportJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
+	{
+		$srcFile = str_replace('{REMOTE_ID}', $data->remoteId, $distributionProfileAction->serverPath);
+		
+		KalturaLog::debug("Fetch report from url [$srcFile]");
+		$results = file_get_contents($srcFile);
+	
+		if($results && is_string($results))
+		{
+			$parsedValues = $this->parseResults($results, $providerData->resultParserType, $providerData->resultParseData);
+			if(count($parsedValues))
+				list($data->plays, $data->views) = $parsedValues;
+		}
+		
+		return true;
 	}
 
 	/* (non-PHPdoc)
