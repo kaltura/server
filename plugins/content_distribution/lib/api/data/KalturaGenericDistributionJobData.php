@@ -22,6 +22,9 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
+		if(!$distributionJobData)
+			return;
+			
 		$action = KalturaDistributionAction::SUBMIT;
 		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
 			$action = KalturaDistributionAction::DELETE;
