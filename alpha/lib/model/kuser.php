@@ -459,11 +459,12 @@ class kuser extends Basekuser
 	
 	public function getPuserId()
 	{
-		if (defined("KALTURA_API_V3"))
-			return parent::getPuserId();
-			
-		//return " {$this->getPartnerId()} , {$this->getId()}";
-		return PuserKuserPeer::getPuserIdFromKuserId ( $this->getPartnerId(), $this->getId() );	
+		$puserId = parent::getPuserId();
+		if (!$puserId) {
+			$puserId = PuserKuserPeer::getPuserIdFromKuserId ( $this->getPartnerId(), $this->getId() );
+		}
+		
+		return $puserId;
 	}
 	
 	// this will make sure that the extra data set in the search_text won't leak out 

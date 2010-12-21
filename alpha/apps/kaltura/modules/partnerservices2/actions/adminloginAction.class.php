@@ -50,7 +50,7 @@ class adminloginAction extends defPartnerservices2Action
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
 		// so no hint about existing admin will leak 
-		if ( count ( $loginData ) < 1 )
+		if ( !$loginData )
 		{
 			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
 			return;
