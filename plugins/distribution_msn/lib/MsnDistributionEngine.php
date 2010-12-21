@@ -174,6 +174,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 				}
 				throw new Exception('Unknows MSN error');
 				
+			// TODO - check with MSN what other statuses are available
+			
 			default:
 				return false;
 		}
