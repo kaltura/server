@@ -78,6 +78,7 @@ class httpMgr extends kFileTransferMgr
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		
 		curl_setopt($this->ch, CURLOPT_HEADER, false);
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false); 
 		
 		return $this->ch;
 	}
