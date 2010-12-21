@@ -179,6 +179,34 @@ class kUrlManager
 	}
 	
 	/**
+	 * @param thumbAsset $thumbAsset
+	 * @return string
+	 */
+	public function getThumbnailAssetUrl(thumbAsset $thumbAsset)
+	{
+		$thumbAssetId = $thumbAsset->getId();
+		$partnerId = $thumbAsset->getPartnerId();
+		$url = "/api_v3/service/thumbAsset/action/serve/partnerId/$partnerId/thumbAssetId/$thumbAssetId";
+		
+		return $url;
+	}
+	
+	/**
+	 * @param asset $asset
+	 * @return string
+	 */
+	public function getAssetUrl(asset $asset)
+	{
+		if($asset instanceof thumbAsset)
+			return $this->getThumbnailAssetUrl($asset);
+			
+		if($asset instanceof flavorAsset)
+			return $this->getFlavorAssetUrl($asset);
+			
+		return null;
+	}
+	
+	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
