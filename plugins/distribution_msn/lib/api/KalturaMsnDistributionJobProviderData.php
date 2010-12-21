@@ -64,13 +64,13 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 			$this->thumbAssetId = reset($thumbAssets)->getId();
 			
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
-			$this->xml = MsnDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId);
+			$this->xml = MsnDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
 		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
-			$this->xml = MsnDistributionProvider::generateDeleteXML($distributionJobData->entryDistribution->entryId, $distributionJobData->remoteId);
+			$this->xml = MsnDistributionProvider::generateDeleteXML($distributionJobData->entryDistribution->entryId, $this);
 			
 		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
-			$this->xml = MsnDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $distributionJobData->remoteId);
+			$this->xml = MsnDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $this);
 	}
 		
 	private static $map_between_objects = array

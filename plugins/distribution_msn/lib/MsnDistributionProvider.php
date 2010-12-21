@@ -129,17 +129,61 @@ class MsnDistributionProvider implements IDistributionProvider
 		return array();
 	}
 	
-	public static function generateDeleteXML($entryId, $remoteId)
+	/**
+	 * @param string $entryId
+	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @return string
+	 */
+	public static function generateDeleteXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		
+		$xml = $this->generateXML($entryId, $providerData);
+		return $xml->saveXML();
 	}
 	
-	public static function generateUpdateXML($entryId, $remoteId)
+	/**
+	 * @param string $entryId
+	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @return string
+	 */
+	public static function generateUpdateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
+		$xml = $this->generateXML($entryId, $providerData);
+	
+		// change end time to 5 days from now (it's an MSN hack)
+		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
 		
+		$nodes = $xml->getElementsByTagName('activeEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
+		
+		$nodes = $xml->getElementsByTagName('searchableEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
+			
+		$nodes = $xml->getElementsByTagName('archiveEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
+		
+		return $xml->saveXML();
 	}
 	
+	/**
+	 * @param string $entryId
+	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @return string
+	 */
 	public static function generateSubmitXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
+	{
+		$xml = $this->generateXML($entryId, $providerData);
+		return $xml->saveXML();
+	}
+	
+	/**
+	 * @param string $entryId
+	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @return DOMDocument
+	 */
+	public static function generateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
@@ -151,6 +195,8 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		
 		$xslPath = dirname(__FILE__) . '/../../xml/submit.xsl';
+		if(!file_exists($xslPath))
+			return null;
 		$xsl = new DOMDocument();
 		$xsl->load($xslPath);
 			
@@ -179,9 +225,9 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 			
 		$xsdPath = dirname(__FILE__) . '/../../xml/submit.xsd';
-		if($xsdPath && !$xml->schemaValidate($xsdPath))		
+		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))		
 			return null;
 		
-		return $xml->saveXML();
+		return $xml;
 	}
 }
