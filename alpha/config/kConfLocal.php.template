@@ -25,6 +25,11 @@ class kConfLocal
 			
 				"apphome_url" => "@SERVICE_URL@",
 				"apphome_url_no_protocol" => "@KALTURA_VIRTUAL_HOST_NAME@",
+				"contact_url" => "@CONTACT_URL@",
+				"beginners_tutorial_url" => "@BEGINNERS_TUTORIAL_URL@",
+				"quick_start_guide_url" => "@QUICK_START_GUIDE_URL@",
+				"forum_url" => "@FORUMS_URLS@",
+				"unsubscribe_mail_url" => "@UNSUBSCRIBE_EMAIL_URL@", // actual user email will be added at the end of this string
 				"default_email" => "customer_service@@KALTURA_VIRTUAL_HOST_NAME@",
 				"default_email_name" => "@ENVIRONMENT_NAME@ Automated Response",
 				"partner_registration_confirmation_email" => "registration_confirmation@@KALTURA_VIRTUAL_HOST_NAME@",
