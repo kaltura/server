@@ -14,6 +14,8 @@
  */
 class GenericDistributionProviderAction extends BaseGenericDistributionProviderAction implements ISyncableFile 
 {
+	// TODO - force provider editable and required fields
+	
 	const FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_TRANSFORMER = 1;
 	const FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_VALIDATOR = 2;
 	const FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_RESULTS_TRANSFORMER = 3;

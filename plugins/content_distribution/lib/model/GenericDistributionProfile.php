@@ -1,6 +1,8 @@
 <?php
 class GenericDistributionProfile extends DistributionProfile
 {
+	// TODO - force provider and provider action editable and required fields
+	
 	const CUSTOM_DATA_GENERIC_PROVIDER_ID = 'genericProviderId';	
 	const CUSTOM_DATA_PROTOCOL = 'protocol';
 	const CUSTOM_DATA_SERVERURL = 'serverUrl';
