@@ -173,7 +173,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @action generateByEntryId
 	 * @param string $entryId
 	 * @param int $destThumbParamsId indicate the id of the ThumbParams to be generate this thumbnail by
-	 * @return int job id
+	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
@@ -206,11 +206,13 @@ class ThumbAssetService extends KalturaBaseService
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $destThumbParamsId);
 
-		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
-		if($job)
-			return $job->getId();
+		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		if(!$dbThumbAsset)
+			return null;
 			
-		return null;
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->fromObject($dbThumbAsset);
+		return $thumbAsset;
 	}
 
 	/**
@@ -218,7 +220,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param KalturaThumbParams $thumbParams
 	 * @param string $sourceAssetId id of the source asset (flavor or thumbnail) to be used as source for the thumbnail generation
-	 * @return int job id
+	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
@@ -251,17 +253,19 @@ class ThumbAssetService extends KalturaBaseService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId);
-		if($job)
-			return $job->getId();
+		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true);
+		if(!$dbThumbAsset)
+			return null;
 			
-		return null;
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->fromObject($dbThumbAsset);
+		return $thumbAsset;
 	}
 
 	/**
 	 * @action regenerate
 	 * @param string $thumbAssetId
-	 * @return int job id
+	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
@@ -297,11 +301,13 @@ class ThumbAssetService extends KalturaBaseService
 		if (!in_array($entry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
 
-		$job = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
-		if($job)
-			return $job->getId();
+		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
+		if(!$dbThumbAsset)
+			return null;
 			
-		return null;
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->fromObject($dbThumbAsset);
+		return $thumbAsset;
 	}
 	
 	/**
