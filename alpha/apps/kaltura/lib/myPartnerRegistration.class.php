@@ -137,9 +137,9 @@ class myPartnerRegistration
 		$newPartner->setAdminName($contact);
 		$newPartner->setAdminEmail($email);
 		$newPartner->setUrl1($website_url);
-		if ($ID_is_for === "commercial_use" || $ID_is_for === KalturaCommercialUseType::COMMERCIAL_USE)
+		if ($ID_is_for === "commercial_use" || $ID_is_for === CommercialUseType::COMMERCIAL_USE)
 			$newPartner->setCommercialUse(true);
-		else //($ID_is_for == "non-commercial_use") || $ID_is_for === KalturaCommercialUseType::NON_COMMERCIAL_USE)
+		else //($ID_is_for == "non-commercial_use") || $ID_is_for === CommercialUseType::NON_COMMERCIAL_USE)
 			$newPartner->setCommercialUse(false);
 		$newPartner->setDescription($description);
 		$newPartner->setKsMaxExpiryInSeconds(86400);
@@ -263,7 +263,7 @@ class myPartnerRegistration
 		if ($description == "")
 			throw new SignupException('Please fill in description', SignupException::INVALID_FIELD_VALUE);
 
-		if ( ($ID_is_for !== KalturaCommercialUseType::COMMERCIAL_USE) && ($ID_is_for !== KalturaCommercialUseType::NON_COMMERCIAL_USE) &&
+		if ( ($ID_is_for !== CommercialUseType::COMMERCIAL_USE) && ($ID_is_for !== CommercialUseType::NON_COMMERCIAL_USE) &&
 			 ($ID_is_for !== "commercial_use") && ($ID_is_for !== "non-commercial_use") ) //string values left for backward compatibility
 			throw new SignupException('Invalid field value.\nSorry.', SignupException::UNKNOWN_ERROR);
 

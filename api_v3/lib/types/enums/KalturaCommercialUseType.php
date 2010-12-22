@@ -3,9 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaCommercialUseType extends KalturaEnum
+class KalturaCommercialUseType extends KalturaEnum implements CommercialUseType
 {
-	const COMMERCIAL_USE = 1;
-	const NON_COMMERCIAL_USE = 0;
+	// see CommercialUseType interface
 }
-?>
