@@ -9,8 +9,6 @@ class KalturaAccessControlOrderBy
 
 class KalturaAdminUserOrderBy
 {
-	const ID_ASC = "+id";
-	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -1176,8 +1174,6 @@ class KalturaUploadTokenStatus
 
 class KalturaUserOrderBy
 {
-	const ID_ASC = "+id";
-	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -4807,6 +4803,319 @@ class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 
 }
 
+class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaGenericDistributionProfileAction extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProtocol
+	 */
+	public $protocol = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $ftpPassiveMode = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $httpFieldName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $httpFileName = null;
+
+
+}
+
+class KalturaGenericDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $genericProviderId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $submit;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $update;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $delete;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $fetchReport;
+
+
+}
+
+class KalturaMsnDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $domain = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $movFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $flvFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $wmvFlavorParamsId = null;
+
+
+}
+
+abstract class KalturaDistributionProvider extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 * @readonly
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $scheduleUpdateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $deleteInsteadUpdate = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunrise = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunset = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredEntryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths = null;
+
+
+}
+
+class KalturaMsnDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $movFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $wmvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+
+}
+
 class KalturaSchedulerStatus extends KalturaObjectBase
 {
 	/**
@@ -6235,7 +6544,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * @var int
 	 * @readonly
 	 */
-	public $loginUsersQuota = null;
+	public $adminLoginUsersQuota = null;
 
 
 }
@@ -6273,20 +6582,6 @@ class KalturaThumbParamsListResponse extends KalturaObjectBase
 
 abstract class KalturaUserBaseFilter extends KalturaFilter
 {
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
 	/**
 	 * 
 	 *
@@ -6376,6 +6671,20 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 
 class KalturaUserFilter extends KalturaUserBaseFilter
 {
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
 	/**
 	 * 
 	 *
@@ -7740,7 +8049,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 *
 	 * @var int
 	 */
-	public $loginUsersQuota = null;
+	public $adminLoginUsersQuota = null;
 
 
 }
@@ -8533,68 +8842,6 @@ abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
 
 class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
 {
-
-}
-
-abstract class KalturaDistributionProvider extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaDistributionProviderType
-	 * @readonly
-	 */
-	public $type = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $scheduleUpdateEnabled = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $deleteInsteadUpdate = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $intervalBeforeSunrise = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $intervalBeforeSunset = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredEntryFields = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredMetadataXPaths = null;
-
 
 }
 
