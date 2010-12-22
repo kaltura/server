@@ -362,7 +362,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			}
 		}
 		
-		$loginData->setLastLoginPartnerId($kuser->getPartnerId());
+		if ($kuser->getIsAdmin() && !in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'))) {
+			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
+		}
 		$loginData->save();
 		
 		$kuser->setLastLoginTime(time());
