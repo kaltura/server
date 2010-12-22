@@ -166,6 +166,9 @@ KTestMe.prototype = {
 			if (jQuery(item).find("input:checkbox:checked").size() > 0)
 			{
 				var name = jQuery(item).find("input:text,select").attr("name");
+				if(!name)
+					return;
+				
 				var value = jQuery(item).find("input:text,select").val();
 				params[name] = value;
 				
