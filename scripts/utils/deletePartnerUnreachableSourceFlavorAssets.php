@@ -54,15 +54,15 @@ foreach ($flavorAssets as $flavorAsset)
 			echo 'changed source flavor asset to status deleted for entry: ' . $flavorAsset->getEntryId() .
 				' and for flavor id ' . $flavorAsset->getId() . PHP_EOL;
 			// set the status of the flavor asset to deleted and set deleted time (taken from flavorAssetService)
-	//		$entry = $flavorAsset->getEntry();
-	//		if ($entry)
-	//		{
-	//			$entry->removeFlavorParamsId($flavorAsset->getFlavorParamsId());
-	//			$entry->save();
-	//		}
-	//		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
-	//		$flavorAsset->setDeletedAt(time());
-	//		$flavorAsset->save();
+			$entry = $flavorAsset->getEntry();
+			if ($entry)
+			{
+				$entry->removeFlavorParamsId($flavorAsset->getFlavorParamsId());
+				$entry->save();
+			}
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+			$flavorAsset->setDeletedAt(time());
+			$flavorAsset->save();
 			
 			$changedEntriesCounter++;
 		}
