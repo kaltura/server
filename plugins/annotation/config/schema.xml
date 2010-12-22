@@ -19,11 +19,6 @@
 			<index-column name="partner_id" />
 			<index-column name="entry_id" />
 		</index>
-		<index name="parent_entry_index">
-			<index-column name="partner_id" />
-			<index-column name="parent_id" />
-			<index-column name="entry_id" />
-		</index>
 		<index name="int_id_index">
 			<index-column name="int_id" />
 		</index>
