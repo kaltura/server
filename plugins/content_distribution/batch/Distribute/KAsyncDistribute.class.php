@@ -10,7 +10,7 @@ abstract class KAsyncDistribute extends KBatchBase
 {
 	/**
 	 * Enter description here ...
-	 * @var DistributionEngine
+	 * @var IDistributionEngine
 	 */
 	protected $engine;
 	
@@ -77,7 +77,7 @@ abstract class KAsyncDistribute extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
-			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $job->data);
 		}
 		return $job;
 	}

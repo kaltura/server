@@ -2,12 +2,12 @@
 require_once("bootstrap.php");
 
 /**
- * Executes the KAsyncDistributeSubmit
+ * Executes the KAsyncDistributeUpdate
  * 
  * @package Scheduler
  * @subpackage Distribute
  */
 
-$instance = new KAsyncDistributeSubmit();
+$instance = new KAsyncDistributeUpdate();
 $instance->run(); 
 $instance->done();
