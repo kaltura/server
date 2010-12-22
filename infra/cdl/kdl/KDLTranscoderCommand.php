@@ -183,8 +183,16 @@ $vcodecParams = "fl";
 $format = "fl";
 $acodec = "libmp3lam";
 
-		if($this->_inFileName){
-			$cmdStr = "-i ".$this->_inFileName;
+		if($this->_clipStart!==null && $this->_clipStart>0){
+			$cmdStr = $cmdStr." -ss ".$this->_clipStart/1000;
+		}
+		
+		if($this->_clipDur!==null && $this->_clipDur>0){
+			$cmdStr = $cmdStr." -t ".$this->_clipDur/1000;
+		}
+		
+if($this->_inFileName){
+			$cmdStr .= " -i ".$this->_inFileName;
 		}
 		if($this->_vidId!="none"){
 			switch($this->_vidId){
@@ -288,14 +296,6 @@ $acodec = "libmp3lam";
 			$cmdStr = $cmdStr." -an";
 		}
 		
-		if($this->_clipStart!==null && $this->_clipStart>0){
-			$cmdStr = $cmdStr." -ss ".$this->_clipStart/1000;
-		}
-		
-		if($this->_clipDur!==null && $this->_clipDur>0){
-			$cmdStr = $cmdStr." -t ".$this->_clipDur/1000;
-		}
-		
 		if($this->_conId!="none") {
 			switch($this->_conId){
 				case KDLContainerTarget::FLV:
@@ -320,6 +320,14 @@ $acodec = "libmp3lam";
 					break;
 			}
 			$cmdStr = $cmdStr." -f ".$format;
+		}
+		
+		/*
+		 * Following 'dummy' seek-to setting is done to ensure preciseness
+		 * of the main seek command that is done at the beginning o fthe command line
+		 */
+		if($this->_clipStart!==null && $this->_clipStart>0){
+			$cmdStr = $cmdStr." -ss 0.01";
 		}
 		
 		if($extra)
