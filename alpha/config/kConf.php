@@ -163,6 +163,8 @@ class kConf extends kConfLocal
 				'report_partner_registration' => false, // whether to report partner registration
 				
 				"usage_tracking_url" => "http://corp.kaltura.com/index.php/events/usage_tracking",
+				
+				"no_save_of_last_login_partner_for_partner_ids" => array(0, -1, -2, 99),
 
 			)
 		);
