@@ -24,6 +24,8 @@ class KalturaUserBaseFilter extends KalturaFilter
 
 	private $order_by_map = array
 	(
+		"+id" => "+id",
+		"-id" => "-id",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 	);

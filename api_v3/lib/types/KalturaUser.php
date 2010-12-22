@@ -7,6 +7,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var string
+	 * @filter order
 	 */
 	public $id;
 
