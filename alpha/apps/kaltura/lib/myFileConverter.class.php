@@ -176,11 +176,15 @@ class myFileConverter
 		// hq - activate high quality settings
 		// deinterlace - deinterlace pictures
 		
-		// TODO cut long movie and take the image from the short video 
+		// The '-ss 0.01' is  'dummy' seek-to setting is done to ensure preciseness of the main seek
+		// command that is done at the beginning of the command line
+		// here 'the -ss 0.01' is presented in the $position_str_suffix
+		// the $position_str presets the specifix second to capture
 		$position_str = $position ? " -ss $position " : "";
+		$position_str_suffix = $position ? " -ss 0.01 " : "";
 		$dimensions = ($width == -1 || $height == -1) ? "" : ("-s ". $width ."x" . $height);
-		$exec_cmd = kConversionEngineFfmpeg::getCmd() . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
-		" " . $position_str . " -vframes $frame_count -f \"" . $target_type . "\" " . "\"$target_file\"" . " 2>&1";
+		$exec_cmd = kConversionEngineFfmpeg::getCmd() . $position_str . " -i " . "\"$source_file\"" . " -an -y -r 1 " . $dimensions .
+			" " . " -vframes $frame_count -f \"" . $target_type . "\" " . $position_str_suffix . "\"$target_file\"" . " 2>&1";
 
 		KalturaLog::log("ffmpeg cmd [$exec_cmd]");
 		$output = array ();
