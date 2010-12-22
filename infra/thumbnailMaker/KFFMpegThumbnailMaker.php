@@ -17,7 +17,9 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	{
 		$dimensions = (is_null($width) || is_null($height)) ? '' : ("-s ". $width ."x" . $height);
 		$position_str = $position ? " -ss $position " : '';
-		return "$this->cmdPath -i $this->srcPath -an -y -r 1 $dimensions $position_str -vframes $frameCount -f $targetType $this->targetPath >> $this->targetPath.log 2>&1";
+		$position_str_suffix = $position ? " -ss 0.01 " : "";
+		return "$this->cmdPath $position_str -i $this->srcPath -an -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
+			" $this->targetPath >> $this->targetPath.log 2>&1";
 	}
 	
 	protected function parseOutput($output)
