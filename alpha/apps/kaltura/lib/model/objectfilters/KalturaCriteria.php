@@ -48,6 +48,10 @@ class KalturaCriteria extends Criteria
 	 */
 	public function attachFilter(baseObjectFilter $filter)
 	{
+		foreach($this->filters as $existsFilter)
+			if($existsFilter === $filter)
+				return;
+				
 		$this->filters[] = $filter;
 	}
 	

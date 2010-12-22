@@ -232,7 +232,6 @@ class KalturaEntryService extends KalturaBaseService
 			$pager->attachToCriteria($c);
 			
 		$entryFilter->attachToCriteria($c);
-		$entryFilter->addSearchMatchToCriteria( $c , null  , entry::getSearchableColumnName() );
 			
 		return $c;
 	}
