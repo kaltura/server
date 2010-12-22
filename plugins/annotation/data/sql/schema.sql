@@ -7,9 +7,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 #-- annotation
 #-----------------------------------------------------------------------------
 
-#DROP TABLE IF EXISTS `annotation`;
-
-
 CREATE TABLE `annotation`
 (
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
@@ -28,7 +25,6 @@ CREATE TABLE `annotation`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
-	KEY `parent_entry_index`(`partner_id`, `parent_id`, `entry_id`),
 	KEY `int_id_index`(`int_id`)
 )Type=MyISAM;
 
