@@ -57,6 +57,9 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getEntryMetadata($entryId)
 	{
+		if(!class_exists('KalturaMetadata'))
+			return null;
+			
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->objectIdEqual = $entryId;
 		$metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
