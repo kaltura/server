@@ -1,5 +1,5 @@
 <?php
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaPending
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -21,6 +21,12 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	public static function dependsOn()
+	{
+		$dependency = new KalturaDependency(MetadataPlugin::getPluginName());
+		return array($dependency);
 	}
 	
 	public static function isAllowedPartner($partnerId)
