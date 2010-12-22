@@ -25,7 +25,6 @@ CREATE TABLE `annotation`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
-	KEY `parent_entry_index`(`partner_id`, `parent_id`, `entry_id`),
 	KEY `int_id_index`(`int_id`)
 )Type=MyISAM;
 
