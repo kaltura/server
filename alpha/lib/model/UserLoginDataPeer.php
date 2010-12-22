@@ -88,6 +88,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
+		if ($new_email === $email) {
+			$new_email = null;
+		}
+		
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 		$loginData = UserLoginDataPeer::doSelectOne($c);
