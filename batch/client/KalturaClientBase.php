@@ -122,7 +122,10 @@ class KalturaClientBase
 		}
 		else 
 		{
-			$this->log("result (serialized): " . $postResult);
+			if(strlen($postResult) > 1024)
+				$this->log("result (serialized): " . strlen($postResult) . " bytes");
+			else
+				$this->log("result (serialized): " . $postResult);
 			
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
@@ -133,8 +136,8 @@ class KalturaClientBase
 					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
 				}
 				$dump = print_r($result, true);
-				$this->log("result (object dump): " . $dump);
-				
+				if(strlen($dump) < 1024)
+					$this->log("result (object dump): " . $dump);
 			}
 			else
 			{
