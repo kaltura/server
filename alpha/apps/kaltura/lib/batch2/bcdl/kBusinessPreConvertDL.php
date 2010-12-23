@@ -508,6 +508,8 @@ class kBusinessPreConvertDL
 		$thumbParamsOutput->setVideoOffset($thumbParams->getVideoOffset());
 		$thumbParamsOutput->setWidth($thumbParams->getWidth());
 		$thumbParamsOutput->setHeight($thumbParams->getHeight());
+		$thumbParamsOutput->setScaleWidth($thumbParams->getScaleWidth());
+		$thumbParamsOutput->setScaleHeight($thumbParams->getScaleHeight());
 		$thumbParamsOutput->setBackgroundColor($thumbParams->getBackgroundColor());
 		
 		if($mediaInfo)
