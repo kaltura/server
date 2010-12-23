@@ -8,6 +8,17 @@ class MsnDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit,
 	IDistributionEngineCloseDelete
 {
+	const USAGE_COUNTER_PLAYED = 1;
+	const USAGE_COUNTER_EMAILED = 2;
+	const USAGE_COUNTER_RATED = 3;
+	const USAGE_COUNTER_BLOGGED = 4;
+	const USAGE_COUNTER_REVIEWED = 5;
+	const USAGE_COUNTER_BOOKMARKED = 6;
+	const USAGE_COUNTER_PLAYBACKFAILED = 7;
+	const USAGE_COUNTER_TIMESPENT = 8;
+	const USAGE_COUNTER_RECOMMENDED = 9;
+
+	
 	private $defaultDomain = 'catalog.video.msn.com';
 	private $submitPath = '/admin/services/storevideoandfiles.aspx';
 	private $updatePath = '/admin/services/storevideoandfiles.aspx';
@@ -104,6 +115,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 		KalturaLog::debug("MSN HTTP response:\n$results\n");
+		$data->results = $results;
 		return $results;
 	}
 
@@ -130,6 +142,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 			// TODO - check with MSN what other statuses are available
 			
 			default:
+				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
 		}
 	}
@@ -240,6 +253,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 			// TODO - check with MSN what other statuses are available
 			
 			default:
+				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
 		}
 	}
@@ -267,6 +281,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 			// TODO - check with MSN what other statuses are available
 			
 			default:
+				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
 		}
 	}
@@ -282,14 +297,55 @@ class MsnDistributionEngine extends DistributionEngine implements
 		if(!$usageNodes->length)
 			throw new Exception('usageItem node not found in XML');
 			
-		$usageNode = $usageNodes->item(0);
-		
-		$usageAttr = $usageNode->attributes->getNamedItem('totalCount');
-		if($usageAttr)
+		foreach($usageNodes as $usageNode)
 		{
-//			TODO - find out if that counter is for plays or for view
-//			$data->plays = $usageAttr->value;
-//			$data->views = $usageAttr->value;
+			$typeAttr = $usageNode->attributes->getNamedItem('counterType');
+			$usageAttr = $usageNode->attributes->getNamedItem('totalCount');
+			if(!$typeAttr || !$usageAttr)
+				continue;
+				
+			switch($typeAttr->value)
+			{
+				case self::USAGE_COUNTER_PLAYED:
+					$data->plays = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_EMAILED:
+					$data->providerData->emailed = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_RATED:
+					$data->providerData->rated = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_BLOGGED:
+					$data->providerData->blogged = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_REVIEWED:
+					$data->providerData->reviewed = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_BOOKMARKED:
+					$data->providerData->bookmarked = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_PLAYBACKFAILED:
+					$data->providerData->playbackFailed = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_TIMESPENT:
+					$data->providerData->timeSpent = $usageAttr->value;
+					break;
+					
+				case self::USAGE_COUNTER_RECOMMENDED:
+					$data->providerData->recommended = $usageAttr->value;
+					break;
+					
+				default:
+					KalturaLog::err("Unknown counterType [{$typeAttr->value}]");
+					break;
+			}
 		}
 				
 		return true;
