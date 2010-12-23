@@ -121,7 +121,9 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		
 		$request = $action->getRequest();
 		
-		$flavorParamsResponse = $this->client->flavorParams->listAction();
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 100;
+		$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
 			
 		$action->view->errMessage = null;
 		$action->view->form = '';

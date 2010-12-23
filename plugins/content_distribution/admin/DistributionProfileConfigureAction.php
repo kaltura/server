@@ -71,7 +71,9 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			
 			$form->setAction($action->view->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction')));
 			
-			$flavorParamsResponse = $this->client->flavorParams->listAction();
+			$pager = new KalturaFilterPager();
+			$pager->pageSize = 100;
+			$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
 		
 			if($profileId)
 			{
