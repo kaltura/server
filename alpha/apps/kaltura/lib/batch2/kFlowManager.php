@@ -231,6 +231,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$dbBatchJob->setFinishTime(time());
 				$dbBatchJob->save();
 				
+				// TODO - don't abort if it's bulk upload
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
 			
