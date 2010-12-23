@@ -419,8 +419,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if ($isAdminUser)
 		{
 			$userQuota = $partner->getAdminLoginUsersQuota();
+			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();
 			// check if login users quota exceeded - value -1 means unlimited
-			if (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $partner->getAdminLoginUsersNumber())) {
+			if ($adminLoginUsersNum  && (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $adminLoginUsersNum))) {
 				throw new kUserException('', kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 		}
