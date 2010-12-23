@@ -43,7 +43,7 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 0, $scaleHeight = 0, $bgcolor = 0xffffff)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff)
 	{
 		$attributes = array();
 
@@ -89,8 +89,20 @@ class KImageMagickCropper extends KBaseCropper
 
 		if($scaleWidth || $scaleHeight)
 		{
-			$scale = ($scaleWidth ? $scaleWidth * 100 . '%' : '');
-			$scale .= 'x' . ($scaleHeight ? $scaleHeight * 100 . '%' : '');
+			if(!$scaleWidth)
+				$scaleWidth = 1;
+			if(!$scaleHeight)
+				$scaleHeight = 1;
+				
+			$cropX *= $scaleWidth;
+			$cropY *= $scaleHeight;	
+			$cropWidth *= $scaleWidth;
+			$cropHeight *= $scaleHeight;
+			
+			$scaleWidth *= 100;
+			$scaleHeight *= 100;
+				
+			$scale = "{$scaleWidth}%x{$scaleHeight}%";
 			
 			$attributes[] = "-scale $scale";
 		}
