@@ -32,7 +32,7 @@ class resetadminpasswordAction extends defPartnerservices2Action
 		
 		$email = trim ( $this->getPM ( "email" ) );
 		try {	
-			list( $new_password , $new_email ) = UserLoginDataPeer::resetUserPassword ( $email  );
+			$new_password = UserLoginDataPeer::resetUserPassword ( $email  );
 		}		
 		catch (kUserException $e) {
 			$code = $e->getCode();

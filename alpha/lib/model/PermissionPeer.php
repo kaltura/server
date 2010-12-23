@@ -29,6 +29,7 @@ class PermissionPeer extends BasePermissionPeer
 			$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 			// a user role can only contain API_ACCESS and EXTERNAL permission types - TODO should be changed to perPartner / perUser permissions
 			$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+			$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 			
 			PermissionPeer::setUseCriteriaFilter(false);
 			$hasPermission = PermissionPeer::doSelectOne($c);
@@ -190,6 +191,7 @@ class PermissionPeer extends BasePermissionPeer
 	{
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		PermissionPeer::setUseCriteriaFilter(false);
 		$allPermissions = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);

@@ -7,8 +7,8 @@
  * @package lib.model
  */ 
 class kuserPeer extends BasekuserPeer 
-{
-	const ROOT_ADMIN_PUSER_ID = '__ROOT_ADMIN__';
+{	
+	const  KALTURA_NEW_USER_EMAIL = 120;
 	
 	private static $s_default_count_limit = 301;
 
@@ -387,13 +387,52 @@ class kuserPeer extends BasekuserPeer
 		}
 		
 		// if password is set, user should be able to login to the system - add a user_login_data record
-		if ($password) {
+		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$user->enableLogin($user->getEmail(), $password);
+			$user->enableLogin($user->getEmail(), $password ? $password : UserLoginDataPeer::generateNewPassword());
+			if (!$password) {
+				self::sendNewUserMail($user);
+			}
 		}	
 		
 		$user->save();
 		return $user;
+	}
+	
+	
+	
+	private function sendNewUserMail(kuser $user)
+	{
+		$mailType = null;
+		$bodyParams = array();
+
+		$mailType = self::KALTURA_NEW_USER_EMAIL;
+				
+		$userName = $user->getFullName();
+		$loginEmail = $user->getEmail();
+		$partnerId = $user->getPartnerId();
+		$roleName = $user->getUserRoleNames();
+		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
+		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
+		$contactLink = kConf::get('contact_url');
+		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
+		$quickStartGuideLink = kConf::get('quick_start_guide_url');
+		$forumsLink = kConf::get('forum_url');
+		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$loginEmail;
+		
+		
+		$bodyParams = array($userName, $loginEmail, $partnerId, $roleName, $resetPasswordLink, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+	
+		kJobsManager::addMailJob(
+			null, 
+			0, 
+			$partnerId, 
+			$mailType, 
+			kMailJobData::MAIL_PRIORITY_NORMAL, 
+			kConf::get ("partner_registration_confirmation_email" ), 
+			kConf::get ("partner_registration_confirmation_name" ), 
+			$loginEmail, 
+			$bodyParams);
 	}
 			
 }

@@ -48,8 +48,8 @@ class updateadminpasswordAction extends defPartnerservices2Action
 				$this->addException( APIErrors::INVALID_FIELD_VALUE, $f_name );
 			}
 		}
-		try {	
-			list( $new_password , $new_email) = UserLoginDataPeer::resetUserPassword ( $email , $password , $old_password , $new_email );
+		try {
+			UserLoginDataPeer::updateLoginData ( $email , $old_password, $new_email, $password );
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -84,7 +84,7 @@ class updateadminpasswordAction extends defPartnerservices2Action
 		{
 			$this->addMsg ( "new_email" , $new_email ) ;
 		}
-		$this->addMsg ( "new_password" , $new_password ) ;
+		$this->addMsg ( "new_password" , $password ) ;
 	}
 }
 ?>

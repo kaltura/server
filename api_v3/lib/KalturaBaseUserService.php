@@ -36,7 +36,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 
 		try {
-			list( $new_password , $new_email) = UserLoginDataPeer::resetUserPassword ( $email , $newPassword , $password , $newEmail);
+			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword );
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -79,7 +79,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		try {
-			list( $new_password , $new_email) = UserLoginDataPeer::resetUserPassword($email);
+			$new_password = UserLoginDataPeer::resetUserPassword($email);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();

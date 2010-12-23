@@ -90,15 +90,15 @@ while(count($users))
 		
 		if ($existing_login_data)
 		{
-			KalturaLog::log('Existing user_login_data record with same password found with id ['.$existing_login_data->getId().']');
+			KalturaLog::log('Existing user_login_data record with same email found with id ['.$existing_login_data->getId().']');
 			if ($existing_login_data->getSalt() == $user->getSalt() && $existing_login_data->getSha1Password() == $user->getSha1Password()) {
 				$new_kuser->setLoginDataId($existing_login_data->getId());
 			}
 			else {
 				KalturaLog::alert('!!! Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']');
 				echo '!!! Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']';
+				continue;
 			}
-			continue;
 		}
 		else {
 			$new_login_data->setConfigPartnerId($admin_console_partner_id);

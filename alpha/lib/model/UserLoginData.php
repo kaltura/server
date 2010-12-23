@@ -44,27 +44,14 @@ class UserLoginData extends BaseUserLoginData {
 	}
 	
 	
-	public function resetPassword ($requestedPassword = null, $oldPassword = null)
+	public function resetPassword ($newPassword)
 	{
-		if ($requestedPassword && !$this->isPasswordValid($oldPassword))
-		{
-			return null;
-		}
-		if ($requestedPassword) {
-			$newPassword = $requestedPassword;
-		}
-		else {
-			$newPassword = userloginDataPeer::generateNewPassword();
-		}
-		$this->setPassword( $newPassword );	
-		if ($requestedPassword) {
-			$this->addToPreviousPasswords($this->getSha1Password(), $this->getSalt());
-		}
-		$this->setPasswordHashKey($this->newPassHashKey());
+		$this->setPassword( $newPassword );
+		$this->addToPreviousPasswords($this->getSha1Password(), $this->getSalt());
+		$this->setPasswordHashKey(null);
 		$this->setLoginAttempts(0);
 		$this->setLoginBlockedUntil(null);
-		$this->save();
-		return $newPassword;
+		$this->save();		
 	}
 	
 	

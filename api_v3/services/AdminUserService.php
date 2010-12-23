@@ -55,12 +55,12 @@ class AdminUserService extends KalturaBaseUserService
 	{
 		try
 		{
-			$user = parent::updateLoginDataImpl($email, $password, $newEmail, $newPassword);
+			parent::updateLoginDataImpl($email, $password, $newEmail, $newPassword);
 			
 			// copy required parameters to a KalturaAdminUser object for backward compatibility
 			$adminUser = new KalturaAdminUser();
-			$adminUser->email = $user->email;
-			$adminUser->password = $user->password;
+			$adminUser->email = $newEmail ? $newEmail : $email;
+			$adminUser->password = $newPassword ? $newPassword : $password;
 			
 			return $adminUser;
 		}

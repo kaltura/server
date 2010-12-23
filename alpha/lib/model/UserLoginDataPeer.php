@@ -80,18 +80,76 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		);
 	}
 	
-
-	public static function resetUserPassword($email , $requested_password = null , $old_password = null, $new_email = null)
-	{		
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null)
+	{
 		// if email is null, no need to do any DB queries
-		if (!$email) {
+		if (!$oldLoginEmail) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
-		if ($new_email === $email) {
-			$new_email = null;
+		if ($newLoginEmail === $oldLoginEmail) {
+			$newLoginEmail = null;
 		}
 		
+		$c = new Criteria(); 
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $oldLoginEmail ); 
+		$loginData = UserLoginDataPeer::doSelectOne($c);
+		
+		// check if login data exists
+		if (!$loginData) {
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		
+		// check if the email string is a valid email
+		if ($newLoginEmail && !kString::isEmailString($newLoginEmail)) {
+			throw new kUserException('', kUserException::INVALID_EMAIL);
+		}
+		
+		// check if a user with the new email already exists
+		if ($newLoginEmail && UserLoginDataPeer::getByEmail($newLoginEmail)) {
+			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
+		}
+		
+		// if this is an update request (and not just password reset), check that old password is valid
+		if ( $newPassword && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
+		{
+			throw new kUserException('', kUserException::WRONG_PASSWORD);
+		}
+		
+		// check that new password structure is valid
+		if ($newPassword && 
+				  !UserLoginDataPeer::isPasswordStructureValid($newPassword) ||
+				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
+				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
+				  (stripos($newPassword, $loginData->getFullName()) !== false)         ){
+			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
+		}
+		
+		// check that password hasn't been used before by this user
+		if ($newPassword && $loginData->passwordUsedBefore($newPassword)) {
+			throw new kUserException('', kUserException::PASSWORD_ALREADY_USED);
+		}		
+		
+		// update password if requested
+		if ($newPassword && $newPassword != $oldPassword) {
+			$password = $loginData->resetPassword($newPassword, $oldPassword);
+		}
+		
+		// update email if requested
+		if ( $newLoginEmail && $newLoginEmail != $loginData->getLoginEmail()) 
+		{
+			$loginData->setLoginEmail($newLoginEmail);
+		}
+				
+		$loginData->save();
+		
+		return $loginData;
+	}
+		
+
+	
+	public static function resetUserPassword($email)
+	{
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
 		$loginData = UserLoginDataPeer::doSelectOne($c);
@@ -101,53 +159,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
-		// check if the email string is a valid email
-		if ($new_email && !kString::isEmailString($new_email)) {
-			throw new kUserException('', kUserException::INVALID_EMAIL);
-		}
-		
-		// check if a user with the new email already exists
-		if ($new_email && UserLoginDataPeer::getByEmail($new_email)) {
-			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
-		}
-		
-		// if this is an update request (and not just password reset), check that old password is valid
-		if ( $requested_password && (!$old_password || !$loginData->isPasswordValid ( $old_password )) )
-		{
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
-		}
-		
-		// check that new password structure is valid
-		if ($requested_password && 
-				  !UserLoginDataPeer::isPasswordStructureValid($requested_password) ||
-				  (stripos($requested_password, $loginData->getFirstName()) !== false)   ||
-				  (stripos($requested_password, $loginData->getLastName()) !== false)    ||
-				  (stripos($requested_password, $loginData->getFullName()) !== false)         ){
-			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
-		}
-		
-		// check that password hasn't been used before by this user
-		if ($requested_password && $loginData->passwordUsedBefore($requested_password)) {
-			throw new kUserException('', kUserException::PASSWORD_ALREADY_USED);
-		}		
-		
-		// reset password
-		$password = $loginData->resetPassword($requested_password, $old_password);
-		
-		// update email if requested
-		if ( $new_email && $new_email != $loginData->getLoginEmail()) 
-		{
-			$loginData->setLoginEmail($new_email);
-		}
+		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 				
-		$loginData->save();
-		
-		// if this is a reset request (not update), send reset password link by email to the user
-		if (!$requested_password) {
-			self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey()));
-		}
-		
-		return array ( $password , $new_email);
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey()));
+		return true;
 	}
 	
 	/**
@@ -241,11 +256,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException ('', kUserException::PASSWORD_ALREADY_USED);
 		}
 		
-		$loginData->setPassword($newPassword);
-		$loginData->setLoginAttempts(0);
-		$loginData->setLoginBlockedUntil(null);
-		$loginData->setPasswordHashKey(null);
-		$loginData->save();
+		$loginData->resetPassword($newPassword);
 		return true;
 	}
 	

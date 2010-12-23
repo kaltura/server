@@ -688,6 +688,18 @@ class kuser extends Basekuser
 		}
 	}
 	
+	/**
+	 * Return user's login data object if valid
+	 */
+	public function getLoginData()
+	{
+		$loginDataId = $this->getLoginDataId();
+		if (!$loginDataId) {
+			return null;
+		}
+		return UserLoginDataPeer::retrieveByPK($loginDataId);
+	}
+	
 
 	
 	// -- start of deprecated functions
@@ -826,7 +838,7 @@ class kuser extends Basekuser
 	}
 	
 	/**
-	 * @return array Array of role IDs associated to the current kuser
+	 * @return string String of role IDs associated to the current kuser
 	 */
 	public function getUserRoleIds()
 	{
@@ -839,6 +851,21 @@ class kuser extends Basekuser
 			$ids[] = $item->getUserRoleId();
 		}
 		return implode(',', $ids);
+	}
+	
+	/**
+	 * @return array Array of role IDs associated to the current kuser
+	 */
+	public function getUserRoleNames()
+	{
+		$names = array();
+		$ids = $this->getUserRoleIds();
+		$ids = explode(',', $ids);
+		foreach ($ids as $id) {
+			$role = UserRolePeer::retrieveByPK($id);
+			$names[] = $role->getName();
+		}
+		return implode(',', $names);
 	}
 
 	/**
