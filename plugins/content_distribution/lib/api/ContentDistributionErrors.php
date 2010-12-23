@@ -9,6 +9,8 @@ class ContentDistributionErrors extends KalturaErrors
 	
 	const ENTRY_DISTRIBUTION_NOT_FOUND = "ENTRY_DISTRIBUTION_NOT_FOUND,Entry distrbution not found [%s]";
 	
+	const ENTRY_DISTRIBUTION_STATUS = "ENTRY_DISTRIBUTION_STATUS,Entry distrbution [%s] wrong status [%s]";
+	
 	const GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND = "GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND,Generic distrbution provider not found [%s]";
 	
 	const GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND = "GENERIC_DISTRIBUTION_PROVIDER_ACTION_NOT_FOUND,Generic distrbution provider action not found [%s]";
