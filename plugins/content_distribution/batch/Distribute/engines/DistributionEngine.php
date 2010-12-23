@@ -37,7 +37,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	/* (non-PHPdoc)
 	 * @see IDistributionEngine::setClient()
 	 */
-	protected function setClient(KalturaClient $kalturaClient)
+	public function setClient(KalturaClient $kalturaClient)
 	{
 		$this->kalturaClient = $kalturaClient;
 	}
