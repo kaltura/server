@@ -5,6 +5,13 @@
  */
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
+	private static $actionAttributes = array(
+		KalturaDistributionAction::SUBMIT => 'submit',
+		KalturaDistributionAction::UPDATE => 'update',
+		KalturaDistributionAction::DELETE => 'delete',
+		KalturaDistributionAction::FETCH_REPORT => 'fetchReport',
+	);
+	
 	/**
 	 * @var string
 	 */
@@ -33,29 +40,63 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 		if($distributionJobData instanceof KalturaDistributionFetchReportJobData)
 			$action = KalturaDistributionAction::FETCH_REPORT;
 			
-		$genericProviderAction = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($distributionJobData->distributionProfile->genericProviderId, $action);
+		if(!($distributionJobData->distributionProfile instanceof KalturaGenericDistributionProfile))
+		{
+			KalturaLog::err("Distribution profile is not generic");
+			return;
+		}
 		
-		if(is_null($distributionJobData->distributionProfile->protocol))
-			$distributionJobData->distributionProfile->protocol = $genericProviderAction->getProtocol();
-		if(is_null($distributionJobData->distributionProfile->serverUrl))
-			$distributionJobData->distributionProfile->serverUrl = $genericProviderAction->getServerAddress();
-		if(is_null($distributionJobData->distributionProfile->serverPath))
-			$distributionJobData->distributionProfile->serverPath = $genericProviderAction->getRemotePath();
-		if(is_null($distributionJobData->distributionProfile->username))
-			$distributionJobData->distributionProfile->username = $genericProviderAction->getRemoteUsername();
-		if(is_null($distributionJobData->distributionProfile->password))
-			$distributionJobData->distributionProfile->password = $genericProviderAction->getRemotePassword();
-		if(is_null($distributionJobData->distributionProfile->ftpPassiveMode))
-			$distributionJobData->distributionProfile->ftpPassiveMode = $genericProviderAction->getFtpPassiveMode();
+		$this->loadProperties($distributionJobData, $distributionJobData->distributionProfile, $action);
+	}
 	
-		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+	public function loadProperties(KalturaDistributionJobData $distributionJobData, KalturaGenericDistributionProfile $distributionProfile, $action)
+	{
+		$actionName = self::$actionAttributes[$action];
+		
+		$genericProviderAction = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($distributionProfile->genericProviderId, $action);
+		if(!$genericProviderAction)
+		{
+			KalturaLog::err("Generic provider [{$distributionProfile->genericProviderId}] action [$actionName] not found");
+			return;
+		}
+		
+		if(is_null($distributionProfile->$actionName->protocol))
+			$distributionProfile->$actionName->protocol = $genericProviderAction->getProtocol();
+		if(is_null($distributionProfile->$actionName->serverUrl))
+			$distributionProfile->$actionName->serverUrl = $genericProviderAction->getServerAddress();
+		if(is_null($distributionProfile->$actionName->serverPath))
+			$distributionProfile->$actionName->serverPath = $genericProviderAction->getRemotePath();
+		if(is_null($distributionProfile->$actionName->username))
+			$distributionProfile->$actionName->username = $genericProviderAction->getRemoteUsername();
+		if(is_null($distributionProfile->$actionName->password))
+			$distributionProfile->$actionName->password = $genericProviderAction->getRemotePassword();
+		if(is_null($distributionProfile->$actionName->ftpPassiveMode))
+			$distributionProfile->$actionName->ftpPassiveMode = $genericProviderAction->getFtpPassiveMode();
+		if(is_null($distributionProfile->$actionName->httpFieldName))
+			$distributionProfile->$actionName->httpFieldName = $genericProviderAction->getHttpFieldName();
+		if(is_null($distributionProfile->$actionName->httpFileName))
+			$distributionProfile->$actionName->httpFileName = $genericProviderAction->getHttpFileName();
+	
+		$entry = entryPeer::retrieveByPKNoFilter($distributionJobData->entryDistribution->entryId);
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [" . $distributionJobData->entryDistribution->entryId . "] not found");
+			return;
+		}
+			
 		$mrss = kMrssManager::getEntryMrss($entry);
 		if(!$mrss)
+		{
+			KalturaLog::err("MRSS not returned for entry [" . $entry->getId() . "]");
 			return;
+		}
 			
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($mrss))
+		{
+			KalturaLog::err("MRSS not is not valid XML:\n$mrss\n");
 			return;
+		}
 		
 		$key = $genericProviderAction->getSyncKey(GenericDistributionProviderAction::FILE_SYNC_DISTRIBUTION_PROVIDER_ACTION_MRSS_TRANSFORMER);
 		if(kFileSyncUtils::fileSync_exists($key))
@@ -71,7 +112,10 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 				
 				$xml = $proc->transformToDoc($xml);
 				if(!$xml)
+				{
+					KalturaLog::err("Transform returned false");
 					return;
+				}
 			}
 		}
 	
@@ -79,8 +123,12 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 		if(kFileSyncUtils::fileSync_exists($key))
 		{
 			$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
-			if($xsdPath && !$xml->schemaValidate($xsdPath))		
+			if($xsdPath && !$xml->schemaValidate($xsdPath))	
+			{
+				KalturaLog::err("Inavlid XML:\n" . $xml->saveXML());
+				KalturaLog::err("Schema [$xsdPath]:\n" . file_get_contents($xsdPath));	
 				return;
+			}
 		}
 		
 		$this->xml = $xml->saveXML();
