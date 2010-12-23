@@ -244,7 +244,9 @@ class KalturaUser extends KalturaObject implements IFilterable
 		}
 		
 		// copy role IDs
-		$dbObject->setUserRoles($this->roleIds);
+		if ($this->roleIds !== null) {
+			$dbObject->setUserRoles($this->roleIds);
+		}
 		
 		return $dbObject;		
 	}
