@@ -14,4 +14,12 @@ interface IKalturaContentDistributionProvider extends IKalturaBase
 	 * @return KalturaDistributionProvider
 	 */
 	public static function getKalturaProvider();
+	
+	/**
+	 * Append provider specific nodes and attributes to the MRSS
+	 * 
+	 * @param EntryDistribution $entryDistribution
+	 * @param SimpleXMLElement $mrss
+	 */
+	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss);
 }
