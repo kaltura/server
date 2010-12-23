@@ -33,14 +33,6 @@ class Form_NewUser extends Zend_Form
 			'validators' 	=> array()
 		));
 		
-		// Add a password element
-		$this->addElement('text', 'password', array(
-			'label'			=> 'Password:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-			'validators' 	=> array()
-		));
-
 		// Add the submit button
 		$this->addElement('button', 'submit', array(
 			'type' => 'submit',

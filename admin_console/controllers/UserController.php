@@ -196,7 +196,6 @@ class UserController extends Zend_Controller_Action
 				$user->status = KalturaUserStatus::ACTIVE;
 				$user->id = $user->email;
 				$user->isAdmin = true;
-				$user->password = $request->getPost('password');
 				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
 				$partnerData->role = $request->getPost('role');
 				$user->partnerData = serialize($partnerData);
