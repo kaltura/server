@@ -253,7 +253,9 @@ class kMrssManager
 			$content->addAttribute('format', $flavorAsset->getContainerFormat());
 			if($flavorAsset->getFlavorParamsId())
 				$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
-			$content->addChild('tags', $flavorAsset->getTags());
+			$tags = $mrss->addChild('tags');
+			foreach(explode(',', $flavorAsset->getTags()) as $tag)
+				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
 			
 		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
@@ -266,7 +268,9 @@ class kMrssManager
 			$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
 			if($thumbAsset->getFlavorParamsId())
 				$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
-			$thumbnail->addChild('tags', $thumbAsset->getTags());
+			$tags = $mrss->addChild('tags');
+			foreach(explode(',', $thumbAsset->getTags()) as $tag)
+				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
 		
 		$mrssContributors = self::getMrssContributors();
