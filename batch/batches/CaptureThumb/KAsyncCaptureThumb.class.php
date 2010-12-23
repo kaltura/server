@@ -75,8 +75,6 @@ class KAsyncCaptureThumb extends KBatchBase
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		
-		$mediaInfo = null;
-		
 		try
 		{
 			$data->thumbPath = null;
@@ -131,6 +129,14 @@ class KAsyncCaptureThumb extends KBatchBase
 			$width = $data->thumbParamsOutput->width;
 			$height = $data->thumbParamsOutput->height;
 			
+			$scaleWidth = $data->thumbParamsOutput->scaleWidth;
+			$scaleHeight = $data->thumbParamsOutput->scaleHeight;
+			
+			if($scaleWidth)
+				$cropWidth *= $scaleWidth;
+			if($scaleHeight)
+				$cropHeight *= $scaleHeight;
+				
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $bgcolor);
 			if(!$cropped || !file_exists($thumbPath))
