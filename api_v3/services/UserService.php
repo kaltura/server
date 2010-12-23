@@ -107,7 +107,7 @@ class UserService extends KalturaBaseUserService
 		if (!$dbUser)
 			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
 
-		if ($dbUser->getIsAdmin() && !$user->isAdmin) {
+		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
 			throw new KalturaAPIException(APIErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
 			
