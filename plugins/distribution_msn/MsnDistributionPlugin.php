@@ -195,4 +195,15 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		$distributionProvider->fromObject(self::getProvider());
 		return $distributionProvider;
 	}
+	
+	/**
+	 * Append provider specific nodes and attributes to the MRSS
+	 * 
+	 * @param EntryDistribution $entryDistribution
+	 * @param SimpleXMLElement $mrss
+	 */
+	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	{
+		
+	}
 }
