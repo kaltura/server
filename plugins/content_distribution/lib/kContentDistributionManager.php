@@ -28,11 +28,12 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
-	public static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	protected static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
  		$jobData = new kDistributionSubmitJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
  		
 		$batchJob = new BatchJob();
 		$batchJob->setEntryId($entryDistribution->getEntryId());
@@ -49,11 +50,12 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
-	public static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	protected static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
  		$jobData = new kDistributionUpdateJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());
  		
 		$batchJob = new BatchJob();
@@ -71,11 +73,35 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
-	public static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	protected static function addFetchReportJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+ 		$jobData = new kDistributionFetchReportJobData();
+ 		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
+ 		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
+ 		$jobData->setRemoteId($entryDistribution->getRemoteId());
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($entryDistribution->getEntryId());
+		$batchJob->setPartnerId($entryDistribution->getPartnerId());
+		
+		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobSubType = $distributionProfile->getProviderType();
+	
+		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
+	protected static function addSubmitDeleteJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
  		$jobData = new kDistributionDeleteJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
  		$jobData->setRemoteId($entryDistribution->getRemoteId());
  		
 		$batchJob = new BatchJob();
@@ -131,6 +157,20 @@ class kContentDistributionManager
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
 		$entryDistribution->save();
 			
+		return null;
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
+	public static function submitFetchEntryDistributionReport(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+		$distributionProvider = $distributionProfile->getProvider();
+		if($distributionProvider->isReportsEnabled())
+			return self::addFetchReportJob($entryDistribution, $distributionProfile);
+
 		return null;
 	}
 	
@@ -251,7 +291,7 @@ class kContentDistributionManager
 				continue;
 			}
 			
-			$key = $thumbAssets->getWidth() . 'x' . $thumbAssets->getHeight();
+			$key = $thumbAsset->getWidth() . 'x' . $thumbAsset->getHeight();
 			if(isset($thumbDimensionsWithKeys[$key]))
 			{
 				unset($thumbDimensionsWithKeys[$key]);
