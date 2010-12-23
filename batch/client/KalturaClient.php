@@ -9,6 +9,8 @@ class KalturaAccessControlOrderBy
 
 class KalturaAdminUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -280,6 +282,8 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -344,6 +348,7 @@ class KalturaDistributionProtocol
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const MSN = "msnDistribution.MSN";
 }
 
 class KalturaDurationType
@@ -440,6 +445,13 @@ class KalturaFlavorParamsOrderBy
 
 class KalturaFlavorParamsOutputOrderBy
 {
+}
+
+class KalturaGenericDistributionProviderParser
+{
+	const XSL = 1;
+	const XPATH = 2;
+	const REGEX = 3;
 }
 
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -1051,6 +1063,8 @@ class KalturaUploadTokenStatus
 
 class KalturaUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -2405,14 +2419,14 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public $scaleWidth = null;
 
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public $scaleHeight = null;
 
@@ -2927,6 +2941,13 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public $providerData;
 
+	/**
+	 * The results as returned from the remote destination
+	 *
+	 * @var string
+	 */
+	public $results = null;
+
 
 }
 
@@ -3258,6 +3279,88 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 	 * @var string
 	 */
 	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $emailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rated = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $blogged = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $reviewed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bookmarked = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $playbackFailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $timeSpent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $recommended = null;
+
+
+}
+
+class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $resultParseData = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	public $resultParserType = null;
 
 
 }
