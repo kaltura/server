@@ -19,6 +19,8 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if($taskConfig->params->tempXmlPath)
 		{
 			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
+			if(!is_dir($this->tempXmlPath))
+				mkdir($this->tempXmlPath, 777, true);
 		}
 		else
 		{
