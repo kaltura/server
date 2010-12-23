@@ -59,9 +59,9 @@ class GenericDistributionEngine extends DistributionEngine implements
 		$destFile = $distributionProfileAction->serverPath;
 			
 		if($distributionProfileAction->protocol != KalturaDistributionProtocol::HTTP && $distributionProfileAction->protocol != KalturaDistributionProtocol::HTTPS)
-		{
 			$destFile .= '/' . $fileName;
-		}
+			
+		$destFile = str_replace('{REMOTE_ID}', $data->remoteId, $destFile);
 		
 		file_put_contents($srcFile, $providerData->xml);
 		KalturaLog::debug("XML written to file [$srcFile]");
@@ -76,6 +76,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		
 		if($results && is_string($results))
 		{
+			$data->results = $results;
 			$parsedValues = $this->parseResults($results, $providerData->resultParserType, $providerData->resultParseData);
 			if(count($parsedValues))
 				list($data->remoteId) = $parsedValues;
@@ -221,6 +222,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	
 		if($results && is_string($results))
 		{
+			$data->results = $results;
 			$parsedValues = $this->parseResults($results, $providerData->resultParserType, $providerData->resultParseData);
 			if(count($parsedValues))
 				list($data->plays, $data->views) = $parsedValues;

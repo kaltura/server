@@ -28,7 +28,29 @@ class kDistributionJobData extends kJobData
 	 * @var kDistributionJobProviderData
 	 */
 	private $providerData;
+
+	/**
+	 * The results as returned from the remote destination
+	 * @var string
+	 */
+	private $results;
 	
+	/**
+	 * @return the $results
+	 */
+	public function getResults()
+	{
+		return $this->results;
+	}
+
+	/**
+	 * @param string $results
+	 */
+	public function setResults($results)
+	{
+		$this->results = $results;
+	}
+
 	/**
 	 * @return the $providerType
 	 */

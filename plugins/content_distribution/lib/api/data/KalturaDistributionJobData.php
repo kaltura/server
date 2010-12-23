@@ -44,6 +44,12 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var KalturaDistributionJobProviderData
 	 */
 	public $providerData;
+
+	/**
+	 * The results as returned from the remote destination
+	 * @var string
+	 */
+	public $results;
 	
 	
 	private static $map_between_objects = array
@@ -52,6 +58,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		"entryDistributionId" ,
 		"remoteId" ,
 		"providerType" ,
+		"results" ,
 	);
 
 	public function getMapBetweenObjects ( )
