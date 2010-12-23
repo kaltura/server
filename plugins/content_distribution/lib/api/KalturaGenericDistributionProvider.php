@@ -115,24 +115,23 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		$object->setUpdateRequiredEntryFields($this->updateRequiredEntryFields);
 		$object->setUpdateRequiredMetadataXpaths($this->updateRequiredMetadataXPaths);
 		
+		$thumbDimensions = array();
 		if($this->optionalThumbDimensions)
 		{
-			$thumbDimensions = array();
 			foreach($this->optionalThumbDimensions as $thumbDimension)
 				$thumbDimensions[] = $thumbDimension->toObject();
-				
-			$object->setOptionalThumbDimensionsObjects($thumbDimensions);
-		}
+		}		
+		$object->setOptionalThumbDimensionsObjects($thumbDimensions);
 	
 		
+		$thumbDimensions = array();
 		if($this->requiredThumbDimensions)
 		{
-			$thumbDimensions = array();
 			foreach($this->requiredThumbDimensions as $thumbDimension)
 				$thumbDimensions[] = $thumbDimension->toObject();
-
-			$object->setRequiredThumbDimensionsObjects($thumbDimensions);
 		}
+		$object->setRequiredThumbDimensionsObjects($thumbDimensions);
+		
 		return $object;		
 	}
 
