@@ -39,6 +39,7 @@ entrydistribution.submitadd													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|con
 entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.validate													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 
 genericdistributionprovider.add												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 genericdistributionprovider.get												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
