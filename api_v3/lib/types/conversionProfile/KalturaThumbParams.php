@@ -47,12 +47,12 @@ class KalturaThumbParams extends KalturaAssetParams
 	public $height = 0;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $scaleWidth = 0;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $scaleHeight = 0;
 	
