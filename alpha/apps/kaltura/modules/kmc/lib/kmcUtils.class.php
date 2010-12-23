@@ -89,13 +89,12 @@ class kmcUtils
 			die;
 			break;
 		    case 2:
-			$kmc2 = "/index.php/kmc/kmc2";
-			header("Location: ".$kmc2);
-			die;
-			break;
 		    case 3:
-			$kmc3 = "/index.php/kmc/kmc3";
-			header("Location: ".$kmc3);
+		    case 4:
+		    default:
+			$ver = $partner->getKmcVersion();
+			$kmc_url = "/index.php/kmc/kmc$ver";
+			header("Location: ".$kmc_url);
 			die;
 			break;
 		}
