@@ -10,30 +10,76 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 	 * @var string
 	 */
 	public $csId;
+	
 	/**
 	 * @var string
 	 */
 	public $source;
+	
 	/**
 	 * @var int
 	 */
 	public $metadataProfileId;
+	
 	/**
 	 * @var string
 	 */
 	public $movFlavorAssetId;
+	
 	/**
 	 * @var string
 	 */
 	public $flvFlavorAssetId;
+	
 	/**
 	 * @var string
 	 */
 	public $wmvFlavorAssetId;
+	
 	/**
 	 * @var string
 	 */
 	public $thumbAssetId;
+	
+	/**
+	 * @var int
+	 */
+	public $emailed;
+	
+	/**
+	 * @var int
+	 */
+	public $rated;
+	
+	/**
+	 * @var int
+	 */
+	public $blogged;
+	
+	/**
+	 * @var int
+	 */
+	public $reviewed;
+	
+	/**
+	 * @var int
+	 */
+	public $bookmarked;
+	
+	/**
+	 * @var int
+	 */
+	public $playbackFailed;
+	
+	/**
+	 * @var int
+	 */
+	public $timeSpent;
+	
+	/**
+	 * @var int
+	 */
+	public $recommended;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -83,6 +129,14 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 		"flvFlavorAssetId" ,
 		"wmvFlavorAssetId" ,
 		"thumbAssetId" ,
+		"emailed" ,
+		"rated" ,
+		"blogged" ,
+		"reviewed" ,
+		"bookmarked" ,
+		"playbackFailed" ,
+		"timeSpent" ,
+		"recommended" ,
 	);
 
 	public function getMapBetweenObjects ( )
