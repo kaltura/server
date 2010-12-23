@@ -50,7 +50,17 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		$distribution->addAttribute('distributionProfileId', $entryDistribution->getDistributionProfileId());
 		
 		if($distributionsProvider)
+		{
 			$distribution->addAttribute('provider', $distributionsProvider->getName());
+			if($distributionsProvider->getType() == DistributionProviderType::GENERIC)
+			{
+				$distribution->addAttribute('distributionProviderId', $distributionsProvider->getId());
+			}
+			else
+			{
+				// TODO append data from the provider plugin
+			}
+		}
 			
 		if($entryDistribution->getRemoteId())
 			$distribution->addChild('remoteId', $entryDistribution->getRemoteId());
