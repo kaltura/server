@@ -25,6 +25,14 @@ class KAsyncDistributeDeleteCloser extends KAsyncDistributeCloser
 	}
 	
 	/* (non-PHPdoc)
+	 * @see KAsyncDistribute::saveEmptyQueue()
+	 */
+	protected function saveEmptyQueue()
+	{
+		$this->saveSchedulerQueue(self::getType());
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KAsyncDistributeCloser::getExclusiveAlmostDoneDistributeJobs()
 	 */
 	public function getExclusiveAlmostDoneDistributeJobs()
@@ -56,9 +64,9 @@ class KAsyncDistributeDeleteCloser extends KAsyncDistributeCloser
 	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::getDistributionEngine()
 	 */
-	protected function getDistributionEngine($providerType)
+	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineCloseDelete', $providerType);
+		return DistributionEngine::getEngine('IDistributionEngineCloseDelete', $providerType, $this->getClient(), $this->taskConfig, $data);
 	}
 	
 	/* (non-PHPdoc)

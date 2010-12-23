@@ -22,13 +22,18 @@ abstract class KAsyncDistribute extends KBatchBase
 	/**
 	 * @return DistributionEngine
 	 */
-	abstract protected function getDistributionEngine($providerType);
+	abstract protected function getDistributionEngine($providerType, KalturaDistributionJobData $data);
 	
 	/**
 	 * Throw detailed exceptions for any failure 
 	 * @return bool true if job is closed, false for almost done
 	 */
 	abstract protected function execute(KalturaDistributionJobData $data);
+	
+	/**
+	 * Saves the typed queue to for the scheduler
+	 */
+	abstract protected function saveEmptyQueue();
 	
 	public function run($jobs = null)
 	{
@@ -45,7 +50,7 @@ abstract class KAsyncDistribute extends KBatchBase
 		if(! count($jobs) > 0)
 		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
+			$this->saveEmptyQueue();
 			return null;
 		}
 		
@@ -61,7 +66,7 @@ abstract class KAsyncDistribute extends KBatchBase
 		
 		try
 		{
-			$this->engine = $this->getDistributionEngine($job->jobSubType);
+			$this->engine = $this->getDistributionEngine($job->jobSubType, $data);
 			if (!$this->engine)
 			{
 				KalturaLog::err('Cannot create DistributeEngine of type ['.$job->jobSubType.']');

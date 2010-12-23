@@ -25,6 +25,14 @@ class KAsyncDistributeSubmit extends KAsyncDistribute
 	}
 	
 	/* (non-PHPdoc)
+	 * @see KAsyncDistribute::saveEmptyQueue()
+	 */
+	protected function saveEmptyQueue()
+	{
+		$this->saveSchedulerQueue(self::getType());
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::getExclusiveDistributeJobs()
 	 */
 	public function getExclusiveDistributeJobs()
@@ -56,9 +64,9 @@ class KAsyncDistributeSubmit extends KAsyncDistribute
 	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::getDistributionEngine()
 	 */
-	protected function getDistributionEngine($providerType)
+	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineSubmit', $providerType);
+		return DistributionEngine::getEngine('IDistributionEngineSubmit', $providerType, $this->getClient(), $this->taskConfig, $data);
 	}
 	
 	/* (non-PHPdoc)
