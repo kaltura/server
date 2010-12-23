@@ -90,9 +90,8 @@ class KalturaDistributionJobData extends KalturaJobData
 			}
 		}
 		
-		$providerData = $sourceObject->getProviderData();
 		$providerType = $sourceObject->getProviderType();
-		if($providerType && $providerData && $providerData instanceof kDistributionJobProviderData)
+		if($providerType)
 		{
 			if($providerType == KalturaDistributionProviderType::GENERIC)
 			{
@@ -103,7 +102,8 @@ class KalturaDistributionJobData extends KalturaJobData
 				$this->providerData = KalturaPluginManager::loadObject('KalturaDistributionJobProviderData', $providerType, array($this));
 			}
 			
-			if($this->providerData)
+			$providerData = $sourceObject->getProviderData();
+			if($this->providerData && $providerData && $providerData instanceof kDistributionJobProviderData)
 				$this->providerData->fromObject($providerData);
 		}
 	}
