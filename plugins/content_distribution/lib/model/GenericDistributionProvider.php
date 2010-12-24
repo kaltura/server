@@ -122,6 +122,18 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	}
 	
 	/**
+	 * @see content_distribution/lib/model/om/BaseGenericDistributionProvider#getRequiredFlavorParamsIds()
+	 * @return array
+	 */
+	public function getRequiredFlavorParamsIdsArray()
+	{
+		if(!$this->getRequiredFlavorParamsIds())
+			return array();
+			
+		return explode(',', $this->getRequiredFlavorParamsIds());
+	}
+	
+	/**
 	 * @return array<kDistributionThumbDimensions>
 	 */
 	public function getRequiredThumbDimensionsObjects()
