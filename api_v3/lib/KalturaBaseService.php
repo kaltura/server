@@ -144,6 +144,32 @@ abstract class KalturaBaseService
 				if ( 0 >= $res )
 				{
 					// chaned this to be an exception rather than an error
+					switch($res)
+					{
+						case ks::INVALID_STR:
+							KalturaLog::err("Required ticket type [$ticket_type] actual ticket type [$ks->type]");
+							break;
+											
+						case ks::INVALID_PARTNER:
+							KalturaLog::err("Wrong partner [$ks_partner_id] actual partner [$ks->partner_id]");
+							break;
+											
+						case ks::INVALID_USER:
+							KalturaLog::err("Wrong user [$ks_puser_id] actual user [$ks->user]");
+							break;
+											
+						case ks::INVALID_TYPE:
+							KalturaLog::err("Required ticket type [$ticket_type] actual ticket type [$ks->type]");
+							break;
+											
+						case ks::EXPIRED:
+							KalturaLog::err("KS Expired [" . date('Y-m-d H:i:s', $ks->valid_until) . "]");
+							break;
+											
+						case ks::LOGOUT:
+							KalturaLog::err("KS already logged out");
+							break;
+					}
 					throw new KalturaAPIException ( APIErrors::INVALID_KS , $ks_str , $res , ks::getErrorStr( $res ));
 				}
 				$this->ks = $ks;
