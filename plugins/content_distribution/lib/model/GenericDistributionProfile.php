@@ -26,7 +26,31 @@ class GenericDistributionProfile extends DistributionProfile
 		return GenericDistributionProviderPeer::retrieveByPK($genericProviderId);
 	}
 	
-
+	public function preSave(PropelPDO $con = null)
+	{
+		$provider = $this->getProvider();
+		if($provider instanceof GenericDistributionProvider)
+		{
+			$requiredFlavorParams = $this->getRequiredFlavorParamsIdsArray();
+			foreach($provider->getRequiredFlavorParamsIdsArray() as $flavorParamsId)
+				if(!in_array($flavorParamsId, $requiredFlavorParams))
+					$requiredFlavorParams[] = $flavorParamsId;
+			$this->setRequiredFlavorParamsIdsArray($requiredFlavorParams);
+			
+			$requiredDimensions = $this->getRequiredThumbDimensionsObjects();
+			$requiredDimensionsKeys = array();
+			foreach($requiredDimensions as $requiredDimension)
+				$requiredDimensionsKeys = $requiredDimension->getKey();
+				
+			foreach($provider->getRequiredThumbDimensionsObjects() as $requiredDimension)
+				if(!in_array($requiredDimension->getKey(), $requiredDimensionsKeys))
+					$requiredDimensions[] = $requiredDimension;
+			$this->setRequiredThumbDimensionsObjects($requiredDimensions);
+		}
+    	
+		return parent::preSave($con);
+	}
+	
 	public function getGenericProviderId()			{return $this->getFromCustomData(self::CUSTOM_DATA_GENERIC_PROVIDER_ID);}
 		
 	public function getProtocol($action)			{return $this->getFromCustomData(self::CUSTOM_DATA_PROTOCOL, $action);}
