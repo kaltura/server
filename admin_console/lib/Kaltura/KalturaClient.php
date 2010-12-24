@@ -9,6 +9,8 @@ class KalturaAccessControlOrderBy
 
 class KalturaAdminUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -280,6 +282,8 @@ class KalturaConversionEngineType
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
 	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const AVIDEMUX = "avidemux.Avidemux";
 }
 
 class KalturaConversionProfileOrderBy
@@ -356,6 +360,7 @@ class KalturaDistributionProviderOrderBy
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const MSN = "msnDistribution.MSN";
 }
 
 class KalturaDocumentType
@@ -1174,6 +1179,8 @@ class KalturaUploadTokenStatus
 
 class KalturaUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
@@ -3146,14 +3153,14 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public $scaleWidth = null;
 
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public $scaleHeight = null;
 
@@ -4320,6 +4327,112 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
+
+}
+
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -4781,6 +4894,13 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public $providerData;
 
+	/**
+	 * The results as returned from the remote destination
+	 *
+	 * @var string
+	 */
+	public $results = null;
+
 
 }
 
@@ -5112,6 +5232,88 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 	 * @var string
 	 */
 	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $emailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rated = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $blogged = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $reviewed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bookmarked = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $playbackFailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $timeSpent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $recommended = null;
+
+
+}
+
+class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $resultParseData = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	public $resultParserType = null;
 
 
 }
@@ -7201,79 +7403,6 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -8917,6 +9046,13 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	 * @readonly
 	 */
 	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
 
 	/**
 	 * 
@@ -12358,7 +12494,7 @@ class KalturaThumbAssetService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "integer");
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
 		return $resultObject;
 	}
 
