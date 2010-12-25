@@ -60,21 +60,21 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			return;
 		}
 		
-		if(is_null($distributionProfile->$actionName->protocol))
+		if(!$distributionProfile->$actionName->protocol)
 			$distributionProfile->$actionName->protocol = $genericProviderAction->getProtocol();
-		if(is_null($distributionProfile->$actionName->serverUrl))
+		if(!$distributionProfile->$actionName->serverUrl)
 			$distributionProfile->$actionName->serverUrl = $genericProviderAction->getServerAddress();
-		if(is_null($distributionProfile->$actionName->serverPath))
+		if(!$distributionProfile->$actionName->serverPath)
 			$distributionProfile->$actionName->serverPath = $genericProviderAction->getRemotePath();
-		if(is_null($distributionProfile->$actionName->username))
+		if(!$distributionProfile->$actionName->username)
 			$distributionProfile->$actionName->username = $genericProviderAction->getRemoteUsername();
-		if(is_null($distributionProfile->$actionName->password))
+		if(!$distributionProfile->$actionName->password)
 			$distributionProfile->$actionName->password = $genericProviderAction->getRemotePassword();
-		if(is_null($distributionProfile->$actionName->ftpPassiveMode))
+		if(!$distributionProfile->$actionName->ftpPassiveMode)
 			$distributionProfile->$actionName->ftpPassiveMode = $genericProviderAction->getFtpPassiveMode();
-		if(is_null($distributionProfile->$actionName->httpFieldName))
+		if(!$distributionProfile->$actionName->httpFieldName)
 			$distributionProfile->$actionName->httpFieldName = $genericProviderAction->getHttpFieldName();
-		if(is_null($distributionProfile->$actionName->httpFileName))
+		if(!$distributionProfile->$actionName->httpFileName)
 			$distributionProfile->$actionName->httpFileName = $genericProviderAction->getHttpFileName();
 	
 		$entry = entryPeer::retrieveByPKNoFilter($distributionJobData->entryDistribution->entryId);
