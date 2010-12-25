@@ -30,68 +30,56 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-if($argc < 2)
-{
-	echo "Entry id must be supplied as attribute\n";
-	exit;
-}
-$entryId = $argv[1];
-$config = array();
-foreach($argv as $arg)
-{
-	$matches = null;
-	if(preg_match('/(.*)=(.*)/', $arg, $matches))
-		$config[$matches[1]] = $matches[2];
-}
+//if($argc < 2)
+//{
+//	echo "Entry id must be supplied as attribute\n";
+//	exit;
+//}
+//$entryId = $argv[1];
+//$config = array();
+//foreach($argv as $arg)
+//{
+//	$matches = null;
+//	if(preg_match('/(.*)=(.*)/', $arg, $matches))
+//		$config[$matches[1]] = $matches[2];
+//}
 
-$entry = entryPeer::retrieveByPK($entryId);
+$entryId = '0_4c6o03wp';
+
+$providerData = new KalturaMsnDistributionJobProviderData();
+$providerData->csId = 'Fox Sports';
+$providerData->source = 'FOX_big12';
+$providerData->metadataProfileId = 36;
+$providerData->movFlavorAssetId = '0_vo1lfb5n';
+$providerData->flvFlavorAssetId = '0_qz9lzewf';
+$providerData->wmvFlavorAssetId = '0_qz9lzewf';
+$providerData->thumbAssetId = '0_1e6adevn';
+
+$data = new KalturaDistributionSubmitJobData();
+$data->providerData = $providerData; 
+$data->distributionProfile = new KalturaMsnDistributionProfile();
+//$data->distributionProfile->domain = 'tools.catalog.video.msn-int.com';
+$data->distributionProfile->domain = 'catalog.video.msn.com';
+$data->distributionProfile->username = 'Jonathan.Kanariek@kaltura.com';
+$data->distributionProfile->password = 'aMdlW2Cf';
+
+$entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
-
-file_put_contents('entry.xml', $mrss);
-//exit;
-
-if(!$mrss)
-	return;
-	
-$xml = new DOMDocument();
-if(!$xml->loadXML($mrss))
-	return;
-	
-$xslPath = dirname(__FILE__) . '/submit.xsl';
-$xsl = new DOMDocument();
-$xsl->load($xslPath);
-
-$varNodes = $xsl->getElementsByTagName('variable');
-foreach($varNodes as $varNode)
-{
-	$nameAttr = $varNode->attributes->getNamedItem('name');
-	if(!$nameAttr)
-		continue;
+file_put_contents('mrss.xml', $mrss);
+//var_dump($mrss);
 		
-	$name = $nameAttr->value;
-	if($name && isset($config[$name]))
-	{
-		$varNode->textContent = $config[$name];
-		$varNode->appendChild($xsl->createTextNode($config[$name]));
-		KalturaLog::debug("Set config $name to [" . $config[$name] . "]");
-	}
-}
-file_put_contents('out.xsl', $xsl->saveXML());
+$xml = MsnDistributionProvider::generateSubmitXML($entryId, $providerData);
+$providerData->xml = $xml;
+file_put_contents('out.xml', $xml);
+//var_dump($xml);
 
-$proc = new XSLTProcessor;
-$proc->registerPHPFunctions();
-$proc->importStyleSheet($xsl);
+//$xml = file_get_contents('example.xml');
+$providerData->xml = $xml;
 
-$xml = $proc->transformToDoc($xml);
-if(!$xml)
-	return;
-	
-//$xsdPath = dirname(__FILE__) . '/submit.xsd';
-//if($xsdPath && !$xml->schemaValidate($xsdPath))		
-//	return;
+$engine = new MsnDistributionEngine();
+$engine->submit($data);
 
-file_put_contents('out.xml', $xml->saveXML());
-echo $xml->saveXML();
+var_dump($data->remoteId);
 
-echo time() . "\n";
-
+//$data->remoteId = '56ee9481-6463-42fa-b9b7-e784d73bd514';
+$engine->closeSubmit($data);
