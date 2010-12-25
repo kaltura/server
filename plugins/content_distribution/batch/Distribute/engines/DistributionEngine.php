@@ -18,7 +18,7 @@ abstract class DistributionEngine implements IDistributionEngine
 		$engine = null;
 		if($providerType == KalturaDistributionProviderType::GENERIC)
 		{
-			$engine = new GenericDistributionEngine($kalturaClient);
+			$engine = new GenericDistributionEngine();
 		}
 		else
 		{
