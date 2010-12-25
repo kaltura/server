@@ -217,7 +217,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		$xslPath = dirname(__FILE__) . '/../../xml/submit.xsl';
+		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsl';
 		if(!file_exists($xslPath))
 		{
 			KalturaLog::err("XSL file not found [$xslPath]");
@@ -253,7 +253,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 			
-		$xsdPath = dirname(__FILE__) . '/../../xml/submit.xsd';
+		$xsdPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsd';
 		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
 		{
 			KalturaLog::err("Schema validation failed");		
