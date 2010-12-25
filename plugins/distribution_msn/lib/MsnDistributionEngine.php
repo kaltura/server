@@ -62,7 +62,9 @@ class MsnDistributionEngine extends DistributionEngine implements
 			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
 		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
-		$data->remoteId = trim($results);
+		$matches = null;
+		if(preg_match('/<uuid[^>]*>([^<]+)<\/uuid>/', $results, $matches))
+			$data->remoteId = $matches[1];
 		
 		return false;
 	}
@@ -124,10 +126,14 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$publishState = $this->fetchStatus($data);
+		KalturaLog::err("publishState [$publishState]");
 		switch($publishState)
 		{
 			case 'Published':
 				return true;
+				
+			case 'Pending':
+				return false;
 				
 			case 'Error':
 				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
@@ -152,7 +158,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchStatus(KalturaDistributionSubmitJobData $data)
 	{
-		$xml = $this->fetchXML($data);
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+	
+		$xml = $this->fetchXML($data, $data->distributionProfile);
 			
 		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
 		if($publishStateAttr)
@@ -166,7 +175,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 * @throws Exception
 	 * @return DOMDocument
 	 */
-	public function fetchXML(KalturaDistributionSubmitJobData $data)
+	public function fetchXML(KalturaDistributionSubmitJobData $data, KalturaMsnDistributionProfile $distributionProfile)
 	{
 		$domain = $this->defaultDomain;
 		if(!is_null($distributionProfile->domain))
@@ -289,7 +298,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		$xml = $this->fetchXML($data);
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+	
+		$xml = $this->fetchXML($data, $data->distributionProfile);
 			
 		$usageNodes = $xml->documentElement->getElementsByTagName('usageItem');
 		if(!$usageNodes->length)
