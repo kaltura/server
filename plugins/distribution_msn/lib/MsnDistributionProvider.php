@@ -191,7 +191,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
-			
+		
 		return $xml->saveXML();
 	}
 	
@@ -244,6 +244,7 @@ class MsnDistributionProvider implements IDistributionProvider
 		}
 
 		$proc = new XSLTProcessor;
+		$proc->registerPHPFunctions();
 		$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
