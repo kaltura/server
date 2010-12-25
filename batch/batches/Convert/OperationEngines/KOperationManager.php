@@ -14,6 +14,9 @@ class KOperationManager
 	public static function getEngine($type, KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		$engine = self::createNewEngine($type, $taskConfig, $data);
+		if(!$engine)
+			return null;
+			
 		$engine->configure($taskConfig, $data);
 		return $engine;
 	}
