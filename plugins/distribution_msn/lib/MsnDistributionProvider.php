@@ -202,7 +202,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
 		if(!$mrss)
 		{
