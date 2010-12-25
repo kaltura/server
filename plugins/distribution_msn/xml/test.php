@@ -69,12 +69,12 @@ $data->distributionProfile->password = 'aMdlW2Cf';
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 file_put_contents('mrss.xml', $mrss);
-//var_dump($mrss);
+KalturaLog::debug("MRSS [$mrss]");
 		
 $xml = MsnDistributionProvider::generateSubmitXML($entryId, $providerData);
 $providerData->xml = $xml;
 file_put_contents('out.xml', $xml);
-//var_dump($xml);
+KalturaLog::debug("XML [$xml]");
 
 //$xml = file_get_contents('example.xml');
 $providerData->xml = $xml;
@@ -83,6 +83,7 @@ $engine = new MsnDistributionEngine();
 $engine->submit($data);
 
 var_dump($data->remoteId);
+KalturaLog::debug("remoteId [$data->remoteId]");
 
 //$data->remoteId = '56ee9481-6463-42fa-b9b7-e784d73bd514';
 $engine->closeSubmit($data);
