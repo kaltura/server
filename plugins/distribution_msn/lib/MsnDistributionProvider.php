@@ -136,7 +136,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateDeleteXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$xml = $this->generateXML($entryId, $providerData);
+		$xml = self::generateXML($entryId, $providerData);
 		return $xml->saveXML();
 	}
 	
@@ -147,7 +147,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateUpdateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$xml = $this->generateXML($entryId, $providerData);
+		$xml = self::generateXML($entryId, $providerData);
 	
 		// change end time to 5 days from now (it's an MSN hack)
 		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
@@ -174,7 +174,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateSubmitXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$xml = $this->generateXML($entryId, $providerData);
+		$xml = self::generateXML($entryId, $providerData);
 		return $xml->saveXML();
 	}
 	
