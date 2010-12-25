@@ -138,7 +138,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
+		{
+			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
+		}
 			
 		return $xml->saveXML();
 	}
@@ -152,7 +155,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
+		{
+			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
+		}
 	
 		// change end time to 5 days from now (it's an MSN hack)
 		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
@@ -181,7 +187,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
+		{
+			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
+		}
 			
 		return $xml->saveXML();
 	}
@@ -196,15 +205,24 @@ class MsnDistributionProvider implements IDistributionProvider
 		$entry = entryPeer::retrieveByPK($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
 		if(!$mrss)
+		{
+			KalturaLog::err("No MRSS returned for entry [$entryId]");
 			return null;
+		}
 			
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($mrss))
+		{
+			KalturaLog::err("Could not load MRSS as XML for entry [$entryId]");
 			return null;
+		}
 		
 		$xslPath = dirname(__FILE__) . '/../../xml/submit.xsl';
 		if(!file_exists($xslPath))
+		{
+			KalturaLog::err("XSL file not found [$xslPath]");
 			return null;
+		}
 		$xsl = new DOMDocument();
 		$xsl->load($xslPath);
 			
@@ -230,11 +248,17 @@ class MsnDistributionProvider implements IDistributionProvider
 		
 		$xml = $proc->transformToDoc($xml);
 		if(!$xml)
+		{
+			KalturaLog::err("XML Transformation failed");
 			return null;
+		}
 			
 		$xsdPath = dirname(__FILE__) . '/../../xml/submit.xsd';
-		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))		
+		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
+		{
+			KalturaLog::err("Schema validation failed");		
 			return null;
+		}
 		
 		return $xml;
 	}
