@@ -87,7 +87,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 		
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, false);
@@ -180,7 +179,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 		
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_FORBID_REUSE, true); 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
