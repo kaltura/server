@@ -252,6 +252,37 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseEntryDistribution#postUpdate()
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		$objectUpdated = $this->isModified();
+		$objectDeleted = false;
+		if($this->isColumnModified(EntryDistributionPeer::STATUS) && $this->getStatus() == EntryDistributionStatus::DELETED)
+			$objectDeleted = true;
+			
+		$ret = parent::postUpdate($con);
+		
+		if($objectDeleted)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+			
+		return $ret;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/om/BaseEntryDistribution#postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
 
 	public function getSubmitResultsVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION);}
 	public function getUpdateResultsVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION);}
