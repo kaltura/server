@@ -30,19 +30,12 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-//if($argc < 2)
-//{
-//	echo "Entry id must be supplied as attribute\n";
-//	exit;
-//}
-//$entryId = $argv[1];
-//$config = array();
-//foreach($argv as $arg)
-//{
-//	$matches = null;
-//	if(preg_match('/(.*)=(.*)/', $arg, $matches))
-//		$config[$matches[1]] = $matches[2];
-//}
+if($argc < 2)
+{
+	echo "Entry id must be supplied as attribute\n";
+	exit;
+}
+$entryId = $argv[1];
 
 $entryId = '0_4c6o03wp';
 
@@ -54,6 +47,16 @@ $providerData->movFlavorAssetId = '0_vo1lfb5n';
 $providerData->flvFlavorAssetId = '0_qz9lzewf';
 $providerData->wmvFlavorAssetId = '0_qz9lzewf';
 $providerData->thumbAssetId = '0_1e6adevn';
+
+foreach($argv as $arg)
+{
+	$matches = null;
+	if(preg_match('/(.*)=(.*)/', $arg, $matches))
+	{
+		$field = $matches[1];
+		$providerData->$field = $matches[2];
+	}
+}
 
 $data = new KalturaDistributionSubmitJobData();
 $data->providerData = $providerData; 
