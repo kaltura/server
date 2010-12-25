@@ -64,7 +64,13 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		$matches = null;
 		if(preg_match('/<uuid[^>]*>([^<]+)<\/uuid>/', $results, $matches))
+		{
 			$data->remoteId = $matches[1];
+		}
+		else 
+		{
+			throw new Exception("No uuid returned from MSN");
+		}
 		
 		return false;
 	}
