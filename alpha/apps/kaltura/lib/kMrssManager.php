@@ -212,10 +212,10 @@ class kMrssManager
 				$mrss->addChild('category', self::stringToSafeXml($category));
 		
 		if($entry->getStartDate(null))
-			$mrss->addChild('startDate', $entry->getStartDate());
+			$mrss->addChild('startDate', $entry->getStartDate(null));
 		
 		if($entry->getEndDate(null))
-			$mrss->addChild('endDate', $entry->getEndDate());
+			$mrss->addChild('endDate', $entry->getEndDate(null));
 		
 		switch($entry->getType())
 		{
