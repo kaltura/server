@@ -66,7 +66,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 				
 		foreach($metadata as $metadataField => $metadataValue)
 		{
-			if($metadataValue instanceof SimpleXMLElement)
+			if($metadataValue instanceof SimpleXMLElement && $metadataValue->count())
 				$this->contributeMetadataObject($metadataObject, $metadataValue);
 			else
 				$metadataObject->addChild($metadataField, $metadataValue);
