@@ -1,12 +1,12 @@
 <?php
-class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
+class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
-	// TODO - add event consumer to take the statistics from fetch report and save in entry distribution
-	
 	const PLUGIN_NAME = 'msnDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
+	
+	const MSN_REPORT_HANDLER = 'kMsnDistributionReportHandler';
 
 	public static function getPluginName()
 	{
@@ -205,5 +205,15 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::MSN_REPORT_HANDLER,
+		);
 	}
 }
