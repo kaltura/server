@@ -5,7 +5,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 	
 $stopFile = dirname(__FILE__).'/stop_user_migration'; // creating this file will stop the script
-$userLimitEachLoop = 20;
+$userLimitEachLoop = 1000;
 $admin_console_partner_id = -2;
 
 //------------------------------------------------------
@@ -60,6 +60,9 @@ while(count($users))
 		
 		$new_kuser = new kuser();
 		$new_login_data = new UserLoginData();
+		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
+		$user->setEmail($partner->getAdminEmail());
+		$user->setFullName($partner->getAdminName());
 		
 		list($firstName, $lastName) = kString::nameSplit($user->getFullName());
 		
@@ -92,18 +95,15 @@ while(count($users))
 		// check for existing kusers for this admin_kuser
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::PUSER_ID, '__ADMIN__' . $user->getId());
-		$existing_kusers = kuserPeer::doSelect($c, $con);
+		$existing_kuser = kuserPeer::doSelectOne($c, $con);
 		
-		if ($existing_kusers)
+		if ($existing_kuser)
 		{
-			foreach ($existing_kusers as $kuser)
-			{
-				$kuser->setFirstName($firstName);
-				$kuser->setLastName($lastName);
-				$kuser->setEmail($user->getEmail());
-				$kuser->setIsAdmin(true);
-				$kuser->setIsRootUser(true);
-			}
+			$existing_kuser->setFirstName($firstName);
+			$existing_kuser->setLastName($lastName);
+			$existing_kuser->setEmail($user->getEmail());
+			$existing_kuser->setIsAdmin(true);
+			$partner->setAccountOwnerKuserId($existing_kuser->getId());
 		}
 		else
 		{
@@ -117,29 +117,27 @@ while(count($users))
 			$new_kuser->setPicture($user->getPicture());
 			$new_kuser->setPuserId('__ADMIN__'.$user->getId());
 			$new_kuser->setIsAdmin(true);
-			$new_kuser->setIsRootUser(true);
 			if ($new_kuser->getPartnerId() == $admin_console_partner_id) {
 				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
 				$partnerData->isPrimary = null;
  				$partnerData->role = null;
  				$new_kuser->setPartnerData(serialize($partnerData));
 			}
+			$partner->setAccountOwnerKuserId($new_kuser->getId());
 		}
+		
 		
 		if (!$dryRun) {
 			KalturaLog::log('Saving new user_login_data with the following parameters: ');
 			KalturaLog::log(print_r($new_login_data, true));
 			$new_login_data->save(); // save
 			
-			if ($existing_kusers)
+			if ($existing_kuser)
 			{
-				foreach ($existing_kusers as $kuser)
-				{
-					$kuser->setLoginDataId($new_login_data->getId());
-					KalturaLog::log('Saving EXISTING kuser with the following parameters: ');
-					KalturaLog::log(print_r($kuser, true));			
-					$kuser->save(); // save
-				}
+				$existing_kuser->setLoginDataId($new_login_data->getId());
+				KalturaLog::log('Saving EXISTING kuser with the following parameters: ');
+				KalturaLog::log(print_r($existing_kuser, true));			
+				$existing_kuser->save(); // save
 			}
 			else
 			{
@@ -148,6 +146,8 @@ while(count($users))
 				KalturaLog::log(print_r($new_kuser, true));			
 				$new_kuser->save(); // save
 			}
+			KalturaLog::log('Saving partner ['.$partner->getId().'] with account owner kuser ID ['.$partner->getAccountOwnerKuserId().']');
+			$partner->save();
 		}
 		else {
 			KalturaLog::log('DRY RUN - records are not being saved: ');
@@ -155,6 +155,8 @@ while(count($users))
 			KalturaLog::log(print_r($new_login_data, true));
 			KalturaLog::log('Newkuser with the following parameters (login_data_id unknown): ');
 			KalturaLog::log(print_r($new_kuser, true));
+			KalturaLog::log('DRY RUN - saving partner ['.$partner->getId().'] with account owner kuser ID ['.$partner->getAccountOwnerKuserId().']');
+			
 		}		
 				
 		file_put_contents($lastUserFile, $lastUser);

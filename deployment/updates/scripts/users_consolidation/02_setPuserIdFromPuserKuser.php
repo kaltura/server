@@ -5,7 +5,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 	
 $stopFile = dirname(__FILE__).'/stop_puser_id_migration'; // creating this file will stop the script
-$userLimitEachLoop = 20;
+$userLimitEachLoop = 10000;
 
 //------------------------------------------------------
 

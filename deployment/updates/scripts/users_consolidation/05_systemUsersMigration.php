@@ -6,7 +6,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 	
 $admin_console_partner_id = -2;
 $stopFile = dirname(__FILE__).'/stop_user_migration'; // creating this file will stop the script
-$userLimitEachLoop = 20; //TODO: change
+$userLimitEachLoop = 1000; //TODO: change
 
 //------------------------------------------------------
 
