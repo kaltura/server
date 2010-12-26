@@ -3,7 +3,7 @@
   <xsd:element name="metadata">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element id="md_4185A378-6ABB-33AF-9D69-093FFD503410" name="MSNVideoCat" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="MSNVideoCat" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
@@ -14,7 +14,7 @@
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element id="md_D53CF50E-167B-0BF8-9442-09401E93AEB6" name="MSNVideoTop" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="MSNVideoTop" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
@@ -25,7 +25,7 @@
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element id="md_FBDBB93E-B485-FF45-0D46-094038D29D11" name="MSNVideoTopCat" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="MSNVideoTopCat" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
@@ -36,7 +36,7 @@
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element id="md_62ACC1CD-2A13-67E9-8659-094052554BC6" name="MSNPublic" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="MSNPublic" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation></xsd:documentation>
             <xsd:appinfo>
