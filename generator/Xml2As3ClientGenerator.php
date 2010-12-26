@@ -121,9 +121,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		//every VO can return an Array with all the his properties and is inheritance properties
 		///////////////////////////////////////////////
 		if($xml->attributes()->base)
-			$str .= "override public function getUpdateableParamKeys():Array\n";
+			$str .= "		override public function getUpdateableParamKeys():Array\n";
 		else
-			$str .= "public function getUpdateableParamKeys():Array\n";
+			$str .= "		public function getUpdateableParamKeys():Array\n";
 
 		$str .="		{\n";
 		$str .= "			var arr : Array;\n";
