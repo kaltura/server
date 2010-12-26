@@ -44,12 +44,14 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @filter order
+	 * @insertonly
 	 */
 	public $adminName;
 	
 	/**
 	 * @var string
 	 * @filter order
+	 * @insertonly
 	 */
 	public $adminEmail;
 	
@@ -181,6 +183,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $adminLoginUsersQuota;
 	
+	/**
+	 * @var string
+	 */
+	public $adminUserId;
+	
+	
 	private static $map_between_objects = array
 	(
 		"id" , "name", "website" => "url1" , "notificationUrl" => "url2" , "appearInSearch" , "createdAt" , "adminName" , "adminEmail" ,
@@ -197,7 +205,15 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function fromPartner(Partner $partner)
 	{
 		parent::fromObject($partner);
+		$this->adminEmail = $partner->getAdminEmail();
+		$this->adminName = $partner->getAdminName();
+		$this->adminUserId = $partner->getAdminUserId();
 		return $this;
+	}
+	
+	public function fromObject ( $source_object  )
+	{
+		return self::fromPartner($source_object);
 	}
 	
 	public function toPartner()

@@ -50,6 +50,10 @@ class kuser extends Basekuser
 			$this->setIsAdmin(false);
 		}
 		
+		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser()) {
+			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , partnerservice::KALTURAS_PARTNER_EMAIL_CHANGE );
+		}
+		
 		return parent::save( $con );	
 	}
 	
@@ -677,7 +681,7 @@ class kuser extends Basekuser
 	 */
 	public function setStatus($status)
 	{
-		if ($status == KuserStatus::DELETED && $this->getIsRootUser()) {
+		if ($status == KuserStatus::DELETED && $this->isRootUser()) {
 			throw new kUserException('', kUserException::CANNOT_DELETE_ROOT_ADMIN_USER);
 		}
 		
@@ -793,14 +797,24 @@ class kuser extends Basekuser
 		return $this;
 	}
 	
-	public function setIsRootUser($isRootUser)
+	public function isRootUser()
 	{
-		$this->putInCustomData('is_root_user', $isRootUser);
+		$partner = $this->getPartner();
+		if (!$partner) {
+			return false;
+		}
+		else {
+			return $this->getId() == $partner->getAccountOwnerKuserId();
+		}
 	}
 	
-	public function getIsRootUser()
+	/**
+	 * @return Partner
+	 */
+	public function getPartner()
 	{
-		return $this->getFromCustomData('is_root_user');
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		return $partner;
 	}
 	
 	// ----------------------------------------

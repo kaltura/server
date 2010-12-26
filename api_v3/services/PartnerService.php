@@ -109,13 +109,31 @@ class PartnerService extends KalturaBaseService
 		if ( ! $dbPartner )
 			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
 		
-		$partnerUpdate = $partner->toPartner();
-		
-		if ( isset($partner->adminEmail) && $partner->adminEmail && $partnerUpdate->getAdminEmail() != $dbPartner->getAdminEmail() )
-		{
-			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $dbPartner->getAdminEmail(), $partnerUpdate->getAdminEmail(), $dbPartner->getName() , partnerservice::KALTURAS_PARTNER_EMAIL_CHANGE );
+		try {
+			$partnerUpdate = $partner->toPartner();
+			$partnerUpdate->setId($dbPartner->getId());
+			
+			if ($partner->adminUserId) {
+				$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $partner->adminUserId);
+				if (!$adminKuser) {
+					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+				}
+				$partnerUpdate->setAccountOwnerKuserId($adminKuser->getId());
+			}
 		}
-
+		catch(kUserException $e) {
+			if ($e->getCode() === kUserException::USER_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+			}
+			throw $e;
+		}
+		catch(kPermissionException $e) {
+			if ($e->getCode() === kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE) {
+				throw new KalturaAPIException(KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
+			}
+			throw $e;			
+		}		
+		
 		// TODO - what is the $allowEmpty policy  ?
 		baseObjectUtils::autoFillObjectFromObject ( $partnerUpdate , $dbPartner , $allowEmpty );
 		

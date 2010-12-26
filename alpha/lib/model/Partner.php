@@ -602,6 +602,82 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('pass_reset_url_prefix');
 	}
 	
+	
+	// -------------------------------------------------
+	// -- start of account owner kuser related functions
+	// -------------------------------------------------
+		
+	
+	/**
+	 * @throws kUserException::USER_NOT_FOUND
+	 * @throws kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE
+	 */
+	public function setAccountOwnerKuserId($kuserId)
+	{
+		$kuser = kuserPeer::retrieveByPK($kuserId);
+		if (!$kuser || $kuser->getPartnerId() != $this->getId()) {
+			throw new kUserException('', kUserException::USER_NOT_FOUND);
+		}
+		$kuserRoles = explode(',', $kuser->getUserRoleIds());
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::STR_ID, UserRoleId::PARTNER_ADMIN_ROLE, Criteria::EQUAL);
+		$adminUserRole = UserRolePeer::doSelectOne($c);
+		if (!in_array($adminUserRole->getId(), $kuserRoles)) {
+			throw new kPermissionException('', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
+		}		
+		$this->putInCustomData('account_owner_kuser_id', $kuserId);
+	}
+	
+	public function getAccountOwnerKuserId()
+	{
+		return $this->getFromCustomData('account_owner_kuser_id');
+	}
+	
+	public function getAdminUserId()
+	{
+		$ownerKuserId = $this->getAccountOwnerKuserId();
+		if (!$ownerKuserId) {
+			return null;
+		}
+		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+		return $ownerKuser->getPuserId();
+	}
+
+	
+	public function getAdminEmail()
+	{
+		$ownerKuserId = $this->getAccountOwnerKuserId();
+		if (!$ownerKuserId) {
+			return parent::getAdminEmail();
+		}
+		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+		if (!$ownerKuser) {
+			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
+			return null;
+		}
+		return $ownerKuser->getEmail();	
+	}
+	
+	public function getAdminName()
+	{
+		$ownerKuserId = $this->getAccountOwnerKuserId();
+		if (!$ownerKuserId) {
+			return parent::getAdminName();
+		}
+		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+		if (!$ownerKuser) {
+			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
+			return null;
+		}
+		return $ownerKuser->getFullName();		
+	}
+		
+	// -----------------------------------------------
+	// -- end of account owner kuser related functions
+	// -----------------------------------------------
+	
+	
+	
 	// ------------------------------------
 	// -- start of enabled special features
 	// ------------------------------------

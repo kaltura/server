@@ -289,5 +289,7 @@
 		const PERMISSION_ALREADY_EXISTS = "PERMISSION_ALREADY_EXISTS,Permission [%s] already exists for partner [%s]";
 	
 		const USER_IS_BLOCKED = "USER_IS_BLOCKED,User is blocked";
+		
+		const ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE = "ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE,Account owner must have a partner administrator role";
 	}
 ?>

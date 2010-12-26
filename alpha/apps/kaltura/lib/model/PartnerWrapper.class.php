@@ -20,7 +20,7 @@ class PartnerWrapper extends objectWrapperBase
 		"adminEmail" , "description" , "commercialUse" , "landingPage" , "userLandingPage", "notificationsConfig",
 		"notify", "allowMultiNotification" , "contentCategories" , "type" , 
 		"landingPage" , "userLandingPage" , "phone" , "describeYourself" , "adultContent" , "defConversionProfileType",
-		"allowQuickEdit" , "mergeEntryLists" , "maxUploadSize" );
+		"allowQuickEdit" , "mergeEntryLists" , "maxUploadSize", "accountOwnerKuserId" );
 
 	public function describe()
 	{
@@ -35,5 +35,6 @@ class PartnerWrapper extends objectWrapperBase
 	{
 		return $this->updateable_fields;
 	}
+
 }
 ?>

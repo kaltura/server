@@ -234,14 +234,13 @@ class myPartnerRegistration
 
 		$kuser->setPartnerId($newPartner->getId());
 		$kuser->setIsAdmin(true);
-		$kuser->setIsRootUser(true);
 		$kuser->setPuserId($newPartner->getAdminEmail());
 
 		$kuser = kuserPeer::addUser($kuser, $password, false); //this also saves the kuser and adds a user_login_data record
 		
 		$loginData = UserLoginDataPeer::retrieveByPK($kuser->getLoginDataId());
 	
-		return array($password, $loginData->getPasswordHashKey());
+		return array($password, $loginData->getPasswordHashKey(), $kuser->getId());
 	}
 
 	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
@@ -284,7 +283,8 @@ class myPartnerRegistration
 
 			// create a new admin_kuser for the user,
 			// so he will be able to login to the system (including permissions)
-			list($newAdminKuserPassword, $newPassHashKey) = $this->createNewAdminKuser($newPartner , $password );
+			list($newAdminKuserPassword, $newPassHashKey, $kuserId) = $this->createNewAdminKuser($newPartner , $password );
+			$newPartner->setAccountOwnerKuserId($kuserId);
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
 		}
