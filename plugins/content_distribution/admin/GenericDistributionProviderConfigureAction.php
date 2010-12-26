@@ -147,9 +147,9 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 					
 					$optionalFlavorParamsIds = array();
 					$requiredFlavorParamsIds = array();
-					if($genericDistributionProvider->optionalFlavorParamsIds)
+					if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
 						$optionalFlavorParamsIds = explode(',', $genericDistributionProvider->optionalFlavorParamsIds);
-					if($genericDistributionProvider->requiredFlavorParamsIds)
+					if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
 						$requiredFlavorParamsIds = explode(',', $genericDistributionProvider->requiredFlavorParamsIds);
 						
 					$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
