@@ -90,8 +90,8 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
-			$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText)";
-			$additionalConditions[] = '(@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts)";
+			$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
+			$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts";
 			
 			return $additionalConditions;
 		}
@@ -107,8 +107,8 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 					
 			foreach($freeTextsArr as $freeText)
 			{
-				$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText)";
-				$additionalConditions[] = '(@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText)";
+				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
+				$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText";
 			}
 			return $additionalConditions;
 		}
@@ -119,8 +119,8 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 				unset($freeTextsArr[$valIndex]);
 				
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-		$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr)";
-		$additionalConditions[] = '(@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr)";
+		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
+		$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
 		return $additionalConditions;
 	}
 	

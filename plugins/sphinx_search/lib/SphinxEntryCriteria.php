@@ -179,7 +179,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 		
 		if(count($this->matchClause))
 		{
-			$matches = implode(' & ', $this->matchClause);
+			$matches = '(' . implode(') & (', $this->matchClause) . ')';
 			$this->whereClause[] = "MATCH('$matches')";
 		}
 		
@@ -366,7 +366,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 							
 					foreach($freeTextsArr as $freeText)
 					{
-						$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText)";
+						$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
 					}
 				}
 				else
@@ -381,7 +381,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 					}
 							
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-					$additionalConditions[] = "(@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr)";
+					$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
 				}
 			}
 			if(count($additionalConditions))
