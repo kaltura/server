@@ -20,6 +20,7 @@ class assetParamsFilter extends baseObjectFilter
 			"_eq_thumb_params_version",
 			"_eq_thumb_asset_id",
 			"_eq_thumb_asset_version",
+			"_eq_format",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at")	;
