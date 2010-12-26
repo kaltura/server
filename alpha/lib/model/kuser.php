@@ -69,7 +69,7 @@ class kuser extends Basekuser
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
 		
-		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser() && !is_null($kuser->oldColumnsValues[kuserPeer::EMAIL])) {
+		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
 					
