@@ -60,6 +60,12 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			return;
 		}
 		
+		if(!$distributionJobData->entryDistribution)
+		{
+			KalturaLog::err("Entry Distribution object not provided");
+			return;
+		}
+		
 		if(!$distributionProfile->$actionName->protocol)
 			$distributionProfile->$actionName->protocol = $genericProviderAction->getProtocol();
 		if(!$distributionProfile->$actionName->serverUrl)
@@ -106,8 +112,26 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 			{
 				$xsl = new DOMDocument();
 				$xsl->load($xslPath);
+			
+				// set variables in the xsl
+				$varNodes = $xsl->getElementsByTagName('variable');
+				foreach($varNodes as $varNode)
+				{
+					$nameAttr = $varNode->attributes->getNamedItem('name');
+					if(!$nameAttr)
+						continue;
+						
+					$name = $nameAttr->value;
+					if($name && $distributionJobData->$name)
+					{
+						$varNode->textContent = $distributionJobData->$name;
+						$varNode->appendChild($xsl->createTextNode($distributionJobData->$name));
+						KalturaLog::debug("Set variable [$name] to [{$distributionJobData->$name}]");
+					}
+				}
 				
 				$proc = new XSLTProcessor;
+				$proc->registerPHPFunctions();
 				$proc->importStyleSheet($xsl);
 				
 				$xml = $proc->transformToDoc($xml);
