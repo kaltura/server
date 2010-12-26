@@ -8,7 +8,6 @@
  */
 class PartnerService extends KalturaBaseService 
 {
-	const KALTURAS_PARTNER_EMAIL_CHANGE = 52;
 	// use initService to add a peer to the partner filter
 	/**
 	 * @ignore

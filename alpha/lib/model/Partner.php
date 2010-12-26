@@ -612,19 +612,22 @@ class Partner extends BasePartner
 	 * @throws kUserException::USER_NOT_FOUND
 	 * @throws kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE
 	 */
-	public function setAccountOwnerKuserId($kuserId)
+	public function setAccountOwnerKuserId($kuserId, $doChecks = true) //$doChecks needed to support user migration and can later be deleted
 	{
-		$kuser = kuserPeer::retrieveByPK($kuserId);
-		if (!$kuser || $kuser->getPartnerId() != $this->getId()) {
-			throw new kUserException('', kUserException::USER_NOT_FOUND);
-		}
-		$kuserRoles = explode(',', $kuser->getUserRoleIds());
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::STR_ID, UserRoleId::PARTNER_ADMIN_ROLE, Criteria::EQUAL);
-		$adminUserRole = UserRolePeer::doSelectOne($c);
-		if (!in_array($adminUserRole->getId(), $kuserRoles)) {
-			throw new kPermissionException('', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
-		}		
+		if ($doChecks)
+		{
+			$kuser = kuserPeer::retrieveByPK($kuserId);
+			if (!$kuser || $kuser->getPartnerId() != $this->getId()) {
+				throw new kUserException('', kUserException::USER_NOT_FOUND);
+			}
+			$kuserRoles = explode(',', $kuser->getUserRoleIds());
+			$c = new Criteria();
+			$c->addAnd(UserRolePeer::STR_ID, UserRoleId::PARTNER_ADMIN_ROLE, Criteria::EQUAL);
+			$adminUserRole = UserRolePeer::doSelectOne($c);
+			if (!in_array($adminUserRole->getId(), $kuserRoles)) {
+				throw new kPermissionException('', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
+			}
+		}	
 		$this->putInCustomData('account_owner_kuser_id', $kuserId);
 	}
 	

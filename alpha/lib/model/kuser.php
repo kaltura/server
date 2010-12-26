@@ -49,11 +49,7 @@ class kuser extends Basekuser
 		if (!$this->getIsAdmin()) {
 			$this->setIsAdmin(false);
 		}
-		
-		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser()) {
-			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , partnerservice::KALTURAS_PARTNER_EMAIL_CHANGE );
-		}
-		
+					
 		return parent::save( $con );	
 	}
 	
@@ -69,8 +65,12 @@ class kuser extends Basekuser
 		}
 			
 		$oldLoginDataId = null;
-			if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
+		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
+		}
+		
+		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser() && !is_null($kuser->oldColumnsValues[kuserPeer::EMAIL])) {
+			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
 					
 		$ret = parent::postUpdate($con);

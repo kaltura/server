@@ -37,9 +37,7 @@ class updatepartnerAction extends defPartnerservices2Action
 	protected function addUserOnDemand ( )	{		return self::CREATE_USER_FALSE;	}
 
 	protected function allowEmptyPuser()	{		return true;	}
-	
-	const KALTURAS_PARTNER_EMAIL_CHANGE = 52;
-		
+			
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
 		$allow_empty = $this->getP ( "allow_empty_field" , false );
@@ -62,7 +60,7 @@ class updatepartnerAction extends defPartnerservices2Action
 			if ( $partner && $target_partner )
 			{
 				if ( @$fields_modified["adminEmail"] && $target_partner->getAdminEmail() != $fields_modified["adminEmail"]) {
-					myPartnerUtils::emailChangedEmail($partner_id, $target_partner->getAdminEmail(), $fields_modified["adminEmail"], $target_partner->getName(), updatepartnerAction::KALTURAS_PARTNER_EMAIL_CHANGE);
+					myPartnerUtils::emailChangedEmail($partner_id, $target_partner->getAdminEmail(), $fields_modified["adminEmail"], $target_partner->getName(), PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE);
 				}
 				$partner->setType ( $target_partner->getType() );
 				baseObjectUtils::fillObjectFromObject( $updateable_fields , $partner , $target_partner , 
