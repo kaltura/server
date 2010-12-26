@@ -280,7 +280,7 @@ class kContentDistributionManager
 			$thumbDimensionsWithKeys[$thumbDimension->getKey()] = $thumbDimension;
 		
 		$thumbAssetsIds = array();
-		$requiredThumbParamsIds = $distributionProfile->getAutoCreateThumb();
+		$requiredThumbParamsIds = $distributionProfile->getAutoCreateThumbArray();
 		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
 		foreach($thumbAssets as $thumbAsset)
 		{
