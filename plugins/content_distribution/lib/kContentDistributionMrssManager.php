@@ -71,8 +71,15 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		if($entryDistribution->getSunset(null))
 			$distribution->addChild('sunset', $entryDistribution->getSunset(null));
 			
-		$distribution->addChild('flavorAssetIds', $entryDistribution->getFlavorAssetIds());
-		$distribution->addChild('thumbAssetIds', $entryDistribution->getThumbAssetIds());
+		$flavorAssetIds = explode(',', $entryDistribution->getFlavorAssetIds());
+		$flavorAssetIdsNode = $distribution->addChild('flavorAssetIds');
+		foreach($flavorAssetIds as $flavorAssetId)
+			$flavorAssetIdsNode->addChild('flavorAssetId', $flavorAssetId);
+			
+		$thumbAssetIds = explode(',', $entryDistribution->getThumbAssetIds());
+		$thumbAssetIdsNode = $distribution->addChild('thumbAssetIds');
+		foreach($thumbAssetIds as $thumbAssetId)
+			$thumbAssetIdsNode->addChild('thumbAssetId', $thumbAssetId);
 	}
 
 	/* (non-PHPdoc)
