@@ -19,7 +19,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 	const USAGE_COUNTER_RECOMMENDED = 9;
 
 	
-	private $defaultDomain = 'catalog.video.msn.com';
 	private $submitPath = '/admin/services/storevideoandfiles.aspx';
 	private $updatePath = '/admin/services/storevideoandfiles.aspx';
 	private $deletePath = '/admin/services/storevideoandfiles.aspx'; // it's updating with end date to 5 days from now
@@ -31,9 +30,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
-		if($taskConfig->params->msnDefaultDomain)
-			$this->defaultDomain = $taskConfig->params->msnDefaultDomain;
-			
 		if($taskConfig->params->msnSubmitPath)
 			$this->submitPath = $taskConfig->params->msnSubmitPath;
 			
@@ -84,10 +80,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$domain = $this->defaultDomain;
-		if(!is_null($distributionProfile->domain))
-			$domain = $distributionProfile->domain;
-			
+		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
@@ -183,10 +176,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchXML(KalturaDistributionSubmitJobData $data, KalturaMsnDistributionProfile $distributionProfile)
 	{
-		$domain = $this->defaultDomain;
-		if(!is_null($distributionProfile->domain))
-			$domain = $distributionProfile->domain;
-			
+		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
