@@ -240,6 +240,12 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$publishState = $this->fetchStatus($data);
 		switch($publishState)
 		{
+			case 'Published':
+				return false;
+				
+			case 'Pending':
+				return false;
+				
 //			case 'Deleted': // TODO - what is the right status after delete?
 //				return true;
 				
@@ -270,6 +276,9 @@ class MsnDistributionEngine extends DistributionEngine implements
 		{
 			case 'Published': // TODO - is that the right status after update?
 				return true;
+				
+			case 'Pending':
+				return false;
 				
 			case 'Error':
 				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
