@@ -4,6 +4,8 @@ require_once ( "kalturaAction.class.php" );
 
 class kmc4Action extends kalturaAction
 {
+	const CURRENT_KMC_VERSION = 4;
+	
 	private $confs = array();
 	
 	const SYSTEM_DEFAULT_PARTNER = 0;
@@ -41,7 +43,7 @@ class kmc4Action extends kalturaAction
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
-			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, 4);
+			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
@@ -106,7 +108,7 @@ class kmc4Action extends kalturaAction
 		$defaultPlugins = kConf::get('default_plugins');
 		if(is_array($defaultPlugins) && in_array('MetadataPlugin', $defaultPlugins) && $partner)
 		{
-			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == 3)
+			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == self::CURRENT_KMC_VERSION)
 			{
 				$this->kmc_enable_custom_data = 'true';
 			}
@@ -153,49 +155,36 @@ class kmc4Action extends kalturaAction
 	/** END - partner-specific: change KDP version for partners working with auto-moderaion **/
 		
 	/** applications versioning **/
-		$this->kmc_content_version 	= kConf::get('kmc_content_version');
+		/*$this->kmc_content_version 	= kConf::get('kmc_content_version');
 		$this->kmc_account_version 	= kConf::get('kmc_account_version');
 		$this->kmc_appstudio_version 	= kConf::get('kmc_appstudio_version');
 		$this->kmc_rna_version 		= kConf::get('kmc_rna_version');
-		$this->kmc_dashboard_version 	= kConf::get('kmc_dashboard_version');
+		$this->kmc_dashboard_version 	= kConf::get('kmc_dashboard_version');*/
 		$this->kmc_swf_version = kConf::get('kmc_version');
 	/** END - applications versioning **/
 		
 	/** uiconf listing work **/
 		/** fill $this->confs with all uiconf objects for all modules **/
-		$contentSystemUiConfs = kmcUtils::getAllKMCUiconfs('content',   $this->kmc_content_version, self::SYSTEM_DEFAULT_PARTNER);
-		$contentTemplateUiConfs = kmcUtils::getAllKMCUiconfs('content',   $this->kmc_content_version, $this->templatePartnerId);
-		//$this->confs = kmcUtils::getAllKMCUiconfs('content',   $this->kmc_content_version, $this->templatePartnerId);
-		$appstudioSystemUiConfs = kmcUtils::getAllKMCUiconfs('appstudio', $this->kmc_appstudio_version, self::SYSTEM_DEFAULT_PARTNER);
-		$appstudioTemplateUiConfs = kmcUtils::getAllKMCUiconfs('appstudio', $this->kmc_appstudio_version, $this->templatePartnerId);
-		//$this->confs = array_merge($this->confs, kmcUtils::getAllKMCUiconfs('appstudio', $this->kmc_appstudio_version, $this->templatePartnerId));
-		$reportsSystemUiConfs = kmcUtils::getAllKMCUiconfs('reports',   $this->kmc_rna_version, self::SYSTEM_DEFAULT_PARTNER);
-		$reportsTemplateUiConfs = kmcUtils::getAllKMCUiconfs('reports',   $this->kmc_rna_version, $this->templatePartnerId);
-		//$this->confs = array_merge($this->confs, kmcUtils::getAllKMCUiconfs('reports',   $this->kmc_rna_version, $this->templatePartnerId));
+		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
+		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
 		
 		/** for each module, create separated lists of its uiconf, for each need **/
-		/** content players: **/
-		$this->content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_previewembed", true, $contentSystemUiConfs);
-		$this->content_uiconfs_previewembed_list = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_previewembed_list", true, $contentSystemUiConfs);
-		$this->content_uiconfs_moderation = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_moderation", false, $contentSystemUiConfs);
-		$this->content_uiconfs_drilldown = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_drilldown", false, $contentSystemUiConfs);
-		$this->content_uiconfs_flavorpreview = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_flavorpreview", false, $contentSystemUiConfs);
-		$this->content_uiconfs_metadataview = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_metadataview", false, $contentSystemUiConfs);
+		/** kmc general uiconfs **/
+		$this->kmc_general = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
+		$this->kmc_permissions = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
+		/** P&E players: **/
+		$this->content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);
+		$this->content_uiconfs_previewembed_list = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
+		$this->content_uiconfs_flavorpreview = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_flavorpreview", false, $kmcGeneralUiConf);
 		/** content KCW,KSE,KAE **/
-		$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_upload", false, $contentSystemUiConfs);
-		$this->simple_editor = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_simpleedit", false, $contentSystemUiConfs);
-		$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($contentTemplateUiConfs, "content_advanceedit", false, $contentSystemUiConfs);
-		
-		/** appStudio templates uiconf **/
-		$this->appstudio_uiconfs_templates = kmcUtils::find_confs_by_usage_tag($appstudioTemplateUiConfs, "appstudio_templates", false, $appstudioSystemUiConfs);
-		
-		/** reports drill-down player **/
-		$this->reports_uiconfs_drilldown = kmcUtils::find_confs_by_usage_tag($reportsTemplateUiConfs, "reports_drilldown", false, $reportsSystemUiConfs);
+		$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
+		$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);
+		$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_advanceedit", false, $kmcGeneralUiConf);
 		
 		/** silverlight uiconfs **/
 		$this->silverLightPlayerUiConfs = array();
 		$this->silverLightPlaylistUiConfs = array();
-		if($partner->getKmcVersion() == 3 && $partner->getEnableSilverLight())
+		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnableSilverLight())
 		{
 			$this->silverLightPlayerUiConfs = kmcUtils::getSilverLightPlayerUiConfs('slp');
 			$this->silverLightPlaylistUiConfs = kmcUtils::getSilverLightPlayerUiConfs('sll');
@@ -206,7 +195,7 @@ class kmc4Action extends kalturaAction
 		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs();
 		
 		/** 508 uicinfs **/
-		if($partner->getKmcVersion() == 3 && $partner->getEnable508Players())
+		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())
 		{
 			$this->kdp508_players = kmcUtils::getKdp508PlayerUiconfs();
 		}

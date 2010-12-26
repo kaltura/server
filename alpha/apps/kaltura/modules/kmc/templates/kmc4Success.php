@@ -84,8 +84,8 @@ else
 		vars : {
 		  /* --- new vars KMC4 */
 			kmc_version		: "<?php echo $kmc_swf_version; ?>",
-			kmc_general_uiconf	: "1727902", // TODO - relpace
-			kmc_permissions_uiconf	: "1727903", // TODO - relpace
+			kmc_general_uiconf	: "<?php echo $kmc_general->getId(); ?>", 
+			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
 		  /* END new vars KMC4 */
 		
 			service_url		: "<?php echo $service_url; ?>",
@@ -123,17 +123,17 @@ else
 					account			:	"<?php echo $kmc_account_version ?>", // "Settings" tab
 					reports			:	"<?php echo $kmc_rna_version ?>"
 			},
-			appstudio_uiconfid	: "<?php echo $appstudio_uiconfs_templates->getId(); ?>",
-			reports_drilldown	: "<?php echo $reports_uiconfs_drilldown->getId(); ?>",
+			//appstudio_uiconfid	: "<?php //echo $appstudio_uiconfs_templates->getId(); ?>",
+			//reports_drilldown	: "<?php //echo $reports_uiconfs_drilldown->getId(); ?>",
 			enable_live			: "<?php echo $enable_live_streaming; ?>",
 			next_state			: { module : "dashboard", subtab : "default" },
 			disableurlhashing	: "<?php echo $disableurlhashing; ?>",
 			players_list		: <?php echo $ui_confs_player; ?>,
 			playlists_list		: <?php echo $ui_confs_playlist; ?>,
 			enable_custom_data	: "<?php echo $kmc_enable_custom_data; ?>",
-			metadata_view_uiconf	: "<?php echo $content_uiconfs_metadataview->getId(); ?>",
-			content_drilldown_uiconf : "<?php echo $content_uiconfs_drilldown->getId(); ?>",
-			content_moderate_uiconf	 : "<?php echo $content_uiconfs_moderation->getId(); ?>",
+			//metadata_view_uiconf	: "<?php //echo $content_uiconfs_metadataview->getId(); ?>",
+			//content_drilldown_uiconf : "<?php //echo $content_uiconfs_drilldown->getId(); ?>",
+			//content_moderate_uiconf	 : "<?php //echo $content_uiconfs_moderation->getId(); ?>",
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
 			appstudio_templatesXmlUrl: <?php echo ($appstudio_templatesXmlUrl ? '"'.$appstudio_templatesXmlUrl.'"' : "false"); ?>,
 			enableAds		 : <?php echo $enable_vast ?>,
