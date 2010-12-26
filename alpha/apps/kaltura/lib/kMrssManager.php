@@ -192,6 +192,7 @@ class kMrssManager
 		}
 		
 		$mrss->addChild('entryId', $entry->getId());
+		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('link', $link . $entry->getId());
 		$mrss->addChild('type', $entry->getType());
@@ -249,11 +250,12 @@ class kMrssManager
 			$content = $mrss->addChild('content');
 			$content->addAttribute('url', self::getAssetUrl($flavorAsset));
 			$content->addAttribute('flavorAssetId', $flavorAsset->getId());
-			$content->addAttribute('isSource', (bool) $flavorAsset->getIsOriginal());
+			$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 			$content->addAttribute('format', $flavorAsset->getContainerFormat());
-			if($flavorAsset->getFlavorParamsId())
+			if(!is_null($flavorAsset->getFlavorParamsId()))
 				$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
-			$tags = $mrss->addChild('tags');
+				
+			$tags = $content->addChild('tags');
 			foreach(explode(',', $flavorAsset->getTags()) as $tag)
 				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
@@ -264,11 +266,12 @@ class kMrssManager
 			$thumbnail = $mrss->addChild('thumbnail');
 			$thumbnail->addAttribute('url', self::getAssetUrl($thumbAsset));
 			$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
-			$thumbnail->addAttribute('isDefault', (bool) $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB));
+			$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
 			$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
 			if($thumbAsset->getFlavorParamsId())
 				$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
-			$tags = $mrss->addChild('tags');
+				
+			$tags = $thumbnail->addChild('tags');
 			foreach(explode(',', $thumbAsset->getTags()) as $tag)
 				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
