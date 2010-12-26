@@ -215,8 +215,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 			
 			curl_close($ch);
 		
-			echo "$errNumber: $errDescription\n\n";
-			throw new Exception($errDescription, $errNumber);
+			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
 		}
 		curl_close($ch);
 		
