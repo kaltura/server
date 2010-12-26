@@ -123,7 +123,6 @@ while(count($users))
  				$partnerData->role = null;
  				$new_kuser->setPartnerData(serialize($partnerData));
 			}
-			$partner->setAccountOwnerKuserId($new_kuser->getId());
 		}
 		
 		
@@ -146,6 +145,7 @@ while(count($users))
 				KalturaLog::log(print_r($new_kuser, true));			
 				$new_kuser->save(); // save
 			}
+			$partner->setAccountOwnerKuserId($new_kuser->getId());
 			KalturaLog::log('Saving partner ['.$partner->getId().'] with account owner kuser ID ['.$partner->getAccountOwnerKuserId().']');
 			$partner->save();
 		}
