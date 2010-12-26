@@ -401,7 +401,7 @@ class kuserPeer extends BasekuserPeer
 	
 	
 	
-	private function sendNewUserMail(kuser $user)
+	private static function sendNewUserMail(kuser $user)
 	{
 		$mailType = null;
 		$bodyParams = array();
