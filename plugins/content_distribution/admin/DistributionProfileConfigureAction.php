@@ -90,9 +90,9 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					
 					$optionalFlavorParamsIds = array();
 					$requiredFlavorParamsIds = array();
-					if($distributionProfile->optionalFlavorParamsIds)
+					if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
 						$optionalFlavorParamsIds = explode(',', $distributionProfile->optionalFlavorParamsIds);
-					if($distributionProfile->requiredFlavorParamsIds)
+					if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
 						$requiredFlavorParamsIds = explode(',', $distributionProfile->requiredFlavorParamsIds);
 						
 					$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
