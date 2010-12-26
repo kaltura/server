@@ -14,23 +14,6 @@ class MsnDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_FLV_FLAVOR_PARAMS_ID = 'flvFlavorParamsId';
 	const CUSTOM_DATA_WMV_FLAVOR_PARAMS_ID = 'wmvFlavorParamsId';
 
-	public function __construct() {
-		parent::__construct();
-		
-//		TODO - move it to the admin console form as default for new profile
-//		// Add required thumbnail dimensions
-//		$requiredThumbDimensionsObjects = array();
-//		
-//		$requiredThumbDimensions = new kDistributionThumbDimensions();
-//		$requiredThumbDimensions->setWidth(self::THUMBNAIL_WIDTH);
-//		$requiredThumbDimensions->setHeight(self::THUMBNAIL_HEIGHT);
-//		$requiredThumbDimensionsObjects[] = $requiredThumbDimensions;
-//		
-//		$this->setRequiredThumbDimensionsObjects($requiredThumbDimensionsObjects);
-//		
-//		// TODO - add the required flavor params, maybe from local config, maybe from kConf
-	}
-
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
 	 */
