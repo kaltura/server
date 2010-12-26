@@ -195,7 +195,7 @@ class myPartnerRegistration
 	 	if (!$fromPartner)
 	 		KalturaLog::log("Template content partner was not found!");
  		else
-	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner);
+	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner, true);
 		
 		$newPartner->setKmcVersion('3');
 		$newPartner->save();

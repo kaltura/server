@@ -973,7 +973,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$entry->setTotalRank(0);
 	}
 	
-	public static function copyEntry(entry $entry, Partner $toPartner = null)
+	public static function copyEntry(entry $entry, Partner $toPartner = null, $dontCopyUsers = false)
  	{
  		KalturaLog::log("copyEntry - Copying entry [".$entry->getId()."] to partner [".$toPartner->getId()."]");
  		$newEntry = $entry->copy();
@@ -998,12 +998,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->setFlavorParamsIds(implode(',', $newFlavorParams));
  		}
  		
- 		// copy the kuser (if the same puser id exists its kuser will be used) 
- 		kuserPeer::setUseCriteriaFilter(false);
- 		$kuser = $entry->getKuser();
- 		$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
- 		$newEntry->setKuserId($newKuser->getId());
- 		kuserPeer::setUseCriteriaFilter(true);
+ 		
+ 		if (!$dontCopyUsers)
+ 		{
+ 			// copy the kuser (if the same puser id exists its kuser will be used)
+ 			kuserPeer::setUseCriteriaFilter(false);
+ 			$kuser = $entry->getKuser();
+ 			$newKuser = kuserPeer::createKuserForPartner($newEntry->getPartnerId(), $kuser->getPuserId());
+ 			$newEntry->setKuserId($newKuser->getId());
+ 			kuserPeer::setUseCriteriaFilter(true);
+ 		} 		
  		
  		// copy the kshow
  		kshowPeer::setUseCriteriaFilter(false);

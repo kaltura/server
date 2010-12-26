@@ -1077,7 +1077,7 @@ class myPartnerUtils
 		return $points;
  	}
  	
- 	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner)
+ 	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner, $dontCopyUsers = false)
  	{
  		$toPartner->setAdminLoginUsersQuota($fromPartner->getAdminLoginUsersQuota());
  		$toPartner->save();
@@ -1087,8 +1087,8 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
- 		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP);
- 		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST);
+ 		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP, $dontCopyUsers);
+ 		self::copyEntriesByType($fromPartner, $toPartner, entryType::PLAYLIST, $dontCopyUsers);
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
@@ -1129,7 +1129,7 @@ class myPartnerUtils
  		}
  	}
  	
- 	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType)
+ 	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType, $dontCopyUsers = false)
  	{
  		KalturaLog::log("copyEntriesByType - Copying entries from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."] with type [".$entryType."]");
  		entryPeer::setUseCriteriaFilter ( false );
@@ -1142,7 +1142,7 @@ class myPartnerUtils
  		entryPeer::setUseCriteriaFilter ( true );
  		foreach($entries as $entry)
  		{
- 			myEntryUtils::copyEntry($entry, $toPartner);
+ 			myEntryUtils::copyEntry($entry, $toPartner, $dontCopyUsers);
  		}
  	}
  	
