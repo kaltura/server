@@ -205,7 +205,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function getRequiredFlavorParamsIdsArray()
 	{
-		if(!$this->getRequiredFlavorParamsIds())
+		if(is_null($this->getRequiredFlavorParamsIds()) || !strlen($this->getRequiredFlavorParamsIds()))
 			return array();
 			
 		return explode(',', $this->getRequiredFlavorParamsIds());
@@ -221,7 +221,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 
 	public function getAutoCreateFlavorsArray()
 	{
-		if(!$this->getAutoCreateFlavors())
+		if(is_null($this->getAutoCreateFlavors()) || !strlen($this->getAutoCreateFlavors()))
 			return array();
 			
 		return explode(',', $this->getAutoCreateFlavors());
@@ -229,7 +229,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 
 	public function getAutoCreateThumbArray()
 	{
-		if(!$this->getAutoCreateThumb())
+		if(is_null($this->getAutoCreateThumb()) || !strlen($this->getAutoCreateThumb()))
 			return array();
 			
 		return explode(',', $this->getAutoCreateThumb());
