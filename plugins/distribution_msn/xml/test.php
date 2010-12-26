@@ -37,8 +37,6 @@ if($argc < 2)
 }
 $entryId = $argv[1];
 
-$entryId = '0_4c6o03wp';
-
 $providerData = new KalturaMsnDistributionJobProviderData();
 $providerData->csId = 'Fox Sports';
 $providerData->source = 'FOX_big12';
