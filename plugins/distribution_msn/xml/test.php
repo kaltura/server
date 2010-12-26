@@ -30,12 +30,10 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-if($argc < 2)
-{
-	echo "Entry id must be supplied as attribute\n";
-	exit;
-}
-$entryId = $argv[1];
+$entryId = '0_4c6o03wp';
+
+if(isset($argv[1]))
+	$entryId = $argv[1];
 
 $providerData = new KalturaMsnDistributionJobProviderData();
 $providerData->csId = 'Fox Sports';
