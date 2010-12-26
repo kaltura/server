@@ -4,6 +4,7 @@ require_once ( "kalturaAction.class.php" );
 
 class kmc3Action extends kalturaAction
 {
+	const CURRENT_KMC_VERSION = 3;
 	private $confs = array();
 	
 	const SYSTEM_DEFAULT_PARTNER = 0;
@@ -41,7 +42,7 @@ class kmc3Action extends kalturaAction
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
-			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, 3);
+			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		}
 	/** END - load partner from DB, and set templatePartnerId **/
@@ -106,7 +107,7 @@ class kmc3Action extends kalturaAction
 		$defaultPlugins = kConf::get('default_plugins');
 		if(is_array($defaultPlugins) && in_array('MetadataPlugin', $defaultPlugins) && $partner)
 		{
-			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == 3)
+			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == self::CURRENT_KMC_VERSION)
 			{
 				$this->kmc_enable_custom_data = 'true';
 			}
@@ -194,7 +195,7 @@ class kmc3Action extends kalturaAction
 		/** silverlight uiconfs **/
 		$this->silverLightPlayerUiConfs = array();
 		$this->silverLightPlaylistUiConfs = array();
-		if($partner->getKmcVersion() == 3 && $partner->getEnableSilverLight())
+		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnableSilverLight())
 		{
 			$this->silverLightPlayerUiConfs = kmcUtils::getSilverLightPlayerUiConfs('slp');
 			$this->silverLightPlaylistUiConfs = kmcUtils::getSilverLightPlayerUiConfs('sll');
@@ -205,7 +206,7 @@ class kmc3Action extends kalturaAction
 		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs();
 		
 		/** 508 uicinfs **/
-		if($partner->getKmcVersion() == 3 && $partner->getEnable508Players())
+		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())
 		{
 			$this->kdp508_players = kmcUtils::getKdp508PlayerUiconfs();
 		}
