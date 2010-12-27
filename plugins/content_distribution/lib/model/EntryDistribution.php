@@ -218,6 +218,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			'views' => 'views',
 			'error_type' => 'errorType',
 			'error_number' => 'errorNumber',
+			'last_report' => 'lastReport',
 		);
 	}
 
@@ -240,6 +241,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		'views' => IIndexable::FIELD_TYPE_INTEGER,
 		'error_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'error_number' => IIndexable::FIELD_TYPE_INTEGER,
+		'last_report' => IIndexable::FIELD_TYPE_DATETIME,
 	);
 	
 	/* (non-PHPdoc)
