@@ -251,9 +251,26 @@ class kMrssManager
 			$content->addAttribute('url', self::getAssetUrl($flavorAsset));
 			$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 			$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
-			$content->addAttribute('format', $flavorAsset->getContainerFormat());
+			$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
+			$content->addAttribute('extension', $flavorAsset->getFileExt());
+			
 			if(!is_null($flavorAsset->getFlavorParamsId()))
+			{
 				$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
+				$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
+				if($flavorParams)
+				{
+					$content->addAttribute('flavorParamsName', $flavorParams->getName());
+					$content->addAttribute('format', $flavorParams->getFormat());
+					$content->addAttribute('videoBitrate', $flavorParams->getVideoBitrate());
+					$content->addAttribute('videoCodec', $flavorParams->getVideoCodec());
+					$content->addAttribute('audioBitrate', $flavorParams->getAudioBitrate());
+					$content->addAttribute('audioCodec', $flavorParams->getAudioCodec());
+					$content->addAttribute('frameRate', $flavorParams->getFrameRate());
+					$content->addAttribute('height', $flavorParams->getHeight());
+					$content->addAttribute('width', $flavorParams->getWidth());
+				}
+			}
 				
 			$tags = $content->addChild('tags');
 			foreach(explode(',', $flavorAsset->getTags()) as $tag)
