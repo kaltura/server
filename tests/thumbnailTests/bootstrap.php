@@ -17,7 +17,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*")); // needed for testmeDoc
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator")); // needed for testmeDoc
-KAutoloader::setClassMapFilePath(KAutoloader::buildPath(KALTURA_API_PATH, "cache", "KalturaClassMap.cache"));
+KAutoloader::setClassMapFilePath(KAutoloader::buildPath(kConf::get("cache_root_path"), "unitest", "KalturaClassMap.cache"));
 KAutoloader::dumpExtra();
 
 KAutoloader::setNoCache (true);

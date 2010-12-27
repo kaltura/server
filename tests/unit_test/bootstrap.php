@@ -25,7 +25,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "co
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 Kautoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::setClassMapFilePath(KAutoloader::buildPath(KALTURA_UNIT_TEST_PATH, "cache", "KalturaClassMap.cache"));
+KAutoloader::setClassMapFilePath(KAutoloader::buildPath(kConf::get("cache_root_path"), "unitest", "KalturaClassMap.cache"));
 KAutoloader::register();
 
 date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
