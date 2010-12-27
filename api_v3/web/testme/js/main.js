@@ -155,7 +155,7 @@ KTestMe.prototype = {
 		jQuery(".object").each(function(i, item) {
 			if (jQuery(item).find(".object-name").size() > 0 && jQuery(item).find(".object-type").size() > 0)
 			{
-				var name = jQuery(item).find(".object-name").text().trim();
+				var name = jQuery.trim(jQuery(item).find(".object-name").text());
 				var value = jQuery(item).find(".object-type").val();
 
 				objectTypes[name] = value;
