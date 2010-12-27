@@ -18,6 +18,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="required_flavor_params_ids" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="optional_thumb_dimensions" type="varchar" size="2048" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="required_thumb_dimensions" type="varchar" size="2048" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="report_interval" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
 		<index name="partner_id">
 			<index-column name="partner_id" />
@@ -53,6 +54,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_type" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_number" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_description" type="varchar" size="255" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="last_report" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
 		<index name="partner_entry_profile">
 			<index-column name="partner_id" />
