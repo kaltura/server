@@ -56,6 +56,7 @@ class EntryDistributionTableMap extends TableMap {
 		$this->addColumn('ERROR_TYPE', 'ErrorType', 'INTEGER', false, null, null);
 		$this->addColumn('ERROR_NUMBER', 'ErrorNumber', 'INTEGER', false, null, null);
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'VARCHAR', false, 255, null);
+		$this->addColumn('LAST_REPORT', 'LastReport', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

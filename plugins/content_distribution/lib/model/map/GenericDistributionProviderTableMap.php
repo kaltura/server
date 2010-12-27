@@ -45,8 +45,8 @@ class GenericDistributionProviderTableMap extends TableMap {
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 127, null);
 		$this->addColumn('OPTIONAL_FLAVOR_PARAMS_IDS', 'OptionalFlavorParamsIds', 'VARCHAR', false, 127, null);
 		$this->addColumn('REQUIRED_FLAVOR_PARAMS_IDS', 'RequiredFlavorParamsIds', 'VARCHAR', false, 127, null);
-		$this->addColumn('OPTIONAL_THUMB_DIMENSIONS', 'OptionalThumbDimensions', 'VARCHAR', false, 255, null);
-		$this->addColumn('REQUIRED_THUMB_DIMENSIONS', 'RequiredThumbDimensions', 'VARCHAR', false, 255, null);
+		$this->addColumn('OPTIONAL_THUMB_DIMENSIONS', 'OptionalThumbDimensions', 'VARCHAR', false, 2048, null);
+		$this->addColumn('REQUIRED_THUMB_DIMENSIONS', 'RequiredThumbDimensions', 'VARCHAR', false, 2048, null);
 		$this->addColumn('EDITABLE_FIELDS', 'EditableFields', 'VARCHAR', false, 255, null);
 		$this->addColumn('MANDATORY_FIELDS', 'MandatoryFields', 'VARCHAR', false, 255, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

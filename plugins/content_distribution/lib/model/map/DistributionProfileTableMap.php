@@ -51,8 +51,9 @@ class DistributionProfileTableMap extends TableMap {
 		$this->addColumn('AUTO_CREATE_THUMB', 'AutoCreateThumb', 'VARCHAR', false, 255, null);
 		$this->addColumn('OPTIONAL_FLAVOR_PARAMS_IDS', 'OptionalFlavorParamsIds', 'VARCHAR', false, 127, null);
 		$this->addColumn('REQUIRED_FLAVOR_PARAMS_IDS', 'RequiredFlavorParamsIds', 'VARCHAR', false, 127, null);
-		$this->addColumn('OPTIONAL_THUMB_DIMENSIONS', 'OptionalThumbDimensions', 'VARCHAR', false, 255, null);
-		$this->addColumn('REQUIRED_THUMB_DIMENSIONS', 'RequiredThumbDimensions', 'VARCHAR', false, 255, null);
+		$this->addColumn('OPTIONAL_THUMB_DIMENSIONS', 'OptionalThumbDimensions', 'VARCHAR', false, 2048, null);
+		$this->addColumn('REQUIRED_THUMB_DIMENSIONS', 'RequiredThumbDimensions', 'VARCHAR', false, 2048, null);
+		$this->addColumn('REPORT_INTERVAL', 'ReportInterval', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()

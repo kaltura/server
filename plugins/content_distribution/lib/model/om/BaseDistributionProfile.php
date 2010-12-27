@@ -121,6 +121,12 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 	protected $required_thumb_dimensions;
 
 	/**
+	 * The value for the report_interval field.
+	 * @var        int
+	 */
+	protected $report_interval;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -382,6 +388,16 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 	public function getRequiredThumbDimensions()
 	{
 		return $this->required_thumb_dimensions;
+	}
+
+	/**
+	 * Get the [report_interval] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getReportInterval()
+	{
+		return $this->report_interval;
 	}
 
 	/**
@@ -838,6 +854,29 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 	} // setRequiredThumbDimensions()
 
 	/**
+	 * Set the value of [report_interval] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DistributionProfile The current object (for fluent API support)
+	 */
+	public function setReportInterval($v)
+	{
+		if(!isset($this->oldColumnsValues[DistributionProfilePeer::REPORT_INTERVAL]))
+			$this->oldColumnsValues[DistributionProfilePeer::REPORT_INTERVAL] = $this->report_interval;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->report_interval !== $v) {
+			$this->report_interval = $v;
+			$this->modifiedColumns[] = DistributionProfilePeer::REPORT_INTERVAL;
+		}
+
+		return $this;
+	} // setReportInterval()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -906,7 +945,8 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			$this->required_flavor_params_ids = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
 			$this->optional_thumb_dimensions = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->required_thumb_dimensions = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->custom_data = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->report_interval = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -916,7 +956,7 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 18; // 18 = DistributionProfilePeer::NUM_COLUMNS - DistributionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 19; // 19 = DistributionProfilePeer::NUM_COLUMNS - DistributionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DistributionProfile object", $e);
@@ -1375,6 +1415,9 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 				return $this->getRequiredThumbDimensions();
 				break;
 			case 17:
+				return $this->getReportInterval();
+				break;
+			case 18:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1415,7 +1458,8 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			$keys[14] => $this->getRequiredFlavorParamsIds(),
 			$keys[15] => $this->getOptionalThumbDimensions(),
 			$keys[16] => $this->getRequiredThumbDimensions(),
-			$keys[17] => $this->getCustomData(),
+			$keys[17] => $this->getReportInterval(),
+			$keys[18] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1499,6 +1543,9 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 				$this->setRequiredThumbDimensions($value);
 				break;
 			case 17:
+				$this->setReportInterval($value);
+				break;
+			case 18:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1542,7 +1589,8 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		if (array_key_exists($keys[14], $arr)) $this->setRequiredFlavorParamsIds($arr[$keys[14]]);
 		if (array_key_exists($keys[15], $arr)) $this->setOptionalThumbDimensions($arr[$keys[15]]);
 		if (array_key_exists($keys[16], $arr)) $this->setRequiredThumbDimensions($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setCustomData($arr[$keys[17]]);
+		if (array_key_exists($keys[17], $arr)) $this->setReportInterval($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
 	}
 
 	/**
@@ -1571,6 +1619,7 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		if ($this->isColumnModified(DistributionProfilePeer::REQUIRED_FLAVOR_PARAMS_IDS)) $criteria->add(DistributionProfilePeer::REQUIRED_FLAVOR_PARAMS_IDS, $this->required_flavor_params_ids);
 		if ($this->isColumnModified(DistributionProfilePeer::OPTIONAL_THUMB_DIMENSIONS)) $criteria->add(DistributionProfilePeer::OPTIONAL_THUMB_DIMENSIONS, $this->optional_thumb_dimensions);
 		if ($this->isColumnModified(DistributionProfilePeer::REQUIRED_THUMB_DIMENSIONS)) $criteria->add(DistributionProfilePeer::REQUIRED_THUMB_DIMENSIONS, $this->required_thumb_dimensions);
+		if ($this->isColumnModified(DistributionProfilePeer::REPORT_INTERVAL)) $criteria->add(DistributionProfilePeer::REPORT_INTERVAL, $this->report_interval);
 		if ($this->isColumnModified(DistributionProfilePeer::CUSTOM_DATA)) $criteria->add(DistributionProfilePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1657,6 +1706,8 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		$copyObj->setOptionalThumbDimensions($this->optional_thumb_dimensions);
 
 		$copyObj->setRequiredThumbDimensions($this->required_thumb_dimensions);
+
+		$copyObj->setReportInterval($this->report_interval);
 
 		$copyObj->setCustomData($this->custom_data);
 

@@ -25,7 +25,7 @@ abstract class BaseEntryDistributionPeer {
 	const TM_CLASS = 'EntryDistributionTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 21;
+	const NUM_COLUMNS = 22;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -90,6 +90,9 @@ abstract class BaseEntryDistributionPeer {
 	/** the column name for the ERROR_DESCRIPTION field */
 	const ERROR_DESCRIPTION = 'entry_distribution.ERROR_DESCRIPTION';
 
+	/** the column name for the LAST_REPORT field */
+	const LAST_REPORT = 'entry_distribution.LAST_REPORT';
+
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'entry_distribution.CUSTOM_DATA';
 
@@ -109,11 +112,11 @@ abstract class BaseEntryDistributionPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'SubmittedAt', 'EntryId', 'PartnerId', 'DistributionProfileId', 'Status', 'DirtyStatus', 'ThumbAssetIds', 'FlavorAssetIds', 'Sunrise', 'Sunset', 'RemoteId', 'Plays', 'Views', 'ValidationErrors', 'ErrorType', 'ErrorNumber', 'ErrorDescription', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'submittedAt', 'entryId', 'partnerId', 'distributionProfileId', 'status', 'dirtyStatus', 'thumbAssetIds', 'flavorAssetIds', 'sunrise', 'sunset', 'remoteId', 'plays', 'views', 'validationErrors', 'errorType', 'errorNumber', 'errorDescription', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::SUBMITTED_AT, self::ENTRY_ID, self::PARTNER_ID, self::DISTRIBUTION_PROFILE_ID, self::STATUS, self::DIRTY_STATUS, self::THUMB_ASSET_IDS, self::FLAVOR_ASSET_IDS, self::SUNRISE, self::SUNSET, self::REMOTE_ID, self::PLAYS, self::VIEWS, self::VALIDATION_ERRORS, self::ERROR_TYPE, self::ERROR_NUMBER, self::ERROR_DESCRIPTION, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'submitted_at', 'entry_id', 'partner_id', 'distribution_profile_id', 'status', 'dirty_status', 'thumb_asset_ids', 'flavor_asset_ids', 'sunrise', 'sunset', 'remote_id', 'plays', 'views', 'validation_errors', 'error_type', 'error_number', 'error_description', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'SubmittedAt', 'EntryId', 'PartnerId', 'DistributionProfileId', 'Status', 'DirtyStatus', 'ThumbAssetIds', 'FlavorAssetIds', 'Sunrise', 'Sunset', 'RemoteId', 'Plays', 'Views', 'ValidationErrors', 'ErrorType', 'ErrorNumber', 'ErrorDescription', 'LastReport', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'submittedAt', 'entryId', 'partnerId', 'distributionProfileId', 'status', 'dirtyStatus', 'thumbAssetIds', 'flavorAssetIds', 'sunrise', 'sunset', 'remoteId', 'plays', 'views', 'validationErrors', 'errorType', 'errorNumber', 'errorDescription', 'lastReport', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::SUBMITTED_AT, self::ENTRY_ID, self::PARTNER_ID, self::DISTRIBUTION_PROFILE_ID, self::STATUS, self::DIRTY_STATUS, self::THUMB_ASSET_IDS, self::FLAVOR_ASSET_IDS, self::SUNRISE, self::SUNSET, self::REMOTE_ID, self::PLAYS, self::VIEWS, self::VALIDATION_ERRORS, self::ERROR_TYPE, self::ERROR_NUMBER, self::ERROR_DESCRIPTION, self::LAST_REPORT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'submitted_at', 'entry_id', 'partner_id', 'distribution_profile_id', 'status', 'dirty_status', 'thumb_asset_ids', 'flavor_asset_ids', 'sunrise', 'sunset', 'remote_id', 'plays', 'views', 'validation_errors', 'error_type', 'error_number', 'error_description', 'last_report', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
 	);
 
 	/**
@@ -123,11 +126,11 @@ abstract class BaseEntryDistributionPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'SubmittedAt' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'DistributionProfileId' => 6, 'Status' => 7, 'DirtyStatus' => 8, 'ThumbAssetIds' => 9, 'FlavorAssetIds' => 10, 'Sunrise' => 11, 'Sunset' => 12, 'RemoteId' => 13, 'Plays' => 14, 'Views' => 15, 'ValidationErrors' => 16, 'ErrorType' => 17, 'ErrorNumber' => 18, 'ErrorDescription' => 19, 'CustomData' => 20, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'submittedAt' => 3, 'entryId' => 4, 'partnerId' => 5, 'distributionProfileId' => 6, 'status' => 7, 'dirtyStatus' => 8, 'thumbAssetIds' => 9, 'flavorAssetIds' => 10, 'sunrise' => 11, 'sunset' => 12, 'remoteId' => 13, 'plays' => 14, 'views' => 15, 'validationErrors' => 16, 'errorType' => 17, 'errorNumber' => 18, 'errorDescription' => 19, 'customData' => 20, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::SUBMITTED_AT => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DISTRIBUTION_PROFILE_ID => 6, self::STATUS => 7, self::DIRTY_STATUS => 8, self::THUMB_ASSET_IDS => 9, self::FLAVOR_ASSET_IDS => 10, self::SUNRISE => 11, self::SUNSET => 12, self::REMOTE_ID => 13, self::PLAYS => 14, self::VIEWS => 15, self::VALIDATION_ERRORS => 16, self::ERROR_TYPE => 17, self::ERROR_NUMBER => 18, self::ERROR_DESCRIPTION => 19, self::CUSTOM_DATA => 20, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'submitted_at' => 3, 'entry_id' => 4, 'partner_id' => 5, 'distribution_profile_id' => 6, 'status' => 7, 'dirty_status' => 8, 'thumb_asset_ids' => 9, 'flavor_asset_ids' => 10, 'sunrise' => 11, 'sunset' => 12, 'remote_id' => 13, 'plays' => 14, 'views' => 15, 'validation_errors' => 16, 'error_type' => 17, 'error_number' => 18, 'error_description' => 19, 'custom_data' => 20, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'SubmittedAt' => 3, 'EntryId' => 4, 'PartnerId' => 5, 'DistributionProfileId' => 6, 'Status' => 7, 'DirtyStatus' => 8, 'ThumbAssetIds' => 9, 'FlavorAssetIds' => 10, 'Sunrise' => 11, 'Sunset' => 12, 'RemoteId' => 13, 'Plays' => 14, 'Views' => 15, 'ValidationErrors' => 16, 'ErrorType' => 17, 'ErrorNumber' => 18, 'ErrorDescription' => 19, 'LastReport' => 20, 'CustomData' => 21, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'submittedAt' => 3, 'entryId' => 4, 'partnerId' => 5, 'distributionProfileId' => 6, 'status' => 7, 'dirtyStatus' => 8, 'thumbAssetIds' => 9, 'flavorAssetIds' => 10, 'sunrise' => 11, 'sunset' => 12, 'remoteId' => 13, 'plays' => 14, 'views' => 15, 'validationErrors' => 16, 'errorType' => 17, 'errorNumber' => 18, 'errorDescription' => 19, 'lastReport' => 20, 'customData' => 21, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::SUBMITTED_AT => 3, self::ENTRY_ID => 4, self::PARTNER_ID => 5, self::DISTRIBUTION_PROFILE_ID => 6, self::STATUS => 7, self::DIRTY_STATUS => 8, self::THUMB_ASSET_IDS => 9, self::FLAVOR_ASSET_IDS => 10, self::SUNRISE => 11, self::SUNSET => 12, self::REMOTE_ID => 13, self::PLAYS => 14, self::VIEWS => 15, self::VALIDATION_ERRORS => 16, self::ERROR_TYPE => 17, self::ERROR_NUMBER => 18, self::ERROR_DESCRIPTION => 19, self::LAST_REPORT => 20, self::CUSTOM_DATA => 21, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'submitted_at' => 3, 'entry_id' => 4, 'partner_id' => 5, 'distribution_profile_id' => 6, 'status' => 7, 'dirty_status' => 8, 'thumb_asset_ids' => 9, 'flavor_asset_ids' => 10, 'sunrise' => 11, 'sunset' => 12, 'remote_id' => 13, 'plays' => 14, 'views' => 15, 'validation_errors' => 16, 'error_type' => 17, 'error_number' => 18, 'error_description' => 19, 'last_report' => 20, 'custom_data' => 21, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
 	);
 
 	/**
@@ -217,6 +220,7 @@ abstract class BaseEntryDistributionPeer {
 		$criteria->addSelectColumn(EntryDistributionPeer::ERROR_TYPE);
 		$criteria->addSelectColumn(EntryDistributionPeer::ERROR_NUMBER);
 		$criteria->addSelectColumn(EntryDistributionPeer::ERROR_DESCRIPTION);
+		$criteria->addSelectColumn(EntryDistributionPeer::LAST_REPORT);
 		$criteria->addSelectColumn(EntryDistributionPeer::CUSTOM_DATA);
 	}
 

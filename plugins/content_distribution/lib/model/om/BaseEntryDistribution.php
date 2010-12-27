@@ -139,6 +139,12 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	protected $error_description;
 
 	/**
+	 * The value for the last_report field.
+	 * @var        string
+	 */
+	protected $last_report;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -520,6 +526,46 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	public function getErrorDescription()
 	{
 		return $this->error_description;
+	}
+
+	/**
+	 * Get the [optionally formatted] temporal [last_report] column value.
+	 * 
+	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
+	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
+	 *
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getLastReport($format = 'Y-m-d H:i:s')
+	{
+		if ($this->last_report === null) {
+			return null;
+		}
+
+
+		if ($this->last_report === '0000-00-00 00:00:00') {
+			// while technically this is not a default value of NULL,
+			// this seems to be closest in meaning.
+			return null;
+		} else {
+			try {
+				$dt = new DateTime($this->last_report);
+			} catch (Exception $x) {
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->last_report, true), $x);
+			}
+		}
+
+		if ($format === null) {
+			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
+			return (int) $dt->format('U');
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $dt->format('U'));
+		} else {
+			return $dt->format($format);
+		}
 	}
 
 	/**
@@ -1132,6 +1178,58 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 	} // setErrorDescription()
 
 	/**
+	 * Sets the value of [last_report] column to a normalized version of the date/time value specified.
+	 * 
+	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return     EntryDistribution The current object (for fluent API support)
+	 */
+	public function setLastReport($v)
+	{
+		if(!isset($this->oldColumnsValues[EntryDistributionPeer::LAST_REPORT]))
+			$this->oldColumnsValues[EntryDistributionPeer::LAST_REPORT] = $this->last_report;
+
+		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
+		// -- which is unexpected, to say the least.
+		if ($v === null || $v === '') {
+			$dt = null;
+		} elseif ($v instanceof DateTime) {
+			$dt = $v;
+		} else {
+			// some string/numeric value passed; we normalize that so that we can
+			// validate it.
+			try {
+				if (is_numeric($v)) { // if it's a unix timestamp
+					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
+					// We have to explicitly specify and then change the time zone because of a
+					// DateTime bug: http://bugs.php.net/bug.php?id=43003
+					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+				} else {
+					$dt = new DateTime($v);
+				}
+			} catch (Exception $x) {
+				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
+			}
+		}
+
+		if ( $this->last_report !== null || $dt !== null ) {
+			// (nested ifs are a little easier to read in this case)
+
+			$currNorm = ($this->last_report !== null && $tmpDt = new DateTime($this->last_report)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
+
+			if ( ($currNorm !== $newNorm) // normalized values don't match 
+					)
+			{
+				$this->last_report = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = EntryDistributionPeer::LAST_REPORT;
+			}
+		} // if either are not null
+
+		return $this;
+	} // setLastReport()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -1203,7 +1301,8 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			$this->error_type = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
 			$this->error_number = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->error_description = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->custom_data = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->last_report = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1213,7 +1312,7 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 21; // 21 = EntryDistributionPeer::NUM_COLUMNS - EntryDistributionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 22; // 22 = EntryDistributionPeer::NUM_COLUMNS - EntryDistributionPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating EntryDistribution object", $e);
@@ -1681,6 +1780,9 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 				return $this->getErrorDescription();
 				break;
 			case 20:
+				return $this->getLastReport();
+				break;
+			case 21:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1724,7 +1826,8 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 			$keys[17] => $this->getErrorType(),
 			$keys[18] => $this->getErrorNumber(),
 			$keys[19] => $this->getErrorDescription(),
-			$keys[20] => $this->getCustomData(),
+			$keys[20] => $this->getLastReport(),
+			$keys[21] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1817,6 +1920,9 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 				$this->setErrorDescription($value);
 				break;
 			case 20:
+				$this->setLastReport($value);
+				break;
+			case 21:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1863,7 +1969,8 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[17], $arr)) $this->setErrorType($arr[$keys[17]]);
 		if (array_key_exists($keys[18], $arr)) $this->setErrorNumber($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setErrorDescription($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setCustomData($arr[$keys[20]]);
+		if (array_key_exists($keys[20], $arr)) $this->setLastReport($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
 	}
 
 	/**
@@ -1895,6 +2002,7 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(EntryDistributionPeer::ERROR_TYPE)) $criteria->add(EntryDistributionPeer::ERROR_TYPE, $this->error_type);
 		if ($this->isColumnModified(EntryDistributionPeer::ERROR_NUMBER)) $criteria->add(EntryDistributionPeer::ERROR_NUMBER, $this->error_number);
 		if ($this->isColumnModified(EntryDistributionPeer::ERROR_DESCRIPTION)) $criteria->add(EntryDistributionPeer::ERROR_DESCRIPTION, $this->error_description);
+		if ($this->isColumnModified(EntryDistributionPeer::LAST_REPORT)) $criteria->add(EntryDistributionPeer::LAST_REPORT, $this->last_report);
 		if ($this->isColumnModified(EntryDistributionPeer::CUSTOM_DATA)) $criteria->add(EntryDistributionPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1987,6 +2095,8 @@ abstract class BaseEntryDistribution extends BaseObject  implements Persistent {
 		$copyObj->setErrorNumber($this->error_number);
 
 		$copyObj->setErrorDescription($this->error_description);
+
+		$copyObj->setLastReport($this->last_report);
 
 		$copyObj->setCustomData($this->custom_data);
 
