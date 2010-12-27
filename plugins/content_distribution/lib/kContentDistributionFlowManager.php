@@ -253,6 +253,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return $dbBatchJob;
 		}
 		$entryDistribution->setRemoteId($data->getRemoteId());
+		$entryDistribution->setSubmittedAt(time());
 		$entryDistribution->setStatus(EntryDistributionStatus::READY);
 		$entryDistribution->setDirtyStatus(null);
 	
@@ -267,8 +268,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProvider = $distributionProfile->getProvider();
 		if(!$distributionProvider->isScheduleUpdateEnabled() && $entryDistribution->getSunset(null) > 0)
 			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+		
+		if($data->getResults())
+			$entryDistribution->incrementSubmitResultsVersion();
 			
 		$entryDistribution->save();
+		
+		if($data->getResults())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS);
+			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
 		
 		return $dbBatchJob;
 	}
@@ -301,8 +311,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProvider = $distributionProfile->getProvider();
 		if(!$distributionProvider->isScheduleUpdateEnabled() && $entryDistribution->getSunset(null) > 0)
 			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+	
+		if($data->getResults())
+			$entryDistribution->incrementUpdateResultsVersion();
 			
 		$entryDistribution->save();
+		
+		if($data->getResults())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS);
+			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
 		
 		return $dbBatchJob;
 	}
@@ -323,7 +342,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
 		$entryDistribution->setDirtyStatus(null);
+		
+		if($data->getResults())
+			$entryDistribution->incrementDeleteResultsVersion();
+			
 		$entryDistribution->save();
+		
+		if($data->getResults())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS);
+			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
 		
 		return $dbBatchJob;
 	}
