@@ -197,7 +197,7 @@ class UserRoleService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
 		}
 		
-		$newDbRole = $dbUserRole->copyToPartner($this->partnerId);
+		$newDbRole = $dbUserRole->copyToPartner($this->getPartnerId());
 		$newDbRole->save();
 		
 		$userRole = new KalturaUserRole();
