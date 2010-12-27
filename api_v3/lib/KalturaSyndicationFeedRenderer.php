@@ -82,8 +82,9 @@ class KalturaSyndicationFeedRenderer
 		$this->syndicationFeed = $tmpSyndicationFeed;
 		
 		// add partner to default criteria
-		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId , true);
-		flavorAssetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId , true);
+		myPartnerUtils::addPartnerToCriteria(new categoryPeer(), $this->syndicationFeed->partnerId, true);
+		myPartnerUtils::addPartnerToCriteria(new flavorAssetPeer(), $this->syndicationFeed->partnerId, true);
+		
 		
 		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 
