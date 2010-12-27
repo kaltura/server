@@ -394,6 +394,7 @@ userrole.delete			    		|			|2		|1	|0		|0		|1		|	|		|	|   |
 userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |
 userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |
 userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |
+userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |
 
 permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |
 permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |
