@@ -25,8 +25,6 @@ class BatchService extends KalturaBaseService
 	public function initService ($partnerId, $puserId, $ksStr, $serviceName, $action )
 	{
 		parent::initService ($partnerId, $puserId, $ksStr, $serviceName, $action );
-//		parent::applyPartnerFilterForClass ( new BatchJobPeer() ); 	
-//		parent::applyPartnerFilterForClass ( new notificationPeer() );
 	}
 	
 	
@@ -1449,4 +1447,3 @@ class BatchService extends KalturaBaseService
 // --------------------------------- generic functions 	--------------------------------- //
 
 }
-?>
