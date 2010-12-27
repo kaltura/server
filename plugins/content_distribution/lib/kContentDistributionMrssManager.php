@@ -58,7 +58,9 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 			}
 			else
 			{
-				// TODO append data from the provider plugin
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaContentDistributionProvider');
+				foreach($pluginInstances as $pluginInstance)
+					$pluginInstances->contibuteMRSS($entryDistribution, $distribution);
 			}
 		}
 			
