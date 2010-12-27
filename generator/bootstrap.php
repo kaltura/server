@@ -15,7 +15,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_PLUGIN_PATH, "*"));
-KAutoloader::setClassMapFilePath(KAutoloader::buildPath(KALTURA_GENERATOR_PATH, "cache","KalturaClassMap.cache"));
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/generator/classMap.cache');
 KAutoloader::register();
 
 
