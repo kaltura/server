@@ -411,7 +411,7 @@ class myFileConverter
 		// do convertion
 		$status = null;
 		$imageCropper = new KImageMagickCropper($source_file, $target_file);
-		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, $bgcolor);
+		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor);
 		if (!$status)
 			return null;
 		return $target_file;
