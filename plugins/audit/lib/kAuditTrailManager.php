@@ -56,7 +56,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		else
 		{
-			$cachePath = realpath( dirname(__FILE__) . '/../cache') . "/$partnerId.cfg";
+			$cachePath = kConf::get("cache_root_path") . "/audit/$partnerId.cfg";
 //			KalturaLog::debug("Audit trail config cache path [$cachePath]");
 			if(file_exists($cachePath))
 			{
