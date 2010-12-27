@@ -59,14 +59,14 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 
 	/**
 	 * @readonly
-	 * @var int
+	 * @var KalturaEntryDistributionStatus
 	 * @filter eq,in
 	 */
 	public $status;
 
 	/**
 	 * @readonly
-	 * @var int
+	 * @var KalturaEntryDistributionFlag
 	 * @filter eq,in
 	 */
 	public $dirtyStatus;

@@ -141,7 +141,7 @@ class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var KalturaEntryDistributionStatus
 	 */
 	public $statusEqual;
 
@@ -155,7 +155,7 @@ class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var KalturaEntryDistributionFlag
 	 */
 	public $dirtyStatusEqual;
 

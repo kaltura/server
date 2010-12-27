@@ -114,6 +114,8 @@ genericdistributionprovideraction.delete									|			|2		|1	|0		|0		|1		|rw	|*	|
 genericdistributionprovideraction.deletebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 genericdistributionprovideraction.list										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
 
+entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+
 permission.add						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
 permission.delete					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
 permission.update					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console

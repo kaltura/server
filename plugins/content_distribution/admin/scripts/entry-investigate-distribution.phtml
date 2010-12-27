@@ -1,0 +1,49 @@
+<br/><br/>
+
+<h2><?php echo $this->translate('entry-investigate distributions title'); ?></h2>
+<table>
+	<thead>
+		<tr>
+			<th><?php echo $this->translate('entry-investigate distributions id th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions createdAt th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions updatedAt th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions submittedAt th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions distributionProfileId th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions status th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions dirtyStatus th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions thumbAssetIds th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions flavorAssetIds th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions sunrise th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions sunset th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions remoteId th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions plays th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions views th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions errorType th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions errorNumber th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate distributions errorDescription th'); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach($this->distributions as $distribution): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'), 'distributions')->next(); ?>">
+				<td><?php echo $distribution->id; ?></td>
+				<td><?php echo date($this->translate('date format'), $distribution->createdAt); ?></td>
+				<td><?php echo date($this->translate('date format'), $distribution->updatedAt); ?></td>
+				<td><?php echo date($this->translate('date format'), $distribution->submittedAt); ?></td>
+				<td><?php echo $distribution->distributionProfileId; ?></td>				
+				<td><?php echo $this->enumTranslate('KalturaEntryDistributionStatus', $distribution->status); ?></td>
+				<td><?php echo $this->enumTranslate('KalturaEntryDistributionFlag', $distribution->dirtyStatus); ?></td>
+				<td><?php echo $distribution->thumbAssetIds; ?></td>
+				<td><?php echo $distribution->flavorAssetIds; ?></td>
+				<td><?php echo date($this->translate('date format'), $distribution->sunrise); ?></td>
+				<td><?php echo date($this->translate('date format'), $distribution->sunset); ?></td>
+				<td><?php echo $distribution->remoteId; ?></td>
+				<td><?php echo $distribution->plays; ?></td>
+				<td><?php echo $distribution->views; ?></td>
+				<td><?php echo $this->enumTranslate('KalturaDistributionErrorType', $distribution->errorType); ?></td>
+				<td><?php echo $distribution->errorNumber; ?></td>
+				<td><?php echo $distribution->errorDescription; ?></td>
+			</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>

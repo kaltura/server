@@ -812,6 +812,46 @@ return array(
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this storage.',
 
+
+	'entry-investigate distributions title' => 'Entry Distribution objects',
+	'entry-investigate distributions id th' => 'ID',
+	'entry-investigate distributions createdAt th' => 'Creation time',
+	'entry-investigate distributions updatedAt th' => 'Last update time',
+	'entry-investigate distributions submittedAt th' => 'Submission time',
+	'entry-investigate distributions distributionProfileId th' => 'Distribution profile ID',
+	'entry-investigate distributions status th' => 'Status',
+	'entry-investigate distributions dirtyStatus th' => 'Dirty flag',
+	'entry-investigate distributions thumbAssetIds th' => 'Thumbnail Assets',
+	'entry-investigate distributions flavorAssetIds th' => 'Flavor Assets',
+	'entry-investigate distributions sunrise th' => 'Sunrise time',
+	'entry-investigate distributions sunset th' => 'Sunset time',
+	'entry-investigate distributions remoteId th' => 'Remote ID',
+	'entry-investigate distributions plays th' => 'plays',
+	'entry-investigate distributions views th' => 'views',
+	'entry-investigate distributions errorType th' => 'Error type',
+	'entry-investigate distributions errorNumber th' => 'Error number',
+	'entry-investigate distributions errorDescription th' => 'Error description',
+
+	'KalturaEntryDistributionStatus::PENDING' => 'Pending',
+	'KalturaEntryDistributionStatus::QUEUED' => 'Queued',
+	'KalturaEntryDistributionStatus::READY' => 'Ready',
+	'KalturaEntryDistributionStatus::DELETED' => 'Deleted',
+	'KalturaEntryDistributionStatus::SUBMITTING' => 'Submitting', 
+	'KalturaEntryDistributionStatus::UPDATING' => 'Updating',
+	'KalturaEntryDistributionStatus::DELETING' => 'Deleting',
+	'KalturaEntryDistributionStatus::ERROR_SUBMITTING' => 'Error Submitting',
+	'KalturaEntryDistributionStatus::ERROR_UPDATING' => 'Error Updating',
+	'KalturaEntryDistributionStatus::ERROR_DELETING' => 'Error Deleting',
+	
+	'KalturaEntryDistributionFlag::NONE' => 'Clean',
+	'KalturaEntryDistributionFlag::SUBMIT_REQUIRED' => 'Submit Required',
+	'KalturaEntryDistributionFlag::DELETE_REQUIRED' => 'Delete Required',
+	'KalturaEntryDistributionFlag::UPDATE_REQUIRED' => 'Update Required',
+
+	'KalturaDistributionErrorType::MISSING_FLAVOR' => 'Missing Flavor',
+	'KalturaDistributionErrorType::MISSING_THUMBNAIL' => 'Missing Thumbnail',
+	'KalturaDistributionErrorType::MISSING_METADATA' => 'Missing Metadata',
+	'KalturaDistributionErrorType::INVALID_DATA' => 'Invalid Data',
 );
 
 
