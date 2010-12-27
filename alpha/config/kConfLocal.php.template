@@ -118,6 +118,7 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "AvidemuxPlugin";
 		// self::$map['default_plugins'][] = "ContentDistributionPlugin";
 		// self::$map['default_plugins'][] = "MsnDistributionPlugin";
+		// self::$map['default_plugins'][] = "ContentDistributionSphinxPlugin";
 		
 }
 
