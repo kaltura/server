@@ -361,6 +361,7 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
+	const HULU = "huluDistribution.HULU";
 }
 
 class KalturaDocumentType
@@ -933,6 +934,7 @@ class KalturaPermissionName
 	const LIVE_STREAM_UPDATE = "CONTENT_MANAGE_UPDATE_LIVE";
 	const CONTENT_MODERATE_BASE = "CONTENT_MODERATE_BASE";
 	const CONTENT_MODERATE_METADATA = "CONTENT_MODERATE_METADATA";
+	const CONTENT_MODERATE_CUSTOM_DATA = "CONTENT_MODERATE_CUSTOM_DATA";
 	const PLAYLIST_BASE = "PLAYLIST_BASE";
 	const PLAYLIST_ADD = "PLAYLIST_ADD";
 	const PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
@@ -5144,6 +5146,74 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 
 }
 
+class KalturaHuluDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $domain = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $movFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $flvFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $wmvFlavorParamsId = null;
+
+
+}
+
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -5211,7 +5281,129 @@ class KalturaMsnDistributionProvider extends KalturaDistributionProvider
 
 }
 
+class KalturaHuluDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
 class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $movFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $wmvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $emailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rated = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $blogged = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $reviewed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bookmarked = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $playbackFailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $timeSpent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $recommended = null;
+
+
+}
+
+class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**
 	 * 
@@ -9084,7 +9276,7 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionStatus
 	 */
 	public $statusEqual = null;
 
@@ -9098,7 +9290,7 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionFlag
 	 */
 	public $dirtyStatusEqual = null;
 

@@ -349,6 +349,7 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
+	const HULU = "huluDistribution.HULU";
 }
 
 class KalturaDurationType
@@ -369,6 +370,28 @@ class KalturaEmailIngestionProfileStatus
 {
 	const INACTIVE = 0;
 	const ACTIVE = 1;
+}
+
+class KalturaEntryDistributionFlag
+{
+	const NONE = 0;
+	const SUBMIT_REQUIRED = 1;
+	const DELETE_REQUIRED = 2;
+	const UPDATE_REQUIRED = 3;
+}
+
+class KalturaEntryDistributionStatus
+{
+	const PENDING = 0;
+	const QUEUED = 1;
+	const READY = 2;
+	const DELETED = 3;
+	const SUBMITTING = 4;
+	const UPDATING = 5;
+	const DELETING = 6;
+	const ERROR_SUBMITTING = 7;
+	const ERROR_UPDATING = 8;
+	const ERROR_DELETING = 9;
 }
 
 class KalturaEntryModerationStatus
@@ -804,6 +827,7 @@ class KalturaPermissionName
 	const LIVE_STREAM_UPDATE = "CONTENT_MANAGE_UPDATE_LIVE";
 	const CONTENT_MODERATE_BASE = "CONTENT_MODERATE_BASE";
 	const CONTENT_MODERATE_METADATA = "CONTENT_MODERATE_METADATA";
+	const CONTENT_MODERATE_CUSTOM_DATA = "CONTENT_MODERATE_CUSTOM_DATA";
 	const PLAYLIST_BASE = "PLAYLIST_BASE";
 	const PLAYLIST_ADD = "PLAYLIST_ADD";
 	const PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
@@ -2783,7 +2807,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionStatus
 	 * @readonly
 	 */
 	public $status = null;
@@ -2791,7 +2815,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionFlag
 	 * @readonly
 	 */
 	public $dirtyStatus = null;
@@ -3155,6 +3179,74 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 
 }
 
+class KalturaHuluDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $domain = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $movFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $flvFlavorParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $wmvFlavorParamsId = null;
+
+
+}
+
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -3222,7 +3314,129 @@ class KalturaMsnDistributionProvider extends KalturaDistributionProvider
 
 }
 
+class KalturaHuluDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
 class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $movFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $wmvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $emailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rated = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $blogged = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $reviewed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bookmarked = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $playbackFailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $timeSpent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $recommended = null;
+
+
+}
+
+class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**
 	 * 
@@ -5284,6 +5498,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminName = null;
 
@@ -5291,6 +5506,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminEmail = null;
 
@@ -5454,6 +5670,13 @@ class KalturaPartner extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $adminLoginUsersQuota = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminUserId = null;
 
 
 }
