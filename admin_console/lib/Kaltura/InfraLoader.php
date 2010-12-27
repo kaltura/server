@@ -11,7 +11,7 @@ class Kaltura_InfraLoader implements Zend_Loader_Autoloader_Interface
 		require_once($infaDir . DIRECTORY_SEPARATOR . 'KAutoloader.php');
 		KAutoloader::setClassPath(array($infaDir . DIRECTORY_SEPARATOR . '*'));
 		KAutoloader::addClassPath(KAutoloader::buildPath($pluginsDir, '*'));
-		KAutoloader::setClassMapFilePath(KAutoloader::buildPath($cacheDir, "KalturaClassMap.cache"));
+		KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/admin/classMap.cache');
 		KAutoloader::register();
 	}
 	
