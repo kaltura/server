@@ -1,5 +1,5 @@
 <?php
-class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory
+class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {
 	const PLUGIN_NAME = 'contentDistributionSphinx';
 	
@@ -20,5 +20,13 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 			return new SphinxEntryDistributionCriteria();
 			
 		return null;
+	}
+	
+	/**
+	 * @return string path to configuration file
+	 */
+	public static function getSphinxConfigPath()
+	{
+		return dirname(__FILE__) . '/config/sphinx.conf'; 
 	}
 }
