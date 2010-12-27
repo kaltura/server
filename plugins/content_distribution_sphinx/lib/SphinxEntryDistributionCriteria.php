@@ -22,6 +22,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		EntryDistributionPeer::ERROR_TYPE => 'error_type',
 		EntryDistributionPeer::ERROR_NUMBER => 'error_number',
 		EntryDistributionPeer::LAST_REPORT => 'last_report',
+		EntryDistributionPeer::NEXT_REPORT => 'next_report',
 	);
 	
 	public static $sphinxOrderFields = array(
@@ -33,6 +34,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		EntryDistributionPeer::PLAYS => 'plays',
 		EntryDistributionPeer::VIEWS => 'views',
 		EntryDistributionPeer::LAST_REPORT => 'last_report',
+		EntryDistributionPeer::NEXT_REPORT => 'next_report',
 	);
 
 	/**

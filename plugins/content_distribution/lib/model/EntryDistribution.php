@@ -21,6 +21,39 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	const CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION = "SubmitResultsVersion";
 	const CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION = "UpdateResultsVersion";
 	const CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION = "DeleteResultsVersion";
+
+	/**
+	 * Get the [optionally formatted] temporal [next_report] calculated value.
+	 * 
+	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
+	 *							If format is NULL, then the raw unix timestamp integer will be returned.
+	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+	 * @throws     PropelException - if unable to parse/validate the date/time value.
+	 */
+	public function getLastReport($format = 'Y-m-d H:i:s')
+	{
+		if(!$this->getDistributionProfileId())
+			return null;
+			
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($this->getDistributionProfileId());
+		if(!$distributionProfile || !$distributionProfile->getReportInterval() || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+
+		$reportInterval = $distributionProfile->getReportInterval() + (60 * 60 * 24);
+		$lastReport = $this->getLastReport(null);
+		$nextReport = time();
+		
+		if($lastReport)
+			$nextReport = $lastReport + $reportInterval;
+		
+		if ($format === null)
+			return $nextReport;
+			
+		if (strpos($format, '%') !== false)
+			return strftime($format, $nextReport);
+			
+		return date($format, $nextReport);
+	}
 	
 	/**
 	 * @param int $sub_type
@@ -219,6 +252,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			'error_type' => 'errorType',
 			'error_number' => 'errorNumber',
 			'last_report' => 'lastReport',
+			'next_report' => 'nextReport',
 		);
 	}
 
@@ -242,6 +276,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		'error_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'error_number' => IIndexable::FIELD_TYPE_INTEGER,
 		'last_report' => IIndexable::FIELD_TYPE_DATETIME,
+		'next_report' => IIndexable::FIELD_TYPE_DATETIME,
 	);
 	
 	/* (non-PHPdoc)
