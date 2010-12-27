@@ -1,4 +1,6 @@
 <?php
+require_once(dirname(__FILE__) . '/../alpha/config/kConf.php');
+
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 	protected function _initLog()
