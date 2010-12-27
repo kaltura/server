@@ -384,6 +384,42 @@ class KalturaEditorType
 	const ADVANCED = 2;
 }
 
+class KalturaEntryDistributionFlag
+{
+	const NONE = 0;
+	const SUBMIT_REQUIRED = 1;
+	const DELETE_REQUIRED = 2;
+	const UPDATE_REQUIRED = 3;
+}
+
+class KalturaEntryDistributionOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const SUBMITTED_AT_ASC = "+submittedAt";
+	const SUBMITTED_AT_DESC = "-submittedAt";
+	const SUNRISE_ASC = "+sunrise";
+	const SUNRISE_DESC = "-sunrise";
+	const SUNSET_ASC = "+sunset";
+	const SUNSET_DESC = "-sunset";
+}
+
+class KalturaEntryDistributionStatus
+{
+	const PENDING = 0;
+	const QUEUED = 1;
+	const READY = 2;
+	const DELETED = 3;
+	const SUBMITTING = 4;
+	const UPDATING = 5;
+	const DELETING = 6;
+	const ERROR_SUBMITTING = 7;
+	const ERROR_UPDATING = 8;
+	const ERROR_DELETING = 9;
+}
+
 class KalturaEntryModerationStatus
 {
 	const PENDING_MODERATION = 1;
@@ -4736,7 +4772,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionStatus
 	 * @readonly
 	 */
 	public $status = null;
@@ -4744,7 +4780,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaEntryDistributionFlag
 	 * @readonly
 	 */
 	public $dirtyStatus = null;
@@ -6577,6 +6613,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminName = null;
 
@@ -6584,6 +6621,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminEmail = null;
 
@@ -6747,6 +6785,13 @@ class KalturaPartner extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $adminLoginUsersQuota = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminUserId = null;
 
 
 }
@@ -8935,6 +8980,177 @@ class KalturaDistributionProfileListResponse extends KalturaObjectBase
 	 * 
 	 *
 	 * @var array of KalturaDistributionProfile
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $distributionProfileIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $dirtyStatusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dirtyStatusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetLessThanOrEqual = null;
+
+
+}
+
+class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
+{
+
+}
+
+class KalturaEntryDistributionListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaEntryDistribution
 	 * @readonly
 	 */
 	public $objects;
@@ -14664,6 +14880,162 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 	}
 }
 
+class KalturaEntryDistributionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaEntryDistribution $entryDistribution)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryDistribution", $entryDistribution->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function validate($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "validate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function update($id, KalturaEntryDistribution $entryDistribution)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "entryDistribution", $entryDistribution->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistributionListResponse");
+		return $resultObject;
+	}
+
+	function submitAdd($id, $submitWhenReady = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "submitWhenReady", $submitWhenReady);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitAdd", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitUpdate($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitUpdate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitFetchReport($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitFetchReport", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitDelete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitDelete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function retrySubmit($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "retrySubmit", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+}
+
 class KalturaDistributionProviderService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -15133,6 +15505,13 @@ class KalturaClient extends KalturaClientBase
 	public $distributionProfile = null;
 
 	/**
+	 * Entry Distribution service
+	 *
+	 * @var KalturaEntryDistributionService
+	 */
+	public $entryDistribution = null;
+
+	/**
 	 * Distribution Provider service
 	 *
 	 * @var KalturaDistributionProviderService
@@ -15177,6 +15556,7 @@ class KalturaClient extends KalturaClientBase
 		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
 		$this->virusScanProfile = new KalturaVirusScanProfileService($this);
 		$this->distributionProfile = new KalturaDistributionProfileService($this);
+		$this->entryDistribution = new KalturaEntryDistributionService($this);
 		$this->distributionProvider = new KalturaDistributionProviderService($this);
 		$this->genericDistributionProvider = new KalturaGenericDistributionProviderService($this);
 		$this->genericDistributionProviderAction = new KalturaGenericDistributionProviderActionService($this);
