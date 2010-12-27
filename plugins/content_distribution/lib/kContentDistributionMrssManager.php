@@ -48,6 +48,7 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		$distribution = $mrss->addChild('distribution');
 		$distribution->addAttribute('entryDistributionId', $entryDistribution->getId());
 		$distribution->addAttribute('distributionProfileId', $entryDistribution->getDistributionProfileId());
+		$distribution->addAttribute('lastReport', $entryDistribution->getLastReport(null));
 		
 		if($distributionsProvider)
 		{

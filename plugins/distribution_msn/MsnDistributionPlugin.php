@@ -206,7 +206,6 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	{
 		// append MSN specific report statistics
 		$status = $mrss->addChild('status');
-		// TODO add attribute with date of last report
 		
 		$status->addChild('emailed', $entryDistribution->getFromCustomData('emailed'));
 		$status->addChild('rated', $entryDistribution->getFromCustomData('rated'));
