@@ -1,6 +1,6 @@
 <?php
 
-class SphinxEntryCriteria extends KalturaCriteria
+class SphinxEntryCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
 		entryPeer::ID => 'int_entry_id',
@@ -104,136 +104,31 @@ class SphinxEntryCriteria extends KalturaCriteria
 	);
 	
 	/**
-	 * Field keys to be removed from the criteria after all filters applied 
-	 * @var array
-	 */
-	protected $keyToRemove = array();
-		
-	/**
-	 * Sphinx where clauses
-	 * @var array
-	 */
-	protected $whereClause = array();
-	
-	/**
-	 * Sphinx textual match clauses
-	 * @var array
-	 */
-	protected $matchClause = array();
-	
-	/**
 	 * Array of specific ids that could be returned
 	 * Used for _in_id and _eq_id filter fields 
 	 * The form is array[$operator] = array($entryId1 => $entryCrc1, $entryId2 => $entryCrc2)
 	 * @var array
 	 */
 	protected $entryIds = array();
+
+	/**
+	 * @return criteriaFilter
+	 */
+	protected function getDefaultCriteriaFilter()
+	{
+		return entryPeer::getCriteriaFilter();
+	}
 	
 	/**
-	 * Counts how many criterions couldn't be handled
-	 * @var int
+	 * @return string
 	 */
-	private $criteriasLeft;
-
-	/* (non-PHPdoc)
-	 * @see SphinxCriteria#applyFilters()
-	 */
-	public function applyFilters()
+	protected function getSphinxIndexName()
 	{
-		$this->criteriasLeft = 0;
-		
-		KalturaLog::debug("Applies " . count($this->filters) . " filters");
-		
-		foreach($this->filters as $index => $filter)
-		{
-			KalturaLog::debug("Applies filter $index");
-			$this->applyFilter(clone $filter);
-		}
-		
-		// attach all default criteria from peer
-		entryPeer::getCriteriaFilter()->applyFilter($this);
-		
-		// go over all criterions and try to move them to the sphinx
-		foreach($this->getMap() as $field => $criterion)
-		{
-			if(!($criterion instanceof SphinxEntryCriterion))
-			{
-				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] is not sphinx criteria");
-				$this->criteriasLeft++;
-				continue;
-			}
-			
-			if($criterion->apply($this->whereClause, $this->matchClause))
-			{
-				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] attached");
-				$this->keyToRemove[] = $field;
-			}
-			else
-			{
-				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] failed");
-				$this->criteriasLeft++;
-			}
-		}
-		
-		KalturaLog::debug("Applied " . count($this->matchClause) . " matches, " . count($this->whereClause) . " clauses, " . count($this->keyToRemove) . " keys removed, $this->criteriasLeft keys left");
-		
-		if(count($this->matchClause))
-		{
-			$matches = '(' . implode(') & (', $this->matchClause) . ')';
-			$this->whereClause[] = "MATCH('$matches')";
-		}
-		
-		$wheres = '';
-		if(count($this->whereClause))
-			$wheres = 'WHERE ' . implode(' AND ', $this->whereClause);
-
-		$orderBy = '';
-		$orderByColumns = $this->getOrderByColumns();
-		$orderByColumns = array_unique($orderByColumns);
-		
-		$setLimit = true;
-		if(count($orderByColumns))
-		{
-			$replace = self::$sphinxOrderFields;
-			$search = array_keys($replace);
-			
-			$orders = array();
-			foreach($orderByColumns as $orderByColumn)
-			{
-				$arr = explode(' ', $orderByColumn);
-				$orderField = $arr[0];
-				
-				if(isset($replace[$orderField]))
-				{
-					KalturaLog::debug("Add sort field[$orderField] copy from [$orderByColumn]");
-					$orders[] = str_replace($search, $replace, $orderByColumn);
-				}
-				else
-				{
-					KalturaLog::debug("Skip sort field[$orderField] from [$orderByColumn] limit won't be used in sphinx query");
-					$setLimit = false;
-				}
-			}
-				
-			if(count($orders))
-				$orderBy = 'ORDER BY ' . implode(',', $orders);
-		}
-			
-		$index = kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);
-		$maxMatches = kSphinxSearchManager::SPHINX_MAX_RECORDS;
-		$limit = $maxMatches;
-		
-		if($this->criteriasLeft)
-			$setLimit = false;
-			
-		if($setLimit && $this->getLimit())
-		{
-			$maxMatches += $this->getOffset();
-			$limit = $this->getLimit();
-			if($this->getOffset())
-				$limit = $this->getOffset() . ", $limit";
-		}
-		
+		return kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);;
+	}
+	
+	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)
+	{
 		$sql = "SELECT str_entry_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
 		
 		//debug query
@@ -311,7 +206,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 	 * 
 	 * @param baseObjectFilter $filter
 	 */
-	protected function applyFilterFields(entryFilter $filter)
+	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		if ($filter->get("_matchand_categories") !== null)
 		{
@@ -388,154 +283,8 @@ class SphinxEntryCriteria extends KalturaCriteria
 				$this->matchClause[] = implode(' | ', $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
-	
-		foreach($filter->fields as $field => $val)
-		{	
-			if(is_null($val) || !strlen($val)) 
-			{
-//				KalturaLog::debug("Skip field[$field] value is null");
-				continue;
-			}
-			
-			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
-			if(count($fieldParts) != 3)
-			{
-				KalturaLog::debug("Skip field[$field] has [" . count($fieldParts) . "] parts");
-				continue;
-			}
-			
-			list($prefix, $operator, $fieldName) = $fieldParts;
-			
-			$fieldNamesArr = explode(baseObjectFilter::OR_SEPARATOR, $fieldName);
-			if(count($fieldNamesArr) > 1)
-			{
-				$sphinxFieldNames = array();
-				foreach($fieldNamesArr as $fieldName)
-				{
-					$sphinxField = self::getSphinxFieldName($fieldName);
-					$type = self::getSphinxFieldType($sphinxField);
-					$sphinxFieldNames[] = $sphinxField;
-				}
-				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
-				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
-				$val = implode(' ', $vals);
-			}
-			elseif(!self::hasMatchableField($fieldName))
-			{
-				KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
-				continue;
-			}
-			else
-			{
-				$sphinxField = self::getSphinxFieldName($fieldName);
-				$type = self::getSphinxFieldType($sphinxField);
-			}
-			$valStr = print_r($val, true);
-			
-			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
-			switch($operator)
-			{
-				case baseObjectFilter::MULTI_LIKE_OR:
-				case baseObjectFilter::MATCH_OR:
-					$vals = is_array($val) ? $val : explode(',', $val);
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-					
-					if(count($vals))
-					{
-						$val = implode(' | ', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
-						$filter->unsetByName($field);
-					}
-					break;
-				
-				case baseObjectFilter::NOT_IN:
-					$vals = is_array($val) ? $val : explode(',', $val);
-						
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-					
-					if(count($vals))
-					{
-						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
-						$val = '!' . implode(' & !', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
-						$filter->unsetByName($field);
-					}
-					break;
-				
-				case baseObjectFilter::IN:
-					$vals = is_array($val) ? $val : explode(',', $val);
-						
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-					
-					if(count($vals))
-					{
-						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
-						$val = '(^' . implode('$ | ^', $vals) . '$)';
-						$this->matchClause[] = "@$sphinxField $val";
-						$filter->unsetByName($field);
-					}
-					break;
-				
-				
-				case baseObjectFilter::EQ:
-					if(is_numeric($val) || strlen($val) > 1)
-					{
-						$val = SphinxUtils::escapeString($val);
-						$this->matchClause[] = "@$sphinxField ^$val$";
-						$filter->unsetByName($field);
-					}
-					break;
-				
-				case baseObjectFilter::MULTI_LIKE_AND:
-				case baseObjectFilter::MATCH_AND:
-				case baseObjectFilter::LIKE:
-					$vals = is_array($val) ? $val : explode(' ', $val);
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						elseif(preg_match('/[\s\t]/', $valValue))
-							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue) . '"';
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-							
-					if(count($vals))
-					{
-						$val = implode(' & ', $vals);
-						$this->matchClause[] = "@$sphinxField $val";
-						$filter->unsetByName($field);
-					}
-					break;
-					
-				default:
-					KalturaLog::debug("Skip field[$field] has no opertaor[$operator]");
-			}
-		}
+		
+		return parent::applyFilterFields($filter);
 	}
 	
 	/**
@@ -566,20 +315,10 @@ class SphinxEntryCriteria extends KalturaCriteria
 	 * 
 	 * @param baseObjectFilter $filter
 	 */
-	protected function applyFilter(entryFilter $filter)
+	protected function applyFilter(baseObjectFilter $filter)
 	{
-		$advancedSearch = $filter->getAdvancedSearch();
-		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilter)
-		{
-			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
-			$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause);
-		}
-		
-		$this->applyFilterFields($filter);
 		$this->applyPartnerScope($filter);
-		
-		// attach all unhandled fields
-		$filter->attachToFinalCriteria($this);
+		parent::applyFilter($filter);
 	}
 
 	/* (non-PHPdoc)
@@ -587,7 +326,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 	 */
 	public function getNewCriterion($column, $value, $comparison = null)
 	{
-		return new SphinxEntryCriterion($this, $column, $value, $comparison);
+		return new SphinxCriterion('SphinxEntryCriteria', $this, $column, $value, $comparison);
 	}
 
 	/* (non-PHPdoc)
@@ -604,7 +343,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 			return parent::add($p1);
 		}
 		
-		$nc = new SphinxEntryCriterion($this, $p1, $value, $comparison);
+		$nc = new SphinxCriterion('SphinxEntryCriteria', $this, $p1, $value, $comparison);
 		return parent::add($nc);
 	}
 
@@ -617,7 +356,7 @@ class SphinxEntryCriteria extends KalturaCriteria
 			return parent::addAnd($p1, $p2, $p3);
 			
 		// addAnd(column, value, comparison)
-		$nc = new SphinxEntryCriterion($this, $p1, $p2, $p3);
+		$nc = new SphinxCriterion('SphinxEntryCriteria', $this, $p1, $p2, $p3);
 		$oc = $this->getCriterion($p1);
 		
 		if ( !is_null($oc) )
@@ -635,6 +374,17 @@ class SphinxEntryCriteria extends KalturaCriteria
 	public function setEntryIds($comparison, $entryIds)
 	{
 		$this->entryIds[$comparison] = $entryIds;
+	}
+	
+	public static function hasSphinxFieldName($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "entry.$fieldName";
+		}
+			
+		return isset(self::$sphinxFields[$fieldName]);
 	}
 	
 	public static function getSphinxFieldName($fieldName)

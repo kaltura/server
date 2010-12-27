@@ -1,20 +1,22 @@
 <?php
 
-class SphinxEntryCriterion extends Criterion
+class SphinxCriterion extends KalturaCriterion
 {
+	const MAX_IN_VALUES = 500;
+	
 	/**
 	 * @var bool
 	 */
-	private $hasOr = false;
+	protected $hasOr = false;
 	
 	/**
-	 * @var SphinxEntryCriteria
+	 * @var string Criteria class name
 	 */
-	private $criteria = false;
+	protected $criteriaClass = false;
 	
-	public function __construct(Criteria $criteria, $column, $value, $comparison = null)
+	public function __construct($criteriaClass, Criteria $criteria, $column, $value, $comparison = null)
 	{
-		$this->criteria = $criteria;
+		$this->criteriaClass = $criteriaClass;
 		
 		parent::__construct($criteria, $column, $value, $comparison);
 	}
@@ -36,9 +38,9 @@ class SphinxEntryCriterion extends Criterion
 		{
 			foreach($clauses as $clause)
 			{
-				if(!($clause instanceof SphinxEntryCriterion))
+				if(!($clause instanceof SphinxCriterion))
 				{
-					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not sphinx criteria");
+					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criteria");
 					return false;
 				}
 					
@@ -57,7 +59,7 @@ class SphinxEntryCriterion extends Criterion
 			return false;
 		}
 	
-		if(!isset(SphinxEntryCriteria::$sphinxFields[$field]))
+		if(!call_user_func($this->criteriaClass . '::hasSphinxFieldName', $field))
 		{
 			KalturaLog::debug("Skip criterion[$field] has no sphinx field");
 			return false;
@@ -65,8 +67,8 @@ class SphinxEntryCriterion extends Criterion
 		
 		$value = $this->getValue();
 		
-		$sphinxField = SphinxEntryCriteria::getSphinxFieldName($field);
-		$type = SphinxEntryCriteria::getSphinxFieldType($sphinxField);
+		$sphinxField	= call_user_func($this->criteriaClass . '::getSphinxFieldName', $field);
+		$type			= call_user_func($this->criteriaClass . '::getSphinxFieldType', $sphinxField);
 		
 		if($field == entryPeer::ID)
 		{
@@ -126,7 +128,7 @@ class SphinxEntryCriterion extends Criterion
 					
 					if(count($vals))
 					{
-						$vals = array_slice($vals, 0, SphinxEntryCriteria::MAX_IN_VALUES);
+						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = '!' . implode(' & !', $vals);
 						$matchClause[] = "@$sphinxField $val";
 					}
@@ -145,7 +147,7 @@ class SphinxEntryCriterion extends Criterion
 					
 					if(count($vals))
 					{
-						$vals = array_slice($vals, 0, SphinxEntryCriteria::MAX_IN_VALUES);
+						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = '(^' . implode('$ | ^', $vals) . '$)';
 						$matchClause[] = "@$sphinxField $val";
 					}
