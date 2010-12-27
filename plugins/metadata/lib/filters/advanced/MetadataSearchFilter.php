@@ -9,7 +9,7 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 	const KMC_FIELD_TYPE_LIST = 'listType';
 	const KMC_FIELD_TYPE_DATE = 'dateType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
-	
+	 
 	/**
 	 * @var string
 	 */
