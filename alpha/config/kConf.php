@@ -143,7 +143,8 @@ class kConf extends kConfLocal
 					'kVirusScanFlowManager' => 7,
                 ),
                 
-				"cache_root_path" => dirname(__FILE__).'/../../cache/general/',
+				"cache_root_path" => dirname(__FILE__).'/../../cache/',
+				"general_cache_dir" => dirname(__FILE__).'/../../cache/general',
                 'response_cache_dir' => dirname(__FILE__).'/../../cache/response/',
                 
 				"exec_sphinx" => false, // Should be set to false in multiple data centers environments
