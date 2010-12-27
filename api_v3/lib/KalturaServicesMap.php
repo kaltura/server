@@ -16,7 +16,7 @@ class KalturaServicesMap
 	{
 		if(!count(self::$services))
 		{
-			$cacheFilePathArray = array(KALTURA_API_PATH, 'cache', 'KalturaServicesMap.cache');
+			$cacheFilePathArray = array(kConf::get("cache_root_path"), 'api_v3', 'KalturaServicesMap.cache');
 			$cacheFilePath = implode(DIRECTORY_SEPARATOR, $cacheFilePathArray);
 			if (!file_exists($cacheFilePath))
 			{
