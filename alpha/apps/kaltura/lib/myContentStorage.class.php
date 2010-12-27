@@ -329,7 +329,7 @@ class myContentStorage
 	
 	public static function getFSCacheRootPath ()
 	{
-		return kConf::get("cache_root_path");
+		return kConf::get("general_cache_dir");
 	}
 	
 	public static function getFSDeletedContentRootPath ( $original_path )

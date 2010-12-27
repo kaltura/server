@@ -20,7 +20,7 @@ require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "metadata", "*"));
-KAutoloader::setClassMapFilePath('cache/classMap.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/open_office/classMap.cache');
 KAutoloader::register();
 
 $script_name = $_SERVER['SCRIPT_NAME'];

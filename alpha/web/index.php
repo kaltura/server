@@ -148,7 +148,7 @@ function checkCache()
 				
 				$name_of_file = pathinfo($file_name, PATHINFO_FILENAME);
 				//$local_file_name = str_replace("/web//content/entry/tempthumb/", "/opt/kaltura/cache/content/entry/tempthumb/", $file_name);
-				$local_file_name = kConf::get('cache_root_path').DIRECTORY_SEPARATOR.'content/entry/tempthumb/'.$name_of_file;
+				$local_file_name = kConf::get('general_cache_dir').DIRECTORY_SEPARATOR.'content/entry/tempthumb/'.$name_of_file;
 
 				if (!file_exists($local_file_name))
 				{
