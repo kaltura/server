@@ -1,7 +1,8 @@
 <?php
 interface IKalturaAdminConsoleEntryInvestigate extends IKalturaBase
 {
-	// TODO	
-	// called by the admin console to add data to the investigate screen
-	// should add metadata, content distribution and track entry
+	/**
+	 * @return array<Kaltura_View_Helper_EntryInvestigatePlugin>
+	 */
+	public static function getEntryInvestigatePlugins();
 }
