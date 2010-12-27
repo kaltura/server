@@ -61,6 +61,11 @@ while(count($users))
 		$new_kuser = new kuser();
 		$new_login_data = new UserLoginData();
 		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
+		if (!$partner) {
+			KalturaLog::alert('!!! Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!');
+			echo '!!! Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!';
+			continue;
+		}
 		$user->setEmail($partner->getAdminEmail());
 		$user->setFullName($partner->getAdminName());
 		
