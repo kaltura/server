@@ -1,0 +1,206 @@
+<addContent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="AddContent.xsd">
+	<media>
+		<!-- Required native fields -->
+		<contentType>Video</contentType>
+		<title>9:00 am - 10:00 am</title>
+		<description>Jack Bauer tries to interdict a terrorist nuke before it can be detonated in Los
+			Angeles.</description>
+		<categories>
+			<string>Action and Adventure</string>
+			<string>Political</string>
+		</categories>
+		<rating>TV-14</rating> <!-- Optional native fields -->
+		<availableDate>2007-07-16T21:02:24</availableDate>
+		<expirationDate>2008-09-15T21:02:24</expirationDate>
+		<copyright>2007 Twentieth Century Fox Film Corporation</copyright>
+		<keywords>24,Jack,Bauer,Terrorist,Cell,Kiefer,Sutherland,Suitcase,Nuke</keywords>
+		<language>English</language>
+		<customData>
+			<!-- Required custom data -->
+			<CustomDataElement>
+				<title>Media Type</title>
+				<value>TV</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Series Title</title>
+				<value>24></value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Programming Type</title>
+				<value>Full Episode</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Aspect Ratio</title>
+				<value>16x9</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Frame Rate</title>
+				<value>24</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>isMashupPermitted</title>
+				<value>Yes</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Channel</title>
+				<value>FOX</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Episode Number</title>
+				<value>4</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Season Number</title>
+				<value>6</value>
+			</CustomDataElement>
+			<!-- Optional custom data -->
+			<CustomDataElement>
+				<title>TMS Program ID</title>
+				Content Partner Guidebook
+				v1.3.14
+				25
+				<value>EP004466040135</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>TMS Series ID</title>
+				<value>SH004466040000</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>ExternalID</title>
+				<value>6aaf004</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Full Description</title>
+				<value>
+					Jack reluctantly accepts the President’s request to lead the search for Fayed and the nuclear scientist. When a woman calls emergency services about her family being taken hostage and she mentions Fayed’s name , Jack goes there and gets the address of Fayed’s safe house. Jack tries to convince Curtis to work with Assad even though Curtis has a history with the former terrorist. Curtis becomes angry when the President grants a pardon to Assad. Curtis is about to shoot Assad but
+					Jack
+					intervenes by killing Curtis in order to save Assad’s life. Jack becomes emotionally distraught and tells Buchanan that he is quitting the mission. Jack looks on in horror as the nuclear bomb explodes in the sky.
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Series Description</title>
+				<value>A spy/thriller series about a government agent who Jack Bauer to avert nation
+					threatening crises. The first day, Bauer uncovers an assassination plot against a presidential candidate -- and has 24 hours to stop
+					the murder. The second day, Bauer takes on terrorists who have planted a bomb in Los Angeles. The third day, which takes place
+					three years later, a high profile drug dealer threatens to release a deadly virus on Los Angeles if his captured brother is not
+					released. Day four begins
+					18 months later. Jack is fired from CTU. After the explosion of a commuter train, Jack, now working for
+					the Secretary of Defense, finds himself heading back to CTU on on the Secretary's behalf. Day five follows another 18 months later,
+					when Jack resurfaces after faking his death and his old friends at CTU are getting killed or on the run. He ends up taking down the
+					corrupt President of the United States by the end of the day.</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Season Synopsis</title>
+				<value>
+					Talk about packing a lot into a day: Kiefer Sutherland returns for a sixth season as counterterrorism agent Jack Bauer in this popular series in which each episode represents one action-packed hour in our hero ' s hectic season-long day. This season , terror attacks are striking cities across the U.S. and the government asks Bauer to sacrifice himself to save the country. Mary Lynn Rajskub and D.B. Woodside return to the frenetic series.
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Studio</title>
+				<value>
+					Twentieth Century Fox Film Corporation
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>CP Promotional Text</title>
+				<value>
+					Buy 2 Season 6 on DVD
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>CP Promotional Link</title>
+				<value>
+					http: / www.foxstore.com / detail.php ? item=2642
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Tunein Information</title>
+				<value>24 Season 7 Begins January 2008</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Content Rating Reason</title>
+				<value>
+					L , V
+				</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Original Premiere Date</title>
+				<value>2007-01-15</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Programming Priority</title>
+				<value>1</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Daypart</title>
+				<value>Primetime</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Segments</title>
+				Content Partner Guidebook
+				v1.3.14
+				26
+				<value>00:07:53;00,00:17:35;00,00:23:18;00,00:36:57;00, </value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>isProgressiveAllowed</title>
+				<value>False</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>isDistributable </title>
+				<value>True</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>isClippingAllowed </title>
+				<value>True</value>
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>allowAnyAvailabilityDate</title>
+				<value>True</value>
+			</CustomDataElement>
+		</customData>
+	</media>
+	<mediaFiles>
+		<mediaFile>
+			<contentType>Video</contentType>
+			<encodingProfileTitle>Mezzanine video</encodingProfileTitle>
+			<format>QT</format>
+			<originalLocation>FOX-24-06-004.mov</originalLocation>
+			<customData>
+			</customData>
+		</mediaFile>
+		<mediaFile>
+			<contentType>Video</contentType>
+			<encodingProfileTitle>16x9 24fps High</encodingProfileTitle>
+			<format>FLV</format>
+			<originalLocation>FOX-24-06-004_700.flv</originalLocation>
+			<customData>
+			</customData>
+		</mediaFile>
+		<mediaFile>
+			<contentType>Video</contentType>
+			<encodingProfileTitle>16x9 24fps Medium</encodingProfileTitle>
+			<format>FLV</format>
+			<originalLocation>FOX-24-06-004_480.flv</originalLocation>
+			<customData>
+			</customData>
+		</mediaFile>
+		<mediaFile>
+			<contentType>Image</contentType>
+			<encodingProfileTitle>Mezzanine thumbnail</encodingProfileTitle>
+			<format>JPEG</format>
+			<originalLocation>FOX-24-06-004.jpg</originalLocation>
+			<customData>
+			</customData>
+		</mediaFile>
+		<mediaFile>
+			<contentType>Document</contentType>
+			<format>Text</format>
+			<assetTypes>
+				<string>SAMI</string>
+			</assetTypes>
+			<originalLocation>FOX-24-06-004.smi</originalLocation>
+		</mediaFile>
+	</mediaFiles>
+	<options />
+</addContent>

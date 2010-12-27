@@ -1,8 +1,8 @@
 <?php
-class MsnDistributionProvider implements IDistributionProvider
+class HuluDistributionProvider implements IDistributionProvider
 {
 	/**
-	 * @var MsnDistributionProvider
+	 * @var HuluDistributionProvider
 	 */
 	protected static $instance;
 	
@@ -12,12 +12,12 @@ class MsnDistributionProvider implements IDistributionProvider
 	}
 	
 	/**
-	 * @return MsnDistributionProvider
+	 * @return HuluDistributionProvider
 	 */
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new MsnDistributionProvider();
+			self::$instance = new HuluDistributionProvider();
 			
 		return self::$instance;
 	}
@@ -27,7 +27,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return MsnDistributionProviderType::get()->coreValue(MsnDistributionProviderType::MSN);
+		return HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU);
 	}
 	
 	/**
@@ -35,7 +35,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getName()
 	{
-		return 'MSN';
+		return 'Hulu';
 	}
 
 	/* (non-PHPdoc)
@@ -123,10 +123,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	
 	/**
 	 * @param string $entryId
-	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @param KalturaHuluDistributionJobProviderData $providerData
 	 * @return string
 	 */
-	public static function generateDeleteXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
+	public static function generateDeleteXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
@@ -140,10 +140,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	
 	/**
 	 * @param string $entryId
-	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @param KalturaHuluDistributionJobProviderData $providerData
 	 * @return string
 	 */
-	public static function generateUpdateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
+	public static function generateUpdateXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
@@ -152,7 +152,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 	
-		// change end time to 5 days from now (it's an MSN hack)
+		// change end time to 5 days from now (it's an Hulu hack)
 		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
 		
 		$nodes = $xml->getElementsByTagName('activeEndDate');
@@ -172,10 +172,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	
 	/**
 	 * @param string $entryId
-	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @param KalturaHuluDistributionJobProviderData $providerData
 	 * @return string
 	 */
-	public static function generateSubmitXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
+	public static function generateSubmitXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
@@ -189,10 +189,10 @@ class MsnDistributionProvider implements IDistributionProvider
 	
 	/**
 	 * @param string $entryId
-	 * @param KalturaMsnDistributionJobProviderData $providerData
+	 * @param KalturaHuluDistributionJobProviderData $providerData
 	 * @return DOMDocument
 	 */
-	public static function generateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
+	public static function generateXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);

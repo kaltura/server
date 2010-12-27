@@ -3,6 +3,22 @@
 	<xsd:element name="metadata">
 		<xsd:complexType>
 			<xsd:sequence>
+				<xsd:element name="copyright" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Copyright</label>
+							<key>copyright</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
 				<xsd:element name="shortTitle" minOccurs="0" maxOccurs="1">
 					<xsd:annotation>
 						<xsd:documentation />

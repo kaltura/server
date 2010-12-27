@@ -80,7 +80,11 @@
 				<msdp:genre></msdp:genre>
 				<generator />
 				<rating>None</rating>
-				<msdp:copyright><xsl:value-of select="php:function('date', 'Y', sum(createdAt))" /></msdp:copyright>
+				<msdp:copyright>
+					<xsl:if test="count(customData/metadata/copyright) > 0">
+						<xsl:value-of select="customData/metadata/copyright" />
+					</xsl:if>
+				</msdp:copyright>
 				<msdp:entitlement>BASIC</msdp:entitlement>
 				<msdp:year><xsl:value-of select="php:function('date', 'Y', sum(createdAt))" /></msdp:year>
 				<msdp:liveDate>
