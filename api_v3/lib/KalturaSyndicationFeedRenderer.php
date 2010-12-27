@@ -81,6 +81,10 @@ class KalturaSyndicationFeedRenderer
 		$tmpSyndicationFeed->fromObject($syndicationFeedDB);
 		$this->syndicationFeed = $tmpSyndicationFeed;
 		
+		// add partner to default criteria
+		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId , true);
+		assetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId , true);
+		
 		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 
 		$startDateCriterion = $this->baseCriteria->getNewCriterion(entryPeer::START_DATE, time(), Criteria::LESS_EQUAL);
