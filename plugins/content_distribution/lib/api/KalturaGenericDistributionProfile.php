@@ -42,10 +42,10 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 
 	private static $actions = array 
 	(
-		'submitAction',
-		'updateAction',
-		'deleteAction',
-		'fetchReportAction',
+		'submit',
+		'update',
+		'delete',
+		'fetchReport',
 	);
 	
 	public function toObject($object = null, $skip = array())
@@ -57,17 +57,18 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 			
 		foreach(self::$actions as $action)
 		{
-			if(!$this->$action)
+			$actionAttribute = "{$action}Action";
+			if(!$this->$actionAttribute)
 				continue;
 				
-			$typeReflector = KalturaTypeReflectorCacher::get(get_class($this->$action));
+			$typeReflector = KalturaTypeReflectorCacher::get(get_class($this->$actionAttribute));
 			
-			foreach ( $this->$action->getMapBetweenObjects() as $this_prop => $object_prop )
+			foreach ( $this->$actionAttribute->getMapBetweenObjects() as $this_prop => $object_prop )
 			{
 			 	if ( is_numeric( $this_prop) ) $this_prop = $object_prop;
 				if (in_array($this_prop, $skip)) continue;
 				
-				$value = $this->$action->$this_prop;
+				$value = $this->$actionAttribute->$this_prop;
 				if ($value !== null)
 				{
 					$propertyInfo = $typeReflector->getProperty($this_prop);
@@ -101,13 +102,15 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 		
 		foreach(self::$actions as $action)
 		{
-			if(!$this->$action)
-				$this->$action = new KalturaGenericDistributionProfileAction();
+			$actionAttribute = "{$action}Action";
+			
+			if(!$this->$actionAttribute)
+				$this->$actionAttribute = new KalturaGenericDistributionProfileAction();
 				
-			$reflector = KalturaTypeReflectorCacher::get(get_class($this->$action));
+			$reflector = KalturaTypeReflectorCacher::get(get_class($this->$actionAttribute));
 			$properties = $reflector->getProperties();
 			
-			foreach ( $this->$action->getMapBetweenObjects() as $this_prop => $object_prop )
+			foreach ( $this->$actionAttribute->getMapBetweenObjects() as $this_prop => $object_prop )
 			{
 				if ( is_numeric( $this_prop) ) 
 				    $this_prop = $object_prop;
@@ -122,7 +125,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	                if($properties[$this_prop]->isDynamicEnum())
 	                	$value = kPluginableEnumsManager::coreToApi($properties[$this_prop]->getType(), $value);
 	                	
-	                $this->$action->$this_prop = $value;
+	                $this->$actionAttribute->$this_prop = $value;
 	            }
 	            else
 	            { 
