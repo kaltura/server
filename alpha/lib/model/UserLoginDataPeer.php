@@ -138,7 +138,22 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		// update email if requested
 		if ( $newLoginEmail && $newLoginEmail != $loginData->getLoginEmail()) 
 		{
+			// update login email
 			$loginData->setLoginEmail($newLoginEmail);
+			
+			// update email for all kusers using this login data, in all partners
+			$c = new Criteria();
+			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId(), Criteria::EQUAL);
+			$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
+			kuserPeer::setUseCriteriaFilter(false);
+			$kusers = kuserPeer::doSelect($c);
+			kuserPeer::setUseCriteriaFilter(true);
+			foreach ($kusers as $kuser)
+			{
+				$kuser->setEmail($newLoginEmail);
+				$kuser->save();
+			}
+			
 		}
 				
 		$loginData->save();
@@ -160,6 +175,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
+		$loginData->save();
 				
 		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey()));
 		return true;
@@ -402,7 +418,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
-	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
 	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true)
@@ -459,11 +474,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 				// partner already has a user with the same login data
 				throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 			}
-			
-			if (!$existingData->isPasswordValid($password)) {
-				throw new kUserException('', kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
-			}
-			
+						
 			KalturaLog::DEBUG('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			return $existingData;
 		}	
