@@ -162,12 +162,12 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		return $this->add($nc);
 	}
 	
-	public static function hasSphinxFieldName($fieldName)
+	public function hasSphinxFieldName($fieldName)
 	{
 		return isset(self::$sphinxFields[$fieldName]);
 	}
 	
-	public static function getSphinxFieldName($fieldName)
+	public function getSphinxFieldName($fieldName)
 	{
 		if(!isset(self::$sphinxFields[$fieldName]))
 			return $fieldName;
@@ -175,7 +175,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		return self::$sphinxFields[$fieldName];
 	}
 	
-	public static function getSphinxFieldType($fieldName)
+	public function getSphinxFieldType($fieldName)
 	{
 		if(!isset(self::$sphinxTypes[$fieldName]))
 			return null;
@@ -183,7 +183,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		return self::$sphinxTypes[$fieldName];
 	}
 	
-	public static function hasMatchableField($fieldName)
+	public function hasMatchableField($fieldName)
 	{
 		return in_array($fieldName, array("thumb_asset_ids", "flavor_asset_ids"));
 	}

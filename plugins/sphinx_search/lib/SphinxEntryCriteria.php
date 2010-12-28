@@ -376,7 +376,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$this->entryIds[$comparison] = $entryIds;
 	}
 	
-	public static function hasSphinxFieldName($fieldName)
+	public function hasSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
 		{
@@ -387,7 +387,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return isset(self::$sphinxFields[$fieldName]);
 	}
 	
-	public static function getSphinxFieldName($fieldName)
+	public function getSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
 		{
@@ -401,7 +401,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return self::$sphinxFields[$fieldName];
 	}
 	
-	public static function getSphinxFieldType($fieldName)
+	public function getSphinxFieldType($fieldName)
 	{
 		if(!isset(self::$sphinxTypes[$fieldName]))
 			return null;
@@ -409,7 +409,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return self::$sphinxTypes[$fieldName];
 	}
 	
-	public static function hasMatchableField ( $field_name )
+	public function hasMatchableField ( $field_name )
 	{
 		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids", "duration_type", "search_text"));
 	}

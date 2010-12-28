@@ -40,25 +40,25 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 * @param string $fieldName
 	 * @return bool
 	 */
-	abstract public static function hasSphinxFieldName($fieldName);
+	abstract public function hasSphinxFieldName($fieldName);
 	
 	/**
 	 * @param string $fieldName
 	 * @return string
 	 */
-	abstract public static function getSphinxFieldName($fieldName);
+	abstract public function getSphinxFieldName($fieldName);
 	
 	/**
 	 * @param string $fieldName
 	 * @return string
 	 */
-	abstract public static function getSphinxFieldType($fieldName);
+	abstract public function getSphinxFieldType($fieldName);
 	
 	/**
 	 * @param string $fieldName
 	 * @return bool
 	 */
-	abstract public static function hasMatchableField($fieldName);
+	abstract public function hasMatchableField($fieldName);
 	
 	/**
 	 * @param string $index index name
@@ -202,23 +202,23 @@ abstract class SphinxCriteria extends KalturaCriteria
 				$sphinxFieldNames = array();
 				foreach($fieldNamesArr as $fieldName)
 				{
-					$sphinxField = self::getSphinxFieldName($fieldName);
-					$type = self::getSphinxFieldType($sphinxField);
+					$sphinxField = $this->criteria->getSphinxFieldName($fieldName);
+					$type = $this->criteria->getSphinxFieldType($sphinxField);
 					$sphinxFieldNames[] = $sphinxField;
 				}
 				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
 				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
 			}
-			elseif(!self::hasMatchableField($fieldName))
+			elseif(!$this->hasMatchableField($fieldName))
 			{
 				KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
 				continue;
 			}
 			else
 			{
-				$sphinxField = self::getSphinxFieldName($fieldName);
-				$type = self::getSphinxFieldType($sphinxField);
+				$sphinxField = $this->criteria->getSphinxFieldName($fieldName);
+				$type = $this->criteria->getSphinxFieldType($sphinxField);
 			}
 			$valStr = print_r($val, true);
 			

@@ -373,7 +373,7 @@ class SolrEntryCriteria extends KalturaCriteria
 				$vals = array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
 			}
-			elseif(!self::hasMatchableField($fieldName))
+			elseif(!$this->hasMatchableField($fieldName))
 			{
 				KalturaLog::debug("Skip field[$field] has no matchable for name[$fieldName]");
 				continue;
@@ -586,7 +586,7 @@ class SolrEntryCriteria extends KalturaCriteria
 		return self::$solrTypes[$fieldName];
 	}
 	
-	public static function hasMatchableField ( $field_name )
+	public function hasMatchableField ( $field_name )
 	{
 		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids"));
 	}	

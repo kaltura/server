@@ -59,7 +59,7 @@ class SphinxCriterion extends KalturaCriterion
 			return false;
 		}
 	
-		if(!call_user_func($this->criteriaClass . '::hasSphinxFieldName', $field))
+		if(!$this->criteria->hasSphinxFieldName($field))
 		{
 			KalturaLog::debug("Skip criterion[$field] has no sphinx field");
 			return false;
@@ -67,8 +67,8 @@ class SphinxCriterion extends KalturaCriterion
 		
 		$value = $this->getValue();
 		
-		$sphinxField	= call_user_func($this->criteriaClass . '::getSphinxFieldName', $field);
-		$type			= call_user_func($this->criteriaClass . '::getSphinxFieldType', $sphinxField);
+		$sphinxField	= $this->criteria->getSphinxFieldName($field);
+		$type			= $this->criteria->getSphinxFieldType($sphinxField);
 		
 		if($field == entryPeer::ID)
 		{
