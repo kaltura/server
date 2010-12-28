@@ -91,6 +91,11 @@ class KalturaPermission extends KalturaObject implements IFilterable
 	 */
 	public $updatedAt;
 	
+	/**
+	 * @var string
+	 */
+	public $partnerGroup;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -106,6 +111,7 @@ class KalturaPermission extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'dependsOnPermissionNames',
+		'partnerGroup',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -132,7 +138,9 @@ class KalturaPermission extends KalturaObject implements IFilterable
 		
 		// copy permission items IDs
 		$itemIdsArray = $source_object->getPermissionItemIds();
-		$this->permissionItemsIds = implode(',', $itemIdsArray);
+		if ($itemIdsArray && count($itemIdsArray) > 0) {
+			$this->permissionItemsIds = implode(',', $itemIdsArray);
+		}
 	}
 
 	

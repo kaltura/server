@@ -14,7 +14,7 @@ class KalturaApiParameterPermissionItem extends KalturaPermissionItem
 	public $parameter;
 	
 	/**
-	 * @var string
+	 * @var KalturaApiParameterPermissionItemAction
 	 */
 	public $action;
 	
