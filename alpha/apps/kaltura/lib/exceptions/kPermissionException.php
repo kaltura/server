@@ -17,5 +17,7 @@ class kPermissionException extends kCoreException
 	
 	const PERMISSION_ALREADY_EXISTS = 'PERMISSION_ALREADY_EXISTS';
 	
+	const ROLE_NOT_FOUND = 'ROLE_NOT_FOUND';	
 	
+	const ROLE_IS_BEING_USED = 'ROLE_IS_BEING_USED';
 }

@@ -270,8 +270,6 @@
 		
 		const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
 		
-		const USER_EXISTS_WITH_DIFFERENT_PASSWORD = "USER_EXISTS_WITH_DIFFERENT_PASSWORD,A user with the same login email but a different password already exists";
-	
 		const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA,Login data cannot be updated by this action";
 	
 		const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED,Same login id is already in use";
@@ -291,5 +289,9 @@
 		const USER_IS_BLOCKED = "USER_IS_BLOCKED,User is blocked";
 		
 		const ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE = "ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE,Account owner must have a partner administrator role";
+		
+		const ROLE_IS_BEING_USED = "ROLE_IS_BEING_USED,Role is being used";
+		
+		const CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER = "CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER,Login cannot be disabled for admin users";
 	}
 ?>
