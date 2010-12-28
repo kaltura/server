@@ -77,7 +77,8 @@ while(count($users))
 
 		// check for existing kusers for this admin_kuser
 		$c = new Criteria();
-		$c->addAnd(kuserPeer::PUSER_ID, '__ADMIN__' . $user->getId());
+		$c->addAnd(kuserPeer::PUSER_ID, '__ADMIN__' . $user->getId(), Criteria::EQUAL);
+		$c->addAnd(kuserPeer::PARTNER_ID, $user->getPartnerId(), Criteria::EQUAL);
 		$existing_kuser = kuserPeer::doSelectOne($c, $con);
 		
 		if ($existing_kuser)

@@ -65,7 +65,7 @@ while(count($puserKusers))
 			{
 				$c = new Criteria();
 				$c->addAnd(kuserPeer::PUSER_ID, $puserId, Criteria::EQUAL);
-				$c->addAnd(PartnerPeer::ID, $partnerId, Criteria::EQUAL);
+				$c->addAnd(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 				$otherKusers = kuserPeer::doSelect($c);
 				if (count($otherKusers) > 0)
 				{
