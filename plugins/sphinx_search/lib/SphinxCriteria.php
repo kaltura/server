@@ -134,7 +134,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		$setLimit = true;
 		if(count($orderByColumns))
 		{
-			$replace = self::$sphinxOrderFields;
+			$replace = $this->getSphinxOrderFields();
 			$search = array_keys($replace);
 			
 			$orders = array();
