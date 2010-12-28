@@ -46,20 +46,36 @@ class Permission extends BasePermission
 	}
 	
 	/**
-	 * @return array Array of permission item ids associateds with the current permission
+	 * @return array Array of permission item ids associated with the current permission
 	 */
 	public function getPermissionItemIds()
 	{
 		$ids = array();
-		$items = $this->getPermissionToPermissionItems();
-		if (!$items) {
+		$lookups = $this->getPermissionToPermissionItems();
+		if (!$lookups) {
 			return null;
 		}		
-		foreach ($items as $item) {
-			$ids[] = $item->getPermissionItemId();
+		foreach ($lookups as $lookup) {
+			$ids[] = $lookup->getPermissionItemId();
 		}
 		return $ids;
 	}
+	
+	/**
+	 * @return array Array of permission item objects associated with the current permission
+	 */
+	public function getPermissionItems()
+	{
+		$items = array();
+		$lookups = $this->getPermissionToPermissionItemsJoinPermissionItem();
+		if (!$lookups) {
+			return null;
+		}		
+		foreach ($lookups as $lookup) {
+			$items[] = $lookup->getPermissionItem();
+		}
+		return $items;
+	}	
 
 	/**
 	 * Remove the given permission item from the current permission
@@ -125,6 +141,17 @@ class Permission extends BasePermission
 		$permission->setCustomData($this->getCustomData());
 		$permission->setPartnerId($partnerId); // set new partner id
 		return $permission;
+	}
+	
+	
+	public function getPartnerGroup()
+	{
+		$this->getFromCustomData('partner_group');
+	}
+	
+	public function setPartnerGroup($group)
+	{
+		$this->putInCustomData('partner_group', $group);
 	}
 	
 } // Permission

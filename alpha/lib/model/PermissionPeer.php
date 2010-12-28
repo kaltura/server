@@ -196,16 +196,43 @@ class PermissionPeer extends BasePermissionPeer
 		$allPermissions = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);
 		
+		if ($checkDependency) {
+			$allPermissions = self::filterDependencies($allPermissions);
+		}
+				
+		return $allPermissions;
+	}
+	
+	
+	public static function filterDependenciesByNames($permissionNames)
+	{
+		$c = new Criteria();
+		$c->addAnd(PermissionName, explode(',', $permissionNames), Criteria::IN);
+		$permissionObjects = PermissionPeer::doSelect($c);
+		$permissionObjects = PermissionPeer::filterDependencies($permissionObjects);
+		$permissionNames = array();
+		foreach ($permissionObjects as $object)
+		{
+			$permissionNames[] = $object->getName();
+		}
+		$permissionNames = implode(',', $permissionNames);
+		return $permissionNames;
+	}
+	
+	public static function filterDependencies($permissions)
+	{
+		$checkDependency = true;
+		
 		while ($checkDependency)
 		{
 			$checkDependency = false;
 			$permissionNames = array();
-			foreach ($allPermissions as $permission)
+			foreach ($permissions as $permission)
 			{
 				// create an array of permission names to assist the check
 				$permissionNames[] = $permission->getName();
 			}
-			foreach ($allPermissions as $key => $permission)
+			foreach ($permissions as $key => $permission)
 			{
 				$dependsOn = trim($permission->getDependsOnPermissionNames());
 				$dependsOn = explode(',', $dependsOn);
@@ -220,7 +247,7 @@ class PermissionPeer extends BasePermissionPeer
 						}
 						if (!in_array($dependPermission, $permissionNames)) {
 							// current permission depends on a non existing permission
-							unset($allPermissions[$key]);
+							unset($permissions[$key]);
 							$checkDependency = true; // need to recheck because we have delete a permission
 							break;
 						}
@@ -228,8 +255,7 @@ class PermissionPeer extends BasePermissionPeer
 				}
 			}
 		}
-		
-		return $allPermissions;
-	}	
+		return $permissions;
+	}
 	
 } // PermissionPeer

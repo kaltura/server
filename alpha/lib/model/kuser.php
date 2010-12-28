@@ -751,9 +751,15 @@ class kuser extends Basekuser
 	/**
 	 * Disable user login
 	 * @throws kUserException::USER_LOGIN_ALREADY_DISABLED
+	 * @throws kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
 	 */
 	public function disableLogin()
 	{
+		if ($this->getIsAdmin())
+		{
+			throw new kUserException('', kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER);
+		}
+		
 		if (!$this->getLoginDataId())
 		{
 			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_DISABLED);
@@ -777,11 +783,17 @@ class kuser extends Basekuser
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
-	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
-	public function enableLogin($loginId, $password, $checkPasswordStructure = true)
+	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true)
 	{
+		$sendEmail = false;
+		if (!$password)
+		{
+			$sendEmail = true;
+			$password = UserLoginDataPeer::generateNewPassword();
+		}
+		
 		if ($this->getLoginDataId())
 		{
 			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_ENABLED);
@@ -794,6 +806,12 @@ class kuser extends Basekuser
 		}
 		
 		$this->setLoginDataId($loginData->getId());
+		
+		
+		if ($sendEmail)
+		{
+			kuserPeer::sendNewUserMail($this);
+		}	
 		return $this;
 	}
 	
@@ -873,11 +891,9 @@ class kuser extends Basekuser
 	public function getUserRoleNames()
 	{
 		$names = array();
-		$ids = $this->getUserRoleIds();
-		$ids = explode(',', $ids);
-		foreach ($ids as $id) {
-			$role = UserRolePeer::retrieveByPK($id);
-			$names[] = $role->getName();
+		$lookups = $this->getKuserToUserRolesJoinUserRole();
+		foreach ($lookups as $lookup) {
+			$names[] = $lookup->getUserRole()->getName();
 		}
 		return implode(',', $names);
 	}

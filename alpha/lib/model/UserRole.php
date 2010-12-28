@@ -37,19 +37,41 @@ class UserRole extends BaseUserRole
 	 * 
 	 * @return     string
 	 */
-	public function getPermissionNames()
+	public function getPermissionNames($filterDependencies = false)
 	{
 		$permissionNames = parent::getPermissionNames();
-		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD) {
+		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD)
+		{
 			$permissionNames = '';
-			$permissions = PermissionPeer::getAllValidForPartner(kCurrentContext::$partner_id, false);
+			$permissions = PermissionPeer::getAllValidForPartner(kCurrentContext::$partner_id, $filterDependencies);
 			foreach ($permissions as $permission)
 			{
 				$permissionNames .= $permission->getName().',';	
 			}
 			trim($permissionNames, ',');
+			
+		}
+		else if ($filterDependencies)
+		{
+			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames);
 		}
 		return $permissionNames;
+		
+	}
+	
+	
+	public function setAsDeleted()
+	{
+		// check if role is being used by some user
+		$lookups = $this->getKuserToUserRolesJoinkuser();
+		foreach ($lookups as $lookup) {
+			if ($lookup->getKuser()->getStatus() != KuserStatus::DELETED) {
+				throw new kPermissionException('Cannot delete role id ['.$this->getId().'] used by user id ['.$lookup->getKuser()->getPuserId().']', kPermissionException::ROLE_IS_BEING_USED);
+			}
+		}
+				
+		$this->setStatus(KalturaUserRoleStatus::DELETED);
+		return $this;
 	}
 	
 } // UserRole

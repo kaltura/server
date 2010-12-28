@@ -348,7 +348,6 @@ class kuserPeer extends BasekuserPeer
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
-	 * @throws kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kPermissionException::ROLE_ID_MISSING
@@ -389,10 +388,7 @@ class kuserPeer extends BasekuserPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$user->enableLogin($user->getEmail(), $password ? $password : UserLoginDataPeer::generateNewPassword());
-			if (!$password) {
-				self::sendNewUserMail($user);
-			}
+			$user->enableLogin($user->getEmail(), $password);
 		}	
 		
 		$user->save();
@@ -401,7 +397,7 @@ class kuserPeer extends BasekuserPeer
 	
 	
 	
-	private static function sendNewUserMail(kuser $user)
+	public static function sendNewUserMail(kuser $user)
 	{
 		$mailType = null;
 		$bodyParams = array();
