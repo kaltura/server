@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * for running the script you need to provide path to ini file like:
  *  --ini=/path/to/config.ini
@@ -220,6 +221,7 @@ class uiConfDeployment
 	public static function init($conf_file_path)
 	{
 		require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
+		require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."alpha".DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."kConf.php");
 		define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
 		
 		// Autoloader
