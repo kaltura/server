@@ -189,7 +189,7 @@ class SystemPartnerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
 			
 		$ks = "";
-		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $dbPartner->getAdminEmail(), $ks, 86400, 2, "", "*");
+		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $dbPartner->getAdminUserId(), $ks, 86400, 2, "", "*");
 		return $ks;
 	}
 	
