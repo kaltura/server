@@ -6,10 +6,10 @@
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	private static $actionAttributes = array(
-		KalturaDistributionAction::SUBMIT => 'submit',
-		KalturaDistributionAction::UPDATE => 'update',
-		KalturaDistributionAction::DELETE => 'delete',
-		KalturaDistributionAction::FETCH_REPORT => 'fetchReport',
+		KalturaDistributionAction::SUBMIT => 'submitAction',
+		KalturaDistributionAction::UPDATE => 'updateAction',
+		KalturaDistributionAction::DELETE => 'deleteAction',
+		KalturaDistributionAction::FETCH_REPORT => 'fetchReportAction',
 	);
 	
 	/**

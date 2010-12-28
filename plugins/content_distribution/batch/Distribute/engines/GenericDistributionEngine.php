@@ -40,7 +40,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->submit, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->submitAction, $data->providerData);
 	}
 
 	/**
@@ -162,7 +162,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->delete, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->deleteAction, $data->providerData);
 	}
 
 	/* (non-PHPdoc)
@@ -244,7 +244,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaGenericDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaGenericDistributionJobProviderData");
 		
-		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->update, $data->providerData);
+		return $this->handleAction($data, $data->distributionProfile, $data->distributionProfile->updateAction, $data->providerData);
 	}
 
 }

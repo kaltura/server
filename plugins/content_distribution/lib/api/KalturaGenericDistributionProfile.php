@@ -10,22 +10,22 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $submit;	
+	public $submitAction;
 	
 	/**
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $update;	
+	public $updateAction;	
 	
 	/**
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $delete;	
+	public $deleteAction;	
 	
 	/**
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $fetchReport;	
+	public $fetchReportAction;	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  

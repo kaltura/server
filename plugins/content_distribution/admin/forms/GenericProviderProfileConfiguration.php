@@ -25,14 +25,14 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			$this->populateFromActionObject($object, 'submit', $add_underscore);
 			$this->populateFromActionObject($object, 'update', $add_underscore);
 			$this->populateFromActionObject($object, 'delete', $add_underscore);
-			$this->populateFromActionObject($object, 'report', $add_underscore, 'fetchReport');
+			$this->populateFromActionObject($object, 'report', $add_underscore, 'fetchReportAction');
 		}
 	}
 	
 	public function getActionObject(KalturaGenericDistributionProfile $object, $action, array $properties, $attributeName = null)
 	{
 		if(is_null($attributeName))
-			$attributeName = $action;
+			$attributeName = "{$action}Action";
 			
 		if(!$object->$attributeName)
 			$object->$attributeName = new KalturaGenericDistributionProfileAction();
