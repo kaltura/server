@@ -117,17 +117,6 @@ class myPartnerRegistration
 
 	private function createNewPartner( $parnter_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
 	{
-		// These is enforced by code, and not by constraint in the DB
-		// since we might want to allow several partners with different emails
-		$c = new Criteria();
-		$c->add( UserLoginDataPeer::LOGIN_EMAIL , $email );
-		$loginData = UserLoginDataPeer::doSelectOne($c);
-		if ($loginData) 
-		{
-			// the user already exist in the system
-			throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
-		}
-
 		$secret = md5($this->str_makerand(5,10,true, false, true));
 		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
