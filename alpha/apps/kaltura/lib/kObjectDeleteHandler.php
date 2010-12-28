@@ -54,6 +54,8 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$c->add(assetPeer::ENTRY_ID, $entry->getId());
 		$c->add(assetPeer::STATUS, asset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL);
 		$c->add(assetPeer::DELETED_AT, null, Criteria::ISNULL);
+		
+		assetPeer::resetInstanceCriteriaFilter();
 		$assets = assetPeer::doSelect($c);
 		foreach($assets as $asset)
 		{

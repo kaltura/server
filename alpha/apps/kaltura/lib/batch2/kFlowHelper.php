@@ -559,7 +559,7 @@ class kFlowHelper
 		}
 		
 		if(!is_null($thumbAsset->getFlavorParamsId()))
-			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob, $thumbAsset->getFlavorParamsId());
+			kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $thumbAsset->getFlavorParamsId());
 			
 		return $dbBatchJob;
 	}
@@ -928,9 +928,8 @@ class kFlowHelper
 	 * @param BatchJob $parentJob
 	 * @param int $srcParamsId
 	 */
-	public static function generateThumbnailsFromFlavor(BatchJob $parentJob, $srcParamsId = null)
+	public static function generateThumbnailsFromFlavor($entryId, BatchJob $parentJob = null, $srcParamsId = null)
 	{
-		$entryId = $parentJob->getEntryId();
 		$profile = null;
 		try
 		{
@@ -944,6 +943,13 @@ class kFlowHelper
 		if(!$profile)
 		{
 			KalturaLog::notice("Profile not found for entry id [$entryId]");
+			return;
+		}
+			
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::notice("Entry id [$entryId] not found");
 			return;
 		}
 			
@@ -1004,7 +1010,7 @@ class kFlowHelper
 				continue;
 			}
 			
-			kBusinessPreConvertDL::decideThumbGenerate($parentJob->getEntry(), $thumbParams, $parentJob);
+			kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams, $parentJob);
 		}
 	}
 	
@@ -1291,7 +1297,7 @@ class kFlowHelper
 		
 		kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		
-		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob);
+		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 			
 		return $dbBatchJob; 	
 	}

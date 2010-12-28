@@ -125,6 +125,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public function validateFlavorParamsIds()
 	{
 		$flavorParamsIds = $this->getFlavorParamsAsArray();
+		assetParamsPeer::resetInstanceCriteriaFilter();
 		$flavorParams = assetParamsPeer::retrieveByPKs($flavorParamsIds);
 		
 		$sourceFound = false;

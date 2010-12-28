@@ -92,7 +92,7 @@ class kBusinessPostConvertDL
 		$currentFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$currentFlavorAsset->save();
 		
-		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
+		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob, $currentFlavorAsset->getFlavorParamsId());
 		
 		return $currentFlavorAsset;
 	}
