@@ -5,7 +5,7 @@
  */
 
 require_once("..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
-
+require_once (SF_ROOT_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'kConf.php');
 define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."batch");
 
 // Autoloader - override the autoloader defaults
