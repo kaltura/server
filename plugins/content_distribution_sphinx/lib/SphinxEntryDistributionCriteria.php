@@ -45,6 +45,11 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		return EntryDistributionPeer::getCriteriaFilter();
 	}
 	
+	public function getSphinxOrderFields()
+	{
+		return self::$sphinxOrderFields;
+	}
+	
 	/**
 	 * @return string
 	 */

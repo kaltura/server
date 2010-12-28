@@ -387,6 +387,11 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return isset(self::$sphinxFields[$fieldName]);
 	}
 	
+	public function getSphinxOrderFields()
+	{
+		return self::$sphinxOrderFields;
+	}
+	
 	public function getSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)

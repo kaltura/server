@@ -37,6 +37,11 @@ abstract class SphinxCriteria extends KalturaCriteria
 	abstract protected function getSphinxIndexName();
 	
 	/**
+	 * @return array
+	 */
+	abstract public function getSphinxOrderFields();
+	
+	/**
 	 * @param string $fieldName
 	 * @return bool
 	 */
