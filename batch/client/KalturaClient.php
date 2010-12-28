@@ -3085,28 +3085,28 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $submit;
+	public $submitAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $update;
+	public $updateAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $delete;
+	public $deleteAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $fetchReport;
+	public $fetchReportAction;
 
 
 }
@@ -3198,51 +3198,9 @@ class KalturaHuluDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * 
 	 *
-	 * @var string
-	 */
-	public $domain = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $csId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $source = null;
-
-	/**
-	 * 
-	 *
 	 * @var int
 	 */
 	public $metadataProfileId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $movFlavorParamsId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $flvFlavorParamsId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $wmvFlavorParamsId = null;
 
 
 }
@@ -3450,14 +3408,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProvi
 	 *
 	 * @var string
 	 */
-	public $csId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $source = null;
+	public $xmlFileName = null;
 
 	/**
 	 * 
@@ -3469,86 +3420,23 @@ class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProvi
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 */
-	public $movFlavorAssetId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $flvFlavorAssetId = null;
+	public $distributionProfileId = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $wmvFlavorAssetId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbAssetId = null;
+	public $aspectRatio = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $emailed = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $rated = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $blogged = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $reviewed = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $bookmarked = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $playbackFailed = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $timeSpent = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $recommended = null;
+	public $frameRate = null;
 
 
 }
