@@ -42,10 +42,10 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 
 	private static $actions = array 
 	(
-		'submit',
-		'update',
-		'delete',
-		'fetchReport',
+		'submitAction',
+		'updateAction',
+		'deleteAction',
+		'fetchReportAction',
 	);
 	
 	public function toObject($object = null, $skip = array())
