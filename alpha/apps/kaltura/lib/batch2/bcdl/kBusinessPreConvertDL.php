@@ -46,6 +46,7 @@ class kBusinessPreConvertDL
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false)
 	{
 		$srcAsset = null;
+		assetPeer::resetInstanceCriteriaFilter();
 		if($sourceAssetId)
 		{
 			$srcAsset = assetPeer::retrieveById($sourceAssetId);
@@ -116,13 +117,160 @@ class kBusinessPreConvertDL
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcAssetType = $srcAsset->getType();
 		
-//		TODO
-//		if($runSync)
-//			self::generateThumbnail();
-			
-		$job = kJobsManager::addCapturaThumbJob($parentJob, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
+		if(!$runSync)
+		{
+			$job = kJobsManager::addCapturaThumbJob($parentJob, $entry->getPartnerId(), $entry->getId(), $thumbAsset->getId(), $srcSyncKey, $srcAssetType, $destThumbParamsOutput);
+			return $thumbAsset;
+		}
+
+		$errDescription = null;
+		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription);
 		
+		// failed
+		if(!$capturedPath)
+		{
+			$thumbAsset->incrementVersion();
+			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$thumbAsset->setDescription($thumbAsset->getDescription() . "\n{$errDescription}");
+			$thumbAsset->save();
+			
+			return $thumbAsset;
+		}
+		
+		$thumbAsset->incrementVersion();
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		if(file_exists($capturedPath))
+		{
+			list($width, $height, $type, $attr) = getimagesize($capturedPath);
+			$thumbAsset->setWidth($width);
+			$thumbAsset->setHeight($height);
+			$thumbAsset->setSize(filesize($capturedPath));
+		}		
+		
+		$logPath = $capturedPath . '.log';
+		if(file_exists($logPath))
+		{
+			$thumbAsset->incLogFileVersion();
+			$thumbAsset->save();
+			
+			// creats the file sync
+			$logSyncKey = $thumbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			kFileSyncUtils::moveFromFile($logPath, $logSyncKey);
+			KalturaLog::debug("Log archived file to: " . kFileSyncUtils::getLocalFilePathForKey($logSyncKey));
+		}
+		else
+		{
+			$thumbAsset->save();
+		}
+		
+		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::moveFromFile($capturedPath, $syncKey);
+		KalturaLog::debug("Thumbnail archived file to: " . kFileSyncUtils::getLocalFilePathForKey($syncKey));
+
+		if($thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+		{
+			// increment thumbnail version
+			$entry->setThumbnail(".jpg");
+			$entry->save();
+			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey, false);
+		
+			if($syncFile)
+			{
+				// removes the DEFAULT_THUMB tag from all other thumb assets
+				$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+				foreach($entryThumbAssets as $entryThumbAsset)
+				{
+					if($entryThumbAsset->getId() == $thumbAsset->getId())
+						continue;
+						
+					if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+						continue;
+						
+					$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+					$entryThumbAsset->save();
+				}
+			}
+		}
+		
+		if(!is_null($thumbAsset->getFlavorParamsId()))
+			kFlowHelper::generateThumbnailsFromFlavor($thumbAsset->getEntryId(), null, $thumbAsset->getFlavorParamsId());
+			
 		return $thumbAsset;
+	}
+	
+	public static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription)
+	{
+		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		
+		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$errDescription = 'Source asset could has no valid file sync';
+			return false;
+		}
+		
+		$srcPath = $fileSync->getFullPath();
+		$uniqid = uniqid('thumb_');
+		$destPath = kConf::get('temp_folder') . "/thumb/$uniqid.jpg";
+		$logPath = $destPath . '.log';
+	
+		if(!file_exists($srcPath))
+		{
+			$errDescription = "Source file [$srcPath] does not exist";
+			return false;
+		}
+		
+		if(!is_file($srcPath))
+		{
+			$errDescription = "Source file [$srcPath] is not a file";
+			return false;
+		}
+		
+		try
+		{
+			if($srcAsset->getType() == assetType::FLAVOR)
+			{
+				// generates the thumbnail
+				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
+				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset());
+				if(!$created || !file_exists($destPath))
+				{
+					$errDescription = "Thumbnail not captured";
+					return false;
+				}
+				$srcPath = $destPath;
+				$uniqid = uniqid('thumb_');
+				$destPath = kConf::get('temp_folder') . "/thumb/$uniqid.jpg";
+			}
+			
+			$quality = $destThumbParamsOutput->getQuality();
+			$cropType = $destThumbParamsOutput->getCropType();
+			$cropX = $destThumbParamsOutput->getCropX();
+			$cropY = $destThumbParamsOutput->getCropY();
+			$cropWidth = $destThumbParamsOutput->getCropWidth();
+			$cropHeight = $destThumbParamsOutput->getCropHeight();
+			$bgcolor = $destThumbParamsOutput->getBackgroundColor();
+			$width = $destThumbParamsOutput->getWidth();
+			$height = $destThumbParamsOutput->getHeight();
+			$scaleWidth = $destThumbParamsOutput->getScaleWidth();
+			$scaleHeight = $destThumbParamsOutput->getScaleHeight();
+			
+			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
+			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor);
+			if(!$cropped || !file_exists($destPath))
+			{
+				$errDescription = "Crop failed";
+				return false;
+			}
+			return $destPath;
+		}
+		catch(Exception $ex)
+		{
+			$errDescription = $ex->getMessage();
+			return false;
+		}
 	}
 	
 	/**
@@ -745,7 +893,7 @@ class kBusinessPreConvertDL
 			$entry->addFlavorParamsId($sourceFlavor->getId());
 			$entry->save();
 			
-			kFlowHelper::generateThumbnailsFromFlavor($parentJob);
+			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
 		
 		if(!count($flavors))

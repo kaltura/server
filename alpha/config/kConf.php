@@ -169,6 +169,7 @@ class kConf extends kConfLocal
 				
 				"no_save_of_last_login_partner_for_partner_ids" => array(0, -1, -2, 99),
 
+				"temp_folder" => '/opt/kaltura/tmp',
 			)
 		);
 		
