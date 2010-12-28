@@ -210,8 +210,6 @@ class UserController extends Zend_Controller_Action
 					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'INVALID_FIELD_VALUE')
 					$form->setDescription($ex->getMessage());
-				else if ($ex->getCode() === 'USER_EXISTS_WITH_DIFFERENT_PASSWORD')
-					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'PASSWORD_STRUCTURE_INVALID')
 					$form->setDescription($ex->getMessage());
 				else
