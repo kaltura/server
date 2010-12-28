@@ -127,6 +127,7 @@ class UserRoleService extends KalturaBaseService
 	 * @return KalturaUserRole
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::ROLE_IS_BEING_USED
 	 */		
 	public function deleteAction($userRoleId)
 	{
@@ -135,8 +136,17 @@ class UserRoleService extends KalturaBaseService
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
 		}
-		
-		$dbUserRole->setStatus(KalturaUserRoleStatus::DELETED);
+
+		try {
+			$dbUserRole->setAsDeleted();
+		}
+		catch (kPermissionException $e) {
+			$code = $e->getCode();
+			if ($code == kPermissionException::ROLE_IS_BEING_USED) {
+				throw new KalturaAPIException(KalturaErrors::ROLE_IS_BEING_USED);
+			}
+			throw $e;			
+		}	
 		$dbUserRole->save();
 			
 		$userRole = new KalturaUserRole();

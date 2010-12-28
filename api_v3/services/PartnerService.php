@@ -47,7 +47,7 @@ class PartnerService extends KalturaBaseService
 			$parentPartnerId = null;
 			if ( $this->getKs() && $this->getKs()->isAdmin() )
 			{
-				$parentPartnerId = $this->getKs()->partner_id ;
+				$parentPartnerId = $this->getKs()->partner_id;
 				
 				// only if this partner is a var/grou, allow setting it as parent for the new created partner
 				$parentPartner = PartnerPeer::retrieveByPK( $parentPartnerId );

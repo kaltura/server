@@ -23,7 +23,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
-	 * @throws KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 */
 	function addAction(KalturaUser $user)
@@ -33,7 +32,6 @@ class UserService extends KalturaBaseUserService
 		if ($user instanceof KalturaAdminUser) {
 			$user->isAdmin = true;
 		}
-		
 		$user->partnerId = $this->getPartnerId();
 				
 		$dbUser = null;
@@ -61,9 +59,6 @@ class UserService extends KalturaBaseUserService
 			}
 			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
-			}
-			else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
-				throw new KalturaAPIException(KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
@@ -94,13 +89,12 @@ class UserService extends KalturaBaseUserService
 	 * @action update
 	 * @param string $userId
 	 * @param KalturaUser $user
-	 * @param bool $allUserPartners wheter to update the user details for all partners he/she can login to
 	 * @return KalturaUser
 	 *
 	 * @throws APIErrors::INVALID_USER_ID
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 */
-	public function updateAction($userId, KalturaUser $user, $allUserPartners = false)
+	public function updateAction($userId, KalturaUser $user)
 	{		
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		
@@ -131,36 +125,7 @@ class UserService extends KalturaBaseUserService
 		// update user	
 		$dbUser = $user->toUpdatableObject($dbUser);
 		$dbUser->save();
-		
-		if ($allUserPartners && $dbUser->getLoginDataId()) {
-			// if current user has a login record for multiple partners, update for all partners
-			kuserPeer::setUseCriteriaFilter(false);
-			$c = new Criteria();
-			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $dbUser->getLoginDataId());
-			$c->addAnd(kuserPeer::ID, $dbUser->getId(), Criteria::NOT_EQUAL);
-			$c->addAnd(kuserPeer::PARTNER_ID, null, Criteria::NOT_EQUAL);
-			$otherKusers = kuserPeer::doSelect($c);
-			
-			foreach ($otherKusers as $kuser) {
-				// update user (another kuser record)
-				$user->id = null;
-				$kuser = $user->toUpdatableObject($kuser);
-				$kuser->save();
-			}
-			kuserPeer::setUseCriteriaFilter(false);
-			
-			// update user's login data record
-			try {
-				UserLoginDataPeer::updateFromUserDetails($dbUser->getLoginDataId(), $dbUser);
-			}
-			catch (kUserException $e) {
-				$code = $e->getCode();
-				if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
-				}
-			}
-		}
-		
+				
 		$user = new KalturaUser();
 		$user->fromObject($dbUser);
 		
@@ -224,7 +189,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId 
 	 * @return KalturaUser
 	 *
-	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
 	public function deleteAction($userId)
 	{
@@ -243,7 +208,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
 			}
 			throw $e;			
-		}	
+		}
 		$dbUser->save();
 		
 		$user = new KalturaUser();
@@ -433,16 +398,15 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
-	 * @throws KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 *
 	 */	
-	public function enableLoginAction($userId, $loginId, $password)
+	public function enableLoginAction($userId, $loginId, $password = null)
 	{		
 		try
 		{
 			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
-			$user->enableLogin($loginId, $password);
+			$user->enableLogin($loginId, $password);	
 			$user->save();
 		}
 		catch (Exception $e)
@@ -465,9 +429,6 @@ class UserService extends KalturaBaseUserService
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
-			}
-			else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
-				throw new KalturaAPIException(KalturaErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD);
 			}
 			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
@@ -496,6 +457,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::USER_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
 	 *
 	 */	
 	public function disableLoginAction($userId = null, $loginId = null)
@@ -533,6 +495,9 @@ class UserService extends KalturaBaseUserService
 			$code = $e->getCode();
 			if ($code == kUserException::USER_LOGIN_ALREADY_DISABLED) {
 				throw new KalturaAPIException(KalturaErrors::USER_LOGIN_ALREADY_DISABLED);
+			}
+			if ($code == kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER) {
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER);
 			}
 			throw $e;
 		}
