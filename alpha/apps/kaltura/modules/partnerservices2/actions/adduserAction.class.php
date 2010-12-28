@@ -116,10 +116,6 @@ class adduserAction extends defPartnerservices2Action
 					$this->addException( APIErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED );
 					return null;
 				}
-				else if ($code == kUserException::USER_EXISTS_WITH_DIFFERENT_PASSWORD) {
-					$this->addException( APIErrors::USER_EXISTS_WITH_DIFFERENT_PASSWORD );
-					return null;
-				}
 				else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 					$this->addException( APIErrors::PASSWORD_STRUCTURE_INVALID );
 					return null;
