@@ -99,10 +99,9 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields()
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(entryPeer::NAME, entryPeer::DESCRIPTION);
-
+		if(kConf::hasParam('msn_update_required_entry_fields'))
+			return kConf::get('msn_update_required_entry_fields');
+			
 		return array();
 	}
 
@@ -111,13 +110,9 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths()
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(
-//			"/*[local-name()='metadata']/*[local-name()='ShortDescription']",
-//			"/*[local-name()='metadata']/*[local-name()='LongDescription']",
-//		);
-		
+		if(kConf::hasParam('msn_update_required_metadata_xpaths'))
+			return kConf::get('msn_update_required_metadata_xpaths');
+			
 		return array();
 	}
 	
@@ -246,6 +241,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 			
+		// TODO create validation XSD
 		$xsdPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsd';
 		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
 		{

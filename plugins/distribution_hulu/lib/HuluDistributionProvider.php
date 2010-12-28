@@ -43,7 +43,7 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return true;
+		return false; // TODO check if delete enabled
 	}
 
 	/* (non-PHPdoc)
@@ -51,7 +51,7 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function isUpdateEnabled()
 	{
-		return true;
+		return false; // TODO check if update enabled
 	}
 
 	/* (non-PHPdoc)
@@ -59,7 +59,7 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function isReportsEnabled()
 	{
-		return true;
+		return false; // TODO check if reports enabled
 	}
 
 	/* (non-PHPdoc)
@@ -99,10 +99,9 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields()
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(entryPeer::NAME, entryPeer::DESCRIPTION);
-
+		if(kConf::hasParam('hulu_update_required_entry_fields'))
+			return kConf::get('hulu_update_required_entry_fields');
+			
 		return array();
 	}
 
@@ -111,13 +110,9 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths()
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(
-//			"/*[local-name()='metadata']/*[local-name()='ShortDescription']",
-//			"/*[local-name()='metadata']/*[local-name()='LongDescription']",
-//		);
-		
+		if(kConf::hasParam('hulu_update_required_metadata_xpaths'))
+			return kConf::get('hulu_update_required_metadata_xpaths');
+			
 		return array();
 	}
 	
@@ -128,7 +123,10 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateDeleteXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
-		$xml = self::generateXML($entryId, $providerData);
+		// TODO create the delete.xsl
+		// TODO create delete validation xsd
+		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/delete.xsl';
+		$xml = self::generateXML($entryId, $providerData, $xslPath);
 		if(!$xml)
 		{
 			KalturaLog::err("No XML returned for entry [$entryId]");
@@ -145,28 +143,16 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateUpdateXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
-		$xml = self::generateXML($entryId, $providerData);
+		// TODO create the update.xsl
+		// TODO create update validation xsd
+		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/update.xsl';
+		$xml = self::generateXML($entryId, $providerData, $xslPath);
 		if(!$xml)
 		{
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
-	
-		// change end time to 5 days from now (it's an Hulu hack)
-		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
-		
-		$nodes = $xml->getElementsByTagName('activeEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-		
-		$nodes = $xml->getElementsByTagName('searchableEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
 			
-		$nodes = $xml->getElementsByTagName('archiveEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-		
 		return $xml->saveXML();
 	}
 	
@@ -177,7 +163,9 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateSubmitXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
 	{
-		$xml = self::generateXML($entryId, $providerData);
+		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsl';
+		// TODO create submit validation xsd
+		$xml = self::generateXML($entryId, $providerData, $xslPath);
 		if(!$xml)
 		{
 			KalturaLog::err("No XML returned for entry [$entryId]");
@@ -190,9 +178,10 @@ class HuluDistributionProvider implements IDistributionProvider
 	/**
 	 * @param string $entryId
 	 * @param KalturaHuluDistributionJobProviderData $providerData
+	 * @param string $xslPath
 	 * @return DOMDocument
 	 */
-	public static function generateXML($entryId, KalturaHuluDistributionJobProviderData $providerData)
+	public static function generateXML($entryId, KalturaHuluDistributionJobProviderData $providerData, $xslPath, $xsdPath = null)
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
@@ -209,7 +198,6 @@ class HuluDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsl';
 		if(!file_exists($xslPath))
 		{
 			KalturaLog::err("XSL file not found [$xslPath]");
@@ -246,8 +234,7 @@ class HuluDistributionProvider implements IDistributionProvider
 			return null;
 		}
 			
-		$xsdPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsd';
-		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
+		if($xsdPath && file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
 		{
 			KalturaLog::err("Schema validation failed");		
 			return null;

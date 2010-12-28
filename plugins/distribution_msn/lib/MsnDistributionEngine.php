@@ -376,7 +376,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
-		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		$this->handleSend($this->updatePath, $data, $data->distributionProfile, $data->providerData);
 		
 		return false;
 	}

@@ -1,9 +1,6 @@
 <?php
 class MsnDistributionProfile extends DistributionProfile
 {
-	const THUMBNAIL_WIDTH = 1280;
-	const THUMBNAIL_HEIGHT = 720;
-	
 	const CUSTOM_DATA_USERNAME = 'username';
 	const CUSTOM_DATA_PASSWORD = 'password';
 	const CUSTOM_DATA_DOMAIN = 'domain';

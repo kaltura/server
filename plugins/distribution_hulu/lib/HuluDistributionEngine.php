@@ -3,35 +3,27 @@ class HuluDistributionEngine extends DistributionEngine implements
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,
 	IDistributionEngineReport,
-	IDistributionEngineDelete,
-	IDistributionEngineCloseUpdate,
-	IDistributionEngineCloseSubmit,
-	IDistributionEngineCloseDelete
+	IDistributionEngineDelete
 {
-	const USAGE_COUNTER_PLAYED = 1;
-	const USAGE_COUNTER_EMAILED = 2;
-	const USAGE_COUNTER_RATED = 3;
-	const USAGE_COUNTER_BLOGGED = 4;
-	const USAGE_COUNTER_REVIEWED = 5;
-	const USAGE_COUNTER_BOOKMARKED = 6;
-	const USAGE_COUNTER_PLAYBACKFAILED = 7;
-	const USAGE_COUNTER_TIMESPENT = 8;
-	const USAGE_COUNTER_RECOMMENDED = 9;
-
-	
-	private $submitPath = '/admin/services/storevideoandfiles.aspx';
-	private $updatePath = '/admin/services/storevideoandfiles.aspx';
-	private $deletePath = '/admin/services/storevideoandfiles.aspx'; // it's updating with end date to 5 days from now
-	private $fetchReportPath = '/admin/services/videobyuuid.aspx';
-	private $postFieldName = 'videoxml';
+	private $domain = 'sftp.hulu.com';
+	private $submitPath = '/';
+	private $updatePath = '/';
+	private $deletePath = '/';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
+		if($taskConfig->params->huluDomain)
+			$this->domain = $taskConfig->params->huluDomain;
+			
 		if($taskConfig->params->huluSubmitPath)
 			$this->submitPath = $taskConfig->params->huluSubmitPath;
+		if($taskConfig->params->huluUpdatePath)
+			$this->updatePath = $taskConfig->params->huluUpdatePath;
+		if($taskConfig->params->huluDeletePath)
+			$this->deletePath = $taskConfig->params->huluDeletePath;
 	}
 
 	/* (non-PHPdoc)
@@ -45,18 +37,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaHuluDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaHuluDistributionJobProviderData");
 		
-		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
-		$matches = null;
-		if(preg_match('/<uuid[^>]*>([^<]+)<\/uuid>/', $results, $matches))
-		{
-			$data->remoteId = $matches[1];
-		}
-		else 
-		{
-			throw new Exception("No uuid returned from Hulu");
-		}
+		$this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		// TODO do I have a way to validate the file uploaded?
+		return true;
 	}
 
 	/**
@@ -68,140 +52,25 @@ class HuluDistributionEngine extends DistributionEngine implements
 	 */
 	public function handleSend($path, KalturaDistributionJobData $data, KalturaHuluDistributionProfile $distributionProfile, KalturaHuluDistributionJobProviderData $providerData)
 	{
-		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
-		$url = "https://{$domain}{$path}";
+		if(!$providerData->xml)
+			throw new Exception("XML data not supplied");
 		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, true);
-		
-		$params = array($this->postFieldName => $providerData->xml);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		
-		$results = curl_exec($ch);
-		if(!$results)
-		{
-			$errNumber = curl_errno($ch);
-			$errDescription = curl_error($ch);
+		$fileName = uniqid() . '.xml';
+		$srcFile = $this->tempXmlPath . '/' . $fileName;
+		$destFile = "$path/{$providerData->xmlFileName}";
 			
-			curl_close($ch);
+		file_put_contents($srcFile, $providerData->xml);
+		KalturaLog::debug("XML written to file [$srcFile]");
 		
-			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
-		}
-		curl_close($ch);
-		KalturaLog::debug("Hulu HTTP response:\n$results\n");
-		$data->results = $results;
-		return $results;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseSubmit::closeSubmit()
-	 */
-	public function closeSubmit(KalturaDistributionSubmitJobData $data)
-	{
-		$publishState = $this->fetchStatus($data);
-		KalturaLog::err("publishState [$publishState]");
-		switch($publishState)
-		{
-			case 'Published':
-				return true;
-				
-			case 'Pending':
-				return false;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("Hulu error: $errDescription");
-				}
-				throw new Exception('Unknows Hulu error');
-				
-			// TODO - check with Hulu what other statuses are available
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		if(!$fileTransferMgr)
+			throw new Exception("SFTP manager not loaded");
 			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
-	}
-
-	/**
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @return string status
-	 */
-	public function fetchStatus(KalturaDistributionSubmitJobData $data)
-	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaHuluDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaHuluDistributionProfile");
-	
-		$xml = $this->fetchXML($data, $data->distributionProfile);
-			
-		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
-		if($publishStateAttr)
-			return $publishStateAttr->value;
-				
-		return null;
-	}
-
-	/**
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @throws Exception
-	 * @return DOMDocument
-	 */
-	public function fetchXML(KalturaDistributionSubmitJobData $data, KalturaHuluDistributionProfile $distributionProfile)
-	{
-		$domain = $distributionProfile->domain;
-		$username = $distributionProfile->username;
-		$password = $distributionProfile->password;
-		
-		$url = "https://{$domain}{$this->fetchReportPath}?uuid={$data->remoteId}";
-		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_FORBID_REUSE, true); 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, false);
-		
-		$results = curl_exec($ch);
-		if(!$results)
-		{
-			$errNumber = curl_errno($ch);
-			$errDescription = curl_error($ch);
-			
-			curl_close($ch);
-		
-			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
-		}
-		curl_close($ch);
-		
-		$xml = new DOMDocument();
-		if($xml->loadXML($results))
-			return $xml;
-			
-		return null;
+		$fileTransferMgr->login($this->domain, $username, $password);
+		$fileTransferMgr->putFile($destFile, $srcFile, true);
 	}
 
 	/* (non-PHPdoc)
@@ -217,72 +86,8 @@ class HuluDistributionEngine extends DistributionEngine implements
 		
 		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
 		
-		return false;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseDelete::closeDelete()
-	 */
-	public function closeDelete(KalturaDistributionDeleteJobData $data)
-	{
-		$publishState = $this->fetchStatus($data);
-		switch($publishState)
-		{
-			case 'Published':
-				return false;
-				
-			case 'Pending':
-				return false;
-				
-//			case 'Deleted': // TODO - what is the right status after delete?
-//				return true;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("Hulu error: $errDescription");
-				}
-				throw new Exception('Unknows Hulu error');
-				
-			// TODO - check with Hulu what other statuses are available
-			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineCloseUpdate::closeUpdate()
-	 */
-	public function closeUpdate(KalturaDistributionUpdateJobData $data)
-	{
-		$publishState = $this->fetchStatus($data);
-		switch($publishState)
-		{
-			case 'Published': // TODO - is that the right status after update?
-				return true;
-				
-			case 'Pending':
-				return false;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("Hulu error: $errDescription");
-				}
-				throw new Exception('Unknows Hulu error');
-				
-			// TODO - check with Hulu what other statuses are available
-			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
+		// TODO - validate that the media deleted
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -290,67 +95,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaHuluDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaHuluDistributionProfile");
-	
-		$xml = $this->fetchXML($data, $data->distributionProfile);
-			
-		$usageNodes = $xml->documentElement->getElementsByTagName('usageItem');
-		if(!$usageNodes->length)
-			throw new Exception('usageItem node not found in XML');
-			
-		foreach($usageNodes as $usageNode)
-		{
-			$typeAttr = $usageNode->attributes->getNamedItem('counterType');
-			$usageAttr = $usageNode->attributes->getNamedItem('totalCount');
-			if(!$typeAttr || !$usageAttr)
-				continue;
-				
-			switch($typeAttr->value)
-			{
-				case self::USAGE_COUNTER_PLAYED:
-					$data->plays = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_EMAILED:
-					$data->providerData->emailed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_RATED:
-					$data->providerData->rated = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_BLOGGED:
-					$data->providerData->blogged = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_REVIEWED:
-					$data->providerData->reviewed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_BOOKMARKED:
-					$data->providerData->bookmarked = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_PLAYBACKFAILED:
-					$data->providerData->playbackFailed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_TIMESPENT:
-					$data->providerData->timeSpent = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_RECOMMENDED:
-					$data->providerData->recommended = $usageAttr->value;
-					break;
-					
-				default:
-					KalturaLog::err("Unknown counterType [{$typeAttr->value}]");
-					break;
-			}
-		}
-				
-		return true;
+		// TODO implement report fetching
 	}
 
 	/* (non-PHPdoc)
@@ -364,9 +109,9 @@ class HuluDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaHuluDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaHuluDistributionJobProviderData");
 		
-		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		$this->handleSend($this->updatePath, $data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		// TODO - validate that the media updated
+		return true;
 	}
-
 }

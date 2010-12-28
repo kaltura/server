@@ -12,39 +12,9 @@ class KalturaHuluDistributionProfile extends KalturaDistributionProfile
 	public $password;
 	
 	/**
-	 * @var string
-	 */
-	public $domain;
-	
-	/**
-	 * @var string
-	 */
-	public $csId;
-	
-	/**
-	 * @var string
-	 */
-	public $source;
-	
-	/**
 	 * @var int
 	 */
 	public $metadataProfileId;
-	
-	/**
-	 * @var int
-	 */
-	public $movFlavorParamsId;
-	
-	/**
-	 * @var int
-	 */
-	public $flvFlavorParamsId;
-	
-	/**
-	 * @var int
-	 */
-	public $wmvFlavorParamsId;
 		
 			
 	/*
@@ -54,13 +24,7 @@ class KalturaHuluDistributionProfile extends KalturaDistributionProfile
 	(
 		'username',
 		'password',
-		'domain',
-		'csId',
-		'source',
 		'metadataProfileId',
-		'movFlavorParamsId',
-		'flvFlavorParamsId',
-		'wmvFlavorParamsId',
 	 );
 		 
 	public function getMapBetweenObjects()

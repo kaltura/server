@@ -49,8 +49,8 @@ class kHuluDistributionReportHandler implements kBatchJobStatusEventConsumer
 		$providerData = $data->getProviderData();
 		if($providerData instanceof kHuluDistributionJobProviderData)
 		{
+//			TODO
 //			$entryDistribution->putInCustomData('emailed', $providerData->getEmailed());
-//			
 //			$entryDistribution->save();
 		}
 		

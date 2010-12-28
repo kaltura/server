@@ -9,12 +9,7 @@ class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 	/**
 	 * @var string
 	 */
-	private $csId;
-	
-	/**
-	 * @var string
-	 */
-	private $source;
+	private $xmlFileName;
 	
 	/**
 	 * @var int
@@ -22,197 +17,19 @@ class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 	private $metadataProfileId;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
-	private $movFlavorAssetId;
-	
-	/**
-	 * @var string
-	 */
-	private $flvFlavorAssetId;
+	private $distributionProfileId;
 	
 	/**
 	 * @var string
 	 */
-	private $wmvFlavorAssetId;
-	
-	/**
-	 * @var string
-	 */
-	private $thumbAssetId;
+	private $aspectRatio;
 	
 	/**
 	 * @var int
 	 */
-	private $emailed;
-	
-	/**
-	 * @var int
-	 */
-	private $rated;
-	
-	/**
-	 * @var int
-	 */
-	private $blogged;
-	
-	/**
-	 * @var int
-	 */
-	private $reviewed;
-	
-	/**
-	 * @var int
-	 */
-	private $bookmarked;
-	
-	/**
-	 * @var int
-	 */
-	private $playbackFailed;
-	
-	/**
-	 * @var int
-	 */
-	private $timeSpent;
-	
-	/**
-	 * @var int
-	 */
-	private $recommended;
-
-	/**
-	 * @return the $emailed
-	 */
-	public function getEmailed()
-	{
-		return $this->emailed;
-	}
-
-	/**
-	 * @return the $rated
-	 */
-	public function getRated()
-	{
-		return $this->rated;
-	}
-
-	public function __construct(kDistributionJobData $distributionJobData = null)
-	{
-		parent::__construct($distributionJobData);
-	}
-
-	/**
-	 * @return the $blogged
-	 */
-	public function getBlogged()
-	{
-		return $this->blogged;
-	}
-
-	/**
-	 * @return the $reviewed
-	 */
-	public function getReviewed()
-	{
-		return $this->reviewed;
-	}
-
-	/**
-	 * @return the $bookmarked
-	 */
-	public function getBookmarked()
-	{
-		return $this->bookmarked;
-	}
-
-	/**
-	 * @return the $playbackFailed
-	 */
-	public function getPlaybackFailed()
-	{
-		return $this->playbackFailed;
-	}
-
-	/**
-	 * @return the $timeSpent
-	 */
-	public function getTimeSpent()
-	{
-		return $this->timeSpent;
-	}
-
-	/**
-	 * @return the $recommended
-	 */
-	public function getRecommended()
-	{
-		return $this->recommended;
-	}
-
-	/**
-	 * @param int $emailed
-	 */
-	public function setEmailed($emailed)
-	{
-		$this->emailed = $emailed;
-	}
-
-	/**
-	 * @param int $rated
-	 */
-	public function setRated($rated)
-	{
-		$this->rated = $rated;
-	}
-
-	/**
-	 * @param int $blogged
-	 */
-	public function setBlogged($blogged)
-	{
-		$this->blogged = $blogged;
-	}
-
-	/**
-	 * @param int $reviewed
-	 */
-	public function setReviewed($reviewed)
-	{
-		$this->reviewed = $reviewed;
-	}
-
-	/**
-	 * @param int $bookmarked
-	 */
-	public function setBookmarked($bookmarked)
-	{
-		$this->bookmarked = $bookmarked;
-	}
-
-	/**
-	 * @param int $playbackFailed
-	 */
-	public function setPlaybackFailed($playbackFailed)
-	{
-		$this->playbackFailed = $playbackFailed;
-	}
-
-	/**
-	 * @param int $timeSpent
-	 */
-	public function setTimeSpent($timeSpent)
-	{
-		$this->timeSpent = $timeSpent;
-	}
-
-	/**
-	 * @param int $recommended
-	 */
-	public function setRecommended($recommended)
-	{
-		$this->recommended = $recommended;
-	}
+	private $frameRate;
 	
 	/**
 	 * @return the $xml
@@ -220,22 +37,6 @@ class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 	public function getXml()
 	{
 		return $this->xml;
-	}
-
-	/**
-	 * @return the $csId
-	 */
-	public function getCsId()
-	{
-		return $this->csId;
-	}
-
-	/**
-	 * @return the $source
-	 */
-	public function getSource()
-	{
-		return $this->source;
 	}
 
 	/**
@@ -247,51 +48,35 @@ class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 	}
 
 	/**
-	 * @return the $movFlavorAssetId
+	 * @return the $distributionProfileId
 	 */
-	public function getMovFlavorAssetId()
+	public function getDistributionProfileId()
 	{
-		return $this->movFlavorAssetId;
+		return $this->distributionProfileId;
 	}
 
 	/**
-	 * @return the $flvFlavorAssetId
+	 * @return the $aspectRatio
 	 */
-	public function getFlvFlavorAssetId()
+	public function getAspectRatio()
 	{
-		return $this->flvFlavorAssetId;
+		return $this->aspectRatio;
 	}
 
 	/**
-	 * @return the $wmvFlavorAssetId
+	 * @return the $frameRate
 	 */
-	public function getWmvFlavorAssetId()
+	public function getFrameRate()
 	{
-		return $this->wmvFlavorAssetId;
+		return $this->frameRate;
 	}
 
 	/**
-	 * @return the $thumbAssetId
+	 * @param string $xml
 	 */
-	public function getThumbAssetId()
+	public function setXml($xml)
 	{
-		return $this->thumbAssetId;
-	}
-
-	/**
-	 * @param string $csId
-	 */
-	public function setCsId($csId)
-	{
-		$this->csId = $csId;
-	}
-
-	/**
-	 * @param string $source
-	 */
-	public function setSource($source)
-	{
-		$this->source = $source;
+		$this->xml = $xml;
 	}
 
 	/**
@@ -303,42 +88,42 @@ class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 	}
 
 	/**
-	 * @param string $movFlavorAssetId
+	 * @param int $distributionProfileId
 	 */
-	public function setMovFlavorAssetId($movFlavorAssetId)
+	public function setDistributionProfileId($distributionProfileId)
 	{
-		$this->movFlavorAssetId = $movFlavorAssetId;
+		$this->distributionProfileId = $distributionProfileId;
 	}
 
 	/**
-	 * @param string $flvFlavorAssetId
+	 * @param string $aspectRatio
 	 */
-	public function setFlvFlavorAssetId($flvFlavorAssetId)
+	public function setAspectRatio($aspectRatio)
 	{
-		$this->flvFlavorAssetId = $flvFlavorAssetId;
+		$this->aspectRatio = $aspectRatio;
 	}
 
 	/**
-	 * @param string $wmvFlavorAssetId
+	 * @param int $frameRate
 	 */
-	public function setWmvFlavorAssetId($wmvFlavorAssetId)
+	public function setFrameRate($frameRate)
 	{
-		$this->wmvFlavorAssetId = $wmvFlavorAssetId;
+		$this->frameRate = $frameRate;
+	}
+	
+	/**
+	 * @return the $xmlFileName
+	 */
+	public function getXmlFileName()
+	{
+		return $this->xmlFileName;
 	}
 
 	/**
-	 * @param string $thumbAssetId
+	 * @param string $xmlFileName
 	 */
-	public function setThumbAssetId($thumbAssetId)
+	public function setXmlFileName($xmlFileName)
 	{
-		$this->thumbAssetId = $thumbAssetId;
-	}
-
-	/**
-	 * @param string $xml
-	 */
-	public function setXml($xml)
-	{
-		$this->xml = $xml;
+		$this->xmlFileName = $xmlFileName;
 	}
 }
