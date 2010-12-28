@@ -124,7 +124,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(entryPeer::OM_CLASS);;
+		return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);;
 	}
 	
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)

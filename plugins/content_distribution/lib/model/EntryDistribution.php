@@ -224,7 +224,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	 */
 	public function getObjectIndexName()
 	{
-		return 'entry_distribution';
+		return EntryDistributionPeer::TABLE_NAME;
 	}
 
 	/* (non-PHPdoc)

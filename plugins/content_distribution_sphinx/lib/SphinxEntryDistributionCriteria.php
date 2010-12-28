@@ -50,7 +50,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(EntryDistributionPeer::OM_CLASS);;
+		return kSphinxSearchManager::getSphinxIndexName(EntryDistributionPeer::TABLE_NAME);;
 	}
 	
 	/* (non-PHPdoc)
