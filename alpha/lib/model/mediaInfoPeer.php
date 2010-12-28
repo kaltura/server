@@ -22,6 +22,10 @@ class mediaInfoPeer extends BasemediaInfoPeer
 		return mediaInfoPeer::doSelectOne($criteria);
 	}
 	
+	/**
+	 * @param string $entryId
+	 * @return mediaInfo
+	 */
 	public static function retrieveOriginalByEntryId($entryId)
 	{
 		$sourceFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
