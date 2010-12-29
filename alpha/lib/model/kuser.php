@@ -785,32 +785,39 @@ class kuser extends Basekuser
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
-	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true)
+	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true, $sendEmail = null)
 	{
-		$sendEmail = false;
 		if (!$password)
 		{
-			$sendEmail = true;
 			$password = UserLoginDataPeer::generateNewPassword();
+			if (is_null($sendEmail)) {
+				$sendEmail = true;
+			}
 		}
-		
+				
 		if ($this->getLoginDataId())
 		{
 			throw new kUserException('', kUserException::USER_LOGIN_ALREADY_ENABLED);
 		}
 		
-		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure);	
+		$loginDataExisted = null;
+		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure, $loginDataExisted);	
 		if (!$loginData)
 		{
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
 		$this->setLoginDataId($loginData->getId());
-		
-		
+				
 		if ($sendEmail)
 		{
-			kuserPeer::sendNewUserMail($this);
+			if ($loginDataExisted) {
+				kuserPeer::sendNewUserMail($this, true);
+			}
+			else {
+				kuserPeer::sendNewUserMail($this, false);
+			}
+			kuserPeer::sendNewUserMailToAdmins($this);			
 		}	
 		return $this;
 	}
@@ -942,6 +949,30 @@ class kuser extends Basekuser
 		$c = new Criteria();
 		$c->add(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
 		KuserToUserRolePeer::doDelete($c);
+	}
+	
+	/**
+	 * Checks if the current user has one of the permissions with the given names
+	 * @param array $permissionNamesArray Permission names
+	 * @return true or false
+	 */
+	public function hasPermissionOr(array $permissionNamesArray)
+	{
+		$roleIds = $this->getUserRoleIds();
+		$roleIds = explode(',', $roleIds);
+		foreach ($roleIds as $roleId)
+		{
+			$userRole = UserRolePeer::retrieveByPK($roleId);
+			if ($userRole) {
+				$permissions = explode(',', $userRole->getPermissionNames());
+				foreach ($permissionNamesArray as $permissionName) {
+					if (in_array($permissionName, $permissions)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	

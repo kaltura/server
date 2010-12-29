@@ -260,6 +260,22 @@ class UserLoginData extends BaseUserLoginData {
 		return $hashKey;
 	}
 	
+	public function getNewHashKeyIfCurrentInvalid()
+	{
+		$valid = false;
+		try {
+			$valid = $this->isPassHashKeyValid($this->getPasswordHashKey());
+		}
+		catch (kUserException $e) {
+			$valid = false;
+		}
+		if (!$valid) {
+			$this->setPasswordHashKey($this->newPassHashKey());
+		}
+		return $this->getPasswordHashKey();
+	}
+	
+	
 	public function isPassHashKeyValid($hashKey)
 	{
 		// check if same as user's saved hash key

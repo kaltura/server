@@ -84,7 +84,7 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Update exisitng user, it is possible to update the user id too
+	 * Update existing user, it is possible to update the user id too
 	 * 
 	 * @action update
 	 * @param string $userId
@@ -406,7 +406,7 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
-			$user->enableLogin($loginId, $password);	
+			$user->enableLogin($loginId, $password, true);	
 			$user->save();
 		}
 		catch (Exception $e)

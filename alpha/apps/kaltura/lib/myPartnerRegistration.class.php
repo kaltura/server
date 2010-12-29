@@ -37,30 +37,19 @@ class myPartnerRegistration
 
 	const KALTURAS_CMS_REGISTRATION_CONFIRMATION = 50;
 	const KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION = 54;
-	public function sendRegistrationInformationForPartner ($partner  , $subp_id , $cms_password , $skip_emails = false, $hashKey )
+	const KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION = 55;
+	const KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION = 56;
+	
+	public function sendRegistrationInformationForPartner ($partner, $skip_emails, $existingUser )
 	{
 		// email the client with this info
-		$this->sendRegistrationInformation($partner->getAdminName(),
-											$partner->getId(),
-											$subp_id,
-											$partner->getAdminSecret(),
-											$partner->getSecret(),
-											$partner->getAdminEmail(),
-											UserLoginDataPeer::getPassResetLink($hashKey),
-											null,
-											$partner->getType());
+		$adminKuser = kuserPeer::retrieveByPK($partner->getAccountOwnerKuserId());
+		$this->sendRegistrationInformation($partner, $adminKuser, $existingUser, null, $partner->getType());
 											
 		if ( !$skip_emails && kConf::hasParam("report_partner_registration") && kConf::get("report_partner_registration")) 
 		{											
 			// email the wikisupport@kaltura.com  with this info
-			$this->sendRegistrationInformation($partner->getAdminName(),
-												$partner->getId(),
-												$subp_id,
-												$partner->getAdminSecret(),
-												$partner->getSecret(),
-												$partner->getAdminEmail(),
-												UserLoginDataPeer::getPassResetLink($hashKey),
-												self::KALTURA_SUPPORT );
+			$this->sendRegistrationInformation($partner, $adminKuser, $existingUser, self::KALTURA_SUPPORT );
 
 			// if need to hook into SalesForce - this is the place
 			if ( include_once ( "mySalesForceUtils.class.php" ) )
@@ -78,35 +67,57 @@ class myPartnerRegistration
 	
 
 
-	private  function sendRegistrationInformation($admin_name, $pid, $subpid, $admin_secret, $secret, $cms_email, $passResetLink , $recipient_email = null , $partner_type = 1 )
+	private  function sendRegistrationInformation(Partner $partner, kuser $adminKuser, $existingUser, $recipient_email = null , $partner_type = 1 )
 	{
 		$mailType = null;
 		$bodyParams = array();
+		$partnerId = $partner->getId();
+		$userName = $adminKuser->getFullName();
+		$loginEmail = $adminKuser->getEmail();
+		$loginData = $adminKuser->getLoginData();
+		$hashKey = $loginData->getNewHashKeyIfCurrentInvalid();
+		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($hashKey);
+		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
+		$contactLink = kConf::get('contact_url');
+		$contactPhone = kConf::get('contact_phone_number');		
+		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
+		$quickStartGuideLink = kConf::get('quick_start_guide_url');
+		$forumsLink = kConf::get('forum_url');
+		if ( $recipient_email == null ) $recipient_email = $loginEmail;
+		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$recipient_email;
+		
 	 	// send the $cms_email,$cms_password, TWICE !
-	 	if(kConf::get('kaltura_installation_type') == 'CE')
-		{
-			$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-			$bodyParams = array($admin_name, $cms_email, $pid, $passResetLink);
+	 	if(kConf::get('kaltura_installation_type') == 'CE')	{
+			$partner_type = 1;
 		}
-		else
-		{
-			switch($partner_type)  // send different email for different partner types
-			{
-				case 1: // KMC signup
+		
+		switch($partner_type) { // send different email for different partner types
+			case 1: // KMC signup
+				if ($existingUser) {
+					$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
+					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+				}
+				else {
 					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$cms_email,$pid,$passResetLink);
-					break;
-				default: // all others
-				 	$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
-				 	$bodyParams = array($admin_name,$pid,$cms_email,$passResetLink);
-			}
+					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+				}
+				break;
+			default: // all others
+			 	if ($existingUser) {
+					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+				}
+				else {
+					$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
+					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+				}
+				break;
 		}
-		if ( $recipient_email == null ) $recipient_email = $cms_email;
 		
 		kJobsManager::addMailJob(
 			null, 
 			0, 
-			$pid, 
+			$partnerId, 
 			$mailType, 
 			kMailJobData::MAIL_PRIORITY_NORMAL, 
 			kConf::get ("partner_registration_confirmation_email" ), 
@@ -225,7 +236,7 @@ class myPartnerRegistration
 		$kuser->setIsAdmin(true);
 		$kuser->setPuserId($newPartner->getAdminEmail());
 
-		$kuser = kuserPeer::addUser($kuser, $password, false); //this also saves the kuser and adds a user_login_data record
+		$kuser = kuserPeer::addUser($kuser, $password, false, false); //this also saves the kuser and adds a user_login_data record
 		
 		$loginData = UserLoginDataPeer::retrieveByPK($kuser->getLoginDataId());
 	

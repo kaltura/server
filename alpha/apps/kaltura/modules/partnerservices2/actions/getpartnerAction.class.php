@@ -87,8 +87,9 @@ class getpartnerAction extends defPartnerservices2Action
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		
 		$partner_registration = new myPartnerRegistration ();
-		$partner_registration->sendRegistrationInformationForPartner( $partner , $partner->getSubp() , $cms_password , true, $login_data->getPasswordHashKey() );
 		
+		$partner_registration->sendRegistrationInformationForPartner( $partner , true, true );
+
 		$subpid = $partner_id * 100;
 		$level = ( $detailed ? objectWrapperBase::DETAIL_LEVEL_DETAILED : objectWrapperBase::DETAIL_LEVEL_REGULAR );
 		$wrapper = objectWrapperBase::getWrapperClass( $partner , $level );

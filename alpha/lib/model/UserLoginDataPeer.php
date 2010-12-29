@@ -420,7 +420,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
-	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true)
+	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true, &$alreadyExisted = null)
 	{
 		if (!kString::isEmailString($loginEmail)) {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
@@ -464,6 +464,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			$hashKey = $loginData->newPassHashKey();
 			$loginData->setPasswordHashKey($hashKey);
 			$loginData->save();
+			$alreadyExisted = false;
 			return $loginData;			
 		}
 		else
@@ -476,6 +477,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			}
 						
 			KalturaLog::DEBUG('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
+			$alreadyExisted = true;
 			return $existingData;
 		}	
 	}

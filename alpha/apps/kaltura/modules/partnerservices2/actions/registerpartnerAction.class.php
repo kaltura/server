@@ -49,6 +49,13 @@ class registerpartnerAction extends defPartnerservices2Action
 		$obj_wrapper = objectWrapperBase::getWrapperClass( $partner , 0 );
 
 		$fields_modified = baseObjectUtils::fillObjectFromMap ( $this->getInputParams() , $partner , "partner_" , $obj_wrapper->getUpdateableFields() );
+		
+		
+		$c = new Criteria();
+		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->getAdminEmail(), Criteria::EQUAL);
+		$c->setLimit(1);
+		$existingUser = UserLoginDataPeer::doCount($c) > 0;
+		
 		// check that mandatory fields were set
 		// TODO
 		if ( count ( $fields_modified ) > 0 )
@@ -63,8 +70,7 @@ class registerpartnerAction extends defPartnerservices2Action
 
 				$partner_from_db = PartnerPeer::retrieveByPK( $pid );
 
-				// send a confirmation email as well as the result of the service
-				$partner_registration->sendRegistrationInformationForPartner( $partner_from_db , $subpid , $pass, false, $hashKey);
+				$partner_registration->sendRegistrationInformationForPartner( $partner_from_db , false, $existingUser);
 
 			}
 			catch ( SignupException $se )

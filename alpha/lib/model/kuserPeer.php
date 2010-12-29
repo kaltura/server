@@ -9,6 +9,8 @@
 class kuserPeer extends BasekuserPeer 
 {	
 	const  KALTURA_NEW_USER_EMAIL = 120;
+	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
+	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	
 	private static $s_default_count_limit = 301;
 
@@ -353,7 +355,7 @@ class kuserPeer extends BasekuserPeer
 	 * @throws kPermissionException::ROLE_ID_MISSING
 	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
-	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true)
+	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true, $sendEmail = null)
 	{
 		if (!$user->getPuserId()) {
 			throw new kUserException('', kUserException::USER_ID_MISSING);
@@ -388,7 +390,7 @@ class kuserPeer extends BasekuserPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$user->enableLogin($user->getEmail(), $password);
+			$user->enableLogin($user->getEmail(), $password, true, $sendEmail);
 		}	
 		
 		$user->save();
@@ -397,17 +399,83 @@ class kuserPeer extends BasekuserPeer
 	
 	
 	
-	public static function sendNewUserMail(kuser $user)
+	public static function sendNewUserMailToAdmins(kuser $user)
 	{
-		$mailType = null;
-		$bodyParams = array();
-
-		$mailType = self::KALTURA_NEW_USER_EMAIL;
-				
-		$userName = $user->getFullName();
-		$loginEmail = $user->getEmail();
 		$partnerId = $user->getPartnerId();
+		$creatorUserName = 'Unknown';
+		if (kCurrentContext::$uid)
+		{
+			$creatorUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$uid);
+			if ($creatorUser) {
+				$creatorUserName = $creatorUser->getFullName();
+			}
+		}
+		$publisherName = PartnerPeer::retrieveByPK($partnerId)->getName();
+		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
+		$puserId = $user->getPuserId();
+		$forumsLink = kConf::get('forum_url');
+		$unsubscribeLink = kConf::get('unsubscribe_mail_url');
+		
+		$mailType = self::KALTURA_NEW_USER_EMAIL_TO_ADMINS;
+		$bodyParams = null;
+		
+		// get all partner administrators
+		$c = new Criteria();
+		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
+		$c->addAnd(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$adminKusers = kuserPeer::doSelect($c);
+		
+		foreach ($adminKusers as $admin)
+		{
+			// don't send mail to the created user
+			if ($admin->getId() == $user->getId())
+			{
+				continue;
+			}
+			
+			// send email to all administrators with user management permissions
+			if ($admin->hasPermissionOr(array(PermissionName::ADMIN_USER_ADD, PermissionName::ADMIN_USER_UPDATE, PermissionName::ADMIN_USER_DELETE)))
+			{
+				$adminName = $admin->getFullName();
+				$unsubscribeLink .= $admin->getEmail();
+				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId, $forumsLink, $unsubscribeLink);
+			}
+			
+			// add mail job
+			kJobsManager::addMailJob(
+				null, 
+				0, 
+				$partnerId, 
+				$mailType, 
+				kMailJobData::MAIL_PRIORITY_NORMAL, 
+				kConf::get ("partner_registration_confirmation_email" ), 
+				kConf::get ("partner_registration_confirmation_name" ), 
+				$loginEmail, 
+				$bodyParams
+			);
+			
+		}
+	}
+	
+	
+	public static function sendNewUserMail(kuser $user, $existingUser)
+	{
+		// setup parameters
+		$partnerId = $user->getPartnerId();
+		$userName = $user->getFullName();
+		$creatorUserName = 'Unknown';
+		if (kCurrentContext::$uid)
+		{
+			$creatorUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$uid);
+			if ($creatorUser) {
+				$creatorUserName = $creatorUser->getFullName();
+			}
+		}
+		$publisherName = PartnerPeer::retrieveByPK($partnerId)->getName();
+		$loginEmail = $user->getEmail();
+		$roleName = $user->getUserRoleNames();
+		$puserId = $user->getPuserId();
 		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
 		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
 		$contactLink = kConf::get('contact_url');
@@ -416,9 +484,22 @@ class kuserPeer extends BasekuserPeer
 		$forumsLink = kConf::get('forum_url');
 		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$loginEmail;
 		
+		// setup mail
+		$mailType = null;
+		$bodyParams = array();
 		
-		$bodyParams = array($userName, $loginEmail, $partnerId, $roleName, $resetPasswordLink, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
-	
+		if ($existingUser)
+		{
+			$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+		}
+		else
+		{
+			$mailType = self::KALTURA_NEW_USER_EMAIL;
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+		}		
+		
+		// add mail job
 		kJobsManager::addMailJob(
 			null, 
 			0, 
@@ -428,7 +509,8 @@ class kuserPeer extends BasekuserPeer
 			kConf::get ("partner_registration_confirmation_email" ), 
 			kConf::get ("partner_registration_confirmation_name" ), 
 			$loginEmail, 
-			$bodyParams);
+			$bodyParams
+		);
 	}
 			
 }

@@ -37,6 +37,11 @@ class PartnerService extends KalturaBaseService
 		$partner->validatePropertyNotNull("adminEmail");
 		$partner->validatePropertyNotNull("description");
 		
+		$c = new Criteria();
+		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
+		$c->setLimit(1);
+		$existingUser = UserLoginDataPeer::doCount($c) > 0;
+				
 		try
 		{
 			if ( $cmsPassword == "" ) {
@@ -66,7 +71,7 @@ class PartnerService extends KalturaBaseService
 			$dbPartner = PartnerPeer::retrieveByPK( $pid );
 
 			// send a confirmation email as well as the result of the service
-			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , $subpid , $pass, false, $hashKey );
+			$partner_registration->sendRegistrationInformationForPartner( $dbPartner , false, $existingUser );
 
 		}
 		catch ( SignupException $se )
