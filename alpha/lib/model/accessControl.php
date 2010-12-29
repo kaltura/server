@@ -114,6 +114,24 @@ class accessControl extends BaseaccessControl
 	}
 	
 	/**
+	 * check of there are any restrictions in this accessControl object
+	 * if there any restrictions return true, otherwise return false (if the acessControl is a default one) 
+	 * 
+	 * @return boolean
+	 */
+	public function hasRestrictions()
+	{
+		return
+		(
+			$this->hasSiteRestriction() ||
+			$this->hasCountryRestriction() ||
+			$this->hasSessionRestriction() ||
+			$this->hasPreviewRestriction() ||
+			$this->hasDirectoryRestriction()
+		);
+	}
+	
+	/**
 	 * Get all the restrictions
 	 * 
 	 * @return array

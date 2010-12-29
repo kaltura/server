@@ -382,7 +382,8 @@ class BaseEntryService extends KalturaEntryService
 		$result->isCountryRestricted = false;
 		$result->isSessionRestricted = false;
 		$result->previewLength = -1;
-		if ($accessControl)
+				
+		if ($accessControl & $accessControl->hasRestrictions())
 		{
 			KalturaResponseCacher::disableCache();
 			
