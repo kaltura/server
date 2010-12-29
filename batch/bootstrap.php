@@ -4,12 +4,13 @@
  * @package Scheduler
  */
 
-require_once("..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
-require_once (SF_ROOT_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'kConf.php');
-define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."batch");
+require_once("../infra/bootstrap_base.php");
+require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
+
+define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH . "/batch");
 
 // Autoloader - override the autoloader defaults
-require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
+require_once(KALTURA_INFRA_PATH . "/KAutoloader.php");
 KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "infra", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
@@ -25,7 +26,7 @@ KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/batch/classMa
 KAutoloader::register();
 
 // Logger
-$loggerConfigPath = KALTURA_BATCH_PATH.DIRECTORY_SEPARATOR."logger.ini";
+$loggerConfigPath = KALTURA_BATCH_PATH . "/logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {
