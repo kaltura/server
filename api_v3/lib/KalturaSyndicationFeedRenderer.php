@@ -473,7 +473,10 @@ class KalturaSyndicationFeedRenderer
 			return null;
 	
 		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($kalturaEntry->id,$this->syndicationFeed->flavorParamId);
+		// in case no flavorAsset was found (with respect to $this->syndicationFeed->flavorParamId), retreive highest bitrate flavoeAsset
 		if(!$flavorAsset)
+			$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($kalturaEntry->id);
+		if (!$flavorAsset)
 			return null;
 					
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
