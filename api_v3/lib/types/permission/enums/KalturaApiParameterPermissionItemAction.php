@@ -3,7 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaApiParameterPermissionItemAction extends KalturaEnum implements ApiParameterPermissionItemAction
+class KalturaApiParameterPermissionItemAction extends KalturaStringEnum implements ApiParameterPermissionItemAction
 {
 	// see ApiParameterPermissionItemAction interface
 }
