@@ -135,6 +135,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 				return false;
 				
 			case 'Error':
+			case 'Update Error':
 				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
 				if($liveSiteErrorNodes->length)
 				{
@@ -143,8 +144,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 				}
 				throw new Exception('Unknows MSN error');
 				
-			// TODO - check with MSN what other statuses are available
-			
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
@@ -241,15 +240,13 @@ class MsnDistributionEngine extends DistributionEngine implements
 		switch($publishState)
 		{
 			case 'Published':
-				return false;
+				return true;
 				
 			case 'Pending':
 				return false;
 				
-//			case 'Deleted': // TODO - what is the right status after delete?
-//				return true;
-				
 			case 'Error':
+			case 'Update Error':
 				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
 				if($liveSiteErrorNodes->length)
 				{
@@ -258,8 +255,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 				}
 				throw new Exception('Unknows MSN error');
 				
-			// TODO - check with MSN what other statuses are available
-			
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
@@ -274,13 +269,14 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$publishState = $this->fetchStatus($data);
 		switch($publishState)
 		{
-			case 'Published': // TODO - is that the right status after update?
+			case 'Published':
 				return true;
 				
 			case 'Pending':
 				return false;
 				
 			case 'Error':
+			case 'Update Error':
 				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
 				if($liveSiteErrorNodes->length)
 				{
@@ -289,8 +285,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 				}
 				throw new Exception('Unknows MSN error');
 				
-			// TODO - check with MSN what other statuses are available
-			
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
 				return false;
