@@ -26,6 +26,7 @@ class kConfLocal
 				"apphome_url" => "@SERVICE_URL@",
 				"apphome_url_no_protocol" => "@KALTURA_VIRTUAL_HOST_NAME@",
 				"contact_url" => "@CONTACT_URL@",
+				"contact_phone_number" => "@CONTACT_PHONE_NUMBER@",
 				"beginners_tutorial_url" => "@BEGINNERS_TUTORIAL_URL@",
 				"quick_start_guide_url" => "@QUICK_START_GUIDE_URL@",
 				"forum_url" => "@FORUMS_URLS@",
