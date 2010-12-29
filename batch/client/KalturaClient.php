@@ -3083,28 +3083,28 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $submit;
+	public $submitAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $update;
+	public $updateAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $delete;
+	public $deleteAction;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $fetchReport;
+	public $fetchReportAction;
 
 
 }
