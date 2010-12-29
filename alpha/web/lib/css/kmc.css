@@ -4,10 +4,10 @@ html { height: 100%;}
 
 body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;*/
  a { text-decoration:none;}
-  #kmcHeader { height:29px; padding: 4px 7px 0; background: url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;}
+  #kmcHeader { min-width: 960px; height:29px; padding: 4px 7px 0; background: url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;}
    #kmcHeader div#logo { width:115px; height:30px; margin-top:-3px; float:left; background: url(../images/kmc/kmc_sprite.png) no-repeat 1px 3px;}
     #kmcHeader.whiteLabel div#logo { background: url(../images/kmc/whitelabel_logo.png) no-repeat 0 0;}
-   #kmcHeader ul { height:29px; margin: -4px 0 0 68px; float:left;}
+   #kmcHeader ul { height:29px; margin: -4px 0 0 50px; float:left;}
     #kmcHeader li { float:left;}
      #kmcHeader li a { _width:0; height:32px; padding:  0 24px 0 0 ; display:block; font: bold 11px arial,sans-serif; color:#e3e3e3;}
       #kmcHeader li a span { display:block; padding: 11px 0 9px 25px;}
