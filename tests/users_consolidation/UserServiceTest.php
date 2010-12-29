@@ -66,6 +66,10 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(self::TEST_PARTNER_ID, $this->dummyPartner->getId());
 		$this->dummyPartner2 = PartnerPeer::retrieveByPK(self::TEST_PARTNER_ID_2);
 		$this->assertEquals(self::TEST_PARTNER_ID_2, $this->dummyPartner2->getId());
+		$this->dummyPartner->setAdminLoginUsersQuota(5);
+		$this->dummyPartner->save();
+		$this->dummyPartner2->setAdminLoginUsersQuota(5);
+		$this->dummyPartner2->save();
 		$this->nextUserId = 1;
 		kuserPeer::clearInstancePool();
 		UserLoginDataPeer::clearInstancePool();
@@ -234,7 +238,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		
-		$this->dummyPartner->setLoginUsersQuota(5);
+		$this->dummyPartner->setAdminLoginUsersQuota(5);
 		$this->dummyPartner->save();
 		
 		// -- add a normal end user
@@ -310,9 +314,9 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * Tests user->add with loginUsersQuota partner parameter
+	 * Tests user->add with adminLoginUsersQuota partner parameter
 	 */
-	public function testLoginUsersQuota()
+	public function testAdminLoginUsersQuota()
 	{
 		// check test prerequisites
 		$c = new Criteria();
@@ -329,24 +333,39 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$newUser2 = $this->createUser(true, true, __FUNCTION__);
 		$newUser3 = $this->createUser(true, false, __FUNCTION__);
 		$newUser4 = $this->createUser(true, true, __FUNCTION__);
+		$newUser5 = $this->createUser(true, true, __FUNCTION__);
+		
+		// check that a negative number means no new users possible
+		$this->dummyPartner->setAdminLoginUsersQuota(rand(-30, -2));
+		$this->dummyPartner->save();
+		$exceptionThrown = false;
+		try { $this->addUser($newUser2); }
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'ADMIN_LOGIN_USERS_QUOTA_EXCEEDED');
+		
+		// check that null means no new users possible
+		$this->dummyPartner->setAdminLoginUsersQuota(null);
+		$this->dummyPartner->save();
+		$exceptionThrown = false;
+		try { $this->addUser($newUser2); }
+		catch (Exception $e) { $exceptionThrown = $e; }
+		$this->checkException($exceptionThrown, 'ADMIN_LOGIN_USERS_QUOTA_EXCEEDED');
 		
 		// try to add more users than the partner's quota
-		$this->dummyPartner->setLoginUsersQuota(3);
+		$this->dummyPartner->setAdminLoginUsersQuota(3);
 		$this->dummyPartner->save();
 		$this->assertType('KalturaUser', $this->addUser($newUser));
 		$this->assertType('KalturaUser', $this->addUser($newUser2));
+		$this->assertType('KalturaUser', $this->addUser($newUser5));
 		
-		$exceptionThrown = false;
-		try { $this->client->user->add($newUser3); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
-	
 		$exceptionThrown = false;
 		try { $this->addUser($newUser4); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
+		$this->checkException($exceptionThrown, 'ADMIN_LOGIN_USERS_QUOTA_EXCEEDED');
 		
-		$this->dummyPartner->setLoginUsersQuota(4);
+		$this->assertType('KalturaUser', $this->addUser($newUser3));
+		
+		$this->dummyPartner->setAdminLoginUsersQuota(4);
 		$this->dummyPartner->save();
 		$this->assertType('KalturaUser', $this->addUser($newUser4));
 	}
@@ -356,7 +375,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testAddActionFailures()
 	{
-		$this->dummyPartner->setLoginUsersQuota(5);
+		$this->dummyPartner->setAdminLoginUsersQuota(5);
 		$this->dummyPartner->save();
 		
 		// test failure to add user with user ks
@@ -460,18 +479,12 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertNotNull($ks2);
 		$this->assertEquals(self::TEST_PARTNER_ID_2, $ks2->partner_id);
 		
-		// check login to last partner when no partnerId is given
+		// check login without partnerId -> always goes to first added partner
 		$ks3 = $client->user->loginByLoginId($newUser->email, $newUser->password);
 		$this->assertNotNull($ks3);
 		$ks3 = kSessionUtils::crackKs($ks3);
 		$this->assertNotNull($ks3);
-		$this->assertEquals(self::TEST_PARTNER_ID_2, $ks3->partner_id);
-		
-		$ks1 = $client->user->loginByLoginId($newUser->email, $newUser->password, self::TEST_PARTNER_ID);
-		$this->assertNotNull($ks1);
-		$ks1 = kSessionUtils::crackKs($ks1);
-		$this->assertNotNull($ks1);
-		$this->assertEquals(self::TEST_PARTNER_ID, $ks1->partner_id);
+		$this->assertEquals(self::TEST_PARTNER_ID, $ks3->partner_id);
 		
 		$ks3 = $client->user->loginByLoginId($newUser->email, $newUser->password);
 		$this->assertNotNull($ks3);
@@ -500,17 +513,25 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$ks2 = kSessionUtils::crackKs($ks2);
 		$this->assertNotNull($ks2);
 		$this->assertEquals(self::TEST_PARTNER_ID_2, $ks2->partner_id);
-				
-		// add user with same login id and wrong password - should fail
-		$newUser = $this->createUser(true, true, __FUNCTION__);
-		$createdUser1 = $this->addUser($newUser);
-		$this->assertType('KalturaUser', $createdUser1);
-		$this->assertEquals(self::TEST_PARTNER_ID, $createdUser1->partnerId);
-		$newUser->password = UserLoginDataPeer::generateNewPassword();
-		$exceptionThrown = false;
-		try { $this->addUser2($newUser); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'USER_EXISTS_WITH_DIFFERENT_PASSWORD');
+		
+		// check login without partnerIt -> always goes to the last logged in partner
+		$ks4 = $client->user->loginByLoginId($newUser->email, $newUser->password);
+		$this->assertNotNull($ks4);
+		$ks4 = kSessionUtils::crackKs($ks4);
+		$this->assertNotNull($ks4);
+		$this->assertEquals(self::TEST_PARTNER_ID_2, $ks4->partner_id);
+		
+		$ks5 = $client->user->loginByLoginId($newUser->email, $newUser->password, self::TEST_PARTNER_ID);
+		$this->assertNotNull($ks5);
+		$ks5 = kSessionUtils::crackKs($ks5);
+		$this->assertNotNull($ks5);
+		$this->assertEquals(self::TEST_PARTNER_ID, $ks5->partner_id);
+		
+		$ks6 = $client->user->loginByLoginId($newUser->email, $newUser->password);
+		$this->assertNotNull($ks6);
+		$ks6 = kSessionUtils::crackKs($ks6);
+		$this->assertNotNull($ks6);
+		$this->assertEquals(self::TEST_PARTNER_ID, $ks6->partner_id);
 	}
 	
 	
@@ -613,35 +634,6 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$updatedUser->firstName = 'first';
 		$updatedUser->lastName = 'last';
 		$updatedUser->email = 'abcd@aaaaa.com';
-		
-		// update on all partners
-		$updatedUser1 = $this->client->user->update($createdUser1->id, $updatedUser, true);
-		$this->assertType('KalturaUser', $updatedUser1);
-		
-		// check 1st partner user
-		$this->assertEquals($updatedUser->firstName, $updatedUser1->firstName);
-		$this->assertEquals($updatedUser->lastName, $updatedUser1->lastName);
-		$this->assertEquals($updatedUser->email, $updatedUser1->email);
-		
-		$updatedUser1 = $this->client->user->get($createdUser1->id);
-		$this->assertEquals($updatedUser->firstName, $updatedUser1->firstName);
-		$this->assertEquals($updatedUser->lastName, $updatedUser1->lastName);
-		$this->assertEquals($updatedUser->email, $updatedUser1->email);
-		
-		// check 2nd partner user
-		$updatedUser2 = $this->client2->user->get($createdUser1->id);
-		$this->assertType('KalturaUser', $updatedUser2);
-		$this->assertEquals($updatedUser->firstName, $updatedUser2->firstName);
-		$this->assertEquals($updatedUser->lastName, $updatedUser2->lastName);
-		$this->assertEquals($updatedUser->email, $updatedUser2->email);
-		
-		// check that login data was updated correctly
-		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID_2, $createdUser1->id);
-		UserLoginDataPeer::clearInstancePool();
-		$loginData = UserLoginDataPeer::retrieveByPK($kuser->getLoginDataId());
-		$this->assertEquals($updatedUser->firstName, $loginData->getFirstName());
-		$this->assertEquals($updatedUser->lastName, $loginData->getLastName());
-		$this->assertNotEquals($updatedUser->email, $loginData->getLoginEmail());			
 	}
 	
 	/**
@@ -792,21 +784,12 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	public function testListAction() {
 		
 		// check list by isAdmin and loginEnabled
-		$this->dummyPartner->setLoginUsersQuota(30);
+		$this->dummyPartner->setAdminLoginUsersQuota(30);
 		$this->dummyPartner->save();
 		$this->startSession(KalturaSessionType::ADMIN, null);
-		$adminNoLoginNum = 2;
 		$adminLoginNum = 2;
 		$normalNoLoginNum = 3;
 		$normalLoginNum = 4;
-		
-		$adminNoLogin = array();
-		for ($i=0; $i<$adminNoLoginNum; $i++) {
-			$newUser = $this->createUser(false, true, 'adminNoLogin');
-			$this->addUser($newUser);
-			$adminNoLogin[] = $newUser;
-			
-		}
 		
 		$adminLogin = array();
 		for ($i=0; $i<$adminLoginNum; $i++) {
@@ -849,8 +832,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$normalLoginList = $this->client->user->listAction($normalLoginFilter);
 		
 		// verify number of users
-		$this->assertEquals($adminNoLoginNum, count($adminNoLoginList->objects));
-		$this->assertEquals($adminNoLoginNum, $adminNoLoginList->totalCount);
+		$this->assertEquals(0, count($adminNoLoginList->objects));
+		$this->assertEquals(0, $adminNoLoginList->totalCount);
 		$this->assertEquals($adminLoginNum+1, count($adminLoginList->objects)); // 1 admin login user already existed
 		$this->assertEquals($adminLoginNum+1, $adminLoginList->totalCount);
 		$this->assertEquals($normalNoLoginNum, count($normalNoLoginList->objects));
@@ -858,9 +841,6 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($normalLoginNum, count($normalLoginList->objects));
 		$this->assertEquals($normalLoginNum, $normalLoginList->totalCount);
 		
-		for ($i=0; $i<$adminNoLoginNum; $i++) {
-			$this->assertEquals($adminNoLogin[$i]->id, $adminNoLoginList->objects[$i]->id);
-		}
 		for ($i=0; $i<$adminLoginNum; $i++) {
 			//$this->assertEquals($adminLogin[$i]->id, $adminLoginList->objects[$i+1]->id);
 		}
@@ -871,18 +851,19 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 			$this->assertEquals($normalLogin[$i]->id, $normalLoginList->objects[$i]->id);
 		}
 		
-		$this->markTestIncomplete ( "listAction test not implemented" );
+		$listResponse = $this->client->user->listAction();
+		$allUsers = $listResponse->objects;
+		foreach ($allUsers as $user) {
+			// check that all returned users are of type KalturaUser
+			$this->assertType('KalturaUser', $user);
+			// check that only current partner's users were returned
+			$this->assertEquals(self::TEST_PARTNER_ID, $user->partnerId);
+			// check that deleted users are not returned
+			$this->assertNotEquals(KalturaUserStatus::DELETED, $user->status);
+		}
 		
-		//TODO: check users returned belong to current partner only
-		
-		//TODO: check that total count is right
-		
-		//TODO: check that all objects returned are KalturaUser objects
-		
-		//TODO: check that all user types are returned admin/not login/not
-		
-		//TODO: check that deleted users are not returned
-		
+		// check that total count is right
+		$this->assertEquals(count($allUsers), $listResponse->totalCount);
 	}
 	
 	/**
@@ -944,6 +925,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	
 		// test that cannot update to existing data
 		$this->startSession(KalturaSessionType::ADMIN, null);
+		$this->startSession2(KalturaSessionType::ADMIN, null);
+		
 		$newUser1 = $this->createUser(true, false, __FUNCTION__);
 		$newUser2 = $this->createUser(true, true, __FUNCTION__);
 		$addedUser1 = $this->addUser($newUser1);
@@ -962,6 +945,17 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$ks = kSessionUtils::crackKs($ks);
 		$this->assertNotNull($ks);
 		$this->assertEquals($addedUser2->partnerId, $ks->partner_id);
+		
+		// test that updaing login data, updates the email on all kusers using it.
+		$newUser4 = $this->createUser(true, true);
+		$this->addUser($newUser4);
+		$this->addUser2($newUser4);
+		$newEmail = 'new_email@blahblah.com';
+		$this->client->user->updateLogindata($newUser4->email, $newUser4->password, $newEmail);
+		$getUser1 = $this->client->user->get($newUser4->id);
+		$getUser2 = $this->client2->user->get($newUser4->id);
+		$this->assertEquals($newEmail, $getUser1->email);
+		$this->assertEquals($newEmail, $getUser2->email);
 	}
 	
 	public function testUpdateLoginDataFailuresAction()
@@ -1025,15 +1019,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->checkException($exceptionThrown, 'USER_LOGIN_ALREADY_ENABLED');
 		
 		
-		// check that cannot enable when partner exceeded login users quota
-		$this->dummyPartner->setLoginUsersQuota(1);
-		$newUser1 = $this->createUser(false, false, __FUNCTION__);
-		$addedUser1 = $this->addUser($newUser1);
-		$loginUser = $this->createUser(true, false, __FUNCTION__);
-		$exceptionThrown = false;
-		try { $this->client->user->enableLogin($newUser1->id, $loginUser->email, $loginUser->password); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'LOGIN_USERS_QUOTA_EXCEEDED');
+		//TODO: test enabled login with password = null - and email should be sent to generate initial password
 		
 	}
 	
@@ -1042,7 +1028,6 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testDisableLoginAction()
 	{
-
 		// check that login can be disabled
 		$this->startSession(KalturaSessionType::ADMIN, null);
 		$newUser1 = $this->createUser(true, false, __FUNCTION__);
@@ -1070,6 +1055,22 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		try { $this->client->user->disableLogin($newUser1->id); }
 		catch (Exception $e) { $exceptionThrown = $e; }
 		$this->checkException($exceptionThrown, 'USER_LOGIN_ALREADY_DISABLED');
+	}
+	
+	
+	public function testPartnerRegister()
+	{
+		//TODO: register a new partner and verify that a new admin kuser is created
+		
+		//TODO: verify that new partner email was sent
+		
+		//TODO: verify that new user email was sent
+		
+		//TODO: try to register another partner with the same email and verify success and association to existing user
+		
+		//TODO: verify that existing user mail is sent for the new partner
+		
+		$this->markTestIncomplete ( "testPartnerRegister test not implemented" );
 	}
 
 }
