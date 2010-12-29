@@ -361,7 +361,6 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
 }
 
 class KalturaDocumentType
@@ -930,8 +929,8 @@ class KalturaPermissionName
 	const CONTENT_MANAGE_ANNOTATION = "CONTENT_MANAGE_ANNOTATION";
 	const CONTENT_MANAGE_SHARE = "CONTENT_MANAGE_SHARE";
 	const LIVE_STREAM_BASE = "LIVE_STREAM_BASE";
-	const LIVE_STREAM_ADD = "CONTENT_MANAGE_ADD_LIVE";
-	const LIVE_STREAM_UPDATE = "CONTENT_MANAGE_UPDATE_LIVE";
+	const LIVE_STREAM_ADD = "LIVE_STREAM_ADD";
+	const LIVE_STREAM_UPDATE = "LIVE_STREAM_UPDATE";
 	const CONTENT_MODERATE_BASE = "CONTENT_MODERATE_BASE";
 	const CONTENT_MODERATE_METADATA = "CONTENT_MODERATE_METADATA";
 	const CONTENT_MODERATE_CUSTOM_DATA = "CONTENT_MODERATE_CUSTOM_DATA";
@@ -1005,7 +1004,6 @@ class KalturaPermissionType
 	const API_ACCESS = 1;
 	const SPECIAL_FEATURE = 2;
 	const PLUGIN = 3;
-	const PARTNER_GROUP = 4;
 	const EXTERNAL = 99;
 }
 
@@ -4365,112 +4363,6 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaCommercialUseType
-	 */
-	public $commercialUseEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerPackageLessThanOrEqual = null;
-
-
-}
-
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -5052,28 +4944,28 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $submitAction;
+	public $submit;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $updateAction;
+	public $update;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $deleteAction;
+	public $delete;
 
 	/**
 	 * 
 	 *
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $fetchReportAction;
+	public $fetchReport;
 
 
 }
@@ -7528,6 +7420,79 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -9342,13 +9307,6 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	 * @readonly
 	 */
 	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
 
 	/**
 	 * 
@@ -12852,12 +12810,11 @@ class KalturaUserService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function update($userId, KalturaUser $user, $allUserPartners = false)
+	function update($userId, KalturaUser $user)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "userId", $userId);
 		$this->client->addParam($kparams, "user", $user->toParams());
-		$this->client->addParam($kparams, "allUserPartners", $allUserPartners);
 		$this->client->queueServiceActionCall("user", "update", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -13012,7 +12969,7 @@ class KalturaUserService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function enableLogin($userId, $loginId, $password)
+	function enableLogin($userId, $loginId, $password = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "userId", $userId);
