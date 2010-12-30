@@ -509,7 +509,7 @@ class myInsertEntryHelper
 //				}
 			}
 		}
-		else if ($entry->getStatus() == entryStatus::PENDING)
+		else if ($entry->getStatus() == entryStatus::PENDING || $media_source == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
 		{
 			$entry->setData($entry_fullPath);
 			$entry->save();
