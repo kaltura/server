@@ -28,13 +28,14 @@
 					<?php echo $user->firstName; ?> <?php echo $user->lastName; ?>
 					<?php $titles = array(); ?>
 					<?php if ($user->email == $this->myEmail) { $titles[] = $this->translate('you'); }; ?>
-					<?php if (unserialize($user->partnerData)->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
+					<?php $partnerData = unserialize($user->partnerData); ?>
+					<?php if ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
 					<?php if (count($titles)): ?>
 						(<?php echo implode($titles, ', '); ?>)
 					<?php endif; ?>
 				</td>
 				<td>
-					<?php $disabled = (($user->email == $this->myEmail) || unserialize($user->partnerData)->isPrimary) ? ' disabled="disabled"' : ''; ?>
+					<?php $disabled = (($user->email == $this->myEmail) || ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary)) ? ' disabled="disabled"' : ''; ?>
 					<select class="options" onchange="doAction(this.value, <?php echo $user->id; ?>)"<?php echo $disabled; ?>>
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if ($user->email != $this->myEmail): ?>
