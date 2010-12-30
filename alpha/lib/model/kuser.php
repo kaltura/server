@@ -516,7 +516,7 @@ class kuser extends Basekuser
 	 */
 	public function getFullName()
 	{
-		if ($this->getFirstName()) {
+		if (!is_null($this->getFirstName())) {
 			return trim($this->getFirstName().' '.$this->getLastName());
 		}
 		else {
