@@ -7,6 +7,55 @@ class KalturaAccessControlOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+class KalturaAdminUserOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaApiActionPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaApiParameterPermissionItemAction
+{
+	const READ = "read";
+	const UPDATE = "update";
+	const INSERT = "insert";
+}
+
+class KalturaApiParameterPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaAssetParamsOrderBy
+{
+}
+
+class KalturaAssetParamsOutputOrderBy
+{
+}
+
+class KalturaAssetType
+{
+	const FLAVOR = "1";
+	const THUMBNAIL = "2";
+}
+
 class KalturaAudioCodec
 {
 	const NONE = "";
@@ -17,6 +66,72 @@ class KalturaAudioCodec
 	const COPY = "copy";
 }
 
+class KalturaAuditTrailAction
+{
+	const CREATED = "CREATED";
+	const COPIED = "COPIED";
+	const CHANGED = "CHANGED";
+	const DELETED = "DELETED";
+	const VIEWED = "VIEWED";
+	const CONTENT_VIEWED = "CONTENT_VIEWED";
+	const FILE_SYNC_CREATED = "FILE_SYNC_CREATED";
+	const RELATION_ADDED = "RELATION_ADDED";
+	const RELATION_REMOVED = "RELATION_REMOVED";
+}
+
+class KalturaAuditTrailContext
+{
+	const CLIENT = -1;
+	const SCRIPT = 0;
+	const PS2 = 1;
+	const API_V3 = 2;
+}
+
+class KalturaAuditTrailObjectType
+{
+	const ACCESS_CONTROL = "accessControl";
+	const ADMIN_KUSER = "adminKuser";
+	const BATCH_JOB = "BatchJob";
+	const CATEGORY = "category";
+	const CONVERSION_PROFILE_2 = "conversionProfile2";
+	const EMAIL_INGESTION_PROFILE = "EmailIngestionProfile";
+	const ENTRY = "entry";
+	const FILE_SYNC = "FileSync";
+	const FLAVOR_ASSET = "flavorAsset";
+	const FLAVOR_PARAMS = "flavorParams";
+	const FLAVOR_PARAMS_CONVERSION_PROFILE = "flavorParamsConversionProfile";
+	const FLAVOR_PARAMS_OUTPUT = "flavorParamsOutput";
+	const KSHOW = "kshow";
+	const KSHOW_KUSER = "KshowKuser";
+	const KUSER = "kuser";
+	const MEDIA_INFO = "mediaInfo";
+	const MODERATION = "moderation";
+	const PARTNER = "Partner";
+	const PUSER_KUSER = "PuserKuser";
+	const ROUGHCUT = "roughcutEntry";
+	const SYNDICATION = "syndicationFeed";
+	const UI_CONF = "uiConf";
+	const UPLOAD_TOKEN = "UploadToken";
+	const WIDGET = "widget";
+	const METADATA = "Metadata";
+	const METADATA_PROFILE = "MetadataProfile";
+}
+
+class KalturaAuditTrailOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const PARSED_AT_ASC = "+parsedAt";
+	const PARSED_AT_DESC = "-parsedAt";
+}
+
+class KalturaAuditTrailStatus
+{
+	const PENDING = 1;
+	const READY = 2;
+	const FAILED = 3;
+}
+
 class KalturaBaseEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -25,6 +140,8 @@ class KalturaBaseEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -91,35 +208,41 @@ class KalturaBatchJobStatus
 
 class KalturaBatchJobType
 {
-	const CONVERT = 0;
-	const IMPORT = 1;
-	const DELETE = 2;
-	const FLATTEN = 3;
-	const BULKUPLOAD = 4;
-	const DVDCREATOR = 5;
-	const DOWNLOAD = 6;
-	const OOCONVERT = 7;
-	const CONVERT_PROFILE = 10;
-	const POSTCONVERT = 11;
-	const PULL = 12;
-	const REMOTE_CONVERT = 13;
-	const EXTRACT_MEDIA = 14;
-	const MAIL = 15;
-	const NOTIFICATION = 16;
-	const CLEANUP = 17;
-	const SCHEDULER_HELPER = 18;
-	const BULKDOWNLOAD = 19;
-	const DB_CLEANUP = 20;
-	const PROVISION_PROVIDE = 21;
-	const CONVERT_COLLECTION = 22;
-	const STORAGE_EXPORT = 23;
-	const PROVISION_DELETE = 24;
-	const STORAGE_DELETE = 25;
-	const EMAIL_INGESTION = 26;
-	const METADATA_IMPORT = 27;
-	const METADATA_TRANSFORM = 28;
-	const FILESYNC_IMPORT = 29;
-	const PROJECT = 1000;
+	const CONVERT = "0";
+	const IMPORT = "1";
+	const DELETE = "2";
+	const FLATTEN = "3";
+	const BULKUPLOAD = "4";
+	const DVDCREATOR = "5";
+	const DOWNLOAD = "6";
+	const OOCONVERT = "7";
+	const CONVERT_PROFILE = "10";
+	const POSTCONVERT = "11";
+	const PULL = "12";
+	const REMOTE_CONVERT = "13";
+	const EXTRACT_MEDIA = "14";
+	const MAIL = "15";
+	const NOTIFICATION = "16";
+	const CLEANUP = "17";
+	const SCHEDULER_HELPER = "18";
+	const BULKDOWNLOAD = "19";
+	const DB_CLEANUP = "20";
+	const PROVISION_PROVIDE = "21";
+	const CONVERT_COLLECTION = "22";
+	const STORAGE_EXPORT = "23";
+	const PROVISION_DELETE = "24";
+	const STORAGE_DELETE = "25";
+	const EMAIL_INGESTION = "26";
+	const METADATA_IMPORT = "27";
+	const METADATA_TRANSFORM = "28";
+	const FILESYNC_IMPORT = "29";
+	const CAPTURE_THUMB = "30";
+	const VIRUS_SCAN = "virusScan.VirusScan";
+	const DISTRIBUTION_SUBMIT = "contentDistribution.DistributionSubmit";
+	const DISTRIBUTION_UPDATE = "contentDistribution.DistributionUpdate";
+	const DISTRIBUTION_DELETE = "contentDistribution.DistributionDelete";
+	const DISTRIBUTION_FETCH_REPORT = "contentDistribution.DistributionFetchReport";
+	const DISTRIBUTION_SYNC = "contentDistribution.DistributionSync";
 }
 
 class KalturaBitRateMode
@@ -147,8 +270,8 @@ class KalturaCategoryOrderBy
 
 class KalturaCommercialUseType
 {
-	const COMMERCIAL_USE = "commercial_use";
-	const NON_COMMERCIAL_USE = "non-commercial_use";
+	const COMMERCIAL_USE = 1;
+	const NON_COMMERCIAL_USE = 0;
 }
 
 class KalturaContainerFormat
@@ -164,8 +287,10 @@ class KalturaContainerFormat
 	const WMA = "wma";
 	const ISMV = "ismv";
 	const MKV = "mkv";
+	const WEBM = "webm";
 	const SWF = "swf";
 	const PDF = "pdf";
+	const JPG = "jpg";
 }
 
 class KalturaControlPanelCommandOrderBy
@@ -201,6 +326,24 @@ class KalturaControlPanelCommandType
 	const KILL = 4;
 }
 
+class KalturaConversionEngineType
+{
+	const KALTURA_COM = "0";
+	const ON2 = "1";
+	const FFMPEG = "2";
+	const MENCODER = "3";
+	const ENCODING_COM = "4";
+	const EXPRESSION_ENCODER3 = "5";
+	const FFMPEG_VP8 = "98";
+	const FFMPEG_AUX = "99";
+	const PDF2SWF = "201";
+	const PDF_CREATOR = "202";
+	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const FAST_START = "fastStart.FastStart";
+	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
+	const AVIDEMUX = "avidemux.Avidemux";
+}
+
 class KalturaConversionProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -221,6 +364,8 @@ class KalturaDataEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -231,6 +376,64 @@ class KalturaDirectoryRestrictionType
 	const DISPLAY_WITH_LINK = 1;
 }
 
+class KalturaDistributionAction
+{
+	const SUBMIT = 1;
+	const UPDATE = 2;
+	const DELETE = 3;
+	const FETCH_REPORT = 4;
+}
+
+class KalturaDistributionErrorType
+{
+	const MISSING_FLAVOR = 1;
+	const MISSING_THUMBNAIL = 2;
+	const MISSING_METADATA = 3;
+	const INVALID_DATA = 4;
+}
+
+class KalturaDistributionProfileActionStatus
+{
+	const DISABLED = 1;
+	const AUTOMATIC = 2;
+	const MANUAL = 3;
+}
+
+class KalturaDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaDistributionProfileStatus
+{
+	const DISABLED = 1;
+	const ENABLED = 2;
+	const DELETED = 3;
+}
+
+class KalturaDistributionProtocol
+{
+	const FTP = 1;
+	const SCP = 2;
+	const SFTP = 3;
+	const HTTP = 4;
+	const HTTPS = 5;
+}
+
+class KalturaDistributionProviderOrderBy
+{
+}
+
+class KalturaDistributionProviderType
+{
+	const GENERIC = "1";
+	const MSN = "msnDistribution.MSN";
+	const HULU = "huluDistribution.HULU";
+}
+
 class KalturaDocumentEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -239,6 +442,8 @@ class KalturaDocumentEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -270,6 +475,42 @@ class KalturaEmailIngestionProfileStatus
 	const ACTIVE = 1;
 }
 
+class KalturaEntryDistributionFlag
+{
+	const NONE = 0;
+	const SUBMIT_REQUIRED = 1;
+	const DELETE_REQUIRED = 2;
+	const UPDATE_REQUIRED = 3;
+}
+
+class KalturaEntryDistributionOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const SUBMITTED_AT_ASC = "+submittedAt";
+	const SUBMITTED_AT_DESC = "-submittedAt";
+	const SUNRISE_ASC = "+sunrise";
+	const SUNRISE_DESC = "-sunrise";
+	const SUNSET_ASC = "+sunset";
+	const SUNSET_DESC = "-sunset";
+}
+
+class KalturaEntryDistributionStatus
+{
+	const PENDING = 0;
+	const QUEUED = 1;
+	const READY = 2;
+	const DELETED = 3;
+	const SUBMITTING = 4;
+	const UPDATING = 5;
+	const DELETING = 6;
+	const ERROR_SUBMITTING = 7;
+	const ERROR_UPDATING = 8;
+	const ERROR_DELETING = 9;
+}
+
 class KalturaEntryModerationStatus
 {
 	const PENDING_MODERATION = 1;
@@ -281,34 +522,37 @@ class KalturaEntryModerationStatus
 
 class KalturaEntryStatus
 {
-	const ERROR_IMPORTING = -2;
-	const ERROR_CONVERTING = -1;
-	const IMPORT = 0;
-	const PRECONVERT = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const PENDING = 4;
-	const MODERATE = 5;
-	const BLOCKED = 6;
+	const ERROR_IMPORTING = "-2";
+	const ERROR_CONVERTING = "-1";
+	const IMPORT = "0";
+	const PRECONVERT = "1";
+	const READY = "2";
+	const DELETED = "3";
+	const PENDING = "4";
+	const MODERATE = "5";
+	const BLOCKED = "6";
+	const INFECTED = "virusScan.Infected";
 }
 
 class KalturaEntryType
 {
-	const AUTOMATIC = -1;
-	const MEDIA_CLIP = 1;
-	const MIX = 2;
-	const PLAYLIST = 5;
-	const DATA = 6;
-	const LIVE_STREAM = 7;
-	const DOCUMENT = 10;
+	const AUTOMATIC = "-1";
+	const MEDIA_CLIP = "1";
+	const MIX = "2";
+	const PLAYLIST = "5";
+	const DATA = "6";
+	const LIVE_STREAM = "7";
+	const DOCUMENT = "10";
 }
 
 class KalturaFileSyncObjectType
 {
-	const ENTRY = 1;
-	const UICONF = 2;
-	const BATCHJOB = 3;
-	const FLAVOR_ASSET = 4;
+	const ENTRY = "1";
+	const UICONF = "2";
+	const BATCHJOB = "3";
+	const FLAVOR_ASSET = "4";
+	const METADATA = "5";
+	const METADATA_PROFILE = "6";
 }
 
 class KalturaFileSyncOrderBy
@@ -349,6 +593,7 @@ class KalturaFlavorAssetStatus
 	const READY = 2;
 	const DELETED = 3;
 	const NOT_APPLICABLE = 4;
+	const TEMP = 5;
 }
 
 class KalturaFlavorParamsOrderBy
@@ -364,6 +609,35 @@ class KalturaGender
 	const UNKNOWN = 0;
 	const MALE = 1;
 	const FEMALE = 2;
+}
+
+class KalturaGenericDistributionProviderActionOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaGenericDistributionProviderOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaGenericDistributionProviderParser
+{
+	const XSL = 1;
+	const XPATH = 2;
+	const REGEX = 3;
+}
+
+class KalturaGenericDistributionProviderStatus
+{
+	const ACTIVE = 2;
+	const DELETED = 3;
 }
 
 class KalturaGoogleSyndicationFeedAdultValues
@@ -513,6 +787,8 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -535,6 +811,8 @@ class KalturaLiveStreamEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -613,6 +891,8 @@ class KalturaMediaEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -695,6 +975,8 @@ class KalturaMixEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -805,6 +1087,121 @@ class KalturaPartnerType
 	const SAKAI = 108;
 }
 
+class KalturaPermissionItemOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaPermissionName
+{
+	const FEATURE_ANALYTICS_TAB = "FEATURE_ANALYTICS_TAB";
+	const FEATURE_508_PLAYERS = "FEATURE_508_PLAYERS";
+	const FEATURE_LIVE_STREAM = "FEATURE_LIVE_STREAM";
+	const FEATURE_VAST = "FEATURE_VAST";
+	const FEATURE_SILVERLIGHT = "FEATURE_SILVERLIGHT";
+	const USER_SESSION_PERMISSION = "BASE_USER_SESSION_PERMISSION";
+	const NO_SESSION_PERMISSION = "NO_SESSION_PERMISSION";
+	const BASE_BATCH_SYSTEM_PERMISSION = "BASE_BATCH_SYSTEM_PERMISSION";
+	const CONTENT_INGEST_UPLOAD = "CONTENT_INGEST_UPLOAD";
+	const CONTENT_INGEST_BULK_UPLOAD = "CONTENT_INGEST_BULK_UPLOAD";
+	const CONTENT_INGEST_FEED = "CONTENT_INGEST_FEED";
+	const CONTENT_MANAGE_MIX = "CONTENT_MANAGE_MIX";
+	const CONTENT_MANAGE_BASE = "CONTENT_MANAGE_BASE";
+	const CONTENT_MANAGE_METADATA = "CONTENT_MANAGE_METADATA";
+	const CONTENT_MANAGE_ASSIGN_CATEGORIES = "CONTENT_MANAGE_ASSIGN_CATEGORIES";
+	const CONTENT_MANAGE_THUMBNAIL = "CONTENT_MANAGE_THUMBNAIL";
+	const CONTENT_MANAGE_SCHEDULE = "CONTENT_MANAGE_SCHEDULE";
+	const CONTENT_MANAGE_ACCESS_CONTROL = "CONTENT_MANAGE_ACCESS_CONTROL";
+	const CONTENT_MANAGE_CUSTOM_DATA = "CONTENT_MANAGE_CUSTOM_DATA";
+	const CONTENT_MANAGE_DELETE = "CONTENT_MANAGE_DELETE";
+	const CONTENT_MANAGE_RECONVERT = "CONTENT_MANAGE_RECONVERT";
+	const CONTENT_MANAGE_EDIT_CATEGORIES = "CONTENT_MANAGE_EDIT_CATEGORIES";
+	const CONTENT_MANAGE_ANNOTATION = "CONTENT_MANAGE_ANNOTATION";
+	const CONTENT_MANAGE_SHARE = "CONTENT_MANAGE_SHARE";
+	const LIVE_STREAM_BASE = "LIVE_STREAM_BASE";
+	const LIVE_STREAM_ADD = "LIVE_STREAM_ADD";
+	const LIVE_STREAM_UPDATE = "LIVE_STREAM_UPDATE";
+	const CONTENT_MODERATE_BASE = "CONTENT_MODERATE_BASE";
+	const CONTENT_MODERATE_METADATA = "CONTENT_MODERATE_METADATA";
+	const CONTENT_MODERATE_CUSTOM_DATA = "CONTENT_MODERATE_CUSTOM_DATA";
+	const PLAYLIST_BASE = "PLAYLIST_BASE";
+	const PLAYLIST_ADD = "PLAYLIST_ADD";
+	const PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
+	const PLAYLIST_DELETE = "PLAYLIST_DELETE";
+	const SYNDICATION_BASE = "SYNDICATION_BASE";
+	const SYNDICATION_ADD = "SYNDICATION_ADD";
+	const SYNDICATION_UPDATE = "SYNDICATION_UPDATE";
+	const SYNDICATION_DELETE = "SYNDICATION_DELETE";
+	const STUDIO_BASE = "STUDIO_BASE";
+	const STUDIO_ADD_UICONF = "STUDIO_ADD_UICONF";
+	const STUDIO_UPDATE_UICONF = "STUDIO_UPDATE_UICONF";
+	const STUDIO_DELETE_UICONF = "STUDIO_DELETE_UICONF";
+	const ACCOUNT_BASE = "ACCOUNT_BASE";
+	const ACCOUNT_UPDATE_SETTINGS = "ACCOUNT_UPDATE_SETTINGS";
+	const INTEGRATION_BASE = "INTEGRATION_BASE";
+	const INTEGRATION_UPDATE_SETTINGS = "INTEGRATION_UPDATE_SETTINGS";
+	const ACCESS_CONTROL_BASE = "ACCESS_CONTROL_BASE";
+	const ACCESS_CONTROL_ADD = "ACCESS_CONTROL_ADD";
+	const ACCESS_CONTROL_UPDATE = "ACCESS_CONTROL_UPDATE";
+	const ACCESS_CONTROL_DELETE = "ACCESS_CONTROL_DELETE";
+	const TRANSCODING_BASE = "TRANSCODING_BASE";
+	const TRANSCODING_ADD = "TRANSCODING_ADD";
+	const TRANSCODING_UPDATE = "TRANSCODING_UPDATE";
+	const TRANSCODING_DELETE = "TRANSCODING_DELETE";
+	const CUSTOM_DATA_PROFILE_BASE = "CUSTOM_DATA_PROFILE_BASE";
+	const CUSTOM_DATA_PROFILE_ADD = "CUSTOM_DATA_PROFILE_ADD";
+	const CUSTOM_DATA_PROFILE_UPDATE = "CUSTOM_DATA_PROFILE_UPDATE";
+	const CUSTOM_DATA_PROFILE_DELETE = "CUSTOM_DATA_PROFILE_DELETE";
+	const ADMIN_BASE = "ADMIN_BASE";
+	const ADMIN_USER_ADD = "ADMIN_USER_ADD";
+	const ADMIN_USER_UPDATE = "ADMIN_USER_UPDATE";
+	const ADMIN_USER_DELETE = "ADMIN_USER_DELETE";
+	const ADMIN_ROLE_ADD = "ADMIN_ROLE_ADD";
+	const ADMIN_ROLE_UPDATE = "ADMIN_ROLE_UPDATE";
+	const ADMIN_ROLE_DELETE = "ADMIN_ROLE_DELETE";
+	const ADMIN_PUBLISHER_MANAGE = "ADMIN_PUBLISHER_MANAGE";
+	const ANALYTICS_BASE = "ANALYTICS_BASE";
+	const ADVERTISING_BASE = "ADVERTISING_BASE";
+	const ADVERTISING_UPDATE_SETTINGS = "ADVERTISING_UPDATE_SETTINGS";
+	const PLAYLIST_EMBED_CODE = "PLAYLIST_EMBED_CODE";
+	const STUDIO_BRAND_UICONF = "STUDIO_BRAND_UICONF";
+	const STUDIO_SELECT_CONTENT = "STUDIO_SELECT_CONTENT";
+	const CONTENT_MANAGE_EMBED_CODE = "CONTENT_MANAGE_EMBED_CODE";
+	const ADMIN_WHITE_BRANDING = "ADMIN_WHITE_BRANDING";
+}
+
+class KalturaPermissionOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaPermissionStatus
+{
+	const ACTIVE = 1;
+	const BLOCKED = 2;
+	const DELETED = 3;
+}
+
+class KalturaPermissionType
+{
+	const API_ACCESS = 1;
+	const SPECIAL_FEATURE = 2;
+	const PLUGIN = 3;
+	const EXTERNAL = 99;
+}
+
 class KalturaPlayableEntryOrderBy
 {
 	const PLAYS_ASC = "+plays";
@@ -821,6 +1218,8 @@ class KalturaPlayableEntryOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -833,6 +1232,8 @@ class KalturaPlaylistOrderBy
 	const MODERATION_COUNT_DESC = "-moderationCount";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
 }
@@ -865,6 +1266,15 @@ class KalturaSchedulerStatusType
 	const RUNNING_BATCHES_DISC_IO = 5;
 	const RUNNING_BATCHES_DISC_SPACE = 6;
 	const RUNNING_BATCHES_IS_RUNNING = 7;
+}
+
+class KalturaSearchConditionComparison
+{
+	const EQUEL = 1;
+	const GREATER_THAN = 2;
+	const GREATER_THAN_OR_EQUEL = 3;
+	const LESS_THAN = 4;
+	const LESS_THAN_OR_EQUEL = 5;
 }
 
 class KalturaSearchOperatorType
@@ -1063,25 +1473,20 @@ class KalturaSyndicationFeedType
 	const TUBE_MOGUL = 4;
 }
 
-class KalturaSystemUserOrderBy
+class KalturaThumbCropType
 {
-	const ID_ASC = "+id";
-	const ID_DESC = "-id";
-	const STATUS_ASC = "+status";
-	const STATUS_DESC = "-status";
+	const RESIZE = 1;
+	const RESIZE_WITH_PADDING = 2;
+	const CROP = 3;
+	const CROP_FROM_TOP = 4;
 }
 
-class KalturaSystemUserRole
+class KalturaThumbParamsOrderBy
 {
-	const ROLE_GUEST = "guest";
-	const ROLE_PROFESIONAL_SERVICES = "ps";
-	const ROLE_ADMINISTRATOR = "admin";
 }
 
-class KalturaSystemUserStatus
+class KalturaThumbParamsOutputOrderBy
 {
-	const BLOCKED = 0;
-	const ACTIVE = 1;
 }
 
 class KalturaTubeMogulSyndicationFeedCategories
@@ -1131,8 +1536,15 @@ class KalturaUiConfObjType
 	const APP_STUDIO = 6;
 	const KRECORD = 7;
 	const PLAYER_V3 = 8;
+	const KMC_ACCOUNT = 9;
+	const KMC_ANALYTICS = 10;
+	const KMC_CONTENT = 11;
+	const KMC_DASHBOARD = 12;
+	const KMC_LOGIN = 13;
 	const PLAYER_SL = 14;
 	const CLIENTSIDE_ENCODER = 15;
+	const KMC_GENERAL = 16;
+	const KMC_ROLES_AND_PERMISSIONS = 17;
 }
 
 class KalturaUiConfOrderBy
@@ -1168,8 +1580,29 @@ class KalturaUploadTokenStatus
 
 class KalturaUserOrderBy
 {
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+}
+
+class KalturaUserRoleOrderBy
+{
+	const ID_ASC = "+id";
+	const ID_DESC = "-id";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaUserRoleStatus
+{
+	const ACTIVE = 1;
+	const BLOCKED = 2;
+	const DELETED = 3;
 }
 
 class KalturaUserStatus
@@ -1196,6 +1629,33 @@ class KalturaVideoCodec
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
 	const COPY = "copy";
+}
+
+class KalturaVirusFoundAction
+{
+	const NONE = 0;
+	const DELETE = 1;
+	const CLEAN_NONE = 2;
+	const CLEAN_DELETE = 3;
+}
+
+class KalturaVirusScanEngineType
+{
+	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
+}
+
+class KalturaVirusScanProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaVirusScanProfileStatus
+{
+	const DISABLED = 1;
+	const ENABLED = 2;
 }
 
 class KalturaWidgetOrderBy
@@ -1252,7 +1712,7 @@ class KalturaYahooSyndicationFeedOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
-class KalturaSearchItem extends KalturaObjectBase
+abstract class KalturaSearchItem extends KalturaObjectBase
 {
 
 }
@@ -1375,7 +1835,7 @@ class KalturaFilter extends KalturaObjectBase
 
 }
 
-class KalturaAccessControlFilter extends KalturaFilter
+abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -1405,6 +1865,11 @@ class KalturaAccessControlFilter extends KalturaFilter
 	 */
 	public $createdAtLessThanOrEqual = null;
 
+
+}
+
+class KalturaAccessControlFilter extends KalturaAccessControlBaseFilter
+{
 
 }
 
@@ -1450,23 +1915,22 @@ class KalturaAccessControlListResponse extends KalturaObjectBase
 
 }
 
-class KalturaAdminUser extends KalturaObjectBase
+class KalturaUser extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
 	 * @var string
-	 * @readonly
 	 */
-	public $password = null;
+	public $id = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 * @readonly
 	 */
-	public $email = null;
+	public $partnerId = null;
 
 	/**
 	 * 
@@ -1475,6 +1939,223 @@ class KalturaAdminUser extends KalturaObjectBase
 	 */
 	public $screenName = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fullName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $email = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $dateOfBirth = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $country = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $state = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $city = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $zip = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbnailUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * Admin tags can be updated only by using an admin session
+	 *
+	 * @var string
+	 */
+	public $adminTags = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGender
+	 */
+	public $gender = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserStatus
+	 */
+	public $status = null;
+
+	/**
+	 * Creation date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Last update date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Can be used to store various partner related data as a string 
+	 *
+	 * @var string
+	 */
+	public $partnerData = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $indexedPartnerDataInt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $indexedPartnerDataString = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $storageSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $firstName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastName = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdmin = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lastLoginTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $statusUpdatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $deletedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $loginEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isRootAdmin = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $roleIds = null;
+
+
+}
+
+class KalturaDynamicEnum extends KalturaObjectBase
+{
 
 }
 
@@ -1596,6 +2277,15 @@ class KalturaBaseEntry extends KalturaObjectBase
 	public $createdAt = null;
 
 	/**
+	 * Entry update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
 	 * Calculated rank
 	 * 
 	 *
@@ -1706,7 +2396,7 @@ class KalturaBaseEntry extends KalturaObjectBase
 
 }
 
-class KalturaBaseEntryFilter extends KalturaFilter
+abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 {
 	/**
 	 * This filter should be in use for retrieving only a specific entry (identified by its entryId).
@@ -1874,7 +2564,7 @@ class KalturaBaseEntryFilter extends KalturaFilter
 
 	/**
 	 * This filter should be in use for retrieving only entries, at few specific {@link ?object=KalturaEntryStatus KalturaEntryStatus} (comma separated).
-	 * @var string
+	 * @dynamicType KalturaEntryStatus
 	 *
 	 * @var string
 	 */
@@ -1882,9 +2572,9 @@ class KalturaBaseEntryFilter extends KalturaFilter
 
 	/**
 	 * This filter should be in use for retrieving only entries, not at few specific {@link ?object=KalturaEntryStatus KalturaEntryStatus} (comma separated).
-	 * @var KalturaEntryStatus
+	 * @dynamicType KalturaEntryStatus
 	 *
-	 * @var KalturaEntryStatus
+	 * @var string
 	 */
 	public $statusNotIn = null;
 
@@ -1912,7 +2602,7 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var KalturaEntryModerationStatus
+	 * @var string
 	 */
 	public $moderationStatusNotIn = null;
 
@@ -1925,7 +2615,7 @@ class KalturaBaseEntryFilter extends KalturaFilter
 
 	/**
 	 * This filter should be in use for retrieving entries of few {@link ?object=KalturaEntryType KalturaEntryType} (string should include a comma separated list of {@link ?object=KalturaEntryType KalturaEntryType} enumerated parameters).
-	 * @var string
+	 * @dynamicType KalturaEntryType
 	 *
 	 * @var string
 	 */
@@ -1946,6 +2636,20 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
 
 	/**
 	 * 
@@ -2082,6 +2786,11 @@ class KalturaBaseEntryFilter extends KalturaFilter
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd = null;
 
+
+}
+
+class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
+{
 	/**
 	 * 
 	 *
@@ -2531,6 +3240,14 @@ class KalturaBaseJob extends KalturaObjectBase
 	 */
 	public $executionAttempts = null;
 
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lockVersion = null;
+
 
 }
 
@@ -2965,7 +3682,7 @@ class KalturaScheduler extends KalturaObjectBase
 
 }
 
-class KalturaBaseJobFilter extends KalturaFilter
+abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -3012,7 +3729,12 @@ class KalturaBaseJobFilter extends KalturaFilter
 
 }
 
-class KalturaBatchJobFilter extends KalturaBaseJobFilter
+class KalturaBaseJobFilter extends KalturaBaseJobBaseFilter
+{
+
+}
+
+abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 {
 	/**
 	 * 
@@ -3038,7 +3760,7 @@ class KalturaBatchJobFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 *
-	 * @var KalturaBatchJobType
+	 * @var string
 	 */
 	public $jobTypeNotIn = null;
 
@@ -3140,6 +3862,11 @@ class KalturaBatchJobFilter extends KalturaBaseJobFilter
 	 */
 	public $fileSizeGreaterThan = null;
 
+
+}
+
+class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
+{
 
 }
 
@@ -3394,7 +4121,7 @@ class KalturaSchedulerStatusResponse extends KalturaObjectBase
 
 }
 
-class KalturaControlPanelCommandFilter extends KalturaFilter
+abstract class KalturaControlPanelCommandBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -3473,6 +4200,11 @@ class KalturaControlPanelCommandFilter extends KalturaFilter
 	 */
 	public $statusIn = null;
 
+
+}
+
+class KalturaControlPanelCommandFilter extends KalturaControlPanelCommandBaseFilter
+{
 
 }
 
@@ -4192,6 +4924,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminName = null;
 
@@ -4199,6 +4932,7 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $adminEmail = null;
 
@@ -4354,6 +5088,21 @@ class KalturaPartner extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $allowMultiNotification = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $adminLoginUsersQuota = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminUserId = null;
 
 
 }
@@ -4555,7 +5304,7 @@ class KalturaCategory extends KalturaObjectBase
 
 }
 
-class KalturaCategoryFilter extends KalturaFilter
+abstract class KalturaCategoryBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -4606,6 +5355,11 @@ class KalturaCategoryFilter extends KalturaFilter
 	 */
 	public $fullNameStartsWith = null;
 
+
+}
+
+class KalturaCategoryFilter extends KalturaCategoryBaseFilter
+{
 
 }
 
@@ -4754,7 +5508,7 @@ class KalturaConversionProfile extends KalturaObjectBase
 
 }
 
-class KalturaConversionProfileFilter extends KalturaFilter
+abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -4770,6 +5524,11 @@ class KalturaConversionProfileFilter extends KalturaFilter
 	 */
 	public $idIn = null;
 
+
+}
+
+class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
+{
 
 }
 
@@ -4806,7 +5565,12 @@ class KalturaDataEntry extends KalturaBaseEntry
 
 }
 
-class KalturaDataEntryFilter extends KalturaBaseEntryFilter
+abstract class KalturaDataEntryBaseFilter extends KalturaBaseEntryFilter
+{
+
+}
+
+class KalturaDataEntryFilter extends KalturaDataEntryBaseFilter
 {
 
 }
@@ -4854,7 +5618,36 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 
 }
 
-class KalturaDocumentEntryFilter extends KalturaBaseEntryFilter
+class KalturaConversionAttribute extends KalturaObjectBase
+{
+	/**
+	 * The id of the flavor params, set to null for source flavor
+	 * 
+	 *
+	 * @var int
+	 */
+	public $flavorParamsId = null;
+
+	/**
+	 * Attribute name  
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * Attribute value  
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	/**
 	 * 
@@ -4870,6 +5663,11 @@ class KalturaDocumentEntryFilter extends KalturaBaseEntryFilter
 	 */
 	public $documentTypeIn = null;
 
+
+}
+
+class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
+{
 
 }
 
@@ -4936,6 +5734,7 @@ class KalturaEmailIngestionProfile extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
 	public $partnerId = null;
 
@@ -5168,7 +5967,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 
 }
 
-class KalturaFlavorAsset extends KalturaObjectBase
+class KalturaAsset extends KalturaObjectBase
 {
 	/**
 	 * The ID of the Flavor Asset
@@ -5206,15 +6005,6 @@ class KalturaFlavorAsset extends KalturaObjectBase
 	public $status = null;
 
 	/**
-	 * The Flavor Params used to create this Flavor Asset
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $flavorParamsId = null;
-
-	/**
 	 * The version of the Flavor Asset
 	 * 
 	 *
@@ -5222,6 +6012,73 @@ class KalturaFlavorAsset extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $version = null;
+
+	/**
+	 * The size (in KBytes) of the Flavor Asset
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $size = null;
+
+	/**
+	 * Tags used to identify the Flavor Asset in various scenarios
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * The file extension
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fileExt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $deletedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+
+}
+
+class KalturaFlavorAsset extends KalturaAsset
+{
+	/**
+	 * The Flavor Params used to create this Flavor Asset
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $flavorParamsId = null;
 
 	/**
 	 * The width of the Flavor Asset 
@@ -5260,15 +6117,6 @@ class KalturaFlavorAsset extends KalturaObjectBase
 	public $frameRate = null;
 
 	/**
-	 * The size (in KBytes) of the Flavor Asset
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $size = null;
-
-	/**
 	 * True if this Flavor Asset is the original source
 	 * 
 	 *
@@ -5277,28 +6125,12 @@ class KalturaFlavorAsset extends KalturaObjectBase
 	public $isOriginal = null;
 
 	/**
-	 * Tags used to identify the Flavor Asset in various scenarios
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tags = null;
-
-	/**
 	 * True if this Flavor Asset is playable in KDP
 	 * 
 	 *
 	 * @var bool
 	 */
 	public $isWeb = null;
-
-	/**
-	 * The file extension
-	 * 
-	 *
-	 * @var string
-	 */
-	public $fileExt = null;
 
 	/**
 	 * The container format
@@ -5316,38 +6148,10 @@ class KalturaFlavorAsset extends KalturaObjectBase
 	 */
 	public $videoCodecId = null;
 
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $deletedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $description = null;
-
 
 }
 
-class KalturaFlavorParams extends KalturaObjectBase
+class KalturaAssetParams extends KalturaObjectBase
 {
 	/**
 	 * The id of the Flavor Params
@@ -5416,6 +6220,11 @@ class KalturaFlavorParams extends KalturaObjectBase
 	 */
 	public $format = null;
 
+
+}
+
+class KalturaFlavorParams extends KalturaAssetParams
+{
 	/**
 	 * The video codec of the Flavor Params
 	 * 
@@ -5579,7 +6388,7 @@ class KalturaFlavorAssetWithParams extends KalturaObjectBase
 
 }
 
-class KalturaFlavorParamsFilter extends KalturaFilter
+abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -5595,6 +6404,21 @@ class KalturaFlavorParamsFilter extends KalturaFilter
 	 */
 	public $formatEqual = null;
 
+
+}
+
+class KalturaAssetParamsFilter extends KalturaAssetParamsBaseFilter
+{
+
+}
+
+abstract class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
+{
+
+}
+
+class KalturaFlavorParamsFilter extends KalturaFlavorParamsBaseFilter
+{
 
 }
 
@@ -5845,6 +6669,27 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $bitrates;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
+
 
 }
 
@@ -5886,7 +6731,7 @@ class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
 
 }
 
-class KalturaPlayableEntryFilter extends KalturaBaseEntryFilter
+abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	/**
 	 * 
@@ -5954,7 +6799,12 @@ class KalturaPlayableEntryFilter extends KalturaBaseEntryFilter
 
 }
 
-class KalturaMediaEntryFilter extends KalturaPlayableEntryFilter
+class KalturaPlayableEntryFilter extends KalturaPlayableEntryBaseFilter
+{
+
+}
+
+abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 	/**
 	 * 
@@ -6001,7 +6851,17 @@ class KalturaMediaEntryFilter extends KalturaPlayableEntryFilter
 
 }
 
-class KalturaLiveStreamEntryFilter extends KalturaMediaEntryFilter
+class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
+{
+
+}
+
+abstract class KalturaLiveStreamEntryBaseFilter extends KalturaMediaEntryFilter
+{
+
+}
+
+class KalturaLiveStreamEntryFilter extends KalturaLiveStreamEntryBaseFilter
 {
 
 }
@@ -6195,7 +7055,12 @@ class KalturaMixEntry extends KalturaPlayableEntry
 
 }
 
-class KalturaMixEntryFilter extends KalturaPlayableEntryFilter
+abstract class KalturaMixEntryBaseFilter extends KalturaPlayableEntryFilter
+{
+
+}
+
+class KalturaMixEntryFilter extends KalturaMixEntryBaseFilter
 {
 
 }
@@ -6293,6 +7158,422 @@ class KalturaPartnerUsage extends KalturaObjectBase
 
 }
 
+abstract class KalturaPermissionItem extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+
+}
+
+abstract class KalturaPermissionItemBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
+{
+
+}
+
+class KalturaPremissionItemListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaPermissionItem
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaPermission extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionType
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $friendlyName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionStatus
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dependsOnPermissionNames = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $permissionItemsIds = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerGroup = null;
+
+
+}
+
+abstract class KalturaPermissionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionType
+	 */
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $friendlyNameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $descriptionLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaPermissionStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dependsOnPermissionNamesMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dependsOnPermissionNamesMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaPermissionFilter extends KalturaPermissionBaseFilter
+{
+
+}
+
+class KalturaPermissionListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaPermission
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
 class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 {
 	/**
@@ -6365,7 +7646,12 @@ class KalturaPlaylist extends KalturaBaseEntry
 
 }
 
-class KalturaPlaylistFilter extends KalturaBaseEntryFilter
+abstract class KalturaPlaylistBaseFilter extends KalturaBaseEntryFilter
+{
+
+}
+
+class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 {
 
 }
@@ -6434,6 +7720,13 @@ class KalturaReportInputFilter extends KalturaObjectBase
 	 * @var string
 	 */
 	public $categories = null;
+
+	/**
+	 * time zone offset in minutes
+	 *
+	 * @var int
+	 */
+	public $timeZoneOffset = null;
 
 
 }
@@ -7008,7 +8301,12 @@ class KalturaBaseSyndicationFeed extends KalturaObjectBase
 
 }
 
-class KalturaBaseSyndicationFeedFilter extends KalturaFilter
+abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
+{
+
+}
+
+class KalturaBaseSyndicationFeedFilter extends KalturaBaseSyndicationFeedBaseFilter
 {
 
 }
@@ -7056,6 +8354,165 @@ class KalturaSyndicationFeedEntryCount extends KalturaObjectBase
 	 * @var int
 	 */
 	public $requireTranscodingCount = null;
+
+
+}
+
+class KalturaThumbAsset extends KalturaAsset
+{
+	/**
+	 * The Flavor Params used to create this Flavor Asset
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $thumbParamsId = null;
+
+	/**
+	 * The width of the Flavor Asset 
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $width = null;
+
+	/**
+	 * The height of the Flavor Asset
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $height = null;
+
+
+}
+
+class KalturaThumbParams extends KalturaAssetParams
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbCropType
+	 */
+	public $cropType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $quality = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropX = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropY = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropWidth = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $cropHeight = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $videoOffset = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $width = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $height = null;
+
+	/**
+	 * 
+	 *
+	 * @var float
+	 */
+	public $scaleWidth = null;
+
+	/**
+	 * 
+	 *
+	 * @var float
+	 */
+	public $scaleHeight = null;
+
+	/**
+	 * Hexadecimal value
+	 *
+	 * @var string
+	 */
+	public $backgroundColor = null;
+
+	/**
+	 * Id of the flavor params or the thumbnail params to be used as source for the thumbnail creation
+	 *
+	 * @var int
+	 */
+	public $sourceParamsId = null;
+
+
+}
+
+abstract class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
+{
+
+}
+
+class KalturaThumbParamsFilter extends KalturaThumbParamsBaseFilter
+{
+
+}
+
+class KalturaThumbParamsListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaThumbParams
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
 
 
 }
@@ -7211,7 +8668,7 @@ class KalturaUiConf extends KalturaObjectBase
 
 }
 
-class KalturaUiConfFilter extends KalturaFilter
+abstract class KalturaUiConfBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -7297,6 +8754,11 @@ class KalturaUiConfFilter extends KalturaFilter
 	 */
 	public $creationModeIn = null;
 
+
+}
+
+class KalturaUiConfFilter extends KalturaUiConfBaseFilter
+{
 
 }
 
@@ -7431,7 +8893,7 @@ class KalturaUploadToken extends KalturaObjectBase
 
 }
 
-class KalturaUploadTokenFilter extends KalturaFilter
+abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -7471,6 +8933,11 @@ class KalturaUploadTokenFilter extends KalturaFilter
 
 }
 
+class KalturaUploadTokenFilter extends KalturaUploadTokenBaseFilter
+{
+
+}
+
 class KalturaUploadTokenListResponse extends KalturaObjectBase
 {
 	/**
@@ -7492,14 +8959,36 @@ class KalturaUploadTokenListResponse extends KalturaObjectBase
 
 }
 
-class KalturaUser extends KalturaObjectBase
+class KalturaUserRole extends KalturaObjectBase
 {
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $id = null;
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserRoleStatus
+	 */
+	public $status = null;
 
 	/**
 	 * 
@@ -7514,101 +9003,10 @@ class KalturaUser extends KalturaObjectBase
 	 *
 	 * @var string
 	 */
-	public $screenName = null;
+	public $permissionNames = null;
 
 	/**
 	 * 
-	 *
-	 * @var string
-	 */
-	public $fullName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $email = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $dateOfBirth = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $country = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $state = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $city = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $zip = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbnailUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $description = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tags = null;
-
-	/**
-	 * Admin tags can be updated only by using an admin session
-	 *
-	 * @var string
-	 */
-	public $adminTags = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGender
-	 */
-	public $gender = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUserStatus
-	 */
-	public $status = null;
-
-	/**
-	 * Creation date as Unix timestamp (In seconds)
 	 *
 	 * @var int
 	 * @readonly
@@ -7616,51 +9014,22 @@ class KalturaUser extends KalturaObjectBase
 	public $createdAt = null;
 
 	/**
-	 * Last update date as Unix timestamp (In seconds)
+	 * 
 	 *
 	 * @var int
 	 * @readonly
 	 */
 	public $updatedAt = null;
 
-	/**
-	 * Can be used to store various partner related data as a string 
-	 *
-	 * @var string
-	 */
-	public $partnerData = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $indexedPartnerDataInt = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $indexedPartnerDataString = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $storageSize = null;
-
 
 }
 
-class KalturaUserFilter extends KalturaFilter
+abstract class KalturaUserRoleBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 */
 	public $idEqual = null;
 
@@ -7671,6 +9040,128 @@ class KalturaUserFilter extends KalturaFilter
 	 */
 	public $idIn = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $descriptionLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUserRoleStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $permissionNamesMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $permissionNamesMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaUserRoleFilter extends KalturaUserRoleBaseFilter
+{
+
+}
+
+class KalturaUserRoleListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaUserRole
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaUserBaseFilter extends KalturaFilter
+{
 	/**
 	 * 
 	 *
@@ -7723,6 +9214,20 @@ class KalturaUserFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var KalturaUserStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual = null;
@@ -7733,6 +9238,39 @@ class KalturaUserFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isAdminEqual = null;
+
+
+}
+
+class KalturaUserFilter extends KalturaUserBaseFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $loginEnabledEqual = null;
 
 
 }
@@ -7853,7 +9391,7 @@ class KalturaWidget extends KalturaObjectBase
 
 }
 
-class KalturaWidgetFilter extends KalturaFilter
+abstract class KalturaWidgetBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -7942,6 +9480,11 @@ class KalturaWidgetFilter extends KalturaFilter
 
 }
 
+class KalturaWidgetFilter extends KalturaWidgetBaseFilter
+{
+
+}
+
 class KalturaWidgetListResponse extends KalturaObjectBase
 {
 	/**
@@ -7963,7 +9506,136 @@ class KalturaWidgetListResponse extends KalturaObjectBase
 
 }
 
-class KalturaSystemUser extends KalturaObjectBase
+abstract class KalturaMetadataBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileVersionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileVersionGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileVersionLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataObjectType
+	 */
+	public $metadataObjectTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $versionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $versionGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $versionLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+
+}
+
+class KalturaMetadataFilter extends KalturaMetadataBaseFilter
+{
+
+}
+
+class KalturaMetadata extends KalturaObjectBase
 {
 	/**
 	 * 
@@ -7976,30 +9648,10 @@ class KalturaSystemUser extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
+	 * @readonly
 	 */
-	public $email = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $firstName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $lastName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $password = null;
+	public $partnerId = null;
 
 	/**
 	 * 
@@ -8007,22 +9659,7 @@ class KalturaSystemUser extends KalturaObjectBase
 	 * @var int
 	 * @readonly
 	 */
-	public $createdBy = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSystemUserStatus
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $isPrimary = null;
+	public $metadataProfileId = null;
 
 	/**
 	 * 
@@ -8030,7 +9667,31 @@ class KalturaSystemUser extends KalturaObjectBase
 	 * @var int
 	 * @readonly
 	 */
-	public $statusUpdatedAt = null;
+	public $metadataProfileVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataObjectType
+	 * @readonly
+	 */
+	public $metadataObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $objectId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $version = null;
 
 	/**
 	 * 
@@ -8043,24 +9704,36 @@ class KalturaSystemUser extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var KalturaSystemUserRole
+	 * @var int
+	 * @readonly
 	 */
-	public $role = null;
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $xml = null;
 
 
 }
 
-class KalturaSystemUserFilter extends KalturaFilter
-{
-
-}
-
-class KalturaSystemUserListResponse extends KalturaObjectBase
+class KalturaMetadataListResponse extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaSystemUser
+	 * @var array of KalturaMetadata
 	 * @readonly
 	 */
 	public $objects;
@@ -8076,7 +9749,299 @@ class KalturaSystemUserListResponse extends KalturaObjectBase
 
 }
 
-class KalturaPartnerFilter extends KalturaFilter
+abstract class KalturaMetadataProfileBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataObjectType
+	 */
+	public $metadataObjectTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $versionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataProfileStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+
+}
+
+class KalturaMetadataProfileFilter extends KalturaMetadataProfileBaseFilter
+{
+
+}
+
+class KalturaMetadataProfile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataObjectType
+	 */
+	public $metadataObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataProfileStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $xsd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $views = null;
+
+
+}
+
+class KalturaMetadataProfileListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMetadataProfile
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaMetadataProfileField extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $xPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $key = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $label = null;
+
+
+}
+
+class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMetadataProfileField
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaTransformMetadataResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMetadata
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lowerVersionCount = null;
+
+
+}
+
+class KalturaUpgradeMetadataResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $lowerVersionCount = null;
+
+
+}
+
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -8140,6 +10105,627 @@ class KalturaPartnerFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaStorageProfile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $desciption = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaStorageProfileStatus
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaStorageProfileProtocol
+	 */
+	public $protocol = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageBaseDir = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storageUsername = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $storagePassword = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $storageFtpPassiveMode = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryHttpBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryRmpBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $deliveryIisBaseUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $minFileSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $maxFileSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorParamsIds = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $maxConcurrentConnections = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $pathManagerClass = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $urlManagerClass = null;
+
+	/**
+	 * TODO - remove after events manager is implemented
+	 * No need to create enum for temp field
+	 * 
+	 *
+	 * @var int
+	 */
+	public $trigger = null;
+
+
+}
+
+class KalturaStorageProfileListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaStorageProfile
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaFileSyncBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncObjectType
+	 */
+	public $fileObjectTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fileObjectTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $versionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $versionIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $objectSubTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectSubTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $originalEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $syncTimeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $syncTimeLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncType
+	 */
+	public $fileTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fileTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkedIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkCountGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $linkCountLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $fileSizeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $fileSizeLessThanOrEqual = null;
+
+
+}
+
+class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
+{
+
+}
+
+class KalturaFileSync extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncObjectType
+	 * @readonly
+	 */
+	public $fileObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $objectId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $objectSubType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $dc = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $original = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $readyAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $syncTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncType
+	 * @readonly
+	 */
+	public $fileType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $linkedId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $linkCount = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $fileRoot = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $filePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $fileSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $fileUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $fileContent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $fileDiscSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isCurrentDc = null;
+
+
+}
+
+class KalturaFileSyncListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaFileSync
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
 
 
 }
@@ -8345,6 +10931,34 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 *
 	 * @var string
 	 */
+	public $partnerName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminEmail = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $host = null;
 
 	/**
@@ -8367,6 +10981,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 * @var int
 	 */
 	public $partnerPackage = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $monitorUsage = null;
 
 	/**
 	 * 
@@ -8424,6 +11045,62 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 */
 	public $enableSilverLight = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableVast = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enable508Players = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableMetadata = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableContentDistribution = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableAuditTrail = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableAnnotation = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $defThumbOffset = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $adminLoginUsersQuota = null;
+
 
 }
 
@@ -8446,417 +11123,7 @@ class KalturaSystemPartnerPackage extends KalturaObjectBase
 
 }
 
-class KalturaFileSyncFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partnerIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncObjectType
-	 */
-	public $objectTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectIdIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $versionEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $versionIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $objectSubTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $objectSubTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $dcEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $dcIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $originalEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $readyAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $readyAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $syncTimeGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $syncTimeLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncStatus
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncType
-	 */
-	public $fileTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $fileTypeIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkedIdEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkCountGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $linkCountLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $fileSizeGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $fileSizeLessThanOrEqual = null;
-
-
-}
-
-class KalturaFileSync extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncObjectType
-	 * @readonly
-	 */
-	public $objectType = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $objectId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $version = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $objectSubType = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $dc = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $original = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $readyAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $syncTime = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncStatus
-	 * @readonly
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFileSyncType
-	 * @readonly
-	 */
-	public $fileType = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $linkedId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $linkCount = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $fileRoot = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $filePath = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $fileSize = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $fileUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $fileContent = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $fileDiscSize = null;
-
-
-}
-
-class KalturaFileSyncListResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaFileSync
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-
-}
-
-class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsFilter
+abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
 	/**
 	 * 
@@ -8886,6 +11153,11 @@ class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsFilter
 	 */
 	public $flavorAssetVersionEqual = null;
 
+
+}
+
+class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputBaseFilter
+{
 
 }
 
@@ -8957,7 +11229,99 @@ class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 
 }
 
-class KalturaMediaInfoFilter extends KalturaFilter
+abstract class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbParamsVersionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetVersionEqual = null;
+
+
+}
+
+class KalturaThumbParamsOutputFilter extends KalturaThumbParamsOutputBaseFilter
+{
+
+}
+
+class KalturaThumbParamsOutput extends KalturaThumbParams
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbParamsVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetVersion = null;
+
+
+}
+
+class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaThumbParamsOutput
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
@@ -8966,6 +11330,11 @@ class KalturaMediaInfoFilter extends KalturaFilter
 	 */
 	public $flavorAssetIdEqual = null;
 
+
+}
+
+class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
+{
 
 }
 
@@ -8990,242 +11359,70 @@ class KalturaMediaInfoListResponse extends KalturaObjectBase
 
 }
 
-class KalturaStorageProfile extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $desciption = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaStorageProfileStatus
-	 */
-	public $status = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaStorageProfileProtocol
-	 */
-	public $protocol = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageBaseDir = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storageUsername = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $storagePassword = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $storageFtpPassiveMode = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryHttpBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryRmpBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $deliveryIisBaseUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $minFileSize = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $maxFileSize = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $flavorParamsIds = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $maxConcurrentConnections = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $pathManagerClass = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $urlManagerClass = null;
-
-	/**
-	 * TODO - remove after events manager is implemented
-	 * No need to create enum for temp field
-	 * 
-	 *
-	 * @var int
-	 */
-	public $trigger = null;
-
-
-}
-
-class KalturaStorageProfileListResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaStorageProfile
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-
-}
-
-class KalturaMetadataFilter extends KalturaFilter
+abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $partnerIdEqual = null;
+	public $idEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $metadataProfileIdEqual = null;
+	public $createdAtGreaterThanOrEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $metadataProfileVersionEqual = null;
+	public $createdAtLessThanOrEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $metadataProfileVersionGreaterThanOrEqual = null;
+	public $parsedAtGreaterThanOrEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $metadataProfileVersionLessThanOrEqual = null;
+	public $parsedAtLessThanOrEqual = null;
 
 	/**
 	 * 
 	 *
-	 * @var KalturaMetadataObjectType
+	 * @var KalturaAuditTrailStatus
 	 */
-	public $metadataObjectTypeEqual = null;
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailObjectType
+	 */
+	public $auditObjectTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $auditObjectTypeIn = null;
 
 	/**
 	 * 
@@ -9244,191 +11441,58 @@ class KalturaMetadataFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
-	public $versionEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $versionGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $versionLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataStatus
-	 */
-	public $statusEqual = null;
+	public $relatedObjectIdEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $statusIn = null;
-
-
-}
-
-class KalturaMetadata extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $id = null;
+	public $relatedObjectIdIn = null;
 
 	/**
 	 * 
 	 *
-	 * @var int
-	 * @readonly
+	 * @var KalturaAuditTrailObjectType
 	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $metadataProfileId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $metadataProfileVersion = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataObjectType
-	 * @readonly
-	 */
-	public $metadataObjectType = null;
+	public $relatedObjectTypeEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
-	 * @readonly
 	 */
-	public $objectId = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $version = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $createdAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $updatedAt = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataStatus
-	 * @readonly
-	 */
-	public $status = null;
+	public $relatedObjectTypeIn = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
-	 * @readonly
 	 */
-	public $xml = null;
+	public $entryIdEqual = null;
 
-
-}
-
-class KalturaMetadataListResponse extends KalturaObjectBase
-{
 	/**
 	 * 
 	 *
-	 * @var array of KalturaMetadata
-	 * @readonly
+	 * @var string
 	 */
-	public $objects;
+	public $entryIdIn = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
-	 * @readonly
 	 */
-	public $totalCount = null;
+	public $masterPartnerIdEqual = null;
 
-
-}
-
-class KalturaMetadataProfileFilter extends KalturaFilter
-{
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
-	public $idEqual = null;
+	public $masterPartnerIdIn = null;
 
 	/**
 	 * 
@@ -9440,16 +11504,358 @@ class KalturaMetadataProfileFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var KalturaMetadataObjectType
+	 * @var string
 	 */
-	public $metadataObjectTypeEqual = null;
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $requestIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $requestIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailAction
+	 */
+	public $actionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $actionIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ksEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailContext
+	 */
+	public $contextEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $contextIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryPointEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryPointIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverNameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverNameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ipAddressEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ipAddressIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $clientTagEqual = null;
+
+
+}
+
+class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
+{
+
+}
+
+abstract class KalturaAuditTrailInfo extends KalturaObjectBase
+{
+
+}
+
+class KalturaAuditTrail extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
 
 	/**
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
-	public $versionEqual = null;
+	public $createdAt = null;
+
+	/**
+	 * Indicates when the data was parsed
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $parsedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailObjectType
+	 */
+	public $auditObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $objectId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $relatedObjectId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailObjectType
+	 */
+	public $relatedObjectType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $masterPartnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $requestId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailAction
+	 */
+	public $action = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailInfo
+	 */
+	public $data;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $ks = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailContext
+	 * @readonly
+	 */
+	public $context = null;
+
+	/**
+	 * The API service and action that called and caused this audit
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $entryPoint = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $serverName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $ipAddress = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $userAgent = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $clientTag = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $errorDescription = null;
+
+
+}
+
+class KalturaAuditTrailListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaAuditTrail
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
 
 	/**
 	 * 
@@ -9482,7 +11888,21 @@ class KalturaMetadataProfileFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var KalturaMetadataProfileStatus
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanProfileStatus
 	 */
 	public $statusEqual = null;
 
@@ -9493,10 +11913,29 @@ class KalturaMetadataProfileFilter extends KalturaFilter
 	 */
 	public $statusIn = null;
 
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanEngineType
+	 */
+	public $engineTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $engineTypeIn = null;
+
 
 }
 
-class KalturaMetadataProfile extends KalturaObjectBase
+class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
+{
+
+}
+
+class KalturaVirusScanProfile extends KalturaObjectBase
 {
 	/**
 	 * 
@@ -9505,36 +11944,6 @@ class KalturaMetadataProfile extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataObjectType
-	 */
-	public $metadataObjectType = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $version = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
 
 	/**
 	 * 
@@ -9555,36 +11964,55 @@ class KalturaMetadataProfile extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var KalturaMetadataProfileStatus
+	 * @var int
 	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanProfileStatus
 	 */
 	public $status = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
-	 * @readonly
+	 * @var KalturaVirusScanEngineType
 	 */
-	public $xsd = null;
+	public $engineType = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
-	 * @readonly
+	 * @var KalturaBaseEntryFilter
 	 */
-	public $views = null;
+	public $entryFilter;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusFoundAction
+	 */
+	public $actionIfInfected = null;
 
 
 }
 
-class KalturaMetadataProfileListResponse extends KalturaObjectBase
+class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaMetadataProfile
+	 * @var array of KalturaVirusScanProfile
 	 * @readonly
 	 */
 	public $objects;
@@ -9600,9 +12028,29 @@ class KalturaMetadataProfileListResponse extends KalturaObjectBase
 
 }
 
-class KalturaMetadataProfileField extends KalturaObjectBase
+class KalturaDistributionThumbDimensions extends KalturaObjectBase
 {
 	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $width = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $height = null;
+
+
+}
+
+abstract class KalturaDistributionProfile extends KalturaObjectBase
+{
+	/**
+	 * Auto generated unique id
 	 * 
 	 *
 	 * @var int
@@ -9611,38 +12059,184 @@ class KalturaMetadataProfileField extends KalturaObjectBase
 	public $id = null;
 
 	/**
+	 * Profile creation date as Unix timestamp (In seconds)
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 * @readonly
 	 */
-	public $xPath = null;
+	public $createdAt = null;
+
+	/**
+	 * Profile last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 * @insertonly
+	 */
+	public $providerType = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
-	 * @readonly
 	 */
-	public $key = null;
+	public $name = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
-	 * @readonly
+	 * @var KalturaDistributionProfileStatus
 	 */
-	public $label = null;
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $submitEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $updateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $deleteEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $reportEnabled = null;
+
+	/**
+	 * Comma separated flavor params ids that should be auto converted
+	 *
+	 * @var string
+	 */
+	public $autoCreateFlavors = null;
+
+	/**
+	 * Comma separated thumbnail params ids that should be auto generated
+	 *
+	 * @var string
+	 */
+	public $autoCreateThumb = null;
+
+	/**
+	 * Comma separated flavor params ids that should be submitted if ready
+	 *
+	 * @var string
+	 */
+	public $optionalFlavorParamsIds = null;
+
+	/**
+	 * Comma separated flavor params ids that required to be readt before submission
+	 *
+	 * @var string
+	 */
+	public $requiredFlavorParamsIds = null;
+
+	/**
+	 * Thumbnail dimensions that should be submitted if ready
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $optionalThumbDimensions;
+
+	/**
+	 * Thumbnail dimensions that required to be readt before submission
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $requiredThumbDimensions;
 
 
 }
 
-class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
+abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaMetadataProfileField
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
+{
+
+}
+
+class KalturaDistributionProfileListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionProfile
 	 * @readonly
 	 */
 	public $objects;
@@ -9658,17 +12252,362 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
-class KalturaMetadataBatchJob extends KalturaBatchJob
-{
-
-}
-
-class KalturaTransformMetadataResponse extends KalturaObjectBase
+abstract class KalturaDistributionValidationError extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaMetadata
+	 * @var KalturaDistributionAction
+	 */
+	public $action = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionErrorType
+	 */
+	public $errorType = null;
+
+	/**
+	 * Missing flavor params id, thumbnail params id or missing metadata field name
+	 *
+	 * @var string
+	 */
+	public $data = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+
+}
+
+class KalturaEntryDistribution extends KalturaObjectBase
+{
+	/**
+	 * Auto generated unique id
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Entry distribution creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Entry distribution last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Entry distribution submission date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $submittedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 * @readonly
+	 */
+	public $dirtyStatus = null;
+
+	/**
+	 * Comma separated thumbnail asset ids
+	 *
+	 * @var string
+	 */
+	public $thumbAssetIds = null;
+
+	/**
+	 * Comma separated flavor asset ids
+	 *
+	 * @var string
+	 */
+	public $flavorAssetIds = null;
+
+	/**
+	 * Entry distribution publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunrise = null;
+
+	/**
+	 * Entry distribution un-publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunset = null;
+
+	/**
+	 * The id as returned from the distributed destination
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $remoteId = null;
+
+	/**
+	 * The plays as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $plays = null;
+
+	/**
+	 * The views as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $views = null;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionValidationError
+	 * @readonly
+	 */
+	public $validationErrors;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionErrorType
+	 * @readonly
+	 */
+	public $errorType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $errorNumber = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $errorDescription = null;
+
+
+}
+
+abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $distributionProfileIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 */
+	public $dirtyStatusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dirtyStatusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetLessThanOrEqual = null;
+
+
+}
+
+class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
+{
+
+}
+
+class KalturaEntryDistributionListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaEntryDistribution
 	 * @readonly
 	 */
 	public $objects;
@@ -9681,19 +12620,105 @@ class KalturaTransformMetadataResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
+
+}
+
+abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
+{
 	/**
 	 * 
 	 *
-	 * @var int
-	 * @readonly
+	 * @var KalturaDistributionProviderType
 	 */
-	public $lowerVersionCount = null;
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
 
 
 }
 
-class KalturaUpgradeMetadataResponse extends KalturaObjectBase
+class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
 {
+
+}
+
+abstract class KalturaDistributionProvider extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 * @readonly
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $scheduleUpdateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $deleteInsteadUpdate = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunrise = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunset = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredEntryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths = null;
+
+
+}
+
+class KalturaDistributionProviderListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionProvider
+	 * @readonly
+	 */
+	public $objects;
+
 	/**
 	 * 
 	 *
@@ -9702,19 +12727,455 @@ class KalturaUpgradeMetadataResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
+
+}
+
+class KalturaGenericDistributionProvider extends KalturaDistributionProvider
+{
+	/**
+	 * Auto generated
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Generic distribution provider creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Generic distribution provider last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
 	/**
 	 * 
 	 *
 	 * @var int
 	 * @readonly
 	 */
-	public $lowerVersionCount = null;
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isDefault = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $optionalFlavorParamsIds = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $requiredFlavorParamsIds = null;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $optionalThumbDimensions;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $requiredThumbDimensions;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $editableFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $mandatoryFields = null;
 
 
 }
 
-class KalturaFileSyncImportBatchJob extends KalturaBatchJob
+abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
 {
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isDefaultEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $isDefaultIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+
+}
+
+class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributionProviderBaseFilter
+{
+
+}
+
+class KalturaGenericDistributionProviderListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaGenericDistributionProvider
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaGenericDistributionProviderAction extends KalturaObjectBase
+{
+	/**
+	 * Auto generated
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Generic distribution provider action creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Generic distribution provider action last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $genericDistributionProviderId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionAction
+	 * @insertonly
+	 */
+	public $action = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	public $resultsParser = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProtocol
+	 */
+	public $protocol = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverAddress = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remotePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remoteUsername = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remotePassword = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $editableFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $mandatoryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $mrssTransformer = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $mrssValidator = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $resultsTransformer = null;
+
+
+}
+
+abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $genericDistributionProviderIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $genericDistributionProviderIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionAction
+	 */
+	public $actionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $actionIn = null;
+
+
+}
+
+class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistributionProviderActionBaseFilter
+{
+
+}
+
+class KalturaGenericDistributionProviderActionListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaGenericDistributionProviderAction
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
 
 }
 
@@ -9733,6 +13194,18 @@ class KalturaSearchCondition extends KalturaSearchItem
 	 * @var string
 	 */
 	public $value = null;
+
+
+}
+
+class KalturaSearchComparableCondition extends KalturaSearchCondition
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaSearchConditionComparison
+	 */
+	public $comparison = null;
 
 
 }
@@ -9810,47 +13283,160 @@ class KalturaSiteRestriction extends KalturaBaseRestriction
 
 }
 
-class KalturaMailJobFilter extends KalturaBaseJobFilter
+abstract class KalturaMailJobBaseFilter extends KalturaBaseJobFilter
 {
 
 }
 
-class KalturaNotificationFilter extends KalturaBaseJobFilter
+class KalturaMailJobFilter extends KalturaMailJobBaseFilter
 {
 
 }
 
-class KalturaMediaFlavorParamsFilter extends KalturaFlavorParamsFilter
+abstract class KalturaNotificationBaseFilter extends KalturaBaseJobFilter
 {
 
 }
 
-class KalturaMediaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputFilter
+class KalturaNotificationFilter extends KalturaNotificationBaseFilter
 {
 
 }
 
-class KalturaLiveStreamAdminEntryFilter extends KalturaLiveStreamEntryFilter
+abstract class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $assetParamsIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetParamsVersionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetVersionEqual = null;
+
+
+}
+
+class KalturaAssetParamsOutputFilter extends KalturaAssetParamsOutputBaseFilter
 {
 
 }
 
-class KalturaGoogleVideoSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+abstract class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 
 }
 
-class KalturaITunesSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaMediaFlavorParamsFilter extends KalturaMediaFlavorParamsBaseFilter
 {
 
 }
 
-class KalturaTubeMogulSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+abstract class KalturaMediaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
 {
 
 }
 
-class KalturaYahooSyndicationFeedFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaMediaFlavorParamsOutputFilter extends KalturaMediaFlavorParamsOutputBaseFilter
+{
+
+}
+
+abstract class KalturaLiveStreamAdminEntryBaseFilter extends KalturaLiveStreamEntryFilter
+{
+
+}
+
+class KalturaLiveStreamAdminEntryFilter extends KalturaLiveStreamAdminEntryBaseFilter
+{
+
+}
+
+abstract class KalturaAdminUserBaseFilter extends KalturaUserFilter
+{
+
+}
+
+class KalturaAdminUserFilter extends KalturaAdminUserBaseFilter
+{
+
+}
+
+abstract class KalturaGoogleVideoSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaGoogleVideoSyndicationFeedFilter extends KalturaGoogleVideoSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaITunesSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaITunesSyndicationFeedFilter extends KalturaITunesSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaTubeMogulSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaTubeMogulSyndicationFeedFilter extends KalturaTubeMogulSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
+{
+
+}
+
+abstract class KalturaApiActionPermissionItemBaseFilter extends KalturaPermissionItemFilter
+{
+
+}
+
+class KalturaApiActionPermissionItemFilter extends KalturaApiActionPermissionItemBaseFilter
+{
+
+}
+
+abstract class KalturaApiParameterPermissionItemBaseFilter extends KalturaPermissionItemFilter
+{
+
+}
+
+class KalturaApiParameterPermissionItemFilter extends KalturaApiParameterPermissionItemBaseFilter
 {
 
 }
@@ -10051,6 +13637,67 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 * @var KalturaBulkUploadCsvVersion
 	 */
 	public $csvVersion = null;
+
+
+}
+
+class KalturaCaptureThumbJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFileSyncLocalPath = null;
+
+	/**
+	 * The translated path as used by the scheduler
+	 *
+	 * @var string
+	 */
+	public $actualSrcFileSyncLocalPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFileSyncRemoteUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $thumbParamsOutputId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbParamsOutput
+	 */
+	public $thumbParamsOutput;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAssetType
+	 */
+	public $srcAssetType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbPath = null;
 
 
 }
@@ -10473,6 +14120,34 @@ class KalturaProvisionJobData extends KalturaJobData
 	 */
 	public $returnVal = null;
 
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $mediaType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $primaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $secondaryBroadcastingUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $streamName = null;
+
 
 }
 
@@ -10586,6 +14261,46 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 
 }
 
+class KalturaAssetParamsOutput extends KalturaAssetParams
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $assetParamsId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetParamsVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $readyBehavior = null;
+
+
+}
+
 class KalturaMediaFlavorParams extends KalturaFlavorParams
 {
 
@@ -10593,6 +14308,51 @@ class KalturaMediaFlavorParams extends KalturaFlavorParams
 
 class KalturaMediaFlavorParamsOutput extends KalturaFlavorParamsOutput
 {
+
+}
+
+class KalturaApiActionPermissionItem extends KalturaPermissionItem
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $service = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $action = null;
+
+
+}
+
+class KalturaApiParameterPermissionItem extends KalturaPermissionItem
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $object = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parameter = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaApiParameterPermissionItemAction
+	 */
+	public $action = null;
+
 
 }
 
@@ -10846,11 +14606,12 @@ class KalturaAdminUserService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function login($email, $password)
+	function login($email, $password, $partnerId = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "email", $email);
 		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "partnerId", $partnerId);
 		$this->client->queueServiceActionCall("adminuser", "login", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -10882,7 +14643,7 @@ class KalturaBaseEntryService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function addFromUploadedFile(KalturaBaseEntry $entry, $uploadTokenId, $type = -1)
+	function addFromUploadedFile(KalturaBaseEntry $entry, $uploadTokenId, $type = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entry", $entry->toParams());
@@ -11370,13 +15131,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11509,54 +15269,6 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("batch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("batch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("batch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -11591,13 +15303,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "", array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -11612,13 +15323,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11709,13 +15419,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11772,13 +15481,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11803,7 +15511,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -11811,7 +15519,7 @@ class KalturaBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
 		if ($filter !== null)
 			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("batch", "getExclusivePullJobs", $kparams);
+		$this->client->queueServiceActionCall("batch", "getExclusiveCaptureThumbJobs", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -11820,13 +15528,13 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("batch", "updateExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("batch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -11835,13 +15543,13 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("batch", "freeExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("batch", "freeExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -11867,13 +15575,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11928,13 +15635,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -11976,13 +15682,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12024,13 +15729,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12072,13 +15776,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12339,7 +16042,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -12357,7 +16060,7 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -12375,13 +16078,12 @@ class KalturaBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("batch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -12708,112 +16410,6 @@ class KalturaDataService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaDataListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaDocumentService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function addFromUploadedFile(KalturaDocumentEntry $documentEntry, $uploadTokenId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
-		$this->client->addParam($kparams, "uploadTokenId", $uploadTokenId);
-		$this->client->queueServiceActionCall("document", "addFromUploadedFile", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
-		return $resultObject;
-	}
-
-	function get($entryId, $version = -1)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "version", $version);
-		$this->client->queueServiceActionCall("document", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
-		return $resultObject;
-	}
-
-	function update($entryId, KalturaDocumentEntry $documentEntry)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
-		$this->client->queueServiceActionCall("document", "update", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
-		return $resultObject;
-	}
-
-	function delete($entryId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->queueServiceActionCall("document", "delete", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function listAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("document", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentListResponse");
-		return $resultObject;
-	}
-
-	function upload($fileData)
-	{
-		$kparams = array();
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("document", "upload", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function convertPptToSwf($entryId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->queueServiceActionCall("document", "convertPptToSwf", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
@@ -13600,6 +17196,58 @@ class KalturaJobsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getCaptureThumbStatus($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "getCaptureThumbStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function deleteCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "deleteCaptureThumb", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function abortCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "abortCaptureThumb", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
+	function retryCaptureThumb($jobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "jobId", $jobId);
+		$this->client->queueServiceActionCall("jobs", "retryCaptureThumb", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJobResponse");
+		return $resultObject;
+	}
+
 	function getPullStatus($jobId)
 	{
 		$kparams = array();
@@ -14018,10 +17666,11 @@ class KalturaLiveStreamService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add(KalturaLiveStreamAdminEntry $liveStreamEntry)
+	function add(KalturaLiveStreamAdminEntry $liveStreamEntry, $sourceType = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "liveStreamEntry", $liveStreamEntry->toParams());
+		$this->client->addParam($kparams, "sourceType", $sourceType);
 		$this->client->queueServiceActionCall("livestream", "add", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -14125,17 +17774,12 @@ class KalturaMediaService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId, array $pluginDataArray = null)
+	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
 		$this->client->addParam($kparams, "url", $url);
 		$this->client->addParam($kparams, "bulkUploadId", $bulkUploadId);
-		if ($pluginDataArray !== null)
-			foreach($pluginDataArray as $index => $obj)
-			{
-				$this->client->addParam($kparams, "pluginDataArray:$index", $obj->toParams());
-			}
 		$this->client->queueServiceActionCall("media", "addFromBulk", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -14200,6 +17844,56 @@ class KalturaMediaService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
+	}
+
+	function addFromEntry($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "sourceEntryId", $sourceEntryId);
+		if ($mediaEntry !== null)
+			$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
+		$this->client->addParam($kparams, "sourceFlavorParamsId", $sourceFlavorParamsId);
+		$this->client->queueServiceActionCall("media", "addFromEntry", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
+	}
+
+	function addFromFlavorAsset($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "sourceFlavorAssetId", $sourceFlavorAssetId);
+		if ($mediaEntry !== null)
+			$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
+		$this->client->queueServiceActionCall("media", "addFromFlavorAsset", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
+	}
+
+	function convert($entryId, $conversionProfileId = "", array $dynamicConversionAttributes = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
+		if ($dynamicConversionAttributes !== null)
+			foreach($dynamicConversionAttributes as $index => $obj)
+			{
+				$this->client->addParam($kparams, "dynamicConversionAttributes:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("media", "convert", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
 		return $resultObject;
 	}
 
@@ -14285,64 +17979,6 @@ class KalturaMediaService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function updateThumbnail($entryId, $timeOffset)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "timeOffset", $timeOffset);
-		$this->client->queueServiceActionCall("media", "updateThumbnail", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function updateThumbnailFromSourceEntry($entryId, $sourceEntryId, $timeOffset)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "sourceEntryId", $sourceEntryId);
-		$this->client->addParam($kparams, "timeOffset", $timeOffset);
-		$this->client->queueServiceActionCall("media", "updateThumbnailFromSourceEntry", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function updateThumbnailJpeg($entryId, $fileData)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("media", "updateThumbnailJpeg", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function updateThumbnailFromUrl($entryId, $url)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "url", $url);
-		$this->client->queueServiceActionCall("media", "updateThumbnailFromUrl", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
 		return $resultObject;
 	}
 
@@ -14704,6 +18340,160 @@ class KalturaPartnerService extends KalturaServiceBase
 	}
 }
 
+class KalturaPermissionItemService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaPermissionItem $permissionItem)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItem", $permissionItem->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function get($permissionItemId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->queueServiceActionCall("permissionitem", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function update($permissionItemId, KalturaPermissionItem $permissionItem)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->addParam($kparams, "permissionItem", $permissionItem->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function delete($permissionItemId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->queueServiceActionCall("permissionitem", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function listAction(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPremissionItemListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaPermissionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaPermission $permission)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permission", $permission->toParams());
+		$this->client->queueServiceActionCall("permission", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function get($permissionName)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->queueServiceActionCall("permission", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function update($permissionName, KalturaPermission $permission)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->addParam($kparams, "permission", $permission->toParams());
+		$this->client->queueServiceActionCall("permission", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function delete($permissionName)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->queueServiceActionCall("permission", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function listAction(KalturaPermissionFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("permission", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionListResponse");
+		return $resultObject;
+	}
+}
+
 class KalturaPlaylistService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -14764,6 +18554,21 @@ class KalturaPlaylistService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function cloneAction($id, KalturaPlaylist $newPlaylist = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		if ($newPlaylist !== null)
+			$this->client->addParam($kparams, "newPlaylist", $newPlaylist->toParams());
+		$this->client->queueServiceActionCall("playlist", "clone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPlaylist");
 		return $resultObject;
 	}
 
@@ -15013,6 +18818,18 @@ class KalturaSessionService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function end()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("session", "end", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
 	function impersonate($secret, $impersonatedPartnerId, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400, $privileges = "")
 	{
 		$kparams = array();
@@ -15212,7 +19029,228 @@ class KalturaSystemService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "bool");
+		$resultObject = (bool) $resultObject;
+		return $resultObject;
+	}
+}
+
+class KalturaThumbAssetService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function setAsDefault($thumbAssetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbAssetId", $thumbAssetId);
+		$this->client->queueServiceActionCall("thumbasset", "setAsDefault", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function generateByEntryId($entryId, $destThumbParamsId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "destThumbParamsId", $destThumbParamsId);
+		$this->client->queueServiceActionCall("thumbasset", "generateByEntryId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function generate($entryId, KalturaThumbParams $thumbParams, $sourceAssetId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "thumbParams", $thumbParams->toParams());
+		$this->client->addParam($kparams, "sourceAssetId", $sourceAssetId);
+		$this->client->queueServiceActionCall("thumbasset", "generate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function regenerate($thumbAssetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbAssetId", $thumbAssetId);
+		$this->client->queueServiceActionCall("thumbasset", "regenerate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function get($thumbAssetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbAssetId", $thumbAssetId);
+		$this->client->queueServiceActionCall("thumbasset", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function getByEntryId($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("thumbasset", "getByEntryId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function addFromUrl($entryId, $url)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "url", $url);
+		$this->client->queueServiceActionCall("thumbasset", "addFromUrl", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function addFromImage($entryId, $fileData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("thumbasset", "addFromImage", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function delete($thumbAssetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbAssetId", $thumbAssetId);
+		$this->client->queueServiceActionCall("thumbasset", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+}
+
+class KalturaThumbParamsService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaThumbParams $thumbParams)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbParams", $thumbParams->toParams());
+		$this->client->queueServiceActionCall("thumbparams", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbParams");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("thumbparams", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbParams");
+		return $resultObject;
+	}
+
+	function update($id, KalturaThumbParams $thumbParams)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "thumbParams", $thumbParams->toParams());
+		$this->client->queueServiceActionCall("thumbparams", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbParams");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("thumbparams", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaThumbParamsFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("thumbparams", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbParamsListResponse");
+		return $resultObject;
+	}
+
+	function getByConversionProfileId($conversionProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
+		$this->client->queueServiceActionCall("thumbparams", "getByConversionProfileId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
 		return $resultObject;
 	}
 }
@@ -15440,6 +19478,96 @@ class KalturaUploadTokenService extends KalturaServiceBase
 	}
 }
 
+class KalturaUserRoleService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUserRole $userRole)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRole", $userRole->toParams());
+		$this->client->queueServiceActionCall("userrole", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function get($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function update($userRoleId, KalturaUserRole $userRole)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->addParam($kparams, "userRole", $userRole->toParams());
+		$this->client->queueServiceActionCall("userrole", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function delete($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function listAction(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("userrole", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRoleListResponse");
+		return $resultObject;
+	}
+
+	function cloneAction($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "clone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+}
+
 class KalturaUserService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -15487,6 +19615,19 @@ class KalturaUserService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getByLoginId($loginId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->queueServiceActionCall("user", "getByLoginId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
 	function delete($userId)
 	{
 		$kparams = array();
@@ -15526,6 +19667,112 @@ class KalturaUserService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function login($partnerId, $userId, $password, $expiry = 86400, $privileges = "*")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "expiry", $expiry);
+		$this->client->addParam($kparams, "privileges", $privileges);
+		$this->client->queueServiceActionCall("user", "login", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function loginByLoginId($loginId, $password, $partnerId = "", $expiry = 86400, $privileges = "*")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "expiry", $expiry);
+		$this->client->addParam($kparams, "privileges", $privileges);
+		$this->client->queueServiceActionCall("user", "loginByLoginId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function updateLoginData($oldLoginId, $password, $newLoginId = "", $newPassword = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "oldLoginId", $oldLoginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->addParam($kparams, "newLoginId", $newLoginId);
+		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->queueServiceActionCall("user", "updateLoginData", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function resetPassword($email)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "email", $email);
+		$this->client->queueServiceActionCall("user", "resetPassword", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function setInitialPassword($hashKey, $newPassword)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "hashKey", $hashKey);
+		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->queueServiceActionCall("user", "setInitialPassword", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function enableLogin($userId, $loginId, $password = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->addParam($kparams, "password", $password);
+		$this->client->queueServiceActionCall("user", "enableLogin", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
+		return $resultObject;
+	}
+
+	function disableLogin($userId = "", $loginId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "loginId", $loginId);
+		$this->client->queueServiceActionCall("user", "disableLogin", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUser");
 		return $resultObject;
 	}
 }
@@ -15625,444 +19872,6 @@ class KalturaXInternalService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-}
-
-class KalturaSystemUserService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function verifyPassword($email, $password)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "email", $email);
-		$this->client->addParam($kparams, "password", $password);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "verifyPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function generateNewPassword()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("systemuser_systemuser", "generateNewPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function setNewPassword($userId, $password)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->addParam($kparams, "password", $password);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "setNewPassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function add(KalturaSystemUser $systemUser)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "systemUser", $systemUser->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "add", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function get($userId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function getByEmail($email)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "email", $email);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "getByEmail", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function update($userId, KalturaSystemUser $systemUser)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->addParam($kparams, "systemUser", $systemUser->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "update", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUser");
-		return $resultObject;
-	}
-
-	function delete($userId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "userId", $userId);
-		$this->client->queueServiceActionCall("systemuser_systemuser", "delete", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function listAction(KalturaSystemUserFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("systemuser_systemuser", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemUserListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaSystemPartnerService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function get($partnerId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "partnerId", $partnerId);
-		$this->client->queueServiceActionCall("systempartner_systempartner", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaPartner");
-		return $resultObject;
-	}
-
-	function getUsage(KalturaPartnerFilter $partnerFilter = null, KalturaSystemPartnerUsageFilter $usageFilter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($partnerFilter !== null)
-			$this->client->addParam($kparams, "partnerFilter", $partnerFilter->toParams());
-		if ($usageFilter !== null)
-			$this->client->addParam($kparams, "usageFilter", $usageFilter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("systempartner_systempartner", "getUsage", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemPartnerUsageListResponse");
-		return $resultObject;
-	}
-
-	function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("systempartner_systempartner", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaPartnerListResponse");
-		return $resultObject;
-	}
-
-	function updateStatus($partnerId, $status)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "partnerId", $partnerId);
-		$this->client->addParam($kparams, "status", $status);
-		$this->client->queueServiceActionCall("systempartner_systempartner", "updateStatus", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function getAdminSession($partnerId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "partnerId", $partnerId);
-		$this->client->queueServiceActionCall("systempartner_systempartner", "getAdminSession", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function updateConfiguration($partnerId, KalturaSystemPartnerConfiguration $configuration)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "partnerId", $partnerId);
-		$this->client->addParam($kparams, "configuration", $configuration->toParams());
-		$this->client->queueServiceActionCall("systempartner_systempartner", "updateConfiguration", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function getConfiguration($partnerId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "partnerId", $partnerId);
-		$this->client->queueServiceActionCall("systempartner_systempartner", "getConfiguration", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaSystemPartnerConfiguration");
-		return $resultObject;
-	}
-
-	function getPackages()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("systempartner_systempartner", "getPackages", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-}
-
-class KalturaFileSyncService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listAction(KalturaFileSyncFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("filesync_filesync", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSyncListResponse");
-		return $resultObject;
-	}
-
-	function sync($fileSyncId, $fileData)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSync");
-		return $resultObject;
-	}
-}
-
-class KalturaFlavorParamsOutputService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listAction(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("adminconsole_flavorparamsoutput", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFlavorParamsOutputListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaMediaInfoService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("adminconsole_mediainfo", "list", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaInfoListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaEntryAdminService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function get($entryId, $version = -1)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "version", $version);
-		$this->client->queueServiceActionCall("adminconsole_entryadmin", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
-		return $resultObject;
-	}
-}
-
-class KalturaStorageProfileService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$kparams = array();
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		if ($pager !== null)
-			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "listByPartner", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfileListResponse");
-		return $resultObject;
-	}
-
-	function updateStatus($storageId, $status)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageId", $storageId);
-		$this->client->addParam($kparams, "status", $status);
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "updateStatus", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "null");
-		return $resultObject;
-	}
-
-	function get($storageProfileId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "get", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
-		return $resultObject;
-	}
-
-	function update($storageProfileId, KalturaStorageProfile $storageProfile)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
-		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "update", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
-		return $resultObject;
-	}
-
-	function add(KalturaStorageProfile $storageProfile)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
-		$this->client->queueServiceActionCall("storageprofile_storageprofile", "add", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
 		return $resultObject;
 	}
 }
@@ -16333,6 +20142,20 @@ class KalturaMetadataProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function revert($id, $toVersion)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "toVersion", $toVersion);
+		$this->client->queueServiceActionCall("metadata_metadataprofile", "revert", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMetadataProfile");
+		return $resultObject;
+	}
+
 	function updateDefinitionFromFile($id, $xsdFile)
 	{
 		$kparams = array();
@@ -16388,7 +20211,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportMetadataJob($id, KalturaExclusiveLockKey $lockKey, KalturaMetadataBatchJob $job)
+	function updateExclusiveImportMetadataJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
@@ -16399,7 +20222,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMetadataBatchJob");
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
 		return $resultObject;
 	}
 
@@ -16435,7 +20258,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveTransformMetadataJob($id, KalturaExclusiveLockKey $lockKey, KalturaMetadataBatchJob $job)
+	function updateExclusiveTransformMetadataJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
@@ -16446,7 +20269,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMetadataBatchJob");
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
 		return $resultObject;
 	}
 
@@ -16499,24 +20322,6 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->addParam($kparams, "jobType", $jobType);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
 	function getExclusiveImportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -16534,13 +20339,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -16673,54 +20477,6 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -16755,13 +20511,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "", array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -16776,13 +20531,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -16873,13 +20627,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -16936,13 +20689,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -16967,7 +20719,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -16975,7 +20727,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
 		if ($filter !== null)
 			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusivePullJobs", $kparams);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveCaptureThumbJobs", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -16984,13 +20736,13 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -16999,13 +20751,13 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "freeExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -17031,13 +20783,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17092,13 +20843,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17140,13 +20890,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17188,13 +20937,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17236,13 +20984,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17503,7 +21250,25 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("metadata_metadatabatch", "getExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -17521,13 +21286,12 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("metadata_metadatabatch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17578,6 +21342,494 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 	}
 }
 
+class KalturaDocumentsService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function addFromUploadedFile(KalturaDocumentEntry $documentEntry, $uploadTokenId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
+		$this->client->addParam($kparams, "uploadTokenId", $uploadTokenId);
+		$this->client->queueServiceActionCall("document_documents", "addFromUploadedFile", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		return $resultObject;
+	}
+
+	function addFromEntry($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "sourceEntryId", $sourceEntryId);
+		if ($documentEntry !== null)
+			$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
+		$this->client->addParam($kparams, "sourceFlavorParamsId", $sourceFlavorParamsId);
+		$this->client->queueServiceActionCall("document_documents", "addFromEntry", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		return $resultObject;
+	}
+
+	function addFromFlavorAsset($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "sourceFlavorAssetId", $sourceFlavorAssetId);
+		if ($documentEntry !== null)
+			$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
+		$this->client->queueServiceActionCall("document_documents", "addFromFlavorAsset", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		return $resultObject;
+	}
+
+	function convert($entryId, $conversionProfileId = "", array $dynamicConversionAttributes = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
+		if ($dynamicConversionAttributes !== null)
+			foreach($dynamicConversionAttributes as $index => $obj)
+			{
+				$this->client->addParam($kparams, "dynamicConversionAttributes:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("document_documents", "convert", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function get($entryId, $version = -1)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->queueServiceActionCall("document_documents", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		return $resultObject;
+	}
+
+	function update($entryId, KalturaDocumentEntry $documentEntry)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
+		$this->client->queueServiceActionCall("document_documents", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		return $resultObject;
+	}
+
+	function delete($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("document_documents", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("document_documents", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDocumentListResponse");
+		return $resultObject;
+	}
+
+	function upload($fileData)
+	{
+		$kparams = array();
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("document_documents", "upload", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function convertPptToSwf($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("document_documents", "convertPptToSwf", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+}
+
+class KalturaStorageProfileService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "listByPartner", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfileListResponse");
+		return $resultObject;
+	}
+
+	function updateStatus($storageId, $status)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageId", $storageId);
+		$this->client->addParam($kparams, "status", $status);
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "updateStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function get($storageProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+
+	function update($storageProfileId, KalturaStorageProfile $storageProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfileId", $storageProfileId);
+		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+
+	function add(KalturaStorageProfile $storageProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "storageProfile", $storageProfile->toParams());
+		$this->client->queueServiceActionCall("storageprofile_storageprofile", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaStorageProfile");
+		return $resultObject;
+	}
+}
+
+class KalturaFileSyncService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaFileSyncFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("filesync_filesync", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileSyncListResponse");
+		return $resultObject;
+	}
+
+	function sync($fileSyncId, $fileData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "fileSyncId", $fileSyncId);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("filesync_filesync", "sync", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileSync");
+		return $resultObject;
+	}
+}
+
+class KalturaSystemPartnerService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function get($partnerId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->queueServiceActionCall("systempartner_systempartner", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPartner");
+		return $resultObject;
+	}
+
+	function getUsage(KalturaPartnerFilter $partnerFilter = null, KalturaSystemPartnerUsageFilter $usageFilter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($partnerFilter !== null)
+			$this->client->addParam($kparams, "partnerFilter", $partnerFilter->toParams());
+		if ($usageFilter !== null)
+			$this->client->addParam($kparams, "usageFilter", $usageFilter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("systempartner_systempartner", "getUsage", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaSystemPartnerUsageListResponse");
+		return $resultObject;
+	}
+
+	function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("systempartner_systempartner", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPartnerListResponse");
+		return $resultObject;
+	}
+
+	function updateStatus($partnerId, $status)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "status", $status);
+		$this->client->queueServiceActionCall("systempartner_systempartner", "updateStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function getAdminSession($partnerId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->queueServiceActionCall("systempartner_systempartner", "getAdminSession", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function updateConfiguration($partnerId, KalturaSystemPartnerConfiguration $configuration)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "configuration", $configuration->toParams());
+		$this->client->queueServiceActionCall("systempartner_systempartner", "updateConfiguration", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function getConfiguration($partnerId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->queueServiceActionCall("systempartner_systempartner", "getConfiguration", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaSystemPartnerConfiguration");
+		return $resultObject;
+	}
+
+	function getPackages()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("systempartner_systempartner", "getPackages", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+}
+
+class KalturaFlavorParamsOutputService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("adminconsole_flavorparamsoutput", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFlavorParamsOutputListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaThumbParamsOutputService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaThumbParamsOutputFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("adminconsole_thumbparamsoutput", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbParamsOutputListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaMediaInfoService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("adminconsole_mediainfo", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaInfoListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaEntryAdminService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function get($entryId, $version = -1)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->queueServiceActionCall("adminconsole_entryadmin", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+}
+
 class KalturaFilesyncImportBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -17613,7 +21865,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFileSyncImportBatchJob");
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
 		return $resultObject;
 	}
 
@@ -17649,42 +21901,6 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->addParam($kparams, "jobType", $jobType);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->addParam($kparams, "jobType", $jobType);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveAlmostDone", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
 	function getExclusiveImportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -17702,13 +21918,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveImportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -17841,54 +22056,6 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusiveAlmostDoneRemoteConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
-		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
-		if ($filter !== null)
-			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveAlmostDoneRemoteConvertJobs", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
-
-	function updateExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
-		return $resultObject;
-	}
-
-	function freeExclusiveRemoteConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "id", $id);
-		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
-		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusiveRemoteConvertJob", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
-		return $resultObject;
-	}
-
 	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
@@ -17923,13 +22090,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "", array $flavorsData = null)
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		if ($flavorsData !== null)
 			foreach($flavorsData as $index => $obj)
 			{
@@ -17944,13 +22110,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveConvertProfileJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18041,13 +22206,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18104,13 +22268,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusivePostConvertJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18135,7 +22298,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getExclusivePullJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
@@ -18143,7 +22306,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
 		if ($filter !== null)
 			$this->client->addParam($kparams, "filter", $filter->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusivePullJobs", $kparams);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveCaptureThumbJobs", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -18152,13 +22315,13 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -18167,13 +22330,13 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function freeExclusivePullJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
-		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusivePullJob", $kparams);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "freeExclusiveCaptureThumbJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -18199,13 +22362,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveExtractMediaJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18260,13 +22422,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveStorageExportJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18308,13 +22469,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveStorageDeleteJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18356,13 +22516,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveNotificationJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18404,13 +22563,12 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveMailJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18671,13 +22829,48 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, $entryStatus = "")
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "getExclusiveAlmostDone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
 		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
 		$this->client->addParam($kparams, "job", $job->toParams());
-		$this->client->addParam($kparams, "entryStatus", $entryStatus);
 		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "updateExclusiveJob", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -18728,60 +22921,1092 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 	}
 }
 
-class KalturaDocumentsService extends KalturaServiceBase
+class KalturaAuditTrailService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
 	{
 		parent::__construct($client);
 	}
 
-	function addFromUploadedFile(KalturaDocumentEntry $documentEntry, $uploadTokenId)
+	function listAction(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
-		$this->client->addParam($kparams, "uploadTokenId", $uploadTokenId);
-		$this->client->queueServiceActionCall("document_documents", "addFromUploadedFile", $kparams);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("audit_audittrail", "list", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		$this->client->validateObjectType($resultObject, "KalturaAuditTrailListResponse");
 		return $resultObject;
 	}
 
-	function get($entryId, $version = -1)
+	function add(KalturaAuditTrail $auditTrail)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "version", $version);
-		$this->client->queueServiceActionCall("document_documents", "get", $kparams);
+		$this->client->addParam($kparams, "auditTrail", $auditTrail->toParams());
+		$this->client->queueServiceActionCall("audit_audittrail", "add", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		$this->client->validateObjectType($resultObject, "KalturaAuditTrail");
 		return $resultObject;
 	}
 
-	function update($entryId, KalturaDocumentEntry $documentEntry)
+	function get($id)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "documentEntry", $documentEntry->toParams());
-		$this->client->queueServiceActionCall("document_documents", "update", $kparams);
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("audit_audittrail", "get", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentEntry");
+		$this->client->validateObjectType($resultObject, "KalturaAuditTrail");
+		return $resultObject;
+	}
+}
+
+class KalturaVirusScanProfileService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaVirusScanProfileFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaVirusScanProfileListResponse");
 		return $resultObject;
 	}
 
-	function delete($entryId)
+	function add(KalturaVirusScanProfile $virusScanProfile)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->queueServiceActionCall("document_documents", "delete", $kparams);
+		$this->client->addParam($kparams, "virusScanProfile", $virusScanProfile->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaVirusScanProfile");
+		return $resultObject;
+	}
+
+	function get($virusScanProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "virusScanProfileId", $virusScanProfileId);
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaVirusScanProfile");
+		return $resultObject;
+	}
+
+	function update($virusScanProfileId, KalturaVirusScanProfile $virusScanProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "virusScanProfileId", $virusScanProfileId);
+		$this->client->addParam($kparams, "virusScanProfile", $virusScanProfile->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaVirusScanProfile");
+		return $resultObject;
+	}
+
+	function delete($virusScanProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "virusScanProfileId", $virusScanProfileId);
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaVirusScanProfile");
+		return $resultObject;
+	}
+
+	function scan($flavorAssetId, $virusScanProfileId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "flavorAssetId", $flavorAssetId);
+		$this->client->addParam($kparams, "virusScanProfileId", $virusScanProfileId);
+		$this->client->queueServiceActionCall("virusscan_virusscanprofile", "scan", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+}
+
+class KalturaVirusScanBatchService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function getExclusiveVirusScanJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveVirusScanJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveVirusScanJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveVirusScanJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveVirusScanJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveVirusScanJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveImportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveImportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveImportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveImportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveBulkUploadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveBulkUploadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneBulkUploadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneBulkUploadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveBulkUploadJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveBulkUploadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveBulkUploadJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveBulkUploadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult, array $pluginDataArray = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadResult", $bulkUploadResult->toParams());
+		if ($pluginDataArray !== null)
+			foreach($pluginDataArray as $index => $obj)
+			{
+				$this->client->addParam($kparams, "pluginDataArray:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "addBulkUploadResult", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function getBulkUploadLastResult($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getBulkUploadLastResult", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function updateBulkUploadResults($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateBulkUploadResults", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneConvertCollectionJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertProfileJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneConvertProfileJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		if ($flavorsData !== null)
+			foreach($flavorsData as $index => $obj)
+			{
+				$this->client->addParam($kparams, "flavorsData:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertCollectionJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertProfileJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveConvertCollectionJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveConvertProfileJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveConvertCollectionJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertJobSubType($id, KalturaExclusiveLockKey $lockKey, $subType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "subType", $subType);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveConvertJobSubType", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusivePostConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusivePostConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusivePostConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusivePostConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveExtractMediaJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveExtractMediaJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveExtractMediaJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function addMediaInfo(KalturaMediaInfo $mediaInfo)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "mediaInfo", $mediaInfo->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "addMediaInfo", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaInfo");
+		return $resultObject;
+	}
+
+	function freeExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveExtractMediaJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveStorageExportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveStorageExportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveStorageExportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveStorageExportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveStorageDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveStorageDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveStorageDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveStorageDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveNotificationJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveNotificationJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchGetExclusiveNotificationJobsResponse");
+		return $resultObject;
+	}
+
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveNotificationJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveNotificationJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveMailJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveMailJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveMailJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveMailJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveBulkDownloadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveBulkDownloadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneBulkDownloadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneBulkDownloadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveBulkDownloadJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveBulkDownloadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveBulkDownloadJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveBulkDownloadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveProvisionProvideJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveProvisionProvideJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneProvisionProvideJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneProvisionProvideJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveProvisionProvideJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveProvisionProvideJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveProvisionProvideJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveProvisionProvideJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveProvisionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveProvisionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneProvisionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDoneProvisionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveProvisionDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveProvisionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveProvisionDeleteJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveProvisionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function resetJobExecutionAttempts($id, KalturaExclusiveLockKey $lockKey, $jobType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "resetJobExecutionAttempts", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -18790,52 +24015,2000 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function listAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null)
+	function freeExclusiveJob($id, KalturaExclusiveLockKey $lockKey, $jobType, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "freeExclusiveJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getQueueSize(KalturaWorkerQueueFilter $workerQueueFilter)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "workerQueueFilter", $workerQueueFilter->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getQueueSize", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "getExclusiveAlmostDone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "updateExclusiveJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function cleanExclusiveJobs()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "cleanExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function logConversion($flavorAssetId, $data)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "flavorAssetId", $flavorAssetId);
+		$this->client->addParam($kparams, "data", $data);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "logConversion", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function checkFileExists($localPath, $size)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "localPath", $localPath);
+		$this->client->addParam($kparams, "size", $size);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "checkFileExists", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileExistsResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaDistributionProfileService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaDistributionProfile $distributionProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "distributionProfile", $distributionProfile->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfile");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfile");
+		return $resultObject;
+	}
+
+	function update($id, KalturaDistributionProfile $distributionProfile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "distributionProfile", $distributionProfile->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfile");
+		return $resultObject;
+	}
+
+	function updateStatus($id, $status)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "status", $status);
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "updateStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfile");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaDistributionProfileFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$kparams = array();
 		if ($filter !== null)
 			$this->client->addParam($kparams, "filter", $filter->toParams());
 		if ($pager !== null)
 			$this->client->addParam($kparams, "pager", $pager->toParams());
-		$this->client->queueServiceActionCall("document_documents", "list", $kparams);
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "list", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaDocumentListResponse");
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfileListResponse");
 		return $resultObject;
 	}
 
-	function upload($fileData)
+	function listByPartner(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_distributionprofile", "listByPartner", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProfileListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaEntryDistributionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaEntryDistribution $entryDistribution)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryDistribution", $entryDistribution->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function validate($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "validate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function update($id, KalturaEntryDistribution $entryDistribution)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "entryDistribution", $entryDistribution->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistributionListResponse");
+		return $resultObject;
+	}
+
+	function submitAdd($id, $submitWhenReady = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "submitWhenReady", $submitWhenReady);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitAdd", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitUpdate($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitUpdate", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitFetchReport($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitFetchReport", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function submitDelete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "submitDelete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+
+	function retrySubmit($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_entrydistribution", "retrySubmit", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
+		return $resultObject;
+	}
+}
+
+class KalturaDistributionProviderService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_distributionprovider", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaDistributionProviderListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaGenericDistributionProviderService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaGenericDistributionProvider $genericDistributionProvider)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "genericDistributionProvider", $genericDistributionProvider->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovider", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProvider");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovider", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProvider");
+		return $resultObject;
+	}
+
+	function update($id, KalturaGenericDistributionProvider $genericDistributionProvider)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "genericDistributionProvider", $genericDistributionProvider->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovider", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProvider");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovider", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaGenericDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovider", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "genericDistributionProviderAction", $genericDistributionProviderAction->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function addMrssTransform($id, $xslData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "xslData", $xslData);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addMrssTransform", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function addMrssTransformFromFile($id, $xslFile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
 		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("document_documents", "upload", $kparams, $kfiles);
+		$this->client->addParam($kfiles, "xslFile", $xslFile);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addMrssTransformFromFile", $kparams, $kfiles);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
 		return $resultObject;
 	}
 
-	function convertPptToSwf($entryId)
+	function addMrssValidate($id, $xsdData)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->queueServiceActionCall("document_documents", "convertPptToSwf", $kparams);
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "xsdData", $xsdData);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addMrssValidate", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function addMrssValidateFromFile($id, $xsdFile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "xsdFile", $xsdFile);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addMrssValidateFromFile", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function addResultsTransform($id, $transformData)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "transformData", $transformData);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addResultsTransform", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function addResultsTransformFromFile($id, $transformFile)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$kfiles = array();
+		$this->client->addParam($kfiles, "transformFile", $transformFile);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "addResultsTransformFromFile", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function getByProviderId($genericDistributionProviderId, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "genericDistributionProviderId", $genericDistributionProviderId);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "getByProviderId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function updateByProviderId($genericDistributionProviderId, $actionType, KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "genericDistributionProviderId", $genericDistributionProviderId);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->addParam($kparams, "genericDistributionProviderAction", $genericDistributionProviderAction->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "updateByProviderId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function update($id, KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "genericDistributionProviderAction", $genericDistributionProviderAction->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderAction");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function deleteByProviderId($genericDistributionProviderId, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "genericDistributionProviderId", $genericDistributionProviderId);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "deleteByProviderId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_genericdistributionprovideraction", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaGenericDistributionProviderActionListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaContentDistributionBatchService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function getExclusiveDistributionSubmitJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionSubmitJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionSubmitJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionSubmitJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionSubmitJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionSubmitJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionSubmitJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionSubmitJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveDistributionUpdateJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionUpdateJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionUpdateJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionUpdateJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionUpdateJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionUpdateJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionUpdateJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionUpdateJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveDistributionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionDeleteJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveDistributionFetchReportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionFetchReportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionFetchReportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionFetchReportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionFetchReportJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionFetchReportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionFetchReportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionFetchReportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function createRequiredJobs()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "createRequiredJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function getExclusiveImportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveImportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveImportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveImportJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveImportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveBulkUploadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveBulkUploadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneBulkUploadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneBulkUploadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveBulkUploadJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveBulkUploadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveBulkUploadJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveBulkUploadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult, array $pluginDataArray = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadResult", $bulkUploadResult->toParams());
+		if ($pluginDataArray !== null)
+			foreach($pluginDataArray as $index => $obj)
+			{
+				$this->client->addParam($kparams, "pluginDataArray:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "addBulkUploadResult", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function getBulkUploadLastResult($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getBulkUploadLastResult", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function updateBulkUploadResults($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateBulkUploadResults", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneConvertCollectionJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertProfileJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneConvertProfileJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job, array $flavorsData = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		if ($flavorsData !== null)
+			foreach($flavorsData as $index => $obj)
+			{
+				$this->client->addParam($kparams, "flavorsData:$index", $obj->toParams());
+			}
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveConvertCollectionJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveConvertProfileJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertCollectionJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveConvertCollectionJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertProfileJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveConvertProfileJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveConvertCollectionJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveConvertCollectionJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function updateExclusiveConvertJobSubType($id, KalturaExclusiveLockKey $lockKey, $subType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "subType", $subType);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveConvertJobSubType", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusivePostConvertJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusivePostConvertJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusivePostConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusivePostConvertJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusivePostConvertJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveCaptureThumbJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveCaptureThumbJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveCaptureThumbJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveCaptureThumbJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveExtractMediaJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveExtractMediaJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveExtractMediaJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function addMediaInfo(KalturaMediaInfo $mediaInfo)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "mediaInfo", $mediaInfo->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "addMediaInfo", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaInfo");
+		return $resultObject;
+	}
+
+	function freeExclusiveExtractMediaJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveExtractMediaJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveStorageExportJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveStorageExportJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveStorageExportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveStorageExportJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveStorageExportJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveStorageDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveStorageDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveStorageDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveStorageDeleteJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveStorageDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveNotificationJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveNotificationJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchGetExclusiveNotificationJobsResponse");
+		return $resultObject;
+	}
+
+	function updateExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveNotificationJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveNotificationJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveNotificationJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveMailJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveMailJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveMailJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveMailJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveMailJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveBulkDownloadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveBulkDownloadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneBulkDownloadJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneBulkDownloadJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveBulkDownloadJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveBulkDownloadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveBulkDownloadJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveBulkDownloadJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveProvisionProvideJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveProvisionProvideJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneProvisionProvideJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneProvisionProvideJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveProvisionProvideJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveProvisionProvideJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveProvisionProvideJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveProvisionProvideJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveProvisionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveProvisionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneProvisionDeleteJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneProvisionDeleteJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveProvisionDeleteJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveProvisionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveProvisionDeleteJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveProvisionDeleteJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function resetJobExecutionAttempts($id, KalturaExclusiveLockKey $lockKey, $jobType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "resetJobExecutionAttempts", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function freeExclusiveJob($id, KalturaExclusiveLockKey $lockKey, $jobType, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getQueueSize(KalturaWorkerQueueFilter $workerQueueFilter)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "workerQueueFilter", $workerQueueFilter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getQueueSize", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDone(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->addParam($kparams, "jobType", $jobType);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function cleanExclusiveJobs()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "cleanExclusiveJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
+	function logConversion($flavorAssetId, $data)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "flavorAssetId", $flavorAssetId);
+		$this->client->addParam($kparams, "data", $data);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "logConversion", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function checkFileExists($localPath, $size)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "localPath", $localPath);
+		$this->client->addParam($kparams, "size", $size);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "checkFileExists", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFileExistsResponse");
 		return $resultObject;
 	}
 }
 
 class KalturaClient extends KalturaClientBase
 {
+	/**
+	 * @var string
+	 */
+	protected $apiVersion = '3.1.1';
+
 	/**
 	 * Add & Manage Access Controls
 	 *
@@ -18912,13 +26085,6 @@ class KalturaClient extends KalturaClientBase
 	public $data = null;
 
 	/**
-	 * Document service
-	 *
-	 * @var KalturaDocumentService
-	 */
-	public $document = null;
-
-	/**
 	 * EmailIngestionProfile service lets you manage email ingestion profile records
 	 *
 	 * @var KalturaEmailIngestionProfileService
@@ -18989,6 +26155,20 @@ class KalturaClient extends KalturaClientBase
 	public $partner = null;
 
 	/**
+	 * PermissionItem service lets you create and manage permission items
+	 *
+	 * @var KalturaPermissionItemService
+	 */
+	public $permissionItem = null;
+
+	/**
+	 * Permission service lets you create and manage user permissions
+	 *
+	 * @var KalturaPermissionService
+	 */
+	public $permission = null;
+
+	/**
 	 * Playlist service lets you create,manage and play your playlists
 	 * Playlists could be static (containing a fixed list of entries) or dynamic (baseed on a filter)
 	 *
@@ -19040,6 +26220,20 @@ class KalturaClient extends KalturaClientBase
 	public $system = null;
 
 	/**
+	 * Retrieve information and invoke actions on Thumb Asset
+	 *
+	 * @var KalturaThumbAssetService
+	 */
+	public $thumbAsset = null;
+
+	/**
+	 * Add & Manage Thumb Params
+	 *
+	 * @var KalturaThumbParamsService
+	 */
+	public $thumbParams = null;
+
+	/**
 	 * UiConf service lets you create and manage your UIConfs for the various flash components
 	 * This service is used by the KMC-ApplicationStudio
 	 *
@@ -19060,6 +26254,13 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaUploadTokenService
 	 */
 	public $uploadToken = null;
+
+	/**
+	 * UserRole service lets you create and manage user permissions
+	 *
+	 * @var KalturaUserRoleService
+	 */
+	public $userRole = null;
 
 	/**
 	 * Manage partner users on Kaltura's side
@@ -19084,55 +26285,6 @@ class KalturaClient extends KalturaClientBase
 	public $xInternal = null;
 
 	/**
-	 * System user service
-	 *
-	 * @var KalturaSystemUserService
-	 */
-	public $systemUser = null;
-
-	/**
-	 * System partner service
-	 *
-	 * @var KalturaSystemPartnerService
-	 */
-	public $systemPartner = null;
-
-	/**
-	 * System user service
-	 *
-	 * @var KalturaFileSyncService
-	 */
-	public $fileSync = null;
-
-	/**
-	 * Flavor Params Output service
-	 *
-	 * @var KalturaFlavorParamsOutputService
-	 */
-	public $flavorParamsOutput = null;
-
-	/**
-	 * Media Info service
-	 *
-	 * @var KalturaMediaInfoService
-	 */
-	public $mediaInfo = null;
-
-	/**
-	 * Entry Admin service
-	 *
-	 * @var KalturaEntryAdminService
-	 */
-	public $entryAdmin = null;
-
-	/**
-	 * Storage Profiles service
-	 *
-	 * @var KalturaStorageProfileService
-	 */
-	public $storageProfile = null;
-
-	/**
 	 * Metadata service
 	 *
 	 * @var KalturaMetadataService
@@ -19154,6 +26306,62 @@ class KalturaClient extends KalturaClientBase
 	public $metadataBatch = null;
 
 	/**
+	 * Document service lets you upload and manage document files
+	 *
+	 * @var KalturaDocumentsService
+	 */
+	public $documents = null;
+
+	/**
+	 * Storage Profiles service
+	 *
+	 * @var KalturaStorageProfileService
+	 */
+	public $storageProfile = null;
+
+	/**
+	 * System user service
+	 *
+	 * @var KalturaFileSyncService
+	 */
+	public $fileSync = null;
+
+	/**
+	 * System partner service
+	 *
+	 * @var KalturaSystemPartnerService
+	 */
+	public $systemPartner = null;
+
+	/**
+	 * Flavor Params Output service
+	 *
+	 * @var KalturaFlavorParamsOutputService
+	 */
+	public $flavorParamsOutput = null;
+
+	/**
+	 * Thumb Params Output service
+	 *
+	 * @var KalturaThumbParamsOutputService
+	 */
+	public $thumbParamsOutput = null;
+
+	/**
+	 * Media Info service
+	 *
+	 * @var KalturaMediaInfoService
+	 */
+	public $mediaInfo = null;
+
+	/**
+	 * Entry Admin service
+	 *
+	 * @var KalturaEntryAdminService
+	 */
+	public $entryAdmin = null;
+
+	/**
 	 * 
 	 *
 	 * @var KalturaFilesyncImportBatchService
@@ -19161,11 +26369,67 @@ class KalturaClient extends KalturaClientBase
 	public $filesyncImportBatch = null;
 
 	/**
-	 * Document service lets you upload and manage document files
+	 * Audit Trail service
 	 *
-	 * @var KalturaDocumentsService
+	 * @var KalturaAuditTrailService
 	 */
-	public $documents = null;
+	public $auditTrail = null;
+
+	/**
+	 * Virus scan profile service
+	 *
+	 * @var KalturaVirusScanProfileService
+	 */
+	public $virusScanProfile = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanBatchService
+	 */
+	public $virusScanBatch = null;
+
+	/**
+	 * Distribution Profile service
+	 *
+	 * @var KalturaDistributionProfileService
+	 */
+	public $distributionProfile = null;
+
+	/**
+	 * Entry Distribution service
+	 *
+	 * @var KalturaEntryDistributionService
+	 */
+	public $entryDistribution = null;
+
+	/**
+	 * Distribution Provider service
+	 *
+	 * @var KalturaDistributionProviderService
+	 */
+	public $distributionProvider = null;
+
+	/**
+	 * Generic Distribution Provider service
+	 *
+	 * @var KalturaGenericDistributionProviderService
+	 */
+	public $genericDistributionProvider = null;
+
+	/**
+	 * Generic Distribution Provider Actions service
+	 *
+	 * @var KalturaGenericDistributionProviderActionService
+	 */
+	public $genericDistributionProviderAction = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaContentDistributionBatchService
+	 */
+	public $contentDistributionBatch = null;
 
 
 	public function __construct(KalturaConfiguration $config)
@@ -19180,7 +26444,6 @@ class KalturaClient extends KalturaClientBase
 		$this->category = new KalturaCategoryService($this);
 		$this->conversionProfile = new KalturaConversionProfileService($this);
 		$this->data = new KalturaDataService($this);
-		$this->document = new KalturaDocumentService($this);
 		$this->EmailIngestionProfile = new KalturaEmailIngestionProfileService($this);
 		$this->flavorAsset = new KalturaFlavorAssetService($this);
 		$this->flavorParams = new KalturaFlavorParamsService($this);
@@ -19190,6 +26453,8 @@ class KalturaClient extends KalturaClientBase
 		$this->mixing = new KalturaMixingService($this);
 		$this->notification = new KalturaNotificationService($this);
 		$this->partner = new KalturaPartnerService($this);
+		$this->permissionItem = new KalturaPermissionItemService($this);
+		$this->permission = new KalturaPermissionService($this);
 		$this->playlist = new KalturaPlaylistService($this);
 		$this->report = new KalturaReportService($this);
 		$this->search = new KalturaSearchService($this);
@@ -19197,24 +26462,36 @@ class KalturaClient extends KalturaClientBase
 		$this->stats = new KalturaStatsService($this);
 		$this->syndicationFeed = new KalturaSyndicationFeedService($this);
 		$this->system = new KalturaSystemService($this);
+		$this->thumbAsset = new KalturaThumbAssetService($this);
+		$this->thumbParams = new KalturaThumbParamsService($this);
 		$this->uiConf = new KalturaUiConfService($this);
 		$this->upload = new KalturaUploadService($this);
 		$this->uploadToken = new KalturaUploadTokenService($this);
+		$this->userRole = new KalturaUserRoleService($this);
 		$this->user = new KalturaUserService($this);
 		$this->widget = new KalturaWidgetService($this);
 		$this->xInternal = new KalturaXInternalService($this);
-		$this->systemUser = new KalturaSystemUserService($this);
-		$this->systemPartner = new KalturaSystemPartnerService($this);
-		$this->fileSync = new KalturaFileSyncService($this);
-		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($this);
-		$this->mediaInfo = new KalturaMediaInfoService($this);
-		$this->entryAdmin = new KalturaEntryAdminService($this);
-		$this->storageProfile = new KalturaStorageProfileService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataProfile = new KalturaMetadataProfileService($this);
 		$this->metadataBatch = new KalturaMetadataBatchService($this);
-		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
 		$this->documents = new KalturaDocumentsService($this);
+		$this->storageProfile = new KalturaStorageProfileService($this);
+		$this->fileSync = new KalturaFileSyncService($this);
+		$this->systemPartner = new KalturaSystemPartnerService($this);
+		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($this);
+		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($this);
+		$this->mediaInfo = new KalturaMediaInfoService($this);
+		$this->entryAdmin = new KalturaEntryAdminService($this);
+		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
+		$this->auditTrail = new KalturaAuditTrailService($this);
+		$this->virusScanProfile = new KalturaVirusScanProfileService($this);
+		$this->virusScanBatch = new KalturaVirusScanBatchService($this);
+		$this->distributionProfile = new KalturaDistributionProfileService($this);
+		$this->entryDistribution = new KalturaEntryDistributionService($this);
+		$this->distributionProvider = new KalturaDistributionProviderService($this);
+		$this->genericDistributionProvider = new KalturaGenericDistributionProviderService($this);
+		$this->genericDistributionProviderAction = new KalturaGenericDistributionProviderActionService($this);
+		$this->contentDistributionBatch = new KalturaContentDistributionBatchService($this);
 	}
 }
 

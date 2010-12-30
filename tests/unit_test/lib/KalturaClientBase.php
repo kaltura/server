@@ -1,15 +1,19 @@
 <?php
 class KalturaClientBase 
 {
-	const KALTURA_API_VERSION = "3.0";
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
 	const KALTURA_SERVICE_FORMAT_XML  = 2;
 	const KALTURA_SERVICE_FORMAT_PHP  = 3;
 
 	/**
+	 * @var string
+	 */
+	protected $apiVersion = null;
+
+	/**
 	 * @var KalturaConfiguration
 	 */
-	private $config;
+	protected $config;
 	
 	/**
 	 * @var string
@@ -79,7 +83,7 @@ class KalturaClientBase
 		$this->log("service url: [" . $this->config->serviceUrl . "]");
 		
 		// append the basic params
-		$this->addParam($params, "apiVersion", self::KALTURA_API_VERSION);
+		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
 		
@@ -118,7 +122,10 @@ class KalturaClientBase
 		}
 		else 
 		{
-			$this->log("result (serialized): " . $postResult);
+			if(strlen($postResult) > 1024)
+				$this->log("result (serialized): " . strlen($postResult) . " bytes");
+			else
+				$this->log("result (serialized): " . $postResult);
 			
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
@@ -129,8 +136,8 @@ class KalturaClientBase
 					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
 				}
 				$dump = print_r($result, true);
-				$this->log("result (object dump): " . $dump);
-				
+				if(strlen($dump) < 1024)
+					$this->log("result (object dump): " . $dump);
 			}
 			else
 			{
