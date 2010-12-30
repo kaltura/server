@@ -112,6 +112,7 @@ class KalturaPermission extends KalturaObject implements IFilterable
 		'updatedAt',
 		'dependsOnPermissionNames',
 		'partnerGroup',
+		'type',
 	 );
 		 
 	public function getMapBetweenObjects()
