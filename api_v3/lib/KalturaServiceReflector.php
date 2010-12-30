@@ -90,6 +90,11 @@ class KalturaServiceReflector
 		return $this->_docCommentParser->description;
 	}
 	
+	public function isFromPlugin()
+	{
+		return (strpos($this->_serviceId, '_') > 0);
+	}
+	
 	public function isServiceExists($serviceId)
 	{
 		if(array_key_exists($serviceId, $this->_servicesMap))
@@ -274,6 +279,11 @@ class KalturaServiceReflector
 		}
 		
 		return $this->_serviceInstance;
+	}
+	
+	public function getServiceClass()
+	{
+		return $this->_serviceClass;
 	}
 	
 	public function removeAction($actionName)
