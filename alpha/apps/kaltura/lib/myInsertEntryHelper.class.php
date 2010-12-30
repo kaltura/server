@@ -165,6 +165,7 @@ class myInsertEntryHelper
 			}
 			else 
 			{
+				KalturaLog::err("File [$entry_fullPath] does not exist");
 				$entry_status = entryStatus::ERROR_IMPORTING;
 			}
 		}
