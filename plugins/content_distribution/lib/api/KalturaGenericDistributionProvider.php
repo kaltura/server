@@ -51,11 +51,6 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 	/**
 	 * @var string
 	 */
-	public $name;
-
-	/**
-	 * @var string
-	 */
 	public $optionalFlavorParamsIds;
 
 	/**
@@ -94,7 +89,6 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		'partnerId',
 		'isDefault',
 		'status',
-		'name',
 		'optionalFlavorParamsIds',
 		'requiredFlavorParamsIds',
 		'editableFields',

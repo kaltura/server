@@ -15,6 +15,12 @@ class KalturaDistributionValidationError extends KalturaObject
 	public $errorType;
 	
 	/**
+	 * Missing flavor params id, thumbnail params id or missing metadata field name
+	 * @var string
+	 */
+	public $data;
+	
+	/**
 	 * @var string
 	 */
 	public $description;
@@ -26,6 +32,7 @@ class KalturaDistributionValidationError extends KalturaObject
 	 (
 		'action',
 		'errorType',
+		'data',
 		'description',
 	 );
 		 
