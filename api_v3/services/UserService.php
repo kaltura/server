@@ -91,24 +91,40 @@ class UserService extends KalturaBaseUserService
 	 * @param KalturaUser $user
 	 * @return KalturaUser
 	 *
-	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::INVALID_USER_ID
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
+	 * @throws KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER
 	 */
 	public function updateAction($userId, KalturaUser $user)
 	{		
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		
 		if (!$dbUser)
-			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
-			throw new KalturaAPIException(APIErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
 			
 		try {
 			if (!is_null($user->roleIds)) {
 				UserRolePeer::testValidRolesForUser($user->roleIds);
 			}
+		}
+		catch (kUserException $e) {
+			$code = $e->getCode();
+			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
+			}
+			throw $e;			
+		}
+		
+		
+		// update user
+		try
+		{
+			$dbUser = $user->toUpdatableObject($dbUser);
+			$dbUser->save();
 		}
 		catch (kPermissionException $e)
 		{
@@ -120,11 +136,6 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
 			}
 		}
-		
-		
-		// update user	
-		$dbUser = $user->toUpdatableObject($dbUser);
-		$dbUser->save();
 				
 		$user = new KalturaUser();
 		$user->fromObject($dbUser);
@@ -140,14 +151,14 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId
 	 * @return KalturaUser
 	 *
-	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
 	public function getAction($userId)
 	{
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	
 		if (!$dbUser)
-			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 
 		$user = new KalturaUser();
 		$user->fromObject($dbUser);
@@ -196,7 +207,7 @@ class UserService extends KalturaBaseUserService
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 	
 		if (!$dbUser) {
-			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
 					
 		try {
@@ -204,8 +215,8 @@ class UserService extends KalturaBaseUserService
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
-			if ($code == kUserException::CANNOT_DELETE_ROOT_ADMIN_USER) {
-				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 			}
 			throw $e;			
 		}
@@ -258,13 +269,13 @@ class UserService extends KalturaBaseUserService
 	 * @action notifyBan
 	 * @param string $userId
 	 *
-	 * @throws APIErrors::INVALID_USER_ID
+	 * @throws KalturaErrors::INVALID_USER_ID
 	 */		
 	public function notifyBan($userId)
 	{
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		if (!$dbUser)
-			throw new KalturaAPIException(APIErrors::INVALID_USER_ID, $userId);
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_USER_BANNED, $dbUser);
 	}

@@ -44,7 +44,6 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 * @filter mlikeor, mlikeand
 	 */
 	public $permissionNames;
 	

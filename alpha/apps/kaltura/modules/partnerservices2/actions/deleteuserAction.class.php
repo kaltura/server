@@ -59,8 +59,8 @@ class deleteuserAction extends defPartnerservices2Action
 			}
 			catch (kUserException $e) {
 				$code = $e->getCode();
-				if ($code == kUserException::CANNOT_DELETE_ROOT_ADMIN_USER) {
-					$this->addException( APIErrors::CANNOT_DELETE_ROOT_ADMIN_USER);
+				if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
+					$this->addException( APIErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 					return null;
 				}
 				throw $e;			

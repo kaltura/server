@@ -676,14 +676,14 @@ class kuser extends Basekuser
 	/**
 	 * Set status and statusUpdatedAt fields
 	 * @see Basekuser::setStatus()
-	 * @throws kUserException::CANNOT_DELETE_ROOT_ADMIN_USER
+	 * @throws kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER
 	 */
 	public function setStatus($status)
 	{
-		if ($status == KuserStatus::DELETED && $this->isRootUser()) {
-			throw new kUserException('', kUserException::CANNOT_DELETE_ROOT_ADMIN_USER);
+		if ($status == KuserStatus::DELETED ||  $status == KuserStatus::BLOCKED && $this->isRootUser()) {
+			throw new kUserException('', kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 		}
-		
+				
 		parent::setStatus($status);
 		$this->setStatusUpdatedAt(time());
 		if ($status == KuserStatus::DELETED) {

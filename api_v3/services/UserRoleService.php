@@ -69,6 +69,7 @@ class UserRoleService extends KalturaBaseService
 		$c = new Criteria();
 		$c->addAnd(UserRolePeer::PARTNER_ID, array (0, $this->getPartnerId()), Criteria::IN);
 		$c->addAnd(UserRolePeer::ID, $userRoleId);
+		$c->addAnd(UserRolePeer::STATUS, KalturaUserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		
 		UserRolePeer::setUseCriteriaFilter(false);
 		$dbUserRole = UserRolePeer::doSelectOne($c);
@@ -176,6 +177,7 @@ class UserRoleService extends KalturaBaseService
 
 		$c = new Criteria();
 		$c->addAnd(UserRolePeer::PARTNER_ID, array (0, $this->getPartnerId()), Criteria::IN);
+		$c->addAnd(UserRolePeer::STATUS, KalturaUserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		$userRoleFilter->attachToCriteria($c);
 		$count = UserRolePeer::doCount($c);
 		
@@ -205,7 +207,9 @@ class UserRoleService extends KalturaBaseService
 	{
 		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
 	
-		if (!$dbUserRole || $dbUserRole->getPartnerId() != $this->getPartnerId()) {
+		if ( !$dbUserRole || $dbUserRole->getStatus() == UserRoleStatus::DELETED ||
+		     ($dbUserRole->getPartnerId() != PartnerPeer::GLOBAL_PARTNER && $dbUserRole->getPartnerId() != $this->getPartnerId()) )
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
 		}
 		

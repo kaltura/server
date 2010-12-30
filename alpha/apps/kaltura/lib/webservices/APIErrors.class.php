@@ -274,7 +274,7 @@
 	
 		const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED,Same login id is already in use";
 		
-		const CANNOT_DELETE_ROOT_ADMIN_USER = "CANNOT_DELETE_ROOT_ADMIN_USER,Root admin user cannot be deleted";
+		const CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER = "CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER,Root admin user cannot be deleted";
 		
 		const ROLE_ID_MISSING = "ROLE_ID_MISSING,User must have an associated role";
 		

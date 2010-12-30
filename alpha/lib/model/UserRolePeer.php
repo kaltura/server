@@ -15,6 +15,20 @@
 class UserRolePeer extends BaseUserRolePeer
 {
 	
+	public static function setDefaultCriteriaFilter ()
+	{
+		parent::setDefaultCriteriaFilter();
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( UserRolePeer::STATUS, UserRoleStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
+	
 	/**
 	 * Temporary function that will not allow a user to have 0 or more than 1 role.
 	 * @param string $idsString
