@@ -38,6 +38,7 @@ entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content
 entrydistribution.submitadd													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
+entrydistribution.submitfetchreport											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 entrydistribution.validate													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|content_distribution
 
