@@ -9705,11 +9705,6 @@ class KalturaGenericDistributionProviderActionListResponse extends KalturaObject
 
 }
 
-class KalturaAdminUser extends KalturaUser
-{
-
-}
-
 class KalturaMailJob extends KalturaBaseJob
 {
 	/**
