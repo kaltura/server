@@ -45,11 +45,9 @@ class PermissionPeer extends BasePermissionPeer
 	{
 		$permission->setPartnerId($partnerId);
 		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		$c->addAnd(PermissionPeer::NAME, $permission->getName(), Criteria::EQUAL);
-		PermissionPeer::setUseCriteriaFilter(false);
 		$existingPermission = PermissionPeer::doSelectOne($c);
-		PermissionPeer::setUseCriteriaFilter(true);
 		if (!$existingPermission) {
 			$permission->save();
 			KalturaLog::log('Adding permission ['.$permission->getName().'] to partner ['.$partnerId.'].');
@@ -87,7 +85,7 @@ class PermissionPeer extends BasePermissionPeer
 		try {
 			// try to add permission
 			self::addToPartner($permission, $partnerId);
-			return false;
+			return true;
 		}
 		catch (kPermissionException $e) {
 			$code = $e->getCode();

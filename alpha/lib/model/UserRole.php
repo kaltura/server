@@ -34,12 +34,15 @@ class UserRole extends BaseUserRole
 	
 	/**
 	 * Get the [permission_names] column value.
-	 * 
+	 * If set to self::ALL_PARTNER_PERMISSIONS_WILDCARD (*), return all permisisons relevant for the partner.
+	 * @var bool $filterDependencies true if should filter permissions which are set for partner but not valid due to dependencies on other permissions which are missing for the partner
 	 * @return     string
 	 */
 	public function getPermissionNames($filterDependencies = false)
 	{
+		// get from DB
 		$permissionNames = parent::getPermissionNames();
+		// translate * to permission names of all permissions valid for partner
 		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD)
 		{
 			$permissionNames = '';
