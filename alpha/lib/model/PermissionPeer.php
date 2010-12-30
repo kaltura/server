@@ -92,13 +92,16 @@ class PermissionPeer extends BasePermissionPeer
 			if ($code == kPermissionException::PERMISSION_ALREADY_EXISTS) {
 				// permission already exists - set status to active
 				$permission = self::getByNameAndPartner($permissionName, array($partnerId));
+				if(!$permission)
+					throw new kCoreException("Permission [$permissionName] not found for partner [$partnerId]", kCoreException::INTERNAL_SERVER_ERROR);
+					
 				$permission->setStatus(PermissionStatus::ACTIVE);
 				$permission->save();
 				return true;
 			}
 			throw $e;
 		}
-		throw new Exception('Unknown error occured', kCoreException::INTERNAL_SERVER_ERROR);
+		throw new kCoreException('Unknown error occured', kCoreException::INTERNAL_SERVER_ERROR);
 	}
 
 	
