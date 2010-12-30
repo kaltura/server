@@ -1,5 +1,8 @@
-rm -fr ../api_v3/cache/*
-rm -fr cache/*
+del /F /S /Q ..\cache\api_v3\*
+del /F /S /Q ..\cache\generator\*
+
 php generate.php
-cp output/adminConsoleClient/* ../admin_console/lib/Kaltura
-cp output/batchClient/* ../batch/client
+
+copy /Y output\adminConsoleClient\* ..\admin_console\lib\Kaltura
+copy /Y output\batchClient\* ..\batch\client
+copy /Y output\php5full\* ..\tests\unit_test\lib
