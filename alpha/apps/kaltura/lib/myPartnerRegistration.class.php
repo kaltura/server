@@ -285,6 +285,8 @@ class myPartnerRegistration
 			// so he will be able to login to the system (including permissions)
 			list($newAdminKuserPassword, $newPassHashKey, $kuserId) = $this->createNewAdminKuser($newPartner , $password );
 			$newPartner->setAccountOwnerKuserId($kuserId);
+			
+			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
 		}
@@ -292,6 +294,20 @@ class myPartnerRegistration
 			//TODO: revert all changes, depending where and why we failed
 
 			throw $e;
+		}
+	}
+	
+	private function setAllTemplateEntriesToAdminKuser($partnerId, $kuserId)
+	{
+		$c = new Criteria();
+		$c->addAnd(entryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		entryPeer::setUseCriteriaFilter(false);
+		$allEntries = entryPeer::doSelect($c);
+		entryPeer::setUseCriteriaFilter(true);
+		foreach ($allEntries as $entry)
+		{
+			$entry->setKuserId($kuserId);
+			$entry->save();
 		}
 	}
 }

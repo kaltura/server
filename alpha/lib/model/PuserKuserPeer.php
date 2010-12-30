@@ -41,6 +41,9 @@ class PuserKuserPeer extends BasePuserKuserPeer
 	public static function createPuserKuser ( $partner_id , $subp_id, $puser_id , $kuser_name , $puser_name, $create_kuser = false, $kuser = null)
 	{		
 		$puser_kuser = self::retrieveByPartnerAndUid ( $partner_id , $subp_id, $puser_id , true );
+		if (!$kuser) {
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partner_id, $puser_id, true); // don't create an existing kuser!
+		}
 		
 		if ( $puser_kuser )
 		{

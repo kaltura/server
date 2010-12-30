@@ -84,6 +84,9 @@ class adminloginAction extends defPartnerservices2Action
 			else if ($code == kUserException::WRONG_PASSWORD) {
 				$this->addError  (APIErrors::ADMIN_KUSER_NOT_FOUND);
 			}
+			else if ($code == kUserException::USER_IS_BLOCKED) {
+				$this->addError  (APIErrors::USER_IS_BLOCKED);
+			}
 			$this->addError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 			return null;
 		}
@@ -111,7 +114,7 @@ class adminloginAction extends defPartnerservices2Action
 		$admin_puser_id = $adminKuser->getPuserId();
 		
 		// get the puser_kuser for this admin if exists, if not - creae it and return it - create a kuser too
-		$puser_kuser = PuserKuserPeer::createPuserKuser ( $partner_id , $subp_id, $admin_puser_id , $adminKuser->getScreenName() , $adminKuser->getScreenName(), true );
+		$puser_kuser = PuserKuserPeer::createPuserKuser ( $partner_id , $subp_id, $admin_puser_id , $adminKuser->getScreenName() , $adminKuser->getScreenName(), true);
 		$uid = $puser_kuser->getPuserId();
 		$ks = null;
 		// create a ks for this admin_kuser as if entered the admin_secret using the API

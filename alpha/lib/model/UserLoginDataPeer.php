@@ -458,7 +458,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			$loginData->setLoginAttempts(0);
 			$loginData->setLoginBlockedUntil(null);
 			$loginData->resetPreviousPasswords();
-			$loginData->setLastLoginPartnerId($partnerId);
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
 			$hashKey = $loginData->newPassHashKey();
@@ -478,6 +477,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 						
 			KalturaLog::DEBUG('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
+			
+			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet) {
+				$existingData->setLastLoginPartnerId($partnerId);
+				$existingData->save();
+			}
+			
 			return $existingData;
 		}	
 	}

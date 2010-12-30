@@ -42,11 +42,11 @@ while(count($users))
 		$user->setUserRoles($userRole->getId());
 
 		if (!$dryRun) {
-			KalturaLog::log('Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$user->getUserRoleIds().']');		
+			KalturaLog::log('Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$userRole->getId().']');		
 			$user->save(); // save
 		}
 		else {
-			KalturaLog::log('DRY RUN ONLY - Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$user->getUserRoleIds().']');
+			KalturaLog::log('DRY RUN ONLY - Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$userRole->getId().']');
 		}		
 				
 		file_put_contents($lastUserFile, $lastUser);

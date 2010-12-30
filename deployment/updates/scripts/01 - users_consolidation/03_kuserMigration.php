@@ -61,7 +61,6 @@ while(count($users))
 				$new_login_data->setSha1Password($user->getSha1Password());
 				$new_login_data->setCreatedAt($user->getCreatedAt());
 				$new_login_data->setUpdatedAt($user->getUpdatedAt());
-				$new_login_data->setLastLoginPartnerId($user->getPartnerId());
 			}
 			else {
 				if ($existingLoginData->getSalt() != $user->getSalt() || $existingLoginData->getSha1Password() != $user->getSha1Password()) {

@@ -26,7 +26,16 @@ class UserLoginData extends BaseUserLoginData {
 	
 	public function getLastLoginPartnerId()
 	{
-		return $this->getFromCustomData('last_login_partner_id');
+		$lastPartner =  $this->getFromCustomData('last_login_partner_id');
+		if (!$lastPartner) {
+			$lastPartner = $this->getConfigPartnerId();
+		}
+		return $lastPartner;
+	}
+	
+	public function isLastLoginPartnerIdSet()
+	{
+		return !is_null($this->getFromCustomData('last_login_partner_id'));
 	}
 	
 	public function setPassword($password) 
