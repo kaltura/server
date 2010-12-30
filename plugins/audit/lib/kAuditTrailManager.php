@@ -68,6 +68,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			}
 			else
 			{
+				KalturaLog::debug("Cache file [$cachePath] not found");
 				$auditTrailConfigs = AuditTrailConfigPeer::retrieveByPartnerId($partnerId);
 				$config = array();
 				if(count($auditTrailConfigs))
@@ -83,7 +84,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		
 		if(!isset($config[$objectType]))
+		{
+			KalturaLog::debug("Object type [$objectType] not audited");
 			return null;
+		}
 			
 		return $config[$objectType];
 	}
