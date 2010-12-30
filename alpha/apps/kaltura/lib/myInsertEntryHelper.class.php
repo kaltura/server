@@ -136,30 +136,37 @@ class myInsertEntryHelper
 			$webcam_basePath = $content.'/content/webcam/'.($webcam_suffix ? $webcam_suffix : 'my_recorded_stream_'.$kuser_id);
 			$entry_fullPath = $webcam_basePath.'.flv';
 			
-			// webcam should be preconvert until REALLY ready
-			$entry_status = entryStatus::READY;
-			$ext = "flv";
-			
-			//echo "myInsertEtryHelper:: [$entry_fullPath]";
-			
-			// for webcams that might have problmes with the metada - run the clipping even if $entry_from_time and $entry_to_time are null
-
-			if ( $entry_to_time == 0 ) $entry_to_time = null; // this will cause the clipper to reach the end of the file
-			
-			// clip the webcam to some new file
-			
-			$entry_fixedFullPath = $webcam_basePath.'_fixed.flv';
-			myFlvStaticHandler::fixRed5WebcamFlv($entry_fullPath, $entry_fixedFullPath);
-			
-			$entry_newFullPath = $webcam_basePath.'_clipped.flv';
-			myFlvStaticHandler::clipToNewFile( $entry_fixedFullPath, $entry_newFullPath, $entry_from_time, $entry_to_time );
-			$entry_fullPath = $entry_newFullPath ;
-
-			// continue tracking the webcam 
-			$te->setParam3Str( $entry_fullPath );
-			$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
-						
-			$duration = myFlvStaticHandler::getLastTimestamp($entry_fullPath);
+			if(file_exists($entry_fullPath))
+			{
+				// webcam should be preconvert until REALLY ready
+				$entry_status = entryStatus::READY;
+				$ext = "flv";
+				
+				//echo "myInsertEtryHelper:: [$entry_fullPath]";
+				
+				// for webcams that might have problmes with the metada - run the clipping even if $entry_from_time and $entry_to_time are null
+	
+				if ( $entry_to_time == 0 ) $entry_to_time = null; // this will cause the clipper to reach the end of the file
+				
+				// clip the webcam to some new file
+				
+				$entry_fixedFullPath = $webcam_basePath.'_fixed.flv';
+				myFlvStaticHandler::fixRed5WebcamFlv($entry_fullPath, $entry_fixedFullPath);
+				
+				$entry_newFullPath = $webcam_basePath.'_clipped.flv';
+				myFlvStaticHandler::clipToNewFile( $entry_fixedFullPath, $entry_newFullPath, $entry_from_time, $entry_to_time );
+				$entry_fullPath = $entry_newFullPath ;
+	
+				// continue tracking the webcam 
+				$te->setParam3Str( $entry_fullPath );
+				$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_WEBCAM" );
+							
+				$duration = myFlvStaticHandler::getLastTimestamp($entry_fullPath);
+			}
+			else 
+			{
+				$entry_status = entryStatus::ERROR_IMPORTING;
+			}
 		}
 		else
 		{
