@@ -217,6 +217,22 @@ class KAutoloader
 	}
 	
 	/**
+	 * Get the class file path
+	 * @param string $class
+	 * @return string
+	 */
+	static function getClassFilePath($class)
+	{
+		if(!count(self::$_classMap))
+			self::loadClassMap();
+			
+		if(isset(self::$_classMap[$class]))
+			return self::$_classMap[$class];
+		
+		return null;
+	}
+	
+	/**
 	 * Sets the default class paths
 	 */
 	private static function setDefaultClassPath()
