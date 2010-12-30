@@ -32,7 +32,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
 	 * @throws     PropelException - if unable to parse/validate the date/time value.
 	 */
-	public function getLastReport($format = 'Y-m-d H:i:s')
+	public function getNextReport($format = 'Y-m-d H:i:s')
 	{
 		if(!$this->getDistributionProfileId())
 			return null;
