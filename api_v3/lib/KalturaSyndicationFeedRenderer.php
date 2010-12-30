@@ -82,8 +82,8 @@ class KalturaSyndicationFeedRenderer
 		$this->syndicationFeed = $tmpSyndicationFeed;
 		
 		// add partner to default criteria
-		myPartnerUtils::addPartnerToCriteria(new categoryPeer(), $this->syndicationFeed->partnerId, true);
-		myPartnerUtils::addPartnerToCriteria(new flavorAssetPeer(), $this->syndicationFeed->partnerId, true);
+		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
+		flavorAssetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
 		
 		
 		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -705,7 +705,12 @@ class KalturaSyndicationFeedRenderer
 		while($entry = $this->getNextEntry())
 		{
 			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);			
+			$e->fromObject($entry);
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
+			{
+				continue;
+			}
 			$this->writeOpenXmlNode('url',1);
 			$this->writeFullXmlNode('loc', $this->syndicationFeed->landingPage.$e->id, 2);
 			$this->writeOpenXmlNode('video:video', 2);
