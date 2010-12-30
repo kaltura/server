@@ -34,19 +34,7 @@ class partnersAction extends kalturaSystemAction
 			$allowed_params = array_merge ( $pw->getUpdateableFields() , $extra_fields );	
 
 			$fields_modified = baseObjectUtils::fillObjectFromMap ( $_REQUEST , $partner , "partner_" , $allowed_params , BasePeer::TYPE_PHPNAME , true );
-			
-			if(class_exists('MetadataPlugin'))
-				$partner->setPluginEnabled(MetadataPlugin::PLUGIN_NAME, $_REQUEST['partner_enableMetadata']);
-			
-			if(class_exists('AuditPlugin'))
-				$partner->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
-			
-			if(class_exists('AnnotationPlugin'))
-				$partner->setPluginEnabled(AnnotationPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAnnotation']);
-			
-			if(class_exists('VirusScanPlugin'))
-				$partner->setPluginEnabled(VirusScanPlugin::PLUGIN_NAME, $_REQUEST['partner_enableVirusScan']);
-			
+						
 			if(!isset($_REQUEST['partner_partnerParentId']) || $_REQUEST['partner_partnerParentId'] == '' )
 			{
 				$partner->setPartnerParentId(null);
@@ -57,6 +45,18 @@ class partnersAction extends kalturaSystemAction
 			{
 				baseObjectUtils::fillObjectFromObject( $allowed_params , $partner , $partner_from_db , baseObjectUtils::CLONE_POLICY_PREFER_NEW , null , BasePeer::TYPE_PHPNAME , true );
 			}
+			
+			if(class_exists('MetadataPlugin'))
+				$partner_from_db->setPluginEnabled(MetadataPlugin::PLUGIN_NAME, $_REQUEST['partner_enableMetadata']);
+			
+			if(class_exists('AuditPlugin'))
+				$partner_from_db->setPluginEnabled(AuditPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAuditTrail']);
+			
+			if(class_exists('AnnotationPlugin'))
+				$partner_from_db->setPluginEnabled(AnnotationPlugin::PLUGIN_NAME, $_REQUEST['partner_enableAnnotation']);
+			
+			if(class_exists('VirusScanPlugin'))
+				$partner_from_db->setPluginEnabled(VirusScanPlugin::PLUGIN_NAME, $_REQUEST['partner_enableVirusScan']);
 
 			if ( $partner_from_db->getServiceConfigId() == "" ) $partner_from_db->setServiceConfigId ( null );
 			
