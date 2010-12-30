@@ -516,14 +516,13 @@ class kuser extends Basekuser
 	 */
 	public function getFullName()
 	{
-		if (!is_null($this->getFirstName())) {
-			return trim($this->getFirstName().' '.$this->getLastName());
-		}
-		else {
+		if (!$this->getFirstName() && $this->getFullName())
+		{
 			// full_name is deprecated - this is for backward compatibiliy and for migration
 			KalturaLog::ALERT('Field [full_name] on object [kuser] is deprecated but still being read');
 			return parent::getFullName();
 		}
+		return trim($this->getFirstName().' '.$this->getLastName());
 	}
 	
 	
