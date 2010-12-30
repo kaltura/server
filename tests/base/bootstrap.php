@@ -13,6 +13,7 @@ KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "lib", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "base", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "api", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "unit_test", "lib", "*"),
 ));
 

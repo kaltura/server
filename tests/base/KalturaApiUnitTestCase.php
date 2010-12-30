@@ -54,7 +54,7 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 			}
 			if(!$testConfig->sessionType)
 			{
-				$testConfig->sessionType = 2;
+				$testConfig->sessionType = 0;
 				$needSave = true;
 			}
 			if(!$testConfig->expiry)

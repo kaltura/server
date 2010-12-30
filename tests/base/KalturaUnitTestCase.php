@@ -176,7 +176,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 				}
 				$default->$argName = $argConfig;
 			}
-			$methodConfig = new Zend_Config(array('default' => $default), true);
+			$methodConfig = new Zend_Config(array('test1' => $default), true);
 			
 			$this->config->$methodName = $methodConfig;
 			$this->config->saveToIniFile();
