@@ -54,7 +54,7 @@ class ThumbParamsService extends KalturaBaseService
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
-		$thumbParams = KalturaThumbParamsFactory::getThumbParamsInstance($thumbParamsDb->getType());
+		$thumbParams = KalturaFlavorParamsFactory::getFlavorParamsInstance($thumbParamsDb->getType());
 		$thumbParams->fromObject($thumbParamsDb);
 		
 		return $thumbParams;
@@ -77,9 +77,6 @@ class ThumbParamsService extends KalturaBaseService
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
-		$thumbParams->validatePropertyMinLength("name", 1);
-		
-		$thumbParamsDb = new thumbParams();
 		$thumbParams->toObject($thumbParamsDb);
 		$thumbParamsDb->save();
 			
