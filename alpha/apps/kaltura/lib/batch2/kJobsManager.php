@@ -713,8 +713,11 @@ class kJobsManager
 			return null;
 		}
 		
-		$entry->setStatus(entryStatus::PRECONVERT);
-		$entry->save();
+		if($entry->getStatus() != entryStatus::READY)
+		{
+			$entry->setStatus(entryStatus::PRECONVERT);
+			$entry->save();
+		}
 	
 		$jobData = new kConvertProfileJobData();
 		$jobData->setFlavorAssetId($flavorAssetId);
