@@ -13260,6 +13260,20 @@ class KalturaMetadataProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function revert($id, $toVersion)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "toVersion", $toVersion);
+		$this->client->queueServiceActionCall("metadata_metadataprofile", "revert", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMetadataProfile");
+		return $resultObject;
+	}
+
 	function updateDefinitionFromFile($id, $xsdFile)
 	{
 		$kparams = array();
