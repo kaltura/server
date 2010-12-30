@@ -349,6 +349,7 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
+	const HULU = "huluDistribution.HULU";
 }
 
 class KalturaDurationType
@@ -2729,6 +2730,13 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 	 * @var KalturaDistributionErrorType
 	 */
 	public $errorType = null;
+
+	/**
+	 * Missing flavor params id, thumbnail params id or missing metadata field name
+	 *
+	 * @var string
+	 */
+	public $data = null;
 
 	/**
 	 * 
