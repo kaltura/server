@@ -26,6 +26,7 @@ class UserRoleService extends KalturaBaseService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
+	 * @throws KalturaErrors::PERMISSION_NOT_FOUND
 	 */
 	public function addAction(KalturaUserRole $userRole)
 	{
@@ -93,6 +94,7 @@ class UserRoleService extends KalturaBaseService
 	 * @return KalturaUserRole
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::PERMISSION_NOT_FOUND
 	 */	
 	public function updateAction($userRoleId, KalturaUserRole $userRole)
 	{

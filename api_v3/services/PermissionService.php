@@ -151,11 +151,15 @@ class PermissionService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$permissionFilter->attachToCriteria($c);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array($this->getPartnerId(), PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		PermissionPeer::setUseCriteriaFilter(false);
 		$count = PermissionPeer::doCount($c);
 		
 		if ($pager)
 			$pager->attachToCriteria($c);
+		
 		$list = PermissionPeer::doSelect($c);
+		PermissionPeer::setUseCriteriaFilter(true);
 		
 		$response = new KalturaPermissionListResponse();
 		$response->objects = KalturaPermissionArray::fromDbArray($list);
