@@ -29,6 +29,7 @@ metadataprofile.update				|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
 metadataprofile.updatedefinitionfromfile|		|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
 metadataprofile.updateviewsfromfile	|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
 metadataprofile.listfields			|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata
+metadataprofile.revert				|			|2		|1	|0		|0		|1		|rw	|		|	|   |metadata
 
 
 metadata.list						|			|1		|1	|0		|0		|1		|rw	|		|	|   |metadata

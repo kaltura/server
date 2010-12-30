@@ -286,9 +286,9 @@ class MetadataProfileService extends KalturaBaseService
 	/**
 	 * Update an existing metadata object definition file
 	 * 
-	 * @action updateDefinitionFromFile
+	 * @action revert
 	 * @param int $id 
-	 * @param file $xsdFile XSD metadata definition
+	 * @param int $toVersion
 	 * @return KalturaMetadataProfile
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
@@ -308,6 +308,8 @@ class MetadataProfileService extends KalturaBaseService
 		$dbMetadataProfile->incrementVersion();
 		$dbMetadataProfile->save();
 		
+		$versionGap = $dbMetadataProfile->getVersion() - $toVersion;
+		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
 		
@@ -322,12 +324,13 @@ class MetadataProfileService extends KalturaBaseService
 			if(!$object)
 				continue;
 				
-			$oldKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $toVersion);
+			$metadata->incrementVersion();
+			$oldKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $metadata->getVersion() - $versionGap);
 			if(!kFileSyncUtils::fileSync_exists($oldKey))
 				continue;
 			
-			$metadata->incrementVersion();
 			$metadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
+			$metadata->setStatus(Metadata::STATUS_VALID);
 			$metadata->save();
 			
 			$key = $metadata->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);

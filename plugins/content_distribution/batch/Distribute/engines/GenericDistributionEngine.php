@@ -51,7 +51,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 * @throws kFileTransferMgrException
 	 * @return boolean true if finished, false if will be finished asynchronously
 	 */
-	public function handleAction(KalturaDistributionJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
+	protected function handleAction(KalturaDistributionJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
 	{
 		if(!$providerData->xml)
 			throw new Exception("XML data not supplied");
@@ -93,7 +93,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 * @param string $resultParseData
 	 * @return array of parsed values
 	 */
-	public function parseResults($results, $resultParserType, $resultParseData)
+	protected function parseResults($results, $resultParserType, $resultParseData)
 	{
 		switch($resultParserType)
 		{
@@ -215,7 +215,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 	 * @throws kFileTransferMgrException
 	 * @return boolean true if finished, false if will be finished asynchronously
 	 */
-	public function handleFetchReport(KalturaDistributionFetchReportJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
+	protected function handleFetchReport(KalturaDistributionFetchReportJobData $data, KalturaGenericDistributionProfile $distributionProfile, KalturaGenericDistributionProfileAction $distributionProfileAction, KalturaGenericDistributionJobProviderData $providerData)
 	{
 		$srcFile = str_replace('{REMOTE_ID}', $data->remoteId, $distributionProfileAction->serverPath);
 		

@@ -14,6 +14,8 @@
  */
 class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISyncableFile
 {
+	// TODO - add file syncs for the sent XML
+	
 	const FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS = 1;
 	const FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS = 2;
 	const FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS = 3;
