@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * for future users of this script:
+ * in case this script is run to change display in search values for specific partner,
+ * remember that the sphinx needs to be synchronized to the DB.
+ * after running this script (makePartnerEntriesPublic __PARTNER_ID__),
+ * pleas run the updatePartnerEntries2Sphinx.php script (updatePartnerEntries2Sphinx __PARTNER_ID__),
+ * in order to allow sphinx DB full synchronization with respect to __PARTNER_ID
+ */
 ini_set("memory_limit","256M");
 
 define('SF_ROOT_DIR',    realpath(dirname(__FILE__).'/../../alpha/'));
