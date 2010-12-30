@@ -685,38 +685,107 @@ class Partner extends BasePartner
 	// -- start of enabled special features
 	// ------------------------------------
 	
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		if (is_array($this->setEnabledPlugins))
+		{
+			foreach($this->setEnabledPlugins as $pluginName => $enabled)
+			{
+				if ($enabled) {
+					PermissionPeer::enablePlugin($pluginName, $this->getId());
+				}
+				else {
+					PermissionPeer::disablePlugin($pluginName, $this->getId());
+				}
+			}
+		}
+		
+		if (is_array($this->setEnabledServices))
+		{
+			foreach($this->setEnabledServices as $permissionName => $enabled)
+			{
+				if ($enabled) {
+					PermissionPeer::enableForPartner($permissionName, PermissionType::SPECIAL_FEATURE, $this->getId());
+				}
+				else {
+					PermissionPeer::disableForPartner($permissionName, $this->getId());
+				}
+			}
+		}
+		
+		$this->setEnabledPlugins = array();
+		$this->setEnabledServices = array();
+		
+		parent::postSave($con);
+	}
+	
+	/**
+	 * Temporary array to hold plugin permissions status until next object save..
+	 * @var array
+	 */
+	private $setEnabledPlugins  = array();
+	/**
+	 * Temporary array to hold special service permissions status until next object save..
+	 * @var array
+	 */
+	private $setEnabledServices = array();
+	
+	
 	// plugins
 	public function getPluginEnabled($pluginName) 
 	{ 
-		$permission =  PermissionPeer::isAllowedPlugin($pluginName, $this->getId());
-		return $permission ? true : false;
+		if (isset($this->setEnabledPlugins[$pluginName]))
+		{
+			return $this->setEnabledPlugins[$pluginName];
+		}
+		else
+		{
+			$permission =  PermissionPeer::isAllowedPlugin($pluginName, $this->getId());
+			return $permission ? true : false;
+		}
 	}
 	
 	public function setPluginEnabled($pluginName, $enabled) 
 	{ 
-		if ($enabled) {
-			PermissionPeer::enablePlugin($pluginName, $this->getId());
-		}
-		else {
-			PermissionPeer::disablePlugin($pluginName, $this->getId());
-		}
+		$this->setEnabledPlugins[$pluginName] = $enabled;
 	} 
+	
+	
+	private function setEnabledService($enabled, $permissionName)
+	{
+		$this->setEnabledServices[$permissionName] = $enabled;
+	}
+	
+	private function getEnabledService($permissionName)
+	{
+		if (isset($this->setEnabledServices[$permissionName]))
+		{
+			return $this->setEnabledServices[$permissionName];
+		}
+		else
+		{		
+			$permission = PermissionPeer::isValidForPartner($permissionName, $this->getId());
+			return $permission ? true : false;
+		}
+	}
+	
 	
 	// analytics tab
 	public function getEnableAnalyticsTab() {
-		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_TAB, $this->getId());
-		return $permission ? true : false;
+		return $this->getEnabledService(PermissionName::FEATURE_ANALYTICS_TAB);
 	}
 	
 	public function setEnableAnalyticsTab( $v ) {
 		$this->setEnabledService($v, PermissionName::FEATURE_ANALYTICS_TAB);
 	}
-	
-	
+		
 	// silverlight
 	public function getEnableSilverLight() {
-		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_SILVERLIGHT, $this->getId());
-		return $permission ? true : false;
+		return $this->getEnabledService(PermissionName::FEATURE_SILVERLIGHT);
 	}
 	
 	public function setEnableSilverLight( $v ) {
@@ -725,8 +794,7 @@ class Partner extends BasePartner
 	
 	// vast
 	public function getEnableVast() {
-		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_VAST, $this->getId());
-		return $permission ? true : false;
+		return $this->getEnabledService(PermissionName::FEATURE_VAST);
 	}
 	
 	public function setEnableVast( $v ) {
@@ -735,8 +803,7 @@ class Partner extends BasePartner
 	
 	// 508 players
 	public function getEnable508Players() {
-		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_508_PLAYERS, $this->getId());
-		return $permission ? true : false;
+		return $this->getEnabledService(PermissionName::FEATURE_508_PLAYERS);
 	}
 	
 	public function setEnable508Players( $v ) {
@@ -745,22 +812,11 @@ class Partner extends BasePartner
 	
 	// live stream
 	public function getLiveStreamEnabled() {
-		$permission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIVE_STREAM, $this->getId());
-		return $permission ? true : false;
+		return $this->getEnabledService(PermissionName::FEATURE_LIVE_STREAM);
 	}
 	
 	public function setLiveStreamEnabled( $v ) {
 		$this->setEnabledService($v, PermissionName::FEATURE_LIVE_STREAM);
-	}
-	
-	private function setEnabledService($enabled, $permissionName)
-	{
-		if ($enabled) {
-			PermissionPeer::enableForPartner($permissionName, PermissionType::SPECIAL_FEATURE, $this->getId());
-		}
-		else {
-			PermissionPeer::disableForPartner($permissionName, $this->getId());
-		}
 	}
 	
 	// ----------------------------------
