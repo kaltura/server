@@ -680,7 +680,7 @@ class kuser extends Basekuser
 	 */
 	public function setStatus($status)
 	{
-		if ($status == KuserStatus::DELETED ||  $status == KuserStatus::BLOCKED && $this->isRootUser()) {
+		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED) && $this->isRootUser()) {
 			throw new kUserException('', kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 		}
 				
