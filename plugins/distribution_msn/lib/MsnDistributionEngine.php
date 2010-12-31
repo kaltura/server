@@ -78,7 +78,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 * @param KalturaMsnDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
-	public function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
+	protected function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
@@ -151,10 +151,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	}
 
 	/**
-	 * @param KalturaDistributionSubmitJobData $data
+	 * @param KalturaDistributionJobData $data
 	 * @return string status
 	 */
-	public function fetchStatus(KalturaDistributionSubmitJobData $data)
+	protected function fetchStatus(KalturaDistributionJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
@@ -169,11 +169,11 @@ class MsnDistributionEngine extends DistributionEngine implements
 	}
 
 	/**
-	 * @param KalturaDistributionSubmitJobData $data
+	 * @param KalturaDistributionJobData $data
 	 * @throws Exception
 	 * @return DOMDocument
 	 */
-	public function fetchXML(KalturaDistributionSubmitJobData $data, KalturaMsnDistributionProfile $distributionProfile)
+	protected function fetchXML(KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile)
 	{
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
