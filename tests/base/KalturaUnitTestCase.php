@@ -81,6 +81,9 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			return null;
 		}
 		
+		if(is_string($argConfig))
+			return $argConfig;
+			
 		switch($argConfig->type)
 		{
 			case 'dependency':
