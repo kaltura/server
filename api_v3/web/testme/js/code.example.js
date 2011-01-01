@@ -30,6 +30,9 @@ KCodeExampleBase.prototype.service = null;
 KCodeExampleBase.prototype.action = null;
 KCodeExampleBase.prototype.params = null;
 
+KCodeExampleJava.prototype.jqImports = null;
+KCodeExampleJava.prototype.jqActionImports = null;
+
 KCodeExampleBase.prototype.getNull = function (){
 	return jQuery("<span class=\"code-" + this.lang + "-system\">null</span>");
 };
@@ -56,6 +59,10 @@ KCodeExampleBase.prototype.getArrayCloser = function (){
 
 KCodeExampleBase.prototype.getKsMethod = function (){
 	return "setKs";
+};
+
+KCodeExampleBase.prototype.getService = function (service){
+	return this.codeObjectAttribute(this.jqClientObject.clone(), service);
 };
 
 KCodeExampleBase.prototype.onParamsChange = function (){
@@ -166,6 +173,10 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 		this.jqAction = jQuery("<div class=\"code-action\"/>");
 		this.jqEntity.append(this.jqAction);
 	}
+	
+	if(this.jqActionImports){
+		this.jqActionImports.empty();
+	}
 
 	var jqInitParams = jQuery("<div class=\"code-action-init-params\"/>");
 	this.jqParams = jQuery("<div class=\"code-action-params\"/>");
@@ -185,10 +196,11 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 		}
 	}
 
+	jqService = this.getService(service);
+	
 	var actionMethod = action == "list" ? "listAction" : action;
 	var jqResult = this.codeVar("results");
 	var jqResultDeclare = this.codeVarDefine(jqResult, "Object");
-	var jqService = this.codeObjectAttribute(this.jqClientObject.clone(), service);
 	var jqActionFunction = this.codeUserFunction(actionMethod, jqActionArgs);
 	var jqActionCall = this.codeObjectMethod(jqService, jqActionFunction);
 	var jqActionResults = this.codeAssign(jqResultDeclare, jqActionCall);
@@ -487,7 +499,7 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 	var jqConfigObject = this.codeVar("config");
 	
 	this.addCode(this.codeAssign(jqConfigObject.clone(), this.codeNewInstance("KalturaConfiguration")));
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString("http://" + location.hostname)));
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
 	this.addCode(this.codeAssign(this.jqClientObject.clone(), this.codeNewInstance("KalturaClient", [jqConfigObject.clone()])));
 };
 
@@ -520,14 +532,18 @@ function KCodeExampleJava(entity){
 
 KCodeExampleJava.prototype = new KCodeExampleBase();
 
-KCodeExampleJava.prototype.jqImports = null;
-
 KCodeExampleJava.prototype.init = function(entity, codeLanguage){
 	KCodeExampleBase.prototype.init.apply(this, arguments);
 };
 
 KCodeExampleJava.prototype.getKsMethod = function (){
 	return "setSessionId";
+};
+
+KCodeExampleJava.prototype.getService = function (service){
+	var getter = "get" + service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
+	var jqGetter = this.codeFunction(getter);
+	return this.codeObjectMethod(this.jqClientObject.clone(), jqGetter);
 };
 
 KCodeExampleJava.prototype.addCode = function (code, entity){
@@ -539,7 +555,7 @@ KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type){
 	switch(type){
 		case "int":
 			return this.codeAssign(jqObjectDef, "0");
-			
+
 		case "bool":
 			return this.codeAssign(jqObjectDef, "false");
 			
@@ -549,9 +565,27 @@ KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type){
 };
 
 KCodeExampleJava.prototype.codeVarDefine = function (jqObject, type){
-	if(type == "string")
-		type = "String";
-	
+
+	switch(type){
+		case "int":
+		case "bool":
+		case "Object":
+			break;
+
+		case "string":
+			type = "String";
+			break;
+
+		case "file":
+			type = "File";
+			this.addCode(this.codeImport("java.io.File"), this.jqActionImports);
+			break;
+			
+		default:
+			this.addCode(this.codeImport("com.kaltura.client.types." + type), this.jqActionImports);
+			break;
+	}
+		
 	return KCodeExampleBase.prototype.codeVarDefine.apply(this, arguments);
 };
 
@@ -560,7 +594,9 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	this.addCode(this.codePackage("com.kaltura.code.example"));
 	
 	this.jqImports = jQuery("<div class=\"code-java-imports\"/>");
+	this.jqActionImports = jQuery("<div class=\"code-java-action-imports\"/>");
 	this.jqEntity.append(this.jqImports);
+	this.jqEntity.append(this.jqActionImports);
 
 	this.addCode(this.codeImport("com.kaltura.client.KalturaApiException"), this.jqImports);
 	this.addCode(this.codeImport("com.kaltura.client.KalturaClient"), this.jqImports);
@@ -573,10 +609,12 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
 	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(), this.codeNewInstance("KalturaConfiguration"));
 	this.addCode(jqConfigObjectInit, jqBody);
-	
-	var jqConfigUrl = this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl");
-	var jqSetServiceUrl = this.codeAssign(jqConfigUrl, this.codeString(location.hostname));
-	this.addCode(jqSetServiceUrl, jqBody);
+
+	var jqSetPartnerId = this.codeUserFunction("setPartnerId", [this.codeVar("partnerId")]);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(), jqSetPartnerId), jqBody);
+
+	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString("http://" + location.hostname + "/")]);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(), jqSetEndpoint), jqBody);
 
 	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(), "KalturaClient");
 	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone()]));
