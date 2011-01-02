@@ -19,7 +19,7 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
      div#user_links span { float:right; color:#fff;}
 	 div#user_links a { color:#A6E7F6;}
 	 div#user_links a:hover { color:#A6E7F6; text-decoration:underline;}
-
+#mask { height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
 #wrap{ padding-bottom:4px; }
 #kcms {}
 table{ border: none; }
