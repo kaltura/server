@@ -14,7 +14,7 @@ set_time_limit(0);
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastPuserKuserFile = 'last_kuser';
+$lastPuserKuserFile = 'last_puser_kuser';
 $lastPuserKuser = 0;
 if(file_exists($lastPuserKuserFile)) {
 	$lastPuserKuser = file_get_contents($lastPuserKuserFile);
