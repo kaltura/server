@@ -87,7 +87,6 @@ while(count($users))
 			$existing_kuser->setLastName($lastName);
 			$existing_kuser->setEmail($user->getEmail());
 			$existing_kuser->setIsAdmin(true);
-			$partner->setAccountOwnerKuserId($existing_kuser->getId(), false);
 		}
 		else
 		{
@@ -121,6 +120,7 @@ while(count($users))
 				KalturaLog::log('Saving EXISTING kuser with the following parameters: ');
 				KalturaLog::log(print_r($existing_kuser, true));			
 				$existing_kuser->save(); // save
+				$partner->setAccountOwnerKuserId($existing_kuser->getId(), false);
 			}
 			else
 			{
@@ -128,8 +128,8 @@ while(count($users))
 				KalturaLog::log('Saving NEW kuser with the following parameters: ');
 				KalturaLog::log(print_r($new_kuser, true));			
 				$new_kuser->save(); // save
-			}
-			$partner->setAccountOwnerKuserId($new_kuser->getId(), false);
+				$partner->setAccountOwnerKuserId($new_kuser->getId(), false);
+			}			
 			KalturaLog::log('Saving partner ['.$partner->getId().'] with account owner kuser ID ['.$partner->getAccountOwnerKuserId().']');
 			$partner->save();
 		}
