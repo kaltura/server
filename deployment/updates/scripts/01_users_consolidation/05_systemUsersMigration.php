@@ -22,9 +22,7 @@ if(file_exists($lastUserFile)) {
 if(!$lastUser)
 	$lastUser = 0;
 
-$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-	
-$users = getUsers($con, $lastUser, $userLimitEachLoop);
+$users = getUsers($lastUser, $userLimitEachLoop);
 
 while(count($users))
 {
@@ -64,7 +62,7 @@ while(count($users))
 		
 		$c = new Criteria();
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $user->getEmail());
-		$existing_login_data = UserLoginDataPeer::doSelectOne($c, $con);
+		$existing_login_data = UserLoginDataPeer::doSelectOne($c);
 		
 		if ($existing_login_data)
 		{
@@ -125,17 +123,17 @@ while(count($users))
 	PartnerPeer::clearInstancePool();
 	UserLogindataPeer::clearInstancePool();
 	
-	$users = getUsers($con, $lastUser, $userLimitEachLoop);
+	$users = getUsers($lastUser, $userLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!');
-echo 'Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!';
+KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
+echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
 
-function getUsers($con, $lastUser, $userLimitEachLoop)
+function getUsers($lastUser, $userLimitEachLoop)
 {
 	$c = new Criteria();
 	$c->add(SystemUserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(SystemUserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return SystemUserPeer::doSelect($c, $con);
+	return SystemUserPeer::doSelect($c);
 }

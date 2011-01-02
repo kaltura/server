@@ -22,10 +22,8 @@ if(file_exists($lastUserFile)) {
 }
 if(!$lastUser)
 	$lastUser = 0;
-
-$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 	
-$users = getUsers($con, $lastUser, $userLimitEachLoop);
+$users = getUsers($lastUser, $userLimitEachLoop);
 $loginPartnerIds = getLoginPartners();
 
 while(count($users))
@@ -107,19 +105,19 @@ while(count($users))
 	PartnerPeer::clearInstancePool();
 	UserLoginDataPeer::clearInstancePool();
 	
-	$users = getUsers($con, $lastUser, $userLimitEachLoop);
+	$users = getUsers($lastUser, $userLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!');
-echo 'Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!';
+KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
+echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
 
-function getUsers($con, $lastUser, $userLimitEachLoop)
+function getUsers($lastUser, $userLimitEachLoop)
 {
 	$c = new Criteria();
 	$c->add(kuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(kuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return kuserPeer::doSelect($c, $con);
+	return kuserPeer::doSelect($c);
 }
 
 function getLoginPartners()

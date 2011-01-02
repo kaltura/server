@@ -22,9 +22,7 @@ if(file_exists($lastPartnerFile)) {
 if(!$lastPartner)
 	$lastPartner = 0;
 
-$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-	
-$partners = getPartners($con, $lastPartner, $partnerLimitEachLoop);
+$partners = getPartners($lastPartner, $partnerLimitEachLoop);
 
 
 while(count($partners))
@@ -146,18 +144,18 @@ while(count($partners))
 	
 	PartnerPeer::clearInstancePool();
 	
-	$partners = getPartners($con, $lastPartner, $partnerLimitEachLoop);
+	$partners = getPartners($lastPartner, $partnerLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!');
-echo 'Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!';
+KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
+echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
 
-function getPartners($con, $lastPartner, $partnerLimitEachLoop)
+function getPartners($lastPartner, $partnerLimitEachLoop)
 {
 	$c = new Criteria();
 	$c->add(PartnerPeer::ID, $lastPartner, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(PartnerPeer::ID);
 	$c->setLimit($partnerLimitEachLoop);
-	return PartnerPeer::doSelect($c, $con);
+	return PartnerPeer::doSelect($c);
 }
 

@@ -89,5 +89,5 @@ foreach ($userRoles as $newRole)
 	}
 }
 
-KalturaLog::log('Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!');
-echo 'Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!';
+KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
+echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';

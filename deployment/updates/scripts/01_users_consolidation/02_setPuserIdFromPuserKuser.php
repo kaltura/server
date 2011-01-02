@@ -23,9 +23,7 @@ if(file_exists($lastPuserKuserFile)) {
 if(!$lastPuserKuser)
 	$lastPuserKuser = 0;
 
-$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-	
-$puserKusers = getPuserKusers($con, $lastPuserKuser, $userLimitEachLoop);
+$puserKusers = getPuserKusers($lastPuserKuser, $userLimitEachLoop);
 
 
 while(count($puserKusers))
@@ -109,17 +107,17 @@ while(count($puserKusers))
 	kuserPeer::clearInstancePool();
 	PuserKuserPeer::clearInstancePool();
 	
-	$puserKusers = getPuserKusers($con, $lastPuserKuser, $userLimitEachLoop);
+	$puserKusers = getPuserKusers($lastPuserKuser, $userLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!');
-echo 'Done' . $dryRun ? 'REAL RUN!' : 'DRY RUN!';
+KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
+echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
 
-function getPuserKusers($con, $lastPuserKuser, $userLimitEachLoop)
+function getPuserKusers($lastPuserKuser, $userLimitEachLoop)
 {
 	$c = new Criteria();
 	$c->add(PuserKuserPeer::ID, $lastPuserKuser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(PuserKuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return PuserKuserPeer::doSelect($c, $con);
+	return PuserKuserPeer::doSelect($c);
 }
