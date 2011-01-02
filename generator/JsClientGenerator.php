@@ -160,7 +160,7 @@ class JsClientGenerator extends ClientGeneratorFromXml
 	{
 		$serviceName = $serviceNodes->attributes()->name;
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
-		$serviceClass .= "function $serviceClassName(client){\r\n";
+		$serviceClass = "function $serviceClassName(client){\r\n";
 		$serviceClass .= "\tthis.init(client);\r\n";
 		$serviceClass .= "}\r\n";
 		//$serviceClass .= "$serviceClassName.prototype = new KalturaServiceBase();\r\n";
