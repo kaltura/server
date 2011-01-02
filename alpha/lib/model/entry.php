@@ -1122,6 +1122,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	
 	public function removeCategory($fullName)
 	{
+		$this->old_categories = $this->categories;
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
 		$newCategories = array();
 		foreach($categories as $category) 
@@ -1905,66 +1906,78 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	{
 		if (!$this->is_categories_modified)
 			return;
-			
+		
 		if ($this->categories != null && $this->categories !== "")
 			$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
 		else
 			$newCats = array();
 		
 		if ($this->old_categories !== null && $this->old_categories !== "")
-			$oldCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->old_categories);		
+			$oldCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->old_categories);
 		else
 			$oldCats = array();
 
 		$allIds = array();
+		$allIdsWithParents = array ();
 		
 		$addedCats = array();
 		$removedCats = array();
 		$remainingCats = array();
-		foreach($oldCats as $cat)
+		
+		foreach ( $oldCats as $cat )
 		{
-			if (array_search($cat, $newCats) === false)
-				$removedCats[] = $cat;
+			if (array_search ( $cat, $newCats ) === false)
+				$removedCats [] = $cat;
 		}
 		
-		foreach($newCats as $cat)
+		foreach ( $newCats as $cat )
 		{
-			if (array_search($cat, $oldCats) === false)
-				$addedCats[] = $cat;
+			if (array_search ( $cat, $oldCats ) === false)
+				$addedCats [] = $cat;
 			else
-				$remainingCats[] = $cat;
+				$remainingCats [] = $cat;
 		}
 		
-
-		foreach($addedCats as $cat)
+		foreach ( $remainingCats as $cat ) 
 		{
-			$category = categoryPeer::getByFullNameExactMatch($cat);
-			if (!$category)
-				$category = category::createByPartnerAndFullName($this->getPartnerId(), $cat);
-				
-			$category->incrementEntriesCount();
-			$allIds[] = $category->getId();
-		}
-		
-		foreach($removedCats as $cat)
-		{
-			$category = categoryPeer::getByFullNameExactMatch($cat);
-			if ($category)
-				$category->decrementEntriesCount();
-		}
-		
-		foreach($remainingCats as $cat)
-		{
-			$category = categoryPeer::getByFullNameExactMatch($cat);
-			if ($category)
+			$category = categoryPeer::getByFullNameExactMatch ( $cat );
+			if ($category) 
 			{
-				$allIds[] = $category->getId();
+				$allIds [] = $category->getId ();
+				$allIdsWithParents [] = $category->getId ();
+				$allIdsWithParents = array_merge ( $allIdsWithParents, $category->getAllParentsIds () );
+			}
+		}
+	
+		$alreadyAddedCatIds = $allIdsWithParents;
+		
+		foreach ( $addedCats as $cat )
+		{
+			$category = categoryPeer::getByFullNameExactMatch ( $cat );
+			if (! $category)
+				$category = category::createByPartnerAndFullName ( $this->getPartnerId (), $cat );
+				
+			$category->incrementEntriesCount ( 1, $alreadyAddedCatIds );
+			$allIds [] = $category->getId ();
+			$alreadyAddedCatIds [] = $category->getId ();
+			$alreadyAddedCatIds = array_merge ( $alreadyAddedCatIds, $category->getAllParentsIds () );
+		}
+
+		$alreadyRemovedCatIds = $allIdsWithParents;
+		
+		foreach ( $removedCats as $cat ) {
+			$category = categoryPeer::getByFullNameExactMatch ( $cat );
+			if ($category){
+				$category->decrementEntriesCount ( 1, $alreadyRemovedCatIds );
+				
+				$alreadyRemovedCatIds [] = $category->getId ();
+				$alreadyRemovedCatIds = array_merge ( $alreadyRemovedCatIds, $category->getAllParentsIds () );
 			}
 		}
 		
-		$this->setCategoriesIds(implode(",", $allIds));
-		mySearchUtils::setSearchTextDiscreteForEntry($this);
-		parent::save();
+		$this->setCategoriesIds ( implode ( ",", $allIds ) );
+		mySearchUtils::setSearchTextDiscreteForEntry ( $this );
+		parent::save ();
 		$this->is_categories_modified = false;
 	}
 	
