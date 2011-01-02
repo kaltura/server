@@ -12,6 +12,8 @@ class kHuluDistributionReportHandler implements kBatchJobStatusEventConsumer
 		
 		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			
+		return true;
 	}
 
 	/**
