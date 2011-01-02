@@ -582,6 +582,11 @@ class BatchController extends Zend_Controller_Action
 		}
 	}
 	
+	/**
+	 * @param string $entryId
+	 * @param array $errors
+	 * @return KalturaInvestigateEntryData
+	 */
 	public function getEntryInvestigationData($entryId, &$errors)
 	{
 		$investigateData = new KalturaInvestigateEntryData();
@@ -880,6 +885,8 @@ class BatchController extends Zend_Controller_Action
 		
 		$this->view->investigateData = $this->getEntryInvestigationData($entryId, $this->view->errors);
 		$this->view->enableActions = true;
+		
+        $partnerId = $this->view->investigateData->entry->partnerId;
 		
 		$this->view->plugins = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsoleEntryInvestigate');
