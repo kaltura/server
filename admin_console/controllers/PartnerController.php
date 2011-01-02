@@ -119,8 +119,20 @@ class PartnerController extends Zend_Controller_Action
 		$client = Kaltura_ClientHelper::getClient();
 		$ks = $client->systemPartner->getAdminSession($partnerId);
 		$subp_id = ((int)$partnerId)*100;
-		$url = Kaltura_ClientHelper::getServiceUrl();
-		$url = $url . '/index.php/kmc/extlogin?partner_id='.$partnerId.'&ks='.$ks.'&subp_id='.$subp_id;
+		
+		$url = null;
+		$settings = Zend_Registry::get('config')->settings;
+		if($settings->kmcUrl)
+		{
+			$url = $settings->kmcUrl;
+		}
+		else
+		{
+			$url = Kaltura_ClientHelper::getServiceUrl();	
+			$url .= '/index.php/kmc/extlogin';
+		}
+		
+		$url .= '?partner_id='.$partnerId.'&ks='.$ks.'&subp_id='.$subp_id;
 		$this->getResponse()->setRedirect($url);
 	}
 	
