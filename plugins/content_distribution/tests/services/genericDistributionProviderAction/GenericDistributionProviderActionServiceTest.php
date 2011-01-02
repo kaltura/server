@@ -112,17 +112,6 @@ class GenericDistributionProviderActionServiceTest extends GenericDistributionPr
 	}
 
 	/**
-	 * Called when all tests are done
-	 * @param int $id
-	 * @return int
-	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id
-	 */
-	public function testFinished($id)
-	{
-		return $id;
-	}
-
-	/**
 	 * Tests genericDistributionProviderAction->deleteByProviderId action
 	 * @param int $genericDistributionProviderId
 	 * @param KalturaDistributionAction $actionType
@@ -131,6 +120,17 @@ class GenericDistributionProviderActionServiceTest extends GenericDistributionPr
 	public function testDeleteByProviderId($genericDistributionProviderId, KalturaDistributionAction $actionType)
 	{
 		$resultObject = $this->client->genericDistributionProviderAction->deleteByProviderId($genericDistributionProviderId, $actionType);
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testDeleteByProviderId
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

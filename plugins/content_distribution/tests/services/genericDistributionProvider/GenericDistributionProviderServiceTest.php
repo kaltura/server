@@ -12,7 +12,7 @@ class GenericDistributionProviderServiceTest extends GenericDistributionProvider
 	 * Called when all tests are done
 	 * @param int $id
 	 * @return int
-	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id
+	 * @depends testList with data set #0
 	 */
 	public function testFinished($id)
 	{
