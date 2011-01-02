@@ -6,14 +6,14 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Distribute
  */
-class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
+class KAsyncDistributeUpdateCloser extends KAsyncDistributeCloser
 {
 	/**
 	 * @return number
 	 */
 	public static function getType()
 	{
-		return KalturaBatchJobType::DISTRIBUTION_FETCH_REPORT;
+		return KalturaBatchJobType::DISTRIBUTION_UPDATE;
 	}
 	
 	/* (non-PHPdoc)
@@ -37,7 +37,7 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	public function getExclusiveAlmostDoneDistributeJobs()
 	{
-		return $this->kClient->contentDistributionBatch->getExclusiveAlmostDoneDistributionFetchReportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->taskConfig->maxJobsEachRun, $this->getFilter());
+		return $this->kClient->contentDistributionBatch->getExclusiveAlmostDoneDistributionUpdateJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->taskConfig->maxJobsEachRun, $this->getFilter());
 	}
 	
 	/* (non-PHPdoc)
@@ -45,7 +45,7 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{
-		return $this->kClient->contentDistributionBatch->updateExclusiveDistributionFetchReportJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->contentDistributionBatch->updateExclusiveDistributionUpdateJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
 	}
 	
 	/* (non-PHPdoc)
@@ -53,7 +53,7 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	protected function freeExclusiveJob(KalturaBatchJob $job)
 	{
-		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionFetchReportJob($job->id, $this->getExclusiveLockKey(), false);
+		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionUpdateJob($job->id, $this->getExclusiveLockKey(), false);
 		
 		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
 		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
@@ -66,7 +66,7 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineCloseReport', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineCloseUpdate', $providerType, $this->getClient(), $this->taskConfig, $data);
 	}
 	
 	/* (non-PHPdoc)
@@ -74,6 +74,6 @@ class KAsyncDistributeFetchReportCloser extends KAsyncDistributeCloser
 	 */
 	protected function execute(KalturaDistributionJobData $data)
 	{
-		return $this->engine->closeReport($data);
+		return $this->engine->closeUpdate($data);
 	}
 }
