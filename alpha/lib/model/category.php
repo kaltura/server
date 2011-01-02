@@ -53,9 +53,9 @@ class category extends Basecategory
 		if ($this->isColumnModified(categoryPeer::NAME) || $this->isColumnModified(categoryPeer::PARENT_ID))
 		{
 			$this->updateFullName();
-			
 			$this->renameOnEntries();
 		}
+
 		
 		// happens in 3 cases:
 		// 1. name of the current category was updated
@@ -64,6 +64,7 @@ class category extends Basecategory
 		if ($this->isColumnModified(categoryPeer::FULL_NAME)) 
 			$this->setChildsFullNames();
 		
+
 		// save the childs 
 		foreach($this->childs_for_save as $child)
 		{
@@ -76,7 +77,7 @@ class category extends Basecategory
 			$this->moveEntriesToParent();
 		}
 		
-		if ($this->isColumnModified(categoryPeer::PARENT_ID))
+		if ($this->isColumnModified(categoryPeer::PARENT_ID) && !$this->isNew())
 		{
 			// decrease for the old parent category
 			if($this->old_parent_id)
@@ -91,7 +92,7 @@ class category extends Basecategory
 			
 			$this->old_parent_id = null;
 		}
-		
+				
 		parent::save($con);
 	}
 
@@ -168,52 +169,79 @@ class category extends Basecategory
 			$child->setChildsDepth();
 		}
 	}
-	
-	/**
-	 * Increment entries count (will increment recursively the parent categories too)
-	 */
-	public function incrementEntriesCount($increase = 1)
+   	
+   	/**
+   	* entryAlreadyBlongToCategory return true when entry was already belong to this category before
+   	*/
+	private function entryAlreadyBlongToCategory($entryCategoriesIds)
 	{
-		$this->setEntriesCount($this->getEntriesCount() + $increase);
-		
-		if ($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if ($parentCat)
-			{
-				$parentCat->incrementEntriesCount($increase);
-			}
+		if (!$entryCategoriesIds){
+				return false;
 		}
 		
-		$this->save();
+		$categoriesIds = implode(",",$entryCategoriesIds);
+		foreach($entryCategoriesIds as $entryCategoryId)
+		{
+			if ($entryCategoryId == $this->id)
+				return true;
+		}
+		
+		return false;
 	}
-	
-	/**
-	 * Decrement entries count (will decrement recursively the parent categories too)
-	 */
-	public function decrementEntriesCount($decrease = 1)
-	{
-		if($this->getDeletedAt(null))
-			return;
-			
-		$newCount = $this->getEntriesCount() - $decrease;
-		if ($newCount <= 0) // don't allow zero values
-			$this->setEntriesCount(0);
-		else
+    
+    
+      /**
+       * Increment entries count (will increment recursively the parent categories too)
+       */
+      public function incrementEntriesCount($increase = 1, $entryCategoriesAddedIds = null)
+      {
+            if($entryCategoriesAddedIds && $this->entryAlreadyBlongToCategory($entryCategoriesAddedIds))
+                  return;
+                  
+            $this->setEntriesCount($this->getEntriesCount() + $increase);
+            if ($this->getParentId())
+            {
+                  $parentCat = $this->getParentCategory();
+                  if ($parentCat)
+                  {
+                        $parentCat->incrementEntriesCount($increase, $entryCategoriesAddedIds);
+                  }
+            }
+            
+            $this->save();
+      }
+      
+      /**
+       * Decrement entries count (will decrement recursively the parent categories too)
+       */
+      public function decrementEntriesCount($decrease = 1, $entryCategoriesRemovedIds = null)
+      {
+            
+            
+            if($this->entryAlreadyBlongToCategory($entryCategoriesRemovedIds))
+                  return;
+            
+            if($this->getDeletedAt(null))
+                  return;
+                  
+            $newCount = $this->getEntriesCount() - $decrease;
+            
+            if ($newCount < 0)
+            	$newCount = 0;
 			$this->setEntriesCount($newCount);
-		
-		if ($this->getParentId())
-		{
-			$parentCat = $this->getParentCategory();
-			if ($parentCat)
-			{
-				$parentCat->decrementEntriesCount($decrease);
-			}
-		}
-		
-		$this->save();
-	}
-	
+            
+            if ($this->getParentId())
+            {
+                  $parentCat = $this->getParentCategory();
+                  if ($parentCat)
+                  {
+                        $parentCat->decrementEntriesCount($decrease, $entryCategoriesRemovedIds);
+                  }
+            }
+            
+            $this->save();
+      }
+      
 	public function validateFullNameIsUnique()
 	{
 		$name = $this->getFullName();
@@ -371,6 +399,22 @@ class category extends Basecategory
 			
 		return $this->parent_category;
 	}
+	
+	/**
+	* return array of all parents ids
+	* @return array
+	*/
+	public function getAllParentsIds()
+	{
+		$parentsIds = array();
+		if ($this->getParentId()){
+			$parentsIds[] = $this->getParentId();
+			array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+		}
+		
+		return $parentsIds; 
+	}
+	
 	
 	/**
 	 * @return array
