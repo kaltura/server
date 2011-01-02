@@ -272,12 +272,21 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($data->getResults())
 			$entryDistribution->incrementSubmitResultsVersion();
 			
+		if($data->getSentData())
+			$entryDistribution->incrementSubmitDataVersion();
+			
 		$entryDistribution->save();
 		
 		if($data->getResults())
 		{
 			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS);
 			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
+		
+		if($data->getSentData())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA);
+			kFileSyncUtils::file_put_contents($key, $data->getSentData());
 		}
 		
 		return $dbBatchJob;
@@ -315,12 +324,21 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($data->getResults())
 			$entryDistribution->incrementUpdateResultsVersion();
 			
+		if($data->getSentData())
+			$entryDistribution->incrementUpdateDataVersion();
+			
 		$entryDistribution->save();
 		
 		if($data->getResults())
 		{
 			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS);
 			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
+		
+		if($data->getSentData())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA);
+			kFileSyncUtils::file_put_contents($key, $data->getSentData());
 		}
 		
 		return $dbBatchJob;
@@ -346,12 +364,21 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($data->getResults())
 			$entryDistribution->incrementDeleteResultsVersion();
 			
+		if($data->getSentData())
+			$entryDistribution->incrementDeleteDataVersion();
+			
 		$entryDistribution->save();
 		
 		if($data->getResults())
 		{
 			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS);
 			kFileSyncUtils::file_put_contents($key, $data->getResults());
+		}
+		
+		if($data->getSentData())
+		{
+			$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA);
+			kFileSyncUtils::file_put_contents($key, $data->getSentData());
 		}
 		
 		return $dbBatchJob;

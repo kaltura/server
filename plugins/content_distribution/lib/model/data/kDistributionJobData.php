@@ -34,6 +34,12 @@ class kDistributionJobData extends kJobData
 	 * @var string
 	 */
 	private $results;
+
+	/**
+	 * The data as sent to the remote destination
+	 * @var string
+	 */
+	private $sentData;
 	
 	/**
 	 * @return the $results
@@ -129,5 +135,21 @@ class kDistributionJobData extends kJobData
 	public function setDistributionProfileId($distributionProfileId)
 	{
 		$this->distributionProfileId = $distributionProfileId;
+	}
+	
+	/**
+	 * @return the $sentData
+	 */
+	public function getSentData()
+	{
+		return $this->sentData;
+	}
+
+	/**
+	 * @param string $sentData
+	 */
+	public function setSentData($sentData)
+	{
+		$this->sentData = $sentData;
 	}
 }

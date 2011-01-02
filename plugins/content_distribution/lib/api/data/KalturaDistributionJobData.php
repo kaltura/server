@@ -50,6 +50,12 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $results;
+
+	/**
+	 * The data as sent to the remote destination
+	 * @var string
+	 */
+	public $sentData;
 	
 	
 	private static $map_between_objects = array
@@ -59,6 +65,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		"remoteId" ,
 		"providerType" ,
 		"results" ,
+		"sentData" ,
 	);
 
 	public function getMapBetweenObjects ( )

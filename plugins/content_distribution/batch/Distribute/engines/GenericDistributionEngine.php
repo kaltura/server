@@ -83,6 +83,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 			if(count($parsedValues))
 				list($data->remoteId) = $parsedValues;
 		}
+		$data->sentData = $providerData->xml;
 		
 		return true;
 	}

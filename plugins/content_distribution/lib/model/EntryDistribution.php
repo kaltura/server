@@ -14,16 +14,20 @@
  */
 class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISyncableFile
 {
-	// TODO - add file syncs for the sent XML
-	
 	const FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS = 1;
 	const FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS = 2;
 	const FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS = 3;
+	const FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA = 4;
+	const FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA = 5;
+	const FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA = 6;
 	
 	const CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION = "SubmitResultsVersion";
 	const CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION = "UpdateResultsVersion";
 	const CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION = "DeleteResultsVersion";
-
+	const CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION = "SubmitDataVersion";
+	const CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION = "UpdateDataVersion";
+	const CUSTOM_DATA_FIELD_DELETE_DATA_VERSION = "DeleteDataVersion";
+	
 	/**
 	 * Get the [optionally formatted] temporal [next_report] calculated value.
 	 * 
@@ -73,6 +77,15 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 				
 			case self::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS:
 				return $this->getDeleteResultsVersion();
+				
+			case self::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA:
+				return $this->getSubmitDataVersion();
+				
+			case self::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA:
+				return $this->getUpdateDataVersion();
+				
+			case self::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA:
+				return $this->getDeleteDataVersion();
 		}
 		return null;
 	}
@@ -87,6 +100,9 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			self::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS,
 			self::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS,
 			self::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS,
+			self::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA,
+			self::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA,
+			self::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA,
 		);
 		
 		if(! in_array($sub_type, $valid_sub_types))
@@ -326,9 +342,15 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getSubmitResultsVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION);}
 	public function getUpdateResultsVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION);}
 	public function getDeleteResultsVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION);}
-
+	public function getSubmitDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION);}
+	public function getUpdateDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
+	public function getDeleteDataVersion()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
+	
 	public function incrementSubmitResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION);}
 	public function incrementUpdateResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION);}
 	public function incrementDeleteResultsVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION);}
+	public function incrementSubmitDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION);}
+	public function incrementUpdateDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
+	public function incrementDeleteDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
 	
 } // EntryDistribution

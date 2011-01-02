@@ -115,6 +115,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 		KalturaLog::debug("MSN HTTP response:\n$results\n");
+		$data->sentData = $providerData->xml;
 		$data->results = $results;
 		return $results;
 	}
