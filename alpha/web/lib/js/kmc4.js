@@ -272,7 +272,7 @@ $(window).load(function(){
 				console.info(" partner_id: ",kmc.vars.partner_id);
 			}
 			catch(err) {}
-		}()
+		},
 
 		/*,
 		cookies : {
@@ -280,25 +280,24 @@ $(window).load(function(){
 			get		: function(){},
 			kill	: function(){}
 		}*/
-	}
 //};
-	kmc.utils.closeModal = function() {
+		closeModal : function() {
 			kalturaCloseModalBox();
 			$("#flash_wrap").css("visibility","visible");
 			return false;
-	}
+		},
 	
 //hide header function
-	kmc.utils.maskHeader = function(hide) {
-		if(hide) {
-			$("#mask").remove();
-		}
-		else {
-			$("#kmcHeader").append('<div id="mask"></div>');
-		}
-	} 
+		maskHeader : function(hide) {
+			if(hide) {
+				$("#mask").remove();
+			}
+			else {
+				$("#kmcHeader").append('<div id="mask"></div>');
+			}
+		} 
 		
-	
+	}
 
 	kmc.mediator =  {
 		/*
