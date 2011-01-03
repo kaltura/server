@@ -896,12 +896,17 @@ class kuser extends Basekuser
 	 */
 	public function getUserRoleNames()
 	{
-		$names = array();
-		$lookups = $this->getKuserToUserRolesJoinUserRole();
-		foreach ($lookups as $lookup) {
-			$names[] = $lookup->getUserRole()->getName();
-		}
-		return implode(',', $names);
+		$ids = $this->getUserRoleIds();
+		$ids = explode(',', $ids);
+		
+		$c = new Criteria();
+		$c->addSelectColumn(UserRolePeer::NAME);
+		$c->add(UserRolePeer::ID, $ids, Criteria::IN);
+
+		$stmt = UserRolePeer::doSelectStmt($c);
+		$names = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$names = implode(',', $names);
+		return $names;
 	}
 
 	/**
