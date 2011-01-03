@@ -129,6 +129,21 @@ class MsnDistributionProvider implements IDistributionProvider
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
+	
+		// change end time to 5 days from now (it's an MSN hack)
+		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
+		
+		$nodes = $xml->getElementsByTagName('activeEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
+		
+		$nodes = $xml->getElementsByTagName('searchableEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
+			
+		$nodes = $xml->getElementsByTagName('archiveEndDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
 			
 		return $xml->saveXML();
 	}
@@ -146,21 +161,6 @@ class MsnDistributionProvider implements IDistributionProvider
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
-	
-		// change end time to 5 days from now (it's an MSN hack)
-		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
-		
-		$nodes = $xml->getElementsByTagName('activeEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-		
-		$nodes = $xml->getElementsByTagName('searchableEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-			
-		$nodes = $xml->getElementsByTagName('archiveEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
 		
 		return $xml->saveXML();
 	}
