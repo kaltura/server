@@ -1,0 +1,48 @@
+<addMediaWithFiles>
+	<media>
+		<thumbnailURL>{INSERT VAR 72x92 THUMBNAIL URL}</thumbnailURL>
+		<airdate>{INSERT VAR CREATEDATE IN FORMAT: YYYY-MM-DDTHH:MM:SS-08:00 –- example: 2004-01-09T00:14:00-08:00}</airdate>
+		<title>{INSERT VAR TITLE}</title>
+		<description>{INSERT VAR DESCRIPTION}</description>
+		<keywords>Fox Sports</keywords>
+		<categories>
+			<string>{INSERT CATEGORIES, ITERATE FOR EACH WITH THIS TAG}</string>
+		</categories>
+		<author>Fox Sports</author>
+		<album>Fox Sports</album>
+		<copyright>2004 FOX Interactive Television, LLC</copyright>
+		<customData>
+			<item>
+				<title>Headline</title>
+				<value>{INSERT VAR TITLE}</value>
+			</item>
+			<item>
+				<title>Link Href</title>
+				<value></value>
+			</item>
+			<item>
+				<title>Link Text</title>
+				<value></value>
+			</item>
+			<item>
+				<title>Video Dimensions</title>
+				<value>480x360</value>
+			</item>
+			<item>
+				<title>Notes to Comcast</title>
+				<value></value>
+			</item>
+		</customData>
+	</media>
+	<mediaFiles>
+		<mediaFile>
+			<bitrate>480000</bitrate>
+			<contentType>Video</contentType>
+			<format>FLV</format>
+			<length>{INSERT DURATION IN FORMAT MM:SS:00}</length>
+			<mediaFileType>Internal</mediaFileType>
+			<originalLocation>ftp://foxsports:Admin123@services.theplatform.com/foxsports/{baseURL}{INSERT VAR SLUGNAME}.flv</originalLocation>
+			<allowRelease>true</allowRelease>
+		</mediaFile>
+	</mediaFiles>
+</addMediaWithFiles>

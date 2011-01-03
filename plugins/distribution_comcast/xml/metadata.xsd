@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="metadata">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="copyright" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Copyright</label>
+							<key>copyright</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LongTitle" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Long Title</label>
+							<key>longTitle</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="128"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ShortDescription" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Short Description</label>
+							<key>shortDescription</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ComcastCategory" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Comcast Category</label>
+							<key>comcastCategory</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="textType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+	<xsd:complexType name="dateType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:long" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="objectType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="listType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+</xsd:schema>

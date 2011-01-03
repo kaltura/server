@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XSD for the XML POST to thePlatform's addContent. Last updated 10.14.2010 -->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!-- Top level element -->
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			mps addContent schema for Comcast Interactive Media (CIM).
+			Copyright 2010 thePlatform, Inc. All rights reserved.
+      </xs:documentation>
+	</xs:annotation>
+	<xs:element name="addContent">
+		<xs:complexType>
+			<xs:all>
+				<xs:element minOccurs="0" ref="sweeperDirectives" />
+				<xs:element ref="media" />
+				<xs:element minOccurs="0" ref="mediaFiles" />
+				<xs:element minOccurs="0" name="options">
+					<xs:complexType />
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<!-- Begin sweeperDirectives elements -->
+	<xs:element name="sweeperDirectives">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="ingestProcessDate" type="xs:dateTime" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<!-- End sweeperDirectives elements -->
+	<!-- Begin Media elements -->
+	<xs:element name="media">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="airdate" type="xs:dateTime" />
+				<xs:element name="categories" type="cim-ac-category" />
+				<xs:element minOccurs="0" name="copyright" type="xs:string" />
+				<xs:element name="description" type="xs:string" />
+				<xs:element minOccurs="0" name="expirationDate" type="xs:dateTime" />
+				<xs:element minOccurs="0" name="genre" type="xs:string" />
+				<xs:element minOccurs="0" name="keywords" type="xs:string" />
+				<xs:element minOccurs="0" name="language" type="xs:string" />
+				<xs:element name="rating" type="cim-ac-rating" />
+				<xs:element name="title" type="xs:string" />
+				<xs:element name="customData" type="cim-ac-customData" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<!-- End Media elements -->
+	<!-- Begin MediaFile elements -->
+	<xs:element name="mediaFiles">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="mediaFile" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mediaFile">
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="assetTypes" />
+				<xs:element minOccurs="0" name="bitrate" type="xs:integer" />
+				<xs:element ref="contentType" />
+				<xs:element minOccurs="0" name="encodingProfileTitle" type="cim-ac-encodingProfileTitles" />
+				<xs:element minOccurs="0" ref="format" />
+				<xs:element minOccurs="0" name="height" type="xs:integer" />
+				<xs:element minOccurs="0" name="length" type="xs:integer" />
+				<xs:element fixed="Internal" name="mediaFileType" type="xs:string" />
+				<xs:element name="originalLocation" type="xs:string" />
+				<xs:element minOccurs="0" name="width" type="xs:integer" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="assetTypes">
+		<xs:complexType>
+			<xs:sequence minOccurs="1" maxOccurs="1">
+				<xs:element name="string">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="54x36 Image" />
+							<xs:enumeration value="121x87 Image" />
+							<xs:enumeration value="640x320 Image" />
+							<xs:enumeration value="100x75 Image" />
+							<xs:enumeration value="Video" />
+							<xs:enumeration value="ClosedCaption" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="format">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="Any" />
+				<xs:enumeration value="3GPP" />
+				<xs:enumeration value="3GPP2" />
+				<xs:enumeration value="AAC" />
+				<xs:enumeration value="ASX" />
+				<xs:enumeration value="AVI" />
+				<xs:enumeration value="BMP" />
+				<xs:enumeration value="DFXP" />
+				<xs:enumeration value="DV" />
+				<xs:enumeration value="FLV" />
+				<xs:enumeration value="FLX" />
+				<xs:enumeration value="Flash" />
+				<xs:enumeration value="GIF" />
+				<xs:enumeration value="JPEG" />
+				<xs:enumeration value="LXF" />
+				<xs:enumeration value="M3U" />
+				<xs:enumeration value="MP3" />
+				<xs:enumeration value="MPEG" />
+				<xs:enumeration value="MPEG4" />
+				<xs:enumeration value="MSI" />
+				<xs:enumeration value="Move" />
+				<xs:enumeration value="PLS" />
+				<xs:enumeration value="PNG" />
+				<xs:enumeration value="QT" />
+				<xs:enumeration value="RAM" />
+				<xs:enumeration value="Real" />
+				<xs:enumeration value="SAMI" />
+				<xs:enumeration value="SMIL" />
+				<xs:enumeration value="TIFF" />
+				<xs:enumeration value="WAV" />
+				<xs:enumeration value="WM" />
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<!-- End MediaFile elements -->
+	<!-- Begin Shared elements -->
+	<xs:element name="contentType">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="Image" />
+				<xs:enumeration value="Video" />
+				<xs:enumeration value="Document" />
+				<xs:enumeration value="ClosedCaption" />
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<!-- End Shared elements -->
+	<!-- Begin named complex type definitions -->
+	<xs:complexType name="cim-ac-category">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="string" type="cim-ac-categoryType" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cim-ac-customData">
+		<xs:sequence minOccurs="1">
+			<xs:element minOccurs="1" maxOccurs="unbounded" name="CustomDataElement" type="cim-ac-customDataElement" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cim-ac-customDataElement">
+		<xs:sequence>
+			<xs:element name="title" type="cim-ac-customFieldTitles" />
+			<xs:element name="value" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+	<!-- End named complex type definitions -->
+	<!-- Begin named simple type definitions -->
+	<xs:simpleType name="cim-ac-categoryType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TV Preview" />
+			<xs:enumeration value="TV Interview" />
+			<xs:enumeration value="TV News" />
+			<xs:enumeration value="TV Featurette" />
+			<xs:enumeration value="TV Sneak Peek" />
+			<xs:enumeration value="TV Full Episode" />
+			<xs:enumeration value="MOVIE Trailer" />
+			<xs:enumeration value="MOVIE Interview" />
+			<xs:enumeration value="MOVIE News" />
+			<xs:enumeration value="MOVIE Featurette" />
+			<xs:enumeration value="MOVIE Sneak Peek" />
+			<xs:enumeration value="MOVIE Full Feature" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cim-ac-rating">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="G" />
+			<xs:enumeration value="PG" />
+			<xs:enumeration value="PG-13" />
+			<xs:enumeration value="R" />
+			<xs:enumeration value="NC-17" />
+			<xs:enumeration value="NR" />
+			<xs:enumeration value="TV-Y" />
+			<xs:enumeration value="TV-Y7" />
+			<xs:enumeration value="TV-Y7-FV" />
+			<xs:enumeration value="TV-G" />
+			<xs:enumeration value="TV-PG" />
+			<xs:enumeration value="TV-14" />
+			<xs:enumeration value="TV-MA" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cim-ac-encodingProfileTitles">
+		<xs:restriction base="xs:string">
+
+			<!--Standard profiles -->
+			<xs:enumeration value="(E) Full HD 1.77 – 16x9" />
+			<xs:enumeration value="(E) HD 1.77 - 16x9" />
+			<xs:enumeration value="(E) HD 2.35 - Scope" />
+			<xs:enumeration value="(E) HD 1.85:1 - Academy Flat" />
+			<xs:enumeration value="(E) HD 1.33 – 4x3" />
+			<xs:enumeration value="(E) SD 1.33 – 4x3" />
+			<xs:enumeration value="(E) SD 1.77 – 16x9" />
+			<xs:enumeration value="(E) SD 2.35 – Scope" />
+			<!--End standard profiles -->
+
+			<!--Please use the profiles below for content that is also for iDevices *coordinate with CIM before using -->
+			<xs:enumeration value="(EI) Full HD 1.77 – 16x9" />
+			<xs:enumeration value="(EI) HD 1.77 - 16x9" />
+			<xs:enumeration value="(EI) HD 2.35 - Scope" />
+			<xs:enumeration value="(EI) HD 1.85:1 - Academy Flat" />
+			<xs:enumeration value="(EI) HD 1.33 – 4x3" />
+			<xs:enumeration value="(EI) SD 1.33 – 4x3" />
+			<xs:enumeration value="(EI) SD 1.77 – 16x9" />
+			<xs:enumeration value="(EI) SD 2.35 – Scope" />
+			<!--End iDevice -->
+
+			<!--Please use the profiles below for content that is ONLY for iDevices *coordinate with CIM before using -->
+			<xs:enumeration value="(I) Full HD 1.77 – 16x9" />
+			<xs:enumeration value="(I) HD 1.77 - 16x9" />
+			<xs:enumeration value="(I) HD 2.35 - Scope" />
+			<xs:enumeration value="(I) HD 1.85:1 - Academy Flat" />
+			<xs:enumeration value="(I) HD 1.33 – 4x3" />
+			<xs:enumeration value="(I) SD 1.33 – 4x3" />
+			<xs:enumeration value="(I) SD 1.77 – 16x9" />
+			<xs:enumeration value="(I) SD 2.35 – Scope" />
+			<!--End iDevice Only -->
+
+			<!--Please use the profiles below for content that should be capped to SD specs *coordinate with CIM before using -->
+			<xs:enumeration value="(E) Full HD 1.77 – 16x9-SDOnly" />
+			<xs:enumeration value="(E) HD 1.77 - 16x9-SDOnly" />
+			<xs:enumeration value="(E) HD 2.35 - Scope-SDOnly" />
+			<xs:enumeration value="(E) HD 1.85:1 - Academy Flat-SDOnly" />
+			<xs:enumeration value="(E) HD 1.33 – 4x3-SDonly" />
+			<!--End capped encode -->
+
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cim-ac-customFieldTitles">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Note that the different CustomDataElement titles have different associated value types.
+				We don't enforce that here but rather in the Publish step within mps.
+	 </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="providerExternalId" />
+			<xs:enumeration value="Video Content Type" />
+			<xs:enumeration value="Headline" />
+			<xs:enumeration value="Link Text" />
+			<xs:enumeration value="Link Href" />
+			<xs:enumeration value="C3 Airdate" />
+			<xs:enumeration value="Adult" />
+			<xs:enumeration value="Brand" />
+			<xs:enumeration value="HD Override" />
+			<xs:enumeration value="Series ID" />
+			<xs:enumeration value="Series ID Type" />
+			<xs:enumeration value="Series Name" />
+			<xs:enumeration value="Season Number" />
+			<xs:enumeration value="Episode ID" />
+			<xs:enumeration value="Episode ID Type" />
+			<xs:enumeration value="Episode Name" />
+			<xs:enumeration value="Episode Number" />
+			<xs:enumeration value="Movie ID" />
+			<xs:enumeration value="Movie ID Type" />
+			<xs:enumeration value="Movie Name" />
+			<xs:enumeration value="BlackoutStartTimes" />
+			<xs:enumeration value="BlackoutEndTimes" />
+			<xs:enumeration value="ChapterStartTimes" />
+			<xs:enumeration value="Credit Roll Start" />
+			<xs:enumeration value="Associated Person Addition 01 ID" />
+			<xs:enumeration value="Associated Person Addition 01 ID Type" />
+			<xs:enumeration value="Associated Person Addition 01 Name" />
+			<xs:enumeration value="Associated Person Addition 02 ID" />
+			<xs:enumeration value="Associated Person Addition 02 ID Type" />
+			<xs:enumeration value="Associated Person Addition 02 Name" />
+			<xs:enumeration value="Associated Person Addition 03 ID" />
+			<xs:enumeration value="Associated Person Addition 03 ID Type" />
+			<xs:enumeration value="Associated Person Addition 03 Name" />
+			<xs:enumeration value="Associated Person Addition 04 ID" />
+			<xs:enumeration value="Associated Person Addition 04 ID Type" />
+			<xs:enumeration value="Associated Person Addition 04 Name" />
+			<xs:enumeration value="Associated Person Addition 05 ID" />
+			<xs:enumeration value="Associated Person Addition 05 ID Type" />
+			<xs:enumeration value="Associated Person Addition 05 Name" />
+			<xs:enumeration value="Associated Person Addition 06 ID" />
+			<xs:enumeration value="Associated Person Addition 06 ID Type" />
+			<xs:enumeration value="Associated Person Addition 06 Name" />
+			<xs:enumeration value="Associated Person Addition 07 ID" />
+			<xs:enumeration value="Associated Person Addition 07 ID Type" />
+			<xs:enumeration value="Associated Person Addition 07 Name" />
+			<xs:enumeration value="Associated Person Addition 08 ID" />
+			<xs:enumeration value="Associated Person Addition 08 ID Type" />
+			<xs:enumeration value="Associated Person Addition 08 Name" />
+			<xs:enumeration value="Associated Person Addition 09 ID" />
+			<xs:enumeration value="Associated Person Addition 09 ID Type" />
+			<xs:enumeration value="Associated Person Addition 09 Name" />
+			<xs:enumeration value="Associated Person Addition 10 ID" />
+			<xs:enumeration value="Associated Person Addition 10 ID Type" />
+			<xs:enumeration value="Associated Person Addition 10 Name" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

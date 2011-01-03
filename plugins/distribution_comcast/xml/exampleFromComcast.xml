@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Comcast sample addContent XML v19, last updated 10.14.2010 -->
+<!-- More information available at http://partners.comcast.net:8080 -->
+<addContent>
+	<sweeperDirectives>
+		<ingestProcessDate>2009-07-21T02:30:00Z</ingestProcessDate>       <!-- Optional, a field used to prevent the metadata from being processed until a specific date and time -->
+	</sweeperDirectives>
+	<media>
+		<categories>
+			<string>TV Full Episode</string>                         <!-- Valid Values are: TV Preview, TV Interview, TV News, TV Featurette, TV Sneak Peek, TV Full Episode, MOVIE Trailer, MOVIE Interview, MOVIE news, MOVIE Featurette, MOVIE Sneak Peek, MOVIE Full Feature -->
+		</categories>
+		<copyright>&#169; 2007 Home Box Office</copyright>           <!-- Optional, a plain text field -->
+		<description><![CDATA[The final chapter in the saga of the Soprano family.  Tony tries to make peace with the Leotardos & he also worries that Carlo may have flipped. ]]></description>                       <!-- Required, any plain text value up to 32,764 characters -->
+		<keywords>serio-comedy, new jersey, mob, finale</keywords>   <!-- Optional, a comma separated list of values -->
+		<language>English</language>                                 <!-- Optional, a plain text field (this field is not used at this time) -->
+		<rating>TV-14</rating>                                       <!-- Required,Valid values are: G, NC-17, NR, PG, PG-13, R, TV-14, TV-AO, TV-G, TV-MA, TV-PG, TV-Y, TV-Y7, TV-Y7-FV, X -->
+		<title>Made In America</title>                               <!-- Required, a plain text field -->
+		<airdate>2009-01-12T08:00:01Z</airdate>                      <!-- Required, must be ISO-8601 format -->
+		<expirationDate>2009-02-02T08:00:01Z</expirationDate>        <!-- Optional, must be ISO-8601 format -->
+		<genre />                                                     <!-- Optional, this field is not used at this time -->
+		<customData>
+			<CustomDataElement>
+				<title>Brand</title>                      <!-- Optional, literal string -->
+				<value>HBO</value>                        <!-- Optional, a plain text field that can be used to display an alternate brand - must be approved by CIM before use -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>providerExternalId</title>         <!-- Required, literal string -->
+				<value>90745c5d4e00</value>               <!-- Required, any single text/numeric string, must be unique to each individual asset -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Video Content Type</title>         <!-- Required, literal string -->
+				<value>Long Form</value>                  <!-- Required, value values are Long Form OR Short Form, Long Form is to be applied to TV Full Episodes or Movie Full Feature, all other categories must be mapped to Short Form -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Headline</title>                         <!-- Required for Short Form assets -->
+				<value>Season 1, Episode 5</value>               <!-- Required for Short Form assets, a plain text field that should mirror the title field -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Link Text</title>                         <!-- Required for Comcast.net assets -->
+				<value><![CDATA[E! News Now]]></value>               <!-- Required for .net assets, a plain text field that descripbes the link href below -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Link Href</title>                         <!-- Required for Comcast.net assets -->
+				<value>http://www.enews.com</value>               <!-- Required for .net assets, should be the URL that your logo on the video channel directs to -->
+			</CustomDataElement>
+			<!-- TV Series Matching ID -->
+			<CustomDataElement>
+				<title>Series ID</title>                  <!-- Required for TV, literal string -->
+				<value>1975</value>                       <!-- Required for TV, The cPlatform, TMS, Baseline, IMDB or AMG series matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Series ID Type</title>             <!-- Required for TV, literal string -->
+				<value>cPlatform</value>                  <!-- Required for TV, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Series Name</title>                <!-- Required for TV, literal string -->
+				<value>The Sopranos</value>               <!-- Required for TV, a plain text field -->
+			</CustomDataElement>
+			<!-- TV Season Matching ID -->
+			<CustomDataElement>
+				<title>Season Number</title>                  <!-- Optional for TV, literal string -->
+				<value>6</value>                              <!-- Optional for TV, any integer value -->
+			</CustomDataElement>
+			<!-- TV Episode Matching ID -->
+			<CustomDataElement>
+				<title>Episode ID</title>                 <!-- Required for TV, literal string -->
+				<value>34764</value>                      <!-- Required for TV, The cPlatform, TMS, Baseline, IMDB or AMG episode matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Episode ID Type</title>            <!-- Required for TV, literal string -->
+				<value>cPlatform</value>                  <!-- Required for TV, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Episode Name</title>               <!-- Required for TV, literal string -->
+				<value>Made In America</value>            <!-- Required for TV, a plain text field -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Episode Number</title>             <!-- Required for TV, literal string -->
+				<value>6</value>                          <!-- Required for TV, any integer value -->
+			</CustomDataElement>
+			<!-- Movie Matching ID -->
+			<CustomDataElement>
+				<title>Movie ID</title>                   <!-- Required for Movie, literal string -->
+				<value>545454</value>                     <!-- Required for Movie, The cPlatform, TMS, Baseline, IMDB or AMG episode matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Movie ID Type</title>              <!-- Required for Movie, literal string -->
+				<value>cPlatform</value>                  <!-- Required for Movie, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Movie Name</title>                   <!-- Required for Movie, literal string -->
+				<value>The Sopranos Made Up Movie</value>   <!-- Required for Movie, a plain text field -->
+			</CustomDataElement>
+			<!-- Advertising -->
+			<CustomDataElement>
+				<title>C3 Airdate</title>                          <!-- Optional, literal string when an asset is to follow C3 behavior -->
+				<value>2009-06-22T20:00:00-04</value>             <!-- Optional, the linear airdate and time of the C3 asset, also the beginning of the C3 window. -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>BlackoutStartTimes</title>                <!-- Optional, literal string must be present when an asset follows C3 behavior -->
+				<value>270540,744780,1285850</value>             <!-- Optional, a comma separated list of milliseconds OR HH:MM:SS of when black-out times begin. -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>BlackoutEndTimes</title>                  <!-- Optional, literal string must be present when an asset follows C3 behavior -->
+				<value>273470,747350,1288650</value>             <!-- Optional, a comma separated list of milliseconds OR HH:MM:SS of when black-out times end. -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>ChapterStartTimes</title>                 <!-- Optional, literal string -->
+				<value>270540,744780,1285850</value>             <!-- Optional, a comma separated list of milliseconds OR HH:MM:SS of when ad insertions are expected. -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Credit Roll Start</title>                 <!-- Required, literal string -->
+				<value>1277000</value>                           <!-- Required, a single value in milliseconds OR HH:MM:SS of when credits begin. -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Adult</title>				 <!-- Optional, literal string -->
+				<value>Adult</value> 				 <!-- Optional, valid values are: Adult, nonAdult -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>HD Override</title>				 <!-- Optional, literal string - coordinate with CIM before using -->
+				<value>none</value> 				 <!-- Optional, valid values are: none, HD, SD -->
+			</CustomDataElement>
+			<!-- People, up to 10 people can be associated with each media asset -->
+			<CustomDataElement>
+				<title>Associated Person Addition 01 ID</title>                <!-- Optional, literal string -->
+				<value>72308</value>                                           <!-- Optional, the cPlatform, TMS, Baseline, IMDB or AMG person matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 01 ID Type</title>           <!-- Optional, literal string -->
+				<value>cPlatform</value>                                       <!-- Optional, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 01 Name</title>              <!-- Optional, literal string -->
+				<value>James Gandolfini</value>                                <!-- Optional, a plain text field -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 02 ID</title>                <!-- Optional, literal string -->
+				<value>44429</value>                                           <!-- Optional, the cPlatform, TMS, Baseline, IMDB or AMG person matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 02 ID Type</title>           <!-- Optional, literal string -->
+				<value>cPlatform</value>                                       <!-- Optional, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 02 Name</title>              <!-- Optional, literal string -->
+				<value>Lorraine Bracco</value>                                 <!-- Optional, a plain text field -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 03 ID</title>                <!-- Optional, literal string -->
+				<value>39861</value>                                           <!-- Optional, the cPlatform, TMS, Baseline, IMDB or AMG person matching ID -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 03 ID Type</title>           <!-- Optional, literal string -->
+				<value>cPlatform</value>                                       <!-- Optional, the ID space used, valid values are: cPlatform, TMS, Baseline, IMDB, AMG -->
+			</CustomDataElement>
+			<CustomDataElement>
+				<title>Associated Person Addition 03 Name</title>              <!-- Optional, literal string -->
+				<value>Edie Falco</value>                                      <!-- Optional, a plain text field -->
+			</CustomDataElement>
+		</customData>
+	</media>
+	<mediaFiles>
+		<!--The Source Video File -->
+		<mediaFile>
+			<mediaFileType>Internal</mediaFileType>            <!-- Required, literal string -->
+			<contentType>Video</contentType>                   <!-- Required, literal string -->
+			<assetTypes>
+				<string>Video</string>                                       <!-- Required, valid values are: 121x87 Image, 54x36 Image, 640x320 Image, Video -->
+			</assetTypes>
+			<encodingProfileTitle>(E) SD 1.33 – 4x3</encodingProfileTitle> <!-- Required, see profiles below: Standard profiles: (E) Full HD 1.77 – 16x9 (E) HD 1.77 - 16x9 (E) HD 2.35 - Scope (E) HD 1.85:1 - Academy Flat (E) HD 1.33 – 4x3 (E) SD 1.33 – 4x3 (E) SD 1.77 – 16x9 (E) SD 2.35 – Scope Please use the profiles below for content that is also for iDevices *coordinate with CIM before using (EI) Full HD 1.77 – 16x9 (EI) HD 1.77 - 16x9 (EI) HD 2.35 - Scope (EI) HD 1.85:1 - Academy Flat (EI) HD 1.33 – 4x3 (EI) SD 1.33 – 4x3 (EI) SD 1.77 – 16x9 (EI) SD 2.35 – Scope Please 
+				use the profiles below for content that is ONLY for iDevices *coordinate with CIM before using (I) Full HD 1.77 – 16x9 (I) HD 1.77 - 16x9 (I) HD 2.35 - Scope (I) HD 1.85:1 - Academy Flat (I) HD 1.33 – 4x3 (I) SD 1.33 – 4x3 (I) SD 1.77 – 16x9 (I) SD 2.35 – Scope Please use the profiles below for content that should be capped to SD specs *coordinate with CIM before using (E) Full HD 1.77 – 16x9-SDOnly (E) HD 1.77 - 16x9-SDOnly (E) HD 2.35 - Scope-SDOnly (E) HD 1.85:1 - Academy Flat-SDOnly (E) HD 1.33 
+				– 4x3-SDonly -->
+			<originalLocation>456_4x3_30_15000kbps.mpg</originalLocation>    <!-- Required, the filename of the video source file -->
+			<format>MPEG</format>                                            <!-- Optional, the codec of the video source file -->
+			<height>480</height>                                             <!-- Optional, the vertical resolution in pixels of the source video -->
+			<width>640</width>                                               <!-- Optional, the horizontal resolution in pixels of the source video -->
+			<bitrate>1500</bitrate>                                          <!-- Optional, the bitrate in kbps of the source video -->
+			<length>3600</length>                                            <!-- Optional, the length in seconds of the source video -->
+		</mediaFile>
+		<!--The Thumbnails -->
+		<mediaFile>
+			<mediaFileType>Internal</mediaFileType>            <!-- Required, literal string -->
+			<contentType>Image</contentType>                   <!-- Required, literal string -->
+			<assetTypes>
+				<string>54x36 Image</string>                  <!-- Required, valid values are: 121x87 Image, 54x36 Image, 640x320 Image, Video -->
+			</assetTypes>
+			<originalLocation>S06E21_54x36.jpg</originalLocation>            <!-- Required, the filename of the thumbnail -->
+			<format>JPEG</format>                                            <!-- Optional, the length in format of the thumbnail -->
+		</mediaFile>
+		<!--The Thumbnails -->
+		<mediaFile>
+			<mediaFileType>Internal</mediaFileType>            <!-- Required, literal string -->
+			<contentType>Image</contentType>                   <!-- Required, literal string -->
+			<assetTypes>
+				<string>121x87 Image</string>                  <!-- Required, valid values are: 121x87 Image, 54x36 Image, 640x320 Image, Video -->
+			</assetTypes>
+			<originalLocation>S06E21_121x87.jpg</originalLocation>           <!-- Required, the filename of the thumbnail -->
+			<format>JPEG</format>                                            <!-- Optional, the length in format of the thumbnail -->
+		</mediaFile>
+		<!--The Thumbnails -->
+		<mediaFile>
+			<mediaFileType>Internal</mediaFileType>            <!-- Required, literal string -->
+			<contentType>Image</contentType>                   <!-- Required, literal string -->
+			<assetTypes>
+				<string>640x320 Image</string>                 <!-- Required, valid values are: 121x87 Image, 54x36 Image, 640x320 Image, Video -->
+			</assetTypes>
+			<originalLocation>S06E21_640x320.jpg</originalLocation>          <!-- Required, the filename of the thumbnail -->
+			<format>JPEG</format>                                            <!-- Optional, the length in format of the thumbnail -->
+		</mediaFile>
+		<!-- The section below is optional and is to be used for Closed Caption files, please do NOT include this section if you will not be providing external CC files -->
+		<mediaFile>
+			<mediaFileType>Internal</mediaFileType>
+			<assetTypes>
+				<string>ClosedCaption</string>
+			</assetTypes>
+			<contentType>Document</contentType>
+			<originalLocation>fooo.xml</originalLocation>
+		</mediaFile>
+	</mediaFiles>
+	<!-- end of CC data section -->
+</addContent>
