@@ -110,8 +110,9 @@ while(count($puserKusers))
 	$puserKusers = getPuserKusers($lastPuserKuser, $userLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
-echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
+$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+KalturaLog::log($msg);
+echo $msg;
 
 function getPuserKusers($lastPuserKuser, $userLimitEachLoop)
 {

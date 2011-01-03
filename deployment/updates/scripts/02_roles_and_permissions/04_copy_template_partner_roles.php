@@ -77,8 +77,9 @@ while(count($partners))
 	$partners = getPartners($lastPartner, $partnerLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
-echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
+$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+KalturaLog::log($msg);
+echo $msg;
 
 function getPartners($lastPartner, $partnerLimitEachLoop)
 {

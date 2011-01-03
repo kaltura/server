@@ -126,8 +126,9 @@ while(count($users))
 	$users = getUsers($lastUser, $userLimitEachLoop);
 }
 
-KalturaLog::log('Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!');
-echo 'Done' . $dryRun ? 'DRY RUN!' : 'REAL RUN!';
+$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+KalturaLog::log($msg);
+echo $msg;
 
 function getUsers($lastUser, $userLimitEachLoop)
 {
