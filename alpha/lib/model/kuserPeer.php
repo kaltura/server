@@ -440,21 +440,20 @@ class kuserPeer extends BasekuserPeer
 				$adminName = $admin->getFullName();
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId, $forumsLink, $unsubscribeLink);
+			
+				// add mail job
+				kJobsManager::addMailJob(
+					null, 
+					0, 
+					$partnerId, 
+					$mailType, 
+					kMailJobData::MAIL_PRIORITY_NORMAL, 
+					kConf::get ("partner_registration_confirmation_email" ), 
+					kConf::get ("partner_registration_confirmation_name" ), 
+					$loginEmail, 
+					$bodyParams
+				);
 			}
-			
-			// add mail job
-			kJobsManager::addMailJob(
-				null, 
-				0, 
-				$partnerId, 
-				$mailType, 
-				kMailJobData::MAIL_PRIORITY_NORMAL, 
-				kConf::get ("partner_registration_confirmation_email" ), 
-				kConf::get ("partner_registration_confirmation_name" ), 
-				$loginEmail, 
-				$bodyParams
-			);
-			
 		}
 	}
 	
