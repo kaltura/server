@@ -117,11 +117,11 @@ else
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
 			versions			: {
-					dashboard		:	"<?php echo $kmc_dashboard_version ?>",
-					content			:	"<?php echo $kmc_content_version ?>",
-					appstudio		:	"<?php echo $kmc_appstudio_version ?>",
-					account			:	"<?php echo $kmc_account_version ?>", // "Settings" tab
-					reports			:	"<?php echo $kmc_rna_version ?>"
+					//dashboard		:	"<?php //echo $kmc_dashboard_version ?>",
+					//content			:	"<?php //echo $kmc_content_version ?>",
+					//appstudio		:	"<?php //echo $kmc_appstudio_version ?>",
+					//account			:	"<?php //echo $kmc_account_version ?>", // "Settings" tab
+					//reports			:	"<?php //echo $kmc_rna_version ?>"
 			},
 			//appstudio_uiconfid	: "<?php //echo $appstudio_uiconfs_templates->getId(); ?>",
 			//reports_drilldown	: "<?php //echo $reports_uiconfs_drilldown->getId(); ?>",
