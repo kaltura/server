@@ -106,11 +106,7 @@ else
 					foreach($enumConstans as $name => $value)
 					{
 						$odd = !$odd;
-						
-						// TODO remove call_user_func after moving to php 5.3
-						$value = call_user_func("$enum::get")->apiValue($value);
-//						$value = $enum::get()->apiValue($value);
-						
+						$value = $pluginInstance->getApiValue($value);
 						?>
 							<tr<?php echo ($odd) ? " class=\"odd\"" : ""; ?>>
 								<td><?php echo $name; ?></td>

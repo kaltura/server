@@ -27,7 +27,7 @@ class HuluDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU);
+		return HuluDistributionPlugin::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU);
 	}
 	
 	/**

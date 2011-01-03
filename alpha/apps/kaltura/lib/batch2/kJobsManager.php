@@ -499,7 +499,7 @@ class kJobsManager
 			$convertData->setConfigRemoteUrl($remoteUrl);
 		}
 		*/
-		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('KalturaConversionEngineType', $currentConversionEngine);
+		$dbCurrentConversionEngine = kPluginableEnumsManager::apiToCore('conversionEngineType', $currentConversionEngine);
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	

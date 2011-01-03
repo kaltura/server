@@ -122,7 +122,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		{
 			$objectId = $constructorArgs['objectId'];
 
-			if($enumValue == ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
 			{
 				GenericDistributionProviderActionPeer::setUseCriteriaFilter(false);
 				$object = GenericDistributionProviderActionPeer::retrieveByPK($objectId);
@@ -133,31 +133,31 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		
 		if($baseClass == 'kJobData')
 		{
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return new kDistributionSubmitJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return new kDistributionUpdateJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return new kDistributionDeleteJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return new kDistributionFetchReportJobData();
 		}
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return new KalturaDistributionSubmitJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return new KalturaDistributionUpdateJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return new KalturaDistributionDeleteJobData();
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return new KalturaDistributionFetchReportJobData();
 		}
 		
@@ -177,37 +177,37 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			
 		if($baseClass == 'ISyncableFile')
 		{
-			if($enumValue == ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
 				return 'GenericDistributionProviderAction';
 		}
 		
 		if($baseClass == 'kJobData')
 		{
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return 'kDistributionSubmitJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return 'kDistributionUpdateJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return 'kDistributionDeleteJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return 'kDistributionFetchReportJobData';
 		}
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return 'KalturaDistributionSubmitJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return 'KalturaDistributionUpdateJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return 'KalturaDistributionDeleteJobData';
 				
-			if($enumValue == ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return 'KalturaDistributionFetchReportJobData';
 		}
 		
@@ -237,5 +237,31 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return array(
 			new Kaltura_View_Helper_EntryInvestigateDistribution(),
 		);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getContentDistributionFileSyncObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('ContentDistributionFileSyncObjectType', $value);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

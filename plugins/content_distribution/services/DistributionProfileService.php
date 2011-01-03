@@ -32,7 +32,7 @@ class DistributionProfileService extends KalturaBaseService
 		if(is_null($distributionProfile->status))
 			$distributionProfile->status = KalturaDistributionProfileStatus::DISABLED;
 		
-		$providerType = KalturaDistributionProviderType::getCoreValue($distributionProfile->providerType);
+		$providerType = kPluginableEnumsManager::apiToCore('DistributionProviderType', $distributionProfile->providerType);
 		$dbDistributionProfile = DistributionProfilePeer::createDistributionProfile($providerType);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROVIDER_NOT_FOUND, $distributionProfile->providerType);

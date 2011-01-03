@@ -73,7 +73,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 			
 		if($baseClass == 'kJobData')
 		{
-			if($enumValue == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
+			if($enumValue == self::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			{
 				return new kVirusScanJobData();
 			}
@@ -81,7 +81,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN))
+			if($enumValue == self::getApiValue(VirusScanBatchJobType::VIRUS_SCAN))
 			{
 				return new KalturaVirusScanJobData();
 			}
@@ -103,7 +103,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 			
 		if($baseClass == 'kJobData')
 		{
-			if($enumValue == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
+			if($enumValue == self::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			{
 				return 'kVirusScanJobData';
 			}
@@ -111,7 +111,7 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN))
+			if($enumValue == self::getApiValue(VirusScanBatchJobType::VIRUS_SCAN))
 			{
 				return 'KalturaVirusScanJobData';
 			}
@@ -119,5 +119,30 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		
 		return null;
 	}
-
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getBatchJobTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getEntryStatusCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('entryStatus', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
 }

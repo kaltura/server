@@ -90,7 +90,7 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 	 */
 	public function toSubType($subType)
 	{
-		return $this->toDynamicEnumValue('KalturaConversionEngineType', $subType);
+		return kPluginableEnumsManager::apiToCore('conversionEngineType', $subType);
 	}
 	
 	/**
@@ -99,6 +99,6 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 	 */
 	public function fromSubType($subType)
 	{
-		return $this->fromDynamicEnumValue('KalturaConversionEngineType', $subType);
+		return kPluginableEnumsManager::coreToApi('conversionEngineType', $subType);
 	}
 }

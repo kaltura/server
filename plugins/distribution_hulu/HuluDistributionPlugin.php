@@ -93,22 +93,22 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 		{
 			$reflect = new ReflectionClass('KalturaHuluDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == HuluDistributionProviderType::get()->apiValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(HuluDistributionProviderType::HULU))
 		{
 			$reflect = new ReflectionClass('kHuluDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return new KalturaHuluDistributionProfile();
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return new HuluDistributionProfile();
 			
 		return null;
@@ -159,16 +159,16 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return 'KalturaHuluDistributionJobProviderData';
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == HuluDistributionProviderType::get()->apiValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(HuluDistributionProviderType::HULU))
 			return 'kHuluDistributionJobProviderData';
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return 'KalturaHuluDistributionProfile';
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == HuluDistributionProviderType::get()->coreValue(HuluDistributionProviderType::HULU))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return 'HuluDistributionProfile';
 			
 		return null;
@@ -225,5 +225,22 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 		return array(
 			self::HULU_REPORT_HANDLER,
 		);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDistributionProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('DistributionProviderType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

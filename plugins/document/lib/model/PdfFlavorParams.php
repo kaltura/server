@@ -11,7 +11,7 @@ class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = DocumentAssetType::get()->coreValue(DocumentAssetType::PDF);
+		$this->type = DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF);
 	}
 	
 	// -- Conversion Parameters --

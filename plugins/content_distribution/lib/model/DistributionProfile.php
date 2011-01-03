@@ -62,7 +62,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 			$version = $this->getFileSyncVersion($sub_type);
 		
 		$key = new FileSyncKey();
-		$key->object_type = ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::DISTRIBUTION_PROFILE);
+		$key->object_type = ContentDistributionPlugin::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::DISTRIBUTION_PROFILE);
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;

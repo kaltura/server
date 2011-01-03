@@ -22,7 +22,7 @@ class VirusScanBatchService extends BatchService
 	 */
 	function getExclusiveVirusScanJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = VirusScanBatchJobType::get()->apiValue(VirusScanBatchJobType::VIRUS_SCAN);
+		$jobType = VirusScanPlugin::getApiValue(VirusScanBatchJobType::VIRUS_SCAN);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -41,7 +41,7 @@ class VirusScanBatchService extends BatchService
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		$jobType = VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
@@ -63,7 +63,7 @@ class VirusScanBatchService extends BatchService
 	 */
 	function freeExclusiveVirusScanJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		$jobType = VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN);
+		$jobType = VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN);
 		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	

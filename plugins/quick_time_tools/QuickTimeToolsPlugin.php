@@ -26,7 +26,7 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 			return new KOperationEngineQtTools($params->qtToolsCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == QuickTimeToolsConversionEngineType::get()->apiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
 		{
 			return new KDLTranscoderQTPTools($enumValue);
 		}
@@ -41,10 +41,10 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == QuickTimeToolsConversionEngineType::get()->apiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
+		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
 			return 'KOperationEngineQtTools';
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == QuickTimeToolsConversionEngineType::get()->coreValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(QuickTimeToolsConversionEngineType::QUICK_TIME_PLAYER_TOOLS))
 			return 'KDLTranscoderQTPTools';
 		
 		return null;	
@@ -59,5 +59,22 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 			return array('QuickTimeToolsConversionEngineType');
 			
 		return array();
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConversionEngineCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

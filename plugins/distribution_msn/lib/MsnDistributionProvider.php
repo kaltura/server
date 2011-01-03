@@ -27,7 +27,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return MsnDistributionProviderType::get()->coreValue(MsnDistributionProviderType::MSN);
+		return MsnDistributionPlugin::getDistributionProviderTypeCoreValue(MsnDistributionProviderType::MSN);
 	}
 	
 	/**

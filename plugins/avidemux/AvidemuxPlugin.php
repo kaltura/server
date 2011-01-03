@@ -26,7 +26,7 @@ class AvidemuxPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 			return new KOperationEngineAvidemux($params->avidemuxCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == AvidemuxConversionEngineType::get()->apiValue(AvidemuxConversionEngineType::AVIDEMUX))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(AvidemuxConversionEngineType::AVIDEMUX))
 		{
 			return new KDLOperatorAvidemux($enumValue);
 		}
@@ -41,10 +41,10 @@ class AvidemuxPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == AvidemuxConversionEngineType::get()->apiValue(AvidemuxConversionEngineType::AVIDEMUX))
+		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(AvidemuxConversionEngineType::AVIDEMUX))
 			return 'KOperationEngineFastStart';
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == AvidemuxConversionEngineType::get()->coreValue(AvidemuxConversionEngineType::AVIDEMUX))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(AvidemuxConversionEngineType::AVIDEMUX))
 			return 'KDLOperatorQTFastStart';
 		
 		return null;
@@ -61,4 +61,20 @@ class AvidemuxPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 		return array();
 	}
 	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConversionEngineCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
 }

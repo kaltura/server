@@ -93,22 +93,22 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 		{
 			$reflect = new ReflectionClass('KalturaYouTubeDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == YouTubeDistributionProviderType::get()->apiValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(YouTubeDistributionProviderType::YOUTUBE))
 		{
 			$reflect = new ReflectionClass('kYouTubeDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 			return new KalturaYouTubeDistributionProfile();
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 			return new YouTubeDistributionProfile();
 			
 		return null;
@@ -159,16 +159,16 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 			return 'KalturaYouTubeDistributionJobProviderData';
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == YouTubeDistributionProviderType::get()->apiValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(YouTubeDistributionProviderType::YOUTUBE))
 			return 'kYouTubeDistributionJobProviderData';
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 			return 'KalturaYouTubeDistributionProfile';
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE))
 			return 'YouTubeDistributionProfile';
 			
 		return null;
@@ -205,5 +205,22 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDistributionProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('DistributionProviderType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

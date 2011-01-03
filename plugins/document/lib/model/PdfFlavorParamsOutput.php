@@ -11,7 +11,7 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = DocumentAssetType::get()->coreValue(DocumentAssetType::PDF);
+		$this->type = DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF);
 	}
 	
 	

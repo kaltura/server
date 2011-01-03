@@ -1037,7 +1037,7 @@ class JobsService extends KalturaBaseService
 	 */
 	function getStatusAction($jobId, $jobType)
 	{
-		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $dbJobType)
@@ -1067,7 +1067,7 @@ class JobsService extends KalturaBaseService
 	 */
 	function deleteJobAction($jobId, $jobType)
 	{
-		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		kJobsManager::deleteJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}
@@ -1084,7 +1084,7 @@ class JobsService extends KalturaBaseService
 	 */
 	function abortJobAction($jobId, $jobType)
 	{
-		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		kJobsManager::abortJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}
@@ -1101,7 +1101,7 @@ class JobsService extends KalturaBaseService
 	 */
 	function retryJobAction($jobId, $jobType)
 	{
-		$dbJobType = KalturaBatchJobType::getCoreValue($jobType);
+		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		kJobsManager::retryJob($jobId, $dbJobType);
 		return $this->getStatusAction($jobId, $jobType);
 	}

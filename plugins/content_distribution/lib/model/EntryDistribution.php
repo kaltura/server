@@ -120,7 +120,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			$version = $this->getFileSyncVersion($sub_type);
 		
 		$key = new FileSyncKey();
-		$key->object_type = ContentDistributionFileSyncObjectType::get()->coreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION);
+		$key->object_type = ContentDistributionPlugin::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION);
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;

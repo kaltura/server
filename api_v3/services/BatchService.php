@@ -1361,7 +1361,7 @@ class BatchService extends KalturaBaseService
 		if (!is_null($filter))
 			$jobsFilter = $filter->toFilter($jobType);
 		
-		$dbJobType = kPluginableEnumsManager::apiToCore('KalturaBatchJobType', $jobType);
+		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		return kBatchExclusiveLock::getExclusiveJobs($lockKey->toObject(), $maxExecutionTime, $numberOfJobs, $dbJobType, $jobsFilter);
 	}	
 	

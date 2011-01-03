@@ -22,7 +22,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionSubmitJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -41,7 +41,7 @@ class ContentDistributionBatchService extends BatchService
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
@@ -63,7 +63,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function freeExclusiveDistributionSubmitJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	
@@ -80,7 +80,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionSubmitJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -101,7 +101,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionUpdateJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -120,7 +120,7 @@ class ContentDistributionBatchService extends BatchService
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
@@ -142,7 +142,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function freeExclusiveDistributionUpdateJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	
@@ -159,7 +159,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionUpdateJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -179,7 +179,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -198,7 +198,7 @@ class ContentDistributionBatchService extends BatchService
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
@@ -220,7 +220,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function freeExclusiveDistributionDeleteJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	
@@ -237,7 +237,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -257,7 +257,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionFetchReportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -276,7 +276,7 @@ class ContentDistributionBatchService extends BatchService
 		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
 	
@@ -298,7 +298,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function freeExclusiveDistributionFetchReportJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		return $this->freeExclusiveJobAction($id ,$lockKey, $jobType, $resetExecutionAttempts);
 	}
 	
@@ -315,7 +315,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionFetchReportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionBatchJobType::get()->apiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	

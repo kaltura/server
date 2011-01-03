@@ -40,7 +40,11 @@ class KalturaObject
             {
                 $value = call_user_func($getter_callback);
                 if($properties[$this_prop]->isDynamicEnum())
-                	$value = $this->fromDynamicEnumValue($properties[$this_prop]->getType(), $value);
+                {
+					$propertyType = $properties[$this_prop]->getType();
+					$enumType = call_user_func("$propertyType::getEnumClass");
+                	$value = kPluginableEnumsManager::coreToApi($enumType, $value);
+                }
                 	
                 $this->$this_prop = $value;
             }
@@ -63,16 +67,6 @@ class KalturaObject
 			if ( is_numeric( $this_prop ) ) $this_prop = $object_prop;
 			$this->$this_prop = isset($source_array[$object_prop]) ? $source_array[$object_prop] : null;
 		}
-	}
-	
-	protected function fromDynamicEnumValue($type, $value)
-	{
-		return kPluginableEnumsManager::coreToApi($type, $value);
-	}
-	
-	protected function toDynamicEnumValue($type, $value)
-	{
-		return kPluginableEnumsManager::apiToCore($type, $value);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -98,7 +92,9 @@ class KalturaObject
 				}
 				else if ($propertyInfo->isDynamicEnum())
 				{
-					$value = $this->toDynamicEnumValue($propertyInfo->getType(), $value);
+					$propertyType = $propertyInfo->getType();
+					$enumType = call_user_func("$propertyType::getEnumClass");
+					$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 				}
 				
 				if ($value !== null)

@@ -38,7 +38,7 @@ class KalturaBatchJobFilterExt extends KalturaBatchJobFilter
 		foreach($arr as $jobTypeIn)
 		{
 			list($jobType, $jobSubTypes) = explode(BatchJobFilter::JOB_TYPE_AND_SUB_TYPE_TYPE_DELIMITER, $jobTypeIn);
-			$jobType = KalturaBatchJobType::getCoreValue($jobType);
+			$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 			
 			$finalTypesAndSubTypes[] = $jobType . BatchJobFilter::JOB_TYPE_AND_SUB_TYPE_TYPE_DELIMITER . $jobSubTypes;
 		}

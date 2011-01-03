@@ -299,30 +299,18 @@ class KalturaTypeReflector
 				$baseEnumName = call_user_func("$type::getEnumClass");
 //				$baseEnumName = $type::getEnumClass();
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
-				foreach($pluginInstances as $pluginInstance)
+				foreach($pluginInstances as $pluginName => $pluginInstance)
 				{
 					$enums = $pluginInstance->getEnums($baseEnumName);
 					foreach($enums as $enum)
 					{
-						// TODO remove call_user_func after moving to php 5.3
-						$enumInstance = call_user_func("$enum::get");
-//						$enumInstance = $enum::get();
-
-						$constantsDescription = array();
-						if(method_exists($enumInstance, 'getDescription'))
-							$constantsDescription = $enumInstance->getDescription();
-							
 						// TODO remove call_user_func after moving to php 5.3
 						$enumConstans = call_user_func("$enum::getAdditionalValues");
 //						$enumConstans = $enum::getAdditionalValues();
 						foreach($enumConstans as $name => $value)
 						{
 							$prop = new KalturaPropertyInfo("string", $name);
-								
-							if (array_key_exists($value, $constantsDescription))
-								$prop->setDescription($constantsDescription[$value]);
-								
-							$prop->setDefaultValue($enumInstance->apiValue($value));
+							$prop->setDefaultValue($pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value);
 							$this->_constants[] = $prop;
 						}
 					}

@@ -11,7 +11,7 @@ class SwfFlavorParams extends flavorParams implements SwfFlavorParamsInterface
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = DocumentAssetType::get()->coreValue(DocumentAssetType::SWF);
+		$this->type = DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF);
 	}
 	
 	

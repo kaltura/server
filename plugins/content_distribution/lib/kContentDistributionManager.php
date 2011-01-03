@@ -39,7 +39,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
@@ -62,7 +62,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
@@ -85,7 +85,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
@@ -108,7 +108,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);

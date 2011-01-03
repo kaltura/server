@@ -338,7 +338,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		$dbData = null;
 		
 		if(is_null($this->jobType))
-			$this->jobType = $this->fromDynamicEnumValue('KalturaBatchJobType', $dbBatchJob->getJobType());
+			$this->jobType = kPluginableEnumsManager::coreToApi('BatchJobType', $dbBatchJob->getJobType());
 		
 		switch($dbBatchJob->getJobType())
 		{

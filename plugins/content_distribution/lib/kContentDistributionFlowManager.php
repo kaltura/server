@@ -38,16 +38,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return true;
 		
-		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 			self::onDistributionSubmitJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
-		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
-		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 			self::onDistributionDeleteJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
-		if($dbBatchJob->getJobType() == ContentDistributionBatchJobType::get()->coreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return true;

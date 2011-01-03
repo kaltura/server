@@ -131,7 +131,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			return true;
 		}
 		
-		if($dbBatchJob->getJobType() == VirusScanBatchJobType::get()->coreValue(VirusScanBatchJobType::VIRUS_SCAN))
+		if($dbBatchJob->getJobType() == VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
 			$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 
 		return true;
@@ -173,7 +173,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					KalturaLog::err('Entry not found with id ['.$entry->getId().']');
 				}
 				else {
-					$entry->setStatus(VirusScanEntryStatus::get()->coreValue(VirusScanEntryStatus::INFECTED));
+					$entry->setStatus(VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::INFECTED));
 					$entry->save();
 				}
 				
@@ -211,7 +211,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		$entry = entryPeer::retrieveByPK($dbBatchJob->getEntryId());
 		if ($entry)
 		{
-			$entry->setStatus(VirusScanEntryStatus::get()->coreValue(VirusScanEntryStatus::INFECTED));
+			$entry->setStatus(VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::INFECTED));
 			$entry->save();
 		}
 		else

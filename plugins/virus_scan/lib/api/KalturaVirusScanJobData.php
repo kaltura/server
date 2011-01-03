@@ -49,7 +49,7 @@ class KalturaVirusScanJobData extends KalturaJobData
 	 */
 	public function toSubType($subType)
 	{
-		return $this->toDynamicEnumValue('KalturaVirusScanEngineType', $subType);
+		return kPluginableEnumsManager::apiToCore('VirusScanEngineType', $subType);
 	}
 	
 	/**
@@ -58,6 +58,6 @@ class KalturaVirusScanJobData extends KalturaJobData
 	 */
 	public function fromSubType($subType)
 	{
-		return $this->fromDynamicEnumValue('KalturaVirusScanEngineType', $subType);
+		return kPluginableEnumsManager::coreToApi('VirusScanEngineType', $subType);
 	}
 }

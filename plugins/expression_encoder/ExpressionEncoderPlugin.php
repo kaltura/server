@@ -26,7 +26,7 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 			return new KOperationEngineExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
 		}
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->apiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 		{
 			return new KDLOperatorExpressionEncoder($enumValue);
 		}
@@ -41,10 +41,10 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == ExpressionEncoderConversionEngineType::get()->apiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 			return 'KOperationExpressionEncoder';
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == ExpressionEncoderConversionEngineType::get()->coreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
 			return 'KDLOperatorExpressionEncoder';
 		
 		return null;
@@ -59,5 +59,22 @@ class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoa
 			return array('ExpressionEncoderConversionEngineType');
 			
 		return array();
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConversionEngineCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

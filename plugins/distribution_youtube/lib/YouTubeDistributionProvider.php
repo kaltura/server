@@ -27,7 +27,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return YouTubeDistributionProviderType::get()->coreValue(YouTubeDistributionProviderType::YOUTUBE);
+		return YouTubeDistributionPlugin::getDistributionProviderTypeCoreValue(YouTubeDistributionProviderType::YOUTUBE);
 	}
 	
 	/**

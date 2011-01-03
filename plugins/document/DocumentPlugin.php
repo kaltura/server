@@ -40,13 +40,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		{
 			switch($enumValue)
 			{
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF):
 					return new KalturaPdfFlavorParams();
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF):
 					return new KalturaSwfFlavorParams();
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return new KalturaDocumentFlavorParams();
 				
 				default:
@@ -58,13 +58,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		{
 			switch($enumValue)
 			{
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF):
 					return new KalturaPdfFlavorParamsOutput();
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF):
 					return new KalturaSwfFlavorParamsOutput();
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return new KalturaDocumentFlavorParamsOutput();
 				
 				default:
@@ -128,13 +128,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		{
 			switch($enumValue)
 			{
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF):
 					return 'PdfFlavorParams';
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF):
 					return 'SwfFlavorParams';
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return 'DocumentFlavorParams';
 				
 				default:
@@ -146,13 +146,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		{
 			switch($enumValue)
 			{
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::PDF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF):
 					return 'PdfFlavorParamsOutput';
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::SWF):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF):
 					return 'SwfFlavorParamsOutput';
 					
-				case DocumentAssetType::get()->coreValue(DocumentAssetType::DOCUMENT):
+				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
 					return 'DocumentFlavorParamsOutput';
 				
 				default:
@@ -190,5 +190,22 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		return array(
 			self::DOCUMENT_OBJECT_CREATED_HANDLER,
 		);
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getAssetTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('assetType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

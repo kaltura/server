@@ -3,10 +3,10 @@
  * @package api
  * @subpackage enum
  */
-interface IKalturaDynamicEnum 
+interface IKalturaPluginEnum 
 {
 	/**
 	 * @return array
 	 */
-	public static function getEnumClass();
+	public static function getAdditionalValues();
 }

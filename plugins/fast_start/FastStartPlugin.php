@@ -26,7 +26,7 @@ class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 			return new KOperationEngineFastStart($params->fastStartCmd, $constructorArgs['outFilePath']);
 		}
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == FastStartConversionEngineType::get()->apiValue(FastStartConversionEngineType::FAST_START))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getApiValue(FastStartConversionEngineType::FAST_START))
 		{
 			return new KDLOperatorQTFastStart($enumValue);
 		}
@@ -41,10 +41,10 @@ class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == FastStartConversionEngineType::get()->apiValue(FastStartConversionEngineType::FAST_START))
+		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(FastStartConversionEngineType::FAST_START))
 			return 'KOperationEngineFastStart';
 	
-		if($baseClass == 'KDLOperatorBase' && $enumValue == FastStartConversionEngineType::get()->coreValue(FastStartConversionEngineType::FAST_START))
+		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(FastStartConversionEngineType::FAST_START))
 			return 'KDLOperatorQTFastStart';
 		
 		return null;
@@ -59,5 +59,22 @@ class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKa
 			return array('FastStartConversionEngineType');
 			
 		return array();
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getConversionEngineCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

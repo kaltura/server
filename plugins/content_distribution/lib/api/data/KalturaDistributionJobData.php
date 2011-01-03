@@ -147,7 +147,7 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public function toSubType($subType)
 	{
-		return $this->toDynamicEnumValue('KalturaDistributionProviderType', $subType);
+		return kPluginableEnumsManager::apiToCore('DistributionProviderType', $subType);
 	}
 	
 	/**
@@ -156,6 +156,6 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public function fromSubType($subType)
 	{
-		return $this->fromDynamicEnumValue('KalturaDistributionProviderType', $subType);
+		return kPluginableEnumsManager::coreToApi('DistributionProviderType', $subType);
 	}
 }

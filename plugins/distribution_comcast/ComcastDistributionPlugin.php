@@ -91,22 +91,22 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 		{
 			$reflect = new ReflectionClass('KalturaComcastDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == ComcastDistributionProviderType::get()->apiValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(ComcastDistributionProviderType::COMCAST))
 		{
 			$reflect = new ReflectionClass('kComcastDistributionJobProviderData');
 			return $reflect->newInstanceArgs($constructorArgs);
 		}
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return new KalturaComcastDistributionProfile();
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return new ComcastDistributionProfile();
 			
 		return null;
@@ -157,16 +157,16 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
 
-		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return 'KalturaComcastDistributionJobProviderData';
 	
-		if($baseClass == 'kDistributionJobProviderData' && $enumValue == ComcastDistributionProviderType::get()->apiValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'kDistributionJobProviderData' && $enumValue == self::getApiValue(ComcastDistributionProviderType::COMCAST))
 			return 'kComcastDistributionJobProviderData';
 	
-		if($baseClass == 'KalturaDistributionProfile' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return 'KalturaComcastDistributionProfile';
 			
-		if($baseClass == 'DistributionProfile' && $enumValue == ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST))
+		if($baseClass == 'DistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return 'ComcastDistributionProfile';
 			
 		return null;
@@ -203,5 +203,22 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		
+	}
+	
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getDistributionProviderTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('DistributionProviderType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

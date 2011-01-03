@@ -27,7 +27,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return ComcastDistributionProviderType::get()->coreValue(ComcastDistributionProviderType::COMCAST);
+		return ComcastDistributionPlugin::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST);
 	}
 	
 	/**

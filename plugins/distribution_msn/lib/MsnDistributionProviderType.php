@@ -3,35 +3,14 @@
  * @package api
  * @subpackage enum
  */
-class MsnDistributionProviderType extends KalturaDistributionProviderType
+class MsnDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {
 	const MSN = 'MSN';
-	
-	/**
-	 * @var MsnDistributionProviderType
-	 */
-	protected static $instance;
-
-	/**
-	 * @return MsnDistributionProviderType
-	 */
-	public static function get()
-	{
-		if(!self::$instance)
-			self::$instance = new MsnDistributionProviderType();
-			
-		return self::$instance;
-	}
 	
 	public static function getAdditionalValues()
 	{
 		return array(
 			'MSN' => self::MSN,
 		);
-	}
-	
-	public function getPluginName()
-	{
-		return MsnDistributionPlugin::getPluginName();
 	}
 }
