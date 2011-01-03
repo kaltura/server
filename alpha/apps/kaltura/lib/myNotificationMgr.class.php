@@ -361,6 +361,9 @@ $debug .= "property: $not_property = [$value]\n";
 				$params["extra_notification_data"] = $extra_notification_data;
 		}
 		
+		$ksObj = kSessionUtils::crackKs(kCurrentContext::$ks);
+		$params['ks_data'] = $ksObj->additional_data;
+		
 		return serialize( $params );
 	}
 
