@@ -116,6 +116,76 @@
 		const PDF_CREATOR = "pdf_creator";
 	};
 
+	class KDLVideoAspectRatio {
+		const AR_LOW = "LOW";
+		const AR_5_4 = "5:4";
+		const AR_4_3 = "4:3";
+		const AR_3_2 = "3:2";
+		const AR_8_5 = "8:5";
+		const AR_1024_600 = "8:5";
+		const AR_16_9 = "16:9";
+		const AR_185 = "1.85:1";
+		const AR_2048_1080 = "2048:1080";
+		const AR_235 = "2.35:1";
+		const AR_237 = "2.37:1";
+		const AR_239 = "2.39:1";
+		const AR_255 = "2.55:1";
+		const AR_HIGH = "HIGH";
+		
+		public static function ConvertFrameSize($wid, $hgt)
+		{
+		$arr=array(
+			1280/1024*1000=>KDLVideoAspectRatio::AR_5_4,
+			1280/960*1000=>KDLVideoAspectRatio::AR_4_3,1392./1040*1000=>KDLVideoAspectRatio::AR_4_3,
+			1280/854*1000=>KDLVideoAspectRatio::AR_3_2,1152/768*1000=>KDLVideoAspectRatio::AR_3_2,1280./848*1000=>KDLVideoAspectRatio::AR_3_2,
+			320/200*1000=>KDLVideoAspectRatio::AR_8_5,1440./896*1000=>KDLVideoAspectRatio::AR_8_5,
+			1680./1040*1000=>KDLVideoAspectRatio::AR_8_5,320./192*1000=>KDLVideoAspectRatio::AR_8_5,
+			1024/600*1000=>KDLVideoAspectRatio::AR_1024_600,1024/592*1000=>KDLVideoAspectRatio::AR_1024_600,
+			1360/768*1000=>KDLVideoAspectRatio::AR_16_9,848/480*1000=>KDLVideoAspectRatio::AR_16_9,
+			1920/1080*1000=>KDLVideoAspectRatio::AR_16_9,1366/768*1000=>KDLVideoAspectRatio::AR_16_9,
+			854/480*1000=>KDLVideoAspectRatio::AR_16_9,1920/1072*1000=>KDLVideoAspectRatio::AR_16_9,
+			1850=>KDLVideoAspectRatio::AR_185,
+			2048/1080*1000=>KDLVideoAspectRatio::AR_2048_1080,2048/1072*1000=>KDLVideoAspectRatio::AR_2048_1080,
+			2350=>KDLVideoAspectRatio::AR_235,
+			2370=>KDLVideoAspectRatio::AR_237,
+			2390=>KDLVideoAspectRatio::AR_239,
+			2550=>KDLVideoAspectRatio::AR_255,
+		);
+		$ratio = (int)($wid*1000/$hgt);
+//print_r($arr);	
+		$res="0x0";
+		if(array_key_exists($ratio, $arr))
+		{
+			$res = $arr[$ratio];
+		}
+		else {
+			$prev=key($arr);
+			$first=$prev;
+			foreach($arr as $key=>$val) {
+				if($key>$ratio){
+					break;
+				}
+				$prev=$key;
+			}
+			end($arr);
+			$last = key(($arr));
+			if($first*0.9>$ratio) {
+				$res = KDLVideoAspectRatio::AR_LOW;
+			}
+			else if($last*1.1<$ratio) {
+				$res = KDLVideoAspectRatio::AR_HIGH;
+			}
+			else if(abs($ratio-$prev)<abs($ratio-$key)){
+				$res=$arr[$prev];
+			}
+			else {
+				$res=$arr[$key];
+			}
+		}
+//echo "\n,<br>key=".(int)($wid*1000/$hgt).",val=$res ";
+		return $res;
+		}	
+	};
 
 	class KDLCmdlinePlaceholders {
 		const InFileName	= "__inFileName__";
