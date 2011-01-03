@@ -49,7 +49,7 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null)
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
@@ -75,6 +75,7 @@ class kSessionUtils
 			$ks->rand = microtime(true);
 			$ks->user = $puser_id;
 			$ks->privileges = $privileges;
+			$ks->additional_data = $additional_data;
 			$ks_str = $ks->toSecureString();
 			return 0;
 		}
@@ -247,6 +248,7 @@ class ks
 	public $rand;
 	public $user;
 	public $privileges;
+	public $additional_data = null;
 
 	private $original_str = "";
 
@@ -306,6 +308,9 @@ class ks
 			
 		if(isset($parts[7]))
 			$ks->master_partner_id = $parts[7];
+		
+		if(isset($parts[8]))
+			$ks->additional_data = $parts[8];
 			
 		$salt = $ks->getSalt();
 		 
@@ -333,7 +338,7 @@ class ks
 
 	public function toSecureString ()
 	{
-		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id );
+		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
 		$str = implode ( self::SEPARATOR , $fields );
 
 		$salt = $this->getSalt();
