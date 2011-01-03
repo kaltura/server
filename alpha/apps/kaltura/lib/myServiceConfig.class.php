@@ -151,7 +151,8 @@ class myServiceConfig
 	public function getPartnerGroup()		{	return $this->get ( "pg" );			}
 	public function getKalturaNetwork()		{	return $this->get ( "kn" );			}
 	public function getMatchIp()			{	return $this->get ( "mip" );		}
-	
+	public function getTags()				{	return $this->get ( "tags" );		}
+
 	
 	public function getServiceProperties()
 	{
