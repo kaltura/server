@@ -22,109 +22,103 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
 ------------------------------------------------------------------------------------------------
 
-jobs.addmailjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
-jobs.listbatchjobs					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
-jobs.abortjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
-jobs.retryjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
-jobs.deletejob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
-jobs.addconvertprofilejob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |jobs
+jobs.addmailjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+jobs.listbatchjobs					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+jobs.abortjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+jobs.retryjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+jobs.deletejob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+jobs.addconvertprofilejob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-batchcontrol.setscheduleconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.setworkerconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.stopschedule			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.stopworker				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.startworker			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.kill					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.getcommand				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.setcommandresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.getfullstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.listschedulers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |batchcontrol
-
-system.adduser						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-system.getuserbyemail				|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-system.getuser						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-system.updateuser					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-system.deleteuser					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-system.listusers					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-
-#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-thumbasset.regenerate				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-thumbasset.getbyentryid				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-thumbparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-emailingestionprofile.add				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-emailingestionprofile.get				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-emailingestionprofile.update			|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-emailingestionprofile.delete	       	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-storageprofile.listbypartner		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.updatestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-virusscanprofile.add				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-virusscanprofile.delete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-virusscanprofile.get				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-virusscanprofile.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-virusscanprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
-
-session.impersonate                 |			|0		|1	|0		|0		|1		|r	|*		|	|	|admin-console
+batchcontrol.setscheduleconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.setworkerconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.stopschedule			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.stopworker				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.startworker			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.kill					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.getcommand				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.setcommandresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.getfullstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.listschedulers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
 
-distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-distributionprofile.add														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.get														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.update													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.updatestatus											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-distributionprofile.listbypartner											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+thumbasset.regenerate				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-genericdistributionprovider.add												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovider.get												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovider.update											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovider.delete											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovider.list											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+thumbasset.getbyentryid				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+thumbparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-genericdistributionprovideraction.add										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addmrsstransform							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addmrsstransformfromfile					|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addmrssvalidate							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addmrssvalidatefromfile					|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addresultstransform						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.addresultstransformfromfile				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.get										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.getbyproviderid							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.update									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.updatebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.delete									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.deletebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
-genericdistributionprovideraction.list										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+emailingestionprofile.add				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+emailingestionprofile.get				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+emailingestionprofile.update			|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+emailingestionprofile.delete	       	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|content_distribution
+storageprofile.listbypartner		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+storageprofile.updatestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+storageprofile.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+storageprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+storageprofile.add					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-permission.add						|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permission.delete					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permission.update					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+virusscanprofile.add				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+virusscanprofile.delete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+virusscanprofile.get				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+virusscanprofile.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+virusscanprofile.update				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
-permissionitem.add					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permissionitem.delete				|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permissionitem.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permissionitem.update				|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
-permissionitem.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |admin-console
+session.impersonate                 |			|0		|1	|0		|0		|1		|r	|*		|	|	|BASE_SYSTEM_ADMIN_PERMISSION
+
+
+distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+
+distributionprofile.add														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.get														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.update													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.updatestatus											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+distributionprofile.listbypartner											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+
+genericdistributionprovider.add												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovider.get												|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovider.update											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovider.delete											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovider.list											|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+
+genericdistributionprovideraction.add										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addmrsstransform							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addmrsstransformfromfile					|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addmrssvalidate							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addmrssvalidatefromfile					|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addresultstransform						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.addresultstransformfromfile				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.get										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.getbyproviderid							|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.update									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.updatebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.delete									|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.deletebyproviderid						|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+genericdistributionprovideraction.list										|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+
+entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|BASE_SYSTEM_ADMIN_PERMISSION
+
+permission.add						|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permission.delete					|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permission.update					|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+
+permissionitem.add					|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permissionitem.delete				|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permissionitem.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permissionitem.update				|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
+permissionitem.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |BASE_SYSTEM_ADMIN_PERMISSION
 
 
 ---------------------------------------------------------------------------------------------------
