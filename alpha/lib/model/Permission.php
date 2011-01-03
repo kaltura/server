@@ -66,14 +66,12 @@ class Permission extends BasePermission
 	 */
 	public function getPermissionItems()
 	{
-		$items = array();
-		$lookups = $this->getPermissionToPermissionItemsJoinPermissionItem();
-		if (!$lookups) {
-			return null;
-		}		
-		foreach ($lookups as $lookup) {
-			$items[] = $lookup->getPermissionItem();
-		}
+		$ids = $this->getPermissionItems();
+				
+		$c = new Criteria();
+		$c->add(PermissionItemPeer::ID, $ids, Criteria::IN);
+		$items = PermissionItemPeer::doSelect($c);
+		
 		return $items;
 	}	
 
