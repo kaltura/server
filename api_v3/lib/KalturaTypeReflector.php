@@ -299,8 +299,9 @@ class KalturaTypeReflector
 				$baseEnumName = call_user_func("$type::getEnumClass");
 //				$baseEnumName = $type::getEnumClass();
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
-				foreach($pluginInstances as $pluginName => $pluginInstance)
+				foreach($pluginInstances as $pluginInstance)
 				{
+					$pluginName = $pluginInstance->getPluginName();
 					$enums = $pluginInstance->getEnums($baseEnumName);
 					foreach($enums as $enum)
 					{
