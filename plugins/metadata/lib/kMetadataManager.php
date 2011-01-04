@@ -244,6 +244,7 @@ class kMetadataManager
 		
 		if(isset($searchTexts['text']))
 			$ret['text'] = $searchTexts['text'];
+		// TODO - add text suffix mdend
 			
 		return $ret;
 	}
