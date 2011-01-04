@@ -378,7 +378,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			
 			$kuser = null;
 			
-			// if no specific partner was request, but last logged in partner is not available, login to first found partner
+			// if no specific partner was requested, but last logged in partner is not available, login to first found partner
 			$c = new Criteria();
 			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId());
 			$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
