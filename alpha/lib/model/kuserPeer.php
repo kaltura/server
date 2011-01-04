@@ -439,6 +439,7 @@ class kuserPeer extends BasekuserPeer
 			{
 				$adminName = $admin->getFullName();
 				$unsubscribeLink .= $admin->getEmail();
+				$bodyParams = null;
 				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId, $forumsLink, $unsubscribeLink);
 			
 				// add mail job
