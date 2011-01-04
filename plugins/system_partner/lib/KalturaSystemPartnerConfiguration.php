@@ -146,7 +146,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"kmcVersion",
 		"enableAnalyticsTab",
 		"enableSilverLight",
-		"enableAnnotation",
 		"enableVast",
 		"enable508Players",
 		"defThumbOffset",
