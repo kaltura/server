@@ -39,25 +39,26 @@ class kConf extends kConfLocal
 
 				"default_duplication_time_frame" => 60 ,								
 				"job_duplication_time_frame" => array(
-					1 => 7200, //BatchJob::BATCHJOB_TYPE_IMPORT
+					1 => 7200, //BatchJobType::IMPORT
 				) ,
 			
 				"default_job_execution_attempt" => 3 ,
 				"job_execution_attempt" => array(
-					16 => 5, //BatchJob::BATCHJOB_TYPE_NOTIFICATION
-					4 => 1, //BatchJob::BATCHJOB_TYPE_BULK_UPLOAD
-					23 => 2, //BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT
-					28 => 10, //BatchJob::BATCHJOB_TYPE_METADATA_TRANSFORM
+					16 => 5, //BatchJobType::NOTIFICATION
+					4 => 1, //BatchJobType::BULK_UPLOAD
+					23 => 2, //BatchJobType::STORAGE_EXPORT
+					28 => 10, //BatchJobType::METADATA_TRANSFORM
 				) ,
 			
 				"default_job_retry_interval" => 20 ,
 				"job_retry_intervals" => array(
-					16 => 600, // BatchJob::BATCHJOB_TYPE_NOTIFICATION
-					15 => 150, // BatchJob::BATCHJOB_TYPE_MAIL
-					1 => 300, // BatchJob::BATCHJOB_TYPE_IMPORT
-					23 => 300, // BatchJob::BATCHJOB_TYPE_STORAGE_EXPORT
-					4 => 180, // BatchJob::BATCHJOB_TYPE_BULKUPLOAD
-					10 => 1800, // BatchJob::BATCHJOB_TYPE_CONVERT_PROFILE
+					16 => 600, // BatchJobType::NOTIFICATION
+					15 => 150, // BatchJobType::MAIL
+					1 => 300, // BatchJobType::IMPORT
+					23 => 300, // BatchJobType::STORAGE_EXPORT
+					4 => 180, // BatchJobType::BULKUPLOAD
+					10 => 1800, // BatchJobType::CONVERT_PROFILE
+					29 => 300, // BatchJobType::FILESYNC_IMPORT
 				) ,
 				
 				"ignore_cdl_failure" => false,
