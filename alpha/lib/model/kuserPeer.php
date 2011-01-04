@@ -450,7 +450,7 @@ class kuserPeer extends BasekuserPeer
 					kMailJobData::MAIL_PRIORITY_NORMAL, 
 					kConf::get ("partner_registration_confirmation_email" ), 
 					kConf::get ("partner_registration_confirmation_name" ), 
-					$loginEmail, 
+					$admin->getEmail(), 
 					$bodyParams
 				);
 			}
