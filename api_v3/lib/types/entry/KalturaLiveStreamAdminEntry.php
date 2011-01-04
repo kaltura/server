@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @requiresPermission read,update,insert
  */
 class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
 {

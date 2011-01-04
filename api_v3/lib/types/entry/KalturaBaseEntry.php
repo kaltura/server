@@ -19,6 +19,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand,eq,order
+	 * @requiresPermission update
 	 */
 	public $name;
 	
@@ -26,6 +27,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Entry description
 	 * 
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $description;
 	
@@ -51,6 +53,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
+	 * @requiresPermission insert,update
 	 */
 	public $tags;
 	
@@ -66,6 +69,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter matchand, matchor
+	 * @requiresPermission insert,update
 	 */
 	public $categories;
 	
@@ -73,6 +77,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter matchand, matchor
+	 * @requiresPermission insert,update
 	 */
 	public $categoriesIds;
 	
@@ -173,6 +178,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
+	 * @requiresPermission read
 	 */
 	public $downloadUrl;
 	
@@ -212,6 +218,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var int
 	 * @filter eq,in
+	 * @requiresPermission insert,update
 	 */
 	public $accessControlId;
 	
@@ -220,6 +227,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 *  
 	 * @var int
 	 * @filter gte,lte,gteornull,lteornull
+	 * @requiresPermission insert,update
 	 */
 	public $startDate;
 	
@@ -228,6 +236,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var int
 	 * @filter gte,lte,gteornull,lteornull
+	 * @requiresPermission insert,update
 	 */
 	public $endDate;
 	
