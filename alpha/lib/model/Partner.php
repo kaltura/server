@@ -645,6 +645,15 @@ class Partner extends BasePartner
 		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
 		return $ownerKuser->getPuserId();
 	}
+	
+	public function setAdminUserId($adminUserId)
+	{
+		$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getId(), $adminUserId);
+		if (!$adminKuser) {
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		}
+		$this->setAccountOwnerKuserId($adminKuser->getId());
+	}
 
 	
 	public function getAdminEmail()

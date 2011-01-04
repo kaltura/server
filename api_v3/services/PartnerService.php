@@ -114,16 +114,9 @@ class PartnerService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
 		
 		try {
+			$partner->id = $this->getPartnerId();
 			$partnerUpdate = $partner->toPartner();
 			$partnerUpdate->setId($dbPartner->getId());
-			
-			if ($partner->adminUserId) {
-				$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $partner->adminUserId);
-				if (!$adminKuser) {
-					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
-				}
-				$partnerUpdate->setAccountOwnerKuserId($adminKuser->getId());
-			}
 		}
 		catch(kUserException $e) {
 			if ($e->getCode() === kUserException::USER_NOT_FOUND) {

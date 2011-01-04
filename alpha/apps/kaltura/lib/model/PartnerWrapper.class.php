@@ -7,7 +7,7 @@ class PartnerWrapper extends objectWrapperBase
 	protected $regular_fields_ext = array ( "url1" , "url2" , "appearInSearch" , "createdAt" , "adminName" ,
 		"adminEmail" , "description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "landingPage" , "userLandingPage" ,
 		"phone" , "describeYourself" , "adultContent" , "defConversionProfileType" , "notify", "status",
-		"allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" , "maxUploadSize", "partnerPackage"
+		"allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" , "maxUploadSize", "partnerPackage", "adminUserId",
 	);
 
 	protected $detailed_fields_ext = array ("secret", "adminSecret" ) ;
@@ -20,7 +20,7 @@ class PartnerWrapper extends objectWrapperBase
 		"adminEmail" , "description" , "commercialUse" , "landingPage" , "userLandingPage", "notificationsConfig",
 		"notify", "allowMultiNotification" , "contentCategories" , "type" , 
 		"landingPage" , "userLandingPage" , "phone" , "describeYourself" , "adultContent" , "defConversionProfileType",
-		"allowQuickEdit" , "mergeEntryLists" , "maxUploadSize", "accountOwnerKuserId" );
+		"allowQuickEdit" , "mergeEntryLists" , "maxUploadSize", "adminUserId", );
 
 	public function describe()
 	{
