@@ -48,8 +48,10 @@ class AnnotationTableMap extends TableMap {
 		$this->addColumn('START_TIME', 'StartTime', 'INTEGER', false, null, null);
 		$this->addColumn('END_TIME', 'EndTime', 'INTEGER', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
+		$this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
 		$this->addColumn('KUSER_ID', 'KuserId', 'INTEGER', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PARTNER_DATA', 'PartnerData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

@@ -7,6 +7,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 #-- annotation
 #-----------------------------------------------------------------------------
 
+DROP TABLE IF EXISTS `annotation`;
+
+
 CREATE TABLE `annotation`
 (
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
@@ -21,8 +24,10 @@ CREATE TABLE `annotation`
 	`start_time` INTEGER,
 	`end_time` INTEGER,
 	`status` TINYINT  NOT NULL,
+	`type` TINYINT  NOT NULL,
 	`kuser_id` INTEGER,
 	`custom_data` TEXT,
+	`partner_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_entry_index`(`partner_id`, `entry_id`),
 	KEY `int_id_index`(`int_id`)

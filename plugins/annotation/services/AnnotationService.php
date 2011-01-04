@@ -10,7 +10,6 @@ class AnnotationService extends KalturaBaseService
 	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
 	{
 		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
-		
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
 				
 		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
@@ -34,6 +33,7 @@ class AnnotationService extends KalturaBaseService
 			
 		$c = new Criteria();
 		$c->add(AnnotationPeer::STATUS,AnnotationStatus::ANNOTATION_STATUS_READY);
+		$c->add(AnnotationPeer::TYPE,AnnotationType::ANNOTATION);
 		
 		$annotationFilter = new AnnotationFilter();
 		$filter->toObject($annotationFilter);
@@ -66,17 +66,18 @@ class AnnotationService extends KalturaBaseService
 		$annotation->validateParentId($annotation);
 		$annotation->validateEntryId($annotation);
 		$annotation->validateStartTime($annotation);
-		$annotation->validateEndTime($annotation);				
+		$annotation->validateEndTime($annotation);			
 		if($annotation->text != null)
 			$annotation->validatePropertyMaxLength("text", AnnotationPeer::MAX_ANNOTATION_TEXT);
 		if($annotation->tags != null)
 			$annotation->validatePropertyMaxLength("tags", AnnotationPeer::MAX_ANNOTATION_TAGS);
-
+			
 		$dbAnnotation = $annotation->toInsertableObject();
 		$dbAnnotation->setId($dbAnnotation->getUniqueAnnotationId());
 		$dbAnnotation->setPartnerId($this->getPartnerId());
 		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_READY); 
-		$dbAnnotation->setKuserId($this->getKuser()->getId()); 
+		$dbAnnotation->setKuserId($this->getKuser()->getId());
+		$dbAnnotation->setType(AnnotationType::ANNOTATION); 
 					
 		$created = $dbAnnotation->save();
 		if(!$created)
@@ -99,8 +100,11 @@ class AnnotationService extends KalturaBaseService
 	function getAction($id)
 	{
 		$dbAnnotation = AnnotationPeer::retrieveByPK( $id );
-		
+
 		if(!$dbAnnotation)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			
+		if ($dbAnnotation->getType() != AnnotationType::ANNOTATION)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 			
 		$annotation = new KalturaAnnotation();
@@ -123,6 +127,9 @@ class AnnotationService extends KalturaBaseService
 		$dbAnnotation = AnnotationPeer::retrieveByPK( $id );
 		if(!$dbAnnotation)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		if ($dbAnnotation->getType() != AnnotationType::ANNOTATION)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		$dbAnnotation->setStatus(AnnotationStatus::ANNOTATION_STATUS_DELETED);
 		$dbAnnotation->save();
@@ -141,6 +148,9 @@ class AnnotationService extends KalturaBaseService
 		kalturalog::debug("annotation service updateAction");
 
 		$dbAnnotation = AnnotationPeer::retrieveByPK($id);
+		
+		if ($dbAnnotation->getType() != AnnotationType::ANNOTATION)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 		
 		if (!$dbAnnotation)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);

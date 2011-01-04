@@ -91,6 +91,12 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
+	 * The value for the type field.
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
 	 * The value for the kuser_id field.
 	 * @var        int
 	 */
@@ -101,6 +107,12 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $custom_data;
+
+	/**
+	 * The value for the partner_data field.
+	 * @var        string
+	 */
+	protected $partner_data;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -311,6 +323,16 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
+	/**
 	 * Get the [kuser_id] column value.
 	 * 
 	 * @return     int
@@ -328,6 +350,16 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [partner_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getPartnerData()
+	{
+		return $this->partner_data;
 	}
 
 	/**
@@ -659,6 +691,29 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	} // setStatus()
 
 	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     Annotation The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[AnnotationPeer::TYPE]))
+			$this->oldColumnsValues[AnnotationPeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = AnnotationPeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
+
+	/**
 	 * Set the value of [kuser_id] column.
 	 * 
 	 * @param      int $v new value
@@ -700,6 +755,29 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setCustomData()
+
+	/**
+	 * Set the value of [partner_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     Annotation The current object (for fluent API support)
+	 */
+	public function setPartnerData($v)
+	{
+		if(!isset($this->oldColumnsValues[AnnotationPeer::PARTNER_DATA]))
+			$this->oldColumnsValues[AnnotationPeer::PARTNER_DATA] = $this->partner_data;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->partner_data !== $v) {
+			$this->partner_data = $v;
+			$this->modifiedColumns[] = AnnotationPeer::PARTNER_DATA;
+		}
+
+		return $this;
+	} // setPartnerData()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -745,8 +823,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$this->start_time = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->end_time = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->status = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->type = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->kuser_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->custom_data = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->partner_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -756,7 +836,7 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = AnnotationPeer::NUM_COLUMNS - AnnotationPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 16; // 16 = AnnotationPeer::NUM_COLUMNS - AnnotationPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating Annotation object", $e);
@@ -1195,10 +1275,16 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 				return $this->getStatus();
 				break;
 			case 12:
-				return $this->getKuserId();
+				return $this->getType();
 				break;
 			case 13:
+				return $this->getKuserId();
+				break;
+			case 14:
 				return $this->getCustomData();
+				break;
+			case 15:
+				return $this->getPartnerData();
 				break;
 			default:
 				return null;
@@ -1233,8 +1319,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 			$keys[9] => $this->getStartTime(),
 			$keys[10] => $this->getEndTime(),
 			$keys[11] => $this->getStatus(),
-			$keys[12] => $this->getKuserId(),
-			$keys[13] => $this->getCustomData(),
+			$keys[12] => $this->getType(),
+			$keys[13] => $this->getKuserId(),
+			$keys[14] => $this->getCustomData(),
+			$keys[15] => $this->getPartnerData(),
 		);
 		return $result;
 	}
@@ -1260,8 +1348,10 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(AnnotationPeer::START_TIME)) $criteria->add(AnnotationPeer::START_TIME, $this->start_time);
 		if ($this->isColumnModified(AnnotationPeer::END_TIME)) $criteria->add(AnnotationPeer::END_TIME, $this->end_time);
 		if ($this->isColumnModified(AnnotationPeer::STATUS)) $criteria->add(AnnotationPeer::STATUS, $this->status);
+		if ($this->isColumnModified(AnnotationPeer::TYPE)) $criteria->add(AnnotationPeer::TYPE, $this->type);
 		if ($this->isColumnModified(AnnotationPeer::KUSER_ID)) $criteria->add(AnnotationPeer::KUSER_ID, $this->kuser_id);
 		if ($this->isColumnModified(AnnotationPeer::CUSTOM_DATA)) $criteria->add(AnnotationPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(AnnotationPeer::PARTNER_DATA)) $criteria->add(AnnotationPeer::PARTNER_DATA, $this->partner_data);
 
 		return $criteria;
 	}
@@ -1338,9 +1428,13 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 
 		$copyObj->setStatus($this->status);
 
+		$copyObj->setType($this->type);
+
 		$copyObj->setKuserId($this->kuser_id);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setPartnerData($this->partner_data);
 
 
 		$copyObj->setNew(true);

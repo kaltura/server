@@ -62,6 +62,11 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $userId;
+	
+	/**
+	 * @var string
+	 */
+	public $partnerData;
 
 	
 	
@@ -77,6 +82,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 		"startTime",
 		"endTime",
 		"userId" => "puserId",
+		"partnerData",
 	);
 	
 	public function getMapBetweenObjects()
@@ -162,7 +168,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 			$annotation->endTime = $annotation->startTime;
 			
 		if($annotation->endTime < $annotation->startTime)
-			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_CANNOT_BE_LESS_THEN_START_TIME, $annotation->parentId);
+			throw new KalturaAPIException(KalturaAnnotationErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $annotation->parentId);
 		
 		if($annotationId !== null){ //update
 			$dbAnnotation = AnnotationPeer::retrieveByPK($annotationId);
@@ -212,7 +218,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 		}
 		
 		if($dbEntry->getLengthInMsecs() < $annotation->startTime)
-			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_IS_BIGGER_THEN_ENTRY_END_TIME, $annotation->startTime, $dbEntry->getLengthInMsecs());
+			throw new KalturaAPIException(KalturaAnnotationErrors::START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $annotation->startTime, $dbEntry->getLengthInMsecs());
 	}
 	
 	/**

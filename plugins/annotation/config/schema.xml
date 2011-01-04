@@ -13,8 +13,10 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="start_time" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="end_time" type="integer" />
 		<column primaryKey="false" required="true" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="true" lazyLoad="false" name="type" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="kuser_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar"/>
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_data" type="longvarchar"/>
 		<index name="partner_entry_index">
 			<index-column name="partner_id" />
 			<index-column name="entry_id" />
