@@ -70,7 +70,14 @@ class sftpMgr extends kFileTransferMgr
 	// login using a public key
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
-		return ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase);
+		// try to login
+		if (ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase)) {
+			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
+			return ($this->sftp_id != false && $this->sftp_id != null);
+		}
+		else {
+			return false;
+		}
 	}
 	
 	
