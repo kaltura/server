@@ -12,6 +12,11 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		parent::__construct();
 	}
 	
+	public function saveProviderAdditionalObjects(KalturaDistributionProfile $distributionProfile)
+	{
+		// called after the profile element is saved
+	}
+	
 	abstract protected function addProviderElements();
 	
 	public function resetUnUpdatebleAttributes(KalturaDistributionProfile $distributionProfile)

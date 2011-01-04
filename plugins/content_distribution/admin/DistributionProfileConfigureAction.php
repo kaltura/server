@@ -82,7 +82,8 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$form->populate($request->getPost());
 					$distributionProfile = $form->getObject($profileClass, $request->getPost());
 					$form->resetUnUpdatebleAttributes($distributionProfile);
-					$this->client->distributionProfile->update($profileId, $distributionProfile);
+					$distributionProfile = $this->client->distributionProfile->update($profileId, $distributionProfile);
+					$form->saveProviderAdditionalObjects($distributionProfile);
 				}
 				else
 				{
@@ -119,6 +120,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$distributionProfile->partnerId = null;
 					$distributionProfile = $this->client->distributionProfile->add($distributionProfile);
 					Kaltura_ClientHelper::unimpersonate();
+					$form->saveProviderAdditionalObjects($distributionProfile);
 				}
 				else 
 				{
