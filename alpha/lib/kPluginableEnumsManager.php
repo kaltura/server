@@ -100,12 +100,12 @@ class kPluginableEnumsManager
 	{
 		$typeMap = self::getCoreMap($type);
 		if(!$typeMap)
-			throw new kCoreException("Dynamic enum type [$type] has no values", kCoreException::INTERNAL_SERVER_ERROR); 
+			return $value; 
 		
 		if(isset($typeMap[$value]))
 			return $typeMap[$value];
 			
-		throw new kCoreException("Dynamic enum id [$value] not found for type [$type]", kCoreException::INTERNAL_SERVER_ERROR);
+		return $value;
 	}
 
 	public static function apiToCore($type, $value)
