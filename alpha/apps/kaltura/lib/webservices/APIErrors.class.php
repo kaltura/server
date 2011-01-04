@@ -260,7 +260,7 @@
 		
 		const CANT_UPDATE_PARAMETER = "CANT_UPDATE_PARAMETER,The following parameter cannot be updated [%s]";
 		
-		const LOGIN_DATA_NOT_FOUND = "LOGIN_DATA_NOT_FOUND,The data you entered is invalid";
+		const LOGIN_DATA_NOT_FOUND = "LOGIN_DATA_NOT_FOUND,Login id not found";
 		
 		const WRONG_OLD_PASSWORD = "WRONG_OLD_PASSWORD,old password is wrong";
 		
