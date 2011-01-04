@@ -76,8 +76,8 @@ class kPluginableEnumsManager
 		if(is_null($type))
 			return self::$coreMap;
 			
-		if(isset(self::$coreMap['$type']))
-			return self::$coreMap['$type'];
+		if(isset(self::$coreMap[$type]))
+			return self::$coreMap[$type];
 			
 		return null;
 	}
@@ -90,8 +90,8 @@ class kPluginableEnumsManager
 		if(is_null($type))
 			return self::$apiMap;
 			
-		if(isset(self::$apiMap['$type']))
-			return self::$apiMap['$type'];
+		if(isset(self::$apiMap[$type]))
+			return self::$apiMap[$type];
 			
 		return null;
 	}
