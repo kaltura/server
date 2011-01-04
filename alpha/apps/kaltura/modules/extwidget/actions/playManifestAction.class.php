@@ -84,9 +84,8 @@ class playManifestAction extends kalturaAction
 	{
 		$flavorAssets = array();
 		
-		if($this->flavorId)
+		if($this->flavorId && ($flavorAsset = flavorAssetPeer::retrieveById($this->flavorId)) != null)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveById($this->flavorId);
 			if($this->format != StorageProfile::PLAY_FORMAT_SILVER_LIGHT && $flavorAsset->hasTag(flavorParams::TAG_WEB) && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAssets[] = $flavorAsset;
 				
