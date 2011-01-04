@@ -20,25 +20,25 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-documents.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.convert					|			|1		|1	|1		|2		|1		|	|		|1	|   |
-documents.addfromentry				|			|1		|1	|1		|2		|1		|	|		|1	|   |
-documents.addfromflavorasset		|			|1		|1	|1		|2		|1		|	|		|1	|   |
-documents.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |
-documents.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |
-documents.upload					|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-documents.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |
-documents.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |
+documents.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+documents.convert					|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_RECONVERT
+documents.addfromentry				|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
+documents.addfromflavorasset		|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
+documents.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |CONTENT_MANAGE_BASE
+documents.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA
+documents.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_DELETE
+documents.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+documents.upload					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+documents.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_RECONVERT
+documents.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+documents.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
 
-document.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-document.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |
-document.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-document.delete						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-document.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |
-document.upload						|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-document.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |
-document.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |
-document.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |
+document.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+document.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |CONTENT_MANAGE_BASE
+document.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA
+document.delete						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_DELETE
+document.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+document.upload						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+document.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_RECONVERT
+document.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+document.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE

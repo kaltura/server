@@ -19,11 +19,11 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 ------------------------------------------------------------------------------------------------
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
-systempartner.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.getusage				|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.updatestatus			|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.getadminsession		|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.getconfiguration		|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |
-systempartner.getpackages			|			|2		|1	|0		|0		|1		|	|*		|	|   |
+systempartner.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.getusage				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.updatestatus			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.getadminsession		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.getconfiguration		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG
+systempartner.getpackages			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_PARTNER_CONFIG

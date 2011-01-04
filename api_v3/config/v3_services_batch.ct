@@ -21,189 +21,189 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 ------------------------------------------------------------------------------------------------
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
 ------------------------------------------------------------------------------------------------
-media.addfrombulk					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-media.upload				    	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-media.addfromuploadedfile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-baseentry.addfromuploadedfile		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+media.addfrombulk					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+media.upload				    	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+media.addfromuploadedfile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+baseentry.addfromuploadedfile		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-jobs.abortmail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortbulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortpostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortstorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortstoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortpull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortnotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.abortremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletemail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletebulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteconvertcollection		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletepostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletestorageexport			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletestoragedelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletepull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deletenotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.deleteremoteconvert			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrymail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrybulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrypostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrystorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrystoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrypull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retrynotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.retryremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getpullstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getimportstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getpostconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getextractmediastatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getstorageexportstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getstoragedeletestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getbulkuploadstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getconvertcollectionstatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getprovisionprovidestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getprovisiondeletestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getconvertstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getnotificationstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getconvertprofilestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getremoteconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-jobs.getmailstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+jobs.abortmail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortbulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortpostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortstorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortstoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortpull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortnotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.abortremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletemail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletebulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteconvertcollection		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletepostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletestorageexport			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletestoragedelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletepull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deletenotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.deleteremoteconvert			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrymail						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrybulkupload				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryconvertcollection			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryprovisionprovide			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryprovisiondelete			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryconvert					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrypostconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryextractmedia				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrystorageexport				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrystoragedelete				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryimport					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrypull						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retrynotification				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryconvertprofile			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.retryremoteconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getpullstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getimportstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getpostconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getextractmediastatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getstorageexportstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getstoragedeletestatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getbulkuploadstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getconvertcollectionstatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getprovisionprovidestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getprovisiondeletestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getconvertstatus				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getnotificationstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getconvertprofilestatus		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getremoteconvertstatus			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+jobs.getmailstatus					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-batch.getqueuesize					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.checkfileexists				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivepulljobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivepulljob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivepulljob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveimportjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.cleanexclusivejobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.addbulkuploadresult			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getbulkuploadlastresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updatebulkuploadresults		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.addmediainfo					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivepostconvertjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveextractmediajobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveextractmediajob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveextractmediajob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivestorageexportjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivestoragedeletejobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivestorageexportjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivestoragedeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivestorageexportjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivestoragedeletejob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivebulkuploadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveconvertcollectionjobs	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveprovisionprovidejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveprovisiondeletejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveconvertcollectionjob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveprovisionprovidejob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveprovisiondeletejob	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveconvertcollectionjob |		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveprovisionprovidejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveprovisiondeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusiveconvertjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivenotificationjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivenotificationjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivenotificationjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivemailjobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivemailjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivemailjob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveconvertprofilejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusiveremoteconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivebulkdownloadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivebulkdownloadjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivebulkdownloadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivecapturethumbjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusivecapturethumbjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.freeexclusivecapturethumbjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.logconversion					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.resetjobexecutionattempts		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+batch.getqueuesize					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.checkfileexists				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivepulljobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivepulljob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivepulljob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveimportjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveimportjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.cleanexclusivejobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.addbulkuploadresult			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getbulkuploadlastresult		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updatebulkuploadresults		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.addmediainfo					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivepostconvertjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivepostconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveextractmediajobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveextractmediajob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveextractmediajob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivestorageexportjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivestoragedeletejobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivestorageexportjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivestoragedeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivestorageexportjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivestoragedeletejob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivebulkuploadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveconvertcollectionjobs	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveprovisionprovidejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveprovisiondeletejobs|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveconvertcollectionjob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveprovisionprovidejob|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveprovisiondeletejob	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivebulkuploadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveconvertcollectionjob |		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveprovisionprovidejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveprovisiondeletejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusiveconvertjobs		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveconvertjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivenotificationjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivenotificationjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivenotificationjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivemailjobs			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivemailjob		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivemailjob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveconvertprofilejob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusiveremoteconvertjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivebulkdownloadjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivebulkdownloadjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivebulkdownloadjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivecapturethumbjobs	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusivecapturethumbjob|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.freeexclusivecapturethumbjob	|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.logconversion					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.resetjobexecutionattempts		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-batch.updateexclusiveconvertjobsubtype			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.updateexclusiveconvertprofilejob			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneconvertjobs			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneconvertprofilejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdonebulkuploadjobs		|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneconvertcollectionjobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneprovisionprovidejobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+batch.updateexclusiveconvertjobsubtype			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.updateexclusiveconvertprofilejob			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneconvertjobs			|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneconvertprofilejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdonebulkuploadjobs		|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneconvertcollectionjobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneprovisionprovidejobs|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSIONcontrol
-batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSIONcontrol
-batchcontrol.getcommand				|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSIONcontrol
-batchcontrol.setcommandresult		|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSIONcontrol
-batchcontrol.getfullstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSIONcontrol
+batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
+batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
+batchcontrol.getcommand				|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
+batchcontrol.setcommandresult		|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
+batchcontrol.getfullstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
 
-emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
 filesync.sync						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |file-sync
 
-metadatabatch.getexclusiveimportmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.updateexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.freeexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.getexclusivetransformmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.updateexclusivetransformmetadatajob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.freeexclusivetransformmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.gettransformmetadataobjects		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadatabatch.upgrademetadataobjects			|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+metadatabatch.getexclusiveimportmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.updateexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.freeexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.getexclusivetransformmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.updateexclusivetransformmetadatajob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.freeexclusivetransformmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.gettransformmetadataobjects		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadatabatch.upgrademetadataobjects			|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-metadata.update									|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-metadata.invalidate								|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+metadata.update									|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+metadata.invalidate								|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-filesyncimportbatch.updateexclusivefilesyncimportjob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-filesyncimportbatch.freeexclusivefilesyncimportjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-filesyncimportbatch.getexclusivefilesyncimportjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-filesyncimportbatch.getexclusivealmostdonefilesyncimportjobs		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+filesyncimportbatch.updateexclusivefilesyncimportjob|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+filesyncimportbatch.freeexclusivefilesyncimportjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+filesyncimportbatch.getexclusivefilesyncimportjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+filesyncimportbatch.getexclusivealmostdonefilesyncimportjobs		|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-virusscanbatch.updateexclusivevirusscanjob  |	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-virusscanbatch.freeexclusivevirusscanjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
-virusscanbatch.getexclusivevirusscanjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BASE_BATCH_SYSTEM_PERMISSION
+virusscanbatch.updateexclusivevirusscanjob  |	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+virusscanbatch.freeexclusivevirusscanjob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+virusscanbatch.getexclusivevirusscanjobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
 
-contentdistributionbatch.getexclusivedistributionsubmitjobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.updateexclusivedistributionsubmitjob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.freeexclusivedistributionsubmitjob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivealmostdonedistributionsubmitjobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivedistributionupdatejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.updateexclusivedistributionupdatejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.freeexclusivedistributionupdatejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivealmostdonedistributionupdatejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivedistributiondeletejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.updateexclusivedistributiondeletejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.freeexclusivedistributiondeletejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivealmostdonedistributiondeletejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivedistributionfetchreportjobs			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.updateexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.freeexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.getexclusivealmostdonedistributionfetchreportjobs	|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
-contentdistributionbatch.createrequiredjobs									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BASE_BATCH_SYSTEM_PERMISSION
+contentdistributionbatch.getexclusivedistributionsubmitjobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.updateexclusivedistributionsubmitjob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.freeexclusivedistributionsubmitjob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivealmostdonedistributionsubmitjobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivedistributionupdatejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.updateexclusivedistributionupdatejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.freeexclusivedistributionupdatejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivealmostdonedistributionupdatejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivedistributiondeletejobs					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.updateexclusivedistributiondeletejob				|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.freeexclusivedistributiondeletejob					|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivealmostdonedistributiondeletejobs		|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivedistributionfetchreportjobs			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.updateexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.freeexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.getexclusivealmostdonedistributionfetchreportjobs	|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.createrequiredjobs									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
 
 ---------------------------------------------------------------------------------------------------

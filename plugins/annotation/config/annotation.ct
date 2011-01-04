@@ -20,8 +20,8 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-annotation.update					|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
-annotation.delete					|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
-annotation.list						|			|1,2		|1	|1		|1		|1		|r	|		|	|   |
-annotation.add						|			|1,2		|1	|1		|1		|1		|rw	|		|	|   |
-annotation.get						|			|1,2		|1	|1		|1		|1		|r	|		|	|   |
+annotation.update					|			|1,2	|1	|1		|1		|1		|rw	|		|	|   |CONTENT_MANAGE_ANNOTATION
+annotation.delete					|			|1,2	|1	|1		|1		|1		|rw	|		|	|   |CONTENT_MANAGE_ANNOTATION
+annotation.list						|			|1,2	|1	|1		|1		|1		|r	|		|	|   |CONTENT_MANAGE_ANNOTATION
+annotation.add						|			|1,2	|1	|1		|1		|1		|rw	|		|	|   |CONTENT_MANAGE_ANNOTATION
+annotation.get						|			|1,2	|1	|1		|1		|1		|r	|		|	|   |CONTENT_MANAGE_ANNOTATION
