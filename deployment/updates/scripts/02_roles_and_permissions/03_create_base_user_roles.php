@@ -13,7 +13,7 @@ require_once(dirname(__FILE__).'/../../../bootstrap.php');
 $userRoles = array();
 
 $role = new UserRole();
-$role->setName('Basic user session role');
+$role->setName('Basic User Session Role');
 $role->setStrId(UserRoleId::BASE_USER_SESSION_ROLE);
 $role->setDescription('Allowed actions for a basic user with no special permissions');
 $role->setPermissionNames('BASE_USER_SESSION_PERMISSION');
@@ -22,20 +22,12 @@ $role->setPartnerId(0);
 $userRoles[] = $role;
 
 $role = new UserRole();
-$role->setName('No KS role');
-$role->setStrId(UserRoleId::NO_SESSION_ROLE);
-$role->setDescription('Allowed actions with no session');
-$role->setPermissionNames('NO_SESSION_PERMISSION');
-$role->setStatus(UserRoleStatus::ACTIVE);
-$role->setPartnerId(0);
-$userRoles[] = $role;
-
-$role = new UserRole();
-$role->setName('Partner administrator');
+$role->setName('Publisher Administrator');
 $role->setStrId(UserRoleId::PARTNER_ADMIN_ROLE);
 $role->setDescription('Full control over publisher account and user management functionalities');
 $role->setPermissionNames('*');
 $role->setStatus(UserRoleStatus::ACTIVE);
+$role->setTags('kmc');
 $role->setPartnerId(0);
 $userRoles[] = $role;
 
@@ -49,29 +41,32 @@ $role->setPartnerId(99);
 $userRoles[] = $role;
 
 $role = new UserRole();
-$role->setName('Upload only');
+$role->setName('Upload Only');
 $role->setDescription('Access to content ingestion and management functionalities');
 $uploaderPermissions = 'CONTENT_UPLOAD,CONTENT_BULK_UPLOAD,CONTENT_MANAGE_MIX,CONTENT_MANAGE_BASE,CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL,CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MANAGE_DELETE,CONTENT_MANAGE_RECONVERT,CONTENT_MANAGE_EDIT_CATEGORIES,CONTENT_MANAGE_EMBED_CODE,LIVE_STREAM_BASE,LIVE_STREAM_ADD,LIVE_STREAM_UPDATE';
 $role->setPermissionNames($uploaderPermissions);
 $role->setStatus(UserRoleStatus::ACTIVE);
+$role->setTags('kmc');
 $role->setPartnerId(99);
 $userRoles[] = $role;
 
 $role = new UserRole();
-$role->setName('Content moderator');
+$role->setName('Content Moderator');
 $role->setDescription('Access to publisher content moderation panel');
 $moderatorPermissions = 'CONTENT_MODERATE_BASE,CONTENT_MODERATE_METADATA';
 $role->setPermissionNames($moderatorPermissions);
 $role->setStatus(UserRoleStatus::ACTIVE);
+$role->setTags('kmc');
 $role->setPartnerId(99);
 $userRoles[] = $role;
 
 $role = new UserRole();
-$role->setName('Player designer');
-$role->setDescription('Access to publisher player studio');
+$role->setName('Player Designer');
+$role->setDescription('Access to publisher studio');
 $designerPermissions = 'STUDIO_BASE,STUDIO_ADD_UICONF,STUDIO_UPDATE_UICONF,STUDIO_DELETE_UICONF,STUDIO_BRAND_UICONF';
 $role->setPermissionNames($designerPermissions);
 $role->setStatus(UserRoleStatus::ACTIVE);
+$role->setTags('kmc');
 $role->setPartnerId(99);
 $userRoles[] = $role;
 
