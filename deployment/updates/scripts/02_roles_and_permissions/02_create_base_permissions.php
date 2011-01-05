@@ -11,9 +11,12 @@ require_once(dirname(__FILE__).'/../../../bootstrap.php');
 //------------------------------------------------------
 
 $permissionsData = array (
-	array (-1, PermissionType::API_ACCESS, PermissionName::BASE_BATCH_SYSTEM_PERMISSION, 'Batch system permission', null),
+	// batch system
+	array (-1, PermissionType::API_ACCESS, PermissionName::BATCH_BASE, 'Batch system permission', null),
+	
+	// all partners
 	array (0, PermissionType::API_ACCESS,PermissionName::USER_SESSION_PERMISSION, 'User session permission', null),
-	array (0, PermissionType::API_ACCESS,PermissionName::NO_SESSION_PERMISSION, 'No session permission', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::ALWAYS_ALLOWED_ACTIONS, 'No session permission', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_INGEST_UPLOAD, 'Upload', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_INGEST_BULK_UPLOAD, 'Bulk upload', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_INGEST_FEED, 'Feed subscription', null),
@@ -29,6 +32,12 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_RECONVERT, 'Reconvert flavors', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_EDIT_CATEGORIES, 'Manage categories', null),
 	array (0, PermissionType::EXTERNAL,PermissionName::CONTENT_MANAGE_EMBED_CODE, 'Grab embed code', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_BASE, 'Distribution base', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_MODIFY, 'Distribution manage', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE, 'Distribution profile base', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY, 'Distribution profile manage', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_VIRUS_SCAN, 'Virus scan actions', PermissionPeer::getPermissionNameFromPluginName(VirusScanPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DOWNLOAD, 'Content download', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_ANNOTATION, 'Annotate', PermissionPeer::getPermissionNameFromPluginName(AnnotationPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_SHARE, 'Share content', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::LIVE_STREAM_BASE, 'Live streams access', PermissionName::FEATURE_LIVE_STREAM),
@@ -80,6 +89,39 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::ADMIN_PUBLISHER_MANAGE, 'Manage publishers', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ADMIN_WHITE_BRANDING, 'Manage whitebranding', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_BASE, 'Analytics access', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::WIDGET_ADMIN, 'Widget admin', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_SEND_DATA, 'Send analytics data', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::SYSTEM_BASE_ACTIONS, 'Basic system actions', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::WIDGET_ADMIN, 'Widget admin', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::SEARCH_SERVICE, 'Search service', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_SEND_DATA, 'Send analytics data', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::AUDIT_TRAIL_BASE, 'Audit trail base', PermissionPeer::getPermissionNameFromPluginName(AuditPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::AUDIT_TRAIL_ADD, 'Audit trail add', PermissionPeer::getPermissionNameFromPluginName(AuditPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::SYSTEM_FILESYNC, 'Filesync actions', null),
+		
+	// system admin and admin console permissions
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_BASE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_BASE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_BLOCK, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_REMOVE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_ADD, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_USAGE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_USER_MANAGE, 'Base system admin permission', null),
+	array (-2, PermissionType::EXTERNAL,PermissionName::SYSTEM_ADMIN_SYSTEM_MONITOR, 'Base system admin permission', null),
+	array (-2, PermissionType::EXTERNAL,PermissionName::SYSTEM_ADMIN_DEVELOPERS_TAB, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_BATCH_CONTROL, 'Base system admin permission', null),
+	array (-2, PermissionType::EXTERNAL,PermissionName::SYSTEM_ADMIN_BATCH_CONTROL_INPROGRESS, 'Base system admin permission', null),
+	array (-2, PermissionType::EXTERNAL,PermissionName::SYSTEM_ADMIN_BATCH_CONTROL_FAILED, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_BATCH_CONTROL_SETUP, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_STORAGE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_VIRUS_SCAN, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_EMAIL_INGESTION, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PERMISSIONS_MANAGE, 'Base system admin permission', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_INTERNAL, 'System internal actions', null),
 );
 
 //------------------------------------------------------
