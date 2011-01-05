@@ -1,6 +1,6 @@
 <?php
 
-$defaultLoginUsersQuota = 5; // must be set!
+$defaultLoginUsersQuota = 3; // must be set!
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
