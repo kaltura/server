@@ -38,3 +38,9 @@ kmc2helpSuccess:
   layout:         helplayout
   javascripts:    [ -*, http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js ]
   stylesheets:    [ -*, /lib/css/kmc ]
+  
+previewSuccess:
+  has_layout:     off
+  layout:         helplayout
+  javascripts:    [ -* ]
+  stylesheets:    [ -*, /lib/css/kmc ]  
