@@ -1,0 +1,145 @@
+a:8:{s:7:"flavors";a:10:{i:0;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_8g50r1e2";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:0;s:7:"version";s:1:"1";s:5:"width";i:352;s:6:"height";i:480;s:7:"bitrate";i:3417;s:9:"frameRate";d:29.969999999999998863131622783839702606201171875;s:4:"size";i:27750;s:10:"isOriginal";b:1;s:4:"tags";s:0:"";s:5:"isWeb";b:0;s:7:"fileExt";s:4:"mpeg";s:15:"containerFormat";s:7:"mpeg-ps";s:12:"videoCodecId";s:10:"mpeg video";s:9:"createdAt";i:1287082077;s:9:"updatedAt";i:1287082137;s:9:"deletedAt";N;s:11:"description";s:0:"";}i:1;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_m0tvl0s4";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:5;s:7:"version";s:1:"1";s:5:"width";i:464;s:6:"height";i:352;s:7:"bitrate";i:379;s:9:"frameRate";d:30;s:4:"size";i:3368;s:10:"isOriginal";b:0;s:4:"tags";s:7:"web,mbr";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"flv";s:15:"containerFormat";s:11:"flash video";s:12:"videoCodecId";s:3:"vp6";s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082233;s:9:"deletedAt";N;s:11:"description";s:132:"video warnings: 2109,encoding.com,/#The transcoder (encoding.com) can not process the (/).
+audio warnings: 2106,#Redundant bitrate.
+";}i:2;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_ek66f9e6";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:4;s:7:"version";s:1:"1";s:5:"width";i:464;s:6:"height";i:352;s:7:"bitrate";i:752;s:9:"frameRate";d:30;s:4:"size";i:6154;s:10:"isOriginal";b:0;s:4:"tags";s:7:"web,mbr";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"flv";s:15:"containerFormat";s:11:"flash video";s:12:"videoCodecId";s:3:"vp6";s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082237;s:9:"deletedAt";N;s:11:"description";s:132:"video warnings: 2109,encoding.com,/#The transcoder (encoding.com) can not process the (/).
+audio warnings: 2106,#Redundant bitrate.
+";}i:3;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_4n7ezeqc";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:3;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:1344;s:9:"frameRate";d:30;s:4:"size";i:10547;s:10:"isOriginal";b:0;s:4:"tags";s:7:"web,mbr";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"flv";s:15:"containerFormat";s:11:"flash video";s:12:"videoCodecId";s:3:"vp6";s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082282;s:9:"deletedAt";N;s:11:"description";s:91:"video warnings: 2109,encoding.com,/#The transcoder (encoding.com) can not process the (/).
+";}i:4;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_6q1618s1";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:2;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:2471;s:9:"frameRate";d:30;s:4:"size";i:19046;s:10:"isOriginal";b:0;s:4:"tags";s:7:"web,mbr";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"flv";s:15:"containerFormat";s:11:"flash video";s:12:"videoCodecId";s:3:"vp6";s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082270;s:9:"deletedAt";N;s:11:"description";s:117:"video warnings: 2109,encoding.com,/#The transcoder (encoding.com) can not process the (/).; 2106,#Redundant bitrate.
+";}i:5;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_3hjxr452";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:4;s:14:"flavorParamsId";i:1;s:7:"version";N;s:5:"width";i:0;s:6:"height";i:0;s:7:"bitrate";i:0;s:9:"frameRate";d:0;s:4:"size";i:0;s:10:"isOriginal";b:0;s:4:"tags";s:7:"web,mbr";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"flv";s:15:"containerFormat";N;s:12:"videoCodecId";N;s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082137;s:9:"deletedAt";N;s:11:"description";s:191:"video warnings: 2107,2961,4000#The target flavor bitrate (2961) does not comply with the requested bitrate (4000).; 2109,encoding.com,/#The transcoder (encoding.com) can not process the (/).
+";}i:6;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_d2tcfslx";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:6;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:2223;s:9:"frameRate";d:30;s:4:"size";i:17203;s:10:"isOriginal";b:0;s:4:"tags";s:14:"mp4_export,web";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"mp4";s:15:"containerFormat";s:4:"isom";s:12:"videoCodecId";s:4:"avc1";s:9:"createdAt";i:1287082137;s:9:"updatedAt";i:1287082282;s:9:"deletedAt";N;s:11:"description";s:41:"video warnings: 2106,#Redundant bitrate.
+";}i:7;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_7ogr9tyc";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:48572;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:1293;s:9:"frameRate";d:25;s:4:"size";i:10055;s:10:"isOriginal";b:0;s:4:"tags";s:10:"iphone,web";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"mp4";s:15:"containerFormat";s:4:"isom";s:12:"videoCodecId";s:4:"avc1";s:9:"createdAt";i:1287082341;s:9:"updatedAt";i:1287082407;s:9:"deletedAt";N;s:11:"description";s:0:"";}i:8;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"0_zc8zwscb";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:48592;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:1995;s:9:"frameRate";d:25;s:4:"size";i:15769;s:10:"isOriginal";b:0;s:4:"tags";s:8:"ipad,web";s:5:"isWeb";b:1;s:7:"fileExt";s:3:"mp4";s:15:"containerFormat";s:4:"isom";s:12:"videoCodecId";s:4:"avc1";s:9:"createdAt";i:1287082347;s:9:"updatedAt";i:1287082459;s:9:"deletedAt";N;s:11:"description";s:0:"";}i:9;O:18:"KalturaFlavorAsset":21:{s:2:"id";s:10:"1_gem71sc5";s:7:"entryId";s:10:"0_uka1msg4";s:9:"partnerId";i:243342;s:6:"status";i:2;s:14:"flavorParamsId";i:48582;s:7:"version";s:1:"1";s:5:"width";i:640;s:6:"height";i:480;s:7:"bitrate";i:1262;s:9:"frameRate";d:29.969999999999998863131622783839702606201171875;s:4:"size";i:10444;s:10:"isOriginal";b:0;s:4:"tags";s:9:"html5,ogg";s:5:"isWeb";b:0;s:7:"fileExt";s:3:"ogg";s:15:"containerFormat";s:3:"ogg";s:12:"videoCodecId";s:6:"theora";s:9:"createdAt";i:1290417830;s:9:"updatedAt";i:1290421567;s:9:"deletedAt";N;s:11:"description";s:0:"";}}s:13:"accessControl";O:29:"KalturaEntryContextDataResult":6:{s:16:"isSiteRestricted";b:0;s:19:"isCountryRestricted";b:0;s:19:"isSessionRestricted";b:0;s:13:"previewLength";i:-1;s:14:"isScheduledNow";b:1;s:7:"isAdmin";b:0;}s:4:"meta";O:17:"KalturaMediaEntry":45:{s:9:"mediaType";i:1;s:17:"conversionQuality";s:6:"129452";s:10:"sourceType";i:6;s:18:"searchProviderType";N;s:16:"searchProviderId";N;s:14:"creditUserName";N;s:9:"creditUrl";N;s:9:"mediaDate";N;s:7:"dataUrl";s:89:"http://cdnbakmi.kaltura.com/p/243342/sp/24334200/flvclipper/entry_id/0_uka1msg4/version/0";s:5:"plays";i:984;s:5:"views";i:689;s:5:"width";i:640;s:6:"height";i:480;s:8:"duration";i:60;s:2:"id";s:10:"0_uka1msg4";s:4:"name";s:17:"FolgersCoffe.mpeg";s:11:"description";N;s:9:"partnerId";i:243342;s:6:"userId";s:15:"__ADMIN__242942";s:4:"tags";N;s:9:"adminTags";N;s:6:"status";i:2;s:4:"type";i:1;s:9:"createdAt";i:1287082077;s:4:"rank";d:0;s:9:"totalRank";i:0;s:5:"votes";i:0;s:7:"groupId";N;s:11:"partnerData";N;s:11:"downloadUrl";s:82:"http://cdnbakmi.kaltura.com/p/243342/sp/24334200/raw/entry_id/0_uka1msg4/version/0";s:10:"searchText";s:20:"  FolgersCoffe.mpeg ";s:11:"licenseType";i:-1;s:7:"version";i:0;s:12:"thumbnailUrl";s:93:"http://cdnbakmi.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1msg4/version/100003";s:15:"flavorParamsIds";s:27:"0,4,5,6,2,48572,48592,48582";s:10:"msDuration";i:60000;s:12:"durationType";N;s:10:"categories";s:0:"";s:13:"categoriesIds";s:0:"";s:16:"moderationStatus";i:6;s:15:"moderationCount";i:0;s:9:"updatedAt";i:1290421535;s:15:"accessControlId";i:126432;s:9:"startDate";N;s:7:"endDate";N;}s:8:"entry_id";s:10:"0_uka1msg4";s:10:"partner_id";s:6:"243342";s:2:"ks";s:124:"NDFhNjgzOTc4ZGJhOGZmOWQxNzkyNGQzYjU5ZjZjMDM3NDgxYWYzYXwyNDMzNDI7MjQzMzQyOzEyOTQzMDYxMjM7MDsxMjk0MjE5NzIzLjc0OTE7MDt2aWV3Oio7";s:9:"uiconf_id";s:7:"2890431";s:6:"uiConf";s:14551:"<layout id="full" name="WaterPlayer" skinPath="/content/uiconf/kaltura/kmc/appstudio/kdp3/cassiopea/skin.swf?a=2">
+  <HBox id="topLevel" width="100%" height="100%">
+    <VBox id="player" width="100%" height="100%" styleName="black">
+      <Plugin id="kalturaMix" width="0%" height="0%" includeInLayout="false" loadingPolicy="onDemand"/>
+      <Plugin id="statistics" width="0%" height="0%" includeInLayout="false"/>
+      <Canvas id="PlayerHolder" height="100%" width="100%" styleName="black">
+        <Video id="video" width="100%" height="100%"/>
+        <VBox id="offlineMessageHolder" verticalAlign="middle" horizontalAlign="center" includeInLayout="false" width="100%" height="100%">
+          <Spacer height="100%"/>
+          <Spacer height="100%"/>
+          <Label id="offlineMessage" styleName="offlineMessage" text="{mediaProxy.entry.offlineMessage}" visible="{mediaProxy.isOffline}" width="100%" height="30"/>
+          <Spacer height="100%"/>
+        </VBox>
+        <Screens id="screensLayer" width="100%" height="100%" mouseOverTarget="{PlayerHolder}" styleName="clickThrough" startScreenId="startScreen" startScreenOverId="startScreen" pauseScreenOverId="pauseScreen" pauseScreenId="pauseScreen" playScreenOverId="playScreen" endScreenId="endScreen" endScreenOverId="endScreen"/>
+        <Watermark id="watermark" width="100%" height="100%" watermarkPath="http://www.kaltura.com/content/uiconf/kaltura/kmc/appstudio/kdp3/exampleWatermark.png" watermarkClickPath="http://www.kaltura.com/" watermarkPosition="topRight" padding="5"/>
+        <VBox id="skipBtnHolder" width="100%" height="100%">
+          <Spacer height="100%"/>
+          <HBox width="100%" height="30">
+            <Spacer width="100%"/>
+          </HBox>
+        </VBox>
+        <Plugin id="gigya" width="100%" height="100%" loadingPolicy="noWait" shareEmailBody="Hi,&lt;br>I watched this video and thought you'd enjoy it too. &lt;br>$URL$ to watch.&lt;br> $sender$" shareEmailSubject="Take a look at this video"/>
+        <VBox id="generalPluginContainer" width="100%" height="100%">
+          <Spacer id="contentPusher" height="100%"/>
+        </VBox>
+      </Canvas>
+      <Canvas id="controlsHolder" width="100%" height="30">
+        <HBox id="ControllerScreenHolder" width="100%" height="30" verticalAlign="middle" styleName="darkBg">
+          <HBox id="ControllerScreen" width="100%" height="30" horizontalGap="9" paddingLeft="9" verticalAlign="middle" styleName="darkBg">
+            <Button id="playBtnControllerScreen" command="play" buttonType="iconButton" focusRectPadding="0" icon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="pauseIcon" selectedOverIcon="pauseIcon" selectedDownIcon="pauseIcon" selectedDisabledIcon="pauseIcon" tooltip="" upTooltip="Pause" selectedTooltip="Play" k_buttonType="buttonIconControllerArea" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+            <Button id="liveToggleStatus" toggle="true" color1="0xFF0000" color2="0xFF0000" upIcon="onAirIcon" overIcon="onAirIcon" downIcon="onAirIcon" disabeledIcon="onAirIcon" selectedUpIcon="offlineIcon" selectedOverIcon="offlineIcon" selectedDownIcon="offlineIcon" selectedDisabledIcon="offlineIcon" isSelected="{mediaProxy.isOffline}" visible="{mediaProxy.isLive}" includeInLayout="{mediaProxy.isLive}" mouseEnable="false" useHandCursor=""/>
+            <VBox id="scrubberContainer" width="100%" height="30" verticalAlign="middle" verticalGap="-3" notVisible="{mediaProxy.isLive}">
+              <Spacer height="10"/>
+              <Scrubber id="scrubber" width="100%" height="10" styleName="" color1="14540253" color2="14540253"/>
+              <HBox width="100%">
+                <Timer id="timerControllerScreen1" width="40" styleName="timerProgressLeft" format="mm:ss" height="12" dynamicColor="true" timerType="forwards" color1="14540253"/>
+                <Spacer width="100%" height="8"/>
+                <Timer id="timerControllerScreen2" width="40" styleName="timerProgressRight" format="mm:ss" height="12" timerType="total" dynamicColor="true" color1="14540253"/>
+              </HBox>
+            </VBox>
+            <VolumeBar id="volumeBar" styleName="volumeBtn" width="20" buttonType="iconButton" tooltip="Change volume" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+            <Button id="shareBtnControllerScreen" buttonType="iconButton" kClick="sendNotification('doGigya')" height="22" styleName="controllerScreen" focusRectPadding="0" icon="shareIcon" tooltip="share with friends" k_buttonType="buttonIconControllerArea" uiconfId="" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+            <Button id="fullScreenBtnControllerScreen" command="fullScreen" buttonType="iconButton" height="22" styleName="controllerScreen" icon="openFullScreenIcon" selectedUpIcon="closeFullScreenIcong" selectedOverIcon="closeFullScreenIcon" selectedDownIcon="closeFullScreenIcon" selectedDisabledIcon="closeFullScreenIcon" focusRectPadding="0" allowDisable="false" tooltip="Toggle fullscreen" k_buttonType="buttonIconControllerArea" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+          </HBox>
+          <Spacer width="13"/>
+          <Button id="kalturaLogo" height="50" width="100" kClick="navigate('http://www.kaltura.com')" styleName="controllerScreen" icon="kalturaLogo"/>
+          <Spacer width="13"/>
+        </HBox>
+      </Canvas>
+    </VBox>
+  </HBox>
+  <screens>
+    <screen id="startScreen">
+      <VBox id="startContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+        <Spacer width="100%"/>
+        <Tile id="startTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
+          <Button id="onVideoPlayBtnStartScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="Play video" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+          <Button id="shareBtnStartScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" uiconfId="" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+        </Tile>
+        <Spacer width="100%"/>
+      </VBox>
+    </screen>
+    <screen id="pauseScreen">
+      <VBox id="pauseContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+        <Spacer height="100%"/>
+        <Tile id="pauseTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
+          <Button id="onVideoPlayBtnPauseScreen" command="play" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Play" styleName="onScreenBtn" upIcon="playIcon" overIcon="playIcon" downIcon="playIcon" disabeledIcon="playIcon" selectedUpIcon="playIcon" selectedOverIcon="playIcon" selectedDownIcon="playIcon" selectedDisabledIcon="playIcon" k_buttonType="buttonIconControllerArea" tooltip="Play video" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+          <Button id="shareBtnPauseScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" uiconfId="" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+        </Tile>
+        <Spacer height="100%"/>
+      </VBox>
+    </screen>
+    <screen id="playScreen">
+      <VBox id="playContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+        <Spacer height="100%"/>
+        <Tile id="playTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
+          <Button id="shareBtnPlayScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" uiconfId="" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+        </Tile>
+        <Spacer height="100%"/>
+      </VBox>
+    </screen>
+    <screen id="endScreen">
+      <VBox id="endContainer" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+        <Spacer height="100%"/>
+        <Tile id="endTile" width="100%" verticalGap="10" verticalAlign="middle" horizontalAlign="center">
+          <Button id="replayBtnEndScreen" kClick="sendNotification('doPlay')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Replay" styleName="onScreenBtn" upIcon="replayIcon" k_buttonType="buttonIconControllerArea" tooltip="Replay" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+          <Button id="shareBtnEndScreen" kClick="sendNotification('doGigya')" buttonType="onScreenButton" minWidth="60" labelPlacement="top" label="Share" styleName="onScreenBtn" upIcon="shareIcon" k_buttonType="buttonIconControllerArea" tooltip="share with friends" uiconfId="" color1="14540253" color2="16777215" color3="3355443" color4="10066329" color5="16777215" font="Arial"/>
+        </Tile>
+        <Spacer height="100%"/>
+      </VBox>
+    </screen>
+  </screens>
+  <strings/>
+  <extraData>
+    <GigyaUI theme="dark">
+      <config>
+        <display showEmail="true" useTransitions="true" showBookmark="true" codeBoxHeight="auto" showCodeBox="true" showCloseButton="true" networksWithCodeBox="" networksToHide="livespaces, piczo, orkut, pageflakes, vox, tagged, hi5, wordpress, multiply" networksToShow="myspace, facebook, bebo, blogger, freewebs, livejournal, blackplanet, myyearbook, typepad, xanga, igoogle, netvibes, migente, friendster" bookmarksToShow="googlebookmarks,delicious,digg,facebookshare,newsvine,reddit,twitter,ask,myaol,slashdot,skimbit,simpy,blogmarks,spurl,linkagogo,Magnolia,faves,segnalo,netvouz,blinklist,dropjack,feedmelinks"/>
+        <body>
+          <background frame-color="#BFBFBF" background-color="#292929" frame-thickness="0" gradient-color-begin="#292929" gradient-color-end="#292929" corner-roundness="0;0;0;0"/>
+          <controls corner-roundness="4;4;4;4" gradient-color-begin="#EAEAEA" gradient-color-end="#F4F4F4" bold="false">
+            <snbuttons type="textUnder" frame-color="#666666" background-color="#292929" over-frame-color="#FFFFFF" color="#BFBFBF" gradient-color-begin="#666666" gradient-color-end="Transparent" size="10" bold="false" down-frame-color="#666666" down-gradient-color-begin="Transparent" over-gradient-color-end="#ffffff" down-gradient-color-end="#666666" over-color="#ffffff" down-color="#ffffff" over-bold="false">
+              <more frame-color="#A4DBFF" over-frame-color="#A4DBFF" gradient-color-begin="#F4F4F4" gradient-color-end="#BBE4FF" over-gradient-color-begin="#A4DBFF" over-gradient-color-end="#F4F4F4"/>
+              <previous frame-color="#BBE4FF" over-frame-color="#A4DBFF" gradient-color-begin="#FFFFFF" gradient-color-end="#A4DBFF" over-gradient-color-begin="#A4DBFF" over-gradient-color-end="#F4F4F4"/>
+            </snbuttons>
+            <textboxes frame-color="#CACACA" background-color="#292929" color="#757575" gradient-color-begin="#292929" gradient-color-end="#292929" bold="false">
+              <codeboxes color="#808080" frame-color="#6A6A6A" background-color="#606060" gradient-color-begin="Transparent" gradient-color-end="Transparent" size="10"/>
+              <inputs frame-color="#6a6a6a" color="#808080" gradient-color-begin="Transparent" gradient-color-end="Transparent"/>
+              <dropdowns list-item-over-color="#52A4DA" frame-color="#6a6a6a" background-color="#292929" color="#808080" gradient-color-begin="#292929" gradient-color-end="#292929"/>
+            </textboxes>
+            <buttons frame-color="#6a6a6a" background-color="Transparent" gradient-color-begin="#666666" gradient-color-end="Transparent" color="#FFFFFF" frame-thickness="1" size="12" bold="false" over-frame-color="#FFFFFF" down-frame-color="#6a6a6a" over-gradient-color-begin="#666666" down-gradient-color-begin="Transparent" over-gradient-color-end="#353535" down-gradient-color-end="Transparent" over-size="12" over-bold="false">
+              <post-buttons frame-color="#6a6a6a" gradient-color-end="Transparent"/>
+            </buttons>
+            <listboxes frame-color="#CACACA" corner-roundness="4;4;4;4" gradient-color-begin="#F4F4F4" gradient-color-end="#FFFFFF"/>
+            <checkboxes checkmark-color="#FFFFC8" frame-color="#6a6a6a" down-gradient-color-begin="#292929" down-gradient-color-end="#292929" background-color="#292929" corner-roundness="3;3;3;3" gradient-color-begin="Transparent" gradient-color-end="Transparent" over-background-color="#292929" down-background-color="#292929"/>
+            <servicemarker gradient-color-begin="Transparent" gradient-color-end="#666666"/>
+            <tooltips frame-thickness="0" color="#292929" gradient-color-begin="#FFFFFF" gradient-color-end="#FFFFC8" size="10" frame-color="#FFDBA4"/>
+          </controls>
+          <texts color="808080">
+            <privacy color="#808080"/>
+            <headers color="#FFFFFF" bold="false"/>
+            <labels color="#FFFFFF" bold="false"/>
+            <messages color="#202020" background-color="#FFFFA4" frame-thickness="0" corner-roundness="4;4;4;4"/>
+            <links color="#FFFFFF" underline="false" over-color="#666666" down-color="#666666" down-bold="false"/>
+          </texts>
+        </body>
+      </config>
+    </GigyaUI>
+  </extraData>
+  <plugins/>
+  <uiVars>
+    <var key="video.keepAspectRatio" value="true"/>
+    <var key="playlistAPI.autoContinue" value="false"/>
+    <var key="imageDefaultDuration" value="2"/>
+    <var key="autoPlay" value="false"/>
+    <var key="autoMute" value="false"/>
+  </uiVars>
+</layout>";}

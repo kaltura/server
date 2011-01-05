@@ -1,0 +1,308 @@
+1
+00:00:15,000 --> 00:00:18,000
+À votre gauche vous pouvez voir...
+
+2
+00:00:18,750 --> 00:00:20,333
+À votre droite vous pouvez voir les...
+
+3
+00:00:20,417 --> 00:00:21,917
+... les étêteurs.
+
+4
+00:00:22,000 --> 00:00:24,625
+Tout est sans danger.|Parfaitement sans danger.
+
+5
+00:00:26,000 --> 00:00:27,000
+Emo ?
+
+6
+00:00:28,625 --> 00:00:30,000
+Attention !
+
+7
+00:00:46,917 --> 00:00:48,000
+Tu nas rien ?
+
+8
+00:00:51,917 --> 00:00:53,917
+Je crois pas...|et vous ?
+
+9
+00:00:55,625 --> 00:00:57,125
+Ça va.
+
+10
+00:00:57,583 --> 00:01:01,667
+Lève-toi.|Emo, ce nest pas sûr ici.
+
+11
+00:01:02,000 --> 00:01:03,208
+Allons-y.
+
+12
+00:01:03,833 --> 00:01:05,083
+Et après ?
+
+13
+00:01:05,875 --> 00:01:08,000
+Tu verras !
+
+14
+00:01:16,167 --> 00:01:18,167
+Emo.|Par ici.
+
+15
+00:01:34,875 --> 00:01:35,875
+Suis-moi !
+
+16
+00:02:11,417 --> 00:02:12,625
+Cours, Emo !
+
+17
+00:02:48,375 --> 00:02:50,083
+Tu nest pas attentif !
+
+18
+00:02:51,000 --> 00:02:54,333
+Je veux juste répondre au...|... téléphone.
+
+19
+00:02:55,000 --> 00:02:58,208
+Emo, regarde,|je veux dire : écoute.
+
+20
+00:02:59,750 --> 00:03:02,292
+Tu dois apprendre à écouter.
+
+21
+00:03:03,625 --> 00:03:05,125
+Ce nest pas un jeu.
+
+22
+00:03:06,167 --> 00:03:08,750
+Tu... Nous pourrions|facilement mourir ici.
+
+23
+00:03:10,208 --> 00:03:14,125
+Écoute,|les sons de la machine.
+
+24
+00:03:18,333 --> 00:03:20,417
+Écoute ta respiration.
+
+25
+00:04:26,917 --> 00:04:29,208
+Ça ne vous lasse pas, à force ?
+
+26
+00:04:29,583 --> 00:04:30,833
+Me lasser ?!?
+
+27
+00:04:31,750 --> 00:04:34,667
+La machine est comme|un mécanisme d'horlogerie.
+
+28
+00:04:35,500 --> 00:04:37,708
+Un faux pas...
+
+29
+00:04:37,833 --> 00:04:39,792
+... et tu es écrabouillé.
+
+30
+00:04:41,042 --> 00:04:42,375
+Mais nest-ce pas...
+
+31
+00:04:42,417 --> 00:04:46,542
+Écrabouillé, Emo !|Cest ce que tu veux, être écrabouillé ?
+
+32
+00:04:48,083 --> 00:04:50,000
+Cest ton but dans la vie ?
+
+33
+00:04:50,583 --> 00:04:52,250
+Écrabouillé.
+
+34
+00:05:41,833 --> 00:05:43,458
+Emo, ferme les yeux.
+
+35
+00:05:44,750 --> 00:05:46,333
+- Pourquoi ?|- Maintenant !
+
+36
+00:05:53,750 --> 00:05:55,667
+Bien.
+
+37
+00:05:59,542 --> 00:06:02,792
+Que vois-tu à ta gauche, Emo ?
+
+38
+00:06:04,417 --> 00:06:06,000
+- Rien.|- Vraiment ?
+
+39
+00:06:06,333 --> 00:06:07,917
+Rien du tout.
+
+40
+00:06:08,250 --> 00:06:12,417
+Et à ta droite,|que vois-tu à ta droite, Emo ?
+
+41
+00:06:13,875 --> 00:06:16,917
+La même chose Proog, la même chose...
+
+42
+00:06:17,083 --> 00:06:18,583
+Rien !
+
+43
+00:06:40,625 --> 00:06:42,958
+Écoutez Proog ! Vous entendez ça ?
+
+44
+00:06:43,625 --> 00:06:45,042
+On peut y aller ?
+
+45
+00:06:45,208 --> 00:06:48,042
+Là ?|Ce nest pas prudent.
+
+46
+00:06:49,917 --> 00:06:52,500
+- Mais...|- Crois-moi, ça ne lest pas.
+
+47
+00:06:53,292 --> 00:06:54,792
+Et si, peut-être je...
+
+48
+00:06:54,833 --> 00:06:56,333
+Non.
+
+49
+00:06:57,667 --> 00:07:00,167
+NON !
+
+50
+00:07:00,875 --> 00:07:03,292
+Dautres questions Emo ?
+
+51
+00:07:04,250 --> 00:07:05,917
+Non.
+
+52
+00:07:09,458 --> 00:07:10,833
+Emo ?
+
+53
+00:07:11,875 --> 00:07:13,333
+Emo, pourquoi...
+
+54
+00:07:13,583 --> 00:07:14,458
+Emo...
+
+55
+00:07:14,500 --> 00:07:18,500
+... pourquoi ne peux-tu pas voir|la beauté de cet endroit ?
+
+56
+00:07:18,833 --> 00:07:20,750
+Son fonctionnement.
+
+57
+00:07:21,875 --> 00:07:23,792
+Sa perfection.
+
+58
+00:07:24,083 --> 00:07:27,167
+Non, Proog, je ne vois pas.
+
+59
+00:07:27,542 --> 00:07:30,333
+Je ne vois pas|parce quil ny a rien ici.
+
+60
+00:07:31,500 --> 00:07:35,333
+Pourquoi je confierais ma vie|à quelque chose qui nest pas là ?
+
+61
+00:07:35,417 --> 00:07:36,833
+Tu peux répondre à ça ?
+
+62
+00:07:37,417 --> 00:07:38,833
+Réponds-moi.
+
+63
+00:07:43,000 --> 00:07:44,000
+Proog...
+
+64
+00:07:45,458 --> 00:07:46,958
+Tes un malade !
+
+65
+00:07:47,250 --> 00:07:49,000
+Ne mapproche pas !
+
+66
+00:07:52,500 --> 00:07:55,000
+Non ! Emo ! Cest un piège !
+
+67
+00:07:55,833 --> 00:07:57,167
+Cest un piège !
+
+68
+00:07:57,208 --> 00:08:01,417
+À votre gauche vous pouvez voir|les jardins suspendus de Babylone !
+
+69
+00:08:02,250 --> 00:08:03,875
+Ça te plaît comme piège ?
+
+70
+00:08:05,458 --> 00:08:07,000
+Non, Emo.
+
+71
+00:08:09,417 --> 00:08:12,792
+À votre droite vous pouvez voir...|Ça alors...
+
+72
+00:08:13,000 --> 00:08:14,750
+... le colosse de Rhodes !
+
+73
+00:08:15,750 --> 00:08:16,500
+Non !
+
+74
+00:08:16,750 --> 00:08:21,750
+Le colosse de Rhodes,|et il n'est là que pour toi Proog.
+
+75
+00:08:51,333 --> 00:08:52,833
+Mais cest là...
+
+76
+00:08:53,208 --> 00:08:55,500
+Je te le jure,|Emo...
+
+77
+00:08:57,333 --> 00:09:00,000
+... cest là.
+

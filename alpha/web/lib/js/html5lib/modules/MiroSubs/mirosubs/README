@@ -1,0 +1,28 @@
+To run the development version:
+
+1. Install virtualenv http://pypi.python.org/pypi/virtualenv
+2. (optional) download and download the virtualenv wrapper bash
+  functions http://www.doughellmann.com/projects/virtualenvwrapper/
+3. create a virtual environment and activate it
+4. run:
+   $ easy_install -U setuptools
+   $ easy_install pip
+   $ cd deploy
+   $ pip install -r requirements.txt
+       note: you'll need mercurial installed to make this last command work.
+5. Check out google closure into directory of your choice: svn checkout
+   http://closure-library.googlecode.com/svn/trunk/ <directory>. Then
+   symlink media/js/closure-library to the checkout location.
+6. Add mirosubs.example.com to your hosts file, pointing at 127.0.0.1.
+   This is necessary for Twitter oauth to work correctly.
+7. Use the dev-settings file when running manage.py. First run syncdb with
+   --settings=dev-settings, then run migrate with --settings=dev-settings.
+   Use ./dev-runserver.sh to run the development server with development
+   settings. You can access the site at http://mirosubs.example.com:8000.
+8. (optional) If you want to run video searches locally, you need to set up solr:
+   A. Download solr and unzip to ../buildout/parts/solr (relative to this directory).
+   B. Run ./manage.py run_solr in one terminal that is dedicated to running the solr process.
+   C. run ./manage.py rebuild_index to update the index.
+   D. That should be it but, in case you're interested, there's a
+      list of haystack commands at
+      http://docs.haystacksearch.org/dev/management_commands.html

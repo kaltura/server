@@ -1,0 +1,200 @@
+.TimedTextEdit .leftcolumn #textinput textarea
+{
+	width:512px;
+	height:200px;
+}
+
+.TimedTextEdit .leftcolumn #textinput
+{
+	display: block;
+	margin: auto;
+	position:absolute;
+	top: 340px;
+}
+
+.TimedTextEdit .leftcolumn
+{
+	padding: 10px;
+	width: 890px;
+	margin: auto;
+}
+
+.TimedTextEdit .rightcolumn {
+	background-color:#606060;
+	border:0 solid black;
+	bottom:5px;
+	color:#EFEFEF;
+	left:215px;
+	line-height:100%;
+	margin-left:300px;
+	padding:10px;
+	position:absolute;
+	right:5px;
+	top:5px;
+}
+
+.TimedTextEdit .tabs
+{
+	position:absolute;
+	top: 530px;
+}
+
+.TimedTextEdit .tab{
+	position:absolute;
+	background:#888;
+	border:1px solid black;
+	height:30px;
+	width:160px;
+	padding:4px;
+	text-align: center;
+}
+
+.TimedTextEdit .selected{
+	background:#bbb;
+	height:40px;
+}
+
+.TimedTextEdit #step1tab
+{
+	left: 0px;
+}
+
+.TimedTextEdit #step2tab
+{
+	left: 171px;
+}
+
+.TimedTextEdit #step3tab
+{
+	left: 342px;
+}
+
+.TimedTextEdit .nextstep
+{
+	position:absolute;
+	top: 600px;
+	left:197px;
+	width:100px;
+	height:25px;
+	text-align:center;
+	background:#77bb40;
+	color:white;
+	font-weight:bold;
+	padding:12px;
+	border: 1px solid black;
+}
+
+.TimedTextEdit #titles_list
+{
+	background: #ddd;
+	padding: 12px;
+	text-align:center;
+	position:absolute;
+	top:340px;
+	width:488px;
+	height:164px;
+}
+
+.TimedTextEdit .current_title
+{
+	font-size: larger;
+	background: #dd8
+}
+
+.TimedTextEdit .time_in
+{
+	font-size: xx-small;
+	position:absolute;
+	margin-top:2px;
+	margin-left:2em;
+}
+
+.TimedTextEdit .time_out
+{
+	font-size: xx-small;
+	position:absolute;
+	margin-top:2px;
+	margin-left:438px;
+}
+
+.TimedTextEdit a {
+	color:#aaa;
+}
+
+.TimedTextEdit video
+{
+	height:290px;
+	width:512px;
+}
+
+.TimedTextEdit .videodiv
+{
+	display: block;
+	margin: auto;
+	position:absolute;
+}
+
+.TimedTextEdit .subtitles
+{
+	width: 80%;
+	margin: auto;
+	position: relative;
+	text-align: center;
+	font-family: sans-serif;
+	line-height: 2em;
+	color: rgba(255,255,128, 1);
+	text-shadow: rgba(0,0,0, 0.6) 1px 1px;
+	background: rgba(0,0,0, 0.6);
+}
+
+.TimedTextEdit .subtitleslines1
+{
+	top: -4.8em;
+}
+
+.TimedTextEdit.subtitleslines2
+{
+	top: -6.8em;
+}
+
+.TimedTextEdit.subtitleslines3
+{
+	top: -8.8em;
+}
+
+.TimedTextEdit input[type=number]
+{
+	width:1.2em;
+	padding:2px;
+	background: #ffd;
+	border:none;
+}
+/*
+.TimedTextEdit input[type=text]
+{
+	background: #ffd;
+	border:none;
+}
+*/
+
+.TimedTextEdit .hotkeybox {
+	background: #333;
+	padding: 5px;
+	line-height: 200%;
+	font-size: small;
+	position:absolute;
+	width:340px;
+	bottom:10px;
+}
+
+.TimedTextEdit #titles_textarea {
+	font-family: helvetica, sans-serif;
+	line-height: 1.5em;
+}
+
+.TimedTextEdit .step-help{
+	bottom:155px;
+	overflow:auto;
+	position:absolute;
+	top:10px;
+}

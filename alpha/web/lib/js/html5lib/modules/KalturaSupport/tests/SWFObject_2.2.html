@@ -1,0 +1,44 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="../../../mwEmbedLoader.js"></script>  
+</head>
+<body>
+<h2>Fall forward from Flash to html5</h2>
+<a href="?forceMobileHTML5">Force HTML5</a> for testing with desktop html5 browsers
+<br />
+<div id="videoPlayerTarget"></div>
+<script type="text/javascript">
+	mw.setConfig( 'jQueryUISkin', 'darkness');
+	
+	mw.setConfig( 'EmbedPlayer.AttributionButton', {
+		'title' : 'Test Attribution Button',
+	 	'href' : 'http://www.google.com',
+		// Style icon to be applied
+		'class' : 'my-icon',
+		// An icon image url ( should be a 12x12 image url or data url )
+		'iconurl' : 'data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7'
+	});
+		
+	// Embed video-player
+	var src = "0_gs5uho0i";
+    var flashvars = {
+                entryId: src,
+                sourceType: (src.search(/http:\/\//) == -1) ? "entryId" : "url"
+            };
+            var params = {
+                allowFullScreen: "true",
+                allowNetworking: "all",
+                allowScriptAccess: "always",
+                bgcolor: "#000000"
+            };
+            var attributes = {
+                id: "videoPlayer",
+                name: "videoPlayer"
+            };
+	
+	var flashObj = swfobject.embedSWF("http://www.kaltura.com/index.php/kwidget/cache_st/1287024453/wid/_357521/uiconf_id/2222061", "videoPlayerTarget", "480", "270", "10.0.0.0", "http://www.warnerbros.com/all/html/us/swf/expressinstall.swf", flashvars, params, attributes);
+</script>
+</body>
+</html>

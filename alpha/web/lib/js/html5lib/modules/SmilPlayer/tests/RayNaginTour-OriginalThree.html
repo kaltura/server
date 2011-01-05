@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+    <title>Video CrossFade Example</title>
+	 <script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed&&debug=true"></script> 
+	<!--  <script type="text/javascript" src="../../ResourceLoader.php?class=window.jQuery,mwEmbed&debug=true"></script> -->
+	<script type="text/javascript">
+		mw.setConfig( 'EmbedPlayer.OverlayControls', false );
+		mw.ready(function(){
+			$j( "#seekInputTime" ).blur( function(){ 
+				var smilVid = $j('#videoCrossfade').get(0);
+				$j('#seekInProgress').show();
+				smilVid.setCurrentTime( parseFloat( $j(this).val() ), function() {
+					$j('#seekInProgress').hide();
+				});
+			});
+			$j('#startBuffer').click( function(){
+				$j('#videoCrossfade').get(0).load();
+				return false;
+			});
+			$j('#renderToFile').click(function(){				
+				$j(this).empty().unbind().after(
+					$j('<span />').text( ' ' ),
+					$j('<span />').attr('id', 'targetFoggStatus' )
+				);
+				
+				// xxx for local rendering 'AddMedia.firefogg' is overkill 
+				// but will have to clean up modularity later
+				
+				mw.load( ['AddMedia.firefogg','mw.FirefoggRender'],function(){
+					var foggRender = $j('#videoCrossfade').firefoggRender({
+						'statusTarget': '#targetFoggStatus'
+					});
+					foggRender.doRender();
+
+					$j('#renderToFile').text('Stop Render').click(function(){
+						foggRender.stopRender();						
+					}); 
+				})
+				return false;
+			});
+		});
+	</script>
+</head>
+<body>
+<h3>Sample Video CrossFade</h3>
+<table>
+<tr>
+<td>
+
+<video id="videoCrossfade" type="application/smil" src="RayNaginTour-OriginalThree.xml" width="400" height="300"></video>
+<p></p>seek to <input id="seekInputTime" size="4" value = "6"></input><span id="seekInProgress" style="display: none"> Seeking<blink>...</blink></span>
+<br/>
+<a id="startBuffer" href="#">Start buffering</a> <br>
+<a id="renderToFile" href="#">Render to file</a>
+</td>
+<td valign="top">
+Sample playlist code: 
+<div style="clear:both"></div>
+<textarea style="width:500px;">
+<video id="videoCrossfade" type="application/smil" src="RayNaginTour-OriginalThree.xml" width="400" height="300"></video>
+</textarea>
+<div style="clear:both"></div>
+
+SMIL Source: 
+<div style="clear:both"></div>
+<iframe  style="width:500px;height:300px" src="RayNaginTour-OriginalThree.xml"></iframe>
+</td>
+</tr>
+</table>
+</body>
+</html>

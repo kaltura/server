@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Native Player html5 bindings </title>
+
+
+</head>
+<body>
+<div style="position:absolute;display:block; left: 500px; width:300px; background: #eee; border:solid thin black">
+	<table style="font-size:.8em">
+  <tr>
+		<td colspan="2">
+      <b>Media Events:</b>
+    </td>
+  </tr>
+  <tr>
+		<td colspan="2"><textarea style="width:288px" rows="10" id="mediaeventlog"></textarea></td>
+	</tr>
+	
+	
+	<tr>
+		<td colspan="2">
+	    <b>Events logging: (not quite there yet)</b>
+		</td>		
+	</tr>
+	<tr>
+		<td colspan="2"><div id="eventSelectors"> </div></td>
+	</tr>
+			
+	</table>
+</div>
+
+<div style="width:500px;height:300px;display:block;position:relative">
+ <video id="myVid" poster="http://cdn.kaltura.org/apis/html5lib/kplayer-examples/media/elephants-dream.jpg"	
+		 duration="10:53" preload="auto" controls>
+	  <source type="video/webm" src="http://cdn.kaltura.org/apis/html5lib/kplayer-examples/media/elephants-dream_400p.webm" />
+	  <source type="video/h264" src="http://cdn.kaltura.org/apis/html5lib/kplayer-examples/media/elephants-dream_iphone.m4v" />
+	  <source type="video/ogg" src="http://cdn.kaltura.org/apis/html5lib/kplayer-examples/media/elephants-dream_400p.ogv" />
+	</video>
+</div>
+
+
+
+<!-- <script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed&&debug=true"></script> -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.3.min.js"></script>
+<script type="text/javascript">
+  /* 
+    Media Event Bindings
+    from http://www.w3.org/TR/html5/video.html
+    4.8.9.12 Event summary
+    The following events fire on media elements as part of the processing model described above:
+  */
+  var vid,
+      mediaEvents = [
+    { event: 'loadstart',   logMessage: 'The user agent has begun looking for media data, as part of the resource selection algorithm.' },
+    { event: 'progress',    logMessage: 'The user agent is fetching media data.' },
+    { event: 'suspend',     logMessage: 'The user agent is intentionally not currently fetching media data, but does not have the entire media resource downloaded.' },
+    { event: 'abort',       logMessage: 'The user agent stops fetching the media data before it is completely downloaded, but not due to an error.' },
+    { event: 'error',       logMessage: 'An error occurs while fetching the media data.' },
+    { event: 'emptied',     logMessage: "A media element whose networkState was previously not in the NETWORK_EMPTY state has just switched to that state (either because of a fatal error during load that's about to be reported, or because the load() method was invoked while the resource selection algorithm was already running)." },
+    { event: 'stalled',     logMessage: 'The user agent is trying to fetch media data, but data is unexpectedly not forthcoming.' },
+    { event: 'play',        logMessage: 'Playback has begun. Fired after the play() method has returned, or when the autoplay attribute has caused playback to begin.' },
+    { event: 'pause',       logMessage: 'Playback has been paused. Fired after the pause() method has returned.' },
+    { event: 'loadedmetadata',  logMessage: 'The user agent has just determined the duration and dimensions of the media resource' },
+    { event: 'loadeddata',      logMessage: 'The user agent can render the media data at the current playback position for the first time.' },
+    { event: 'waiting',         logMessage: 'Playback has stopped because the next frame is not available, but the user agent expects that frame to become available in due course.' },
+    { event: 'playing',         logMessage: 'Playback has started.' },
+    { event: 'canplay',         logMessage: 'The user agent can resume playback of the media data, but estimates that if playback were to be started now, the media resource could not be rendered at the current playback rate up to its end without having to stop for further buffering of content.' },
+    { event: 'canplaythrough',  logMessage: 'The user agent estimates that if playback were to be started now, the media resource could be rendered at the current playback rate all the way to its end without having to stop for further buffering.' },
+    { event: 'seeking',         logMessage: 'The seeking IDL attribute changed to true and the seek operation is taking long enough that the user agent has time to fire the event.' },
+    { event: 'seeked',          logMessage: 'The seeking IDL attribute changed to false.' }, 
+    { event: 'timeupdate',      logMessage: 'The current playback position changed as part of normal playback or in an especially interesting way, for example discontinuously.' },
+    { event: 'ended',           logMessage: 'Playback has stopped because the end of the media resource was reached.' },
+    { event: 'ratechange',      logMessage: 'Either the defaultPlaybackRate or the playbackRate attribute has just been updated.' },
+    { event: 'durationchange',  logMessage: 'The duration attribute has just been updated.' },
+    { event: 'volumechange',    logMessage: 'Either the volume attribute or the muted attribute has changed.' }
+  ];
+
+// log to textarea
+function logME(event) {
+  $('#mediaeventlog').append(event+'\n');
+}
+
+
+// setup logging for an event or tear it down
+function setLogging(event, isActive, message) {
+  if ( isActive === true ) {
+    $(mediaEvents).each(function (i, e) {
+      if ( e.event === event ) {
+        message = e.logMessage;
+      }
+    });
+    vid.bind( event, function() { logME('* ' + event + ' fired: ' + message); });
+  } else {
+    vid.unbind( event );
+  }
+
+}
+
+$(document).ready(function() {
+
+  var vid =  $('#myVid');
+
+  // setup checkboxes to control logging
+  $(mediaEvents).each(function (i, e) {
+    var event = e.event;
+    var message = e.logMessage;
+    $('#eventSelectors').append('<input class="eventSelector" type=checkbox checked name="' + event +'">' + event + '</input><br />');
+    setLogging(event, true, message);
+  });
+
+  //$('.eventSelector').each(function(i, s) {    //change(console.log('changed'));
+  
+//  
+//    console.log(s);
+//    $(s).change('click');
+//  });
+
+  //disable logging for timeupdate
+  setLogging('timeupdate', false);
+  $('input[name=timeupdate]').attr('checked', false);
+
+  logME('* the media player is ready');
+ 
+});
+
+
+/*
+// when mw is ready we can begin programming it
+mw.ready( function(){
+	vid =  $j('#myVid');
+
+    vid.bind( "play", function(e) { logME('* playback started'); });
+
+  
+  vidcon = $j('#vid1');
+  console.log(vidcon);
+
+    vid.addEventListener( "ended", function(e) { logME('* playback ended'); });
+    vid.addEventListener( "seeking", function(e) { logME('* seeking'); });
+
+    vid.ended( function() { logME('* playback ended'); });
+    vid.play( function() { logME('* playback started'); });
+    
+    vidcon.bind( "play", function(e) { logME('* playback started'); });
+    vidcon.bind( "ended", function(e) { logME('* playback ended'); });
+    vidcon.bind( "seeking", function(e) { logME('* seeking'); });
+    //vid.bind( 'seeking', function(e) { logME('* seeking fired') });
+
+  
+  //$j(mediaEvents).each(function (i, e) {
+    //var event = e.event;
+    //console.log( event ); // function(e) { logME('* ' + e.event + ' fired: ' + e.logMessage); console.log(e); });
+    //console.log( e.logMessage );
+  //});
+
+
+  logME('* the media player is ready');
+ 
+ //console.log(vid);
+
+
+	//update the player and selected src
+	function updateTypeLoop(){
+		vid =  $j('#vid1').get(0);
+		if( vid.mediaElement && vid.mediaElement.selectedSource ){
+			$j('#format').text( vid.mediaElement.selectedSource.getTitle() );
+		}
+		if( vid.selectedPlayer ) {
+			$j('#playertitle').text( vid.selectedPlayer.getName() );
+		  // setTimeout(updateTypeLoop, 1000);
+	  }
+  }
+	setTimeout(updateTypeLoop, 1000);
+	// Chose Player
+	$j('#chooseplayer').click(function(){
+		var vid =  $j('#vid1').get(0);
+		if( vid ){
+			vid.controlBuilder.displayOverlay(  
+				vid.controlBuilder.getPlayerSelect()
+			);						
+		}
+	});
+	// Options boxes 
+	
+  // note we should do a complete event maping: 
+	//	var playerEvents = ['play', 'pause', 'seeking', 'seeked' ];
+	//	$j.each(playerEvents, function( na, eventName ){
+	//		$j('#myVid').bind(eventName, function(){
+	//			$j('#playerLog').append( eventName + "\n");
+			}); 
+		});		
+	});	
+
+	
+});
+*/
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+
+/*/////////////////////////////////////////////
+
+~ Recent Activity
+
+/////////////////////////////////////////////*/
+
+
+
+.recent_activity{
+padding: 0;
+margin: 0;
+}
+
+.recent_activity li{
+padding: 10px 0 10px 60px;
+margin: 0 0 15px;
+
+list-style: none;
+color: #666;
+}
+
+
+
+.recent_activity li a{
+font-weight: bold;
+color: #333;
+text-decoration: none;
+}
+

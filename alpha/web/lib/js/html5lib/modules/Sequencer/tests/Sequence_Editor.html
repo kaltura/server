@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>SMIL Sequence Editor example</title>
+ 	<script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed&&debug=true"></script>
+ 	<script type="text/javascript">
+ 		mw.ready( function(){
+ 			mw.load( 'Sequencer', function(){ 	 			
+	 			$j('#seqContainer').sequencer({
+	        		'smilSource' : 'SampleEditorSequenceSmil.xml',
+	        		//set the add media wizard to only include commons:   
+	        		'AddMediaConf':{
+	        			 'enabled_providers':[ 'wiki_commons', 'kaltura', 'archive_org', 'flickr', 'metavid' ],
+	        			 'import_url_mode' : 'remote_link',
+	        			 'default_query' : 'fish'
+	        		}     		
+	        	});
+        	});
+ 		});
+ 	</script>
+<style>
+	body {
+		font: x-small sans-serif;	
+		color: black;
+		margin: 0;
+		padding: 0;
+	}
+	img {
+			border:medium none;
+		}
+</style>
+ 	
+</head>
+<body>
+	<div id="seqContainer" style="position:absolute;top:5px;bottom:10px;left:10px;right:10px;">
+		Loading sequence editor ...
+	</div>	
+  </body>
+</html>
+

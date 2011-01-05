@@ -1,0 +1,382 @@
+
+video, embed, object{
+width: 470px !important;
+}
+
+
+
+
+/*/////////////////////////////////////////////
+
+~ Classes
+
+/////////////////////////////////////////////*/
+
+/*//////////   ~  Thumbnails  ~   //////////*/
+
+
+.thumbnail_medium{
+  width:100px;
+  height:100px;
+  float: left;
+  padding: 4px;
+  margin-right: 30px;
+  background:  url(../../images/default_thumb.png) 0px top no-repeat !important;
+  }
+
+.thumbnail_small{
+  width: 50px;
+  height: 50px;
+  float: left;
+  padding: 4px;
+  margin-right: 30px;
+  background:  url(../../images/default_thumb.png) 0px bottom no-repeat !important;
+  }
+
+
+.thumbnail_medium img,
+.thumbnail_small img{
+  border: none !important;
+  }
+
+
+
+
+
+.space{
+clear: both;
+height: 50px !important;
+}
+
+
+.red{
+color: red;
+}
+
+
+.yellow{
+background: #fff7a0;
+padding: 30px;
+
+  -moz-border-radius: 5px;
+  -webkit-border-radius: px;
+  border-radius:5px;
+margin-bottom: 30px;
+font-size: 14px;
+}
+
+/*//////////   ~  Inline Type  ~   //////////*/
+
+
+h2.main-title{
+  margin: 0;
+  }
+
+
+h2.main-title span{
+  float: right;
+  font-weight: normal
+  }
+
+.center{
+  text-align: center;
+  }
+  
+.bull{ padding: 0 10px !important;}
+
+.bold{font-weight: bold;}
+
+.larger{
+font-size: 16px;
+}
+
+
+/*//////////   ~  Block Type  ~   //////////*/
+
+
+.small{
+  display: block;
+  font-size: 11px;
+  color: #888;
+  padding-top: 5px;
+  }
+
+
+
+/*//////////   ~  Icons  ~   //////////*/
+
+
+.points{
+  background: url("../../images/points.png") 0 1px no-repeat !important;
+  padding-left: 15px;
+  float: left;
+  margin-top: 2px;
+  margin-left: 0px;
+  }
+
+
+.awards{
+  background: url("../../images/award.png") 0 1px no-repeat !important;
+  padding-left: 15px;
+  float: left;
+  margin-left: 20px;
+  margin-top: 2px;
+  }
+  
+
+.mirosubs-twitter-share{
+  background: url("../images/share_icons.png") 0 -37px no-repeat !important;
+  text-decoration: underline;
+  }
+
+
+.mirosubs-facebook{
+  background: url("../images/share_icons.png") 0 0px no-repeat !important;
+  text-decoration: underline;
+  }
+  
+
+
+.up_down{ text-align: right;}
+
+
+.upload{
+  padding-left: 15px;
+  background: url(../../images/updown.gif) left -1px no-repeat;
+  padding-right: 5px;
+  }
+
+.download{
+  padding-left: 20px;
+  background: url(../../images/updown.gif) -165px -1px no-repeat;
+  }
+
+
+
+.rolled_back{
+  background: url(../../images/history_icons.png) 20px 12px no-repeat;
+  }
+
+.thumb_up{
+  background: url(../../images/history_icons.png) 20px -23px no-repeat;
+  }
+
+.thumb_down{
+  background: url(../../images/history_icons.png) 20px -59px no-repeat;
+  }
+
+.commented .table_activity{
+  background: url(../../images/history_icons.png) 15px -92px no-repeat;
+  padding-left: 40px;
+  }
+
+.edited .table_activity{
+  background: url(../../images/history_icons.png) 15px -242px no-repeat;
+  padding-left: 40px;
+  }
+
+.language_rating{
+  background: url(../../images/history_icons.png) 20px -132px no-repeat;
+  }
+
+.language_begins{
+  background: url(../../images/history_icons.png) 20px -168px no-repeat;
+  }
+
+.video_begins{
+  background: url(../../images/history_icons.png) 20px -204px no-repeat;
+  }
+
+
+
+/*//////////   ~  Margins/Paddings  ~   //////////*/
+
+
+
+.marginleft{ margin-left: 30px;}
+.margin-top{ margin-top: 40px;}
+.no-margin{ margin: 0 !important;}
+.nomargin{
+  margin: 0 !important;
+  }
+
+
+.padding{ padding: 30px;}
+.padding_small{ padding: 10px;}
+
+
+/*//////////   ~  Floats  ~   //////////*/
+
+
+.clearboth,
+.clear{ clear: both !important;}
+
+
+.floatleft{ float: left !important;}
+
+
+.floatright{ float: right !important;}
+
+
+.clear.tall{ margin-top: 40px;}
+
+
+
+/*//////////   ~  Cancelations  ~   //////////*/
+
+
+.nohover:hover{
+  text-decoration: none !important;
+  cursor: default;
+  }
+
+
+
+.nothing{
+  background: white;
+  width: 940px;
+  padding: 20px;
+  clear: both;
+  border: 1px solid #aaa;
+  }
+  
+
+
+.disabled{ cursor: default !important;}
+
+
+.none{display: none;}
+
+
+/*//////////   ~  Inline Box Styling  ~   //////////*/
+
+
+
+.styled{
+  border: 1px solid #aaa;;
+  background: #fff;
+  -moz-border-radius: 5px;  
+  -webkit-border-radius: 5px;
+  }
+
+.styled .head{
+  background: #fff url(../../images/table_head.gif) 0px 0px repeat-x;
+  }
+
+
+
+/*/////////////////////////////////////////////
+
+~ Middle Wrap
+
+/////////////////////////////////////////////*/
+
+
+.wrap{
+  
+  -moz-border-radius-topleft: 3px;
+  -moz-border-radius-topright: 3px;
+  
+  -webkit-border-radius-top-left: 3px;
+  -webkit-border-radius-top-right: 3px;
+  
+  border-radius:5px;
+
+  background: #ecf9fc;
+
+  margin-bottom: 50px;
+  
+  min-height: 500px;
+
+  -moz-box-shadow:inset 0px 2px 0px #fff, 3px 3px 0px #a4c3ca, -3px 3px 0px #a4c3ca, -3px -3px 0px #a4c3ca, 3px -3px 0px #a4c3ca;
+  -webkit-box-shadow:inset 0px 2px 0px #fff, 3px 3px 0px #a4c3ca, -3px 3px 0px #a4c3ca, -3px -3px 0px #a4c3ca, 3px -3px 0px #a4c3ca;
+  box-shadow:inset 0px 2px 0px #fff, 3px 3px 0px #a4c3ca, -3px 3px 0px #a4c3ca, -3px -3px 0px #a4c3ca, 3px -3px 0px #a4c3ca;
+  }
+
+
+.intro{
+  color: #666;
+  margin-bottom: 20px;
+  background: #a4c3ca;
+  padding: 20px;
+  margin: 0;
+  color: #fff;  
+  clear: both;
+  }
+
+.action_buttons{ border-top: 1px solid #fff;}
+
+.action_buttons .blue_button,
+.action_buttons .sort_button{
+  margin: 10px; 
+  float: right;
+  }
+
+
+/*/////////////////////////////////////////////
+
+~ Note
+
+/////////////////////////////////////////////*/
+
+
+/*#index .note{ display: none;}*/
+
+.note{
+  text-align: center;
+  color: #333;
+  background: #faf9c5 url(../../images/note.gif) left 0 repeat-x;
+  text-shadow: 1px 1px 1px #fff;
+  font-size: 16px;
+  border-bottom: 1px solid #bfbe78;
+  height: 42px;
+  padding-top: 22px;
+  }
+
+.note a{
+  color: #333;
+  font-weight: bold;
+  }
+
+
+.no_subs{
+  clear: both;
+  padding: 30px;
+  background: #fff;
+  border-top: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  }
+
+
+.sub_actions{ float: right;}
+
+.sub_actions .button{
+  float: right;
+  clear: none !important;
+  margin:0 0 20px 20px;
+  }
+
+
+
+.bookmarklet{
+height: 120px;
+padding: 80px 50px 0 0px;
+text-align: center;
+text-decoration: none !important;
+display: block;
+clear: both;
+line-height: 1.2em;
+margin:0px;
+font-style: italic;
+font-size: 20px;
+text-shadow: 1px 1px 1px #fff;
+font-weight: bold;
+color: #4395aa !important;
+background: url(../../images/bookmarklet.png) left 0px no-repeat;
+}
+
+
+
+.embedder{
+width: 400px;
+}

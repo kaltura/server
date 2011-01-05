@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smil baseProfile="Language" version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <meta name="title" content="Simple Rendering Example"/>
+
+    <transition id="fromBlack"
+	type="fade" 
+	subtype="fadeFromColor" 
+	fadeColor="#000" 
+	dur="4s"/>
+  
+    <transition id="fromGreen"
+	type="fade" 
+	subtype="fadeFromColor" 
+	fadeColor="#87CF87" 
+	dur="4s"/>
+	
+    <transition id="xFade" 
+	type="fade" 
+	subtype="crossfade" 
+	dur="4s"/>
+	
+  <layout>
+            <root-layout backgroundColor="green" height="800" width="500"/>
+            <region backgroundColor="green" height="700" top="50" left="50" width="400" xml:id="image_region"/>
+            <region xml:id="Title" height="25" width="300" left="100" top="10"/>
+            <region xml:id="Captions" height="70" width="300" left="100" top="510"/>
+            <region id="audio_region" soundLevel="100%"/>
+        </layout>
+ 
+  </head>
+  <body>
+    <par>
+    
+    <video src="media/raw_media/cats_of_ulthar_lovecraft_jp.ogg"
+    	begin="1s"
+    	dur="1000s"
+    />
+    
+    <video src="media/raw_media/le_voyage_dans_la_lune_edit_1.ogv" 	
+		transIn="fromBlack"	
+		type="video/ogg" 	
+		fill="transition"
+		dur="1000s"		
+	/>	
+	
+ 	<video src="media/raw_media/MoviePowderPresentsPlan9FromOuterSpace.ogv" 		
+    	begin="15s"    	 	
+    	transIn="xFade"
+    	 		
+		fill="transition" 
+		dur="1000s"
+		durationHint="70"
+		type="video/ogg" 		
+	/>		
+	
+  <img src="media/raw_media/fruitStand.jpg"
+    dur="25s" 
+    fill="freeze" 
+    fit="meet" 
+    id="image"
+    panZoom="0,0,100%,100%" 
+    region="image_region" 
+    >
+
+    <animate attributeName="panZoom" begin="2.0"
+      dur="1.5s" fill="freeze" values="-1,4,99%,99%;511,509,47%,14%"/>
+    
+    <animate attributeName="panZoom" begin="5.0"
+      dur="1.5s" fill="freeze" values="511,509,47%,14%;418,-3,34%,13%"/>
+    
+    <animate attributeName="panZoom" begin="9.0"
+      dur="1.5s" fill="freeze" values="418,-3,34%,13%;9,1115,41%,20%"/>
+    
+    <animate attributeName="panZoom" begin="13.0"
+      dur="1.5s" fill="freeze" values="9,1115,41%,20%;573,2073,64%,17%"/>
+    
+    <animate attributeName="panZoom" begin="16.0"
+      dur="1.5s" fill="freeze" values="573,2073,64%,17%;1118,1365,14%,8%"/>
+    
+    <animate attributeName="panZoom" begin="18.0"
+      dur="1.5s" fill="freeze" values="1118,1365,14%,8%;0,0,100%,100%"/>
+  </img>
+
+</par>
+</body>
+</smil>
+
+

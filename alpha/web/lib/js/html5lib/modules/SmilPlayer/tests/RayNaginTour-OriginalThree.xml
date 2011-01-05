@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smil baseProfile="Language" version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <meta name="title" content="The Ray Nagin Tour - The Original Three at PA's in Boston"/>
+
+    <transition id="fromBlack"
+      type="fade"
+	    subtype="fadeFromColor"
+	    fadeColor="#000"
+	    dur="4s"/>
+	
+    <transition id="xFade"
+    	type="fade"
+	    subtype="crossfade"
+	    dur="4s"/>
+
+    <layout>
+      <root-layout backgroundColor="black" height="720" width="1120"/>
+      <region backgroundColor="grey" left="640" height="360" width="480" xml:id="grey"/>
+      <region backgroundColor="red" top="360" height="360" width="640" xml:id="red"/>
+      <region id="audio" soundLevel="100%"/>
+    </layout>
+
+  </head>
+  <body>
+    <par>
+      
+      <audio src="media/raw_media/RayNaginTour-OriginalThree.ogg"
+    	  begin="0s"
+    	  dur="1500s"
+        region="audio"
+      />
+      
+ 	    <video src="media/raw_media/Grey-360p-500k.ogv"
+    	  begin="0s"
+		    transIn="fromBlack"
+		    type="video/ogg"
+		    fill="transition"
+		    dur="1500s"
+        region="grey"
+    	/>
+      
+ 	    <video src="media/raw_media/Red-360p-500k.ogv"
+    	  begin="0s"
+    	  transIn="fromBlack"
+		    fill="transition"
+		    dur="1500s"
+		    type="video/ogg"
+        region="red"
+	    />
+		
+    </par>
+  </body>
+</smil>

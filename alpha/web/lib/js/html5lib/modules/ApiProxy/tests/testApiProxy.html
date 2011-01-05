@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Api Proxy Test</title>
+	<script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed&&debug=true"></script>
+	<!--   <script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed"></script> -->
+<script type="text/javascript" >
+//HARD coded local test:
+var remote_wiki_host = 'http://commons.wikimedia.org';
+var remote_script_path = '/w';
+var remote_apiUrl = remote_wiki_host + remote_script_path + '/api.php';
+
+mw.ready( function(){
+	$j('#hostName').text( remote_wiki_host );
+	//callback function here:
+	$j('#setupDone').show('slow');
+	$j('#doHello').click( doHello );
+	$j('#doAppend').click( doAppend );
+	$j('#doFileBrowse').click( doFileUpload );
+});
+
+function doHello(){
+	mw.log('to a hello user');
+	$j('#helloTarget').loadingSpinner();
+	//first get the user name:
+	getUserName( function( user_name ){
+		$j('#helloTarget').addClass('UserNameFound').hide().text( user_name ).fadeIn('slow');
+	} );
+	return false;
+}
+function getUserName( callback ){
+	var rObj = {
+		'action':'query',
+		'meta':'userinfo'
+	}
+	// Do request ( will automatically invoke proxy because its a proxy action and remote url )
+	mw.getJSON( remote_apiUrl, rObj, function( data ){
+			//now we get the data back for that domain
+			if( !data.query || !data.query.userinfo ){
+				mw.log("Error no query.userinfo ");
+				return false;
+			}
+			callback( data.query.userinfo.name );
+		}
+	);
+}
+
+// Simple "hello from api proxy" append on talk page
+function doAppend(){
+	$j('#appendTarget').loadingSpinner();
+	//get user name
+	getUserName( function( userName ){
+		var eTitle = 'User_talk:' + userName;
+		// Get a edit token
+		mw.getToken( remote_apiUrl, eTitle, function( token ) {
+			mw.log("got token: " + token) ;
+			var request = {
+				'action':'edit',
+				'title': eTitle,
+				'summary': "Api proxy test edit",
+				'appendtext': "\n\n==== Hello from Api proxy At: " + Date() + " ====",
+				'token': token
+			}
+			mw.getJSON( remote_apiUrl, request, function( result ){
+				if(result.edit && result.edit.newrevid){
+					$j('#appendTarget').html( "success: " + JSON.stringify ( result) );
+					url = remote_wiki_host + remote_script_path + '/index.php/';
+					url+= result.edit.title.replace(' ', '_');
+					$j('#appendTarget').append( '<br><a target="_new" href="' + url + '">visit page</a>' );
+				}else{
+					$j('#appendTarget').html( "falied: " + JSON.stringify ( result) );
+				}
+			});
+
+		});
+	});
+}
+
+function doFileUpload(){
+	$j('#file-upload-container').fadeIn( 'slow' );
+	$j('#browseTarget').loadingSpinner();
+	// Load firefogg lib
+	mw.load('AddMedia.firefogg', function( ) {
+		// Load proxy lib
+		mw.load( 'ApiProxy', function( ) {
+			// Get a token for the upload:
+			mw.getToken( remote_apiUrl, 'File:MyRandomFileTokenCheck.jpg', function( eToken ) {
+				mw.log(" got token :: " + eToken);
+				// Add the token to the dom:
+				$j( '#file-name' ).append(
+					$j('<input />')
+					.attr({
+						'type': 'hidden',
+						 'id' : 'wpEditToken',
+						 'name' : 'token'
+					})
+					.val( eToken )
+				);
+				var fileIframeName = mw.ApiProxy.browseFile( {
+					//Target div to put the iframe browser button:
+					'target' : '#browseTarget',
+
+					// Set the token
+					'token' : eToken,
+
+					// Api url to upload to
+					'apiUrl' : remote_apiUrl,
+
+					// File Destination Name change callback:
+					'selectFileCb' : function( fname ){
+						// Update our local target:
+						$j('#file-name').val( fname );
+						// Run a destination file name check on the remote target
+						$j('#file-name').doDestCheck( {
+							'apiUrl' : remote_apiUrl,
+							'warn_target': '#file-warning'
+						} );
+					},
+					'doneUploadCb' : function( apiResult ){
+						alert(' upload done' );
+					}
+				} );
+
+				//Setup submit binding:
+				$j('#uploadButton').click( function( ){
+					// Build the output and send upload request to fileProxy
+					mw.ApiProxy.sendServerMsg( {
+						'apiUrl' : remote_apiUrl,
+						'frameName' : fileIframeName,
+						'frameMsg' : {
+							'action' : 'fileSubmit',
+							'formData' : {
+								'filename' : $j('#file-name').val(),
+								'comment' : $j('#file-desc').val()
+							}
+						}
+					} );
+					// Maybe set loading to spinner
+				} );
+
+
+				// Setup doDestCheck on change
+				$j('#file-name').change(function(){
+					$j('#file-name').doDestCheck( {
+						'apiUrl' : remote_apiUrl,
+						'warn_target': '#file-warning'
+					} );
+				});
+			});
+		})
+	});
+};
+
+</script>
+
+</head>
+<body>
+<h3> Simple API proxy testing system </h3>
+
+<div id="setupProxy">Proxy for: <span id="hostName"></span> <br>
+<span style="font-size:small"> this proxy will only work on a limited set of domains that the gadget allows proxy request from </span></div>
+<div id="setupDone" style="display:none;">
+	<br> <a href="#" id="doHello" >Hello User:</a> <span style="width:200px" id="helloTarget"></span>
+
+	<br><br><br> <a href="#" id="doAppend">Append Msg to Talk page:</a>
+	<div id="appendTarget"></div>
+
+	<br><br><a href="#" id="doFileBrowse">Upload a file to remote:</a>
+	<div id="file-upload-container" style="display:none">
+		<div style="background:#FEF;margin:20px;">
+			<h3> Local input </h3>
+			Target file name: <input id="file-name" type="text" size="15" />
+			<div id="file-warning"></div>
+			<BR>
+			Target desc: <input id="file-desc" type="text" size="20" value="test proxy desc"/>
+		</div>
+		<div style="background:#CEF;margin:20px;">
+			<h3> Browse File Served From Remote: </h3>
+			<div id="browseTarget"></div>
+		</div>
+		<div style="background:#FEF;margin:20px;">
+			<h3> Local submit </h3>
+			<input id="uploadButton" type="submit" size="10" value="upload" />
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

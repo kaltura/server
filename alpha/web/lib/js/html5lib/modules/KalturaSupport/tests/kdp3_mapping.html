@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>KDP3 | Kaltura Dynamic Player version 3 JavaScript Playground ( HTML5 backend player ) </title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+	<script type="text/javascript" src="kdp3_mapping_files/swfobject.js"></script>
+	<script type="text/javascript" src="kdp3_mapping_files/prettify.js"></script>
+	
+	
+	 <script type="text/javascript" src="../../../mwEmbedLoader.js"></script> 
+	<!-- <script type="text/javascript" src="http://html5.kaltura.org/js"></script> -->
+	<!--<script type="text/javascript" src="../../../mwEmbed.js"></script>-->
+	
+	<link type="text/css" rel="stylesheet" href="kdp3_mapping_files/prettify.css">
+	<style type="text/css">
+		html, body { margin:0; padding:0; }
+		body, td, th, pre, code, select, option, input, textarea { font-family:"Trebuchet MS", Arial, Sans-serif; font-size:10pt; }
+		#container { width:800px; margin:10px auto; overflow:hidden; }
+		.demo { height:200px; width:790px; margin:0; border:1px solid gray; font-family:Verdana; font-size:10px; background:white; overflow:auto; }
+		.describe { height:200px; width:790px; margin:0; border:1px solid gray; font-family:Verdana; font-size:10px; background:white; overflow:auto; border-top:none; }
+		div.code { }
+		pre { display:block; }
+		.syntaxhighlighter { margin:0 0 0 0 !important; padding:0 !important; }
+		input { font-size:14px; }
+		h3 { color:#aabbaa; font-size:1.4em; } 
+		h4 { font-size:1.2em; margin:8px 0 0; padding:0; padding-bottom:2px; }
+		p { margin:0; padding:0; }
+		ul, ol { margin:0; padding:0; margin-left:20px; }
+		ul li, ol li { margin:2px; list-style-position:outside; }
+		.describetext { color:#666666; }
+		pre, code {margin:0;}
+		img { margin:0;padding:0;border:none; }
+		a img { margin:5px; }
+		.footer { background:none; border-top:5px solid #eee; width:100%; }
+		.footer-conts { width:480px; margin: auto auto;  }
+		.sideBox { background-color:#FFFFFF; border:1px solid #eee; float:left; margin:10px 0 20px 40px; padding:1px; width:310px; }
+		.sideBox .content { background:#eee; padding:10px 12px; }
+		.sideBox ul.menu { margin-top:12px; margin:0 0 0 20px; border:medium none; list-style:none outside none; text-align:left; }
+		.sideBox ul li { background:none repeat scroll 0 0 transparent; margin:6px 0; padding:0; }
+		dfn { border-bottom:1px dotted green; color:green; cursor:default; font-style:normal; }
+		.controls { padding: 5px; }
+		#controls_menu {  }
+	</style>
+	<script type="text/javascript">
+		
+		var notificationslist = ['startUp',
+								'durationChange',
+								'initiatApp',
+								'changeMedia',
+								'cleanMedia',
+								'skinLoaded',
+								'skinLoadFailed',
+								'entryReady',
+								'entryFailed',
+								'sourceReady',
+								'loadMedia',
+								'mediaLoading',
+								'mediaReady',
+								'mediaUnloaded',
+								'mediaLoadError',
+								'mediaError',
+								'rootResize',
+								'mediaViewableChange',
+								'pre1start',
+								'post1start',
+								'doPause',
+								'doPlay',
+								'doPlayEntry',
+								'doStop',
+								'doSeek',
+								'doIntelligentSeek',
+								'doSwitch',
+								'kdpReady',
+								'kdpEmpty',
+								'layoutReady',
+								'playerStateChange',
+								'playerReady',
+								'playerContainerReady',
+								'playerPaused',
+								'playerPlayed',
+								'playerSeekStart',
+								'playerSeekEnd',
+								'playerPlayEnd',
+								'playerUpdatePlayhead',
+								'playerDimensionChange',
+								'openFullScreen',
+								'closeFullScreen',
+								'changeVolume',
+								'volumeChanged',
+								'enableGui',
+								'fastForward',
+								'stopFastForward',
+								'bytesDownloadedChange',
+								'bytesTotalChange',
+								'bufferProgress',
+								'bufferChange',
+								'playerDownloadComplete',
+								'endEntrySession',
+								'endPreSession',
+								'endPostSession',
+								'durationChange',
+								'hasCloseFullScreen',
+								'hasOpenedFullScreen',
+								'switchingChange',
+								'scrubberDragStart',
+								'scrubberDragEnd',
+								'alert',
+								'showUiElement',
+								'cancelAlerts',
+								'enableAlerts',
+								'freePreviewEnd'];
+		
+		function jsCallbackReady () {
+			$('#kdp3').get(0).addJsListener("volumeChanged", "volumeChangedHandler");
+			$('#kdp3').get(0).addJsListener("playerStateChange", "playerStateChangeHandler");
+			$('#kdp3').get(0).addJsListener("durationChange", "durationChangeHandler");
+			$('#kdp3').get(0).addJsListener("playerUpdatePlayhead", "playerUpdatePlayheadHandler");
+			$('#kdp3').get(0).addJsListener("bytesTotalChange", "bytesTotalChangeHandler");
+			$('#kdp3').get(0).addJsListener("bytesDownloadedChange", "bytesDownloadedChangeHandler");
+			$('#kdp3').get(0).addJsListener("entryReady", "entryHandler"); // Used by MediaSpace
+
+			for (var i=0; i < notificationslist.length; ++i) {
+				if (notificationslist[i] != 'playerUpdatePlayhead') {
+					mw.log( 'Add listener: ' + notificationslist[i] );
+					window[ notificationslist[i] + "Handler2" ] = function(data, id){
+						if ($("#stopListeners").attr("checked") == false){
+							$("#notifications").text( $("#notifications").text() + "'+notificationslist[i]+': ");
+							printobj(data);
+						}
+					}
+					$('#kdp3').get(0).addJsListener( notificationslist[i], notificationslist[i]+"Handler2" );
+				}
+			}
+		}
+		
+		function printobj (obj) {
+			x = '';
+			if (typeof(obj) == 'object') {
+				for (var key in obj) {
+					x += key + " => " + obj[key] + ", ";
+				}
+			} else {
+				x = obj;
+			}
+			var oldscroll = $("#notifications").scrollTop();
+			$("#notifications").text($("#notifications").text() + x + '\n');
+			if ($('#autoscroll').attr('checked') == true)
+				$("#notifications").scrollTop($("#notifications").get(0).scrollHeight); 
+			else
+				$("#notifications").scrollTop(oldscroll);
+		}
+		
+		function statisticsHandler (data, id) {
+			$('#notifications').text($('#notifications').text() + '\n' + data);
+		}
+		
+		function bytesTotalChangeHandler (data, id) {
+			$('#bytestotal').text(data.newValue);
+		}
+		
+		function bytesDownloadedChangeHandler (data, id) {
+			$('#bytesloaded').text(data.newValue);
+		}
+		
+		var newVolume = 0;
+		var oldVolume = 1;
+		function volumeChangedHandler (data, id) {
+			$('#volumeLevel').text(data.newVolume);
+		}
+		
+		function playerStateChangeHandler (data, id) {
+			$('#playerstate').text(data);
+		}
+		
+		function durationChangeHandler (data, id) {
+			$('#videoduration').text(data.newValue);
+		}
+		
+		function playerUpdatePlayheadHandler(data, id) {
+			if ($('#listenToUpdate').attr('checked') == true) {
+				$("#notifications").text($("#notifications").text() + "playerUpdatePlayhead: ");
+				printobj(data);
+			}
+			$('#videotime').text(data);
+		}
+		
+		function entryHandler(entry) {
+			console.log(entry);
+		}
+		
+		$(function() {
+			$('#cMedia').click( function() {
+				$('#kdp3').get(0).sendNotification("changeMedia",{entryId:"1_8c3s1pvx"});
+			});
+		});
+	</script>
+	
+	<script type="text/javascript">/*
+		var flashvars = {};
+		flashvars.autoPlay = "false";
+		//flashvars.entryId = "http://cdn.kaltura.org/apis/html5lib/kplayer-examples/media/bbb.flv";
+		//flashvars.sourceType = "url";
+		flashvars.entryId = "0_swup5zao";
+		flashvars.sourceType = "entryId";
+		flashvars.debugMode = "true";
+		flashvars.fileSystemMode = "true";
+		flashvars.widgetId = "_243342";
+		flashvars.partnerId = "243342";
+		flashvars.pluginDomain = "plugins/";
+		flashvars.kml = "local";
+		flashvars.kmlPath = "http://www.kaltura.org/demos/kdp3/config.xml";
+		flashvars.host = "www.kaltura.com";
+		flashvars.cdnHost = "cdn.kaltura.com";
+		flashvars.externalInterfaceDisabled = "false";
+		flashvars.skinPath = "http://www.kaltura.org/demos/kdp3/assets/skin.swf";
+		flashvars["full.skinPath"] = "http://www.kaltura.org/demos/kdp3/assets/skin.swf";
+		//DEFINE CUSTOM SKIN URL -		
+		/*
+		//DEFINE OPENX BANNER USING WATERMARK PLUGIN - 
+		flashvars['bannerad.watermarkClickPath']='http://d1.openx.org/ck.php?n=a45b33cc';
+		flashvars['bannerad.watermarkPath']='http://d1.openx.org/avw.php?zoneid=110118&cb=22&n=a45b33cc';
+		flashvars['bannerad.width']=468;
+		flashvars['bannerad.height']=60;
+		flashvars['bannerad.plugin']=true;
+		flashvars['bannerad.position']='firstChild';
+		flashvars['bannerad.relativeTo']='player';
+		flashvars['bannerad.className']='Watermark';
+		
+		var params = {};
+		params.quality = "best";
+		params.wmode = "opaque";
+		params.allowfullscreen = "true";
+		params.allowscriptaccess = "always";
+		
+		var attributes = {};
+		attributes.id = "kdp3";
+		attributes.name = "kdp3";
+		attributes.styleclass = "player";
+		
+		swfobject.embedSWF("http://www.kaltura.org/demos/kdp3/kdp3.swf", "kdp3", "570", "380", "10.0.0", "jslib/expressInstall.swf", flashvars, params, attributes);
+		*/
+	</script>	
+</head>
+<body>
+	<div id="controls_menu" class="sideBox">
+	<div class="content">
+		<strong><a href="http://www.kaltura.org/demos/kdp3/docs.html">[Go to KDP3 Docs]</a></strong>
+		<h2>Player Control</h2>
+        <dfn title="Click the play, pause or stop buttons to control the player playback. Set a time in seconds to the seek field and click the 'seek to' button to jump to that seconds in the playing media">Playback control:</dfn>&nbsp;<a href="http://www.kaltura.org/demos/kdp3/docs.html#sendnotification">[docs]</a>
+        <div class="controls">
+			<a href="#" onclick="$('#kdp3').get(0).sendNotification('doPlay');return false;">Play</a> | <a href="#" onclick="$('#kdp3').get(0).sendNotification('doPause');return false;">Pause</a> | <a href="#" onclick="$('#kdp3').get(0).sendNotification('doStop');return false;">Stop</a> 
+			| <a href="#" onclick="$('#kdp3').get(0).evaluate('{mediaProxy.entry.id}');">Get entry id</a> | 
+			<a href="#" id="cMedia">Change Media</a>
+        </div>
+        <div class="controls">
+			Seek to: <input size="4" id="seekto" value="25" type="text"><button onclick="$('#kdp3').get(0).sendNotification('doSeek', parseFloat($('#seekto').val()));return false;">Seek</button>
+        </div>
+		<br>
+        <dfn title="Use the controls below to mute or unmute the player volume or enter a number between 0 and 1 in the 'Set volume' field and click the 'Change' button to set the player volume">Volume control:</dfn>
+        <div class="controls">
+			<a href="#" onclick="newVolume=$('#kdp3').get(0).evaluate('{video.volume}');if(newVolume>0)oldVolume=newVolume;$('#kdp3').get(0).sendNotification('changeVolume', 0);return false;">Mute</a> | <a href="#" onclick="$('#kdp3').get(0).sendNotification('changeVolume', oldVolume);return false;">Unmute</a>
+        </div>
+		<div class="controls">
+			Set volume: <input size="2" id="vol" value="1" type="text"><span style="color: rgb(85, 85, 85);">(0-1)</span>&nbsp;<button onclick="$('#kdp3').get(0).sendNotification('changeVolume', parseFloat($('#vol').val()));return false;">Change</button>
+		</div>
+		<br>
+		<dfn title="Common statistics that are available, these are basically listeners to events and evaluation of KDP objects">Player statistics</dfn>&nbsp;<a href="http://www.kaltura.org/demos/kdp3/docs.html#addlistener">[docs]</a>
+        <div class="controls">
+          Duration: <span id="videoduration">0</span><br>
+          Current time: <span id="videotime">0</span><br>
+          Player state: <span id="playerstate">paused</span><br>
+          Bytes - (Total: <span id="bytestotal">0</span>, Loaded: <span id="bytesloaded">0</span>)<br>
+          Volume: <span id="volumeLevel">1</span>
+        </div>
+		<br>
+		<div>
+			<dfn title="The box below lists all the events that are handled by KDP, for readability, we do not list the playerUpdatePlayhead notification by default, since it is being called too often, tick the playerUpdatePlayhead checkbox below to list this notification as well">Notifications:</dfn>&nbsp;<a href="http://www.kaltura.org/demos/kdp3/docs.html#addlistener">[docs]</a><input id="autoscroll" checked="checked" type="checkbox"><label for="autoscroll">AutoScroll?</label>
+			<textarea id="notifications" style="height: 80px; width: 285px;">
+			</textarea><br>
+			<input id="listenToUpdate" type="checkbox"><label for="listenToUpdate">Listen to playerUpdatePlayhead</label>&nbsp;<a href="http://www.kaltura.org/demos/kdp3/docs.html#notifications">[docs]</a><br>
+			<input id="stopListeners" type="checkbox"><label for="stopListeners">Stop listening?</label>&nbsp;<a href="http://www.kaltura.org/demos/kdp3/docs.html#removelistener">[docs]</a>
+		</div>
+	</div>
+</div>
+<div id="container">
+	<h1 class="title">Kaltura Dynamic Player version 3 ( HTML5lib backend test ) </h1>
+	<a href="?forceMobileHTML5"> Force Mobile HTML5</a> for testing with desktop chrome and safari.	
+	<p>Hover over the parameters or APIs from the list for description, click to test &amp; learn more.</p>
+	<object id="kdp3" name="kdp3" type="application/x-shockwave-flash" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="330" width="400" xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:video" resource="http://www.kaltura.com/index.php/kwidget/cache_st/1291647430/wid/_243342/uiconf_id/2890431/entry_id/0_uka1msg4" data="http://www.kaltura.com/index.php/kwidget/cache_st/1291647430/wid/_243342/uiconf_id/2890431/entry_id/0_uka1msg4"><param name="allowFullScreen" value="true" /><param name="allowNetworking" value="all" /><param name="allowScriptAccess" value="always" /><param name="bgcolor" value="#000000" /><param name="flashVars" value="&" /><param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/1291647430/wid/_243342/uiconf_id/2890431/entry_id/0_uka1msg4" /><a href="http://corp.kaltura.com">video platform</a> <a href="http://corp.kaltura.com/video_platform/video_management">video management</a> <a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> <a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a> <a rel="media:thumbnail" href="http://cdnbakmi.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1msg4/width/120/height/90/bgcolor/000000/type/2" /> <span property="dc:description" content="" /><span property="media:title" content="FolgersCoffe.mpeg" /> <span property="media:width" content="400" /><span property="media:height" content="330" /> <span property="media:type" content="application/x-shockwave-flash" /> </object>
+</div>	
+<div id="cleardiv" style="clear: both; margin-top: 10px;"></div>
+</body></html>

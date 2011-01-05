@@ -1,0 +1,49 @@
+*{margin: 0; padding: 0; border: 0; list-style: none; outline: 0}
+body{
+	background:		#fff;
+	font:			11px/13px Arial, Helvetica, Verdana, Sans;
+	color:			#636363;
+	min-width:		980px
+}
+a{	color:			#b40000; text-decoration: none}
+#header, #main{
+	position:		relative;
+	display: 		block;
+	margin:			0 auto;
+	width:			980px;
+	z-index:		2
+}
+#myVidInteface, .vamp .controls{position: relative; width: 425px}
+.vamp .controls{
+	position: 		relative;
+	background: 	transparent url('../img/bg.gif') 0 0 repeat-x;
+	height: 		25px;
+}
+.vamp .controls li{float: left; height: 25px; margin: 0 8px;}
+.play-control{
+	background: 	transparent url('../img/playBtn.png') center center no-repeat;
+	width:			20px;
+}
+.progress-control{	
+	width:			200px;
+}
+.load-progress{background: lime;}
+.play-progress{
+	background: 	transparent url('../img/slider.gif') left top no-repeat;
+	width: 25px;
+}
+.time-control{line-height: 25px;}
+.volume-control{
+	background: 	transparent url('../img/volumeOff.gif') center center no-repeat;
+	width:		 	21px;
+	padding-left:	13px
+}
+.volume-control-level{
+	background: 	transparent url('../img/volumeOn.gif') left center no-repeat;
+	height:			25px;
+	width:		 	50%;
+}
+.fullscreen-control{
+	background: transparent url('../img/fullScreen.png') center center no-repeat;
+	width:			20px;
+}

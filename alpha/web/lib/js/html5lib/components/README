@@ -1,0 +1,3 @@
+Components are parts of the core mwEmbed package that have been separated into different files for easy maintainability.
+
+Default included Components are listed in the main loader.js file. 

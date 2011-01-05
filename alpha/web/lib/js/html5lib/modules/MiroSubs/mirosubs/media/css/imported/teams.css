@@ -1,0 +1,23 @@
+
+.start_team{
+float: right !important;
+margin: 16px 0 0 !important;
+}
+
+.team_meta{
+margin: 0 0 40px;
+padding: 0;
+}
+
+.team_meta li{
+margin: 0;
+padding: 0;
+list-style: none;
+font-size: 11px;
+}
+
+
+
+.no-padding-top{
+padding-top: 0 !important;
+}

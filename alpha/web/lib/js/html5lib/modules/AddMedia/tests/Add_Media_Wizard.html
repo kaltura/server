@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title> Sample mwEmbed Add Media Wizard</title>
+	<style type="text/css">
+		body{
+			font-size:80%;
+		}
+		img {
+			border:medium none;
+		}
+	</style>
+	<!--   <script src="../ResourceLoader.php?class=window.jQuery,mwEmbed&debug=true"></script> -->
+ 	<script type="text/javascript" src="../../../ResourceLoader.php?class=window.jQuery,mwEmbed&&debug=true"></script>
+
+ 	<script type="text/javascript">
+ 	mw.ready( function(){
+ 		mw.load( 'AddMedia.addMediaWizard', function(){
+ 			$j('#add_media_link').wrap( $j( '<a />').attr('href', '#') ).text( 'Add Media Wizard' );
+ 			$j('#add_media_link').addMediaWizard( {
+				'profile' : 'html_edit',
+				'target_textbox' : '#wpTextbox1',
+				'target_render_area' : '#inline_append',
+				'import_url_mode' : 'remote_link',
+				'remote_insert_description' : true,
+
+				// if the info overlay per asset should be displayed
+				'displayResourceInfoIcons' : false,
+
+				// If we should display buttons to switch between "box" and "detailed" view
+				'displayResultFormatButton' : false,
+
+				// Note selections in the textbox will take over the default query
+				'default_query' : 'fish',
+
+				//we only enabled commons
+				//(since javascript includes from other servers would be problamatic ) in a default install
+				//** but you can set this to 'all' to pull from multiple repositories
+				'enabled_providers' : [ 'wiki_commons', 'kaltura', 'archive_org', 'flickr', 'metavid' ]
+
+			} );
+ 		} );
+	});
+ 	</script>
+</head>
+<body>
+<h3>Sample Add Media Wizard</h3>
+
+<span id="add_media_link">loading...</span><br><br>
+<table border="1" width="800">
+	<tr>
+		<td valign="top" width="50%" id="inline_append">Asset Output</td>
+		<td valign="top" width="50%">Html Output:<textarea
+			id="wpTextbox1" cols="60" rows="6" id="code_append" name="wpTextbox1"
+			tabindex="3" /></textarea></td>
+	</tr>
+</table>
+</body>
+</html>
+

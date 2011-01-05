@@ -1,0 +1,198 @@
+
+.modal_editor {
+	/*background:#AAA none repeat scroll 0 0;
+	border:3px solid #666666;*/
+	left:10px;
+	top:10px;
+	right:10px;
+	bottom:10px;
+	position:fixed;		
+	z-index:100;
+}
+
+.displayHTML a:visited {
+	color:white;
+}
+
+.loadingSpinner {
+	width:32px;
+	height:32px;
+	display:block;
+	padding:0px;
+	background-image: url('images/loading_ani.gif');
+}
+.cssLoadingSpinner {
+	position:relative;
+	width:100px;
+	height:100px;
+	//margin:25px;
+	-moz-border-radius:100px;
+	float:left;
+	-moz-transform:scale(0.3);
+	-webkit-transform:scale(0.3);
+	
+	/* not used right now: */
+	-webkit-animation-name: rotateThis;
+	-webkit-animation-duration:2s;
+	-webkit-animation-iteration-count:infinite;
+	-webkit-animation-timing-function:linear;
+}
+.cssLoadingSpinner div {
+	width:15px;
+	height:30px;
+	position:absolute;
+	top:35px;
+	left:45px;
+}
+.cssLoadingSpinner div {
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	border-radius:30px;
+}
+/* uncomment this to use css animation in webkit browsers */
+ @-webkit-keyframes rotateThis {
+	from {-webkit-transform:scale(0.7) rotate(0deg);}
+	to   {-webkit-transform:scale(0.7) rotate(360deg);}
+}
+
+/* jquery.ui overides */
+
+.ui-icon_link {
+	padding: .4em 1em .4em 20px;
+	text-decoration: none;
+	position: relative;	
+}
+.ui-icon_link span.ui-icon {
+	margin: 0 5px 0 0;
+	position: absolute;
+	left: 0.2em;
+	right: auto;
+	top: 50%;
+	margin-top: -8px;
+	zoom: 1;
+}
+.ui-icon_link span.ui-text {	
+	position: absolute;
+	left: 0.2em;
+	right: auto;	
+	margin-top: -3px;
+	zoom: 1;
+}
+
+.ui-progressbar-value{
+	background-image: url('images/pbar-ani.gif');
+}
+
+.ui-widget-overlay{
+	background: url('images/ui-bg_diagonals-thick_20_666666_40x40.png') repeat scroll 50% 50% #666666;
+	opacity:0.5;
+}
+
+.ui-widget-content input {
+	padding: 5px;
+}
+.ui-widget-content a {
+	color:#009;
+}
+
+ul.ui-provider-selection {
+	list-style-type: none;
+	margin: 0 0 0.6em 0;
+	overflow: hidden;
+	padding: 0;
+	text-align: center;
+}
+
+ul.ui-provider-selection li {
+	border-left: 1px solid black;
+	float: left;
+	line-height: 1.1em;
+	margin: 0 0.5em 0 -0.5em;
+	padding: 0 0.5em;
+	color: blue;
+	list-style-image:none;	
+	cursor:pointer;	
+}
+
+ul.ui-provider-selection li .ui-selected {
+	color: black;
+	font-weight: bold;
+}
+
+ul.ui-provider-selection li a.ui-active {
+	color: black;
+	font-weight: bold;
+}
+
+ul.ui-provider-selection li a {
+	color: blue;
+	text-decoration: none;	
+}
+
+/* Vertical Tabs
+----------------------------------
+.ui-dialog-buttonpane { padding:4px !important; }
+.ui-tabs-vertical { width: 100%; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 25%; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 68%;}
+
+.ui-dialog .ui-dialog-buttonpane button { float: left !important; }
+*/
+
+
+.mw-imported-resource{
+	border: thin solid black;
+}
+
+.kaltura-icon {
+	background-image:url('images/kaltura_logo_sm_transparent.png') !important;
+	background-repeat:no-repeat;
+	display: block;
+	height: 12px;
+	width: 12px;
+	margin-top: -6px !important;
+	margin-left: 3px !important;	
+}
+
+.mw-fullscreen-overlay {
+	background: rgb(0, 0, 0) none repeat scroll 0% 0%; 
+	position: fixed; 
+	top: 0pt;
+	left: 0pt;
+	width: 100%;
+	height: 100%; 
+	-moz-background-clip: border; 
+	-moz-background-origin: padding; 
+	-moz-background-inline-policy: continuous; 
+}
+
+.fg-menu .ui-icon{
+	position:relative;
+	top:-1px;
+}
+
+.ui-dialog-buttonpane a{
+	float: right;
+	margin-right: 10px;
+}
+
+/**
+* Special Video player play-btn 
+* Lets us use root common style sheets with jquery based skins
+* ( without additional assets in the embedPlayer skins folder )
+*/
+.play-btn-large {
+	width: 70px;
+	height: 53px;
+	background : url('images/player_big_play_button.png?1'); 
+	position : absolute; 
+	cursor : pointer; 
+	border : none !important;
+	z-index : 1; 
+}
+.play-btn-large:hover {
+	background : url('images/player_big_play_button_hover.png?1'); 
+}
