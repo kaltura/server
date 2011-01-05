@@ -1,6 +1,16 @@
 <?php
 class kApiParameterPermissionItem extends PermissionItem
 {
+	// column names
+	
+	const OBJECT_COLUMN_NAME = 'permission_item.PARAM_1';
+
+	const PARAMETER_COLUMN_NAME = 'permission_item.PARAM_2';
+	
+	const ACTION_COLUMN_NAME = 'permission_item.PARAM_3';
+	
+	
+	// public functions
 	
 	public function getObject()
 	{

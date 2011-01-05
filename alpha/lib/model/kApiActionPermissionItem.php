@@ -2,6 +2,14 @@
 class kApiActionPermissionItem extends PermissionItem
 {
 	
+	// column names
+	
+	const SERVICE_COLUMN_NAME = 'permission_item.PARAM_1';
+
+	const ACTION_COLUMN_NAME = 'permission_item.PARAM_2';
+	
+	// public functions
+	
 	public function getService()
 	{
 		return $this->getParam1();
@@ -21,5 +29,5 @@ class kApiActionPermissionItem extends PermissionItem
 	{
 		$this->setParam2($action);
 	}
-	
+		
 }
