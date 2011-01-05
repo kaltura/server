@@ -27,7 +27,7 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
-		$dbPlaylist = $playlist->toPlaylist();
+		$dbPlaylist = $playlist->toObject();
 		
 		$this->checkAndSetValidUser($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);
@@ -48,7 +48,7 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setDisplayInSearch ( 2 ); // make all the playlist entries PUBLIC !
 		
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromPlaylist( $dbPlaylist );
+		$playlist->fromObject( $dbPlaylist );
 		
 		return $playlist;
 	}
@@ -78,7 +78,7 @@ class PlaylistService extends KalturaEntryService
 			$dbPlaylist->setDesiredVersion($version);
 			
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromPlaylist( $dbPlaylist );
+		$playlist->fromObject( $dbPlaylist );
 		
 		return $playlist;
 	}
@@ -106,7 +106,8 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 		
 		$playlist->playlistType = $dbPlaylist->getMediaType();
-		$playlistUpdate = $playlist->toUpdatablePlaylist();
+		$playlistUpdate = null;
+		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
 
 		
 		$this->checkIfUserAllowedToUpdateEntry($playlistUpdate);
@@ -136,7 +137,7 @@ class PlaylistService extends KalturaEntryService
 			myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
 		
 		$dbPlaylist->save();
-		$playlist->fromPlaylist( $dbPlaylist );
+		$playlist->fromObject( $dbPlaylist );
 		
 		return $playlist;
 	}	
@@ -182,7 +183,7 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException ( APIErrors::CANT_UPDATE_PARAMETER, 'playlistType' );
 		
 		$oldPlaylist = new KalturaPlaylist();
-		$oldPlaylist->fromPlaylist($dbPlaylist);
+		$oldPlaylist->fromObject($dbPlaylist);
 			
 		if (!$newPlaylist) {
 			$newPlaylist = new KalturaPlaylist();
@@ -327,7 +328,7 @@ class PlaylistService extends KalturaEntryService
 		myPlaylistUtils::updatePlaylistStatistics ( $this->getPartnerId() , $dbPlaylist );//, $extra_filters , $detailed );
 		
 		$playlist = new KalturaPlaylist(); // start from blank
-		$playlist->fromPlaylist( $dbPlaylist );
+		$playlist->fromObject( $dbPlaylist );
 		
 		return $playlist;
 	}

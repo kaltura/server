@@ -71,40 +71,45 @@ class KalturaPlaylist extends KalturaBaseEntry
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}	
 	
-	public function toUpdatablePlaylist()
+	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
 		// support filters array only if atleast one filters was specified
 		if ($this->playlistType == KalturaPlaylistType::DYNAMIC && $this->filters && $this->filters->count > 0)
 			$this->filtersToPlaylistContentXml();
 			
-		$playlist = new entry();
-		$playlist->setType ( entryType::PLAYLIST );
-		parent::toUpdatableObject( $playlist )	;
-		$playlist->setType ( entryType::PLAYLIST );
-		$playlist->setDataContent( $this->playlistContent );
-		return $playlist;
+		$object_to_fill = new entry();
+		$object_to_fill->setType ( entryType::PLAYLIST );
+		parent::toUpdatableObject( $object_to_fill )	;
+		$object_to_fill->setType ( entryType::PLAYLIST );
+		$object_to_fill->setDataContent( $this->playlistContent );
+		return $object_to_fill;
 	}
 	
-	public function toPlaylist()
+	public function toObject($dbObject = null, $skip = array())
 	{
+		if (is_null($dbObject))
+			$dbObject = new entry();
+		
 		// support filters array only if atleast one filters was specified
 		if ($this->playlistType == KalturaPlaylistType::DYNAMIC && $this->filters && $this->filters->count > 0)
 			$this->filtersToPlaylistContentXml();
 		
-		$playlist = new entry();
-		$playlist->setType ( entryType::PLAYLIST );
-		parent::toObject( $playlist )	;
-		$playlist->setType ( entryType::PLAYLIST );
-		$playlist->setDataContent( $this->playlistContent );
+		$dbObject->setType ( entryType::PLAYLIST );
+		parent::toObject( $dbObject )	;
+		$dbObject->setType ( entryType::PLAYLIST );
+		$dbObject->setDataContent( $this->playlistContent );
 		
-		return $playlist;
+		return $dbObject;
 	}
 	
-	public function fromPlaylist ( entry  $playlist )
+	public function fromObject($sourceObject)
 	{
-		parent::fromObject( $playlist );
+		if(!$sourceObject)
+			return;
+
+		parent::fromObject( $sourceObject );
 		$host = requestUtils::getHost();
-		$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $playlist , $host );
+		$this->executeUrl = myPlaylistUtils::toPlaylistUrl( $sourceObject , $host );
 		
 		if ($this->playlistType == KalturaPlaylistType::DYNAMIC)
 			$this->playlistContentXmlToFilters();

@@ -9,7 +9,7 @@ class KalturaPlaylistArray extends KalturaTypedArray
 		foreach ( $arr as $obj )
 		{
 			$nObj = new KalturaPlaylist();
-			$nObj->fromPlaylist(  $obj );
+			$nObj->fromObject(  $obj );
 			$newArr[] = $nObj;
 		}
 		

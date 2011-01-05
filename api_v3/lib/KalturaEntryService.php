@@ -15,7 +15,7 @@ class KalturaEntryService extends KalturaBaseService
 		try
 		{
 			// first copy all the properties to the db entry, then we'll check for security stuff
-			$dbEntry = $entry->toObject(new entry());
+			$dbEntry = $entry->toInsertableObject(new entry());
 		}
 		catch(kCoreException $ex)
 		{
