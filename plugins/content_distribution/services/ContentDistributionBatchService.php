@@ -22,7 +22,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionSubmitJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -80,7 +80,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionSubmitJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -101,7 +101,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionUpdateJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -159,7 +159,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionUpdateJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -179,7 +179,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -237,7 +237,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
@@ -257,7 +257,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveDistributionFetchReportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 
@@ -315,7 +315,7 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getExclusiveAlmostDoneDistributionFetchReportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
-		$jobType = ContentDistributionPlugin::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT);
 		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 	}
 	
