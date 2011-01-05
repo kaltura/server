@@ -3,7 +3,6 @@
  * @package api
  * @subpackage objects
  * @deprecated
- * @requiresPermission read,update,insert
  */
 class KalturaAdminUser extends KalturaUser 
 {
