@@ -438,6 +438,7 @@ class kuserPeer extends BasekuserPeer
 			if ($admin->hasPermissionOr(array(PermissionName::ADMIN_USER_ADD, PermissionName::ADMIN_USER_UPDATE, PermissionName::ADMIN_USER_DELETE)))
 			{
 				$adminName = $admin->getFullName();
+				if (!$adminName) { $adminName = $admin->getPuserId(); }
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = null;
 				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId, $forumsLink, $unsubscribeLink);
@@ -464,6 +465,7 @@ class kuserPeer extends BasekuserPeer
 		// setup parameters
 		$partnerId = $user->getPartnerId();
 		$userName = $user->getFullName();
+		if (!$userName) { $userName = $user->getPuserId(); }
 		$creatorUserName = 'Unknown';
 		if (!is_null(kCurrentContext::$uid))
 		{

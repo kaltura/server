@@ -73,6 +73,7 @@ class myPartnerRegistration
 		$bodyParams = array();
 		$partnerId = $partner->getId();
 		$userName = $adminKuser->getFullName();
+		if (!$userName) { $userName = $adminKuser->getPuserId(); }
 		$loginEmail = $adminKuser->getEmail();
 		$loginData = $adminKuser->getLoginData();
 		$hashKey = $loginData->getNewHashKeyIfCurrentInvalid();
