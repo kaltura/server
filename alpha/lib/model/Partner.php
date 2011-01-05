@@ -698,7 +698,7 @@ class Partner extends BasePartner
 			if (!$kuser || $kuser->getPartnerId() != $this->getId()) {
 				throw new kUserException('', kUserException::USER_NOT_FOUND);
 			}
-			$kuserRoles = explode(',', $kuser->getUserRoleIds());
+			$kuserRoles = explode(',', $kuser->getRoleIds());
 			$c = new Criteria();
 			$c->addAnd(UserRolePeer::STR_ID, UserRoleId::PARTNER_ADMIN_ROLE, Criteria::EQUAL);
 			$adminUserRole = UserRolePeer::doSelectOne($c);
