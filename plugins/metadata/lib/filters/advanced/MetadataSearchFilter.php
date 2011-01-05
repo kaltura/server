@@ -60,7 +60,7 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 						$value = $item->getValue();
 						$value = SphinxUtils::escapeString($value);
 						$fieldId = $xPaths[$field];
-						$condition = "\"{$pluginName}_{$fieldId} $value mdend\"";
+						$condition = "\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "\"";
 					}
 				}
 				elseif($item instanceof MetadataSearchFilter)

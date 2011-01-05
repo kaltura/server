@@ -5,6 +5,8 @@ class kMetadataManager
 	const APP_INFO_KEY = 'key';
 	const APP_INFO_LABEL = 'label';
 	
+	const SEARCH_TEXT_SUFFIX = 'mdend';
+	
 	protected static $objectTypeNames = array(
 		Metadata::TYPE_ENTRY => 'entry',
 	);
@@ -225,7 +227,7 @@ class kMetadataManager
 		
 		foreach($searchItems as $key => $searchItem)
 			foreach($searchItem as $searchPhrase)
-				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase mdend";
+				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX;
 				
 		if(count($textItems))
 		{
@@ -234,8 +236,9 @@ class kMetadataManager
 				 
 			$searchTexts['text'] .= ' ' . implode(' ', $textItems);
 		}
+		$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX;
 		
-		KalturaLog::debug('Search Texts: ' . print_r($searchTexts, true));
+//		KalturaLog::debug('Search Texts: ' . print_r($searchTexts, true));
 		
 		$ret = array();
 		foreach($searchTexts as $index => $value)
@@ -244,7 +247,6 @@ class kMetadataManager
 		
 		if(isset($searchTexts['text']))
 			$ret['text'] = $searchTexts['text'];
-		// TODO - add text suffix mdend
 			
 		return $ret;
 	}
