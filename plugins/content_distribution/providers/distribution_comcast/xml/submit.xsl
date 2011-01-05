@@ -19,16 +19,31 @@
 
 	<xsl:template match="item">
 	
-		<addMediaWithFiles>
+		<addContent>
 			<media>
+				<id>
+					<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+						<xsl:value-of select="distribution[@provider='MSN']/remoteId" />
+					</xsl:if>
+				</id>
 				<xsl:if test="count(thumbnail[@thumbAssetId = $thumbAssetId])">
 					<thumbnailURL>
 						<xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/>
 					</thumbnailURL>
 				</xsl:if>
 				<airdate>
-					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s-08:00', sum(createdAt))" />
+					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(createdAt))" />
 				</airdate>
+				<xsl:if test="sum(distribution[@provider='Comcast']/sunrise) > 0">
+					<availableDate>
+						<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='Comcast']/sunrise))" />
+					</availableDate>
+				</xsl:if>
+				<xsl:if test="sum(distribution[@provider='Comcast']/sunset) > 0">
+					<expirationDate>
+						<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='Comcast']/sunset))" />
+					</expirationDate>
+				</xsl:if>
 				<title><xsl:value-of select="title" /></title>
 				<description>
 					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
@@ -105,7 +120,7 @@
 					</mediaFile>
 				</xsl:for-each>
 			</mediaFiles>
-		</addMediaWithFiles>
+		</addContent>
 
 	</xsl:template>
 </xsl:stylesheet>

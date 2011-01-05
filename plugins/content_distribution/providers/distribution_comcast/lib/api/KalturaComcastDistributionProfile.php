@@ -22,17 +22,17 @@ class KalturaComcastDistributionProfile extends KalturaDistributionProfile
 	public $metadataProfileId;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $keywords;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $author;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $album;
 		

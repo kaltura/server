@@ -60,13 +60,11 @@ class KalturaComcastDistributionJobProviderData extends KalturaDistributionJobPr
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = ComcastDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
-//		TODO - currently not supported
-//				
-//		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
-//			$this->xml = ComcastDistributionProvider::generateDeleteXML($distributionJobData->entryDistribution->entryId, $this);
-//			
-//		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
-//			$this->xml = ComcastDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $this);
+		if($distributionJobData instanceof KalturaDistributionDeleteJobData)
+			$this->xml = ComcastDistributionProvider::generateDeleteXML($distributionJobData->entryDistribution->entryId, $this);
+			
+		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
+			$this->xml = ComcastDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $this);
 	}
 		
 	private static $map_between_objects = array

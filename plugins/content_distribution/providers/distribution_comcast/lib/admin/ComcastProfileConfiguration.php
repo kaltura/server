@@ -53,8 +53,45 @@ class Form_ComcastProfileConfiguration extends Form_ProviderProfileConfiguration
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
-		$this->addElement('text', 'username', array(
-			'label'			=> 'Username:',
+		$metadataProfiles = null;
+		try
+		{
+			$metadataProfileFilter = new KalturaMetadataProfileFilter();
+//			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
+			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+			
+			$client = Kaltura_ClientHelper::getClient();
+			Kaltura_ClientHelper::impersonate($this->partnerId);
+			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
+			Kaltura_ClientHelper::unimpersonate();
+			
+			$metadataProfiles = $metadataProfileList->objects;
+		}
+		catch (KalturaClientException $e)
+		{
+			$metadataProfiles = null;
+		}
+		
+		if(count($metadataProfiles))
+		{
+			$this->addElement('select', 'metadata_profile_id', array(
+				'label'			=> 'Metadata Profile ID:',
+				'filters'		=> array('StringTrim'),
+			));
+			
+			$element = $this->getElement('metadata_profile_id');
+			foreach($metadataProfiles as $metadataProfile)
+				$element->addMultiOption($metadataProfile->id, $metadataProfile->name);
+		}
+		else 
+		{
+			$this->addElement('hidden', 'metadata_profile_id', array(
+				'value'			=> 0,
+			));
+		}
+		
+		$this->addElement('text', 'email', array(
+			'label'			=> 'E-Mail:',
 			'filters'		=> array('StringTrim'),
 		));
 	
@@ -63,38 +100,23 @@ class Form_ComcastProfileConfiguration extends Form_ProviderProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 	
-		$this->addElement('text', 'domain', array(
-			'label'			=> 'Domain:',
+		$this->addElement('text', 'account', array(
+			'label'			=> 'Account:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'cs_id', array(
-			'label'			=> 'CS ID:',
+		$this->addElement('text', 'keywords', array(
+			'label'			=> 'Keywords:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'source', array(
-			'label'			=> 'Source:',
+		$this->addElement('text', 'author', array(
+			'label'			=> 'Author:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'metadata_profile_id', array(
-			'label'			=> 'Metadata Profile ID:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'mov_flavor_params_id', array(
-			'label'			=> 'MOV Flavor Params ID:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'flv_flavor_params_id', array(
-			'label'			=> 'FLV Flavor Params ID:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'wmv_flavor_params_id', array(
-			'label'			=> 'WMV Flavor Params ID:',
+		$this->addElement('text', 'album', array(
+			'label'			=> 'Album:',
 			'filters'		=> array('StringTrim'),
 		));
 	}

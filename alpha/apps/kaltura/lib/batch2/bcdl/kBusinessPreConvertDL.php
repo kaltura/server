@@ -313,8 +313,7 @@ class kBusinessPreConvertDL
 	 */
 	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription)
 	{
-		//KalturaLog::debug(__METHOD__." - (parentJob === null) [".($parentJob === null)."] entryId [$entryId], flavorParamsId [$flavorParamsId]");
-		KalturaLog::log(__METHOD__." - (parentJob === null) [".($parentJob === null)."] entryId [$entryId], flavorParamsId [$flavorParamsId]");
+		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
 		
 		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset))

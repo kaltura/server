@@ -22,14 +22,14 @@ class ComcastDistributionProfile extends DistributionProfile
 	public function getAccount()				{return $this->getFromCustomData(self::CUSTOM_DATA_ACCOUNT);}
 	public function getMetadataProfileId()		{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID);}
 	public function getKeywords()				{return $this->getFromCustomData(self::CUSTOM_DATA_KEYWORDS);}
-	public function getAuthor()		{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR);}
-	public function getAlbum()		{return $this->getFromCustomData(self::CUSTOM_DATA_ALBUM);}
+	public function getAuthor()					{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR);}
+	public function getAlbum()					{return $this->getFromCustomData(self::CUSTOM_DATA_ALBUM);}
 	
 	public function setEmail($v)				{$this->putInCustomData(self::CUSTOM_DATA_EMAIL, $v);}
 	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
 	public function setAccount($v)				{$this->putInCustomData(self::CUSTOM_DATA_ACCOUNT, $v);}
 	public function setMetadataProfileId($v)	{$this->putInCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID, $v);}
-	public function setKeywords($v)	{$this->putInCustomData(self::CUSTOM_DATA_KEYWORDS, $v);}
-	public function setAuthor($v)	{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR, $v);}
-	public function setAlbum($v)	{$this->putInCustomData(self::CUSTOM_DATA_ALBUM, $v);}
+	public function setKeywords($v)				{$this->putInCustomData(self::CUSTOM_DATA_KEYWORDS, $v);}
+	public function setAuthor($v)				{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR, $v);}
+	public function setAlbum($v)				{$this->putInCustomData(self::CUSTOM_DATA_ALBUM, $v);}
 }

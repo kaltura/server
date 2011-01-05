@@ -287,7 +287,7 @@ class kContentDistributionManager
 			if(in_array($thumbAsset->getFlavorParamsId(), $requiredThumbParamsIds))
 			{
 				$thumbAssetsIds[] = $thumbAsset->getId();
-				KalturaLog::debug("Assign humb asset [" . $thumbAsset->getId() . "] from required thumbnail params ids");
+				KalturaLog::debug("Assign thumb asset [" . $thumbAsset->getId() . "] from required thumbnail params ids");
 				continue;
 			}
 			
@@ -295,7 +295,7 @@ class kContentDistributionManager
 			if(isset($thumbDimensionsWithKeys[$key]))
 			{
 				unset($thumbDimensionsWithKeys[$key]);
-				KalturaLog::debug("Assign humb asset [" . $thumbAsset->getId() . "] from dimension [$key]");
+				KalturaLog::debug("Assign thumb asset [" . $thumbAsset->getId() . "] from dimension [$key]");
 				$thumbAssetsIds[] = $thumbAsset->getId();
 			}
 		}

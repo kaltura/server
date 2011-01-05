@@ -37,6 +37,7 @@
 				<xs:element name="categories" type="cim-ac-category" />
 				<xs:element minOccurs="0" name="copyright" type="xs:string" />
 				<xs:element name="description" type="xs:string" />
+				<xs:element minOccurs="0" name="availableDate" type="xs:dateTime" />
 				<xs:element minOccurs="0" name="expirationDate" type="xs:dateTime" />
 				<xs:element minOccurs="0" name="genre" type="xs:string" />
 				<xs:element minOccurs="0" name="keywords" type="xs:string" />

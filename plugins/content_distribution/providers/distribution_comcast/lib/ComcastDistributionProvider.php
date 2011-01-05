@@ -43,7 +43,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return false; // TODO - check if delete supported
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -51,7 +51,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public function isUpdateEnabled()
 	{
-		return false; // TODO - check if update supported
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -67,7 +67,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return false; // TODO - check if schedule supported
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -117,31 +117,38 @@ class ComcastDistributionProvider implements IDistributionProvider
 	}
 	
 	/**
-	 * TODO - remove the method if delete not supported
 	 * @param string $entryId
 	 * @param KalturaComcastDistributionJobProviderData $providerData
 	 * @return string
 	 */
 	public static function generateDeleteXML($entryId, KalturaComcastDistributionJobProviderData $providerData)
 	{
+		// TODO add remote id
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
+	
+		// change end time to a day ago
+		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() - (1 * 24 * 60 * 60));
+		
+		$nodes = $xml->getElementsByTagName('expirationDate');
+		foreach($nodes as $node)
+			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
 			
 		return $xml->saveXML();
 	}
 	
 	/**
-	 * TODO - remove the method if update not supported
 	 * @param string $entryId
 	 * @param KalturaComcastDistributionJobProviderData $providerData
 	 * @return string
 	 */
 	public static function generateUpdateXML($entryId, KalturaComcastDistributionJobProviderData $providerData)
 	{
+		// TODO add remote id
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{
@@ -230,7 +237,6 @@ class ComcastDistributionProvider implements IDistributionProvider
 			return null;
 		}
 			
-		// TODO create validation XSD
 		$xsdPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsd';
 		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
 		{
