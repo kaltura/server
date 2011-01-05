@@ -226,6 +226,7 @@ class kalturaIframe {
 			$rawResultObject = $client->doQueue();
 			$client->throwExceptionIfError($this->resultObj);
 		} catch( Exception $e ){
+			echo "<pre>"; print_r($e); exit();
 			$this->fatalIframeError( KALTURA_GENERIC_SERVER_ERROR . "\n" . $e->getMessage() );
 			return array();
 		}
