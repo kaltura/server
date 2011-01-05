@@ -53,6 +53,43 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
+		$metadataProfiles = null;
+		try
+		{
+			$metadataProfileFilter = new KalturaMetadataProfileFilter();
+//			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
+			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+			
+			$client = Kaltura_ClientHelper::getClient();
+			Kaltura_ClientHelper::impersonate($this->partnerId);
+			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
+			Kaltura_ClientHelper::unimpersonate();
+			
+			$metadataProfiles = $metadataProfileList->objects;
+		}
+		catch (KalturaClientException $e)
+		{
+			$metadataProfiles = null;
+		}
+		
+		if(count($metadataProfiles))
+		{
+			$this->addElement('select', 'metadata_profile_id', array(
+				'label'			=> 'Metadata Profile ID:',
+				'filters'		=> array('StringTrim'),
+			));
+			
+			$element = $this->getElement('metadata_profile_id');
+			foreach($metadataProfiles as $metadataProfile)
+				$element->addMultiOption($metadataProfile->id, $metadataProfile->name);
+		}
+		else 
+		{
+			$this->addElement('hidden', 'metadata_profile_id', array(
+				'value'			=> 0,
+			));
+		}
+		
 		$this->addElement('text', 'username', array(
 			'label'			=> 'Username:',
 			'filters'		=> array('StringTrim'),
@@ -75,11 +112,6 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 		
 		$this->addElement('text', 'source', array(
 			'label'			=> 'Source:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'metadata_profile_id', array(
-			'label'			=> 'Metadata Profile ID:',
 			'filters'		=> array('StringTrim'),
 		));
 		
