@@ -42,7 +42,7 @@ while(count($roles))
 		$lastRole = $role->getId();
 		KalturaLog::log('-- role id ' . $lastRole);
 		
-		if ($role->getStrId() != UserRoleId::BASE_USER_SESSION_ROLE && $role->getStrId() != UserRoleId::NO_SESSION_ROLE) {
+		if ($role->getStrId() != UserRoleId::BASE_USER_SESSION_ROLE) {
 			$role->setTags('kmc');
 		}
 		else {
