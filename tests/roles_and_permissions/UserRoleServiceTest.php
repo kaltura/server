@@ -265,7 +265,7 @@ class UserRoleServiceTest extends PHPUnit_Framework_TestCase {
 		// failure to add a role with a permission which the partner does not have
 		$newRole = new KalturaUserRole();
 		$newRole->name = 'Stam 2'.uniqid();
-		$newRole->permissionNames = PermissionName::BASE_BATCH_SYSTEM_PERMISSION;
+		$newRole->permissionNames = PermissionName::BATCH_BASE;
 		$exceptionThrown = false;
 		try { $addedRole = $this->addRoleWrap($newRole); }
 		catch (Exception $e) { $exceptionThrown = $e; }
@@ -548,7 +548,7 @@ class UserRoleServiceTest extends PHPUnit_Framework_TestCase {
 		
 		// failure to add a permisison which the partner does not have
 		$updateRole = new KalturaUserRole();
-		$updateRole->permissionNames = PermissionName::BASE_BATCH_SYSTEM_PERMISSION;
+		$updateRole->permissionNames = PermissionName::BATCH_BASE;
 		$exceptionThrown = false;
 		try { $addedRole = $this->client->userRole->update($addedRole->id, $updateRole); }
 		catch (Exception $e) { $exceptionThrown = $e; }
