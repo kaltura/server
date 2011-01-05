@@ -207,8 +207,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 				$sphinxFieldNames = array();
 				foreach($fieldNamesArr as $fieldName)
 				{
-					$sphinxField = $this->criteria->getSphinxFieldName($fieldName);
-					$type = $this->criteria->getSphinxFieldType($sphinxField);
+					$sphinxField = $this->getSphinxFieldName($fieldName);
+					$type = $this->getSphinxFieldType($sphinxField);
 					$sphinxFieldNames[] = $sphinxField;
 				}
 				$sphinxField = '(' . implode(',', $sphinxFieldNames) . ')';
@@ -222,8 +222,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 			}
 			else
 			{
-				$sphinxField = $this->criteria->getSphinxFieldName($fieldName);
-				$type = $this->criteria->getSphinxFieldType($sphinxField);
+				$sphinxField = $this->getSphinxFieldName($fieldName);
+				$type = $this->getSphinxFieldType($sphinxField);
 			}
 			$valStr = print_r($val, true);
 			
