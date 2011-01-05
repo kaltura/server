@@ -65,9 +65,27 @@
 				<label for="ks">KS (string):</label><input type="text" class="" name="ks" size="30"/> <input id="chk-ks" type="checkbox" checked="checked"/>
 			</div>
 			
+			<?php if($indexConfig->noCache): ?>
 			<div class="param">
 				<label for="ks">No Cache (bool):</label><input type="text" class="" name="nocache" size="30"/> <input type="checkbox"/>
 			</div>
+			<?php endif; ?>
+
+			<?php if($indexConfig->format): ?>
+			<div class="param">
+				<label for="ks">Format:</label>
+				<select class="" name="format">
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_XML; ?>">XML</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_JSON; ?>">JSON</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_JSONP; ?>">JSONP</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_PHP; ?>">PHP</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_PHP_ARRAY; ?>">PHP Array</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_HTML; ?>">HTML</option>
+					<option value="<?php echo KalturaResponseType::RESPONSE_TYPE_MRSS; ?>">MRSS</option>
+				</select>
+				<input type="checkbox"/>
+			</div>
+			<?php endif; ?>
 
 			<div class="param">
 				<label for="service">Select service:</label>
