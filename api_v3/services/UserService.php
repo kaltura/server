@@ -94,6 +94,8 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER
+	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
+	 * @throws KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE
 	 */
 	public function updateAction($userId, KalturaUser $user)
 	{		
@@ -135,6 +137,13 @@ class UserService extends KalturaBaseUserService
 			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
 				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
 			}
+			if ($code == kPermissionException::USER_ROLE_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+			}
+			if ($code == kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE) {
+				throw new KalturaAPIException(KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
+			}
+			throw $e;
 		}
 				
 		$user = new KalturaUser();
