@@ -368,12 +368,12 @@ class kuserPeer extends BasekuserPeer
 		}
 		
 		// check if roles are valid - may throw exceptions
-		if (!$user->getUserRoleIds()) {
+		if (!$user->getRoleIds()) {
 			// assign default role according to user type admin / normal
 			$userRole = UserRolePeer::getDefaultRoleForUser($user);
-			$user->setUserRoles($userRole->getId());
+			$user->setRoleIds($userRole->getId());
 		}
-		UserRolePeer::testValidRolesForUser($user->getUserRoleIds());
+		UserRolePeer::testValidRolesForUser($user->getRoleIds());
 		
 		if($user->getScreenName() === null) {
 			$user->setScreenName($user->getPuserId());

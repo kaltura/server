@@ -53,6 +53,66 @@ class kuser extends Basekuser
 		return parent::save( $con );	
 	}
 	
+	public function preSave(PropelPDO $con = null)
+	{
+		// verify that all role ids set are valid
+		if ($this->roleIdsChanged)
+		{
+			// add new roles
+			$idsArray = explode(',',$this->roleIds);
+			foreach ($idsArray as $id)
+			{				
+				if (!is_null($id) && $id != '')
+				{
+					// check if user role item exists
+					$userRole = UserRolePeer::retrieveByPK($id);
+					if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getPartnerId(),PartnerPeer::GLOBAL_PARTNER) ) )
+					{
+						throw new kPermissionException("A user role with ID [$id] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+					}
+				}
+			}
+			
+			if ($this->isRootUser())
+			{
+				$adminRole = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
+				if (!(in_array($adminRole->getId(), $idsArray)))
+				{
+				 	throw new kPermissionException('Account owner must be set with a partner administrator role', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);	
+				}
+			}
+		}
+		return parent::preSave();
+	}
+	
+	
+	public function postSave(PropelPDO $con = null) 
+	{
+		if ($this->roleIdsChanged)
+		{
+			// delete old roles
+			$c = new Criteria();
+			$c->addAnd(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
+			KuserToUserRolePeer::doDelete($c);
+			
+			// add new roles
+			$idsArray = explode(',',$this->roleIds);
+			foreach ($idsArray as $id)
+			{				
+				if (!is_null($id) && $id != '')
+				{
+					$kuserToRole = new KuserToUserRole();
+					$kuserToRole->setUserRoleId($id);
+					$kuserToRole->setKuserId($this->getId());
+					$kuserToRole->save();
+				}
+			}
+		}
+		
+		$this->roleIdsChanged = false;
+		return parent::postSave();	
+	}
+	
 
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Basekuser#postUpdate()
@@ -72,7 +132,8 @@ class kuser extends Basekuser
 		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
-					
+		
+				
 		$ret = parent::postUpdate($con);
 		
 		if ($objectDeleted)
@@ -823,7 +884,15 @@ class kuser extends Basekuser
 	
 	public function isRootUser()
 	{
-		$partner = $this->getPartner();
+		if ($this->isNew()) {
+			return false;
+		}
+		try {
+			$partner = $this->getPartner();
+		}
+		catch (Exception $e) {
+			return false;
+		}
 		if (!$partner) {
 			return false;
 		}
@@ -841,120 +910,54 @@ class kuser extends Basekuser
 		return $partner;
 	}
 	
+	
 	// ----------------------------------------
 	// -- start of user role handling functions
 	// ----------------------------------------
-	
-	/**
-	 * Add a user role to the current kuser
-	 * @param int $userRoleId
-	 * @throws kPermissionException::PERMISSION_ITEM_NOT_FOUND
-	 */
-	public function addUserRole($userRoleId, $save = true)
-	{
-		// check if user role item exists
-		$userRole = UserRolePeer::retrieveByPK($userRoleId);
-		if (!$userRole) {
-			throw new kPermissionException("A user role with ID [$userRoleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
-		}
 		
-		// check if role is already associated to the current kuser
-		$kuserToRole = KuserToUserRolePeer::getByKuserAndUserRoleIds($this->getId(), $userRoleId);
-		if ($kuserToRole) {
-			KalturaLog::notice('Kuser with ID ['.$this->getId().'] is already associated with role id ['.$userRoleId.']');
-			return true;
-		}
-		
-		// add role to current kuser
-		$kuserToRole = new KuserToUserRole();
-		$kuserToRole->setUserRole($userRole);
-		$this->addKuserToUserRole($kuserToRole);
-		if ($save) {
-			$this->save();
-		}
-		return true;
-	}
-	
-	/**
-	 * @return string String of role IDs associated to the current kuser
-	 */
-	public function getUserRoleIds()
-	{
-		$ids = array();
-		$items = $this->getKuserToUserRoles();
-		if (!$items) {
-			return null;
-		}		
-		foreach ($items as $item) {
-			$ids[] = $item->getUserRoleId();
-		}
-		return implode(',', $ids);
-	}
-	
+	private $roleIds = null;
+	private $roleIdsChanged = false;
+				
 	/**
 	 * @return array Array of role IDs associated to the current kuser
 	 */
 	public function getUserRoleNames()
-	{
-		$ids = $this->getUserRoleIds();
-		$ids = explode(',', $ids);
-		
+	{		
 		$c = new Criteria();
 		$c->addSelectColumn(UserRolePeer::NAME);
-		$c->add(UserRolePeer::ID, $ids, Criteria::IN);
-
+		$c->add(UserRolePeer::ID, explode(',',$this->getRoleIds()), Criteria::IN);
 		$stmt = UserRolePeer::doSelectStmt($c);
 		$names = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		$names = implode(',', $names);
 		return $names;
 	}
-
-	/**
-	 * Remove the given user role from the current kuser
-	 * @param int $permissionItemId
-	 */
-	public function removeUserRole($userRoleId)
-	{		
-		// check if role is already associated to the kuser
-		$kuserToRole = KuserToUserRolePeer::getByKuserAndUserRoleIds($this->getId(), $userRoleId);
-		if (!$kuserToRole) {
-			KalturaLog::notice('Kuser with id ['.$this->getId().'] is not associated with rolw id ['.$userRoleId.']');
-			return true;
-		}
-		
-		// delete association between kuser and role
-		$kuserToRole->delete();
-	}
 	
+	public function getRoleIds()
+	{
+		if (is_null($this->roleIds))
+		{
+			$this->roleIds = '';
+			$c = new Criteria();
+			$c->addSelectColumn(KuserToUserRolePeer::USER_ROLE_ID);
+			$c->addAnd(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
+			$stmt = KuserToUserRolePeer::doSelectStmt($c);
+			$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+			$this->roleIds = implode(',', $ids);
+		}
+		return $this->roleIds;
+	}
 
 	/**
 	 * Set the roles of the current kuser
 	 * @param string $idsString A comma seperated string of user role IDs
 	 */
-	public function setUserRoles($idsString)
-	{
-		$this->deleteAllUserRoles();
-		$ids = explode(',', trim($idsString));
+	public function setRoleIds($idsString)
+	{		
+		$this->roleIds = $idsString;
+		$this->roleIdsChanged = true;
+	}
+
 		
-		foreach ($ids as $id)
-		{
-			if (!is_null($id) && $id != '') {
-				$this->addUserRole($id, false);
-			}
-		}
-	}
-	
-	
-	/**
-	 * Delete all user roles from the current kuser
-	 */
-	private function deleteAllUserRoles()
-	{
-		$c = new Criteria();
-		$c->add(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
-		KuserToUserRolePeer::doDelete($c);
-	}
-	
 	/**
 	 * Checks if the current user has one of the permissions with the given names
 	 * @param array $permissionNamesArray Permission names
@@ -962,8 +965,7 @@ class kuser extends Basekuser
 	 */
 	public function hasPermissionOr(array $permissionNamesArray)
 	{
-		$roleIds = $this->getUserRoleIds();
-		$roleIds = explode(',', $roleIds);
+		$roleIds = explode(',', $this->getRoleIds());
 		foreach ($roleIds as $roleId)
 		{
 			$userRole = UserRolePeer::retrieveByPK($roleId);
