@@ -132,9 +132,13 @@ echo $msg;
 
 function getUsers($lastUser, $userLimitEachLoop)
 {
+	SystemUserPeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(SystemUserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(SystemUserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return SystemUserPeer::doSelect($c);
+	SystemUserPeer::setUseCriteriaFilter(false);
+	$users =  SystemUserPeer::doSelect($c);
+	SystemUserPeer::setUseCriteriaFilter(true);
+	return $users;
 }

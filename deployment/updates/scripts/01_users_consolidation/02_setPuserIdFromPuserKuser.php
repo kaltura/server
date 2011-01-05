@@ -105,7 +105,7 @@ while(count($puserKusers))
 	}
 	
 	kuserPeer::clearInstancePool();
-	PuserKuserPeer::clearInstancePool();
+	
 	
 	$puserKusers = getPuserKusers($lastPuserKuser, $userLimitEachLoop);
 }
@@ -116,9 +116,13 @@ echo $msg;
 
 function getPuserKusers($lastPuserKuser, $userLimitEachLoop)
 {
+	PuserKuserPeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(PuserKuserPeer::ID, $lastPuserKuser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(PuserKuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return PuserKuserPeer::doSelect($c);
+	PuserKuserPeer::setUseCriteriaFilter(false);
+	$puserKusers =  PuserKuserPeer::doSelect($c);
+	PuserKuserPeer::setUseCriteriaFilter(true);
+	return $puserKusers;
 }

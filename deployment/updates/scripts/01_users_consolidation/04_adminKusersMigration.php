@@ -144,7 +144,7 @@ while(count($users))
 		file_put_contents($lastUserFile, $lastUser);
 	}
 	
-	adminKuserPeer::clearInstancePool();
+	
 	kuserPeer::clearInstancePool();
 	PartnerPeer::clearInstancePool();
 	UserLogindataPeer::clearInstancePool();
@@ -158,9 +158,13 @@ echo $msg;
 
 function getUsers($lastUser, $userLimitEachLoop)
 {
+	adminKuserPeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(adminKuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(adminKuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return adminKuserPeer::doSelect($c);
+	adminKuserPeer::setUseCriteriaFilter(false);
+	$users = adminKuserPeer::doSelect($c);
+	adminKuserPeer::setUseCriteriaFilter(true);
+	return $users;
 }

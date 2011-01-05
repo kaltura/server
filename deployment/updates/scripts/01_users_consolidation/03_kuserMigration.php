@@ -101,8 +101,8 @@ while(count($users))
 		file_put_contents($lastUserFile, $lastUser);
 	}
 	
-	kuserPeer::clearInstancePool();
-	PartnerPeer::clearInstancePool();
+	
+	
 	UserLoginDataPeer::clearInstancePool();
 	
 	$users = getUsers($lastUser, $userLimitEachLoop);
@@ -114,15 +114,21 @@ echo $msg;
 
 function getUsers($lastUser, $userLimitEachLoop)
 {
+	kuserPeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(kuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(kuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return kuserPeer::doSelect($c);
+	kuserPeer::setUseCriteriaFilter(false);
+	$users =  kuserPeer::doSelect($c);
+	kuserPeer::setUseCriteriaFilter(true);
+	return $users;
 }
 
 function getLoginPartners()
 {
+	PartnerPeer::clearInstancePool();
+	
 	$c = new Criteria();
 	$c1 = $c->getNewCriterion(PartnerPeer::SERVICE_CONFIG_ID, 'services-paramount-mobile.ct');
 	$c2 = $c->getNewCriterion(PartnerPeer::SERVICE_CONFIG_ID, 'services-disney-mediabowl.ct');
@@ -130,7 +136,9 @@ function getLoginPartners()
 	$c1->addOr($c2);
 	
 	$c->add($c1);
+	PartnerPeer::setUseCriteriaFilter(false);
 	$partners = PartnerPeer::doSelect($c);
+	PartnerPeer::setUseCriteriaFilter(true);
 	$ids = array();
 	foreach ($partners as $par) {
 		$ids[] = $par->getId();

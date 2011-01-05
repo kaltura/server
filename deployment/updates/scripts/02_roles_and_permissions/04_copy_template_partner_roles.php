@@ -71,7 +71,6 @@ while(count($partners))
 		file_put_contents($lastPartnerFile, $lastPartner);
 	}
 	
-	PartnerPeer::clearInstancePool();
 	UserRolePeer::clearInstancePool();
 	
 	$partners = getPartners($lastPartner, $partnerLimitEachLoop);
@@ -83,10 +82,14 @@ echo $msg;
 
 function getPartners($lastPartner, $partnerLimitEachLoop)
 {
+	PartnerPeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(PartnerPeer::ID, $lastPartner, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(PartnerPeer::ID);
 	$c->setLimit($partnerLimitEachLoop);
-	return PartnerPeer::doSelect($c);
+	PartnerPeer::setUseCriteriaFilter(false);
+	$partners = PartnerPeer::doSelect($c);
+	PartnerPeer::setUseCriteriaFilter(true);
+	return $partners;
 }
 

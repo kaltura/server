@@ -37,7 +37,7 @@ while(count($users))
 		KalturaLog::log('-- kuser id ' . $lastUser);
 			
 		$userRole = UserRolePeer::getDefaultRoleForUser($user);
-		$user->setUserRoles($userRole->getId());
+		$user->setRoleIds($userRole->getId());
 
 		if (!$dryRun) {
 			KalturaLog::log('Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$userRole->getId().']');		
@@ -50,9 +50,6 @@ while(count($users))
 		file_put_contents($lastUserFile, $lastUser);
 	}
 	
-	kuserPeer::clearInstancePool();
-	UserRolePeer::clearInstancePool();
-	
 	$users = getUsers($lastUser, $userLimitEachLoop);
 }
 
@@ -62,9 +59,14 @@ echo $msg;
 
 function getUsers($lastUser, $userLimitEachLoop)
 {
+	kuserPeer::clearInstancePool();
+	UserRolePeer::clearInstancePool();
 	$c = new Criteria();
 	$c->add(kuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
 	$c->addAscendingOrderByColumn(kuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
-	return kuserPeer::doSelect($c);
+	kuserPeer::setUseCriteriaFilter(false);
+	$users = kuserPeer::doSelect($c);
+	kuserPeer::setUseCriteriaFilter(true);
+	return $users;
 }
