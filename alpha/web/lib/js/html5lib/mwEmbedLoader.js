@@ -43,7 +43,7 @@ var FORCE_LOAD_JQUERY = false;
 
 // These Lines are for local testing: 
 SCRIPT_FORCE_DEBUG = true;
-SCRIPT_LOADER_URL = 'http://local.trunk/lib/js/html5lib/ResourceLoader.php';
+SCRIPT_LOADER_URL = 'http://kaldev.kaltura.com/lib/js/html5lib/ResourceLoader.php';
 
 if( typeof console != 'undefined' && console.log ) {
 	console.log( 'Kaltura MwEmbed Loader Version: ' + kURID );
