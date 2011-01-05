@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smil baseProfile="Language" version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <meta name="title" content="Simple Crossfading Example"/>
+    
+    <transition id=""
+	type="fade" 
+	subtype="fadeFromColor" 
+	fadeColor="#000" 
+	dur="4s"/>	
+	
+  </head>
+  <body>
+    <seq>    
+	
+    <video src="http://upload.wikimedia.org/wikipedia/commons/9/94/Folgers.ogv" 	
+		dur="5s"
+		clipBegin = "17s"
+	/>	
+	
+	<video src="http://upload.wikimedia.org/wikipedia/commons/1/14/Independence_Day%2C_1940_Promotion.ogv"		
+		dur="1s"		
+	/>	
+		
+	<video src="http://upload.wikimedia.org/wikipedia/commons/1/14/Independence_Day%2C_1940_Promotion.ogv"
+    	transIn="fromBlack"	 				
+		dur="2s"		
+		clipBegin = "16s"
+	/>
+	
+	<video src="http://upload.wikimedia.org/wikipedia/commons/9/94/Folgers.ogv" 				
+		dur="3s"
+		clipBegin = "16s"
+	/>
+	
+	<video src="http://upload.wikimedia.org/wikipedia/commons/1/14/Independence_Day%2C_1940_Promotion.ogv" 				
+		dur="2"
+		clipBegin = "18"
+	/>	
+	
+ 	<video src="http://upload.wikimedia.org/wikipedia/commons/8/8b/Yochai_Benkler_-_On_Autonomy%2C_Control_and_Cultural_Experience.ogg" 		
+		transIn="fromBlack"
+		dur="10"
+		clipBegin = "0:3:43"
+	/>		
+	
+    </seq>
+    
+  </body>
+</smil>
+
+

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Direct Iframe api Test</title>            
+<script type="text/javascript">
+</script>
+</head>
+<body>
+	<h3> Kaltura iFrame Resizable Player + iFrame cross-domain player api </h3>
+	<span style="width:300px;float:left">
+		Widget id: <input id="kwidgetid" size="15" value="_243342"><br />
+		Entry id: <input id="kentryid" size="15" value="0_swup5zao"> <br />
+	</span>
+	<input id="displayIframe" type="button" value="Update iframe"></input>
+	<input id="triggerPlay" type="button" value="Play"></input>
+	<input id="triggerPause" type="button" value="Pause"></input>
+	<input id="alertTime" type="button" value="Alert currentTime"></input>
+	<input id="seek10" type="button" value="Set currentTime to 10"></input>
+	<br/>
+	Play / Pause events: 
+	<textarea id="playPauseLog" style="width:50x;height:40px;"></textarea>
+		<br/>
+			<br/>	<br/>
+	<div id="resizable" style="padding: 2.5em;width:400px;height:300px;border-style:solid;border-width:5px;">					
+		<div id="iframeHolder" style="width:100%;height:100%"></div>		 		
+	<div/>	
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.3/themes/base/jquery-ui.css" type="text/css" media="all" />
+	
+	<script type="text/javascript" src="../../../mwEmbedLoader.js"></script>
+	
+	<script type="text/javascript">
+	mw.setConfig( 'EmbedPlayer.EnableIframeApi', true );
+	
+	mw.ready(function(){		
+		mw.load(  ['mw.EmbedPlayerNative' , '$j.postMessage' , 'mw.IFramePlayerApiClient', 'JSON' ] , function(){						
+			// Add resize binding:			
+			$j('#resizable').resizable();		
+			
+			// Setup iframe rewrite for new source selection:  
+			$j('#displayIframe').click(function(){ 				
+				appendIframe();		
+				bindIframePlayer();							
+			});
+			
+			function appendIframe(){			
+				//alert('append::' + mw.getConfig('EmbedPlayer.EnableIframeApi'));
+					
+				$('#iframeHolder').empty().append(
+					$j('<iframe />').attr({
+						"id" : "vid",
+						"src" : '../../../mwEmbedFrame.php/wid/' + $('#kwidgetid').val() 
+							+ '/entry_id/' + $('#kentryid').val() + '/?debug=true' +
+							mw.getKalturaIframeHash() // add the parent domain to the frame location:  
+					})
+					.css({
+						'width' : '100%',
+						'height' : '100%',
+						'border' : '0px'				
+					})			
+				);
+				// run append iframe directly
+			};
+			appendIframe();
+			bindIframePlayer();	
+				
+					
+		});
+		function bindIframePlayer(){
+			// Bind the iFrame player:				
+			$j( '#vid' ).iFramePlayer();
+			
+			// Now we can use all the normal player calls bindings and attributes: 
+			$j( '#triggerPlay' ).click(function(){								
+				$('#vid').get(0).play();
+			});
+
+			$j( '#triggerPause' ).click(function(){
+				$j( '#vid' ).get(0).pause();
+			});
+
+			$j('#alertTime').click(function(){
+				alert( $j( '#vid').get(0).currentTime );
+			});
+
+			$j('#seek10').click( function(){
+				$j( '#vid').get(0).currentTime = 10;
+			});
+
+			$j('#vid').bind('play', function(){
+				$j('#playPauseLog').append( "Play Event\n" );
+			});
+			
+			$j('#vid').bind('pause', function(){
+				$j('#playPauseLog').append( "Pause Event\n" );				
+			});			
+			
+		}	
+	});	 
+	</script>
+</body>
+</html>

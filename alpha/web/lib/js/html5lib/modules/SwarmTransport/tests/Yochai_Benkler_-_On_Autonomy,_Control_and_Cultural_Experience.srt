@@ -1,0 +1,446 @@
+0
+00:00:00,000 --> 00:00:00,000
+Interview with Yochai Benkler
+
+1
+00:00:06,080 --> 00:00:08,040
+When I say user autonomy, what I'm talking about
+
+2
+00:00:08,040 --> 00:00:15,920
+is at the simplest level the ability 
+of people to do more for themselves,
+
+3
+00:00:15,920 --> 00:00:19,920
+by themselves, 
+without having to ask anyone's permission
+
+4
+00:00:19,920 --> 00:00:27,800
+and without having to submit to anyone's
+
+5
+00:00:27,800 --> 00:00:29,840
+control over what it is they are doing. 
+
+6
+00:00:30,280 --> 00:00:39,480
+What happened in the industrial 
+information and cultural economy
+
+7
+00:00:39,480 --> 00:00:49,480
+was that people shifted from being 
+relatively free to use a limited range
+
+8
+00:00:49,480 --> 00:00:55,440
+of materials that they had in social settings 
+that were open for conversation.
+
+9
+00:00:55,440 --> 00:01:01,280
+Family friends, 
+relatively small localities for the majority of people.
+
+10
+00:01:01,480 --> 00:01:05,800
+To an industrial model of cultural production
+
+11
+00:01:05,840 --> 00:01:08,480
+where the materials were produced by 
+
+12
+00:01:08,480 --> 00:01:15,400
+some set of commercial professional producers, 
+who then control the experience 
+
+13
+00:01:15,400 --> 00:01:22,400
+and located individuals at the passive 
+receiving end of the cultural conversation
+
+14
+00:01:22,600 --> 00:01:29,600
+so that efforts to take these materials and remake them, 
+
+15
+00:01:29,600 --> 00:01:32,480
+or efforts to participate as a cultural speaker,
+
+16
+00:01:32,520 --> 00:01:37,640
+by and large required permission.
+
+17
+00:01:38,000 --> 00:01:45,200
+What we're seeing now is that 
+through a combination of technology,
+
+18
+00:01:45,120 --> 00:01:52,040
+both digital processing and computation technology 
+and networking technology,
+
+19
+00:01:52,520 --> 00:01:56,080
+people can take more of their cultural environment, 
+
+20
+00:01:56,520 --> 00:02:01,520
+more of the information environment, 
+make it their own,
+
+21
+00:02:01,520 --> 00:02:04,760
+use it as found materials 
+to put together their own expressions,
+
+22
+00:02:04,760 --> 00:02:07,800
+do their own research, 
+create their own communications, 
+
+23
+00:02:07,800 --> 00:02:11,320
+create their own communities, 
+when they need collaboration with others.
+
+24
+00:02:11,520 --> 00:02:16,480
+Rather than relying on a 
+limited set of existing institutions.
+
+25
+00:02:17,000 --> 00:02:20,840
+Or on a set of materials 
+that they are not allowed to use
+
+26
+00:02:20,920 --> 00:02:25,760
+without going and asking 
+"please may I use this?
+
+27
+00:02:25,760 --> 00:02:27,080
+Please may I create?"
+
+28
+00:02:27,200 --> 00:02:30,800
+What happens when people can do more for and 
+
+29
+00:02:30,800 --> 00:02:35,040
+by themselves is that the set of actors;
+
+30
+00:02:35,600 --> 00:02:38,240
+primarily companies, 
+and in some places governments
+
+31
+00:02:38,840 --> 00:02:44,880
+that control the experience - 
+those whose permission was required, 
+
+32
+00:02:45,200 --> 00:02:47,440
+are resisting this transistion because 
+
+33
+00:02:47,440 --> 00:02:49,720
+control is a good thing to get 
+if you can get it. 
+
+34
+00:02:49,800 --> 00:02:52,760
+Or at least control is a good thing to have 
+if you can get it.
+
+35
+00:02:54,360 --> 00:03:01,080
+And what we're seeing today 
+is a series of different kinds of campaigns,
+
+36
+00:03:01,160 --> 00:03:04,240
+Some of them quite self conscious,
+
+37
+00:03:04,360 --> 00:03:08,480
+I think for example, 
+Hollywood's campaign to expand
+
+38
+00:03:08,560 --> 00:03:13,640
+technological constraint
+on use of cultural materials
+
+39
+00:03:13,680 --> 00:03:16,400
+digital rights management, trusted systems,
+
+40
+00:03:16,440 --> 00:03:18,840
+is a self conscious campaign.
+
+41
+00:03:18,880 --> 00:03:27,440
+Some of it much less conscious 
+much more based on anxieties,
+
+42
+00:03:27,440 --> 00:03:30,800
+and speaking out anxieties. 
+So for example 
+
+43
+00:03:30,800 --> 00:03:35,600
+when you hear the persistent concerns 
+over internet security,
+
+44
+00:03:35,760 --> 00:03:39,560
+and what will happen if people crack your system
+
+45
+00:03:39,560 --> 00:03:43,120
+when you hear the constant concerns about quality
+
+46
+00:03:43,080 --> 00:03:44,760
+and where will good quality come from?
+
+47
+00:03:44,760 --> 00:03:51,120
+and the error rate in wikipedia, 
+these are all much more subconscious expressions
+
+48
+00:03:51,200 --> 00:03:55,320
+of a fear that ends up being used as justification,
+
+49
+00:03:55,520 --> 00:04:00,520
+for embracing the control system 
+that is being displaced
+
+50
+00:04:00,520 --> 00:04:04,320
+because of the technological and social actions,
+
+51
+00:04:04,520 --> 00:04:11,120
+because of the technological characteristics 
+and the social practices,  
+
+52
+00:04:11,400 --> 00:04:17,160
+that are being adopted in widespread 
+cooperative networked practices. 
+
+53
+00:04:17,680 --> 00:04:25,040
+So we're seeing sometimes legal moves to change,
+
+54
+00:04:25,280 --> 00:04:30,640
+and require legal control where 
+practically it's no longer necessary. 
+
+55
+00:04:30,680 --> 00:04:36,640
+Sometimes we see... I wouldn't call them propaganda,
+
+56
+00:04:36,680 --> 00:04:41,600
+but I'd call them public debate and public enactment 
+
+57
+00:04:41,600 --> 00:04:47,400
+of anxiety, in order to increase the perceived importance,
+
+58
+00:04:47,400 --> 00:04:51,480
+of the traditional controllers. 
+The most important place where you see this is,
+
+59
+00:04:51,480 --> 00:04:55,080
+teachers tell students not to use Wikipedia.
+
+60
+00:04:55,720 --> 00:05:02,040
+Because that use shakes up the sense that I'm a teacher,
+
+61
+00:05:02,200 --> 00:05:06,120
+I know exactly what the set of materials are 
+that I have approved
+
+62
+00:05:06,120 --> 00:05:07,720
+and are capable of being approved.
+
+63
+00:05:07,800 --> 00:05:13,160
+I am used to seeing Kids, 
+appealing to authority
+
+64
+00:05:13,200 --> 00:05:16,120
+rather that cross referencing multiple resources.
+
+65
+00:05:16,360 --> 00:05:20,280
+I don't want to teach them 
+that they should see this as a source,
+
+66
+00:05:20,680 --> 00:05:24,400
+But not as a source of authority, a source of insight,
+
+67
+00:05:24,400 --> 00:05:28,920
+a potential move in a research that's always sceptical.  
+
+68
+00:05:29,000 --> 00:05:34,400
+One of the things that has to happen 
+in the context of the radically decentralised system
+
+69
+00:05:34,440 --> 00:05:38,480
+Is that we all have to become sceptical beings, 
+all the time.
+
+70
+00:05:38,480 --> 00:05:43,200
+Which is a fundamental change from 
+the traditional cultural system 
+
+71
+00:05:43,200 --> 00:05:46,840
+Where we would talk. 
+'How do I know if it's true? Well you've said it.'
+
+72
+00:05:46,840 --> 00:05:50,960
+Where did they publish it? 
+And looking for indicia of authority
+
+73
+00:05:51,000 --> 00:05:53,520
+ that will tell me this is authority.
+
+74
+00:05:53,880 --> 00:05:58,920
+Instead I have to begin to develop new capabilities 
+
+75
+00:05:59,200 --> 00:06:04,720
+of looking at five sources, 
+assigning them different levels of weight
+
+76
+00:06:04,720 --> 00:06:08,920
+and saying I have reasonable confidence 
+that the correct answer is
+
+77
+00:06:08,920 --> 00:06:15,400
+x rather than y without really assigning 
+full authority to any single site.
+
+78
+00:06:15,400 --> 00:06:19,800
+So that's another locus of control trying to,
+
+79
+00:06:19,800 --> 00:06:24,720
+get people to continue to hang on 
+to to this sense that you need
+
+80
+00:06:24,720 --> 00:06:29,080
+the expert authority, 
+you need the person whose is in charge,
+
+81
+00:06:29,080 --> 00:06:33,600
+to tell you what is good and what is not good. 
+what is high quality, what is low quality.
+
+82
+00:06:33,600 --> 00:06:38,280
+What is reliable information, 
+what is not reliable information.
+
+83
+00:06:38,280 --> 00:06:42,240
+And that's another domain 
+where we see the controllers,
+
+84
+00:06:42,280 --> 00:06:49,200
+in this case I think less strategically,
+
+85
+00:06:49,200 --> 00:06:53,400
+than in the context of the way that for example, 
+Hollywood backs digital rights management. 
+
+86
+00:06:53,560 --> 00:07:02,760
+I think it's a cousin in terms of self preservation.
+
+87
+00:07:03,200 --> 00:07:08,080
+But I think it's also a public enactment 
+of deeply held beliefs
+
+88
+00:07:08,080 --> 00:07:12,520
+about why it is, that the particular people, 
+that play a particular role
+
+89
+00:07:12,520 --> 00:07:16,280
+of authoritative speakers, 
+in the older system
+
+90
+00:07:16,280 --> 00:07:20,840
+continue to believe in the values 
+that made them authoritative, 
+
+91
+00:07:20,840 --> 00:07:25,120
+and made their authority important.  
+And so that's much more cultural resistance,
+
+92
+00:07:25,120 --> 00:07:31,600
+than it is practical, 
+legal or technical design resistance.
+
+93
+00:07:31,680 --> 00:07:37,080
+But  were seeing resistance from 
+different kind of actors who played the role, 
+
+94
+00:07:37,080 --> 00:07:42,800
+of controllers in the older models, 
+trying to preserve 
+
+95
+00:07:42,800 --> 00:07:45,880
+their relatively privileged position as controllers,
+
+96
+00:07:45,920 --> 00:07:48,120
+through different systems of constraint.
+

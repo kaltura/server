@@ -1,0 +1,285 @@
+/*/////////////////////////////////////////////
+
+~ Layout
+
+/////////////////////////////////////////////*/
+
+
+.wrapper{
+  margin: 0 auto;
+  position: relative;
+  }
+
+
+.right_column{
+  width: 440px;
+  float: right;
+  }
+
+
+.left_column{
+  width: 440px;
+  float: left;
+  }
+
+
+.content{
+  min-height: 300px;
+  clear: both;
+  line-height: 15px;
+  font-size: 12px;
+  }
+
+
+
+
+/*/////////////////////////////////////////////
+
+~ Header
+
+/////////////////////////////////////////////*/
+
+
+.header{
+  border-bottom: 1px solid #fff;
+  min-height: 130px;
+  width: 100%;
+  }
+
+.header .top_bar{
+  font-size: 12px;
+  float: left;
+  width: 100%;
+  line-height: 3em;
+  }
+
+
+.header h1 {
+  float: left;
+  margin: 10px 0 0 -10px;
+  font-size: 12px;
+  position: absolute;
+  top: 20px;
+  }
+
+
+.header h1 a, .header h1 span.logo {
+  background: url(../../images/logo.png) 0 10px no-repeat;
+  margin: 0;
+  overflow: hidden;
+  padding: 50px 0 0;
+  height: 0;
+  width: 290px;
+  display: block;
+  }
+
+
+.header h1 a:hover{
+  background: url(../../images/logo.png) 0 -59px no-repeat;
+  }
+
+
+
+/*//////////   ~  Top User Panel  ~   //////////*/
+
+
+.accountstatus{
+  width: 600px;
+  text-align: right;
+  float: right;
+  }
+
+
+.accountstatus p{
+  margin: 0;
+  padding: 6px 0px 0 0;
+  }
+
+
+
+.accountstatus p a{
+  margin: 0;
+  padding: 0px 10px 0 0;
+  }
+
+
+.user_panel{
+  right: 0;
+  top: 15px;
+  font-size: 11px;
+  position: absolute;
+  }
+
+
+.user_panel a{
+  text-decoration: none;
+  padding-right: 10px;
+  float: left;
+  margin-top: 3px;
+  margin-right: 10px;
+  }
+
+.user_panel img{
+  border: none;
+  float: left;
+  margin-right: 10px;
+  }
+
+
+
+
+
+
+/*/////////////////////////////////////////////
+
+~ Standard List
+
+/////////////////////////////////////////////*/
+
+
+
+.big_list,
+.small_list{
+  margin: 0;
+  padding: 0;
+  }
+
+
+.big_list,
+.big_list *{
+  font-size: 13px;
+  line-height: 1.4em;
+  }
+
+
+.small_list,
+.small_list *{
+  font-size: 11px;
+  line-height: 1.3em;
+  }
+
+
+.big_list .info{
+  margin-left: 120px;
+  }
+
+
+.small_list .info{
+  margin-left: 65px;
+  }
+  
+
+.big_list li,
+.small_list li{
+  margin: 0px 0;
+  padding: 20px 0;
+  list-style: none;
+  clear: both;
+  overflow: auto;
+  border-bottom: 1px solid #fff;
+  }
+
+.small_list li{
+  padding: 15px 0;
+  }
+
+
+
+.big_list li a,
+.small_list li a{
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  text-decoration: none;
+  }
+
+
+.big_list li:hover a,
+.small_list li:hover a{
+  text-decoration: underline;
+  }
+
+
+
+.big_list li h4,
+.small_list li h4{
+  margin: 0;
+  }
+
+
+.big_list li h4 a,
+.small_list li h4 a{
+  margin: 0;
+  color: #333;
+  padding: 0;
+  font-size: 1.3em;
+  }
+
+.big_list li span,
+.small_list li span{
+  margin: 0px;
+  color: #888;
+  padding: 0;
+  font-size: .9em;
+  }
+  
+
+.big_list li p,
+.small_list li p{
+  margin: 0;
+  padding: 0;
+  color: #444;
+  }
+
+
+
+/*/////////////////////////////////////////////
+
+~ Share
+
+/////////////////////////////////////////////*/
+
+
+.mirosubs-share h2{
+  border-bottom: 0 !important;;
+  padding: 0 !important;
+  line-height: 1em;
+  }
+
+.mirosubs-share h3{
+  border-bottom: 0 !important;;
+  padding: 0 !important;
+  }
+
+
+
+/*/////////////////////////////////////////////
+
+~ Footer
+
+/////////////////////////////////////////////*/
+
+
+.footer{
+  padding: 20px 30px 16px;
+  margin: 50px 0 80px;
+  color: #333;
+  clear: both;
+  width: 920px;
+  margin: 60px auto;
+  font-weight: bold;
+  font-size: 13px;
+  background: url(../../images/1x1.png);
+  -moz-border-radius: 5px;  
+  -webkit-border-radius: 5px;
+  height: 1.6em;
+  }
+
+
+.footer a{ color: #333;}
+
+
+.footer .floatright a{ padding-left: 20px;}
+
+
+

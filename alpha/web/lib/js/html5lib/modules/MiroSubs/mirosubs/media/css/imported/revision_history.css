@@ -1,0 +1,338 @@
+
+
+
+#video h2.main-title a{
+  text-decoration: none;
+color: #333 !important;
+  }
+
+
+/*/////////////////////////////////////////////
+
+~ Revision History
+
+/////////////////////////////////////////////*/
+
+
+
+.revision_list{
+  padding:0;
+  clear: none;
+  float: left;
+  width: 440px !important;
+  margin: 0 !important;
+  }
+
+
+.revision_list li{
+  list-style: none;
+  padding: 15px;
+  width: 410px;
+  line-height: 1.6em;
+  padding: 15px !important;
+  }
+
+
+li.even, li.even li{
+  background: #edfcfd !important;
+  }
+
+
+
+a.roll_back{
+  width: 419px;
+  display: block;
+  margin: 0px auto;
+  padding: 15px 10px;
+  background: #c74141 url(../../images/gradient_light.png) 0 0px repeat-x;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  color: #000;
+  border: 1px solid #9e381d;
+  font-size: 14px;
+  text-shadow: 1px 1px 0px #c67573;
+  box-shadow:inset 0px 1px 1px #c67573;
+  -moz-box-shadow:inset 0px 1px 0px #c67573;
+  -webkit-box-shadow:inset 0px 1px 2px #c67573;
+  }
+
+
+a.new_edit{
+  width: 419px;
+  display: block;
+  margin: 0px auto 0;
+  padding: 15px 10px;
+  background: #69b165 url(../../images/gradient_light.png) 0 0 repeat-x;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  color: #052803;
+  border: 1px solid #2a6a20;
+  font-size: 14px;
+  -moz-border-radius-topright: 5px;  
+  -moz-border-radius-topleft: 5px;  
+  -webkit-border-radius: 5px;
+  text-shadow: 1px 1px 0px #97c595;
+  box-shadow:inset 0px 1px 1px #97c595;
+  -moz-box-shadow:inset 0px 1px 0px #97c595;
+  -webkit-box-shadow:inset 0px 1px 2px #97c595;
+  }
+
+.revision_buttons{
+  margin: 0;
+  }
+
+
+
+
+.viewing_old{
+  display: block;
+  margin: 20px auto ;
+  padding: 15px 10px;
+  background: #e45129;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  color: #fff;
+  border: 3px solid #9e381d;
+  font-size: 14px;
+  }
+
+
+.time_change{
+  color: #e45129;
+  }
+
+
+.diff_title{
+  font-weight: normal;
+  }
+
+
+
+a.next_edit{
+  float: right;
+  padding-right: 20px;
+  }
+
+
+a.previous_edit{
+  float: left;
+  padding-left: 20px;
+  }
+
+
+a.next_edit ,a.previous_edit{
+  font-weight: bold;
+  font-size: 16px;
+  }
+
+
+
+
+.view_all{
+  float: right;
+  padding: 10px;
+  }
+
+.view_history{
+  float: right;
+  margin-right: 20px;
+  }
+
+
+
+
+
+.user_thumb{
+  height: 100px;
+  width: 100px;
+  float: left;
+  background: url(../../images/default_thumb.png) 0 0px repeat-x;
+  
+  }
+
+.progress{
+  background: url(../../images/gradient.png) 0 -50px repeat-x;
+  border: 1px solid #666;
+  width: 500px;
+  height: 13px;
+  float: left;
+  display: block;
+  -moz-border-radius: 15px;  
+  -webkit-border-radius: 15px;
+  box-shadow:inset 0px 1px 1px #555;
+  -moz-box-shadow:inset 0px 1px 0px #999;
+  -webkit-box-shadow:inset 0px 1px 2px #555;
+  position: relative;
+  background: -moz-linear-gradient(top,  #ddd,  #fff);
+  }
+
+
+.progress .completion{
+  height: 13px;
+  display: block;
+  -moz-border-radius: 15px; 
+  background: #d0e9ed url(../../images/gradient.png) 0 0px repeat-x;
+  -webkit-border-radius: 15px;
+  box-shadow: 1px 0px 0px #000;
+  -moz-box-shadow: 1px 0px 0px #000;
+  -webkit-box-shadow: 1px 0px 0px #000;
+  }
+
+
+
+
+.progress .completion.ten_percent{
+width: 30px !important;
+}
+
+
+.progress .completion.twenty_percent{
+width: 60px !important;
+}
+
+.progress .completion.thirty_percent{
+width: 120px !important;
+}
+
+.progress .completion.fourty_percent{
+width: 240px !important;
+}
+
+
+.progress .completion.fifty_percent{
+width: 300px !important;
+}
+
+
+
+.progress .completion.red{
+background: #cc3335 url(../../images/gradient.png) 0 0px repeat-x;
+}
+
+.progress .completion.yellow{
+background: #ffff66 url(../../images/gradient.png) 0 0px repeat-x;
+}
+
+.progress .completion.green{
+background: #33cc00 url(../../images/gradient.png) 0 0px repeat-x;
+}
+
+
+
+
+
+
+/*/////////////////////////////////////////////
+
+~ Thumbs
+
+/////////////////////////////////////////////*/
+
+.user_approval{
+  float: right;
+  margin-top: 73px;
+  border: 1px solid;
+  width: 390px;
+  padding: 0;
+  }
+
+
+.user_approval li{
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+  border-bottom: 1px solid #333;
+  }
+
+
+
+.user_approval li .thumb{
+  float: left;
+  width: 13px;
+  height: 13px;
+  margin-right: 13px;
+  }
+
+.user_approval li a{
+  color: #fff;}
+
+
+
+.user_approval li.thumb_down{
+  background: #ff0000 url(../../images/gradient.png) 0 0px repeat-x;
+  font-weight: bold;
+  color: #fff;
+  }
+
+.user_approval li.thumb_up .thumb{
+  background:  url(../../images/thumb.png) 3px 0px no-repeat !important;
+  }
+
+
+.user_approval li.thumb_up{
+  background: #1fd211 url(../../images/gradient.png) 0 0 repeat-x;
+  font-weight: bold;  
+  color: #fff;
+  }
+
+.user_approval li.thumb_down .thumb{
+  background:  url(../../images/thumb.png) 3px bottom no-repeat !important;
+  }
+  
+  
+
+
+
+#revisions-tab {
+  clear: both;
+  position: relative;
+  }
+
+
+
+
+
+
+
+
+.view_revision{
+  float: right;
+  margin-right: 20px;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

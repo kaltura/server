@@ -1,0 +1,157 @@
+#rsd_filters_container {
+	float: left;
+	width: 150px;
+	overflow: auto;
+}
+
+.rsd_box_result {
+	position: relative;
+}
+.rsd_clickable {
+	color: blue;
+	margin-top: 12px;
+	text-decoration: underline;
+}
+
+.rsd_cookies_blocked_MSIE {
+	width: 506px;
+	height: 61px;
+	display:block;
+	background-image: url('images/cookies_blocked_MSIE_eye.png');
+}
+
+.rsd_magnify_clip {
+	background-image: url('images/magnify-clip.png');
+	width: 15px;
+	height: 11px;
+	display:block;
+}
+
+.rsd_control_container{
+	margin: 10px 0;
+	width: 100%;
+}
+
+.rsd_cp_tab img{
+	border:0px;
+}
+.rsd_cp_tab a{
+	height:16px;
+}
+
+#rsd_results_container a{
+	text-decoration:underline;
+}
+
+#rsd_resource_edit{
+	z-index:2;
+}
+.rsd_file_type {
+	position: absolute;
+	bottom: 0px;
+	left: 3px;
+	font-size: x-small;
+}
+.rsd_import_button {
+	mergin-left: 5px;
+}
+
+.rsd_layout_select {
+	float: left;
+	top: 0px;
+	font-style: italic;
+}
+
+.rsd_linkback{
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	font-size: x-small;
+}
+.rsd_license {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+}
+.rsd_license img {
+	float: left;
+}
+.rsd_license span {
+	float: left;
+	background: #FFF;
+	color: #200;
+	font-size: x-small;
+	filter: alpha(opacity=70);
+	-moz-opacity: 0.7;
+	opacity: 0.7;
+}
+
+.rsd_list_item {
+	float: left;
+}
+
+.rsd_paging_control {
+	float: right;
+}
+
+.rsd_search_button {
+	margin-left: 10px;
+}
+
+.rsd_search_description {
+	position: relative;
+	top: 0px;
+	font-style: italic;
+}
+.rsd_upload_button {
+	margin-left: 25px;
+}
+.rsd_res_item{
+	cursor:pointer;
+	border: 1px solid black;
+}
+.rsd_result_enumeration {
+	margin: 0 1em;
+}
+.rsd_results_body {
+	width: 100%;
+}
+#rsd_results_header {
+	margin: 4px;
+	background: #DEF;
+	height: 22px;
+}
+#rsd_results_footer {
+	margin: 4px;
+	background: #DEF;
+	height: 22px;
+	text-align: center;
+}
+
+#rsd_upload_form {
+	font-size: 110%;
+}
+
+
+.mv_clip_box_result{
+	padding:10px;
+	float:left;
+	border: thin solid #FFF;
+	overflow:hidden;
+	margin: 5px;
+}
+.mv_clip_box_result_over{
+	border: thin solid #F99;
+}
+.mv_clip_list_result{
+	padding:10px;
+	border: thin solid #BBB;
+	clear:both;
+	position:relative;
+}
+.mv_clip_list_result_over{
+	padding:10px;
+	border: thin solid #F99;
+	clear:both;
+}
+

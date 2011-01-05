@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smil baseProfile="Language" version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <meta name="title" content="Simple PNG Animation Over Video"/>
+
+    <transition id="fromBlack"
+	type="fade" 
+	subtype="fadeFromColor" 
+	fadeColor="#000" 
+	dur="4s"/>
+  
+    <transition id="fromGreen"
+	type="fade" 
+	subtype="fadeFromColor" 
+	fadeColor="#87CF87" 
+	dur="4s"/>
+	
+    <transition id="xFade" 
+	type="fade" 
+	subtype="crossfade" 
+	dur="4s"/>
+	
+  <layout>
+            <root-layout backgroundColor="black" height="1080" width="1920"/>
+            <region backgroundColor="blue" height="1080" width="1920" xml:id="video_region"/>
+            <region backgroundColor="green" height="720" width="480" xml:id="image_region"/>
+            <region id="audio_region" soundLevel="0%"/>
+        </layout>
+ 
+  </head>
+  <body>
+    <par>
+    
+    <audio src="media/raw_media/cats_of_ulthar_lovecraft_jp.ogg"
+    	begin="1s"
+    	dur="25s"
+    />
+    
+    <video src="http://www.archive.org/download/The_Bangville_Police_1913/The_Bangville_Police_1913.ogv" 	
+		transIn="fromBlack"	
+		type="video/ogg" 	
+		fill="transition"
+		dur="25s"
+    region="video_region"
+	/>	
+	
+  <img src="http://dl.dropbox.com/u/32096/roadragepanda.png"
+    dur="25s"
+    begin="5s"
+    transIn="fromBlack"
+    id="image"
+    fill="freeze"
+    panZoom="0,0,300,200" 
+    region="image_region" 
+    >
+
+    <animate attributeName="panZoom" begin="12.0"
+      dur="5s" fill="freeze" values="0,0,100%,100%,-100,100,100%,250%"/>
+    
+  </img>
+
+</par>
+</body>
+</smil>
+
+

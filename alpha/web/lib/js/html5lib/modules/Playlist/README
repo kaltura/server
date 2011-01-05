@@ -1,0 +1,10 @@
+The media rss module provides basic mediaRss parsing and playlist display. 
+
+It in includes a basic jquery-ui themeable gui. 
+
+The main options which can be set after the kaltura javascript include:
+
+// Here are the defaults ( only layout right now ) 
+
+// MediaRssLayout can be "horizontal" or "vertical"
+mw.setConfig( 'MediaRss.Layout', 'horizontal' ); 

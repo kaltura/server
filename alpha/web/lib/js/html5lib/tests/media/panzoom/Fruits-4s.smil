@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<smil baseProfile="Language" version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+    <head>
+        <meta content="Pan and Zoom" name="title"/>
+        <meta content="dcab" name="author"/>
+        <meta content="Fri Sep 26 09:58:15 CEST 2008" name="date"/>
+        <layout>
+            <root-layout backgroundColor="green" height="800" width="500"/>
+            <region backgroundColor="green" height="700" top="50" left="50" width="400" xml:id="image_region"/>
+            <region xml:id="Title" height="25" width="300" left="100" top="10"/>
+            <region xml:id="Captions" height="70" width="300" left="100" top="510"/>
+            <region id="audio_region" soundLevel="100%"/>
+        </layout>
+    </head>
+    <body>
+        <par>
+
+            <smilText dur="25s" textFontSize="x-large" textFontWeight="normal" textColor="white" region="Title">
+               Tante Chris' Fruits and Treats
+            </smilText>
+
+            <img dur="25s" fill="freeze" fit="meet" id="image"
+                panZoom="0,0,100%,100%" region="image_region" src="fruitStand.jpg">
+
+                <animate attributeName="panZoom" begin="2.0"
+                    dur="1.5s" fill="freeze" values="-1,4,99%,99%;511,509,47%,14%"/>
+                <animate attributeName="panZoom" begin="5.0"
+                    dur="1.5s" fill="freeze" values="511,509,47%,14%;418,-3,34%,13%"/>
+                <animate attributeName="panZoom" begin="9.0"
+                    dur="1.5s" fill="freeze" values="418,-3,34%,13%;9,1115,41%,20%"/>
+                <animate attributeName="panZoom" begin="13.0"
+                    dur="1.5s" fill="freeze" values="9,1115,41%,20%;573,2073,64%,17%"/>
+                <animate attributeName="panZoom" begin="16.0"
+                    dur="1.5s" fill="freeze" values="573,2073,64%,17%;1118,1365,14%,8%"/>
+                <animate attributeName="panZoom" begin="18.0"
+                    dur="1.5s" fill="freeze" values="1118,1365,14%,8%;0,0,100%,100%"/>
+            </img>
+
+            <smilText dur="25s" textFontSize="large" textFontWeight="normal" textColor="white" region="Captions">
+               <clear begin="3s"/>
+                 Today, we've got grapes....
+               <clear begin="6s"/>
+                 and we have lemons....
+               <clear begin="10s"/>
+                 and juicy, red ripe tomatos....
+               <clear begin="14s"/>
+                 and tart mandrins ....
+               <tev begin="16s"/>
+                 as well as squeeze-ready organges.
+               <clear begin="19s"/>
+            </smilText>
+
+        </par>
+    </body>
+</smil>

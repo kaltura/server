@@ -1,0 +1,23 @@
+#mw_layout_left_img{
+	background-image: url('images/image_layout_left.png');
+	width: 50px;
+	height: 33px;
+	display: block;
+	float: left;
+}
+
+#mw_layout_right_img{
+	background-image: url('images/image_layout_right.png');
+	width: 50px;
+	height: 33px;
+	display: block;
+	float: left;
+}
+
+#mw_crop_button {
+	background-image: url('images/stock-tool-button-crop.png');
+	width: 22px;
+	height: 22px;
+	display: block;
+	float: left;
+}

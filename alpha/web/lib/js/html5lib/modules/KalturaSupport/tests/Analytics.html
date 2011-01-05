@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Fall forward html5</title>
+
+<script type="text/javascript" src="../../../mwEmbedLoader.js"></script>
+
+<script type="text/javascript">
+	if( document.URL.indexOf('forceMobileHTML5') != -1 ){		
+		mw.setConfig( 'forceMobileHTML5' , true );
+	}			
+	mw.setConfig( 'EmbedPlayer.OverlayControls', false );
+	mw.ready(function(){
+		$j(mw).bind( 'Kaltura.SendAnalyticEvent', function(event,  analyticName ){
+			$j('#analyticsLog').append( analyticName + "\n");
+		});
+	});
+</script>
+</head>
+<body>
+<h2> Fall forward: ( kaltura embed code on iPad / iPhone ) + analytics </h2>
+<a href="?forceMobileHTML5"> Force Mobile Safari</a> for testing with desktop chrome and safari.
+
+<br />
+
+
+<div style="position:absolute;top:90px;left:450px;width:300px;height:300px;" >
+<i>Analytics events:</i> ( only html5 )<br />
+<textarea id="analyticsLog" cols='40' rows='24' ></textarea>
+</div>
+
+<object id="kaltura_player" name="kaltura_player" 
+type="application/x-shockwave-flash" 
+allowFullScreen="true" allowNetworking="all" 
+allowScriptAccess="always" height="330" width="400" 
+data="http://www.kaltura.com/index.php/kwidget/cache_st/1274763304/wid/_243342/uiconf_id/48501/entry_id/0_swup5zao">
+<param name="allowFullScreen" value="true" />
+<param name="allowNetworking" value="all" />
+<param name="allowScriptAccess" value="always" />
+<param name="bgcolor" value="#000000" />
+
+<param name="flashVars" value="&" />
+<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/1274763304/wid/_243342/uiconf_id/48501/entry_id/0_swup5zao" />
+<a href="http://corp.kaltura.com">video platform</a> 
+<a href="http://corp.kaltura.com/technology/video_management">video management</a> 
+<a href="http://corp.kaltura.com/solutions/overview">video solutions</a> 
+<a href="http://corp.kaltura.com/technology/video_player">video player</a>
+</object>
+
+
+
+
+</body>
+</html>
+

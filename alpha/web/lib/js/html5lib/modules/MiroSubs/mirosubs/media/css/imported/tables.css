@@ -1,0 +1,79 @@
+
+table{
+  background: #fff;
+  border-collapse: collapse;
+  padding: 0;
+  clear: both;
+  width: 100%;  
+}
+
+thead{
+  background: #fff url(../../images/gradient_light.png) 0 2px repeat-x;
+  border-bottom: 1px solid #aaa;
+  }
+
+thead th{
+  text-align: left;
+  padding: 0;
+  border-right: 1px solid #ccc;
+  margin: 0 !important;
+  display: table-cell !important;
+  float: none !important;
+  }
+
+th a{
+  margin-right: 15px;
+  padding-right: 25px;
+  text-decoration: none !important;
+  background: url(../../images/sort_arrows.gif) right 11px no-repeat;
+  }
+
+tr{ display: table-row;}
+
+
+tr.even{ background: #edfcfd !important;}
+
+
+td.last{ border-right: none;}
+
+
+th span, th a{
+  color: #333 !important;
+  padding: 10px 15px;
+  display: block;
+  text-shadow: 1px 1px 0px #fff;
+  }
+
+
+td{
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+  margin: 0 !important;
+  display: table-cell !important;
+  float: none !important;
+  }
+
+
+
+th.last{ border-right: none !important;}
+
+
+
+.checkbox input{
+  float: left;
+  width: 15px;
+  margin: 7px 10px 0 0;
+  }
+
+
+table .checkbox input{
+  float: none;
+  margin: 0;
+  width: 15px !important;
+  margin: 0px 0px 0 0;
+  }
+
+
+
