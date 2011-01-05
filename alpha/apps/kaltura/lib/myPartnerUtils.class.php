@@ -63,8 +63,13 @@ class myPartnerUtils
 	{
 		// TODO - handle errors
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
-		if ( !$partner ) return Partner::VALIDATE_WRONG_LOGIN;
-
+		if ( !$partner ) {
+			return Partner::VALIDATE_WRONG_LOGIN;
+		}
+		if ($partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
+			return Partner::VALIDATE_PARTNER_BLOCKED;
+		}
+		
 		return $partner->validateSecret( $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin);
 	}
 
