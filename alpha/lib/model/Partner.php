@@ -602,6 +602,84 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('pass_reset_url_prefix');
 	}
 	
+	public function setUserKsPermissionName($permissionName)
+	{
+		$this->putInCustomData('user_ks_permission_name', $permissionName);
+	}
+	
+	public function getUserKsPermissionName()
+	{
+		return $this->getFromCustomData('user_ks_permission_name');
+	}
+	
+	public function setNoKsPermissionName($permissionName)
+	{
+		$this->putInCustomData('no_ks_permission_name', $permissionName);
+	}
+	
+	public function getNoKsPermissionName()
+	{
+		return $this->getFromCustomData('no_ks_permission_name');
+	}
+	
+	/**
+	 * Code to be run after persisting the object
+	 * @param PropelPDO $con
+	 */
+	public function postSave(PropelPDO $con = null)
+	{
+		// update plugin permissions in the database
+		if (is_array($this->setEnabledPlugins))
+		{
+			foreach($this->setEnabledPlugins as $pluginName => $enabled)
+			{
+				if ($enabled) {
+					PermissionPeer::enablePlugin($pluginName, $this->getId());
+				}
+				else {
+					PermissionPeer::disablePlugin($pluginName, $this->getId());
+				}
+			}
+		}
+		
+		// update special services permissions in the database
+		if (is_array($this->setEnabledServices))
+		{
+			foreach($this->setEnabledServices as $permissionName => $enabled)
+			{
+				if ($enabled) {
+					PermissionPeer::enableForPartner($permissionName, PermissionType::SPECIAL_FEATURE, $this->getId());
+				}
+				else {
+					PermissionPeer::disableForPartner($permissionName, $this->getId());
+				}
+			}
+		}
+		
+		// update the owner kuser deatils if required
+		if ($this->tempAdminEmail || $this->tempAdminName)
+		{
+			$ownerKuserId = $this->getAccountOwnerKuserId();
+			if ($ownerKuserId) {
+				$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+				if ($this->tempAdminName) {
+					$ownerKuser->setFullName($this->tempAdminName);
+				}
+				if ($this->tempAdminEmail) {
+					$ownerKuser->setEmail($this->tempAdminEmail);
+				}
+				$ownerKuser->save();
+			}	
+		}
+				
+		$this->tempAdminEmail = null;
+		$this->tempAdminName = null;
+		$this->setEnabledPlugins = array();
+		$this->setEnabledServices = array();
+		
+		parent::postSave($con);
+	}
+	
 	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions
@@ -636,6 +714,9 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('account_owner_kuser_id');
 	}
 	
+	/**
+	 * @return puserId of the kuser currently set as the account owner
+	 */
 	public function getAdminUserId()
 	{
 		$ownerKuserId = $this->getAccountOwnerKuserId();
@@ -646,6 +727,11 @@ class Partner extends BasePartner
 		return $ownerKuser->getPuserId();
 	}
 	
+	/**
+	 * Change the kuser set as the account owner to the one with puserId = $adminUserId
+	 * @param string $adminUserId puserId of the new kuser
+	 * @throws KalturaErrors::USER_NOT_FOUND
+	 */
 	public function setAdminUserId($adminUserId)
 	{
 		$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getId(), $adminUserId);
@@ -655,23 +741,36 @@ class Partner extends BasePartner
 		$this->setAccountOwnerKuserId($adminKuser->getId());
 	}
 
+	/**
+	 * Temporary admin name - saves new admin name until partner is saved
+	 * @var string
+	 */
+	private $tempAdminName  = null;
 	
-	public function getAdminEmail()
+	/**
+	 * Temporary admin email - saves new admin email until partner is saved
+	 * @var string
+	 */
+	private $tempAdminEmail = null;
+	
+	
+	public function setAdminName($name)
 	{
-		$ownerKuserId = $this->getAccountOwnerKuserId();
-		if (!$ownerKuserId) {
-			return parent::getAdminEmail();
-		}
-		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
-		if (!$ownerKuser) {
-			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
-			return null;
-		}
-		return $ownerKuser->getEmail();	
+		$this->tempAdminName = $name;
 	}
+	
+	public function setAdminEmail($email)
+	{
+		$this->tempAdminEmail = $email;	
+	}
+	
 	
 	public function getAdminName()
 	{
+		if ($this->tempAdminName) {
+			return $this->tempAdminName;
+		}
+		
 		$ownerKuserId = $this->getAccountOwnerKuserId();
 		if (!$ownerKuserId) {
 			return parent::getAdminName();
@@ -683,6 +782,24 @@ class Partner extends BasePartner
 		}
 		return $ownerKuser->getFullName();		
 	}
+	
+	public function getAdminEmail()
+	{
+		if ($this->tempAdminEmail) {
+			return $this->tempAdminEmail;
+		}
+		
+		$ownerKuserId = $this->getAccountOwnerKuserId();
+		if (!$ownerKuserId) {
+			return parent::getAdminEmail();
+		}
+		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+		if (!$ownerKuser) {
+			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
+			return null;
+		}
+		return $ownerKuser->getEmail();	
+	}
 		
 	// -----------------------------------------------
 	// -- end of account owner kuser related functions
@@ -693,45 +810,7 @@ class Partner extends BasePartner
 	// ------------------------------------
 	// -- start of enabled special features
 	// ------------------------------------
-	
-	/**
-	 * Code to be run after persisting the object
-	 * @param PropelPDO $con
-	 */
-	public function postSave(PropelPDO $con = null)
-	{
-		if (is_array($this->setEnabledPlugins))
-		{
-			foreach($this->setEnabledPlugins as $pluginName => $enabled)
-			{
-				if ($enabled) {
-					PermissionPeer::enablePlugin($pluginName, $this->getId());
-				}
-				else {
-					PermissionPeer::disablePlugin($pluginName, $this->getId());
-				}
-			}
-		}
 		
-		if (is_array($this->setEnabledServices))
-		{
-			foreach($this->setEnabledServices as $permissionName => $enabled)
-			{
-				if ($enabled) {
-					PermissionPeer::enableForPartner($permissionName, PermissionType::SPECIAL_FEATURE, $this->getId());
-				}
-				else {
-					PermissionPeer::disableForPartner($permissionName, $this->getId());
-				}
-			}
-		}
-		
-		$this->setEnabledPlugins = array();
-		$this->setEnabledServices = array();
-		
-		parent::postSave($con);
-	}
-	
 	/**
 	 * Temporary array to hold plugin permissions status until next object save..
 	 * @var array
