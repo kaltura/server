@@ -80,6 +80,10 @@ abstract class KAsyncDistribute extends KBatchBase
 			 			
 			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE, $data);
 		}
+		catch(KalturaDistributionException $e)
+		{
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $e->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::RETRY, $job->data);
+		}
 		catch(Exception $ex)
 		{
 			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $job->data);
