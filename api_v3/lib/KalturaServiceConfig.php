@@ -1,17 +1,20 @@
 <?php
 class KalturaServiceConfig extends myServiceConfig
 {
-	public function __construct($file_name , $service_name = null)
+	public function __construct($file_name , $service_name = null, $load_plugins = true)
 	{
 	    KalturaServiceConfig::setStrictMode(false);
 	    
-		$serviceConfigs = array();
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
-		foreach($pluginInstances as $pluginInstance)
-			$serviceConfigs[] = $pluginInstance->getServiceConfig();
-		
-	    foreach($serviceConfigs as $serviceConfig)
-	    	KalturaServiceConfig::addSecondaryConfigTables($serviceConfig);
+	    if ($load_plugins)
+	    {
+			$serviceConfigs = array();
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
+			foreach($pluginInstances as $pluginInstance)
+				$serviceConfigs[] = $pluginInstance->getServiceConfig();
+			
+		    foreach($serviceConfigs as $serviceConfig)
+		    	KalturaServiceConfig::addSecondaryConfigTables($serviceConfig);
+	    }
 	    
 		parent::myServiceConfig($file_name , $service_name);
 	} 
