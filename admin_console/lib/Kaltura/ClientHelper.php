@@ -85,6 +85,14 @@ class Kaltura_ClientHelper
 		$config->serviceUrl = self::getServiceUrl();
 		$config->curlTimeout = self::getCurlTimeout();
 		$config->setLogger(new Kaltura_ClientLoggingProxy());
+		$front = Zend_Controller_Front::getInstance();
+		$bootstrap = $front->getParam('bootstrap');
+		if ($bootstrap) 
+		{
+			$enviroment = $bootstrap->getApplication()->getEnvironment();
+			if ($enviroment === 'development')
+				$config->startZendDebuggerSession = true;
+		}
 		
 		$client = new KalturaClient($config);
 		$client->setKs($ks);
