@@ -76,6 +76,7 @@ virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_VIRU
 
 session.impersonate                 |			|0		|1	|0		|0		|1		|r	|*		|	|	|SYSTEM_ADMIN_BASE
 
+metadataprofile.list				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_BASE
 
 distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE
 entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE
