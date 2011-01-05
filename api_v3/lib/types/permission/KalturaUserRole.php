@@ -47,6 +47,11 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 	 */
 	public $permissionNames;
 	
+	/**
+	 * @var string
+	 * @filter mlikeor,mlikeand
+	 */
+	public $tags;
 	
 	/**
 	 * @var int
@@ -74,6 +79,7 @@ class KalturaUserRole extends KalturaObject implements IFilterable
 		'status',
 		'partnerId',
 		'permissionNames',
+		'tags',
 		'createdAt',
 		'updatedAt',
 	 );
