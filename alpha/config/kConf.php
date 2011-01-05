@@ -50,7 +50,7 @@ class kConf extends kConfLocal
 					28 => 10, //BatchJobType::METADATA_TRANSFORM
 				) ,
 			
-				"default_job_retry_interval" => 20 ,
+				"default_job_retry_interval" => 60 ,
 				"job_retry_intervals" => array(
 					16 => 600, // BatchJobType::NOTIFICATION
 					15 => 150, // BatchJobType::MAIL
