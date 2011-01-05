@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1293028191">
-  <!-- Generated on date 22/12/10 16:29:51 -->
+<xml apiVersion="3.1.1" generatedDate="1294221047">
+  <!-- Generated on date 05/01/11 09:50:47 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
     <enum name="KalturaAdminUserOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
@@ -17,6 +19,11 @@
       <const name="CREATED_AT_DESC" value="-createdAt"/>
       <const name="UPDATED_AT_ASC" value="+updatedAt"/>
       <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaApiParameterPermissionItemAction" enumType="string">
+      <const name="READ" value="read"/>
+      <const name="UPDATE" value="update"/>
+      <const name="INSERT" value="insert"/>
     </enum>
     <enum name="KalturaApiParameterPermissionItemOrderBy" enumType="string">
       <const name="ID_ASC" value="+id"/>
@@ -276,6 +283,8 @@
       <const name="PDF_CREATOR" value="202"/>
       <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
       <const name="FAST_START" value="fastStart.FastStart"/>
+      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
+      <const name="AVIDEMUX" value="avidemux.Avidemux"/>
     </enum>
     <enum name="KalturaConversionProfileOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -339,6 +348,9 @@
     <enum name="KalturaDistributionProviderOrderBy" enumType="string"/>
     <enum name="KalturaDistributionProviderType" enumType="string">
       <const name="GENERIC" value="1"/>
+      <const name="MSN" value="msnDistribution.MSN"/>
+      <const name="HULU" value="huluDistribution.HULU"/>
+      <const name="COMCAST" value="comcastDistribution.COMCAST"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -371,6 +383,12 @@
       <const name="INACTIVE" value="0"/>
       <const name="ACTIVE" value="1"/>
     </enum>
+    <enum name="KalturaEntryDistributionFlag" enumType="int">
+      <const name="NONE" value="0"/>
+      <const name="SUBMIT_REQUIRED" value="1"/>
+      <const name="DELETE_REQUIRED" value="2"/>
+      <const name="UPDATE_REQUIRED" value="3"/>
+    </enum>
     <enum name="KalturaEntryDistributionOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
@@ -382,6 +400,18 @@
       <const name="SUNRISE_DESC" value="-sunrise"/>
       <const name="SUNSET_ASC" value="+sunset"/>
       <const name="SUNSET_DESC" value="-sunset"/>
+    </enum>
+    <enum name="KalturaEntryDistributionStatus" enumType="int">
+      <const name="PENDING" value="0"/>
+      <const name="QUEUED" value="1"/>
+      <const name="READY" value="2"/>
+      <const name="DELETED" value="3"/>
+      <const name="SUBMITTING" value="4"/>
+      <const name="UPDATING" value="5"/>
+      <const name="DELETING" value="6"/>
+      <const name="ERROR_SUBMITTING" value="7"/>
+      <const name="ERROR_UPDATING" value="8"/>
+      <const name="ERROR_DELETING" value="9"/>
     </enum>
     <enum name="KalturaEntryModerationStatus" enumType="int">
       <const name="PENDING_MODERATION" value="1"/>
@@ -892,10 +922,11 @@
       <const name="CONTENT_MANAGE_ANNOTATION" value="CONTENT_MANAGE_ANNOTATION"/>
       <const name="CONTENT_MANAGE_SHARE" value="CONTENT_MANAGE_SHARE"/>
       <const name="LIVE_STREAM_BASE" value="LIVE_STREAM_BASE"/>
-      <const name="LIVE_STREAM_ADD" value="CONTENT_MANAGE_ADD_LIVE"/>
-      <const name="LIVE_STREAM_UPDATE" value="CONTENT_MANAGE_UPDATE_LIVE"/>
+      <const name="LIVE_STREAM_ADD" value="LIVE_STREAM_ADD"/>
+      <const name="LIVE_STREAM_UPDATE" value="LIVE_STREAM_UPDATE"/>
       <const name="CONTENT_MODERATE_BASE" value="CONTENT_MODERATE_BASE"/>
       <const name="CONTENT_MODERATE_METADATA" value="CONTENT_MODERATE_METADATA"/>
+      <const name="CONTENT_MODERATE_CUSTOM_DATA" value="CONTENT_MODERATE_CUSTOM_DATA"/>
       <const name="PLAYLIST_BASE" value="PLAYLIST_BASE"/>
       <const name="PLAYLIST_ADD" value="PLAYLIST_ADD"/>
       <const name="PLAYLIST_UPDATE" value="PLAYLIST_UPDATE"/>
@@ -1271,6 +1302,8 @@
       <const name="DELETED" value="5"/>
     </enum>
     <enum name="KalturaUserOrderBy" enumType="string">
+      <const name="ID_ASC" value="+id"/>
+      <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
@@ -1466,7 +1499,6 @@
       <property name="isRootAdmin" type="bool" readOnly="1" insertOnly="0" description=""/>
       <property name="roleIds" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaAdminUser" base="KalturaUser"/>
     <class name="KalturaDynamicEnum"/>
     <class name="KalturaBaseEntry">
       <property name="id" type="string" readOnly="1" insertOnly="0" description="Auto generated 10 characters alphanumeric string&#10;"/>
@@ -1908,8 +1940,8 @@
       <property name="notificationUrl" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="appearInSearch" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="adminName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="adminEmail" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="adminName" type="string" readOnly="0" insertOnly="1" description=""/>
+      <property name="adminEmail" type="string" readOnly="0" insertOnly="1" description=""/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="commercialUse" type="int" enumType="KalturaCommercialUseType" readOnly="0" insertOnly="0" description=""/>
       <property name="landingPage" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1932,6 +1964,7 @@
       <property name="cmsPassword" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="allowMultiNotification" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="adminLoginUsersQuota" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="adminUserId" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaPartnerUsage">
       <property name="hostingGB" type="float" readOnly="1" insertOnly="0" description=""/>
@@ -1978,6 +2011,7 @@
       <property name="permissionItemsIds" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerGroup" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaPermissionBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2134,6 +2168,11 @@
       <property name="actualEntryCount" type="int" readOnly="0" insertOnly="0" description="count of entries that will appear in the feed (including all relevant filters)&#13;"/>
       <property name="requireTranscodingCount" type="int" readOnly="0" insertOnly="0" description="count of entries that requires transcoding in order to be included in feed&#13;"/>
     </class>
+    <class name="KalturaThumbAsset" base="KalturaAsset">
+      <property name="thumbParamsId" type="int" readOnly="1" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
+      <property name="width" type="int" readOnly="1" insertOnly="0" description="The width of the Flavor Asset &#10;"/>
+      <property name="height" type="int" readOnly="1" insertOnly="0" description="The height of the Flavor Asset&#10;"/>
+    </class>
     <class name="KalturaThumbParams" base="KalturaAssetParams">
       <property name="cropType" type="int" enumType="KalturaThumbCropType" readOnly="0" insertOnly="0" description=""/>
       <property name="quality" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2144,15 +2183,10 @@
       <property name="videoOffset" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="height" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="scaleWidth" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="scaleHeight" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleWidth" type="float" readOnly="0" insertOnly="0" description=""/>
+      <property name="scaleHeight" type="float" readOnly="0" insertOnly="0" description=""/>
       <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
       <property name="sourceParamsId" type="int" readOnly="0" insertOnly="0" description="Id of the flavor params or the thumbnail params to be used as source for the thumbnail creation&#13;"/>
-    </class>
-    <class name="KalturaThumbAsset" base="KalturaAsset">
-      <property name="thumbParamsId" type="int" readOnly="1" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
-      <property name="width" type="int" readOnly="1" insertOnly="0" description="The width of the Flavor Asset &#10;"/>
-      <property name="height" type="int" readOnly="1" insertOnly="0" description="The height of the Flavor Asset&#10;"/>
     </class>
     <class name="KalturaThumbParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
     <class name="KalturaThumbParamsFilter" base="KalturaThumbParamsBaseFilter"/>
@@ -2237,6 +2271,7 @@
       <property name="status" type="int" enumType="KalturaUserRoleStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="permissionNames" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
@@ -2250,8 +2285,6 @@
       <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="permissionNamesMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="permissionNamesMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2898,6 +2931,7 @@
     <class name="KalturaDistributionValidationError" abstract="1">
       <property name="action" type="int" enumType="KalturaDistributionAction" readOnly="0" insertOnly="0" description=""/>
       <property name="errorType" type="int" enumType="KalturaDistributionErrorType" readOnly="0" insertOnly="0" description=""/>
+      <property name="data" type="string" readOnly="0" insertOnly="0" description="Missing flavor params id, thumbnail params id or missing metadata field name&#13;"/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaEntryDistribution">
@@ -2908,8 +2942,8 @@
       <property name="entryId" type="string" readOnly="0" insertOnly="1" description=""/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="distributionProfileId" type="int" readOnly="0" insertOnly="1" description=""/>
-      <property name="status" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="dirtyStatus" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaEntryDistributionStatus" readOnly="1" insertOnly="0" description=""/>
+      <property name="dirtyStatus" type="int" enumType="KalturaEntryDistributionFlag" readOnly="1" insertOnly="0" description=""/>
       <property name="thumbAssetIds" type="string" readOnly="0" insertOnly="0" description="Comma separated thumbnail asset ids&#13;"/>
       <property name="flavorAssetIds" type="string" readOnly="0" insertOnly="0" description="Comma separated flavor asset ids&#13;"/>
       <property name="sunrise" type="int" readOnly="0" insertOnly="0" description="Entry distribution publish time as Unix timestamp (In seconds)&#10;"/>
@@ -2935,9 +2969,9 @@
       <property name="entryIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="distributionProfileIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="distributionProfileIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="statusEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaEntryDistributionStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="dirtyStatusEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="dirtyStatusEqual" type="int" enumType="KalturaEntryDistributionFlag" readOnly="0" insertOnly="0" description=""/>
       <property name="dirtyStatusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="sunriseGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="sunriseLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -3123,7 +3157,7 @@
     <class name="KalturaApiParameterPermissionItem" base="KalturaPermissionItem">
       <property name="object" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="parameter" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="action" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="action" type="string" enumType="KalturaApiParameterPermissionItemAction" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaGoogleVideoSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="adultContent" type="string" enumType="KalturaGoogleSyndicationFeedAdultValues" readOnly="0" insertOnly="0" description=""/>
@@ -4089,17 +4123,17 @@
       <action name="generateByEntryId" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <param name="destThumbParamsId" type="int" optional="0" description="indicate the id of the ThumbParams to be generate this thumbnail by&#13;"/>
-        <result type="int"/>
+        <result type="KalturaThumbAsset"/>
       </action>
       <action name="generate" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <param name="thumbParams" type="KalturaThumbParams" optional="0" description="&#13;"/>
         <param name="sourceAssetId" type="string" optional="1" default="" description="id of the source asset (flavor or thumbnail) to be used as source for the thumbnail generation&#13;"/>
-        <result type="int"/>
+        <result type="KalturaThumbAsset"/>
       </action>
       <action name="regenerate" description="">
         <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
-        <result type="int"/>
+        <result type="KalturaThumbAsset"/>
       </action>
       <action name="get" description="">
         <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
@@ -4255,10 +4289,9 @@
         <param name="user" type="KalturaUser" optional="0" description="&#13;"/>
         <result type="KalturaUser"/>
       </action>
-      <action name="update" description="Update exisitng user, it is possible to update the user id too&#10;">
+      <action name="update" description="Update existing user, it is possible to update the user id too&#10;">
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <param name="user" type="KalturaUser" optional="0" description="Id&#13;"/>
-        <param name="allUserPartners" type="bool" optional="1" default="false" description="wheter to update the user details for all partners he/she can login to&#13;"/>
         <result type="KalturaUser"/>
       </action>
       <action name="get" description="Get user by user ID&#10;">
@@ -4317,7 +4350,7 @@
       <action name="enableLogin" description="Enable the user to login with a loginId (email) and password.&#10;">
         <param name="userId" type="string" optional="0" description="&#13;"/>
         <param name="loginId" type="string" optional="0" description="&#13;"/>
-        <param name="password" type="string" optional="0" description="&#13;"/>
+        <param name="password" type="string" optional="1" default="" description="&#13;"/>
         <result type="KalturaUser"/>
       </action>
       <action name="disableLogin" description="Disallow user to login with an id/password.&#10;Passing either a loginId or a userId is allowed.&#10;">
@@ -4449,6 +4482,11 @@
         <param name="metadataProfile" type="KalturaMetadataProfile" optional="0" description="&#13;"/>
         <param name="xsdData" type="string" optional="1" default="" description="XSD metadata definition&#13;"/>
         <param name="viewsData" type="string" optional="1" default="" description="UI views definition&#13;"/>
+        <result type="KalturaMetadataProfile"/>
+      </action>
+      <action name="revert" description="Update an existing metadata object definition file&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <param name="toVersion" type="int" optional="0" description="&#13;"/>
         <result type="KalturaMetadataProfile"/>
       </action>
       <action name="updateDefinitionFromFile" description="Update an existing metadata object definition file&#10;">
@@ -6015,6 +6053,10 @@
         <param name="id" type="int" optional="0" description="&#13;"/>
         <result type="KalturaEntryDistribution"/>
       </action>
+      <action name="validate" description="Validates Entry Distribution by id for submission&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaEntryDistribution"/>
+      </action>
       <action name="update" description="Update Entry Distribution by id&#10;">
         <param name="id" type="int" optional="0" description="&#13;"/>
         <param name="entryDistribution" type="KalturaEntryDistribution" optional="0" description="&#13;"/>
@@ -6035,6 +6077,10 @@
         <result type="KalturaEntryDistribution"/>
       </action>
       <action name="submitUpdate" description="Submits Entry Distribution changes to the remote destination&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaEntryDistribution"/>
+      </action>
+      <action name="submitFetchReport" description="Submits Entry Distribution report request&#10;">
         <param name="id" type="int" optional="0" description="&#13;"/>
         <result type="KalturaEntryDistribution"/>
       </action>
