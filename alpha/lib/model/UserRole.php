@@ -29,6 +29,7 @@ class UserRole extends BaseUserRole
 		$newRole->setPermissionNames($this->getPermissionNames());
 		$newRole->setCustomData($this->getCustomData());
 		$newRole->setPartnerId($partnerId); // set new partner id
+		$newRole->setTags($this->getTags());
 		return $newRole;
 	}
 	
