@@ -363,12 +363,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		
+		$partner = PartnerPeer::retrieveByPK($partnerId);		
 		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
-		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE)
+		
+		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 		{
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
-				if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
+				if ($partner && $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
+					throw new kUserException('', kUserException::USER_IS_BLOCKED);
+				}
+				else if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
 					throw new kUserException('', kUserException::USER_IS_BLOCKED);
 				}
 				else {
@@ -377,20 +382,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			}
 			
 			$kuser = null;
-			
 			// if no specific partner was requested, but last logged in partner is not available, login to first found partner
-			$c = new Criteria();
-			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId());
-			$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
-			$kuser = kuserPeer::doSelectOne($c);
-			
-			if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
-				throw new kUserException('', kUserException::USER_IS_BLOCKED);
-			}
-			
-			if (!$kuser) {
-				throw new kUserException('', kUserException::USER_NOT_FOUND);
-			}
+			$kuser = self::findFirstValidKuser($loginData->getId(), $partnerId); // throws exception on error
 		}
 		
 		if ($kuser->getIsAdmin() && !in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'))) {
@@ -402,6 +395,38 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$kuser->save();
 		
 		return $kuser;
+	}
+	
+	
+	
+	private static function findFirstValidKuser($loginDataId, $notPartnerId = null)
+	{
+		$c = new Criteria();
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		if ($notPartnerId) {
+			$c->addAnd(kuserPeer::PARTNER_ID, $notPartnerId, Criteria::NOT_EQUAL);
+		}
+		$c->addAscendingOrderByColumn(kuserPeer::PARTNER_ID);
+		
+		$kusers = kuserPeer::doSelect($c);
+						
+		foreach ($kusers as $kuser)
+		{
+			if ($kuser->getStatus() != KuserStatus::ACTIVE)
+			{
+				continue;
+			}
+			$partner = PartnerPeer::retrieveByPK($kuser->getPartnerId());
+			if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+			{
+				continue;
+			}
+			
+			return $kuser;
+		}
+		
+		throw new kUserException('', kUserException::USER_NOT_FOUND);
 	}
 	
 	/**
