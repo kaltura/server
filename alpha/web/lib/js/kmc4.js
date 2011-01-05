@@ -567,7 +567,7 @@ $(window).load(function(){
 			} // end !multitab_playlist
 
 			var embed_code, preview_player,
-			id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Entry ID",
+			id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Embedding",
 			uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 //			console.log("uiconf_details="+uiconf_details);
 			if(kmc.vars.jw) {
@@ -587,16 +587,18 @@ $(window).load(function(){
 			}
 			var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							 '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#contentSection118"></a>' + id_type +
-							 ': ' + id + '</div> <div id="modal_content">' +
+							 ': ' + name + '</div> <div id="modal_content">' +
 							 ((typeof live_bitrates == "object") ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
+							 '<div id="player_wrap">' + preview_player + '</div>' +
 //							 ((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(id, name, description, is_playlist, uiconf_id)) +
 							 ((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
-							 (kmc.vars.jw ? jw_nomix_box_html : '') +
-							 '<div id="player_wrap">' + preview_player + '</div>' +
+							 (kmc.vars.jw ? jw_nomix_box_html : '') +							 
 							 (kmc.vars.jw ? jw_options_html : '') +
 							 ((kmc.vars.silverlight || live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-							 '<div class="label">Embed Code:</div> <textarea id="embed_code" rows="5" cols=""' +
-							 'readonly="true" style="width:' + (parseInt(uiconf_details.width)-10) + 'px;">' + embed_code + '</textarea>' +
+							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id)) + 
+							 '<div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
+							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
+							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><button id="select_code">' +
 							 '<span>Select Code</span></button></div></div>';
 //			alert(modal_html);
@@ -605,7 +607,7 @@ $(window).load(function(){
 
 			kalturaCloseModalBox();
 			$("#flash_wrap").css("visibility","hidden");
-			modal = kalturaInitModalBox ( null , { width : parseInt(uiconf_details.width) + 20 , height: parseInt(uiconf_details.height) + 200 } );
+			modal = kalturaInitModalBox ( null , { width : parseInt(uiconf_details.width) + 140 , height: parseInt(uiconf_details.height) + 200 } );
 			modal.innerHTML = modal_html;
 			$("#mbContent").addClass("new");
 			// attach events here instead of writing them inline
@@ -622,6 +624,12 @@ $(window).load(function(){
 			});
 			$("#player_select").change(function(){
 				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates);
+			});
+			
+			$("#html5_support").change(function(){
+				var html5_support = ($(this).attr("checked")) ? true : false;
+				var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id, html5_support);
+				$("#embed_code").val(val);				
 			});
 		}, // doPreviewEmbed
 
@@ -657,10 +665,21 @@ $(window).load(function(){
 		buildRtmpOptions : function() {
 			var selected = ' selected="selected"';
 			var delivery_type = kmc.vars.embed_code_delivery_type || "http";
-			var html = '<div id="rtmp" class="label">Delivery Type:</div> <select id="delivery_type">';
+			var html = '<div id="rtmp" class="label">Select Flash Delivery Type:</div> <div class="right"><select id="delivery_type">';
 			var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
 						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
-			html += options + '</select>';
+			html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' + 
+					'while Progressive Download allows buffering of the content. <a href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
+			return html;
+		},
+		
+		buildHTML5Option : function(entry_id, partner_id) {
+			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id;
+			var url_text = url.replace(/http:\/\/|www./ig, '');
+			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' + 
+					   ' &amp; iPad with HTML5</label></div><br /><div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
+					   ' <a href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a><br class"clear" />View player outside KMC: <a target="_blank" href="' + url + 
+					   '"><span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div><br />';
 			return html;
 		},
 
@@ -701,7 +720,7 @@ $(window).load(function(){
 
 		// eventually replace with <? php echo $embedCodeTemplate; ?>  ;  (variables used: HEIGHT WIDTH HOST CACHE_ST UICONF_ID PARTNER_ID PLAYLIST_ID ENTRY_ID) + {VER}, {SILVERLIGHT}, {INIT_PARAMS} for Silverlight + NAME, DESCRIPTION
 		embed_code_template :	{
-			object_tag :	'<object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" ' +
+			object_tag :	'<object id="kaltura_player_{CACHE_ST}" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" ' +
 							'allowNetworking="all" allowScriptAccess="always" height="{HEIGHT}" width="{WIDTH}" ' +
 							'xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:{MEDIA}" ' +
 							'resource="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" ' +
@@ -710,6 +729,8 @@ $(window).load(function(){
 							'<param name="allowScriptAccess" value="always" /><param name="bgcolor" value="#000000" />' +
 							'<param name="flashVars" value="{FLASHVARS}&{FLAVOR}" /><param name="movie" value="http://{HOST}/index.php/kwidget' +
 							'/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" />{ALT} {SEO} ' + '</object>',
+			iframe_tag : 	'<script type="text/javascript" src="{SCRIPT_URL}"></script><iframe id="kaltura_player_{CACHE_ST}" name="kaltura_player" src="{IFRAME_URL}"' + 
+							' height="{HEIGHT}" width="{WIDTH}" frameborder="0">{ALT} {SEO}</iframe>',
 			playlist_flashvars :	'playlistAPI.autoInsert=true&playlistAPI.kpl0Name={PL_NAME}' +
 									'&playlistAPI.kpl0Url=http%3A%2F%2F{HOST}%2Findex.php%2Fpartnerservices2%2Fexecuteplaylist%3Fuid%3D%26' +
 									'partner_id%3D{PARTNER_ID}%26subp_id%3D{PARTNER_ID}00%26format%3D8%26ks%3D%7Bks%7D%26playlist_id%3D{PLAYLIST_ID}',
@@ -733,7 +754,7 @@ $(window).load(function(){
 
 		// id = entry id, asset id or playlist id; name = entry name or playlist name;
 		// uiconf = uiconfid (normal scenario) or uiconf details json (for #content|Manage->drill down->flavors->preview)
-		buildKalturaEmbed : function(id, name, description, is_playlist, uiconf) {
+		buildKalturaEmbed : function(id, name, description, is_playlist, uiconf, html5) {
 //		alert("buildKalturaEmbed(id="+id+", name="+name+", is_playlist="+is_playlist+", uiconf = " + uiconf);
 			var uiconf_id = uiconf.uiconf_id || uiconf,
 			uiconf_details = (typeof uiconf == "object") ? uiconf : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist),  // getUiconfDetails returns json
@@ -741,11 +762,12 @@ $(window).load(function(){
 			embed_code;
 //			console.log(uiconf_details); alert("uiconf_details logged");
 //			alert("cache_st = " + cache_st);
-			embed_code = kmc.preview_embed.embed_code_template.object_tag;
+			embed_code = (html5) ? kmc.preview_embed.embed_code_template.iframe_tag : kmc.preview_embed.embed_code_template.object_tag;
 			if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
 				kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
 				if(kmc.vars.embed_code_delivery_type == "rtmp") {
-					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;streamerUrl=" + kmc.vars.rtmp_host + "&amp;rtmpFlavors=1&{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
+					// Ran: Removed streamerUrl & rtmpFlavors flashvars [not needed]
+					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
 				}
 			}
 			if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
@@ -765,6 +787,9 @@ $(window).load(function(){
 				embed_code = embed_code.replace("{FLASHVARS}", "");
 			}
 			
+			var iframe_url = kmc.vars.service_url + '/lib/js/html5lib/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
+			var script_url = kmc.vars.service_url + '/lib/js/html5lib/mwEmbedLoader.js';
+			
 			embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
 			embed_code = embed_code.replace(/{HEIGHT}/gi,uiconf_details.height);
 			embed_code = embed_code.replace(/{WIDTH}/gi,uiconf_details.width);
@@ -779,6 +804,8 @@ $(window).load(function(){
 			embed_code = embed_code.replace("{CDN_HOST}",kmc.vars.cdn_host);
 			embed_code = embed_code.replace("{NAME}", name);
 			embed_code = embed_code.replace("{DESCRIPTION}", description);
+			embed_code = embed_code.replace("{IFRAME_URL}", iframe_url); // added for iframe embed
+			embed_code = embed_code.replace("{SCRIPT_URL}", script_url); // added for iframe embed
 //			embed_code = embed_code.replace("{DURATION}", entry.duration || '');
 //			alert("embed_code: "+embed_code);
 			return embed_code;
@@ -799,7 +826,7 @@ $(window).load(function(){
 				html_select += '<option ' + selected + ' value="' + this_uiconf.id + '">' + this_uiconf.name + '</option>';
 			}
 //			html_select = '<select onchange="kmc.preview_embed.doPreviewEmbed(\'' + id + '\',\'' + name + '\',\'' + description + '\',' + is_playlist + ', this.value)">'
-			html_select = '<select id="player_select">' + html_select + '</select>';
+			html_select = '<div class="label">Select Player:</div><div class="right"><select id="player_select">' + html_select + '</select></div><br /><div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div><br />';
 			kmc.vars.current_uiconf = null;
 			return html_select;
 		},

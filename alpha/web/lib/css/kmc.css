@@ -36,6 +36,7 @@ ul, ol, dir, menu { list-style:none; }
 img{ border:none; }
 .floatl{ float:left; }
 .floatr{ float:right; }
+.clear { clear: both; }
 
 #overlay{ position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background-color:#000; opacity:0.65; filter: alpha(opacity=65); cursor: default; }
 * html #overlay{ position: absolute; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
@@ -126,7 +127,7 @@ fieldset{ border:0 none; position:relative; }
 	/* modal.css overide */
 	#mbContent.new { padding:0; border:none; display:table; background:none;}
 
-	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto; -moz-border-radius:8px; -webkit-border-radius:8px; background: #f7f7f7; font-size:12px;}
+	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto 15px; -moz-border-radius:8px; -webkit-border-radius:8px; background: #f7f7f7; font-size:12px;}
 	 #titlebar { height:19px; padding: 10px 8px 8px 14px; font-weight:bold; color:#EEEEEE; -moz-border-radius-topleft:5px;; -moz-border-radius-topright:5px; -webkit-border-top-left-radius:5px; -webkit-border-top-right-radius:5px; background: url(../images/kmc/kmc_sprite.png) repeat-x 0 -115px;}
 	  #titlebar a { width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat -155px -152px;}
 		#titlebar a#help { background-position: -177px -152px;}
@@ -134,14 +135,13 @@ fieldset{ border:0 none; position:relative; }
 	 #modal_content { padding: 11px 12px;}
 	  #modal #player_wrap { min-height:290px; min-width:400px; padding-bottom:8px;  margin: 10px auto 0;}
 	  #modal textarea#embed_code { border: solid 1px #B7BABC; /*9B9B9B;*/ -moz-border-radius:6px; -webkit-border-radius:6px;}
-	   #modal textarea#embed_code { width:398px; border: solid 1px #B7BABC; color:#333;}
+	   #modal textarea#embed_code { width:300px; height: 14px; border: solid 1px #B7BABC; color:#333;}
 	  #modal button { font: normal 11px arial,sans-serif; color:#2B2B2B;}
 	  #modal button#select_code { height:24px; padding: 0 13px 0 0; border:none; margin: 11px auto 5px; display:block; line-height:normal; overflow:visible; background: url(../images/kmc/kmc_sprite.png) no-repeat -63px -152px; font: normal 11px arial,sans-serif; color:#2B2B2B; cursor:pointer;}
 	  #modal button#select_code { #background-position: -66px -152px;}
 	  #modal button#select_code:hover { background-position: -63px -177px; color:#000;}
 	  #modal button#select_code:hover { #background-position: -66px -177px;}
-	   #modal button span { height:20px; padding: 4px 0 0 13px; margin: 0 0 0 -3px; float:left; white-space:nowrap; background:transparent url(../images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
-	   #modal button span { #margin: 1px -24px 0 0;}
+	   #modal button span { height:20px; padding: 4px 0 0 15px; margin: 1px 1px 0 0; float:left; white-space:nowrap; background:transparent url(../images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
 	   #modal button:hover span { background-position: 0 -178px;}
 	   @-moz-document url-prefix() { button span { margin-top:-2px;} }
 
@@ -152,12 +152,15 @@ fieldset{ border:0 none; position:relative; }
 	/* jw */
 	#modal input { background:#F7F7F7;}
 	#modal a.license { margin: 0 5px;}
-	#modal div.label { width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold;}
+	#modal div.label { min-width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold;}
 	 #modal div#rtmp.label { margin-top:3px;}
+	#modal div.note { clear: both; font-size: 10px; }
 	#modal div.description { width:300px; margin: 10px 0 5px; float:left;}
 	#modal div.description ul { margin-top:2px; display:none;}
 	#modal div.description li { margin-bottom:3px;}
 	#modal div.description ul input { width:99px; height:16px; padding:1px; border: solid 1px #9B9B9B; background:#fff;}
+	#modal div.right { float: right; margin: 6px 18px 6px 0; }
+	#modal input#html5_support { width: auto;  }
 
 	/* end jw */
 /* end KMC modal */
@@ -166,11 +169,11 @@ fieldset{ border:0 none; position:relative; }
 	a, a:visited { }
     a.close, a.help { height:19px; width:19px; background: url(sprite.png) no-repeat -19px 0; float:right; margin: -2px 0 0 5px;}
 	a.help { background-position: 0 0;}
-	#player_wrap { min-height:290px; min-width:400px; padding-bottom:8px;}
+	#player_wrap { min-height:290px; min-width:400px; padding-bottom:8px; margin: 0 auto; text-align: center; }
 	#jw_preview { width:400px; padding:10px 12px; border: solid 1px #bbb; margin: 0 auto; -moz-border-radius:8px; -webkit-border-radius:8px; background:#98BBC3 url(sprite.png) repeat-x 0 -20px; font: normal 12px arial,sans-serif;}
 	#player_wrap { margin: 0 auto;}
 	a.license { margin: 0 5px;}
-	div.label { width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold; color:#2B2B2B;}
+	div.label { min-width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold; color:#2B2B2B;}
 	div.description { width:300px; margin: 10px 0 0;}
 	div.description a { color:#433179;}
 	 div.description a img { vertical-align:-1px;}
