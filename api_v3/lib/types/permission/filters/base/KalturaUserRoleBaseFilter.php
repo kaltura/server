@@ -17,6 +17,8 @@ class KalturaUserRoleBaseFilter extends KalturaFilter
 		"statusIn" => "_in_status",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -107,6 +109,20 @@ class KalturaUserRoleBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
 
 	/**
 	 * 
