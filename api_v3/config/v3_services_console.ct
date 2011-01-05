@@ -22,12 +22,12 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg		|kn	|mip|tags 
 ------------------------------------------------------------------------------------------------
 
-jobs.addmailjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
-jobs.listbatchjobs					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
-jobs.abortjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
-jobs.retryjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
-jobs.deletejob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
-jobs.addconvertprofilejob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_MANAGE_JOBS
+jobs.addmailjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
+jobs.listbatchjobs					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
+jobs.abortjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
+jobs.retryjob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
+jobs.deletejob						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
+jobs.addconvertprofilejob			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 
 batchcontrol.setscheduleconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 batchcontrol.setworkerconfig		|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
@@ -43,7 +43,7 @@ batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BA
 batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 
 
-#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_PARTNER_CONFIG
+#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 
 entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
 flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
