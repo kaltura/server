@@ -61,6 +61,12 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	protected $permission_names;
 
 	/**
+	 * The value for the tags field.
+	 * @var        string
+	 */
+	protected $tags;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -184,6 +190,16 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	public function getPermissionNames()
 	{
 		return $this->permission_names;
+	}
+
+	/**
+	 * Get the [tags] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getTags()
+	{
+		return $this->tags;
 	}
 
 	/**
@@ -438,6 +454,29 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	} // setPermissionNames()
 
 	/**
+	 * Set the value of [tags] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UserRole The current object (for fluent API support)
+	 */
+	public function setTags($v)
+	{
+		if(!isset($this->oldColumnsValues[UserRolePeer::TAGS]))
+			$this->oldColumnsValues[UserRolePeer::TAGS] = $this->tags;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->tags !== $v) {
+			$this->tags = $v;
+			$this->modifiedColumns[] = UserRolePeer::TAGS;
+		}
+
+		return $this;
+	} // setTags()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -594,9 +633,10 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->permission_names = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->custom_data = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->tags = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -606,7 +646,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 10; // 10 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 11; // 11 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserRole object", $e);
@@ -1054,12 +1094,15 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 				return $this->getPermissionNames();
 				break;
 			case 7:
-				return $this->getCreatedAt();
+				return $this->getTags();
 				break;
 			case 8:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 9:
+				return $this->getUpdatedAt();
+				break;
+			case 10:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1090,9 +1133,10 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			$keys[4] => $this->getPartnerId(),
 			$keys[5] => $this->getStatus(),
 			$keys[6] => $this->getPermissionNames(),
-			$keys[7] => $this->getCreatedAt(),
-			$keys[8] => $this->getUpdatedAt(),
-			$keys[9] => $this->getCustomData(),
+			$keys[7] => $this->getTags(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getUpdatedAt(),
+			$keys[10] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1146,12 +1190,15 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 				$this->setPermissionNames($value);
 				break;
 			case 7:
-				$this->setCreatedAt($value);
+				$this->setTags($value);
 				break;
 			case 8:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 9:
+				$this->setUpdatedAt($value);
+				break;
+			case 10:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1185,9 +1232,10 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setPartnerId($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setPermissionNames($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCustomData($arr[$keys[9]]);
+		if (array_key_exists($keys[7], $arr)) $this->setTags($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
 	}
 
 	/**
@@ -1206,6 +1254,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserRolePeer::PARTNER_ID)) $criteria->add(UserRolePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(UserRolePeer::STATUS)) $criteria->add(UserRolePeer::STATUS, $this->status);
 		if ($this->isColumnModified(UserRolePeer::PERMISSION_NAMES)) $criteria->add(UserRolePeer::PERMISSION_NAMES, $this->permission_names);
+		if ($this->isColumnModified(UserRolePeer::TAGS)) $criteria->add(UserRolePeer::TAGS, $this->tags);
 		if ($this->isColumnModified(UserRolePeer::CREATED_AT)) $criteria->add(UserRolePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(UserRolePeer::UPDATED_AT)) $criteria->add(UserRolePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UserRolePeer::CUSTOM_DATA)) $criteria->add(UserRolePeer::CUSTOM_DATA, $this->custom_data);
@@ -1274,6 +1323,8 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setPermissionNames($this->permission_names);
+
+		$copyObj->setTags($this->tags);
 
 		$copyObj->setCreatedAt($this->created_at);
 

@@ -2589,6 +2589,7 @@
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="partner_id" type="integer"/>
 		<column primaryKey="false" required="true"  autoIncrement="false" lazyLoad="false" name="status" type="integer"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="permission_names" type="longvarchar"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar"/>		

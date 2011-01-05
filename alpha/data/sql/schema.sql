@@ -1907,6 +1907,7 @@ CREATE TABLE `user_role`
 	`partner_id` INTEGER  NOT NULL,
 	`status` INTEGER  NOT NULL,
 	`permission_names` TEXT,
+	`tags` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
