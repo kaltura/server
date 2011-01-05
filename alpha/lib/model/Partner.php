@@ -21,6 +21,7 @@ class Partner extends BasePartner
 	const VALIDATE_WRONG_LOGIN = -1;
 	const VALIDATE_WRONG_PASSWORD = -2;
 	const VALIDATE_TOO_MANY_INVALID_LOGINS = -3;
+	const VALIDATE_PARTNER_BLOCKED = -4;
 	const VALIDATE_LKS_DISABLED = -10;
 	
 	const PARTNER_STATUS_ACTIVE = 1;
