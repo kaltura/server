@@ -257,6 +257,7 @@ class kalturaIframe {
 		$cacheLife = $wgKalturaUiConfCacheTime; 
 			
 		$conf = new KalturaConfiguration( $this->getPartnerId() );
+		$conf->serviceUrl = $wgKalturaServiceUrl;
 		$client = new KalturaClient( $conf );
 		
 		// Check modify time on cached php file
