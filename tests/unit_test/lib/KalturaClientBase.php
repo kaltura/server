@@ -193,6 +193,7 @@ class KalturaClientBase
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
+		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -215,6 +216,18 @@ class KalturaClientBase
 			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 		else
 			curl_setopt($ch, CURLOPT_TIMEOUT, $this->config->curlTimeout);
+			
+		if ($this->config->startZendDebuggerSession === true)
+		{
+			$zendDebuggerParams = $this->getZendDebuggerParams($url);
+		 	$cookies = array_merge($cookies, $zendDebuggerParams);
+		}
+		
+		if (count($cookies) > 0) 
+		{
+			$cookiesStr = http_build_query($cookies, null, '; ');
+			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
+		} 
 
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
@@ -389,6 +402,36 @@ class KalturaClientBase
 		if ($this->shouldLog)
 			$this->config->getLogger()->log($msg);
 	}
+	
+	/**
+	 * Return a list of parameter used to a new start debug on the destination server api
+	 * @link http://kb.zend.com/index.php?View=entry&EntryID=434
+	 * @param $url
+	 */
+	protected function getZendDebuggerParams($url)
+	{
+		$params = array();
+		$passThruParams = array('debug_host',
+			'debug_fastfile',
+			'debug_port',
+			'start_debug',
+			'send_debug_header',
+			'send_sess_end',
+			'debug_jit',
+			'debug_stop',
+			'use_remote');
+		
+		foreach($passThruParams as $param)
+		{
+			if (isset($_COOKIE[$param]))
+				$params[$param] = $_COOKIE[$param];
+		}
+		
+		$params['original_url'] = $url;
+		$params['debug_session_id'] = microtime(true); // to create a new debug session
+		
+		return $params;
+	}
 }
 
 class KalturaServiceActionCall
@@ -550,11 +593,12 @@ class KalturaConfiguration
 {
 	private $logger;
 
-	public $serviceUrl    = "http://www.kaltura.com/";
-	public $partnerId     = null;
-	public $format        = 3;
-	public $clientTag 	  = "php5";
-	public $curlTimeout   = 10;
+	public $serviceUrl    				= "http://www.kaltura.com/";
+	public $partnerId    				= null;
+	public $format        				= 3;
+	public $clientTag 	  				= "php5";
+	public $curlTimeout   				= 10;
+	public $startZendDebuggerSession 	= false;
 	
 	/**
 	 * Constructs new Kaltura configuration object

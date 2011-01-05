@@ -447,6 +447,7 @@ class KalturaDistributionProviderType
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
 	const HULU = "huluDistribution.HULU";
+	const COMCAST = "comcastDistribution.COMCAST";
 }
 
 class KalturaDocumentEntryOrderBy
@@ -1222,6 +1223,7 @@ class KalturaPermissionType
 	const API_ACCESS = 1;
 	const SPECIAL_FEATURE = 2;
 	const PLUGIN = 3;
+	const PARTNER_GROUP = 4;
 	const EXTERNAL = 99;
 }
 
@@ -3580,6 +3582,13 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $results = null;
+
+	/**
+	 * The data as sent to the remote destination
+	 *
+	 * @var string
+	 */
+	public $sentData = null;
 
 
 }
@@ -10854,6 +10863,13 @@ class KalturaUserRole extends KalturaObjectBase
 	 * @var string
 	 */
 	public $permissionNames = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
 
 	/**
 	 * 
