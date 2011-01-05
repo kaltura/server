@@ -130,7 +130,8 @@ class MetadataSearchFilter extends AdvancedSearchFilter
 		if($filter->get('_free_text'))
 		{
 			$additionalConditions = $this->getFreeTextConditions($filter->get('_free_text'));
-			$additionalCondition = implode(' | ', $additionalConditions);
+			$additionalCondition = '(' . implode(') | (', $additionalConditions) . ')';
+				
 			KalturaLog::debug("Additional Condition [$additionalCondition]");
 			$matchClause[] = $additionalCondition;
 		}
