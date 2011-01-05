@@ -36,6 +36,7 @@ define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::setClassMapFilePath('../../cache/classMap.cache');
 KAutoloader::register();
