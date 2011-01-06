@@ -197,6 +197,10 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return parent::setThumbAssetIds($v);
 	}
 
+	/**
+	 * @return array<kDistributionValidationError>
+	 * @see BaseEntryDistribution::getValidationErrors()
+	 */
 	public function getValidationErrors()
 	{
 		$validationErrors = parent::getValidationErrors();
@@ -212,6 +216,10 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return array();
 	}
 
+	/**
+	 * @param array<kDistributionValidationError> $v
+	 * @return EntryDistribution
+	 */
 	public function setValidationErrorsArray(array $v)
 	{
 		return parent::setValidationErrors(serialize($v));
