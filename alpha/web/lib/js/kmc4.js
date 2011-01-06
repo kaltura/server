@@ -669,7 +669,7 @@ $(window).load(function(){
 			var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
 						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
 			html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' + 
-					'while Progressive Download allows buffering of the content. <a href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
+					'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
 			return html;
 		},
 		
@@ -678,7 +678,7 @@ $(window).load(function(){
 			var url_text = url.replace(/http:\/\/|www./ig, '');
 			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' + 
 					   ' &amp; iPad with HTML5</label></div><br /><div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-					   ' <a href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a><br class"clear" />View player outside KMC: <a target="_blank" href="' + url + 
+					   ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a><br class"clear" />View player outside KMC: <a target="_blank" href="' + url + 
 					   '"><span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div><br />';
 			return html;
 		},
