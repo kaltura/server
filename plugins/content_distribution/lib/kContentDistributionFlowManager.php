@@ -7,15 +7,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
+		KalturaLog::debug(print_r($modifiedColumns, true));
 		if($object instanceof entry && $object->getStatus() == entryStatus::READY)
 		{
-			if(isset($modifiedColumns[entryPeer::STATUS]))
+			if(in_array(entryPeer::STATUS, $modifiedColumns))
 				return self::onEntryReady($object);
 			else
 				return self::onEntryChanged($object, $modifiedColumns);
 		}
 		
-		if($object instanceof asset && isset($modifiedColumns[assetPeer::STATUS]) && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof asset && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
 			return self::onAssetReady($object);
 		
 		if($object instanceof EntryDistribution)
@@ -594,7 +595,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		// updated in the indexing server (sphinx)
 		kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
 			
-		if(!isset($modifiedColumns[EntryDistributionPeer::SUNRISE]) && !isset($modifiedColumns[EntryDistributionPeer::SUNSET]))
+		if(!in_array(EntryDistributionPeer::SUNRISE, $modifiedColumns) && !in_array(EntryDistributionPeer::SUNSET, $modifiedColumns))
 			return true;
 			
 		KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] of entry [" . $entryDistribution->getEntryId() . "] schedule changed");
@@ -663,7 +664,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			foreach($updateRequiredEntryFields as $updateRequiredEntryField)
 			{
-				if(isset($modifiedColumns[$updateRequiredEntryField]))
+				if(in_array($updateRequiredEntryField, $modifiedColumns))
 				{
 					$updateRequired = true;
 					break;
