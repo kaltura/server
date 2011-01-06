@@ -89,10 +89,6 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 				return new KalturaHuluDistributionJobProviderData();
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 		{
 			$reflect = new ReflectionClass('KalturaHuluDistributionJobProviderData');
@@ -155,10 +151,6 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 				return 'KalturaHuluDistributionJobProviderData';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(HuluDistributionProviderType::HULU))
 			return 'KalturaHuluDistributionJobProviderData';
 	

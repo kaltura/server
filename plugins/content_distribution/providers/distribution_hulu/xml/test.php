@@ -28,8 +28,6 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
-kCurrentContext::$ps_vesion = 'ps3';
-
 $entryId = '0_4c6o03wp';
 
 if(isset($argv[1]))

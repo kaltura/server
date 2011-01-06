@@ -7,10 +7,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return true;
-		
 		if($object instanceof entry && $object->getStatus() == entryStatus::READY)
 		{
 			if(isset($modifiedColumns[entryPeer::STATUS]))
@@ -34,10 +30,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return true;
-		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 			self::onDistributionSubmitJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
@@ -59,10 +51,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectDeleted(BaseObject $object)
 	{
-		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return true;
-		
 		if($object instanceof entry)
 			return self::onEntryDeleted($object);
 		
@@ -79,10 +67,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null)
 	{
-		// Content distribution is not supporting partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return true;
-		
 		if(!class_exists('Metadata') || !($object instanceof Metadata))
 			return true;
 
