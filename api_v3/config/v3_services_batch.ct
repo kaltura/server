@@ -155,16 +155,16 @@ batch.getexclusivealmostdoneprovisiondeletejobs	|	|2	|1	|0		|0		|1		|rw	|*		|	| 
 batch.getexclusivealmostdoneremoteconvertjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 batch.getexclusivealmostdonebulkdownloadjobs	|	|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
-batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
-batchcontrol.getcommand				|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
-batchcontrol.setcommandresult		|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
-batchcontrol.getfullstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASEcontrol
+batchcontrol.configloaded			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batchcontrol.reportstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batchcontrol.getcommand				|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batchcontrol.setcommandresult		|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
+batchcontrol.getfullstatus			|			|2	|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
 emailingestionprofile.getbyemailaddress	|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 emailingestionprofile.addmediaentry		|		|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
-filesync.sync						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |file-sync
+filesync.sync						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 
 metadatabatch.getexclusiveimportmetadatajobs	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE
 metadatabatch.updateexclusiveimportmetadatajob	|	|2		|1	|0		|0		|1		|rw	|*		|	|   |BATCH_BASE

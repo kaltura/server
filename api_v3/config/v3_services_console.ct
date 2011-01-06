@@ -43,7 +43,7 @@ batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BA
 batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 
 
-#systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
+systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 
 entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
 flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
