@@ -874,7 +874,10 @@ class kJobsManager
 		// validate that partner exists
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if(!$partner)
+		{
+			KalturaLog::err("Invalid partner id [$partnerId]");
 			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
+		}
 		
 		// set the priority and work group
 		$batchJob->setPriority($partner->getPriority($batchJob->getBulkJobId()));
