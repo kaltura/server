@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1294221047">
-  <!-- Generated on date 05/01/11 09:50:47 -->
+<xml apiVersion="3.1.1" generatedDate="1294336750">
+  <!-- Generated on date 06/01/11 17:59:10 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -896,6 +896,10 @@
       <const name="UPDATED_AT_ASC" value="+updatedAt"/>
       <const name="UPDATED_AT_DESC" value="-updatedAt"/>
     </enum>
+    <enum name="KalturaPermissionItemType" enumType="string">
+      <const name="API_ACTION_ITEM" value="kApiActionPermissionItem"/>
+      <const name="API_PARAMETER_ITEM" value="kApiParameterPermissionItem"/>
+    </enum>
     <enum name="KalturaPermissionName" enumType="string">
       <const name="FEATURE_ANALYTICS_TAB" value="FEATURE_ANALYTICS_TAB"/>
       <const name="FEATURE_508_PLAYERS" value="FEATURE_508_PLAYERS"/>
@@ -903,11 +907,40 @@
       <const name="FEATURE_VAST" value="FEATURE_VAST"/>
       <const name="FEATURE_SILVERLIGHT" value="FEATURE_SILVERLIGHT"/>
       <const name="USER_SESSION_PERMISSION" value="BASE_USER_SESSION_PERMISSION"/>
-      <const name="NO_SESSION_PERMISSION" value="NO_SESSION_PERMISSION"/>
-      <const name="BASE_BATCH_SYSTEM_PERMISSION" value="BASE_BATCH_SYSTEM_PERMISSION"/>
+      <const name="ALWAYS_ALLOWED_ACTIONS" value="ALWAYS_ALLOWED_ACTIONS"/>
+      <const name="SYSTEM_BASE_ACTIONS" value="SYSTEM_BASE_ACTIONS"/>
+      <const name="SYSTEM_FILESYNC" value="SYSTEM_FILESYNC"/>
+      <const name="SYSTEM_INTERNAL" value="SYSTEM_INTERNAL"/>
+      <const name="SYSTEM_ADMIN_BASE" value="SYSTEM_ADMIN_BASE"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_BASE" value="SYSTEM_ADMIN_PUBLISHER_BASE"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS" value="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_CONFIG" value="SYSTEM_ADMIN_PUBLISHER_CONFIG"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_BLOCK" value="SYSTEM_ADMIN_PUBLISHER_BLOCK"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_REMOVE" value="SYSTEM_ADMIN_PUBLISHER_REMOVE"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_ADD" value="SYSTEM_ADMIN_PUBLISHER_ADD"/>
+      <const name="SYSTEM_ADMIN_PUBLISHER_USAGE" value="SYSTEM_ADMIN_PUBLISHER_USAGE"/>
+      <const name="SYSTEM_ADMIN_USER_MANAGE" value="SYSTEM_ADMIN_USER_MANAGE"/>
+      <const name="SYSTEM_ADMIN_SYSTEM_MONITOR" value="SYSTEM_ADMIN_SYSTEM_MONITOR"/>
+      <const name="SYSTEM_ADMIN_DEVELOPERS_TAB" value="SYSTEM_ADMIN_DEVELOPERS_TAB"/>
+      <const name="SYSTEM_ADMIN_BATCH_CONTROL" value="SYSTEM_ADMIN_BATCH_CONTROL"/>
+      <const name="SYSTEM_ADMIN_BATCH_CONTROL_INPROGRESS" value="SYSTEM_ADMIN_BATCH_CONTROL_INPROGRESS"/>
+      <const name="SYSTEM_ADMIN_BATCH_CONTROL_FAILED" value="SYSTEM_ADMIN_BATCH_CONTROL_FAILED"/>
+      <const name="SYSTEM_ADMIN_BATCH_CONTROL_SETUP" value="SYSTEM_ADMIN_BATCH_CONTROL_SETUP"/>
+      <const name="SYSTEM_ADMIN_STORAGE" value="SYSTEM_ADMIN_STORAGE"/>
+      <const name="SYSTEM_ADMIN_VIRUS_SCAN" value="SYSTEM_ADMIN_VIRUS_SCAN"/>
+      <const name="SYSTEM_ADMIN_EMAIL_INGESTION" value="SYSTEM_ADMIN_EMAIL_INGESTION"/>
+      <const name="SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE" value="SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE"/>
+      <const name="SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY" value="SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY"/>
+      <const name="SYSTEM_ADMIN_PERMISSIONS_MANAGE" value="SYSTEM_ADMIN_PERMISSIONS_MANAGE"/>
+      <const name="BATCH_BASE" value="BATCH_BASE"/>
       <const name="CONTENT_INGEST_UPLOAD" value="CONTENT_INGEST_UPLOAD"/>
       <const name="CONTENT_INGEST_BULK_UPLOAD" value="CONTENT_INGEST_BULK_UPLOAD"/>
       <const name="CONTENT_INGEST_FEED" value="CONTENT_INGEST_FEED"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_BASE" value="CONTENT_MANAGE_DISTRIBUTION_BASE"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_MODIFY" value="CONTENT_MANAGE_DISTRIBUTION_MODIFY"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY"/>
+      <const name="CONTENT_MANAGE_VIRUS_SCAN" value="CONTENT_MANAGE_VIRUS_SCAN"/>
       <const name="CONTENT_MANAGE_MIX" value="CONTENT_MANAGE_MIX"/>
       <const name="CONTENT_MANAGE_BASE" value="CONTENT_MANAGE_BASE"/>
       <const name="CONTENT_MANAGE_METADATA" value="CONTENT_MANAGE_METADATA"/>
@@ -921,7 +954,7 @@
       <const name="CONTENT_MANAGE_EDIT_CATEGORIES" value="CONTENT_MANAGE_EDIT_CATEGORIES"/>
       <const name="CONTENT_MANAGE_ANNOTATION" value="CONTENT_MANAGE_ANNOTATION"/>
       <const name="CONTENT_MANAGE_SHARE" value="CONTENT_MANAGE_SHARE"/>
-      <const name="LIVE_STREAM_BASE" value="LIVE_STREAM_BASE"/>
+      <const name="CONTENT_MANAGE_DOWNLOAD" value="CONTENT_MANAGE_DOWNLOAD"/>
       <const name="LIVE_STREAM_ADD" value="LIVE_STREAM_ADD"/>
       <const name="LIVE_STREAM_UPDATE" value="LIVE_STREAM_UPDATE"/>
       <const name="CONTENT_MODERATE_BASE" value="CONTENT_MODERATE_BASE"/>
@@ -964,6 +997,11 @@
       <const name="ADMIN_ROLE_DELETE" value="ADMIN_ROLE_DELETE"/>
       <const name="ADMIN_PUBLISHER_MANAGE" value="ADMIN_PUBLISHER_MANAGE"/>
       <const name="ANALYTICS_BASE" value="ANALYTICS_BASE"/>
+      <const name="WIDGET_ADMIN" value="WIDGET_ADMIN"/>
+      <const name="SEARCH_SERVICE" value="SEARCH_SERVICE"/>
+      <const name="ANALYTICS_SEND_DATA" value="ANALYTICS_SEND_DATA"/>
+      <const name="AUDIT_TRAIL_BASE" value="AUDIT_TRAIL_BASE"/>
+      <const name="AUDIT_TRAIL_ADD" value="AUDIT_TRAIL_ADD"/>
       <const name="ADVERTISING_BASE" value="ADVERTISING_BASE"/>
       <const name="ADVERTISING_UPDATE_SETTINGS" value="ADVERTISING_UPDATE_SETTINGS"/>
       <const name="PLAYLIST_EMBED_CODE" value="PLAYLIST_EMBED_CODE"/>
@@ -1976,7 +2014,7 @@
     </class>
     <class name="KalturaPermissionItem" abstract="1">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="type" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="type" type="string" enumType="KalturaPermissionItemType" readOnly="1" insertOnly="0" description=""/>
       <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
@@ -1984,7 +2022,7 @@
     <class name="KalturaPermissionItemBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="typeEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="typeEqual" type="string" enumType="KalturaPermissionItemType" readOnly="0" insertOnly="0" description=""/>
       <property name="typeIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2285,6 +2323,8 @@
       <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
