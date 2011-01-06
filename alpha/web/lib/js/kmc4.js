@@ -1228,7 +1228,7 @@ kmc.vars.kmc_swf = {
 		kmc_uiconf:kmc.vars.kmc_general_uiconf, 
 		
 		//permission uiconf id:
-		permission_uiconf:kmc.vars.kmc_permissions_uiconf, 
+		permission_uiconf:kmc.vars.kmc_permissions_uiconf 
 		
 		// path to modules (optional):
 		//modules_path:kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/modules",
