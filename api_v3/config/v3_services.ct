@@ -107,10 +107,10 @@ media.anonymousrank					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_META
 
 
 livestream.add							|		|2		|1	|1		|2		|1		|	|		|	|   |LIVE_STREAM_ADD
-livestream.get							|		|1		|1	|1		|2		|1		|	|		|	|   |LIVE_STREAM_BASE,CONTENT_MANAGE_BASE
+livestream.get							|		|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 livestream.update						|		|2		|1	|1		|2		|1		|	|		|	|   |LIVE_STREAM_UPDATE
 livestream.delete						|		|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
-livestream.list							|		|1		|1	|1		|2		|1		|	|		|	|   |LIVE_STREAM_BASE
+livestream.list							|		|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 livestream.updateofflinethumbnailjpeg	|		|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 livestream.updateofflinethumbnailfromurl|		|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 
