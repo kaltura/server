@@ -309,33 +309,54 @@ class kContentDistributionManager
 		return $entryDistribution;
 	}
 	
+	public static function getSearchStringNoDistributionProfiles()
+	{
+		return "contentDistNoProfiles";
+	}
+	
 	public static function getSearchStringDistributionProfile($distributionProfileId)
 	{
-		return "^contentDistProfile $distributionProfileId$";
+		return "contentDistProfile $distributionProfileId";
 	}
 	
 	public static function getSearchStringDistributionSunStatus($distributionSunStatus, $distributionProfileId = null)
 	{
 		if($distributionProfileId)
-			return "^entryDistSun $distributionSunStatus $distributionProfileId$";
+			return "entryDistSun $distributionSunStatus $distributionProfileId";
 			
-		return "^entryDistSun $distributionSunStatus$";
+		return "entryDistSun $distributionSunStatus";
 	}
 	
 	public static function getSearchStringDistributionFlag($entryDistributionFlag, $distributionProfileId = null)
 	{
 		if($distributionProfileId)
-			return $conditions[] = "^entryDistFlag $entryDistributionFlag $distributionProfileId$";;
+			return "entryDistFlag $entryDistributionFlag $distributionProfileId";
 			
-		return $conditions[] = "^entryDistFlag $entryDistributionFlag$";;
+		return "entryDistFlag $entryDistributionFlag";
 	}
 	
 	public static function getSearchStringDistributionStatus($entryDistributionStatus, $distributionProfileId = null)
 	{
 		if($distributionProfileId)
-			return $conditions[] = "^entryDistStatus $entryDistributionStatus $distributionProfileId$";;
+			return "entryDistStatus $entryDistributionStatus $distributionProfileId";
 			
-		return $conditions[] = "^entryDistStatus $entryDistributionStatus$";;
+		return "entryDistStatus $entryDistributionStatus";
+	}
+	
+	public static function getSearchStringDistributionValidationError($validationErrorType = null, $distributionProfileId = null)
+	{
+		if($distributionProfileId)
+			return "entryDistErr $validationErrorType $distributionProfileId";
+			
+		return "entryDistErr $validationErrorType";
+	}
+	
+	public static function getSearchStringDistributionHasValidationError($distributionProfileId = null)
+	{
+		if($distributionProfileId)
+			return "entryDistHasErr $distributionProfileId";
+			
+		return "entryDistHasErr";
 	}
 	
 	public static function getEntrySearchValues(entry $entry)
@@ -344,6 +365,9 @@ class kContentDistributionManager
 			return null;
 			
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
+		if(!count($entryDistributions))
+			return self::getSearchStringNoDistributionProfiles();
+			
 		$searchValues = array();
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -352,6 +376,13 @@ class kContentDistributionManager
 			$searchValues[] = self::getSearchStringDistributionStatus($entryDistribution->getStatus(), $distributionProfileId);
 			$searchValues[] = self::getSearchStringDistributionFlag($entryDistribution->getDirtyStatus(), $distributionProfileId);
 			$searchValues[] = self::getSearchStringDistributionSunStatus($entryDistribution->getSunStatus(), $distributionProfileId);
+			
+			$validationErrors = $entryDistribution->getValidationErrors();
+			if(count($validationErrors))
+				$searchValues[] = self::getSearchStringDistributionHasValidationError($distributionProfileId);
+				
+			foreach($validationErrors as $validationError)
+				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId);
 		}
 		return implode(',', $searchValues);
 	}
