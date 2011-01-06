@@ -17,24 +17,40 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	{
 		$xpath = new DOMXPath($this->_doc);
 		
+		// enumes
 		$this->appendLine('<?php');
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('');
 	    
-		// enumes
 		$enumNodes = $xpath->query("/xml/enums/enum");
 		foreach($enumNodes as $enumNode)
 		{
 			$this->writeEnum($enumNode);
 		}
-		
+    	$this->addFile("KalturaEnums.php", $this->getTextBlock());
+    	
+    	
 		// classes
+    	$this->startNewTextBlock();
+		$this->appendLine('<?php');
+		$this->appendLine('require_once("KalturaClientBase.php");');
+		$this->appendLine('');
+		
 		$classNodes = $xpath->query("/xml/classes/class");
 		foreach($classNodes as $classNode)
 		{
 			$this->writeClass($classNode);
 		}
+    	$this->addFile("KalturaTypes.php", $this->getTextBlock());
 		
+		
+		// services
+    	$this->startNewTextBlock();
+		$this->appendLine('<?php');
+		$this->appendLine('require_once("KalturaClientBase.php");');
+		$this->appendLine('require_once("KalturaEnums.php");');
+		$this->appendLine('require_once("KalturaTypes.php");');
+		$this->appendLine('');
 		
 		$serviceNodes = $xpath->query("/xml/services/service");
 		foreach($serviceNodes as $serviceNode)
@@ -315,7 +331,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	 */");
 		$this->appendLine("	protected \$apiVersion = '$apiVersion';");
 		$this->appendLine("");
-		
+	
 		foreach($serviceNodes as $serviceNode)
 		{
 			$serviceName = $serviceNode->getAttribute("name");
@@ -331,10 +347,46 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("");
 		}
 		
-		$this->appendLine("");
+		$this->appendLine("	/**");
+		$this->appendLine("	 * Array of all plugin services");
+		$this->appendLine("	 *");
+		$this->appendLine("	 * @var array<KalturaServiceBase>");
+		$this->appendLine("	 */");
+		$this->appendLine("	protected \$pluginServices = array();");
+		$this->appendLine("	");
+	
+		$this->appendLine("	/**");
+		$this->appendLine("	 * Kaltura client constructor");
+		$this->appendLine("	 *");
+		$this->appendLine("	 * @param KalturaConfiguration \$config");
+		$this->appendLine("	 */");
 		$this->appendLine("	public function __construct(KalturaConfiguration \$config)");
 		$this->appendLine("	{");
 		$this->appendLine("		parent::__construct(\$config);");
+		$this->appendLine("		");
+		
+		$this->appendLine("		// load all plugins");
+		$this->appendLine("		\$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';");
+		$this->appendLine("		if(is_dir(\$pluginsFolder))");
+		$this->appendLine("		{");
+		$this->appendLine("			\$dir = dir(\$pluginsFolder);");
+		$this->appendLine("			while (false !== \$fileName = \$dir->read())");
+		$this->appendLine("			{");
+		$this->appendLine("				\$matches = null;");
+		$this->appendLine("				if(preg_match('/^([^.]+).php$/', \$fileName, \$matches))");
+		$this->appendLine("				{");
+		$this->appendLine("					require_once(\"\$pluginsFolder/\$fileName\");");
+		$this->appendLine("					");
+		$this->appendLine("					\$pluginClass = \$matches[1];");
+		$this->appendLine("					\$plugin = new \$pluginClass();");
+		$this->appendLine("					\$services = \$plugin->getServices();");
+		$this->appendLine("					foreach(\$services as \$service)");
+		$this->appendLine("						\$this->pluginServices[\$service->serviceName] = \$service;");
+		$this->appendLine("				}");
+		$this->appendLine("			}");
+		$this->appendLine("		}");
+		$this->appendLine("		");
+
 		foreach($serviceNodes as $serviceNode)
 		{
 			$serviceName = $serviceNode->getAttribute("name");
@@ -342,7 +394,15 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("		\$this->$serviceName = new $serviceClassName(\$this);");
 		}
 		$this->appendLine("	}");
+		$this->appendLine("	");
+	
+		$this->appendLine("	public function __get(\$serviceName)");
+		$this->appendLine("	{");
+		$this->appendLine("		if(isset(\$this->pluginServices[\$serviceName]))");
+		$this->appendLine("			return \$this->pluginServices[\$serviceName];");
+		$this->appendLine("		");
+		$this->appendLine("		return null;");
+		$this->appendLine("	}");
 		$this->appendLine("}");
 	}
 }
-?>
