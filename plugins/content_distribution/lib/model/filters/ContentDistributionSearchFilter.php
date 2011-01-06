@@ -11,6 +11,11 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 	protected $condition = null;
 	
 	/**
+	 * @var bool
+	 */
+	protected $noDistributionProfiles;
+	
+	/**
 	 * @var int
 	 */
 	protected $distributionProfileId;
@@ -28,11 +33,63 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 	protected $entryDistributionFlag;
 	
 	/**
-	 * enum from EntryDistributionStatus
-	 * @var int
+	 * @var bool
 	 */
-	protected $entryDistributionStatus;
+	protected $hasEntryDistributionValidationErrors;
 	
+	/**
+	 * @var array
+	 */
+	protected $entryDistributionValidationErrors;
+	
+	/**
+	 * @return the $noDistributionProfiles
+	 */
+	public function getNoDistributionProfiles()
+	{
+		return $this->noDistributionProfiles;
+	}
+
+	/**
+	 * @return the $hasEntryDistributionValidationErrors
+	 */
+	public function getHasEntryDistributionValidationErrors()
+	{
+		return $this->hasEntryDistributionValidationErrors;
+	}
+
+	/**
+	 * @return the $entryDistributionValidationErrors
+	 */
+	public function getEntryDistributionValidationErrors()
+	{
+		return $this->entryDistributionValidationErrors;
+	}
+
+	/**
+	 * @param bool $noDistributionProfiles
+	 */
+	public function setNoDistributionProfiles($noDistributionProfiles)
+	{
+		$this->noDistributionProfiles = $noDistributionProfiles;
+	}
+
+	/**
+	 * @param bool $hasEntryDistributionValidationErrors
+	 */
+	public function setHasEntryDistributionValidationErrors($hasEntryDistributionValidationErrors)
+	{
+		$this->hasEntryDistributionValidationErrors = $hasEntryDistributionValidationErrors;
+	}
+
+	/**
+	 * @param array $entryDistributionValidationErrors
+	 */
+	public function setEntryDistributionValidationErrors(array $entryDistributionValidationErrors)
+	{
+		$this->entryDistributionValidationErrors = $entryDistributionValidationErrors;
+	}
+
 	public function setDistributionProfileId($distributionProfileId)
 	{
 		$this->distributionProfileId = $distributionProfileId;
@@ -80,17 +137,27 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 			
 		$conditions = array();
 		
+		if($this->noDistributionProfiles)
+			return '^' . kContentDistributionManager::getSearchStringNoDistributionProfiles() . '$';
+		
 		if(!is_null($this->distributionProfileId))
-			$conditions[] = kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId);
+			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId) . '$';
 		
 		if(!is_null($this->distributionSunStatus))
-			$conditions[] = kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId);
+			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId) . '$';
 		
 		if(!is_null($this->entryDistributionFlag))
-			$conditions[] = kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId);
+			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId) . '$';
 		
 		if(!is_null($this->entryDistributionStatus))
-			$conditions[] = kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId);
+			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId) . '$';
+			
+		if($this->hasEntryDistributionValidationErrors)
+			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId) . '$';
+
+		if(!is_null($this->entryDistributionValidationErrors))
+			foreach($this->entryDistributionValidationErrors as $validationError)
+				$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionValidationError($validationError, $this->distributionProfileId) . '$';
 			
 		if(!count($conditions))
 			return null;
