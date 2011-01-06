@@ -169,7 +169,7 @@ class kBusinessPostConvertDL
 		{
 			KalturaLog::debug('Convert Finished - has In-Complte Required jobs');
 		} 
-		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
+		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
 			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
