@@ -295,7 +295,11 @@ $(window).load(function(){
 			else {
 				$("#kmcHeader").append('<div id="mask"></div>');
 			}
-		} 
+		},
+		
+		createTabs : function(arr) {
+			$("#kcms")[0].alert('creating tabs...');
+		}
 		
 	}
 
@@ -787,8 +791,8 @@ $(window).load(function(){
 				embed_code = embed_code.replace("{FLASHVARS}", "");
 			}
 			
-			var iframe_url = kmc.vars.service_url + '/lib/js/html5lib/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
-			var script_url = kmc.vars.service_url + '/lib/js/html5lib/mwEmbedLoader.js';
+			var iframe_url = kmc.vars.service_url + '/html5/html5lib/v1.0/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
+			var script_url = kmc.vars.service_url + '/html5/html5lib/v1.0/mwEmbedLoader.php';
 			
 			embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
 			embed_code = embed_code.replace(/{HEIGHT}/gi,uiconf_details.height);
