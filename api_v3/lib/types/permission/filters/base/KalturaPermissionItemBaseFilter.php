@@ -57,7 +57,7 @@ class KalturaPermissionItemBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var string
+	 * @var KalturaPermissionItemType
 	 */
 	public $typeEqual;
 
