@@ -108,23 +108,13 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
 			
-		try {
-			if (!is_null($user->roleIds)) {
-				UserRolePeer::testValidRolesForUser($user->roleIds);
-			}
-		}
-		catch (kUserException $e) {
-			$code = $e->getCode();
-			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
-				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
-			}
-			throw $e;			
-		}
-		
-		
 		// update user
 		try
 		{
+			$user->id = $userId; // do not allow updaing the user id (puserId)
+			if (!is_null($user->roleIds)) {
+				UserRolePeer::testValidRolesForUser($user->roleIds);
+			}
 			$dbUser = $user->toUpdatableObject($dbUser);
 			$dbUser->save();
 		}
@@ -144,6 +134,13 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
 			}
 			throw $e;
+		}
+		catch (kUserException $e) {
+			$code = $e->getCode();
+			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
+				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
+			}
+			throw $e;			
 		}
 				
 		$user = new KalturaUser();
