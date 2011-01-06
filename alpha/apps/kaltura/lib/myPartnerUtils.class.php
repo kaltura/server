@@ -173,10 +173,6 @@ class myPartnerUtils
 		$peer->addPartnerToCriteria($partner_id, $private_partner_data, $partner_group, $kaltura_network);
 	}
 
-	public static function partnerHasRoles ( $partner_id )
-	{
-
-	}
 
 	public static function setPartnerFrocePolicy ( $val )
 	{

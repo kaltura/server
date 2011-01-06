@@ -784,38 +784,17 @@ $this->benchmarkEnd( "signature" );
 
 	protected function forceProducerOnly ( $partner_id , $puser_id , $kshow_id )
 	{
-		if ( myPartnerUtils::partnerHasRoles( $partner_id ) )
+		$kshow = kshowPeer::retrieveByPK( $kshow_id );
+		if ( ! $kshow )
 		{
-			$puser_role = PuserRolePeer::retrieveByKshowPartnerAndUid( $kshow_id , $partner_id , $puser_id );
-			if ( ! $puser_role )
-			{
-				// this puser is not supposed to change properties of this kshow
-//				$this->addError ( "puser ($partner_id,$puser_id) does not have access privileges to kshow [$kshow_id]" );
-				throw new Exception (  "puser ($partner_id,$puser_id) does not have access privileges to kshow [$kshow_id]" );
-			}
-
-			$role = $puser_role->getRole();
-			if ( $role != PuserRole::PUSER_ROLE_PRODUCER )
-			{
-				// the error is slightly different from the error above
-				$this->addError ( "puser ($partner_id,$puser_id) does not have proper access privileges to kshow [$kshow_id]" );
-				throw new Exception ( "puser ($partner_id,$puser_id) does not have proper access privileges to kshow [$kshow_id]" );
-			}
+			$this->addError ( "no such kshow [$kshow_id]" );
+			throw new Exception();
 		}
-		else
-		{
-			$kshow = kshowPeer::retrieveByPK( $kshow_id );
-			if ( ! $kshow )
-			{
-				$this->addError ( "no such kshow [$kshow_id]" );
-				throw new Exception();
-			}
 
-			if ( $kshow->getProducerId() != $kshow_id )
-			{
-				$this->addError ( "no such kshow [$kshow_id]" );
-				throw new Exception();
-			}
+		if ( $kshow->getProducerId() != $kshow_id )
+		{
+			$this->addError ( "no such kshow [$kshow_id]" );
+			throw new Exception();
 		}
 	}
 
