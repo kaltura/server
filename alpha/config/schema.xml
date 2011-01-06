@@ -9,7 +9,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="is_admin" type="boolean"/>
 		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="screen_name" type="varchar" size="20" />
+			lazyLoad="false" name="screen_name" type="varchar" size="100" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="full_name" type="varchar" size="40" />
 		<column primaryKey="false" required="false" autoIncrement="false"
@@ -17,7 +17,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="last_name" type="varchar" size="40" />
 		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="email" type="varchar" size="50" />
+			lazyLoad="false" name="email" type="varchar" size="100" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="sha1_password" type="varchar" size="40" />
 		<column primaryKey="false" required="false" autoIncrement="false"
@@ -87,7 +87,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="partner_data" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="puser_id" type="varchar" size="64" />
+			lazyLoad="false" name="puser_id" type="varchar" size="100" />
 		<column primaryKey="false" required="false" autoIncrement="false"
 			lazyLoad="false" name="admin_tags" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false"

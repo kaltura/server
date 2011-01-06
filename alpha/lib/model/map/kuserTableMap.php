@@ -39,11 +39,11 @@ class kuserTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('LOGIN_DATA_ID', 'LoginDataId', 'INTEGER', false, null, null);
 		$this->addColumn('IS_ADMIN', 'IsAdmin', 'BOOLEAN', false, null, null);
-		$this->addColumn('SCREEN_NAME', 'ScreenName', 'VARCHAR', false, 20, null);
+		$this->addColumn('SCREEN_NAME', 'ScreenName', 'VARCHAR', false, 100, null);
 		$this->addColumn('FULL_NAME', 'FullName', 'VARCHAR', false, 40, null);
 		$this->addColumn('FIRST_NAME', 'FirstName', 'VARCHAR', false, 40, null);
 		$this->addColumn('LAST_NAME', 'LastName', 'VARCHAR', false, 40, null);
-		$this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
+		$this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 100, null);
 		$this->addColumn('SHA1_PASSWORD', 'Sha1Password', 'VARCHAR', false, 40, null);
 		$this->addColumn('SALT', 'Salt', 'VARCHAR', false, 32, null);
 		$this->addColumn('DATE_OF_BIRTH', 'DateOfBirth', 'DATE', false, null, null);
@@ -78,7 +78,7 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, null);
 		$this->addColumn('SEARCH_TEXT', 'SearchText', 'VARCHAR', false, 4096, null);
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
-		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', false, 64, null);
+		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', false, 100, null);
 		$this->addColumn('ADMIN_TAGS', 'AdminTags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_INT', 'IndexedPartnerDataInt', 'INTEGER', false, null, null);
 		$this->addColumn('INDEXED_PARTNER_DATA_STRING', 'IndexedPartnerDataString', 'VARCHAR', false, 64, null);
