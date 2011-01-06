@@ -106,15 +106,40 @@ class kBusinessConvertDL
 	 */
 	public static function compareFlavors(flavorParamsOutput $a, flavorParamsOutput $b)
 	{
+		$flavorA = $a->getId();
+		$flavorB = $b->getId();
+	
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS && $b->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
+		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
+		}
+		
+		if($a->getReadyBehavior() > flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
+		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
+			return -1;
+		}
 			
 		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
+		}
+			
+		if($a->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED && $b->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL)
+		{
+			KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
+			return -1;
+		}
 			
 		if($a->getVideoBitrate() > $b->getVideoBitrate())
+		{
+			KalturaLog::debug("flavor[$flavorB] before flavor[$flavorA] at line[" . __LINE__ . "]");
 			return 1;
+		}
 			
+		KalturaLog::debug("flavor[$flavorA] before flavor[$flavorB] at line[" . __LINE__ . "]");
 		return -1;
 	}
 	
