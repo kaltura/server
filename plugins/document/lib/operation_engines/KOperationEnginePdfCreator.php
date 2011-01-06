@@ -8,13 +8,16 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	private $orgInFilePath = '';
 	
 	/**
-	 * @var KalturaFlavorParamsOutput
+	 * @var KalturaPdfFlavorParamsOutput
 	 */
 	private $flavorParamsOutput;
 
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		parent::configure($taskConfig, $data);
+		if(!($data->flavorParamsOutput instanceof KalturaPdfFlavorParamsOutput))
+			throw new Exception("KOperationEnginePdfCreator must work on KalturaPdfFlavorParamsOutput object, " . get_class($data->flavorParamsOutput) . " received");
+
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
 	}
 	
@@ -26,6 +29,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		
 		// bypassing PDF Creator for source PDF files
 		$inputExtension = strtolower(pathinfo($inFilePath, PATHINFO_EXTENSION));
+//		TODO
+//		if($this->flavorParamsOutput->readonly)
 		if ($inputExtension == 'pdf') {
 			KalturaLog::notice('Bypassing PDF Creator for source PDF files');
 			if (!@copy($inFilePath, $this->outFilePath)) {

@@ -2,6 +2,9 @@
 
 class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 {
+	const CUSTOM_DATA_NAMESPACE = 'PDF';
+	const CUSTOM_DATA_FIELD_READONLY = 'readonly';
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -48,6 +51,21 @@ class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 	{
 		return parent::getFromCustomData('paperWidth');
 	}
+
+	/**
+	 * @param bool $isReadonly
+	 */
+	public function setReadonly($isReadonly)
+	{
+		parent::putInCustomData(self::CUSTOM_DATA_FIELD_READONLY, $isReadonly, self::CUSTOM_DATA_NAMESPACE);
+	}
 	
+	/**
+	 * @return bool
+	 */
+	public function getReadonly()
+	{
+		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_READONLY, self::CUSTOM_DATA_NAMESPACE);
+	}
 	
 }

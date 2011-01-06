@@ -1,9 +1,14 @@
 <?php
 class KalturaPdfFlavorParams extends KalturaFlavorParams 
 {
+	/**
+	 * @var bool
+	 */
+	public $readonly;
 	
 	private static $map_between_objects = array
 	(
+		'readonly',
 	);
 	
 	public function getMapBetweenObjects()

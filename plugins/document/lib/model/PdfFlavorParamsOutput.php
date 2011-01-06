@@ -49,4 +49,20 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	{
 		return parent::getFromCustomData('paperWidth');
 	}
+	
+	/**
+	 * @param bool $isReadonly
+	 */
+	public function setReadonly($isReadonly)
+	{
+		parent::putInCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, $isReadonly, PdfFlavorParams::CUSTOM_DATA_NAMESPACE);
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getReadonly()
+	{
+		return parent::getFromCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, PdfFlavorParams::CUSTOM_DATA_NAMESPACE);
+	}
 }
