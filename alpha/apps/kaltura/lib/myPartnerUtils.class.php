@@ -161,12 +161,6 @@ class myPartnerUtils
 //		self::addPartnerToCriteria ( new BatchJobPeer(), $partner_id );
 	}
 
-	private static function _addPartnerToCriteria ( $criteria_filter , $partner_field_name  , $partner_id )
-	{
-		$criteria = $criteria_filter->getFilter();
-		$criteria->addAnd ( $partner_field_name , $partner_id );
-		$criteria_filter->enable();
-	}
 	
 	// if only partner_id exists - force it on the criteria
 	// if also $partner_group - allow or partner_id or the partner_group - use in ( partner_id ,  $partner_group ) - where partner_group is split by ','
