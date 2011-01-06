@@ -144,7 +144,7 @@ class Permission extends BasePermission
 	
 	public function getPartnerGroup()
 	{
-		$this->getFromCustomData('partner_group');
+		return $this->getFromCustomData('partner_group');
 	}
 	
 	public function setPartnerGroup($group)
