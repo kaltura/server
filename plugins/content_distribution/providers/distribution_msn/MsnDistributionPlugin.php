@@ -89,6 +89,10 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 				return new KalturaMsnDistributionJobProviderData();
 		}
 		
+		// content distribution does not work in partner services 2 context because it uses dynamic enums
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
+			return null;
+
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(MsnDistributionProviderType::MSN))
 		{
 			$reflect = new ReflectionClass('KalturaMsnDistributionJobProviderData');
@@ -151,6 +155,10 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 				return 'KalturaMsnDistributionJobProviderData';
 		}
 		
+		// content distribution does not work in partner services 2 context because it uses dynamic enums
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
+			return null;
+
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(MsnDistributionProviderType::MSN))
 			return 'KalturaMsnDistributionJobProviderData';
 	

@@ -87,6 +87,10 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return new KalturaComcastDistributionJobProviderData();
 		}
 		
+		// content distribution does not work in partner services 2 context because it uses dynamic enums
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
+			return null;
+
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 		{
 			$reflect = new ReflectionClass('KalturaComcastDistributionJobProviderData');
@@ -149,6 +153,10 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return 'KalturaComcastDistributionJobProviderData';
 		}
 		
+		// content distribution does not work in partner services 2 context because it uses dynamic enums
+		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
+			return null;
+
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ComcastDistributionProviderType::COMCAST))
 			return 'KalturaComcastDistributionJobProviderData';
 	
