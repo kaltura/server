@@ -1,62 +1,32 @@
 <?php
 class YouTubeDistributionProfile extends DistributionProfile
 {
-	const THUMBNAIL_WIDTH = 1280;
-	const THUMBNAIL_HEIGHT = 720;
-	
 	const CUSTOM_DATA_USERNAME = 'username';
-	const CUSTOM_DATA_PASSWORD = 'password';
-	const CUSTOM_DATA_DOMAIN = 'domain';
-	const CUSTOM_DATA_CS_ID = 'csId';
-	const CUSTOM_DATA_SOURCE = 'source';
-	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
-	const CUSTOM_DATA_MOV_FLAVOR_PARAMS_ID = 'movFlavorParamsId';
-	const CUSTOM_DATA_FLV_FLAVOR_PARAMS_ID = 'flvFlavorParamsId';
-	const CUSTOM_DATA_WMV_FLAVOR_PARAMS_ID = 'wmvFlavorParamsId';
-
-	public function __construct() {
-		parent::__construct();
-		
-//		TODO - move it to the admin console form as default for new profile
-//		// Add required thumbnail dimensions
-//		$requiredThumbDimensionsObjects = array();
-//		
-//		$requiredThumbDimensions = new kDistributionThumbDimensions();
-//		$requiredThumbDimensions->setWidth(self::THUMBNAIL_WIDTH);
-//		$requiredThumbDimensions->setHeight(self::THUMBNAIL_HEIGHT);
-//		$requiredThumbDimensionsObjects[] = $requiredThumbDimensions;
-//		
-//		$this->setRequiredThumbDimensionsObjects($requiredThumbDimensionsObjects);
-//		
-//		// TODO - add the required flavor params, maybe from local config, maybe from kConf
-	}
+	const CUSTOM_DATA_NOTIFICATION_EMAIL = 'notificationEmail';
+	const CUSTOM_DATA_SFTP_HOST = 'sftpHost';
+	const CUSTOM_DATA_SFTP_LOGIN = 'sftpLogin';
+	const CUSTOM_DATA_SFTP_PUBLIC_KEY = 'sftpPublicKey';
+	const CUSTOM_DATA_SFTP_PRIVATE_KEY = 'sftpPrivateKey';
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
 	 */
 	public function getProvider()
 	{
-		return MsnDistributionPlugin::getProvider();
+		return YouTubeDistributionPlugin::getProvider();
 	}
 
 	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
-	public function getPassword()				{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
-	public function getDomain()					{return $this->getFromCustomData(self::CUSTOM_DATA_DOMAIN);}
-	public function getCsId()					{return $this->getFromCustomData(self::CUSTOM_DATA_CS_ID);}
-	public function getSource()					{return $this->getFromCustomData(self::CUSTOM_DATA_SOURCE);}
-	public function getMetadataProfileId()		{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID);}
-	public function getMovFlavorParamsId()		{return $this->getFromCustomData(self::CUSTOM_DATA_MOV_FLAVOR_PARAMS_ID);}
-	public function getFlvFlavorParamsId()		{return $this->getFromCustomData(self::CUSTOM_DATA_FLV_FLAVOR_PARAMS_ID);}
-	public function getWmvFlavorParamsId()		{return $this->getFromCustomData(self::CUSTOM_DATA_WMV_FLAVOR_PARAMS_ID);}
+	public function getNotificationEmail()		{return $this->getFromCustomData(self::CUSTOM_DATA_NOTIFICATION_EMAIL);}
+	public function getSftpHost()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_HOST);}
+	public function getSftpLogin()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_LOGIN);}
+	public function getSftpPublicKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY);}
+	public function getSftpPrivateKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY);}
 	
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
-	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
-	public function setDomain($v)				{$this->putInCustomData(self::CUSTOM_DATA_DOMAIN, $v);}
-	public function setCsId($v)					{$this->putInCustomData(self::CUSTOM_DATA_CS_ID, $v);}
-	public function setSource($v)				{$this->putInCustomData(self::CUSTOM_DATA_SOURCE, $v);}
-	public function setMetadataProfileId($v)	{$this->putInCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID, $v);}
-	public function setMovFlavorParamsId($v)	{$this->putInCustomData(self::CUSTOM_DATA_MOV_FLAVOR_PARAMS_ID, $v);}
-	public function setFlvFlavorParamsId($v)	{$this->putInCustomData(self::CUSTOM_DATA_FLV_FLAVOR_PARAMS_ID, $v);}
-	public function setWmvFlavorParamsId($v)	{$this->putInCustomData(self::CUSTOM_DATA_WMV_FLAVOR_PARAMS_ID, $v);}
-	
+	public function setNotificationEmail($v)	{$this->putInCustomData(self::CUSTOM_DATA_NOTIFICATION_EMAIL, $v);}
+	public function setSftpHost($v)				{$this->putInCustomData(self::CUSTOM_DATA_SFTP_HOST, $v);}
+	public function setSftpLogin($v)			{$this->putInCustomData(self::CUSTOM_DATA_SFTP_LOGIN, $v);}
+	public function setSftpPublicKey($v)		{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY, $v);}
+	public function setSftpPrivateKey($v)		{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY, $v);}
 }

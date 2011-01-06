@@ -3,7 +3,7 @@
 define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../'));
 require_once(KALTURA_ROOT_PATH . '/infra/bootstrap_base.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
-
+require_once (KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'alpha'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'kConf.php');
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH . "/api_v3");
 
 // Autoloader
@@ -30,68 +30,58 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-if($argc < 2)
-{
-	echo "Entry id must be supplied as attribute\n";
-	exit;
-}
-$entryId = $argv[1];
-$config = array();
-foreach($argv as $arg)
-{
-	$matches = null;
-	if(preg_match('/(.*)=(.*)/', $arg, $matches))
-		$config[$matches[1]] = $matches[2];
-}
+$timestampName = date('Ymd-His') . '_' . time();
+$metadataTempFileName = 'youtube_' . $timestampName . '.xml';
+$notificationEmail = 'roman.kreichman@kaltura.com';
+$userName = 'kalturasandbox';
+$title = 'my title 2';
+$description = 'my description';
+$serverUrl = 'foxsports-kaltura.xfer.youtube.com';
+$loginName = 'foxsports-kaltura';
+$publicKeyFile = '/var/www/kaltura/app/plugins/distribution_youtube/id_rsa_youtube.pub';
+$privateKeyFile = '/var/www/kaltura/app/plugins/distribution_youtube/id_rsa_youtube';
+$metadataTemplate = '/var/www/kaltura/app/plugins/distribution_youtube/xml/metadata_template.xml';
+$videoFileFile = '/var/www/kaltura/app/plugins/distribution_youtube/xml/Logo_White.flv';
+$deliveryCompleteFile = '/var/www/kaltura/app/plugins/distribution_youtube/xml/delivery.complete';
 
-$entry = entryPeer::retrieveByPK($entryId);
-$mrss = kMrssManager::getEntryMrss($entry);
+$metadataTempFilePath = kConf::get('temp_folder') . '/distribution/';
+if (!file_exists($metadataTempFilePath))
+	mkdir($metadataTempFilePath);
+$metadataTempFilePath = $metadataTempFilePath . $metadataTempFileName;
 
-file_put_contents('entry.xml', $mrss);
-//exit;
+// prepare the metadata
+$doc = new DOMDocument();
+$doc->load($metadataTemplate);
 
-if(!$mrss)
-	return;
-	
-$xml = new DOMDocument();
-if(!$xml->loadXML($mrss))
-	return;
-	
-$xslPath = dirname(__FILE__) . '/submit.xsl';
-$xsl = new DOMDocument();
-$xsl->load($xslPath);
+$xpath = new DOMXPath($doc);
+$xpath->registerNamespace('media', 'http://search.yahoo.com/mrss');
+$xpath->registerNamespace('yt', 'http://www.youtube.com/schemas/yt/0.2');
 
-$varNodes = $xsl->getElementsByTagName('variable');
-foreach($varNodes as $varNode)
-{
-	$nameAttr = $varNode->attributes->getNamedItem('name');
-	if(!$nameAttr)
-		continue;
-		
-	$name = $nameAttr->value;
-	if($name && isset($config[$name]))
-	{
-		$varNode->textContent = $config[$name];
-		$varNode->appendChild($xsl->createTextNode($config[$name]));
-		KalturaLog::debug("Set config $name to [" . $config[$name] . "]");
-	}
-}
-file_put_contents('out.xsl', $xsl->saveXML());
+$notificationEmailNode = $xpath->query('/rss/channel/yt:notification_email')->item(0);
+$userNameNode = $xpath->query('/rss/channel/yt:account/yt:username')->item(0);
+$titleNode = $xpath->query('/rss/channel/item/media:title')->item(0)->childNodes->item(0);
+$descriptionNode = $xpath->query('/rss/channel/item/media:content/media:description')->item(0)->childNodes->item(0);
+$fileNameNode = $xpath->query('/rss/channel/item/media:content/@url')->item(0);
 
-$proc = new XSLTProcessor;
-$proc->registerPHPFunctions();
-$proc->importStyleSheet($xsl);
+$notificationEmailNode->nodeValue = $notificationEmail;
+$userNameNode->nodeValue = $userName;
+$titleNode->nodeValue = $title;
+$descriptionNode->nodeValue = $description;
+$fileNameNode->nodeValue = 'file://' . pathinfo($videoFileFile, PATHINFO_BASENAME);
 
-$xml = $proc->transformToDoc($xml);
-if(!$xml)
-	return;
-	
-//$xsdPath = dirname(__FILE__) . '/submit.xsd';
-//if($xsdPath && !$xml->schemaValidate($xsdPath))		
-//	return;
+$doc->save($metadataTempFilePath);
 
-file_put_contents('out.xml', $xml->saveXML());
-echo $xml->saveXML();
+// open connection
+$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+$fileTransferMgr->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
 
-echo time() . "\n";
+$directoryName = '/' . $timestampName;
 
+// upload the metadata
+$fileTransferMgr->putFile($directoryName . '/' . $metadataTempFileName, $metadataTempFilePath);
+
+// upload the video
+$fileTransferMgr->putFile($directoryName . '/' . pathinfo($videoFileFile, PATHINFO_BASENAME), $videoFileFile);
+
+// upload the delivery.complete marker file
+$fileTransferMgr->putFile($directoryName . '/' . pathinfo($deliveryCompleteFile, PATHINFO_BASENAME), $deliveryCompleteFile);

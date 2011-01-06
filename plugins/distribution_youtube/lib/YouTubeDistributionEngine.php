@@ -8,15 +8,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit,
 	IDistributionEngineCloseDelete
 {
-	const USAGE_COUNTER_PLAYED = 1;
-	const USAGE_COUNTER_EMAILED = 2;
-	const USAGE_COUNTER_RATED = 3;
-	const USAGE_COUNTER_BLOGGED = 4;
-	const USAGE_COUNTER_REVIEWED = 5;
-	const USAGE_COUNTER_BOOKMARKED = 6;
-	const USAGE_COUNTER_PLAYBACKFAILED = 7;
-	const USAGE_COUNTER_TIMESPENT = 8;
-	const USAGE_COUNTER_RECOMMENDED = 9;
+	const TEMP_DIRECTORY = 'youtube_distribution';
 
 	
 	/* (non-PHPdoc)
@@ -37,30 +29,72 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
 		
-		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
-		$data->remoteId = trim($results);
+		$this->handleSend($data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		return true;
 	}
 
 	/**
-	 * @param string $path
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaYouTubeDistributionProfile $distributionProfile
 	 * @param KalturaYouTubeDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
-	public function handleSend($path, KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	public function handleSend(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		// FIXME !!! hardcoded for testing
-		$serverUrl = 'foxsports-kaltura.xfer.youtube.com';
-		$loginName = 'foxsports-kaltura';
-		$publicKeyFile = '/var/www/kaltura/app/plugins/distribution_youtube/id_rsa_youtube.pub';
-		$privateKeyFile = '/var/www/kaltura/app/plugins/distribution_youtube/id_rsa_youtube';
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
-		$fileTransferMgr->loginPubKey($serverUrl, $distributionProfileAction->username, $publicKeyFile, $privateKeyFile);
-		$fileTransferMgr->mkDir('test');
-		$results = $fileTransferMgr->getResults();
+		$timestampName = date('Ymd-His') . '_' . time();
+		$metadataTempFileName = 'youtube_' . $timestampName . '.xml';
+		$notificationEmail = $distributionProfile->notificationEmail;
+		$username = $distributionProfile->username;
+		$entryId = $data->entryDistribution->entryId;
+		$entry = $this->kalturaClient->media->get($entryId);
+		$metadataTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/metadata_template.xml';
+		$deliveryCompleteFile = realpath(dirname(__FILE__) . '/../') . '/xml/delivery.complete';
+		$videoFileFile = $providerData->videoAssetFilePath;
+		if (!file_exists($videoFileFile))
+			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
+		
+		$metadataTempFilePath = $this->getTempDirectoryForProfile($distributionProfile->id);
+		$metadataTempFilePath = $metadataTempFilePath . $metadataTempFileName;
+		
+		// prepare the metadata
+		$doc = new DOMDocument();
+		$doc->load($metadataTemplate);
+		
+		$xpath = new DOMXPath($doc);
+		$xpath->registerNamespace('media', 'http://search.yahoo.com/mrss');
+		$xpath->registerNamespace('yt', 'http://www.youtube.com/schemas/yt/0.2');
+		
+		$notificationEmailNode = $xpath->query('/rss/channel/yt:notification_email')->item(0);
+		$userNameNode = $xpath->query('/rss/channel/yt:account/yt:username')->item(0);
+		$titleNode = $xpath->query('/rss/channel/item/media:title')->item(0)->childNodes->item(0);
+		$descriptionNode = $xpath->query('/rss/channel/item/media:content/media:description')->item(0)->childNodes->item(0);
+		$keywordsNode = $xpath->query('/rss/channel/item/media:content/media:keywords')->item(0)->childNodes->item(0);
+		$fileNameNode = $xpath->query('/rss/channel/item/media:content/@url')->item(0);
+		
+		$notificationEmailNode->nodeValue = $notificationEmail;
+		$userNameNode->nodeValue = $username;
+		$titleNode->nodeValue = $entry->name;
+		$descriptionNode->nodeValue = $entry->description;
+		$keywordsNode->nodeValue = $entry->tags;
+		$fileNameNode->nodeValue = 'file://' . pathinfo($videoFileFile, PATHINFO_BASENAME);
+		
+		$doc->save($metadataTempFilePath);
+		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		
+		$directoryName = '/' . $timestampName;
+		
+		// upload the metadata
+		$sftpManager->putFile($directoryName . '/' . $metadataTempFileName, $metadataTempFilePath);
+		
+		// upload the video
+		$sftpManager->putFile($directoryName . '/' . pathinfo($videoFileFile, PATHINFO_BASENAME), $videoFileFile);
+		
+		// upload the delivery.complete marker file
+		$sftpManager->putFile($directoryName . '/' . pathinfo($deliveryCompleteFile, PATHINFO_BASENAME), $deliveryCompleteFile);
+		
+		$providerData->sftpDirectory = $directoryName;
 	}
 
 	/* (non-PHPdoc)
@@ -68,95 +102,21 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
+		$publishState = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 		return false;
-		$publishState = $this->fetchStatus($data);
-		switch($publishState)
-		{
-			case 'Published':
-				return true;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("MSN error: $errDescription");
-				}
-				throw new Exception('Unknows MSN error');
-				
-			// TODO - check with MSN what other statuses are available
-			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
+		// parse
 	}
 
 	/**
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @return string status
+	 * @param $data
+	 * @param $distributionProfile
+	 * @param $providerData
 	 */
-	public function fetchStatus(KalturaDistributionSubmitJobData $data)
+	public function fetchStatusXml(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$xml = $this->fetchXML($data);
-			
-		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
-		if($publishStateAttr)
-			return $publishStateAttr->value;
-				
-		return null;
-	}
-
-	/**
-	 * @param KalturaDistributionSubmitJobData $data
-	 * @throws Exception
-	 * @return DOMDocument
-	 */
-	public function fetchXML(KalturaDistributionSubmitJobData $data)
-	{
-		$domain = $this->defaultDomain;
-		if(!is_null($distributionProfile->domain))
-			$domain = $distributionProfile->domain;
-			
-		$username = $distributionProfile->username;
-		$password = $distributionProfile->password;
-		
-		$url = "https://{$domain}{$this->fetchReportPath}?uuid={$data->remoteId}";
-		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_FORBID_REUSE, true); 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, false);
-		
-		$results = curl_exec($ch);
-		if(!$results)
-		{
-			$errNumber = curl_errno($ch);
-			$errDescription = curl_error($ch);
-			
-			curl_close($ch);
-		
-			echo "$errNumber: $errDescription\n\n";
-			throw new Exception($errDescription, $errNumber);
-		}
-		curl_close($ch);
-		
-		$xml = new DOMDocument();
-		if($xml->loadXML($results))
-			return $xml;
-			
-		return null;
+		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$sftpManager->getFile()
 	}
 
 	/* (non-PHPdoc)
@@ -181,26 +141,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
 		$publishState = $this->fetchStatus($data);
-		switch($publishState)
-		{
-//			case 'Deleted': // TODO - what is the right status after delete?
-//				return true;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("MSN error: $errDescription");
-				}
-				throw new Exception('Unknows MSN error');
-				
-			// TODO - check with MSN what other statuses are available
-			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
+		
 	}
 
 	/* (non-PHPdoc)
@@ -209,26 +150,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
 		$publishState = $this->fetchStatus($data);
-		switch($publishState)
-		{
-			case 'Published': // TODO - is that the right status after update?
-				return true;
-				
-			case 'Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("MSN error: $errDescription");
-				}
-				throw new Exception('Unknows MSN error');
-				
-			// TODO - check with MSN what other statuses are available
-			
-			default:
-				KalturaLog::err("Unknown publishState [$publishState]");
-				return false;
-		}
+
 	}
 
 	/* (non-PHPdoc)
@@ -236,64 +158,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		$xml = $this->fetchXML($data);
-			
-		$usageNodes = $xml->documentElement->getElementsByTagName('usageItem');
-		if(!$usageNodes->length)
-			throw new Exception('usageItem node not found in XML');
-			
-		foreach($usageNodes as $usageNode)
-		{
-			$typeAttr = $usageNode->attributes->getNamedItem('counterType');
-			$usageAttr = $usageNode->attributes->getNamedItem('totalCount');
-			if(!$typeAttr || !$usageAttr)
-				continue;
-				
-			switch($typeAttr->value)
-			{
-				case self::USAGE_COUNTER_PLAYED:
-					$data->plays = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_EMAILED:
-					$data->providerData->emailed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_RATED:
-					$data->providerData->rated = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_BLOGGED:
-					$data->providerData->blogged = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_REVIEWED:
-					$data->providerData->reviewed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_BOOKMARKED:
-					$data->providerData->bookmarked = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_PLAYBACKFAILED:
-					$data->providerData->playbackFailed = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_TIMESPENT:
-					$data->providerData->timeSpent = $usageAttr->value;
-					break;
-					
-				case self::USAGE_COUNTER_RECOMMENDED:
-					$data->providerData->recommended = $usageAttr->value;
-					break;
-					
-				default:
-					KalturaLog::err("Unknown counterType [{$typeAttr->value}]");
-					break;
-			}
-		}
-				
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -311,5 +176,53 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @return sftpMgr
+	 */
+	protected function getSFTPManager(KalturaYouTubeDistributionProfile $distributionProfile)
+	{
+		$serverUrl = $distributionProfile->sftpHost;
+		$loginName = $distributionProfile->sftpLogin;
+		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
+		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
+		return $sftpManager;
+	}
+	
+	/*
+	 * Creates and return the temp directory used for this distribution profile 
+	 */
+	protected function getTempDirectoryForProfile($distributionProfileId)
+	{
+		$metadataTempFilePath = kConf::get('temp_folder') . '/' . YouTubeDistributionEngine::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
+		if (!file_exists($metadataTempFilePath))
+			mkdir($metadataTempFilePath, 0777, true);
+		return $metadataTempFilePath;
+	}
+	
+	/*
+	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
+	 */
+	protected function getFileLocationForSFTPKey($distributionProfileId, $keyContent, $fileName) 
+	{
+		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
+		$fileLocation = $tempDirectory . $fileName;
+		if (!file_exists($fileLocation))
+		{
+			file_put_contents($fileLocation, $keyContent);
+		}
+		else
+		{
+			if (file_get_contents($fileLocation) !== $keyContent) // if key was updated
+			{
+				file_put_contents($fileLocation, $keyContent);
+			}
+		}
+		
+		return $fileLocation;
+	}
 }

@@ -1,8 +1,6 @@
 <?php
 class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
-	// TODO - add event consumer to take the statistics from fetch report and save in entry distribution
-	
 	const PLUGIN_NAME = 'youTubeDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;

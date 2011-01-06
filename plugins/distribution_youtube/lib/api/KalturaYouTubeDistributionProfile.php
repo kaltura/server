@@ -9,42 +9,30 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * @var string
 	 */
-	public $password;
+	public $notificationEmail;
 	
 	/**
 	 * @var string
 	 */
-	public $domain;
+	public $sftpHost;
 	
 	/**
+	 * 
 	 * @var string
 	 */
-	public $csId;
+	public $sftpLogin;
 	
 	/**
+	 * 
 	 * @var string
 	 */
-	public $source;
+	public $sftpPublicKey;
 	
 	/**
-	 * @var int
+	 * 
+	 * @var string
 	 */
-	public $metadataProfileId;
-	
-	/**
-	 * @var int
-	 */
-	public $movFlavorParamsId;
-	
-	/**
-	 * @var int
-	 */
-	public $flvFlavorParamsId;
-	
-	/**
-	 * @var int
-	 */
-	public $wmvFlavorParamsId;
+	public $sftpPrivateKey;
 		
 			
 	/*
@@ -53,14 +41,11 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 	private static $map_between_objects = array 
 	(
 		'username',
-		'password',
-		'domain',
-		'csId',
-		'source',
-		'metadataProfileId',
-		'movFlavorParamsId',
-		'flvFlavorParamsId',
-		'wmvFlavorParamsId',
+		'notificationEmail',
+		'sftpHost',
+		'sftpLogin',
+		'sftpPublicKey',
+		'sftpPrivateKey',
 	 );
 		 
 	public function getMapBetweenObjects()

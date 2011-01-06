@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss" xmlns:yt="http://www.youtube.com/schemas/yt/0.2">
+    <channel>
+        <yt:notification_email></yt:notification_email>
+		<yt:account><yt:username></yt:username></yt:account>
+        <item>
+            <yt:action>Insert</yt:action>
+            <media:title><![CDATA[]]></media:title>
+            <media:content url="file://">
+                <media:description type="plain"><![CDATA[]]></media:description>
+				<media:keywords><![CDATA[]]></media:keywords>
+            </media:content>
+            <yt:start_time></yt:start_time>
+            <yt:end_time></yt:end_time>
+			<yt:web_metadata>
+				<yt:custom_id></yt:custom_id>
+			</yt:web_metadata>
+			<yt:language>en</yt:language>
+        </item>
+    </channel>
+</rss>

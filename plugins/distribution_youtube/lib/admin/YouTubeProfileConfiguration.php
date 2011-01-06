@@ -7,41 +7,28 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 		
 		if($object instanceof KalturaYouTubeDistributionProfile)
 		{
-			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
-			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);
-			
-			if($object->movFlavorParamsId)
+			$upload = new Zend_File_Transfer_Adapter_Http();
+			$files = $upload->getFileInfo();
+         
+			if(isset($files['sftp_public_key']))
 			{
-				if(!in_array($object->movFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->movFlavorParamsId;
-					
-				$flavorKey = array_search($object->movFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
+				$file = $files['sftp_public_key'];
+				if ($file['size'])
+				{
+					$content = file_get_contents($file['tmp_name']);
+					$object->sftpPublicKey = $content;
+				}
 			}
 			
-			if($object->flvFlavorParamsId)
+			if(isset($files['sftp_private_key']))
 			{
-				if(!in_array($object->flvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->flvFlavorParamsId;
-					
-				$flavorKey = array_search($object->flvFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
+				$file = $files['sftp_private_key'];
+				if ($file['size'])
+				{
+					$content = file_get_contents($file['tmp_name']);
+					$object->sftpPrivateKey = $content;
+				}
 			}
-			
-			if($object->wmvFlavorParamsId)
-			{
-				if(!in_array($object->wmvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->wmvFlavorParamsId;
-					
-				$flavorKey = array_search($object->wmvFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
-			}
-			
-			$object->requiredFlavorParamsIds = implode(',', $requiredFlavorParamsIds);
-			$object->optionalFlavorParamsIds = implode(',', $optionalFlavorParamsIds);
 		}
 		return $object;
 	}
@@ -58,19 +45,27 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 	
-		$this->addElement('text', 'password', array(
-			'label'			=> 'Password:',
+		$this->addElement('text', 'notification_email', array(
+			'label'			=> 'Notification Email:',
 			'filters'		=> array('StringTrim'),
 		));
 	
-		$this->addElement('text', 'domain', array(
-			'label'			=> 'Domain:',
+		$this->addElement('text', 'sftp_host', array(
+			'label'			=> 'SFTP Host:',
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'metadata_profile_id', array(
-			'label'			=> 'Metadata Profile ID:',
+		$this->addElement('text', 'sftp_login', array(
+			'label'			=> 'SFTP Login:',
 			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('file', 'sftp_public_key', array(
+			'label' => 'SFTP Public Key:'
+		));
+		
+		$this->addElement('file', 'sftp_private_key', array(
+			'label' => 'SFTP Private Key:'
 		));
 	}
 }
