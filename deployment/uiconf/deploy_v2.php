@@ -12,7 +12,7 @@
  *  --no-create
  */
 ini_set("memory_limit", "512M");
-error_reporting(0);
+error_reporting(E_ALL);
 $code = array();
 $uiConfIds = array();
 
@@ -242,15 +242,15 @@ class uiConfDeployment
 		
 		date_default_timezone_set(kConf::get("date_default_timezone"));
 		
-		try
-		{
+//		try
+//		{
 			$confObj = new Zend_Config_Ini($conf_file_path);	
-		}
-		catch(Exception $ex)
-		{
-			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
-			exit(1);
-		}		
+//		}
+//		catch(Exception $ex)
+//		{
+//			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
+//			exit(1);
+//		}		
 		return $confObj;
  	}
 	
@@ -305,20 +305,20 @@ class uiConfDeployment
 		global $skipAddUiconf;
 		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on 
 		
-		try
-		{
+//		try
+//		{
 			$pe_conf->save();
 			
 			// chmod parent directory to 777 to allow changes by the apache user
 			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
 			@system('chmod 777 -R '.dirname($localPath));
-		}
-		catch(Exception $ex)
-		{
-			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
-			exit(1);
-		}
+//		}
+//		catch(Exception $ex)
+//		{
+//			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
+//			exit(1);
+//		}
 
 		return $pe_conf->getId();
 	}
