@@ -333,6 +333,7 @@ class ContentDistributionBatchService extends BatchService
 	function createRequiredJobsAction()
 	{
 		// TODO read from sphinx the dirty records and create jobs
+		// TODO update sun status on entry distribution
 		
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::NEXT_REPORT, time(), Criteria::GREATER_EQUAL);
