@@ -2,8 +2,21 @@
 
 class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 {
-	
+	/**
+	 * @var string
+	 */
 	private $orgInFilePath = '';
+	
+	/**
+	 * @var KalturaFlavorParamsOutput
+	 */
+	private $flavorParamsOutput;
+
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	{
+		parent::configure($taskConfig, $data);
+		$this->flavorParamsOutput = $data->flavorParamsOutput;
+	}
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
