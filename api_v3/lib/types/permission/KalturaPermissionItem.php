@@ -16,7 +16,7 @@ class KalturaPermissionItem extends KalturaObject implements IFilterable
 		
 
 	/**
-	 * @var string
+	 * @var PermissionItemType
 	 * @filter eq,in
 	 * @readonly
 	 */
