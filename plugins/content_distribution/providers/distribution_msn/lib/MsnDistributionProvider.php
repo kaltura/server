@@ -192,6 +192,9 @@ class MsnDistributionProvider implements IDistributionProvider
 		KalturaLog::debug("Generates XML for entry [$entryId]");
 		
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if(!$entry)
+			return null;
+			
 		$mrss = kMrssManager::getEntryMrss($entry);
 		if(!$mrss)
 		{
