@@ -105,7 +105,7 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 		if($wmvFlavorAsset)
 			$this->wmvFlavorAssetId = $wmvFlavorAsset->getId();
 		
-		$thumbAssets = thumbAssetPeer::retrieveByPKs($distributionJobData->entryDistribution->thumbAssetIds);
+		$thumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 			$this->thumbAssetId = reset($thumbAssets)->getId();
 			
