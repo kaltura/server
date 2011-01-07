@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss" xmlns:yt="http://www.youtube.com/schemas/yt/0.2">
+    <channel>
+        <yt:notification_email></yt:notification_email>
+		<yt:account><yt:username></yt:username></yt:account>
+		<yt:owner_name></yt:owner_name>
+        <item>
+            <yt:action></yt:action>
+            <yt:id type="video_id"></yt:id>
+            <media:title><![CDATA[]]></media:title>
+            <media:content url="file://">
+                <media:description type="plain"><![CDATA[]]></media:description>
+				<media:keywords><![CDATA[]]></media:keywords>
+            </media:content>
+            <yt:start_time></yt:start_time>
+            <yt:end_time></yt:end_time>
+            <yt:target>upload,claim</yt:target>
+			<yt:web_metadata>
+				<yt:custom_id></yt:custom_id>
+			</yt:web_metadata>
+			<yt:language>en</yt:language>
+			<yt:saved_policies>
+				<yt:saved_policy>
+					<yt:content_type>commercial</yt:content_type>
+					<yt:saved_policy_id type="name">Track in all countries</yt:saved_policy_id>
+				</yt:saved_policy>
+				<yt:saved_policy>
+					<yt:content_type>ugc</yt:content_type>
+					<yt:saved_policy_id type="name">Track in all countries</yt:saved_policy_id>
+				</yt:saved_policy>
+			</yt:saved_policies>
+        </item>
+    </channel>
+</rss>

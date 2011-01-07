@@ -9,9 +9,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseDelete
 {
 	const TEMP_DIRECTORY = 'youtube_distribution';
-		
-	const INSERT_UPDATE_TEMPLATE = 'insert_update_template.xml';
-	const DELETE_TEMPLATE = 'insert_update_template.xml';
+	const FEED_TEMPLATE = 'feed_template.xml';
 
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
@@ -162,7 +160,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if (!file_exists($videoFileFile))
 			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
 		
-		$feed = new YouTubeDistributionFeedHelper(self::INSERT_UPDATE_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry($entry);
 		$feed->setContentUrl('file://' . pathinfo($videoFileFile, PATHINFO_BASENAME));
@@ -188,7 +186,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$feed = new YouTubeDistributionFeedHelper(self::DELETE_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
 		$feed->setAction('Delete');
 		$feed->setVideoId($data->remoteId);
 		
@@ -211,7 +209,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->kalturaClient->media->get($entryId);
 		
-		$feed = new YouTubeDistributionFeedHelper(self::INSERT_UPDATE_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
 		$feed->setAction('Update');
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry($entry);
