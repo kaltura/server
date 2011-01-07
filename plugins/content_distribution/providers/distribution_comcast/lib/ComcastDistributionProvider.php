@@ -222,7 +222,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 				continue;
 				
 			$name = $nameAttr->value;
-			if($name && $providerData->$name)
+			if($name && isset($providerData->$name))
 			{
 				$varNode->textContent = $providerData->$name;
 				$varNode->appendChild($xsl->createTextNode($providerData->$name));
