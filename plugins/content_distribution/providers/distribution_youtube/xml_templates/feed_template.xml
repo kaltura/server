@@ -6,7 +6,6 @@
 		<yt:owner_name></yt:owner_name>
         <item>
             <yt:action></yt:action>
-            <yt:id type="video_id"></yt:id>
             <media:title><![CDATA[]]></media:title>
             <media:content url="file://">
                 <media:description type="plain"><![CDATA[]]></media:description>

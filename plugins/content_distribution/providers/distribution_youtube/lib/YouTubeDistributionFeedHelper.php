@@ -159,7 +159,11 @@ class YouTubeDistributionFeedHelper
 
 	public function setVideoId($value)
 	{
-		$this->setNodeValue("/rss/channel/item/yt:id[@type='video_id']", $value);
+		$videoIdNode = $this->doc->createElement('yt:id', $value);
+		$videoIdNode->setAttribute('type', 'video_id');
+		
+		$actionNode = $this->xpath->query('/rss/channel/item/yt:action')->item(0);
+		$actionNode->parentNode->insertBefore($videoIdNode, $actionNode);
 	}
 	
 	public function setMetadataFromEntry(KalturaMediaEntry $entry)

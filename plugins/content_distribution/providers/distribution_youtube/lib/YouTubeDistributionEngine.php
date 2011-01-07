@@ -236,12 +236,16 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$statusXml = null;
 		try 
 		{
+			KalturaLog::info('Trying to get the following status file: ['.$statusFilePath.']');
 			$statusXml = $sftpManager->fileGetContents($statusFilePath);
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
+			KalturaLog::info('File doesn\'t exists yet, retry later');
 			return false;
 		}
+		
+		KalturaLog::info('Status file was found');
 		
 		return $statusXml;
 	}
