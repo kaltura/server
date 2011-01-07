@@ -37,10 +37,10 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaComcastDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaComcastDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaComcastDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaComcastDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaComcastDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaComcastDistributionJobProviderData");
 		
 		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		$matches = null;

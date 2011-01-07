@@ -52,10 +52,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
 		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		$matches = null;
@@ -126,7 +126,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$publishState = $this->fetchStatus($data);
-		KalturaLog::err("publishState [$publishState]");
+		KalturaLog::info("publishState [$publishState]");
 		switch($publishState)
 		{
 			case 'Published':
@@ -158,7 +158,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	protected function fetchStatus(KalturaDistributionJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		$xml = $this->fetchXML($data, $data->distributionProfile);
 			
@@ -222,10 +222,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
 		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
 		
@@ -298,7 +298,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		$xml = $this->fetchXML($data, $data->distributionProfile);
 			
@@ -366,10 +366,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaMsnDistributionJobProviderData");
 		
 		$this->handleSend($this->updatePath, $data, $data->distributionProfile, $data->providerData);
 		

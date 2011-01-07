@@ -32,10 +32,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaHuluDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaHuluDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaHuluDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaHuluDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaHuluDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaHuluDistributionJobProviderData");
 		
 		$this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		
@@ -79,10 +79,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaHuluDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaHuluDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaHuluDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaHuluDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaHuluDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaHuluDistributionJobProviderData");
 		
 		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
 		
@@ -104,10 +104,10 @@ class HuluDistributionEngine extends DistributionEngine implements
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaHuluDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaHuluDistributionProfile");
+			throw new Exception("Distribution profile must be of type KalturaHuluDistributionProfile");
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaHuluDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaHuluDistributionJobProviderData");
+			throw new Exception("Provider data must be of type KalturaHuluDistributionJobProviderData");
 		
 		$this->handleSend($this->updatePath, $data, $data->distributionProfile, $data->providerData);
 		
