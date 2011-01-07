@@ -318,19 +318,7 @@ class kMetadataManager
 			return self::setMetadataStatus($metadata, Metadata::STATUS_VALID, $metadataProfile->getVersion());
 		}
 		
-		$lines = explode("\r", file_get_contents($xmlPath));
-    
-		$errors = libxml_get_errors();
-		$errorsMsg = array();
-		foreach($errors as $error)
-		{
-			$lineNum = ($error->line) - 1;
-    		$line = htmlspecialchars(isset($lines[$lineNum]) ? '[' . $lines[$lineNum] . ']' : '');
-			$msg = htmlspecialchars($error->message);
-			$errorsMsg[] = "$msg at line $error->line $line";
-		}
-		$errorMessage = implode("\n", $errorsMsg);
-			
+		$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
 		KalturaLog::debug("Metadata is invalid:\n$errorMessage");
 		return self::setMetadataStatus($metadata, Metadata::STATUS_INVALID);
 	}
