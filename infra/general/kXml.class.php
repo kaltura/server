@@ -2,6 +2,25 @@
 
 class kXml
 {
+	public static function getLibXmlErrorDescription($xml)
+	{
+		$errors = libxml_get_errors();
+		if(!count($errors))
+			return null;
+			
+		$lines = explode("\r", $xml);
+		
+		$errorsMsg = array();
+		foreach($errors as $error)
+		{
+			$lineNum = ($error->line) - 1;
+    		$line = htmlspecialchars(isset($lines[$lineNum]) ? '[' . $lines[$lineNum] . ']' : '');
+			$msg = htmlspecialchars($error->message);
+			$errorsMsg[] = "$msg at line $error->line $line";
+		}
+		return implode("\n", $errorsMsg);
+	}
+	
 	public static function getFirstElement ( $xml_node , $element_name , $xpath_str = null )
 	{
 		if ( $xpath_str )
