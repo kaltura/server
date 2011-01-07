@@ -72,6 +72,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			self::FIELD_ACCOUNT => $distributionProfile->account,
 		);
 		
+		foreach($params as $param => $value)
+			KalturaLog::debug("post param [$param] value [$value]");
+			
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
