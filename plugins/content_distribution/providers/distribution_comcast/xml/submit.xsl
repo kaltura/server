@@ -106,7 +106,7 @@
 			<mediaFiles>
 				<xsl:for-each select="content[@flavorAssetId = $flavorAssetId]">
 					<mediaFile>
-						<assetTypes>Video</assetTypes>
+						<assetTypes><string>Video</string></assetTypes>
 						<bitrate><xsl:value-of select="@videoBitrate" /></bitrate>
 						<contentType>Video</contentType>
 						<format>
@@ -115,7 +115,7 @@
 							</xsl:call-template>
 						</format>
 						<height><xsl:value-of select="@height" /></height>
-						<length><xsl:value-of select="media/duration" /></length>
+						<length><xsl:value-of select="/item/media/duration" /></length>
 						<mediaFileType>Internal</mediaFileType>
 						<originalLocation><xsl:value-of select="@url" /></originalLocation>
 						<!--  
