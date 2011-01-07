@@ -256,14 +256,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		}
 		
 		foreach($requiredFlavorParamsIds as $requiredFlavorParamsId)
-		{
-			$validationError = new kDistributionValidationError();
-			$validationError->setAction($action);
-			$validationError->setErrorType(DistributionErrorType::MISSING_FLAVOR);
-			$validationError->setData($requiredFlavorParamsId);
-			
-			$validationErrors[] = $validationError;
-		}
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_FLAVOR, $requiredFlavorParamsId);
 		
 		$requiredThumbDimensions = $this->getRequiredThumbDimensionsObjects();
 		$entryThumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entryDistribution->getEntryId());
@@ -283,16 +276,19 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		}
 		
 		foreach($requiredThumbDimensionsWithKeys as $key => $requiredThumbDimension)
-		{
-			$validationError = new kDistributionValidationError();
-			$validationError->setAction($action);
-			$validationError->setErrorType(DistributionErrorType::MISSING_THUMBNAIL);
-			$validationError->setData($key);
-			
-			$validationErrors[] = $validationError;
-		}
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_THUMBNAIL, $key);
 				
 		return $validationErrors;
+	}
+
+	protected function createValidationError($action, $type, $data = null)
+	{
+		$validationError = new kDistributionValidationError();
+		$validationError->setAction($action);
+		$validationError->setErrorType($type);
+		$validationError->setData($data);
+		
+		return $validationError;
 	}
 
 	/* (non-PHPdoc)
