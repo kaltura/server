@@ -77,24 +77,24 @@ class KalturaDistributionJobData extends KalturaJobData
 	{
 		parent::fromObject($sourceObject);
 		
-		if($this->distributionProfileId)
-		{
-			$distributionProfile = DistributionProfilePeer::retrieveByPK($this->distributionProfileId);
-			if($distributionProfile && $distributionProfile->getStatus() == DistributionProfileStatus::ENABLED)
-			{
-				$this->distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($distributionProfile->getProviderType());
-				$this->distributionProfile->fromObject($distributionProfile);
-			}
-		}
+		if(!$this->distributionProfileId)
+			return;
+			
+		if(!$this->entryDistributionId)
+			return;
+			
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($this->distributionProfileId);
+		if(!$distributionProfile || $distributionProfile->getStatus() != DistributionProfileStatus::ENABLED)
+			return;
+			
+		$this->distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($distributionProfile->getProviderType());
+		$this->distributionProfile->fromObject($distributionProfile);
 		
-		if($this->entryDistributionId)
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($this->entryDistributionId);
+		if($entryDistribution)
 		{
-			$entryDistribution = EntryDistributionPeer::retrieveByPK($this->entryDistributionId);
-			if($entryDistribution)
-			{
-				$this->entryDistribution = new KalturaEntryDistribution();
-				$this->entryDistribution->fromObject($entryDistribution);
-			}
+			$this->entryDistribution = new KalturaEntryDistribution();
+			$this->entryDistribution->fromObject($entryDistribution);
 		}
 		
 		$providerType = $sourceObject->getProviderType();
