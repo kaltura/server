@@ -125,6 +125,19 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelectOne($c, $con);
 	}
 	
+	/**
+	 * Retrieve by IDs instead of INT_ID
+	 * @param $ids
+	 * @param $con
+	 * @return array<flavorAsset>
+	 */
+	public static function retrieveByIds($ids, $con = null)
+	{
+		$c = new Criteria(); 
+		$c->add(assetPeer::ID, $ids, Criteria::IN); 
+		return assetPeer::doSelect($c, $con);
+	}
+	
 	public static function doSelectOneJoinFlavorParams(Criteria $criteria, $con = null)
 	{
 		$critcopy = clone $criteria;

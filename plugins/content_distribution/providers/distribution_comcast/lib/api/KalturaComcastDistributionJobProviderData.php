@@ -51,11 +51,11 @@ class KalturaComcastDistributionJobProviderData extends KalturaDistributionJobPr
 		
 		assetPeer::resetInstanceCriteriaFilter();
 		
-		$flavorAssets = assetPeer::retrieveByPKs(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
+		$flavorAssets = assetPeer::retrieveByIds($distributionJobData->entryDistribution->flavorAssetIds);
 		if(count($flavorAssets))
 			$this->flavorAssetId = reset($flavorAssets)->getId();
 		
-		$thumbAssets = assetPeer::retrieveByPKs(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
+		$thumbAssets = assetPeer::retrieveByIds($distributionJobData->entryDistribution->thumbAssetIds);
 		if(count($thumbAssets))
 			$this->thumbAssetId = reset($thumbAssets)->getId();
 			
