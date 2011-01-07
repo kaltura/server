@@ -152,7 +152,6 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		'id',
 		'createdAt',
 		'updatedAt',
-		'submittedAt',
 		'entryId',
 		'partnerId',
 		'distributionProfileId',
@@ -200,9 +199,10 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			return;
 			
 		parent::fromObject($sourceObject);
-	
+		
 		$this->sunrise = $sourceObject->getSunrise(null);
 		$this->sunset = $sourceObject->getSunset(null);
+		$this->submittedAt = $sourceObject->getSubmittedAt(null);
             
 		$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
 	}
