@@ -44,18 +44,17 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 	
 	/**
 	 * @param      int $metadataProfileId
-	 * @param      string $type
+	 * @param      string $key
 	 * @param      PropelPDO $con the connection to use
-	 * @return     array<MetadataProfileField>
+	 * @return     MetadataProfileField
 	 */
-	public static function retrieveActiveByMetadataProfileAndType($metadataProfileId, $type, PropelPDO $con = null)
+	public static function retrieveByMetadataProfileAndKey($metadataProfileId, $key, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$criteria->add(MetadataProfileFieldPeer::TYPE, $type);
-		$criteria->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_ACTIVE);
+		$criteria->add(MetadataProfileFieldPeer::KEY, $key);
 
-		return MetadataProfileFieldPeer::doSelect($criteria, $con);
+		return MetadataProfileFieldPeer::doSelectOne($criteria, $con);
 	}
 	
 	/**
