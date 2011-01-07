@@ -61,7 +61,8 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 			{
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaContentDistributionProvider');
 				foreach($pluginInstances as $pluginInstance)
-					$pluginInstance->contibuteMRSS($entryDistribution, $distribution);
+					if($pluginInstance->getProvider() === $distributionsProvider)
+						$pluginInstance->contibuteMRSS($entryDistribution, $distribution);
 			}
 		}
 			
