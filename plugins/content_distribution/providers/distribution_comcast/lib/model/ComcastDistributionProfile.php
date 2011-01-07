@@ -9,6 +9,8 @@ class ComcastDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_AUTHOR = 'author';
 	const CUSTOM_DATA_ALBUM = 'album';
 
+	const METADATA_FIELD_CATEGORY = 'comcastCategory';
+	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
 	 */
@@ -16,7 +18,41 @@ class ComcastDistributionProfile extends DistributionProfile
 	{
 		return ComcastDistributionPlugin::getProvider();
 	}
-
+			
+	/* (non-PHPdoc)
+	 * @see DistributionProfile::validateForSubmission()
+	 */
+	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
+	{
+		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
+		
+		if(!class_exists('MetadataProfile'))
+			return $validationErrors;
+			
+		$metadataProfileId = $this->getMetadataProfileId();
+		if(!$metadataProfileId)
+		{
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			return $validationErrors;
+		}
+		
+		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_CATEGORY);
+		if(!$metadataProfileCategoryField)
+		{
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			return $validationErrors;
+		}
+		
+		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		if(!$metadata)
+		{
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			return $validationErrors;
+		}
+		
+		return $validationErrors;
+	}
+	
 	public function getEmail()					{return $this->getFromCustomData(self::CUSTOM_DATA_EMAIL);}
 	public function getPassword()				{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
 	public function getAccount()				{return $this->getFromCustomData(self::CUSTOM_DATA_ACCOUNT);}
