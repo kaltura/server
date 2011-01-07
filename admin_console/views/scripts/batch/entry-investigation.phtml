@@ -704,7 +704,6 @@
 						<th><?php echo $this->translate('entry-investigate asset width th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate asset height th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate asset size th'); ?></th>
-						<th><?php echo $this->translate('entry-investigate asset original th'); ?></th>
 						<th><?php echo $this->translate('entry-investigate asset ext th'); ?></th>
 					</tr>
 				</thead>
@@ -732,7 +731,6 @@
 									<td><?php echo $thumbAsset->width; ?></td>
 									<td><?php echo $thumbAsset->height; ?></td>
 									<td><?php echo $thumbAsset->size; ?></td>
-									<td><?php echo $thumbAsset->isOriginal; ?></td>
 									<td><?php echo $thumbAsset->fileExt; ?></td>
 								</tr>
 								<tr class="additionalData" id="tr_thumb_data_<?php echo $thumbAsset->id; ?>" style="display: none">
@@ -804,7 +802,6 @@
 															<th><?php echo $this->translate('entry-investigate thumb params format th'); ?></th>
 															<th><?php echo $this->translate('entry-investigate thumb params width th'); ?></th>
 															<th><?php echo $this->translate('entry-investigate thumb params height th'); ?></th>
-															<th><?php echo $this->translate('entry-investigate thumb params output commandLinesStr th'); ?></th>
 														</tr>
 													</thead>
 													<tfoot>
@@ -825,7 +822,6 @@
 															<td><?php echo $thumbParams->format; ?></td>
 															<td><?php echo $thumbParams->width; ?></td>
 															<td><?php echo $thumbParams->height; ?></td>
-															<td><?php echo $thumbParams->commandLinesStr; ?></td>
 														</tr>
 														<?php endforeach; ?>
 													</tbody>
