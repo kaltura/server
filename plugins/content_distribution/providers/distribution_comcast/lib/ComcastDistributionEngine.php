@@ -105,6 +105,11 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		KalturaLog::debug("Comcast HTTP response:\n$results\n");
 		$data->sentData = $providerData->xml;
 		$data->results = $results;
+		
+		$matches = null;
+		if(preg_match('/<faultstring[^>]*>([^<]+)<\/faultstring>/', $results, $matches))
+			throw new Exception("Comcast Error [" . $matches[1] . "]");
+		
 		return $results;
 	}
 }
