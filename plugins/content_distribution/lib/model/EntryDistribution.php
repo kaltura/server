@@ -42,7 +42,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			return null;
 			
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($this->getDistributionProfileId());
-		if(!$distributionProfile || !$distributionProfile->getReportInterval() || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
+		if(!$distributionProfile || $distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || !$distributionProfile->getReportInterval() || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
 
 		$reportInterval = $distributionProfile->getReportInterval() + (60 * 60 * 24);

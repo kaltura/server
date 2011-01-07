@@ -121,6 +121,9 @@ class kContentDistributionManager
 	 */
 	public static function submitDeleteEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isDeleteEnabled())
 			return self::addSubmitDeleteJob($entryDistribution, $distributionProfile);
@@ -144,6 +147,9 @@ class kContentDistributionManager
 	 */
 	public static function submitUpdateEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -167,6 +173,9 @@ class kContentDistributionManager
 	 */
 	public static function submitFetchEntryDistributionReport(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isReportsEnabled())
 			return self::addFetchReportJob($entryDistribution, $distributionProfile);
@@ -182,6 +191,9 @@ class kContentDistributionManager
 	 */
 	public static function submitAddEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, $submitWhenReady = true)
 	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
 		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);

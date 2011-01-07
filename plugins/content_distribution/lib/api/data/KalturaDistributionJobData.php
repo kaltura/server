@@ -80,7 +80,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		if($this->distributionProfileId)
 		{
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($this->distributionProfileId);
-			if($distributionProfile)
+			if($distributionProfile && $distributionProfile->getStatus() == DistributionProfileStatus::ENABLED)
 			{
 				$this->distributionProfile = KalturaDistributionProfileFactory::createKalturaDistributionProfile($distributionProfile->getProviderType());
 				$this->distributionProfile->fromObject($distributionProfile);
