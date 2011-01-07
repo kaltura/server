@@ -48,7 +48,15 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$status = $statusParser->getStatusForCommand('Insert');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Insert');
 		if (is_null($status))
-			throw new KalturaDistributionException('Status could not be found after distribution submission');
+		{
+			// try to get the status of Parse command
+			$status = $statusParser->getStatusForCommand('Parse');
+			$statusDetail = $statusParser->getStatusDetailForCommand('Parse');
+			if (!is_null($status))
+				throw new KalturaDistributionException('Distribution failed on parsing command with status ['.$status.'] and error ['.$statusDetail.']');
+			else
+				throw new KalturaDistributionException('Status could not be found after distribution submission');
+		}
 		
 		if ($status != 'Success')
 			throw new KalturaDistributionException('Distribution failed with status ['.$status.'] and error ['.$statusDetail.']');
@@ -160,7 +168,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if (!file_exists($videoFileFile))
 			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
 		
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry($entry);
 		$feed->setContentUrl('file://' . pathinfo($videoFileFile, PATHINFO_BASENAME));
@@ -186,7 +194,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
 	{
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Delete');
 		$feed->setVideoId($data->remoteId);
 		
@@ -209,7 +217,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->kalturaClient->media->get($entryId);
 		
-		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile);
+		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Update');
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry($entry);

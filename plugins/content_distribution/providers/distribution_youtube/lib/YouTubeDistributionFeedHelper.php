@@ -37,7 +37,7 @@ class YouTubeDistributionFeedHelper
 	 * @param $templateName
 	 * @param $distributionProfile
 	 */
-	public function __construct($templateName, KalturaYouTubeDistributionProfile $distributionProfile)
+	public function __construct($templateName, KalturaYouTubeDistributionProfile $distributionProfile, KalturaEntryDistribution $entryDistribution)
 	{
 		$this->distributionProfile = $distributionProfile;
 		
@@ -53,9 +53,27 @@ class YouTubeDistributionFeedHelper
 		$this->directoryName = '/' . $this->timestampName;
 		$this->metadataTempFileName = 'youtube_' . $this->timestampName . '.xml';
 		
+		if ($entryDistribution->sunrise)
+			$this->setStartTime(date('c', $entryDistribution->sunrise));
+		if ($entryDistribution->sunset)
+			$this->setEndTime(date('c', $entryDistribution->sunset));
+		
 		$this->setNotificationEmail($distributionProfile->notificationEmail);
 		$this->setUsername($distributionProfile->username);
-		$this->setOwnerName('Kaltura'); // FIXME!!!
+		if ($distributionProfile->ownerName)
+			$this->setOwnerName($distributionProfile->ownerName);
+		$this->setTarget($distributionProfile->target);
+		$this->setCategory($distributionProfile->defaultCategory);
+		
+		// community
+		$this->setAllowComments($distributionProfile->allowComments);
+		$this->setAllowEmbedding($distributionProfile->allowEmbedding);
+		$this->setAllowRatings($distributionProfile->allowRatings);
+		$this->setAllowResponses($distributionProfile->allowResponses);
+		
+		// policies
+		$this->setCommercialPolicy($distributionProfile->commercialPolicy);
+		$this->setUGCPolicy($distributionProfile->ugcPolicy);
 	}
 	
 	/**
@@ -117,6 +135,11 @@ class YouTubeDistributionFeedHelper
 		$this->setNodeValue('/rss/channel/item/yt:action', $value);
 	}
 	
+	public function setTarget($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:target', $value);
+	}
+	
 	public function setNotificationEmail($value)
 	{
 		$this->setNodeValue('/rss/channel/yt:notification_email', $value);
@@ -130,6 +153,16 @@ class YouTubeDistributionFeedHelper
 	public function setOwnerName($value)
 	{
 		$this->setNodeValue('/rss/channel/yt:owner_name', $value);
+	}
+	
+	public function setStartTime($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:start_time', $value);
+	}
+	
+	public function setEndTime($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:end_time', $value);
 	}
 	
 	public function setTitle($value)
@@ -147,6 +180,11 @@ class YouTubeDistributionFeedHelper
 		$this->setNodeValue('/rss/channel/item/media:content/media:keywords', $value);
 	}
 	
+	public function setCategory($value)
+	{
+		$this->setNodeValue('/rss/channel/item/media:content/media:category', $value);
+	}
+	
 	public function setContentUrl($value)
 	{
 		$this->setNodeValue('/rss/channel/item/media:content/@url', $value);
@@ -156,7 +194,45 @@ class YouTubeDistributionFeedHelper
 	{
 		$this->setNodeValue('/rss/channel/item/yt:web_metadata/yt:custom_id', $value);
 	}
+	
+	public function setAllowComments($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_comments', $value);
+	}
+	
+	public function setAllowResponses($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_responses', $value);
+	}
+	
+	public function setAllowRatings($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_ratings', $value);
+	}
+	
+	public function setAllowEmbedding($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:community/yt:allow_embedding', $value);
+	}
+	
+	public function setCommercialPolicy($value)
+	{
+		$this->setPolicyById('commercial', $value);
+	}
+	
 
+	public function setUGCPolicy($value)
+	{
+		$this->setPolicyById('ugc', $value);
+	}
+
+	public function setPolicyById($id, $value)
+	{
+		$savedPolicyNode = $this->xpath->query("//*/yt:saved_policies/yt:saved_policy/yt:content_type[text()='".$id."']/..")->item(0);
+		$polocyIdNode = $this->xpath->query("yt:saved_policy_id", $savedPolicyNode)->item(0);
+		$polocyIdNode->nodeValue = $value;
+	}
+	
 	public function setVideoId($value)
 	{
 		$videoIdNode = $this->doc->createElement('yt:id', $value);

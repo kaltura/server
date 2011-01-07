@@ -33,8 +33,60 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $sftpPrivateKey;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $ownerName;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $defaultCategory;
 		
-			
+	/**
+	 * 
+	 * @var string
+	 */
+	public $allowComments;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $allowEmbedding;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $allowRatings;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $allowResponses;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $commercialPolicy;
+	
+	/**
+	 * 
+	 * @var string
+	 */
+	public $ugcPolicy;
+		
+	/**
+	 * @var string
+	 */
+	public $target;	
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -46,6 +98,15 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 		'sftpLogin',
 		'sftpPublicKey',
 		'sftpPrivateKey',
+		'ownerName',
+		'defaultCategory',
+		'allowComments',
+		'allowEmbedding',
+		'allowRatings',
+		'allowResponses',
+		'commercialPolicy',
+		'ugcPolicy',
+		'target'
 	 );
 		 
 	public function getMapBetweenObjects()

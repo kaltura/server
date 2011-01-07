@@ -10,22 +10,28 @@
             <media:content url="file://">
                 <media:description type="plain"><![CDATA[]]></media:description>
 				<media:keywords><![CDATA[]]></media:keywords>
+				<media:category></media:category>
             </media:content>
             <yt:start_time></yt:start_time>
             <yt:end_time></yt:end_time>
-            <yt:target>upload,claim</yt:target>
+            <yt:target></yt:target>
 			<yt:web_metadata>
 				<yt:custom_id></yt:custom_id>
 			</yt:web_metadata>
-			<yt:language>en</yt:language>
+            <yt:community>
+                <yt:allow_comments></yt:allow_comments>
+                <yt:allow_responses></yt:allow_responses>
+                <yt:allow_ratings></yt:allow_ratings>
+                <yt:allow_embedding></yt:allow_embedding>
+            </yt:community>
 			<yt:saved_policies>
 				<yt:saved_policy>
 					<yt:content_type>commercial</yt:content_type>
-					<yt:saved_policy_id type="name">Track in all countries</yt:saved_policy_id>
+					<yt:saved_policy_id type="name"></yt:saved_policy_id>
 				</yt:saved_policy>
 				<yt:saved_policy>
 					<yt:content_type>ugc</yt:content_type>
-					<yt:saved_policy_id type="name">Track in all countries</yt:saved_policy_id>
+					<yt:saved_policy_id type="name"></yt:saved_policy_id>
 				</yt:saved_policy>
 			</yt:saved_policies>
         </item>

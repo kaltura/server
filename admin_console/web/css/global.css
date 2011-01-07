@@ -378,7 +378,7 @@ body#monitoring-xymon {}
 #partner-external-storages #description {display: block;}
 #partner-external-storages div.commentFormObjects{ height: 240px; width: 400px; overflow: auto;}
 
-
+#frmDistributionProfileConfig fieldset { float: none; padding: 10px 20px 10px 10px; }
 
 
   

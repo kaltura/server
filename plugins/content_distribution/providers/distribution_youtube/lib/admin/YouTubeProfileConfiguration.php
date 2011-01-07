@@ -40,8 +40,9 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
+		// General
 		$this->addElement('text', 'username', array(
-			'label'			=> 'Username:',
+			'label'			=> 'YouTube Account:',
 			'filters'		=> array('StringTrim'),
 		));
 	
@@ -49,7 +50,27 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 			'label'			=> 'Notification Email:',
 			'filters'		=> array('StringTrim'),
 		));
-	
+		
+		$this->addElement('text', 'owner_name', array(
+			'label' => 'Owner Name:',
+		));
+		
+		$this->addElement('select', 'target', array(
+			'label' => 'Target:',
+			'multioptions' => array(
+				'upload,claim,fingerprint' => 'upload,claim,fingerprint', 
+				'upload,claim' => 'upload,claim', 
+				'claim,fingerprint' => 'claim,fingerprint',
+			)
+		));
+		
+		$this->addDisplayGroup(
+			array('username', 'notification_email', 'owner_name', 'target'), 
+			'general', 
+			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
+		);
+		
+		// SFTP Configuration
 		$this->addElement('text', 'sftp_host', array(
 			'label'			=> 'SFTP Host:',
 			'filters'		=> array('StringTrim'),
@@ -67,5 +88,81 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 		$this->addElement('file', 'sftp_private_key', array(
 			'label' => 'SFTP Private Key:'
 		));
+		
+		$this->addDisplayGroup(
+			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key'), 
+			'sftp', 
+			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'))
+		);
+		
+		//  Metadata
+		$this->addElement('text', 'default_category', array(
+			'label' => 'Default Category:',
+		));
+		
+		$this->addDisplayGroup(
+			array('default_category'), 
+			'metadata',
+			array('legend' => 'Metadata', 'decorators' => array('FormElements', 'Fieldset'))
+		);
+		
+		// Community
+		$this->addElement('select', 'allow_comments', array(
+			'label' => 'Allow Comments:',
+			'multioptions' => array(
+				'' => 'Default', 
+				'Always' => 'Always', 
+				'Approve' => 'Approve',
+				'Never' => 'Never',
+			)
+		));
+		
+		$this->addElement('select', 'allow_embedding', array(
+			'label' => 'Allow Embedding:',
+			'multioptions' => array(
+				'' => 'Default', 
+				'true' => 'True', 
+				'false' => 'False',
+			)
+		));
+		
+		$this->addElement('select', 'allow_ratings', array(
+			'label' => 'Allow Ratings:',
+			'multioptions' => array(
+				'' => 'Default', 
+				'true' => 'True', 
+				'false' => 'False',
+			)
+		));
+		
+		$this->addElement('select', 'allow_responses', array(
+			'label' => 'Allow Responses:',
+			'multioptions' => array(
+				'' => 'Default', 
+				'Always' => 'Always', 
+				'Approve' => 'Approve',
+				'Never' => 'Never',
+			)
+		));
+		
+		$this->addDisplayGroup(
+			array('allow_comments', 'allow_embedding', 'allow_ratings', 'allow_responses'), 
+			'community', 
+			array('legend' => 'Community', 'decorators' => array('FormElements', 'Fieldset'))
+		);
+		
+		$this->addElement('text', 'commercial_policy', array(
+			'label' => 'Commercial Policy:'
+		));
+		
+		$this->addElement('text', 'ugc_policy', array(
+			'label' => 'UGC Policy:'
+		));
+		
+		$this->addDisplayGroup(
+			array('commercial_policy', 'ugc_policy'), 
+			'policies', 
+			array('legend' => 'Saved Policies', 'decorators' => array('FormElements', 'Fieldset'))
+		);
 	}
 }

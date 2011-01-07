@@ -132,11 +132,10 @@ class sftpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
-		$exists_cmd = 'test -e ' . $remote_file . ' && echo EXISTS';
-		$exec_output = $this->execCommand($exists_cmd);
-		return (trim($exec_output) == 'EXISTS');
+		$sftp = $this->getSftpConnection();
+		$stats = @ssh2_sftp_stat($sftp, $remote_file);
+		return ($stats !== false);
 	}
-
 
         // return the current working directory
 	protected function doPwd ()
@@ -160,6 +159,41 @@ class sftpMgr extends kFileTransferMgr
              return (trim($exec_output) == ''); // empty output means the command passed ok
         }
 	
+	// download a file from the server
+	public function fileGetContents ($remote_file)
+	{	
+		$sftp = $this->getSftpConnection();
+		$uri = "ssh2.sftp://$sftp$remote_file";
+        $stream = @fopen($uri, 'r');
+        if (!$stream)
+        	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
+        	
+        $contents = fread($stream, filesize($uri));
+        if ($contents === false)
+            throw new kFileTransferMgrException("Failed to read file from [".$uri."]");
+                   
+        return $contents;
+	}
+	
+	// upload a file to the server
+	public function filePutContents ($remote_file, $contents)
+	{	
+		if (!$this->fileExists(dirname($remote_file))) {
+			$this->mkDir(dirname($remote_file));
+		}
+		
+        $sftp = $this->getSftpConnection();
+		$uri = "ssh2.sftp://$sftp$remote_file";
+        $stream = @fopen($uri, 'w');
+        if (!$stream)
+        	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
+        	
+        if (@fwrite($stream, $contents) === false) {
+            @fclose($stream);
+        	throw new kFileTransferMgrException("Failed to upload file to [".$uri."]");
+		}
+        return @fclose($stream);
+	}
 	
 	// execute the given command on the server
 	private function execCommand($command_str)
