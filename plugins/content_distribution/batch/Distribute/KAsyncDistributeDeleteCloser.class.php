@@ -53,7 +53,11 @@ class KAsyncDistributeDeleteCloser extends KAsyncDistributeCloser
 	 */
 	protected function freeExclusiveJob(KalturaBatchJob $job)
 	{
-		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionDeleteJob($job->id, $this->getExclusiveLockKey(), false);
+		$resetExecutionAttempts = false;
+		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
+			$resetExecutionAttempts = true;
+	
+		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionDeleteJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
 		
 		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
 		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
