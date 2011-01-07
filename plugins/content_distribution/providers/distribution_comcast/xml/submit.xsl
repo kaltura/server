@@ -21,11 +21,11 @@
 	
 		<addContent>
 			<media>
-				<id>
-					<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+				<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+					<id>
 						<xsl:value-of select="distribution[@provider='MSN']/remoteId" />
-					</xsl:if>
-				</id>
+					</id>
+				</xsl:if>
 				<xsl:if test="count(thumbnail[@thumbAssetId = $thumbAssetId])">
 					<thumbnailURL>
 						<xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/>
@@ -34,6 +34,23 @@
 				<airdate>
 					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(createdAt))" />
 				</airdate>
+				<categories>
+					<xsl:for-each select="customData[@metadataProfileId = $metadataProfileId]/metadata/ComcastCategory">
+						<string>
+							<xsl:value-of select="."/>
+						</string>
+					</xsl:for-each>
+				</categories>
+				<copyright>
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/copyright) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/copyright"/>
+					</xsl:if>
+				</copyright>
+				<description>
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription"/>
+					</xsl:if>
+				</description>
 				<xsl:if test="sum(distribution[@provider='Comcast']/sunrise) > 0">
 					<availableDate>
 						<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='Comcast']/sunrise))" />
@@ -44,45 +61,32 @@
 						<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='Comcast']/sunset))" />
 					</expirationDate>
 				</xsl:if>
-				<title><xsl:value-of select="title" /></title>
-				<description>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription"/>
-					</xsl:if>
-				</description>
 				<keywords><xsl:value-of select="$keywords" /></keywords>
-				<categories>
-					<xsl:for-each select="customData[@metadataProfileId = $metadataProfileId]/metadata/ComcastCategory">
-						<string>
-							<xsl:value-of select="."/>
-						</string>
-					</xsl:for-each>
-				</categories>
+				<rating>G</rating>
+				<title><xsl:value-of select="title" /></title>
+				<!--  
 				<author><xsl:value-of select="$author" /></author>
 				<album><xsl:value-of select="$album" /></album>
-				<copyright>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/copyright) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/copyright"/>
-					</xsl:if>
-				</copyright>
+				-->
 				<customData>
-					<item>
+					<CustomDataElement>
 						<title>Headline</title>
 						<value>
 							<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle) > 0">
 								<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle"/>
 							</xsl:if>
 						</value>
-					</item>
-					<item>
+					</CustomDataElement>
+					<CustomDataElement>
 						<title>Link Href</title>
 						<value></value>
-					</item>
-					<item>
+					</CustomDataElement>
+					<CustomDataElement>
 						<title>Link Text</title>
 						<value></value>
-					</item>
-					<item>
+					</CustomDataElement>
+					<!--  
+					<CustomDataElement>
 						<title>Video Dimensions</title>
 						<value>
 							<xsl:for-each select="content[@flavorAssetId = $flavorAssetId]">
@@ -91,11 +95,12 @@
 								<xsl:value-of select="@height" />
 							</xsl:for-each>
 						</value>
-					</item>
-					<item>
+					</CustomDataElement>
+					<CustomDataElement>
 						<title>Notes to Comcast</title>
 						<value></value>
-					</item>
+					</CustomDataElement>
+					-->
 				</customData>
 			</media>
 			<mediaFiles>

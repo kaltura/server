@@ -33,6 +33,8 @@
 	<xs:element name="media">
 		<xs:complexType>
 			<xs:all>
+				<xs:element minOccurs="0" name="id" type="xs:string" />
+				<xs:element minOccurs="0" name="thumbnailURL" type="xs:string" />
 				<xs:element name="airdate" type="xs:dateTime" />
 				<xs:element name="categories" type="cim-ac-category" />
 				<xs:element minOccurs="0" name="copyright" type="xs:string" />

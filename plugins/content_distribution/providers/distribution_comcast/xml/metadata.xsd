@@ -51,7 +51,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
-				<xsd:element name="ComcastCategory" minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="ComcastCategory" minOccurs="1" maxOccurs="unbounded">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
@@ -62,8 +62,47 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 					<xsd:simpleType>
-						<xsd:restriction base="textType">
-							<xsd:maxLength value="40" />
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="TV Preview" />
+							<xsd:enumeration value="TV Interview" />
+							<xsd:enumeration value="TV News" />
+							<xsd:enumeration value="TV Featurette" />
+							<xsd:enumeration value="TV Sneak Peek" />
+							<xsd:enumeration value="TV Full Episode" />
+							<xsd:enumeration value="MOVIE Trailer" />
+							<xsd:enumeration value="MOVIE Interview" />
+							<xsd:enumeration value="MOVIE News" />
+							<xsd:enumeration value="MOVIE Featurette" />
+							<xsd:enumeration value="MOVIE Sneak Peek" />
+							<xsd:enumeration value="MOVIE Full Feature" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ComcastRating" minOccurs="1" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Comcast Rating</label>
+							<key>comcastRating</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="G" />
+							<xsd:enumeration value="PG" />
+							<xsd:enumeration value="PG-13" />
+							<xsd:enumeration value="R" />
+							<xsd:enumeration value="NC-17" />
+							<xsd:enumeration value="NR" />
+							<xsd:enumeration value="TV-Y" />
+							<xsd:enumeration value="TV-Y7" />
+							<xsd:enumeration value="TV-Y7-FV" />
+							<xsd:enumeration value="TV-G" />
+							<xsd:enumeration value="TV-PG" />
+							<xsd:enumeration value="TV-14" />
+							<xsd:enumeration value="TV-MA" />
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
