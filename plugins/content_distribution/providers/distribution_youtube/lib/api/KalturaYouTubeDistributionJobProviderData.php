@@ -24,10 +24,6 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 		if(!($distributionJobData->distributionProfile instanceof KalturaYouTubeDistributionProfile))
 			return;
 			
-		$this->csId = $distributionJobData->distributionProfile->csId;
-		$this->source = $distributionJobData->distributionProfile->source;
-		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
-		
 		$sourceAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
 		if($sourceAsset) 
 		{

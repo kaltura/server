@@ -9,8 +9,10 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseDelete
 {
 	const TEMP_DIRECTORY = 'youtube_distribution';
+		
+	const INSERT_UPDATE_TEMPLATE = 'insert_update_template.xml';
+	const DELETE_TEMPLATE = 'insert_update_template.xml';
 
-	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -29,72 +31,9 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
 		
-		$this->handleSend($data, $data->distributionProfile, $data->providerData);
+		$this->handleSubmit($data, $data->distributionProfile, $data->providerData);
 		
-		return true;
-	}
-
-	/**
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYouTubeDistributionProfile $distributionProfile
-	 * @param KalturaYouTubeDistributionJobProviderData $providerData
-	 * @throws Exception
-	 */
-	public function handleSend(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
-	{
-		$timestampName = date('Ymd-His') . '_' . time();
-		$metadataTempFileName = 'youtube_' . $timestampName . '.xml';
-		$notificationEmail = $distributionProfile->notificationEmail;
-		$username = $distributionProfile->username;
-		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->kalturaClient->media->get($entryId);
-		$metadataTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/metadata_template.xml';
-		$deliveryCompleteFile = realpath(dirname(__FILE__) . '/../') . '/xml/delivery.complete';
-		$videoFileFile = $providerData->videoAssetFilePath;
-		if (!file_exists($videoFileFile))
-			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
-		
-		$metadataTempFilePath = $this->getTempDirectoryForProfile($distributionProfile->id);
-		$metadataTempFilePath = $metadataTempFilePath . $metadataTempFileName;
-		
-		// prepare the metadata
-		$doc = new DOMDocument();
-		$doc->load($metadataTemplate);
-		
-		$xpath = new DOMXPath($doc);
-		$xpath->registerNamespace('media', 'http://search.yahoo.com/mrss');
-		$xpath->registerNamespace('yt', 'http://www.youtube.com/schemas/yt/0.2');
-		
-		$notificationEmailNode = $xpath->query('/rss/channel/yt:notification_email')->item(0);
-		$userNameNode = $xpath->query('/rss/channel/yt:account/yt:username')->item(0);
-		$titleNode = $xpath->query('/rss/channel/item/media:title')->item(0)->childNodes->item(0);
-		$descriptionNode = $xpath->query('/rss/channel/item/media:content/media:description')->item(0)->childNodes->item(0);
-		$keywordsNode = $xpath->query('/rss/channel/item/media:content/media:keywords')->item(0)->childNodes->item(0);
-		$fileNameNode = $xpath->query('/rss/channel/item/media:content/@url')->item(0);
-		
-		$notificationEmailNode->nodeValue = $notificationEmail;
-		$userNameNode->nodeValue = $username;
-		$titleNode->nodeValue = $entry->name;
-		$descriptionNode->nodeValue = $entry->description;
-		$keywordsNode->nodeValue = $entry->tags;
-		$fileNameNode->nodeValue = 'file://' . pathinfo($videoFileFile, PATHINFO_BASENAME);
-		
-		$doc->save($metadataTempFilePath);
-		
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		
-		$directoryName = '/' . $timestampName;
-		
-		// upload the metadata
-		$sftpManager->putFile($directoryName . '/' . $metadataTempFileName, $metadataTempFilePath);
-		
-		// upload the video
-		$sftpManager->putFile($directoryName . '/' . pathinfo($videoFileFile, PATHINFO_BASENAME), $videoFileFile);
-		
-		// upload the delivery.complete marker file
-		$sftpManager->putFile($directoryName . '/' . pathinfo($deliveryCompleteFile, PATHINFO_BASENAME), $deliveryCompleteFile);
-		
-		$providerData->sftpDirectory = $directoryName;
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -102,21 +41,27 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$publishState = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
-		return false;
-		// parse
-	}
+		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
-	/**
-	 * @param $data
-	 * @param $distributionProfile
-	 * @param $providerData
-	 */
-	public function fetchStatusXml(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
-	{
-		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$sftpManager->getFile()
+		if ($statusXml === false) // no status yet
+			return false;
+			
+		$statusParser = new YouTubeDistributionStatusParser($statusXml);
+		$status = $statusParser->getStatusForCommand('Insert');
+		$statusDetail = $statusParser->getStatusDetailForCommand('Insert');
+		if (is_null($status))
+			throw new KalturaDistributionException('Status could not be found after distribution submission');
+		
+		if ($status != 'Success')
+			throw new KalturaDistributionException('Distribution failed with status ['.$status.'] and error ['.$statusDetail.']');
+			
+		$remoteId = $statusParser->getRemoteId();
+		if (is_null($remoteId))
+			throw new KalturaDistributionException('Remote id was not found after distribution submission');
+		
+		$data->remoteId = $remoteId;
+			
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -124,24 +69,53 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYouTubeDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaYouTubeDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
 		
-		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
 		
 		return false;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineCloseDelete::closeDelete()
 	 */
 	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
-		$publishState = $this->fetchStatus($data);
+		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
+
+		if ($statusXml === false) // no status yet
+			return false;
+			
+		$statusParser = new YouTubeDistributionStatusParser($statusXml);
+		$status = $statusParser->getStatusForCommand('Delete');
+		$statusDetail = $statusParser->getStatusDetailForCommand('Delete');
+		if (is_null($status))
+			throw new KalturaDistributionException('Status could not be found after deletion request');
 		
+		if ($status != 'Success')
+			throw new KalturaDistributionException('Delete failed with status ['.$status.'] and error ['.$statusDetail.']');
+			
+		return true;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineUpdate::update()
+	 */
+	public function update(KalturaDistributionUpdateJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYouTubeDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaYouTubeDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaYouTubeDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaYouTubeDistributionJobProviderData");
+		
+		$this->handleUpdate($data, $data->distributionProfile, $data->providerData);
+		
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -149,8 +123,21 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$publishState = $this->fetchStatus($data);
+		$statusXml = $this->fetchStatusXml($data, $data->distributionProfile, $data->providerData);
 
+		if ($statusXml === false) // no status yet
+			return false;
+			
+		$statusParser = new YouTubeDistributionStatusParser($statusXml);
+		$status = $statusParser->getStatusForCommand('Update');
+		$statusDetail = $statusParser->getStatusDetailForCommand('Update');
+		if (is_null($status))
+			throw new KalturaDistributionException('Status could not be found after distribution update');
+		
+		if ($status != 'Success')
+			throw new KalturaDistributionException('Update failed with status ['.$status.'] and error ['.$statusDetail.']');
+			
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -160,21 +147,105 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	{
 		return false;
 	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionEngineUpdate::update()
-	 */
-	public function update(KalturaDistributionUpdateJobData $data)
-	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
-			KalturaLog::err("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaMsnDistributionJobProviderData))
-			KalturaLog::err("Provider data must be of type KalturaMsnDistributionJobProviderData");
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 */
+	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$entryId = $data->entryDistribution->entryId;
+		$entry = $this->kalturaClient->media->get($entryId);
 		
-		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		$videoFileFile = $providerData->videoAssetFilePath;
+		if (!file_exists($videoFileFile))
+			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
 		
-		return false;
+		$feed = new YouTubeDistributionFeedHelper(self::INSERT_UPDATE_TEMPLATE, $distributionProfile);
+		$feed->setAction('Insert');
+		$feed->setMetadataFromEntry($entry);
+		$feed->setContentUrl('file://' . pathinfo($videoFileFile, PATHINFO_BASENAME));
+		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		
+		$feed->sendFeed($sftpManager);
+		
+		// upload the video
+		$videoSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($videoFileFile, PATHINFO_BASENAME);
+		$sftpManager->putFile($videoSFTPPath, $videoFileFile);
+		
+		$feed->setDeliveryComplete($sftpManager);
+		
+		$providerData->sftpDirectory = $feed->getDirectoryName();
+		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 */
+	protected function handleDelete(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$feed = new YouTubeDistributionFeedHelper(self::DELETE_TEMPLATE, $distributionProfile);
+		$feed->setAction('Delete');
+		$feed->setVideoId($data->remoteId);
+		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		
+		$feed->sendFeed($sftpManager);
+		$feed->setDeliveryComplete($sftpManager);
+		
+		$providerData->sftpDirectory = $feed->getDirectoryName();
+		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 */
+	protected function handleUpdate(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$entryId = $data->entryDistribution->entryId;
+		$entry = $this->kalturaClient->media->get($entryId);
+		
+		$feed = new YouTubeDistributionFeedHelper(self::INSERT_UPDATE_TEMPLATE, $distributionProfile);
+		$feed->setAction('Update');
+		$feed->setVideoId($data->remoteId);
+		$feed->setMetadataFromEntry($entry);
+		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		
+		$feed->sendFeed($sftpManager);
+		$feed->setDeliveryComplete($sftpManager);
+		
+		$providerData->sftpDirectory = $feed->getDirectoryName();
+		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYouTubeDistributionProfile $distributionProfile
+	 * @param KalturaYouTubeDistributionJobProviderData $providerData
+	 * @return Status XML or FALSE when status is not available yet
+	 */
+	protected function fetchStatusXml(KalturaDistributionJobData $data, KalturaYouTubeDistributionProfile $distributionProfile, KalturaYouTubeDistributionJobProviderData $providerData)
+	{
+		$statusFilePath = $providerData->sftpDirectory . '/' . 'status-' . $providerData->sftpMetadataFilename;
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$statusXml = null;
+		try 
+		{
+			$statusXml = $sftpManager->fileGetContents($statusFilePath);
+		}
+		catch(kFileTransferMgrException $ex) // file is still missing
+		{
+			return false;
+		}
+		
+		return $statusXml;
 	}
 	
 	/**
@@ -191,17 +262,6 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
 		return $sftpManager;
-	}
-	
-	/*
-	 * Creates and return the temp directory used for this distribution profile 
-	 */
-	protected function getTempDirectoryForProfile($distributionProfileId)
-	{
-		$metadataTempFilePath = kConf::get('temp_folder') . '/' . YouTubeDistributionEngine::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
-		if (!file_exists($metadataTempFilePath))
-			mkdir($metadataTempFilePath, 0777, true);
-		return $metadataTempFilePath;
 	}
 	
 	/*
@@ -224,5 +284,16 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		}
 		
 		return $fileLocation;
+	}
+	
+	/*
+	 * Creates and return the temp directory used for this distribution profile 
+	 */
+	protected function getTempDirectoryForProfile($distributionProfileId)
+	{
+		$metadataTempFilePath = kConf::get('temp_folder') . '/' . self::TEMP_DIRECTORY . '/'  . $distributionProfileId . '/';
+		if (!file_exists($metadataTempFilePath))
+			mkdir($metadataTempFilePath, 0777, true);
+		return $metadataTempFilePath;
 	}
 }
