@@ -3395,13 +3395,6 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 	public $errorType = null;
 
 	/**
-	 * Missing flavor params id, thumbnail params id or missing metadata field name
-	 *
-	 * @var string
-	 */
-	public $data = null;
-
-	/**
 	 * 
 	 *
 	 * @var string
@@ -3924,6 +3917,69 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $sftpPrivateKey = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ownerName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $defaultCategory = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowComments = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowEmbedding = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowRatings = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowResponses = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $commercialPolicy = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ugcPolicy = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $target = null;
 
 
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1294336750">
-  <!-- Generated on date 06/01/11 17:59:10 -->
+<xml apiVersion="3.1.1" generatedDate="1294397907">
+  <!-- Generated on date 07/01/11 10:58:27 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -351,6 +351,7 @@
       <const name="MSN" value="msnDistribution.MSN"/>
       <const name="HULU" value="huluDistribution.HULU"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
+      <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -2971,7 +2972,6 @@
     <class name="KalturaDistributionValidationError" abstract="1">
       <property name="action" type="int" enumType="KalturaDistributionAction" readOnly="0" insertOnly="0" description=""/>
       <property name="errorType" type="int" enumType="KalturaDistributionErrorType" readOnly="0" insertOnly="0" description=""/>
-      <property name="data" type="string" readOnly="0" insertOnly="0" description="Missing flavor params id, thumbnail params id or missing metadata field name&#13;"/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaEntryDistribution">
