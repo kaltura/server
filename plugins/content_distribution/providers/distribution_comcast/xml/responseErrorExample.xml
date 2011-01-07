@@ -1,10 +1,18 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' xmlns:soapenc='http://schemas.xmlsoap.org/soap/encoding/' soap:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>
 	<soap:Body>
 		<soap:Fault>
 			<faultcode>soap:Client</faultcode>
 			<faultstring>electric.xml.ParseException: java.io.IOException: expected &apos;=&apos;, got &apos;n&apos;
 				line 2, char 33: ...Content-Disposition: form-data; n</faultstring>
+		</soap:Fault>
+	</soap:Body>
+</soap:Envelope>
+
+<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/' xmlns:soapenc='http://schemas.xmlsoap.org/soap/encoding/' soap:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>
+	<soap:Body>
+		<soap:Fault>
+			<faultcode>soap:Client</faultcode>
+			<faultstring>java.net.SocketTimeoutException: Read timed out</faultstring>
 		</soap:Fault>
 	</soap:Body>
 </soap:Envelope>
