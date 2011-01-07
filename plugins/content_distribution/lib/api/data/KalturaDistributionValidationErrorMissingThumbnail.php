@@ -16,7 +16,7 @@ class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistribu
 		if($this->dimensions)
 		{
 			$key = $this->dimensions->width . 'x' . $this->dimensions->height;
-			$dbObject->setData();
+			$dbObject->setData($key);
 		}
 
 		return $dbObject;
