@@ -185,8 +185,11 @@ class ComcastDistributionProvider implements IDistributionProvider
 	{
 		KalturaLog::debug("Generates XML for entry [$entryId]");
 		
+		libxml_use_internal_errors(true);
+		
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
+		KalturaLog::debug("MRSS [$mrss]");
 		if(!$mrss)
 		{
 			KalturaLog::err("No MRSS returned for entry [$entryId]");
@@ -195,8 +198,9 @@ class ComcastDistributionProvider implements IDistributionProvider
 			
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($mrss))
-		{
-			KalturaLog::err("Could not load MRSS as XML for entry [$entryId]");
+		{		
+			$errorMessage = kXml::getLibXmlErrorDescription($mrss);
+			KalturaLog::err("Could not load MRSS as XML for entry [$entryId] error description [$errorMessage]");
 			return null;
 		}
 		
@@ -225,6 +229,7 @@ class ComcastDistributionProvider implements IDistributionProvider
 				KalturaLog::debug("Set variable [$name] to [{$providerData->$name}]");
 			}
 		}
+		KalturaLog::debug("XSL [" . $xsl->saveXML() . "]");
 
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
@@ -233,14 +238,17 @@ class ComcastDistributionProvider implements IDistributionProvider
 		$xml = $proc->transformToDoc($xml);
 		if(!$xml)
 		{
-			KalturaLog::err("XML Transformation failed");
+			$errorMessage = kXml::getLibXmlErrorDescription($mrss);
+			KalturaLog::err("XML Transformation failed [$errorMessage]");
 			return null;
 		}
+		KalturaLog::debug("XML [" . $xml->saveXML() . "]");
 			
 		$xsdPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsd';
 		if(file_exists($xsdPath) && !$xml->schemaValidate($xsdPath))
 		{
-			KalturaLog::err("Schema validation failed");		
+			$errorMessage = kXml::getLibXmlErrorDescription($mrss);
+			KalturaLog::err("Schema validation failed [$errorMessage]");		
 			return null;
 		}
 		
