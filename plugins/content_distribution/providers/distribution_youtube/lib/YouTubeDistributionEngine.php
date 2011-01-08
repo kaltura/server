@@ -53,17 +53,17 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 			$status = $statusParser->getStatusForCommand('Parse');
 			$statusDetail = $statusParser->getStatusDetailForCommand('Parse');
 			if (!is_null($status))
-				throw new KalturaDistributionException('Distribution failed on parsing command with status ['.$status.'] and error ['.$statusDetail.']');
+				throw new Exception('Distribution failed on parsing command with status ['.$status.'] and error ['.$statusDetail.']');
 			else
-				throw new KalturaDistributionException('Status could not be found after distribution submission');
+				throw new Exception('Status could not be found after distribution submission');
 		}
 		
 		if ($status != 'Success')
-			throw new KalturaDistributionException('Distribution failed with status ['.$status.'] and error ['.$statusDetail.']');
+			throw new Exception('Distribution failed with status ['.$status.'] and error ['.$statusDetail.']');
 			
 		$remoteId = $statusParser->getRemoteId();
 		if (is_null($remoteId))
-			throw new KalturaDistributionException('Remote id was not found after distribution submission');
+			throw new Exception('Remote id was not found after distribution submission');
 		
 		$data->remoteId = $remoteId;
 			
@@ -100,10 +100,10 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$status = $statusParser->getStatusForCommand('Delete');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Delete');
 		if (is_null($status))
-			throw new KalturaDistributionException('Status could not be found after deletion request');
+			throw new Exception('Status could not be found after deletion request');
 		
 		if ($status != 'Success')
-			throw new KalturaDistributionException('Delete failed with status ['.$status.'] and error ['.$statusDetail.']');
+			throw new Exception('Delete failed with status ['.$status.'] and error ['.$statusDetail.']');
 			
 		return true;
 	}
@@ -138,10 +138,10 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$status = $statusParser->getStatusForCommand('Update');
 		$statusDetail = $statusParser->getStatusDetailForCommand('Update');
 		if (is_null($status))
-			throw new KalturaDistributionException('Status could not be found after distribution update');
+			throw new Exception('Status could not be found after distribution update');
 		
 		if ($status != 'Success')
-			throw new KalturaDistributionException('Update failed with status ['.$status.'] and error ['.$statusDetail.']');
+			throw new Exception('Update failed with status ['.$status.'] and error ['.$statusDetail.']');
 			
 		return true;
 	}
@@ -166,7 +166,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		
 		$videoFileFile = $providerData->videoAssetFilePath;
 		if (!file_exists($videoFileFile))
-			throw new Exception('The file ['.$videoFileFile.'] was not found for YouTube distribution');
+			throw new KalturaDistributionException('The file ['.$videoFileFile.'] was not found (probably not synced yet), the job will retry');
 		
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Insert');
