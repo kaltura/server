@@ -16,6 +16,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		EntryDistributionPeer::FLAVOR_ASSET_IDS => 'flavor_asset_ids',
 		EntryDistributionPeer::SUNRISE => 'sunrise',
 		EntryDistributionPeer::SUNSET => 'sunset',
+		EntryDistributionPeer::SUN_STATUS => 'sun_status',
 		EntryDistributionPeer::REMOTE_ID => 'remote_id',
 		EntryDistributionPeer::PLAYS => 'plays',
 		EntryDistributionPeer::VIEWS => 'views',
