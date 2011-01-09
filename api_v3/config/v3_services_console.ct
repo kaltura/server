@@ -43,8 +43,6 @@ batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BA
 batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 
 
-systempartner.get					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
-
 entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
 flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
 flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
@@ -119,5 +117,13 @@ permissionitem.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSI
 permissionitem.update				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permissionitem.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 
+systempartner.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
+systempartner.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
+systempartner.getusage				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_USAGE
+systempartner.updatestatus			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_REMOVE
+systempartner.getadminsession		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS
+systempartner.getconfiguration		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
+systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG
+systempartner.getpackages			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 
 ---------------------------------------------------------------------------------------------------
