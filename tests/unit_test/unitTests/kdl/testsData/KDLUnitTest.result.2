@@ -1,0 +1,147 @@
+ --------------------------- 
+inputs: flavorParams : 5 / mediaInfo: 14120022 / flavorParamsOutput : 3343142
+ ---------------------------
+Error: Output Reference (id = 3343142)value: -i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 464 -h 352 -a 96 -o __outFileName__ , encoding.com , -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=464:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:           		 -i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 464 -h 352 -a 96 -s 44100 -o __outFileName__ , encoding.com ,  -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=464:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ 
+on field CommandLines
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 9139372 / flavorParamsOutput : 547822
+ --------------------------- 
+Error: Output Reference (id = 547822)value: -i __inFileName__ -vcodec flv -b 288k -s 1920x1200 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 288k -s 1920x1200 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=288:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1920:1200 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 192 -k 5 -w 1920 -h 1200 -a 96 -o __outFileName__ , encoding.com != 
+       Actual output value:            -i __inFileName__ -vcodec flv -b 288k -s 1920x1200 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 288k -s 1920x1200 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=288:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1920:1200 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 192 -k 5 -w 1920 -h 1200 -a 96 -s 44100 -o __outFileName__ , encoding.com 
+on field CommandLines
+
+ --------------------------- 
+inputs: flavorParams : 37352 / mediaInfo: 12096882 / flavorParamsOutput : 2083252
+ --------------------------- 
+Error: Output Reference (id = 2083252)value: 44100 != 
+       Actual output value:           22050 
+on field AudioSampleRate
+
+Error: Output Reference (id = 2083252)value: -i __inFileName__ -vcodec flv -b 800k -s 1104x672 -r 7.336 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 1104x672 -r 7.336 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 7.336 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1104:672 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 7 -b 800 -k 60 -w 1104 -h 672 -a 96 -o __outFileName__ , encoding.com != 
+       Actual output value:            -i __inFileName__ -vcodec flv -b 800k -s 1104x672 -r 7.336 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 800k -s 1104x672 -r 7.336 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 7.336 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1104:672 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__ , -i __inFileName__ -c VP6 -r 7 -b 800 -k 60 -w 1104 -h 672 -a 96 -s 22050 -o __outFileName__ , encoding.com 
+on field CommandLines
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 14494322 / flavorParamsOutput : 3592012
+ --------------------------- 
+Error: Output Reference (id = 3592012)value: -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 800 -k 5 -w 640 -h 480 -a 96 -o __outFileName__ != 
+       Actual output value:            -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 800 -k 5 -w 640 -h 480 -a 96 -s 44100 -o __outFileName__ 
+on field CommandLines
+
+ --------------------------- 
+inputs: flavorParams : 4 / mediaInfo: 12459022 / flavorParamsOutput : 2305102
+ --------------------------- 
+Error: Output Reference (id = 2305102)value: 368 != 
+       Actual output value:           448 
+on field Width
+
+Error: Output Reference (id = 2305102)value: 288 != 
+       Actual output value:           352 
+on field Height
+
+Error: Output Reference (id = 2305102)value: -i __inFileName__ -c VP6 -r 25 -b 357 -k 60 -w 368 -h 288 -a 96 -o __outFileName__ , -i __inFileName__ -vcodec flv -b 536k -s 368x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 536k -s 368x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=536:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=368:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:           -i __inFileName__ -c VP6 -r 25 -b 357 -k 60 -w 448 -h 352 -a 96 -s 44100 -o __outFileName__ ,  -i __inFileName__ -vcodec flv -b 536k -s 448x352 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 536k -s 448x352 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=536:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=448:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ 
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 49862 / mediaInfo: 14935392 / flavorParamsOutput : 3911222
+ --------------------------- 
+Error: Output Reference (id = 3911222)value: -i __inFileName__ -c VP6 -r 24 -b 1200 -k 5 -w 1280 -h 720 -a 96 -o __outFileName__ , encoding.com , -i __inFileName__ -vcodec flv -b 1200k -s 1280x720 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 1200k -s 1280x720 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 23.976 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:           -i __inFileName__ -c VP6 -r 24 -b 1200 -k 5 -w 1280 -h 720 -a 96 -s 44100 -o __outFileName__ , encoding.com ,  -i __inFileName__ -vcodec flv -b 1200k -s 1280x720 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 1200k -s 1280x720 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 23.976 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ 
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 41212 / mediaInfo: 10152272 / flavorParamsOutput : 687022
+ --------------------------- 
+Error: Output Reference (id = 687022)value: 1,2,99,3 != 
+       Actual output value:            
+on field ConversionEngines
+
+Error: Output Reference (id = 687022)value: -i __inFileName__ -c VP6 -r 30 -b 1000 -k 60 -w 848 -h 480 -a 96 -o __outFileName__ , -i __inFileName__ -vcodec flv -b 1000k -s 848x480 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 1000k -s 848x480 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1000:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=848:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:            
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 10542182 / flavorParamsOutput : 934662
+ --------------------------- 
+Error: Output Reference (id = 934662)value: -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 23.976 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 24 -b 800 -k 5 -w 640 -h 480 -a 96 -o __outFileName__ , encoding.com != 
+       Actual output value:            -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 800k -s 640x480 -r 23.976 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 23.976 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 24 -b 800 -k 5 -w 640 -h 480 -a 96 -s 44100 -o __outFileName__ , encoding.com 
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 10148682 / flavorParamsOutput : 684302
+ --------------------------- 
+Error: Output Reference (id = 684302)value: 2,99,3,1 != 
+       Actual output value:            
+on field ConversionEngines
+
+Error: Output Reference (id = 684302)value: -i __inFileName__ -vcodec flv -b 800k -s 1920x1072 -r 25 -g 5 -an -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 1920x1072 -r 25 -g 5 -an -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1920:1072 -nosound -o __outFileName__ , -i __inFileName__ -c VP6 -r 25 -b 800 -k 5 -w 1920 -h 1072 -o __outFileName__ != 
+       Actual output value:            
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 5 / mediaInfo: 13606542 / flavorParamsOutput : 2978772
+ --------------------------- 
+Error: Output Reference (id = 2978772)value: 1,4,2,99,3 != 
+       Actual output value:            
+on field ConversionEngines
+
+Error: Output Reference (id = 2978772)value: -i __inFileName__ -c VP6 -r 15 -b 400 -k 60 -w 400 -h 224 -a 96 -o __outFileName__ , encoding.com , -i __inFileName__ -vcodec flv -b 400k -s 400x224 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 400k -s 400x224 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 14.985 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:224 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:            
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 5 / mediaInfo: 12965702 / flavorParamsOutput : 2599862
+ --------------------------- 
+Error: Output Reference (id = 2599862)value: 384 != 
+       Actual output value:           464 
+on field Width
+
+Error: Output Reference (id = 2599862)value: 288 != 
+       Actual output value:           352 
+on field Height
+
+Error: Output Reference (id = 2599862)value: -i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 384 -h 288 -o __outFileName__ , encoding.com , -i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 30 -g 60 -an -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 30 -g 60 -an -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=384:288 -nosound -o __outFileName__ != 
+       Actual output value:           -i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 464 -h 352 -o __outFileName__ , encoding.com ,  -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 30 -g 60 -an -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 30 -g 60 -an -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=464:352 -nosound -o __outFileName__ 
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 9140052 / flavorParamsOutput : 548142
+ --------------------------- 
+Error: Output Reference (id = 548142)value: 2,99,3,1 != 
+       Actual output value:            
+on field ConversionEngines
+
+Error: Output Reference (id = 548142)value: -i __inFileName__ -vcodec flv -b 800k -s 1920x1072 -r 25 -g 5 -an -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 1920x1072 -r 25 -g 5 -an -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=1920:1072 -nosound -o __outFileName__ , -i __inFileName__ -c VP6 -r 25 -b 800 -k 5 -w 1920 -h 1072 -o __outFileName__ != 
+       Actual output value:            
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 37302 / mediaInfo: 8963972 / flavorParamsOutput : 537072
+ --------------------------- 
+Error: Output Reference (id = 537072)value: 1,4,2,99,3 != 
+       Actual output value:            
+on field ConversionEngines
+
+Error: Output Reference (id = 537072)value: -i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 848 -h 480 -a 96 -o __outFileName__ , encoding.com , -i __inFileName__ -vcodec flv -b 1200k -s 848x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 1200k -s 848x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=848:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ != 
+       Actual output value:            
+on field CommandLines
+
+
+ --------------------------- 
+inputs: flavorParams : 37362 / mediaInfo: 10428512 / flavorParamsOutput : 857782
+ --------------------------- 
+Error: Output Reference (id = 857782)value: -i __inFileName__ -vcodec flv -b 800k -s 864x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ , -i __inFileName__ -vcodec flv -b 800k -s 864x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=864:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 800 -k 5 -w 864 -h 480 -a 96 -o __outFileName__ != 
+       Actual output value:            -i __inFileName__ -vcodec flv -b 800k -s 864x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  -i __inFileName__ -vcodec flv -b 800k -s 864x480 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__ ,  __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=864:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__ , -i __inFileName__ -c VP6 -r 30 -b 800 -k 5 -w 864 -h 480 -a 96 -s 44100 -o __outFileName__ 
+on field CommandLines
+
