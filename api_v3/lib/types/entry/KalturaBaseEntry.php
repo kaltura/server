@@ -111,7 +111,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * The type of the entry, this is auto filled by the derived entry object
 	 * 
 	 * @var KalturaEntryType
-	 * @readonly
+	 * @insertonly
 	 * @filter eq,in
 	 */
 	public $type;
