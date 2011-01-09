@@ -603,24 +603,33 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('pass_reset_url_prefix');
 	}
 	
-	public function setUserKsPermissionName($permissionName)
+	public function setUserSessionRoleId($roleId)
 	{
-		$this->putInCustomData('user_ks_permission_name', $permissionName);
+		$this->putInCustomData('user_session_role_id', $roleId);
 	}
 	
-	public function getUserKsPermissionName()
+	public function getUserSessionRoleId()
 	{
-		return $this->getFromCustomData('user_ks_permission_name');
+		$id = $this->getFromCustomData('user_session_role_id');
+		if (!$id) {
+			$role = UserRolePeer::getByStrId(UserRoleId::BASE_USER_SESSION_ROLE);
+			$id = $role->getId();
+		}
+		return $id;
 	}
 	
-	public function setNoKsPermissionName($permissionName)
+	public function setAlwaysAllowedPermissionNames(array $names)
 	{
-		$this->putInCustomData('no_ks_permission_name', $permissionName);
+		$names = implode(',', $names);
+		$this->putInCustomData('always_allowed_permission_names', $names);
 	}
 	
-	public function getNoKsPermissionName()
+	public function getAlwaysAllowedPermissionNames()
 	{
-		return $this->getFromCustomData('no_ks_permission_name');
+		$names = $this->getFromCustomData('always_allowed_permission_names');
+		$names = explode(',', $names);
+		$names[] = PermissionName::ALWAYS_ALLOWED_ACTIONS;
+		return $names;
 	}
 	
 	/**
@@ -673,8 +682,6 @@ class Partner extends BasePartner
 			}	
 		}
 				
-		$this->tempAdminEmail = null;
-		$this->tempAdminName = null;
 		$this->setEnabledPlugins = array();
 		$this->setEnabledServices = array();
 		
