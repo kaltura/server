@@ -31,7 +31,7 @@ class ExampleUnitTest extends UnitTestBase
 	 */
 	public function providerTestNothing()
 	{
-		$inputs = $this->provider(dirname(__FILE__) . "/tests_data/exampleTest.Data");
+		$inputs = parent::provider(dirname(__FILE__) . "/testsData/exampleTest.Data");
 		return $inputs; //return array<array<>>
 	}
 	

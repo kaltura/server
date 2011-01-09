@@ -15,20 +15,20 @@
 	}
 	else //TODO: clean the else segmant
 	{
-//		//KDL tests
-//		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/tests_data/KDLTests.config";
-//
-//		$testsDataGenerator = new UnitTestDataGenerator($configFileName);
-//		$testsDataGenerator->createTestFiles();
-//	
-		//API_V3 tests
-		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/api_v3/mediaService/tests_data/MediaServiceTests.config";
+		//KDL tests
+		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/testsData/KDLTests.config";
 
 		$testsDataGenerator = new UnitTestDataGenerator($configFileName);
 		$testsDataGenerator->createTestFiles();
-		
+	
+//		//API_V3 tests
+//		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/api_v3/mediaService/testsData/MediaServiceTests.config";
+//
+//		$testsDataGenerator = new UnitTestDataGenerator($configFileName);
+//		$testsDataGenerator->createTestFiles();
+//		
 //		//Example Tests
-//		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/unitTestExample/tests_data/ExampleTestConfigFile.config";
+//		$configFileName = "C:/opt/kaltura/app/tests/unit_test/unitTests/unitTestExample/testsData/ExampleTestConfigFile.config";
 //		
 //		$testsDataGenerator = new UnitTestDataGenerator($configFileName);
 //		$testsDataGenerator->createTestFiles();

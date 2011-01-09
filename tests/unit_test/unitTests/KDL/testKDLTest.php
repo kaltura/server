@@ -1,7 +1,11 @@
 <?php
 
+try{
 	require_once(dirname(__FILE__) . '/../../bootstrap.php');
-	
+}
+catch (Exception $e)
+{
+}
 	/**
 	 * The KDl unit test case
 	 * tests if decision layer makes a right decision about converting and validating files 
@@ -17,21 +21,12 @@
 		 */
 		public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 		{
-			
 			//returns KDLWrap
 			$result = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavorList));
 
-			$validErrorFields = array("CreatedAt", "UpdatedAt", "Id", "PartnerId", "EntryId", "FlavorAssetId", "DeletedAt");
+			$validErrorFields = array("CreatedAt", "UpdatedAt", "Id", "PartnerId", "EntryId", "FlavorAssetId", "DeletedAt", "ReadyBehavior", "FlavorAssetVersion", "FlavorParamsVersion", "AudioResolution");
 			
-			$isEqual = parent::comparePropelObjectsByFields($flavorParamsOutput, reset($result->_targetList), $validErrorFields);
-		
-			$this->assertEquals(true, $isEqual);
-			
-				
-
-			//TODO: write the error list to the file. create an error reporter that gets the string and the path or something
-//			$fhandle = fopen("c:/Users/Roni/.hudson/jobs/");
-//			fwrite($fhandle, PHPUnit_Framework_TestResult);
+			$newErrors = $this->comparePropelObjectsByFields($flavorParamsOutput, reset($result->_targetList), $validErrorFields);
 		}
 		
 		/**
@@ -49,7 +44,7 @@
 			//assert that 0 errors were generated
 			$this->assertEquals(0, count($result->_errors));
 		}
-		
+				
 		/**
 		 * 
 		 * The unit test data provider gets the data for the test "testKDLWrapCDLGenerateTargetFlavors"
@@ -57,7 +52,7 @@
 		 */
 		public function providerCDLGenerateTargetFlavors()
 		{
-			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/tests_data/RealTest1.Data");
+			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/testsData/RealTest1.Data");
 			
 			//The actual input for the tests
 			$inputsForTest = array();
@@ -72,8 +67,10 @@
 				
 				$inputsForTest[] = $testParameters;
 			}
+
+//			$this->errorFile = fopen(dirname(__FILE__) .  "/testsData/KDLUnitTest.result", "w+");
 			
-			return $inputsForTest; 
+			return $inputsForTest;
 		}
 	
 		/**
@@ -82,7 +79,7 @@
 		 */
 		public function providerCDLValidateProduct()
 		{
-			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/tests_data/RealTest2.Data");
+			$inputsAsUnitTestObjects = parent::provider(dirname(__FILE__) . "/testsData/RealTest2.Data");
 			
 			//The actual input for the tests
 			$inputsForTest = array();

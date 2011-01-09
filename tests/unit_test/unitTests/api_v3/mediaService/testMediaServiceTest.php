@@ -11,7 +11,7 @@ class MediaServiceUnitTest extends Api_v3UnitTest
 	 */
 	public function testUploadAction()
 	{
-		$testCaseInputs = parent::provider(dirname(__FILE__) . "/tests_data/testMediaServiceUploadAction.data");
+		$testCaseInputs = parent::provider(dirname(__FILE__) . "/testsData/testMediaServiceUploadAction.data");
 		
 		$dataForSecondTest = array();
 		
@@ -80,7 +80,7 @@ class MediaServiceUnitTest extends Api_v3UnitTest
 	 */
 	public function providerTestMediaServiceGetAction()
 	{
-		$inputs = parent::provider(dirname(__FILE__) . "/tests_data/testMediaServiceGetAction.Data");
+		$inputs = parent::provider(dirname(__FILE__) . "/testsData/testMediaServiceGetAction.Data");
 		$formattedInput = array();
 		foreach ($inputs as $testCaseInputs)
 		{

@@ -14,53 +14,145 @@ interface IUnitTest
  * @author Roni
  *
  */
-class UnitTestBase extends PHPUnit_Framework_TestCase 
+class UnitTestBase extends PHPUnit_Framework_TestCase
 {
+
+	/**
+	 * 
+	 * Indicates wheter the test has failures
+	 * @var bool
+	 */
+	public $hasFailures = false;
+
+	/**
+	 * 
+	 * Returns the inputs for the test
+	 */
+	public function getInputs()
+	{
+		return $this->data;
+	}
+	
+//	/**
+//	 * 
+//	 * Ctor for all the unit tests designed to init all the unit test infrastructure
+//	 */
+//	function __construct($name = "", $data = null)
+//	{
+//		if(UnitTestBase::$failureFile == null)
+//		{
+//			UnitTestBase::$failureFile = fopen(dirname(__FILE__) . "/../unitTests/Results/KDLUnitTest.result", "w+");
+//			UnitTestBase::$failureObjectsFile = fopen(dirname(__FILE__) . "/../unitTests/Results/KDLUnitTest.failures", "w+");
+//			UnitTestBase::$failures = new testsErrors();
+//			UnitTestBase::$listener = new kalturaUnitTestListener();
+//		}
+//		
+//		if($this->result != null)
+//		{
+//			$this->result->addListener(UnitTestBase::$listener);
+//		}
+//		
+//		parent::__construct();
+//							
+//		//TODO: add the tests listener (so we can get a custom failure output)
+//	}
+			
+	
+	/**
+	 * 
+	 * The unit tests results
+	 * @var unknown_type
+	 */
+	public static $results;
+	
+	public function runTest()
+	{
+		//Do this section only once per test file and not for test... so we can initiate all the tests 
+		//TODO: HOW to do nice :) and also how to know if this is a new test class or a new test or jsut another input
+		$this->currentFailure = null;
 		
+		if(UnitTestBase::$failureFile == null)
+		{
+			$class = get_class($this);
+
+			$classPath = KAutoloader::getClassFilePath($class);
+			
+			UnitTestBase::$failureFile = fopen(dirname($classPath) . "/testsData/KDLUnitTest.result", "w+");
+			UnitTestBase::$failureObjectsFile = fopen(dirname($classPath) . "/testsData/KDLUnitTest.failures", "w+");
+			$this->result->addListener(new kalturaUnitTestListener());
+		}
+		
+		parent::runTest();
+	}
+	
+	/**
+	 * 
+	 * The unit tests listener
+	 * @var kalturaUnitTestListener
+	 */
+	public static $listener = null;
+	
+	/**
+	 * 
+	 * The unit test failure file for custom failures (humna readable interface)
+	 * @var unknown_type
+	 */
+	public static $failureFile = null; 
+	
+	/**
+	 * 
+	 * The unit test failures 
+	 * @var testFailures
+	 */
+	public static $failures = null;
+	
+	/**
+	 * 
+	 * The unit test current failure 
+	 * @var the current failure (used by the listener)
+	 */
+	public $currentFailure = null;
+	
+	/**
+	 * 
+	 * All the failures object will be parsed here so we can use them later for failure reporting and unittest overriding
+	 * @var unknown_type
+	 */
+	public static $failureObjectsFile = null;
+	
 	/**
 	 * 
 	 * The unit test data provider (gets the data for the different unit tests)
 	 * @param string $dataFilePath - the data file path (with the objects)
 	 * @return array<array>();
 	 */
-	public function provider($dataFilePath)
+	public static function provider($dataFilePath)
 	{
-		try 
-		{
-			$simpleXML = simplexml_load_file($dataFilePath);
-		}
-		catch(Exception $e)
-		{
-			//TODO: exception handling
-			print("Unable to load file : " . $dataFilePath. " as xml.\n Error: " . $e);
-			die();
-		}
-		
+		$simpleXML = kXml::openXmlFile($dataFilePath);
+				
 		$inputsForUnitTests = array();
 		
 		foreach ($simpleXML->UnitTestsData->UnitTestData as $unitTestData)
 		{
 			$inputs = array();
 			
-			foreach ($simpleXML->UnitTestsData->UnitTestData->Inputs->Input as $input)
+			foreach ($unitTestData->Inputs->Input as $input)
 			{
-				$object = kXml::XmlToObject($input);
+				$object = UnitTestDataObject::fromXml($input);
 
 				//Go to the last and current input and add the variable
 				array_push($inputs, $object);
-
 			}
 			
-			foreach ($simpleXML->UnitTestsData->UnitTestData->OutputReferences->OutputReference as $output)
+			foreach ($unitTestData->OutputReferences->OutputReference as $output)
 			{
-				$object = kXml::XmlToObject($output);
+				$object = UnitTestDataObject::fromXml($output);
 
 				//Go to the last and current input and add the variable
 				array_push($inputs, $object);
 			}
 			
 			$inputsForUnitTests[] = $inputs;
-			
 		}
 		
 		return $inputsForUnitTests; 
@@ -78,15 +170,22 @@ class UnitTestBase extends PHPUnit_Framework_TestCase
 		//Gets the data peer of the object (used to geting all the obejct feilds)
 		$dataPeer = $outputReference->getPeer(); 
 		
+		$outputReferenceId = $outputReference->getId();
+		$newResultId = $newResult->getId();
+		
 		//Gets all object feilds
 		$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
 		
 		$isEqual = true;
 		
+		$newErrors = array();
+		
 		//Create the xml elements by all fields and their values
 		foreach ($fields as $field)
 		{
-			//If the field is inthe valid error list then we skip him 
+			PHPUnit_Util_Timer::start();
+			
+			//If the field is in the valid failure list then we skip him 
 			if(in_array($field, $validErrorFields))
 			{
 				continue;
@@ -94,63 +193,25 @@ class UnitTestBase extends PHPUnit_Framework_TestCase
 			else 
 			{
 				$expectedValue = $outputReference->getByName($field);
-
-				//if thisis an array we need to change it to a string
-				if(is_array($expectedValue))
-				{
-					$expectedValue = implode(" , ", $expectedValue);
-				}
-				
 				$actualValue = $newResult->getByName($field);
 				
 				//if this is an array we need to change it to a string
-				if(is_array($actualValue))
-				{
-					$actualValue = implode(" , ", $actualValue);
-				}
 				
-				if($expectedValue != $actualValue)
-				{
-					print("Error Output Reference value is: " . $expectedValue . " != actual output is: " . $actualValue ." on field " . $field . "\n");
-					$isEqual = false;
+				try {
+					$currentFailure = new unitTestFailure($field, $actualValue, $expectedValue);
+					$this->assertEquals($expectedValue, $actualValue, $currentFailure);
 				}
-				else
-				{
-					//nothing to do here they are equal
+				catch (PHPUnit_Framework_AssertionFailedError $e) {
+					$this->hasFailures  = true;
+					$this->currentFailure = $currentFailure;
+					$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+				}
+				catch (Exception $e) {
+					$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
 				}
 			}
 		}
-		
-		return $isEqual;
-	}
-}
 
-/**
- * 
- * Represents the base class for api_v3 unit tests
- * @author Roni
- *
- */
-class Api_v3UnitTest extends UnitTestBase
-{
-	/**
-	 * 
-	 * Gets the parameters for creating a new kaltura client and returns the new client
-	 * @param int $partnerId
-	 * @param string $secret
-	 * @param string $configServiceUrl
-	 * @return KalturaClient - a new api client 
-	 */
-	public function getClient($partnerId, $secret, $configServiceUrl)
-	{
-		$config = new KalturaConfiguration((int)$partnerId);
-
-		//Add the server url (into the test additional data)
-		$config->serviceUrl = $configServiceUrl;
-		$client = new KalturaClient($config);
-		$ks = $client->session->start($secret, null, KalturaSessionType::ADMIN, (int)$partnerId, null, null);
-		$client->setKs($ks);
-		
-		return $client;
+		return $newErrors;
 	}
 }
