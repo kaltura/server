@@ -134,7 +134,7 @@ Language                         : English
       <OutputReferences>
         <OutputReference type="flavorParamsOutput" key="1608192">
           <Id>1608192</Id>
-          <FlavorParamsId dbValue="35">5</FlavorParamsId>
+          <FlavorParamsId>35</FlavorParamsId>
           <FlavorParamsVersion>0</FlavorParamsVersion>
           <PartnerId>223632</PartnerId>
           <EntryId>0_7ze65jjx</EntryId>
@@ -154,7 +154,7 @@ Language                         : English
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">22050</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>400</Width>
           <Height>288</Height>
@@ -165,17 +165,17 @@ Language                         : English
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 25 -b 270 -k 60 -w 400 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 25 -b 270 -k 60 -w 400 -h 288 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 25 -b 270 -k 60 -w 400 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 400x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -348,17 +348,17 @@ Tagged date                      : UTC 2010-02-18 20:39:44
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 500 -k 5 -w 400 -h 224 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 5 -w 400 -h 224 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:224 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:224 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 5 -w 400 -h 224 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 500k -s 400x224 -r 29.97 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:224 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -496,8 +496,8 @@ Tagged date                      : UTC 2008-12-29 10:59:41
           <AudioChannels></AudioChannels>
           <AudioSampleRate></AudioSampleRate>
           <AudioResolution></AudioResolution>
-          <Width dbValue="352">432</Width>
-          <Height dbValue="288">352</Height>
+          <Width>352</Width>
+          <Height>288</Height>
           <FrameRate>30</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
@@ -505,16 +505,16 @@ Tagged date                      : UTC 2008-12-29 10:59:41
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 352 -h 288 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 432 -h 352 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 30 -g 60 -an -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 432x352 -r 30 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 30 -g 60 -an -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 432x352 -r 30 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=352:288 -nosound -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=432:352 -nosound -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 352 -h 288 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 30 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 30 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=352:288 -nosound -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -658,7 +658,7 @@ Interleave, duration             : 24 ms (0.29 video frame)
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">22050</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>320</Width>
           <Height>240</Height>
@@ -669,17 +669,17 @@ Interleave, duration             : 24 ms (0.29 video frame)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 12 -b 337 -k 5 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 12 -b 337 -k 5 -w 320 -h 240 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 12 -ovc lavc -lavcopts vcodec=flv:vbitrate=506:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 12 -ovc lavc -lavcopts vcodec=flv:vbitrate=506:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 12 -b 337 -k 5 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 506k -s 320x240 -r 12 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 12 -ovc lavc -lavcopts vcodec=flv:vbitrate=506:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -842,17 +842,17 @@ Tagged date                      : UTC 2010-03-12 18:21:30
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 1000 -k 60 -w 1280 -h 720 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 1000 -k 60 -w 1280 -h 720 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1000:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1000:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 1000 -k 60 -w 1280 -h 720 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1000k -s 1280x720 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1000:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=1280:720 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1013,17 +1013,17 @@ Menu
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=404:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=404:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 15 -b 269 -k 5 -w 400 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 15 -b 269 -k 5 -w 400 -h 288 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 404k -s 400x288 -r 15 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=404:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 15 -b 269 -k 5 -w 400 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1176,7 +1176,7 @@ Tagged date                      : UTC 2007-01-05 18:37:19
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">22050</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>880</Width>
           <Height>560</Height>
@@ -1187,17 +1187,17 @@ Tagged date                      : UTC 2007-01-05 18:37:19
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 10 -ovc lavc -lavcopts vcodec=flv:vbitrate=80:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=880:560 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 10 -ovc lavc -lavcopts vcodec=flv:vbitrate=80:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=880:560 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 10 -b 53 -k 5 -w 880 -h 560 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 10 -b 53 -k 5 -w 880 -h 560 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 80k -s 880x560 -r 10 -g 5 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 10 -ovc lavc -lavcopts vcodec=flv:vbitrate=80:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=5 -vf harddup,scale=880:560 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 10 -b 53 -k 5 -w 880 -h 560 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1353,8 +1353,8 @@ Tagged date                      : UTC 2010-04-16 20:12:53
           <AudioChannels>2</AudioChannels>
           <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
-          <Width dbValue="512">624</Width>
-          <Height dbValue="288">352</Height>
+          <Width>512</Width>
+          <Height>288</Height>
           <FrameRate>29.97</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
@@ -1362,16 +1362,16 @@ Tagged date                      : UTC 2010-04-16 20:12:53
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 512 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 624 -h 352 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=512:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=624:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 512 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=512:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1524,17 +1524,17 @@ Interleave, duration             : 40 ms (1.00 video frame)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 320 -h 240 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1673,17 +1673,17 @@ Title                            : DCTM VIDEO IMAGE
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 15 -b 1200 -k 60 -w 528 -h 384 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 15 -b 1200 -k 60 -w 528 -h 384 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=528:384 -nosound -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=528:384 -nosound -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 15 -b 1200 -k 60 -w 528 -h 384 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1200k -s 528x384 -r 15 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=528:384 -nosound -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -1846,17 +1846,17 @@ Language                         : English (US)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 324 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 324 -k 60 -w 320 -h 240 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=486:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=486:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 324 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 486k -s 320x240 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=486:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2012,8 +2012,8 @@ Interleave, duration             : 35 ms (1.04 video frame)
           <AudioChannels>2</AudioChannels>
           <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
-          <Width dbValue="512">624</Width>
-          <Height dbValue="288">352</Height>
+          <Width>512</Width>
+          <Height>288</Height>
           <FrameRate>30</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
@@ -2021,16 +2021,16 @@ Interleave, duration             : 35 ms (1.04 video frame)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 512 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 624 -h 352 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 624x352 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=512:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=624:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 400 -k 60 -w 512 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 512x288 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=512:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2176,7 +2176,7 @@ Interleave, preload duration     : 1000 ms
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">11025</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>640</Width>
           <Height>480</Height>
@@ -2187,17 +2187,17 @@ Interleave, preload duration     : 1000 ms
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -s 11025 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 11025 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 11025 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 11025 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2343,11 +2343,11 @@ Tagged date                      : UTC 2010-03-01 05:52:33
           <DeletedAt></DeletedAt>
           <IsDefault>0</IsDefault>
           <Format>mp4</Format>
-          <VideoCodec dbValue="h264">h264b</VideoCodec>
+          <VideoCodec>h264</VideoCodec>
           <VideoBitrate>1300</VideoBitrate>
           <AudioCodec>aac</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
-          <AudioChannels dbValue="2">1</AudioChannels>
+          <AudioChannels>2</AudioChannels>
           <AudioSampleRate>22050</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>640</Width>
@@ -2355,20 +2355,17 @@ Tagged date                      : UTC 2010-03-01 05:52:33
           <FrameRate>25</FrameRate>
           <GopSize>300</GopSize>
           <TwoPass></TwoPass>
-          <ConversionEngines dbValue="2">2,1,99,3</ConversionEngines>
+          <ConversionEngines>2</ConversionEngines>
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -vcodec libx264 -b 1300k -s 640x480 -r 25 -g 300 -acodec libfaac -ab 96k -ar 22050 -ac 2 -f mp4 -y __outFileName__;FS" key="2"> -i __inFileName__ -vcodec  libx264 -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -b 1300k -s 640x480 -r 25 -g 300 -acodec libfaac -ab 96k -ar 22050 -ac 1 -f mp4 -y __outFileName__;FS</CommandLines>
-            <CommandLines dbValue="" key="1">-i __inFileName__ -c H264 --FE2_H264_PROFILE=0 -r 25 -b 1300 -k 300 -w 640 -h 480 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="" key="99"> -i __inFileName__ -vcodec  libx264 -subq 2 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 0 -b 1300k -s 640x480 -r 25 -g 300 -acodec libfaac -ab 96k -ar 22050 -ac 1 -f mp4 -y __outFileName__;FS</CommandLines>
-            <CommandLines dbValue="" key="3"> __inFileName__ -of lavf -lavfopts format=mp4 -ofps 25 -ovc x264 -sws 9 -x264encopts  bitrate=1300:subq=2:frameref=6:bframes=0:threads=auto:nocabac:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh:keyint=300 -vf harddup,scale=640:480 -oac faac -faacopts mpeg=4:object=2:tns:raw:br=96 -srate 22050 -o __outFileName__;FS</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec libx264 -b 1300k -s 640x480 -r 25 -g 300 -acodec libfaac -ab 96k -ar 22050 -ac 2 -f mp4 -y __outFileName__;FS</CommandLines>
           </Array>
           <FileExt>mp4</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2528,17 +2525,17 @@ Language                         : English (AU)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 601 -k 60 -w 496 -h 368 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 601 -k 60 -w 496 -h 368 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=902:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=496:368 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=902:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=496:368 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 601 -k 60 -w 496 -h 368 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 902k -s 496x368 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=902:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=496:368 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2695,17 +2692,17 @@ Interleave, preload duration     : 522 ms
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 352 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 352 -h 288 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=352:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=352:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 25 -b 400 -k 60 -w 352 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 352x288 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=352:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -2868,17 +2865,17 @@ Language                         : English (US)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 4 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 4 -k 60 -w 320 -h 240 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=6:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=6:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 4 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 6k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=6:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3031,7 +3028,7 @@ Tagged date                      : UTC 2002-02-28 15:55:06
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">22050</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>320</Width>
           <Height>240</Height>
@@ -3042,17 +3039,17 @@ Tagged date                      : UTC 2002-02-28 15:55:06
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 15 -b 350 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 15 -b 350 -k 60 -w 320 -h 240 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 15.042 -ovc lavc -lavcopts vcodec=flv:vbitrate=525:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15.042 -ovc lavc -lavcopts vcodec=flv:vbitrate=525:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 15 -b 350 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 525k -s 320x240 -r 15.042 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 15.042 -ovc lavc -lavcopts vcodec=flv:vbitrate=525:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3205,17 +3202,17 @@ Interleave, duration             : 494 ms (14.83 video frames)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 320 -h 240 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1200k -s 320x240 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3378,23 +3375,24 @@ Tagged date                      : UTC 1970-01-01 00:00:00
           <AudioResolution></AudioResolution>
           <Width>704</Width>
           <Height>384</Height>
-          <FrameRate dbValue="25"></FrameRate>
+          <FrameRate>25</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
-          <ConversionEngines dbValue="1,4,2,99,3">1,2,99,3</ConversionEngines>
+          <ConversionEngines>1,4,2,99,3</ConversionEngines>
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 25 -b 800 -k 60 -w 704 -h 384 -a 96 -c H264 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -b 800 -k 60 -w 704 -h 384 -a 96 -s 44100 -c H264 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 800k -s 704x384 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 800k -s 704x384 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 800k -s 704x384 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 800k -s 704x384 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=704:384 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=704:384 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 25 -b 800 -k 60 -w 704 -h 384 -a 96 -c H264 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 800k -s 704x384 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 800k -s 704x384 -r 25 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 25 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=704:384 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3548,7 +3546,7 @@ Tagged date                      : UTC 2010-03-22 08:54:21
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">22050</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>400</Width>
           <Height>288</Height>
@@ -3559,17 +3557,17 @@ Tagged date                      : UTC 2010-03-22 08:54:21
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 15 -b 422 -k 60 -w 400 -h 288 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 15 -b 422 -k 60 -w 400 -h 288 -a 96 -s 22050 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 22050 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 14.982 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 14.982 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 22050 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 15 -b 422 -k 60 -w 400 -h 288 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 500k -s 400x288 -r 14.982 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 14.982 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=400:288 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3673,7 +3671,7 @@ Tagged date                      : UTC 2010-03-22 08:54:21
           <AudioCodec>mp3</AudioCodec>
           <AudioBitrate>96</AudioBitrate>
           <AudioChannels>2</AudioChannels>
-          <AudioSampleRate dbValue="44100">11025</AudioSampleRate>
+          <AudioSampleRate>44100</AudioSampleRate>
           <AudioResolution></AudioResolution>
           <Width>320</Width>
           <Height>240</Height>
@@ -3684,17 +3682,17 @@ Tagged date                      : UTC 2010-03-22 08:54:21
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 8 -b 400 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 8 -b 400 -k 60 -w 320 -h 240 -a 96 -s 11025 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 11025 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 11025 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 8.036 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 8.036 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 11025 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 8 -b 400 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 320x240 -r 8.036 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 8.036 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -3865,16 +3863,16 @@ Tagged_Date                      : UTC 2010-02-21 22:23:53
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 800 -k 60 -w 592 -h 448 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 800 -k 60 -w 592 -h 448 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=592:448 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=592:448 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 800 -k 60 -w 592 -h 448 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 800k -s 592x448 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=800:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=592:448 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4022,17 +4020,17 @@ Tagged date                      : UTC 2009-05-13 22:10:36
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 720 -h 480 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 720 -h 480 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=720:480 -nosound -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=720:480 -nosound -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 1200 -k 60 -w 720 -h 480 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1200k -s 720x480 -r 29.97 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=720:480 -nosound -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4192,17 +4190,17 @@ Tagged date                      : UTC 2010-02-18 20:34:48
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 15 -b 203 -k 60 -w 320 -h 240 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 15 -b 203 -k 60 -w 320 -h 240 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 14.985 -ovc lavc -lavcopts vcodec=flv:vbitrate=305:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 14.985 -ovc lavc -lavcopts vcodec=flv:vbitrate=305:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 15 -b 203 -k 60 -w 320 -h 240 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 305k -s 320x240 -r 14.985 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 14.985 -ovc lavc -lavcopts vcodec=flv:vbitrate=305:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=320:240 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4329,8 +4327,8 @@ Stream size                      : 10.1 MiB (100%)
           <AudioChannels></AudioChannels>
           <AudioSampleRate></AudioSampleRate>
           <AudioResolution></AudioResolution>
-          <Width dbValue="384">464</Width>
-          <Height dbValue="288">352</Height>
+          <Width>384</Width>
+          <Height>288</Height>
           <FrameRate>20</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
@@ -4338,17 +4336,17 @@ Stream size                      : 10.1 MiB (100%)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 20 -b 400 -k 60 -w 384 -h 288 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 20 -b 400 -k 60 -w 464 -h 352 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 20 -g 60 -an -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 20 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 20 -g 60 -an -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 464x352 -r 20 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 20 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=384:288 -nosound -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 20 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=464:352 -nosound -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 20 -b 400 -k 60 -w 384 -h 288 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 20 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 384x288 -r 20 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 20 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=384:288 -nosound -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4515,16 +4513,16 @@ Tagged_Date                      : UTC 2010-02-25 00:33:08
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 1600 -k 60 -w 640 -h 352 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 1600 -k 60 -w 640 -h 352 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1600:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1600:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 1600 -k 60 -w 640 -h 352 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 1600k -s 640x352 -r 29.97 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 29.97 -ovc lavc -lavcopts vcodec=flv:vbitrate=1600:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:352 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4684,17 +4682,17 @@ Language                         : English (US)
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -s 44100 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="encoding.com" key="4">encoding.com</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 30 -b 500 -k 60 -w 640 -h 480 -a 96 -o __outFileName__</CommandLines>
+            <CommandLines key="4">encoding.com</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 500k -s 640x480 -r 30 -g 60 -acodec libmp3lame -ab 96k -ar 44100 -ac 2 -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 30 -ovc lavc -lavcopts vcodec=flv:vbitrate=500:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=640:480 -oac mp3lame -lameopts abr:br=96 -srate 44100 -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
@@ -4831,8 +4829,8 @@ Tagged date                      : UTC 2005-09-03 19:32:22
           <AudioChannels></AudioChannels>
           <AudioSampleRate></AudioSampleRate>
           <AudioResolution></AudioResolution>
-          <Width dbValue="416">512</Width>
-          <Height dbValue="288">352</Height>
+          <Width>416</Width>
+          <Height>288</Height>
           <FrameRate>12.5</FrameRate>
           <GopSize>60</GopSize>
           <TwoPass></TwoPass>
@@ -4840,16 +4838,16 @@ Tagged date                      : UTC 2005-09-03 19:32:22
           <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
           <CustomData></CustomData>
           <Array>
-            <CommandLines dbValue="-i __inFileName__ -c VP6 -r 13 -b 400 -k 60 -w 416 -h 288 -o __outFileName__" key="1">-i __inFileName__ -c VP6 -r 13 -b 400 -k 60 -w 512 -h 352 -o __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 416x288 -r 12.5 -g 60 -an -f flv -y __outFileName__" key="2"> -i __inFileName__ -vcodec flv -b 400k -s 512x352 -r 12.5 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue="-i __inFileName__ -vcodec flv -b 400k -s 416x288 -r 12.5 -g 60 -an -f flv -y __outFileName__" key="99"> -i __inFileName__ -vcodec flv -b 400k -s 512x352 -r 12.5 -g 60 -an -f flv -y __outFileName__</CommandLines>
-            <CommandLines dbValue=" __inFileName__ -of lavf -lavfopts format=flv -ofps 12.5 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=416:288 -nosound -o __outFileName__" key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 12.5 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=512:352 -nosound -o __outFileName__</CommandLines>
+            <CommandLines key="1">-i __inFileName__ -c VP6 -r 13 -b 400 -k 60 -w 416 -h 288 -o __outFileName__</CommandLines>
+            <CommandLines key="2">-i __inFileName__ -vcodec flv -b 400k -s 416x288 -r 12.5 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="99">-i __inFileName__ -vcodec flv -b 400k -s 416x288 -r 12.5 -g 60 -an -f flv -y __outFileName__</CommandLines>
+            <CommandLines key="3"> __inFileName__ -of lavf -lavfopts format=flv -ofps 12.5 -ovc lavc -lavcopts vcodec=flv:vbitrate=400:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=60 -vf harddup,scale=416:288 -nosound -o __outFileName__</CommandLines>
           </Array>
           <FileExt>flv</FileExt>
-          <Deinterlice dbValue="0"></Deinterlice>
-          <Rotate dbValue="0"></Rotate>
+          <Deinterlice>0</Deinterlice>
+          <Rotate>0</Rotate>
           <Operators></Operators>
-          <EngineVersion>0</EngineVersion>
+          <EngineVersion></EngineVersion>
           <Type>1</Type>
         </OutputReference>
       </OutputReferences>
