@@ -560,17 +560,28 @@ class myInsertEntryHelper
 						
 						// call mediaInfo for file
 						$mediaInfo = new mediaInfo();
-						$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, kConf::get('bin_path_mediainfo'));
-						$KalturaMediaInfo = new KalturaMediaInfo();
-						$KalturaMediaInfo = $mediaInfoParser->getMediaInfo();
-						$mediaInfo = $KalturaMediaInfo->toInsertableObject($mediaInfo);
-						$mediaInfo->setFlavorAssetId($flavorAsset->getId());
-						$mediaInfo->save();						
+						try
+						{
+							$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, kConf::get('bin_path_mediainfo'));
+							$KalturaMediaInfo = new KalturaMediaInfo();
+							$KalturaMediaInfo = $mediaInfoParser->getMediaInfo();
+							$mediaInfo = $KalturaMediaInfo->toInsertableObject($mediaInfo);
+							$mediaInfo->setFlavorAssetId($flavorAsset->getId());
+							$mediaInfo->save();
+						}
+						catch(Exception $e)
+						{
+							KalturaLog::err("Getting media info: " . $e->getMessage());
+							$mediaInfo = null;
+						}
 						
 						// fix flavor asset according to mediainfo
-						KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfo, $flavorAsset);
-						$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
-						$flavorAsset->setTags(implode(',', $flavorTags));
+						if($mediaInfo)
+						{
+							KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfo, $flavorAsset);
+							$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
+							$flavorAsset->setTags(implode(',', $flavorTags));
+						}
 						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 						$flavorAsset->save();
 					}
