@@ -10481,6 +10481,18 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function updateSunStatus()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateSunStatus", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
 	function createRequiredJobs()
 	{
 		$kparams = array();
