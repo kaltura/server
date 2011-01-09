@@ -1,5 +1,5 @@
 <?php
-class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectDataChangedEventConsumer
+class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectDataChangedEventConsumer
 {
 	/**
 	 * @param BaseObject $object
@@ -24,7 +24,35 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
-
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectUpdated(BaseObject $object)
+	{
+		if($object instanceof EntryDistribution)
+		{
+			$entry = entryPeer::retrieveByPK($object->getEntryId());
+			if($entry) // updated in the indexing server (sphinx)
+				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+		}
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectAdded(BaseObject $object)
+	{
+		if($object instanceof EntryDistribution)
+		{
+			$entry = entryPeer::retrieveByPK($object->getEntryId());
+			if($entry) // updated in the indexing server (sphinx)
+				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+		}
+	}
+	
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param BatchJob $twinJob
@@ -588,13 +616,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onEntryDistributionChanged(EntryDistribution $entryDistribution, array $modifiedColumns)
 	{
-		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-		if($entry) // updated in the indexing server (sphinx)
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
-			
-		// updated in the indexing server (sphinx)
-		kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
-			
 		if(!in_array(EntryDistributionPeer::SUNRISE, $modifiedColumns) && !in_array(EntryDistributionPeer::SUNSET, $modifiedColumns))
 			return true;
 			
