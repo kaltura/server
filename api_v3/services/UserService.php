@@ -111,10 +111,15 @@ class UserService extends KalturaBaseUserService
 		// update user
 		try
 		{
-			$user->id = $userId; // do not allow updaing the user id (puserId)
 			if (!is_null($user->roleIds)) {
 				UserRolePeer::testValidRolesForUser($user->roleIds);
 			}
+			if ($user->id != $userId) {
+				$existingUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $user->id);
+				if ($existingUser) {
+					throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
+				}
+			}			
 			$dbUser = $user->toUpdatableObject($dbUser);
 			$dbUser->save();
 		}
