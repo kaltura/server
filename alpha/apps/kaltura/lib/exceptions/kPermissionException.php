@@ -20,8 +20,4 @@ class kPermissionException extends kCoreException
 	const ROLE_NOT_FOUND = 'ROLE_NOT_FOUND';	
 	
 	const ROLE_IS_BEING_USED = 'ROLE_IS_BEING_USED';
-	
-	const USER_ID_UNIDENTIFIED = 'USER_ID_UNIDENTIFIED';
-	
-	const PARTNER_ID_UNIDENTIFIED = 'PARTNER_ID_UNIDENTIFIED';
 }
