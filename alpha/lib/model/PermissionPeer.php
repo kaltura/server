@@ -212,7 +212,7 @@ class PermissionPeer extends BasePermissionPeer
 	public static function filterDependenciesByNames($permissionNames)
 	{
 		$c = new Criteria();
-		$c->addAnd(PermissionName, explode(',', $permissionNames), Criteria::IN);
+		$c->addAnd(PermissionPeer::NAME, explode(',', $permissionNames), Criteria::IN);
 		$permissionObjects = PermissionPeer::doSelect($c);
 		$permissionObjects = PermissionPeer::filterDependencies($permissionObjects);
 		$permissionNames = array();

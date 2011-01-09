@@ -66,7 +66,7 @@ class Permission extends BasePermission
 	 */
 	public function getPermissionItems()
 	{
-		$ids = $this->getPermissionItems();
+		$ids = $this->getPermissionItemIds();
 				
 		$c = new Criteria();
 		$c->add(PermissionItemPeer::ID, $ids, Criteria::IN);
