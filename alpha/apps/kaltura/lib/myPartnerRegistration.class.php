@@ -286,6 +286,7 @@ class myPartnerRegistration
 			// so he will be able to login to the system (including permissions)
 			list($newAdminKuserPassword, $newPassHashKey, $kuserId) = $this->createNewAdminKuser($newPartner , $password );
 			$newPartner->setAccountOwnerKuserId($kuserId);
+			$newPartner->save();
 			
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
