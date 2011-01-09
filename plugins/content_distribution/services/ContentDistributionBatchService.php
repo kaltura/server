@@ -326,19 +326,42 @@ class ContentDistributionBatchService extends BatchService
 
 	
 	/**
+	 * updates entry distribution sun status in the search engine
+	 * 
+	 * @action updateSunStatus
+	 */
+	function updateSunStatusAction()
+	{
+		// serach all records that their sun status changed to after sunset
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::AFTER_SUNSET , Criteria::NOT_EQUAL);
+		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::GREATER_THAN);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
+		
+			
+		// serach all records that their sun status changed to after sunrise
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::BEFORE_SUNRISE);
+		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::GREATER_THAN);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
+	}
+	
+
+	/**
 	 * creates all required jobs according to entry distribution dirty flags 
 	 * 
 	 * @action createRequiredJobs
 	 */
 	function createRequiredJobsAction()
 	{
-		// TODO read from sphinx the dirty records and create jobs
-		// TODO update sun status on entry distribution
-		
+		// serach all records that their next report time arrived
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::NEXT_REPORT, time(), Criteria::GREATER_EQUAL);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
-		
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
@@ -347,8 +370,37 @@ class ContentDistributionBatchService extends BatchService
 			else
 				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
 		}
+		
+		
+		// serach all records that atrrived their sunrise time and requires submittion
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::SUBMIT_REQUIRED);
+		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::GREATER_EQUAL);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+			if($distributionProfile)
+				kContentDistributionManager::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+			else
+				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
+		}
+		
+		
+		// serach all records that atrrived their sunset time and requires deletion
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::DELETE_REQUIRED);
+		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::GREATER_EQUAL);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+			if($distributionProfile)
+				kContentDistributionManager::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+			else
+				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
+		}
 	}
-	
 // --------------------------------- Distribution Synchronizer functions 	--------------------------------- //
 	
 }
