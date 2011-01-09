@@ -135,172 +135,6 @@ class kXml
 	}
 
 	/**
-	 * The main function for converting to an Domdocument.
-	 * Pass in a BaseObject (from kaltura) and returns that object serialized as a DomDocument
-	 *
-	 * @param BaseObject $data
-	 * @param string $rootNodeName - what you want the root node to be - defaultsto data.
-	 * @return DomDocument XML
-	 */
-	public static function objectToXml(UnitTestDataObject $data, $rootNodeName = 'data')
-	{
-		$xml = new DOMDocument(1.0);
-		$rootNode = $xml->createElement($rootNodeName);
-		$xml->appendChild($rootNode); 
-		
-		foreach ($data->additionalData as $key => $value)
-		{
-			$rootNode->setAttribute($key, $value);
-		}
-		
-		//we need to check if this is a propel object
-		if(is_object($data->dataObject))
-		{
-			if($data->dataObject instanceof BaseObject)
-			{
-				//TODO: support in a different method, break this method into two parts
-//				propelObjectToXml();
-				
-				//Gets the data peer of the object (used to geting all the obejct feilds)
-				$dataPeer = $data->dataObject->getPeer(); 
-				
-				//Gets all object fields
-				$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
-				
-				//Create the xml elements by all fields and their values
-				foreach ($fields as $field)
-				{
-					$value = $data->dataObject->getByName($field);
-				
-					if(!is_array($value ))
-					{
-						$node = $xml->createElement($field, $value);
-						$rootNode->appendChild($node);
-					}
-					else
-					{
-						//create the array node
-						$arrayNode = $xml->createElement("array");
-						
-						foreach ($value as $key => $singleValue)
-						{
-							$node = $xml->createElement($field, $singleValue);
-							$node->setAttribute("key", $key );
-							$arrayNode->appendChild($node);
-						}
-											
-						$rootNode->appendChild($arrayNode); 
-					}
-				}
-			}
-			else // object is Kaltura object base
-			{
-				//TODO: serialize the kaltura object into XML.
-				$reflector = new ReflectionClass($data->dataObject);
-				$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
-				foreach ($properties as $property)
-				{
-					$value = $property->getValue($data->dataObject);
-					$propertyName = $property->getName();
-					$propertyValueType = gettype($value);
-					
-					if(!is_array($value))
-					{
-						$node = $xml->createElement($propertyName, $value);
-						$node->setAttribute("type", $propertyValueType);
-						$rootNode->appendChild($node);
-					}
-					else
-					{
-						//create the array node
-						$arrayNode = $xml->createElement("array");
-						
-						foreach ($value as $key => $singleValue)
-						{
-							$node = $xml->createElement($propertyName, $singleValue);
-							$node->setAttribute("type", $propertyValueType);
-							$node->setAttribute("key", $key);
-							$arrayNode->appendChild($node);
-						}
-											
-						$rootNode->appendChild($arrayNode); 
-					}
-				}
-			}
-		}
-		else
-		{
-			//Value types will be written in the same line as their type
-			
-//			$node = $xml->createElement(gettype($data), $data);
-//			$rootNode->appendChild($node);
-//			$rootNode->setAttribute("value", $data);
-		}
-		 		
-		// pass back DomElement object
-		return $xml;
-	}
-
-	/**
-	 * Gets a xml based data and returns a new unit test data object with those values
-	 * @param SimpleXMLElement $xml
-	 * @return UnitTestDataObject the new unit test data object with the given data
-	 */
-	public static function XmlToObject($xml)
-	{
-		$objectInstace = new UnitTestDataObject();
-		 
-		$objectInstace->type = (string)$xml['type'];
-			
-		$objectInstace->dataObject = kXml::getObjectInstance($objectInstace->type);	
-	
-		$objectInstace->additionalData = kXml::getAttributesAsArray($xml);
-		
-		if(class_exists($objectInstace->type))
-		{
-			foreach ($xml->children() as $child)
-			{
-				$childKey = $child->getName();
-				$childValue = (string)$child;
-				$childValueType = (string)$child["type"];
-				try
-				{
-					//TODO: handle fields which are arrays (currently handled hard coded)
-					if($childKey == "array")
-					{
-						$arrayValue = array();
-						
-						foreach ($child->children() as $singleElementKey => $singleElementValue)
-						{
-							$key = (string)$singleElementValue["key"];
-							$arrayValue[$key] = (string)$singleElementValue;
-							$arrayKey = $singleElementKey;
-						}
-						
-						kXml::setPropertyValue(&$objectInstace->dataObject, $arrayKey, $arrayValue, $childValueType);
-					}
-	 				else 
-	 				{
-	 					kXml::setPropertyValue(&$objectInstace->dataObject, $childKey, $childValue, $childValueType);
-	 				}
-				}	
-				catch (Exception $e)
-				{
-					print("Error can't set by name" . $childValue . $e);
-				}
-			}
-		}
-		else
-		{
-			//Handle no classes objects like string and int
-			//TODO: add support for file... here or there...
-		}
-
-		// pass back propel object
-		return $objectInstace;
-	}
-
-	/**
 	 * 
 	 * Sets the given object's given property value 
 	 * @param unknown_type $objectInstace
@@ -325,6 +159,110 @@ class kXml
 			$objectInstace = $fieldValue;
 		}
 	} 
+	
+	/**
+	 * 
+	 * Sets the given object's given property value 
+	 * @param testCaseFailure $failure
+	 * @param string $rootNodeName - default to 'data'
+	 * @return DOMDocument - the xml for the given error
+	 */
+	public static function UnitTestErrorToXml(testCaseFailure $failure, $rootNodeName = 'data')
+	{
+		if(count($failure->failures) == 0)
+		{
+			return "";
+		}
+		
+		$xml = new DOMDocument(1.0);
+		$rootNode = $xml->createElement($rootNodeName);
+		$xml->appendChild($rootNode);
+		
+		$inputsNode = $xml->createElement("Inputs");
+				
+		foreach ($failure->inputs as $inputKey => $inputValue)
+		{
+			//TODO: add support for non propel objects
+			$node = $xml->createElement("Input");
+			$node->setAttribute("type", get_class($inputValue));
+			$node->setAttribute(get_class($inputValue)."Id", $inputValue->getId());
+			$inputsNode->appendChild($node);
+		}
+		
+		$failuresNode = $xml->createElement("Failures");
+		
+		foreach ($failure->failures as $unitTestFailure)
+		{
+			$node = $xml->createElement("Failure");
+			
+			$fieldNode = $xml->createElement("Field", $unitTestFailure->field);
+			$node->appendChild($fieldNode);
+			
+			$value = $unitTestFailure->outputReferenceValue;
+			
+			if(!is_array($value ))
+			{
+				$outputReferenceNode = $xml->createElement("OutputReference", $unitTestFailure->outputReferenceValue);
+				$node->appendChild($outputReferenceNode);
+			}
+			else
+			{
+				$outputReferenceNode = $xml->createElement("OutputReference");
+				$node->appendChild($outputReferenceNode);
+				
+				//create the array node
+				$arrayNode = $xml->createElement("Array");
+
+				//TODO: support not hard coded
+				$field = "CommandLines";
+				
+				foreach ($value as $key => $singleValue)
+				{
+					$arrayValueNode = $xml->createElement($field, $singleValue);
+					$arrayValueNode->setAttribute("key", $key );
+					$arrayNode->appendChild($arrayValueNode );
+				}
+									
+				$outputReferenceNode ->appendChild($arrayNode);
+			}
+					
+			$value = $unitTestFailure->actualValue;
+			
+			if(!is_array($value ))
+			{
+				$actualOutputNode = $xml->createElement("ActualOutput", $unitTestFailure->actualValue);
+				$node->appendChild($actualOutputNode);
+			}
+			else
+			{
+				$actualOutputNode = $xml->createElement("ActualOutput");
+				$node->appendChild($actualOutputNode);
+				
+				//TODO: support not hard coded
+				$field = "CommandLines";
+				
+				//create the array node
+				$arrayNode = $xml->createElement("Array");
+				
+				foreach ($value as $key => $singleValue)
+				{
+					$arrayValueNode = $xml->createElement($field, $singleValue);
+					$arrayValueNode ->setAttribute("key", $key );
+					$arrayNode->appendChild($arrayValueNode );
+				}
+									
+				$actualOutputNode->appendChild($arrayNode);
+			}
+									
+			$failuresNode->appendChild($node);
+		}
+											
+		$rootNode->appendChild($inputsNode);
+		$rootNode->appendChild($failuresNode);
+	
+		//pass back DomElement object
+		return $xml;
+	}
 	
 	/**
 	 * 
@@ -391,6 +329,31 @@ class kXml
 		}
 		
 		return $attributesArray;
+	}
+
+	/**
+	 * 
+	 * Opens a given xml and returns it as a simpleXMLElement
+	 * @param string $xmlFilePath - the xml file path
+	 * @return simpleXMLElement - the xml
+	 */
+	public static function openXmlFile($xmlFilePath)
+	{
+		try 
+		{
+			$simpleXML = simplexml_load_file($xmlFilePath);
+		}
+		catch(Exception $e)
+		{
+			if(UnitTestBase::$failureFile != null)
+			{
+				//TODO: exception handling
+				print("Unable to load file : " . $xmlFilePath. " as xml.\n Error: " . $e->getMessage());
+				die();
+			}
+		}
+		
+		return $simpleXML;
 	}
 }
 
