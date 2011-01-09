@@ -16,6 +16,7 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 {
 	/** the search index column name for the NEXT_REPORT field */
 	const NEXT_REPORT = 'entry_distribution.NEXT_REPORT';
+	const SUN_STATUS = 'entry_distribution.SUN_STATUS';
 	
 	/**
 	 * Creates default criteria filter
