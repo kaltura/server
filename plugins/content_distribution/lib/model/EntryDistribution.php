@@ -226,14 +226,14 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	}
 
 	public function getSunStatus()
-	{
+	{		
 		$now = time();
 		if($now < $this->getSunrise(null))
 			return EntryDistributionSunStatus::BEFORE_SUNRISE;
 			
 		if($now > $this->getSunset(null))
 			return EntryDistributionSunStatus::AFTER_SUNSET;
-			
+
 		return EntryDistributionSunStatus::AFTER_SUNRISE;
 	}
 
@@ -272,6 +272,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			'flavor_asset_ids' => 'flavorAssetIds',
 			'sunrise' => 'sunrise',
 			'sunset' => 'sunset',
+			'sun_status' => 'sunStatus',
 			'remote_id' => 'remoteId',
 			'plays' => 'plays',
 			'views' => 'views',
@@ -296,6 +297,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		'flavor_asset_ids' => IIndexable::FIELD_TYPE_STRING,
 		'sunrise' => IIndexable::FIELD_TYPE_DATETIME,
 		'sunset' => IIndexable::FIELD_TYPE_DATETIME,
+		'sun_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'remote_id' => IIndexable::FIELD_TYPE_STRING,
 		'plays' => IIndexable::FIELD_TYPE_INTEGER,
 		'views' => IIndexable::FIELD_TYPE_INTEGER,
