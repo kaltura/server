@@ -342,9 +342,18 @@ class myReportsMgr
 		}
 		$time_suffix = date ( "Y-m-D-H" , ((int)(time() / 43200))*  43200 ) ; // calculate for intervlas of half days (86400/2)  
 		
-		$path = "/content/reports/$partner_id/{$file_name}_{$time_suffix}";
-		$file_path = myContentStorage::getFSContentRootPath() .  $path;
-		$url = requestUtils::getHost() . $path;
+		$folderPath = "/content/reports/$partner_id";
+		$fullPath = myContentStorage::getFSContentRootPath() .  $folderPath;
+		if(!file_exists($fullPath))
+			mkdir($fullPath, 777, true);
+			
+		$fileName = "{$file_name}_{$time_suffix}";
+		$url = requestUtils::getHost() . "$folderPath/$fileName";
+		$file_path = "$fullPath/$fileName";
+		
+//		$path = "/content/reports/$partner_id/{$file_name}_{$time_suffix}";
+//		$file_path = myContentStorage::getFSContentRootPath() .  $path;
+//		$url = requestUtils::getHost() . $path;
 		return array ( $file_path , $url );
 	}
 	/**
