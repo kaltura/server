@@ -1018,7 +1018,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  			$newKshow->setIntId(null);
  			$newKshow->setPartnerId($toPartner->getId());
  			$newKshow->setSubpId($toPartner->getId() * 100);
- 			$newKshow->setProducerId($newKuser->getId());
+ 			if ($newKuser) {
+ 				$newKshow->setProducerId($newKuser->getId());
+ 			}
  			$newKshow->save();
  			
  			$newEntry->setKshowId($newKshow->getId());
