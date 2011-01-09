@@ -361,8 +361,14 @@ $debug .= "property: $not_property = [$value]\n";
 				$params["extra_notification_data"] = $extra_notification_data;
 		}
 		
-		$ksObj = kSessionUtils::crackKs(kCurrentContext::$ks);
-		$params['ks_data'] = $ksObj->additional_data;
+		try{
+			$ksObj = kSessionUtils::crackKs(kCurrentContext::$ks);
+			$params['ks_data'] = $ksObj->additional_data;
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::log("could not crack KS ['.kCurrentContext::$ks.'] for adding to notification param");
+		}
 		
 		return serialize( $params );
 	}
