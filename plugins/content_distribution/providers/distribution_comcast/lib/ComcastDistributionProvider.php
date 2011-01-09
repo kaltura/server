@@ -123,7 +123,6 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateDeleteXML($entryId, KalturaComcastDistributionJobProviderData $providerData)
 	{
-		// TODO add remote id
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{
@@ -148,7 +147,6 @@ class ComcastDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateUpdateXML($entryId, KalturaComcastDistributionJobProviderData $providerData)
 	{
-		// TODO add remote id
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{

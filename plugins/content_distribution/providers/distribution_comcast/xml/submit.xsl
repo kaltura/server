@@ -21,9 +21,9 @@
 	
 		<addContent>
 			<media>
-				<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+				<xsl:if test="count(distribution[@provider='Comcast']/remoteId) > 0">
 					<id>
-						<xsl:value-of select="distribution[@provider='MSN']/remoteId" />
+						<xsl:value-of select="distribution[@provider='Comcast']/remoteId" />
 					</id>
 				</xsl:if>
 				<xsl:if test="count(thumbnail[@thumbAssetId = $thumbAssetId])">
