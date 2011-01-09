@@ -31,10 +31,11 @@
 
 $(window).load(function(){
 //	$("#kcms")[0].gotoPage(kmc.mediator.readUrlHash());
+	console.log('First Loading');
 	kmc.utils.activateHeader(true);
  
 	$(window).wresize(kmc.utils.resize);
-	kmc.modules.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
+	kmc.vars.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
 });
 
 /* kmc and kmc.vars defined in script block in kmc2success.php */
@@ -262,8 +263,8 @@ $(window).load(function(){
 			if($("#flash_wrap object").length || $("#flash_wrap embed").length) {
 				kmc.utils.resize();
 //				clearInterval(flashMovieTimeout);
-				clearInterval(kmc.modules.isLoadedInterval);
-				kmc.modules.isLoadedInterval = null;
+				clearInterval(kmc.vars.isLoadedInterval);
+				kmc.vars.isLoadedInterval = null;
 			}
 		},
 		debug : function() {
@@ -298,7 +299,45 @@ $(window).load(function(){
 		},
 		
 		createTabs : function(arr) {
-			$("#kcms")[0].alert('creating tabs...');
+			if(arr) {
+				var module_url = kmc.vars.service_url + '/index.php/kmc/kmc4';
+				var arrLen = arr.length;
+				var tabsHTML = '';
+				for( var i = 0; i < arrLen; i++ ) {
+					tabsHTML += '<li><a id="'+ arr[i].module_name +'" href="'+ module_url + '#' + arr[i].module_name +'"><span>' + arr[i].display_name + '</span></a></li>';
+				}
+				
+				$('#hTabs').html(tabsHTML);
+				
+				$('a').click(function(e) {
+					var tab = (e.target.tagName == "A") ? e.target.id : $(e.target).parent().attr("id");
+					
+					switch(tab) {
+						case "Quickstart Guide" :
+							this.href = kmc.vars.quickstart_guide;
+							return true;
+						case "Logout" :
+							kmc.utils.logout();
+							return false;
+						case "Support" :
+							kmc.utils.openSupport(this);
+							return false;
+						default :
+							go_to = { moduleName : tab, subtab : "" };
+							break;
+							
+					}
+					
+					$("#kcms")[0].gotoPage(go_to); //!!!
+					return false;					
+					
+				});
+			}
+		},
+		
+		openIframe : function(url) {
+			alert('ss');
+			$("#kcms")[0].alert('Open Iframe');
 		}
 		
 	}
@@ -431,85 +470,17 @@ $(window).load(function(){
 		 }
 	}
 
-	kmc.modules = {
-		shared : {
-			attributes : {
-				height				: "100%",
-				width				: "100%"
-			},
-			params : {
-				allowScriptAccess	: "always",
-				allowNetworking		: "all",
-				allowFullScreen		: "false",
-				bgcolor				: "#F7F7F7",
-				
-				autoPlay			: "true"//,
-//				wmode				: "opaque"
-			},
-			flashvars : {
-				host				: kmc.vars.host,
-				cdnhost				: kmc.vars.cdn_host,
-				srvurl				: "api_v3/index.php",
-				partnerid			: kmc.vars.partner_id,
-				subpid				: kmc.vars.subp_id,
-				uid					: kmc.vars.user_id,
-				ks					: kmc.vars.ks,
-				entryId				: "-1",
-				kshowId				: "-1",
-				debugmode			: "true",
-				widget_id			: "_" + kmc.vars.partner_id,
-				enableCustomData	: kmc.vars.enable_custom_data,
-				urchinNumber		: kmc.vars.google_analytics_account // "UA-12055206-1""
-			}
-		},
-		dashboard : {
-			swf_url : kmc.vars.flash_dir + "/kmc/dashboard/"   + kmc.vars.versions.dashboard + "/dashboard.swf",
-			flashvars : {
-				userName			: kmc.vars.screen_name,
-				firstLogin			: kmc.vars.first_login
-			}
-		},
-		content : {
-			swf_url : kmc.vars.flash_dir + "/kmc/content/" + kmc.vars.versions.content + "/content.swf",
-			flashvars : {
-				refreshPlayerList	: "refreshPlayerList", // @todo: ???!!!
-				refreshPlaylistList : "refreshPlaylistList", // @todo: ???!!!
-				openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
-				openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
-				email				: kmc.vars.email,
-				openCw				: "kmc.functions.openKcw",
-				enableLiveStream	: kmc.vars.enable_live
-			}
-		},
-		appstudio : {
-			swf_url : kmc.vars.flash_dir + "/kmc/appstudio/" + kmc.vars.versions.appstudio + "/applicationstudio.swf",
-			playlist_url :	'http%3A%2F%2F' + kmc.vars.host + '%2Findex.php%2Fpartnerservices2%2Fexecuteplaylist%3Fuid%3D%26partner_id%3D' +
-							kmc.vars.partner_id + '%26subp_id%3D' +  kmc.vars.partner_id + '00%26format%3D8%26ks%3D%7Bks%7D%26playlist_id%3D',
-			flashvars : {
-				enableAds				: kmc.vars.enableAds
-			}
-		},
-		settings : { // formerly "account""
-			swf_url : kmc.vars.flash_dir + "/kmc/account/"   + kmc.vars.versions.account + "/account.swf",
-			flashvars: {
-			}
-		},
-		reports : {
-			swf_url : kmc.vars.flash_dir + "/kmc/analytics/"   + kmc.vars.versions.reports + "/ReportsAndAnalytics.swf",
-			flashvars : {
-			}
-		}
-	}
-
 	kmc.preview_embed = {
 
 		// called from p&e dropdown, from content.swf and from appstudio.swf
-		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates) {
+		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors) {
 		// entry/playlist id, description, true/ false (or nothing or "" or null), uiconf id, live_bitrates obj or boolean, is_mix
 //			alert("doPreviewEmbed: id="+id+", name="+name+", description="+description+", is_playlist="+is_playlist+", uiconf_id="+uiconf_id);
-		 	if (previewOnly==true) {
-		 		$("#kcms")[0].alert('previewOnly from content');
-		 	}
+			if(has_mobile_flavors) {
+				$("#kcms")[0].alert('YAY');
+			} else {
+				$("#kcms")[0].alert('NAY');
+			}
 			if(id != "multitab_playlist") {
 
 				name = kmc.utils.escapeQuotes(name);
@@ -600,11 +571,11 @@ $(window).load(function(){
 							 (kmc.vars.jw ? jw_options_html : '') +
 							 ((kmc.vars.silverlight || live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
 							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id)) + 
-							 '<div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
+							 '<div class="embed_code_div"><div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><button id="select_code">' +
-							 '<span>Select Code</span></button></div></div>';
+							 '<span>Select Code</span></button></div></div></div>';
 //			alert(modal_html);
 			kmc.vars.jw = false;
 			kmc.vars.silverlight = false;
@@ -635,6 +606,12 @@ $(window).load(function(){
 				var val = kmc.preview_embed.buildKalturaEmbed(id,name,description, is_playlist, uiconf_id, html5_support);
 				$("#embed_code").val(val);				
 			});
+			
+			// show the embed code & enable the checkbox if its not a preview
+		 	if (previewOnly==false) {
+		 		$('.embed_code_div').show();
+		 		$('#html5_support').attr('disabled', null);
+		 	}			
 		}, // doPreviewEmbed
 
 		buildLiveBitrates : function(name,live_bitrates) {
@@ -680,7 +657,7 @@ $(window).load(function(){
 		buildHTML5Option : function(entry_id, partner_id) {
 			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id;
 			var url_text = url.replace(/http:\/\/|www./ig, '');
-			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' + 
+			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' + 
 					   ' &amp; iPad with HTML5</label></div><br /><div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
 					   ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a><br class"clear" />View player outside KMC: <a target="_blank" href="' + url + 
 					   '"><span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div><br />';
@@ -1015,7 +992,7 @@ $(window).load(function(){
 			} /* end build jw embed code */
 		} // END JW
 	}
-
+	
 	kmc.editors = {
 		start: function(entry_id, entry_name, editor_type, new_mix) {
 //			alert("kmc.editors.start("+entry_id+","+entry_name+","+editor_type+","+new_mix+")");
@@ -1222,17 +1199,42 @@ function playerAdded() { // called from appstudio
 //},
 
 $(function() {
+	console.log('Second Loading');
 	kmc.mediator.loadKmc();
+	kmc.utils.createTabs();
 })
 
 kmc.vars.kmc_swf = {
     url : kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/kmc.swf",
     flashvars : {
 		// kmc configuration
-		kmc_uiconf:kmc.vars.kmc_general_uiconf, 
+		kmc_uiconf			: kmc.vars.kmc_general_uiconf, 
 		
 		//permission uiconf id:
-		permission_uiconf:kmc.vars.kmc_permissions_uiconf 
+		permission_uiconf	: kmc.vars.kmc_permissions_uiconf,
+		
+		host				: kmc.vars.host,
+		cdnhost				: kmc.vars.cdn_host,
+		srvurl				: "api_v3/index.php",
+		partnerid			: kmc.vars.partner_id,
+		subpid				: kmc.vars.subp_id,
+		uid					: kmc.vars.user_id,
+		ks					: kmc.vars.ks,
+		entryId				: "-1",
+		kshowId				: "-1",
+		debugmode			: "true",
+		widget_id			: "_" + kmc.vars.partner_id,
+		enableCustomData	: kmc.vars.enable_custom_data,
+		urchinNumber		: kmc.vars.google_analytics_account, // "UA-12055206-1""
+		
+		userName			: kmc.vars.screen_name,
+		firstLogin			: kmc.vars.first_login,				
+		refreshPlayerList	: "refreshPlayerList", // @todo: ???!!!
+		refreshPlaylistList : "refreshPlaylistList", // @todo: ???!!!
+		openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
+		openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
+		email				: kmc.vars.email,
+		openCw				: "kmc.functions.openKcw"		
 		
 		// path to modules (optional):
 		//modules_path:kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/modules",
@@ -1246,13 +1248,7 @@ kmc.mediator.loadKmc = function() {
 			data : kmc.vars.kmc_swf.url,
 			id : "kcms"
 	}
-	var flashvars = kmc.utils.mergeJson(kmc.vars.kmc_swf.flashvars,
-			kmc.modules.shared.flashvars,
-			kmc.modules.dashboard.flashvars,
-			kmc.modules.appstudio.flashvars,
-			kmc.modules.settings.flashvars,
-			kmc.modules.reports.flashvars,
-			kmc.modules.content.flashvars); 
+	var flashvars = kmc.vars.kmc_swf.flashvars; 
 	var params = {
 			flashvars: kmc.utils.jsonToQuerystring(flashvars)
 	} 
