@@ -1237,6 +1237,8 @@ class BatchService extends KalturaBaseService
 	 */
 	function resetJobExecutionAttemptsAction($id ,KalturaExclusiveLockKey $lockKey, $jobType)
 	{
+		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
+		
 		$c = new Criteria();
 		
 		$c->add(BatchJobPeer::ID, $id );
@@ -1268,6 +1270,8 @@ class BatchService extends KalturaBaseService
 	 */
 	function freeExclusiveJobAction($id ,KalturaExclusiveLockKey $lockKey, $jobType, $resetExecutionAttempts = false)
 	{
+		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
+		
 		$job = BatchJobPeer::retrieveByPK($id);
 		
 		// verifies that the job is of the right type
@@ -1312,9 +1316,10 @@ class BatchService extends KalturaBaseService
 	 */
 	function getQueueSizeAction(KalturaWorkerQueueFilter $workerQueueFilter)
 	{
+		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $workerQueueFilter->jobType);
 		$filter = $workerQueueFilter->filter->toObject(new BatchJobFilter());
 		
-		return kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $workerQueueFilter->jobType, $filter);
+		return kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $jobType, $filter);
 	}	
 	
 
@@ -1331,6 +1336,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
+		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, $jobType);
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}		
@@ -1348,6 +1354,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function getExclusiveAlmostDoneAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType = null)
 	{
+		$jobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		$jobsFilter = new BatchJobFilter();
 		if (!$filter)
 			$jobsFilter = $filter->toObject($jobsFilter);
