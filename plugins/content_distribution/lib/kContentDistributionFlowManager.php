@@ -85,7 +85,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($object instanceof GenericDistributionProvider)
 			return self::onGenericDistributionProviderDeleted($object);
-			
+	
+		if($object instanceof EntryDistribution)
+		{
+			$entry = entryPeer::retrieveByPK($object->getEntryId());
+			if($entry) // updated in the indexing server (sphinx)
+				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+		}
+		
 		return true;
 	}
 
