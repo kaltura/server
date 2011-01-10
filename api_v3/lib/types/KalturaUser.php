@@ -135,6 +135,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @insertonly
+	 * @writeonly
 	 */
 	public $password;
 	
