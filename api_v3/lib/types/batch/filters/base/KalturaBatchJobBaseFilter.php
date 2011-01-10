@@ -14,6 +14,7 @@ class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 		"jobTypeNotIn" => "_notin_job_type",
 		"jobSubTypeEqual" => "_eq_job_sub_type",
 		"jobSubTypeIn" => "_in_job_sub_type",
+		"jobSubTypeNotIn" => "_notin_job_sub_type",
 		"onStressDivertToIn" => "_in_on_stress_divert_to",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
@@ -91,6 +92,13 @@ class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 * @var string
 	 */
 	public $jobSubTypeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $jobSubTypeNotIn;
 
 	/**
 	 * 

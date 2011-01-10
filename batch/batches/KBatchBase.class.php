@@ -88,6 +88,12 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 			$filter->createdAtLessThanOrEqual = $minCreatedAt;
 		}
 		
+		if ($this->taskConfig->jobSubTypeIn)
+			$filter->jobSubTypeIn = $this->taskConfig->jobSubTypeIn;
+		
+		if ($this->taskConfig->jobSubTypeNotIn)
+			$filter->jobSubTypeNotIn = $this->taskConfig->jobSubTypeNotIn;
+		
 		return $filter;
 	}
 	

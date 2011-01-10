@@ -22,6 +22,7 @@ class BatchJobFilter extends baseObjectFilter
 			"_lte_created_at" ,
 			"_eq_job_sub_type",
 			"_in_job_sub_type",
+			"_notin_job_sub_type",
 			"_in_work_group_id",
 			"_lt_file_size",
 			"_gt_file_size",

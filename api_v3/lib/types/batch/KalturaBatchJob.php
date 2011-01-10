@@ -28,7 +28,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     
 	/**
 	 * @var int
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
     public $jobSubType;
     
