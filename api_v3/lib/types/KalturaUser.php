@@ -180,11 +180,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 */
 	public $loginEnabled;
 	
-	/**
-	 * @var bool
-	 * @readonly
-	 */
-	public $isRootAdmin;
 	
 	/**
 	 * @var string
@@ -219,7 +214,6 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"lastLoginTime",
 		"statusUpdatedAt",
 		"deletedAt",
-		"isRootAdmin" => "isRootUser",
 		"roleIds",
 	);
 
