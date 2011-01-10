@@ -129,6 +129,22 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				GenericDistributionProviderActionPeer::setUseCriteriaFilter(true);
 				return $object;
 			}
+
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::ENTRY_DISTRIBUTION))
+			{
+				EntryDistributionPeer::setUseCriteriaFilter(false);
+				$object = EntryDistributionPeer::retrieveByPK($objectId);
+				EntryDistributionPeer::setUseCriteriaFilter(true);
+				return $object;
+			}
+
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::DISTRIBUTION_PROFILE))
+			{
+				DistributionProfilePeer::setUseCriteriaFilter(false);
+				$object = DistributionProfilePeer::retrieveByPK($objectId);
+				DistributionProfilePeer::setUseCriteriaFilter(true);
+				return $object;
+			}
 		}
 		
 		if($baseClass == 'kJobData')
@@ -179,6 +195,10 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		{
 			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION))
 				return 'GenericDistributionProviderAction';
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::ENTRY_DISTRIBUTION))
+				return 'EntryDistribution';
+			if($enumValue == self::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::DISTRIBUTION_PROFILE))
+				return 'DistributionProfile';
 		}
 		
 		if($baseClass == 'kJobData')
