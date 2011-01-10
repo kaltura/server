@@ -106,7 +106,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		);
 		
 		if(! in_array($sub_type, $valid_sub_types))
-			throw new FileSyncException(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION, $sub_type, $valid_sub_types);
+			throw new FileSyncException(ContentDistributionFileSyncObjectType::ENTRY_DISTRIBUTION, $sub_type, $valid_sub_types);
 	}
 	
 	/* (non-PHPdoc)
@@ -120,7 +120,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 			$version = $this->getFileSyncVersion($sub_type);
 		
 		$key = new FileSyncKey();
-		$key->object_type = ContentDistributionPlugin::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::GENERIC_DISTRIBUTION_ACTION);
+		$key->object_type = ContentDistributionPlugin::getContentDistributionFileSyncObjectTypeCoreValue(ContentDistributionFileSyncObjectType::ENTRY_DISTRIBUTION);
 		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 		$key->version = $version;
