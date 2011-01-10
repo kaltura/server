@@ -306,7 +306,7 @@ $(window).load(function(){
 				var arrLen = arr.length;
 				var tabsHTML = '';
 				for( var i = 0; i < arrLen; i++ ) {
-					tabsHTML += '<li><a id="'+ arr[i].module_name +'" rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'"><span>' + arr[i].display_name + '</span></a></li>';
+					tabsHTML += '<li><a id="'+ arr[i].module_name +'" rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 				}
 				
 				$('#hTabs').html(tabsHTML);
