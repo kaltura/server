@@ -120,6 +120,7 @@ $(window).load(function(){
 	}
 
 	kmc.utils = {
+			
 		activateHeader : function(on) { // supports turning menu off if needed - just uncomment else clause
 			//if(on) {
 				$("a").click(function(e) {
@@ -181,6 +182,7 @@ $(window).load(function(){
 		//		  });
 		//	}
 		},
+		
 		openSupport : function(href) {
 			kalturaCloseModalBox();
 			var modal_width = $.browser.msie ? 543 : 519;
@@ -311,7 +313,7 @@ $(window).load(function(){
 				
 				$('a').click(function(e) {
 					var tab = (e.target.tagName == "A") ? e.target.id : $(e.target).parent().attr("id");
-					var subtab = $(e.target).attr('rel');
+					var subtab = (e.target.tagName == "A") ? $(e.target).attr("rel") : $(e.target).parent().attr("rel");
 					
 					switch(tab) {
 						case "Quickstart Guide" :
@@ -338,8 +340,18 @@ $(window).load(function(){
 			}
 		},
 		
+		showFlash : function() {
+			$("#flash_wrap").css("visibility","visible");
+			$("#server_wrap").css("margin-top", 0);
+			$("#server_wrap").hide();
+		}, 
+		
 		openIframe : function(url) {
-			$("#kcms")[0].alert('Open Iframe');
+			kmc.vars.frame
+			$("#flash_wrap").css("visibility","hidden");
+			$("#server_frame").attr("src", url);
+			$("#server_wrap").css("margin-top", "-"+ $("#flash_wrap").height() +"px");
+			$("#server_wrap").show();
 		}
 		
 	}
@@ -478,11 +490,7 @@ $(window).load(function(){
 		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors) {
 		// entry/playlist id, description, true/ false (or nothing or "" or null), uiconf id, live_bitrates obj or boolean, is_mix
 //			alert("doPreviewEmbed: id="+id+", name="+name+", description="+description+", is_playlist="+is_playlist+", uiconf_id="+uiconf_id);
-			if(has_mobile_flavors) {
-				$("#kcms")[0].alert('YAY');
-			} else {
-				$('#kcms')[0].alert('NAY');
-			}
+
 			if(id != "multitab_playlist") {
 
 				name = kmc.utils.escapeQuotes(name);
@@ -573,12 +581,13 @@ $(window).load(function(){
 							 (kmc.vars.jw ? jw_nomix_box_html : '') +							 
 							 (kmc.vars.jw ? jw_options_html : '') +
 							 ((kmc.vars.silverlight || live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id)) + 
+							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, has_mobile_flavors)) + 
 							 '<div class="embed_code_div"><div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><button id="select_code">' +
 							 '<span>Select Code</span></button></div></div></div>';
+			console.log('here');
 //			alert(modal_html);
 			kmc.vars.jw = false;
 			kmc.vars.silverlight = false;
@@ -620,7 +629,8 @@ $(window).load(function(){
 		}, // doPreviewEmbed
 
 		buildLiveBitrates : function(name,live_bitrates) {
-			console.log('buildLiveBitrates' + arguments)
+			console.log('buildLiveBitrates');
+			console.log(arguments);
 			var bitrates = "",
 			len = live_bitrates.length,
 			i;
@@ -661,14 +671,16 @@ $(window).load(function(){
 		},
 		
 		buildHTML5Option : function(entry_id, partner_id, has_mobile_flavors) {
+			console.log('buildHTML5Option');
+			console.log(arguments);
 			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id;
 			var url_text = url.replace(/http:\/\/|www./ig, '');
 			var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
-			if(had_mobile_flavors) {
+			if(has_mobile_flavors) {
 				description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
 							  ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' + 
 							  '<br class"clear" />View player outside KMC: <a target="_blank" href="' + url + '">' + 
-							  '<span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div>';
+							  '<span class="preview_url">' + url_text + '</span></a></div>';
 			}
 			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' + 
 					   ' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
