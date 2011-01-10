@@ -357,6 +357,8 @@ class KSchedularTaskConfig
 	public $minCreatedAtMinutes;
 	public $minPriority;
 	public $maxPriority;
+	public $jobSubTypeIn;
+	public $jobSubTypeNotIn;
 	
 	
 	// these params are not coming from the config, but set by the scheduler before new batch execution
