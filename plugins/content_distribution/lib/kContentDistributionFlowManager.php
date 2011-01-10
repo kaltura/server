@@ -37,6 +37,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if($entry) // updated in the indexing server (sphinx)
 				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -51,6 +53,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if($entry) // updated in the indexing server (sphinx)
 				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
 		}
+		
+		return true;
 	}
 	
 	/**
