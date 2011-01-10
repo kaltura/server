@@ -37,6 +37,60 @@ class KalturaMetadataSearchItem extends KalturaSearchOperator
 
 }
 
+class KalturaContentDistributionSearchItem extends KalturaSearchItem
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $noDistributionProfiles = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionSunStatus
+	 */
+	public $distributionSunStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 */
+	public $entryDistributionFlag = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 */
+	public $entryDistributionStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $hasEntryDistributionValidationErrors = null;
+
+	/**
+	 * Comma seperated validation error types
+	 *
+	 * @var string
+	 */
+	public $entryDistributionValidationErrors = null;
+
+
+}
+
 class KalturaDynamicEnum extends KalturaObjectBase
 {
 
@@ -2844,7 +2898,7 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var KalturaEntryType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $type = null;
 
@@ -4353,6 +4407,13 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 * @var string
 	 */
 	public $jobSubTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $jobSubTypeNotIn = null;
 
 	/**
 	 * 

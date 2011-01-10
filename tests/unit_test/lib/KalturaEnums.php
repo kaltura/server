@@ -528,6 +528,13 @@ class KalturaEntryDistributionStatus
 	const ERROR_DELETING = 9;
 }
 
+class KalturaEntryDistributionSunStatus
+{
+	const BEFORE_SUNRISE = 1;
+	const AFTER_SUNRISE = 2;
+	const AFTER_SUNSET = 3;
+}
+
 class KalturaEntryModerationStatus
 {
 	const PENDING_MODERATION = 1;
