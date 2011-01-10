@@ -77,26 +77,12 @@ class SessionService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		
 		// verify that partnerId exists and is in correspondence with given secret
-		$Partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$Partner)
+		$result = myPartnerUtils::isValidSecret($partnerId, $secret, "", $expiry, $type);
+		if ($result !== true)
 		{
-			// partnerId could not be fetched from the DB
-			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
+			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR, $partnerId );
 		}
-		$parnterSecret = null;
-		if ($type == KalturaSessionType::ADMIN)
-		{
-			$parnterSecret = $Partner->getAdminSecret();
-		}
-		else
-		{
-			$parnterSecret = $Partner->getSecret();
-		}
-		if ($parnterSecret !== $secret)
-		{
-			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );
-		}
-		
+				
 		// verify partner is allowed to start session for another partner
 		if (!myPartnerUtils::allowPartnerAccessPartner($partnerId, $this->partnerGroup(), $impersonatedPartnerId))
 		{
