@@ -35,6 +35,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			return true;
 			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if(!$partner)
+			return false;
+			
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
