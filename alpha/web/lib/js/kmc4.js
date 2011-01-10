@@ -31,8 +31,8 @@
 
 $(window).load(function(){
 //	$("#kcms")[0].gotoPage(kmc.mediator.readUrlHash());
-	console.log('First Loading');
-	kmc.utils.activateHeader(true);
+	//alert('First Loading');
+	//kmc.utils.activateHeader(true);
  
 	$(window).wresize(kmc.utils.resize);
 	kmc.vars.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
@@ -304,13 +304,14 @@ $(window).load(function(){
 				var arrLen = arr.length;
 				var tabsHTML = '';
 				for( var i = 0; i < arrLen; i++ ) {
-					tabsHTML += '<li><a id="'+ arr[i].module_name +'" href="'+ module_url + '#' + arr[i].module_name +'"><span>' + arr[i].display_name + '</span></a></li>';
+					tabsHTML += '<li><a id="'+ arr[i].module_name +'" rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'"><span>' + arr[i].display_name + '</span></a></li>';
 				}
 				
 				$('#hTabs').html(tabsHTML);
 				
 				$('a').click(function(e) {
 					var tab = (e.target.tagName == "A") ? e.target.id : $(e.target).parent().attr("id");
+					var subtab = $(e.target).attr('rel');
 					
 					switch(tab) {
 						case "Quickstart Guide" :
@@ -323,20 +324,21 @@ $(window).load(function(){
 							kmc.utils.openSupport(this);
 							return false;
 						default :
-							go_to = { moduleName : tab, subtab : "" };
+							go_to = { moduleName : tab, subtab : subtab };
 							break;
 							
 					}
 					
-					$("#kcms")[0].gotoPage(go_to); //!!!
+					$("#kcms")[0].gotoPage(go_to); 
 					return false;					
 					
 				});
+			} else {
+				$("#kcms")[0].alert('Error getting tabs');
 			}
 		},
 		
 		openIframe : function(url) {
-			alert('ss');
 			$("#kcms")[0].alert('Open Iframe');
 		}
 		
@@ -479,7 +481,7 @@ $(window).load(function(){
 			if(has_mobile_flavors) {
 				$("#kcms")[0].alert('YAY');
 			} else {
-				$("#kcms")[0].alert('NAY');
+				$('#kcms')[0].alert('NAY');
 			}
 			if(id != "multitab_playlist") {
 
@@ -563,7 +565,8 @@ $(window).load(function(){
 			var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							 '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#contentSection118"></a>' + id_type +
 							 ': ' + name + '</div> <div id="modal_content">' +
-							 ((typeof live_bitrates == "object") ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
+//							 ((typeof(live_bitrates) == "object") ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') + // always return true because null is an object
+							 ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
 							 '<div id="player_wrap">' + preview_player + '</div>' +
 //							 ((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(id, name, description, is_playlist, uiconf_id)) +
 							 ((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
@@ -610,11 +613,14 @@ $(window).load(function(){
 			// show the embed code & enable the checkbox if its not a preview
 		 	if (previewOnly==false) {
 		 		$('.embed_code_div').show();
-		 		$('#html5_support').attr('disabled', null);
-		 	}			
+		 	}
+	 		if(has_mobile_flavors) {
+	 			$('#html5_support').attr('disabled', null);
+	 		}		 	
 		}, // doPreviewEmbed
 
 		buildLiveBitrates : function(name,live_bitrates) {
+			console.log('buildLiveBitrates' + arguments)
 			var bitrates = "",
 			len = live_bitrates.length,
 			i;
@@ -654,13 +660,18 @@ $(window).load(function(){
 			return html;
 		},
 		
-		buildHTML5Option : function(entry_id, partner_id) {
+		buildHTML5Option : function(entry_id, partner_id, has_mobile_flavors) {
 			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id;
 			var url_text = url.replace(/http:\/\/|www./ig, '');
+			var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
+			if(had_mobile_flavors) {
+				description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
+							  ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' + 
+							  '<br class"clear" />View player outside KMC: <a target="_blank" href="' + url + '">' + 
+							  '<span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div>';
+			}
 			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' + 
-					   ' &amp; iPad with HTML5</label></div><br /><div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-					   ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a><br class"clear" />View player outside KMC: <a target="_blank" href="' + url + 
-					   '"><span style="padding: 2px; background: #FFFFBC">' + url_text + '</span></a></div><br />';
+					   ' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
 			return html;
 		},
 
@@ -1133,23 +1144,24 @@ $(window).load(function(){
  function expiredF() { // @todo: change all modules
 	kmc.utils.expired();
  }
- function selectPlaylistContent(params) { // @todo: change call in appstudio
+// function selectPlaylistContent(params) { // @todo: change call in appstudio
 // function selectPlaylistContent(uiconf_id,is_playlist) {
 //		alert("kmc.mediator.selectContent("+uiconf_id+","+is_playlist+")");
 //		console.log(uiconf_id);
-		kmc.mediator.selectContent(params.playerId,params.isPlaylist);
- }
- function logout() {
-	kmc.utils.logout();
- }
- function openEditor(entry_id,entry_name,editor_type,newmix) {
-	kmc.editors.start(entry_id,entry_name,editor_type,newmix);
- }
- function refreshSWF() {
+//		kmc.mediator.selectContent(params.playerId,params.isPlaylist);
+// }
+ 
+//function logout() {
+//	kmc.utils.logout();
+//}
+// function openEditor(entry_id,entry_name,editor_type,newmix) {
+//	kmc.editors.start(entry_id,entry_name,editor_type,newmix);
+// }
+// function refreshSWF() {
 //	alert("refreshSWF()");
-	var state = kmc.mediator.readUrlHash();
-	kmc.mediator.loadModule(state.moduleName,state.subtab);
- }
+//	var state = kmc.mediator.readUrlHash();
+//	kmc.mediator.loadModule(state.moduleName,state.subtab);
+// }
  function openPlayer(emptystring, width, height, uiconf_id, previewOnly) { // for catching appstudio p&e
 //	 alert("received call to openPlayer(emptystring="+emptystring+", "+"width="+width+", "+"height="+height+", uiconf_id="+uiconf_id+")");
 	 if (previewOnly==true)
@@ -1174,34 +1186,8 @@ function playerAdded() { // called from appstudio
 
 /*** end old functions ***/
 
-//		moduleRenaming : function(module) {
-//			switch(module) {
-//				case "account" :
-//					module = "Settings";
-//				case "reports" :
-//					module = "Analytics";
-////				case "appstudio" :
-////					module = "Studio";
-//			}
-//			return module;
-//		},
-
-//kmc.mediator.loadKmc = function(module,subtab) {
-//	module = module.toLowerCase();
-//	subtab = subtab.replace(/ /g,"%20");
-//	var module_url = kmc.vars.kmc_swf; // !!!
-//	var attributes = {
-//			height : "100%",
-//			width : "100%"
-//	}
-//	var flashvars = kmc.vars.kmc_swf_flashvars; // !!!
-//	window.kmc_module = swfobject.createSWF(attributes, flashvars, "kmc_swf");
-//},
-
 $(function() {
-	console.log('Second Loading');
 	kmc.mediator.loadKmc();
-	kmc.utils.createTabs();
 })
 
 kmc.vars.kmc_swf = {

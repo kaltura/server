@@ -14,6 +14,8 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
       #kmcHeader li a:hover { color:#A6E7F6;}
       #kmcHeader li a.active { padding-right:24px; background: url(../images/kmc/kmc_sprite.png) right -62px; color:#222;}
       #kmcHeader li a.active span { background: url(../images/kmc/kmc_sprite.png) 0 -62px;}
+    #loading { color: #fff; font-weight: bold; font-size: 12px; padding: 0; margin: 0; }
+      #loading img { margin: 11px 10px 0 0; border: 0; }
    #kmcHeader div#user_links { margin-top:-2px; #margin-top:-16px; float:right; text-align:right; font: normal 10px arial,sans-serif; color:#ccc;}
     div.login #kmcHeader div { margin-top:13px;}
      div#user_links span { float:right; color:#fff;}
@@ -133,6 +135,7 @@ fieldset{ border:0 none; position:relative; }
 		#titlebar a#help { background-position: -177px -152px;}
 	  #modal span#entry_id { padding-left:3px; color:#555;}
 	 #modal_content { padding: 11px 12px;}
+	 #modal .embed_code_div { display: none; }
 	  #modal #player_wrap { min-height:290px; min-width:400px; padding-bottom:8px;  margin: 10px auto 0;}
 	  #modal textarea#embed_code { border: solid 1px #B7BABC; /*9B9B9B;*/ -moz-border-radius:6px; -webkit-border-radius:6px;}
 	   #modal textarea#embed_code { width:300px; height: 14px; border: solid 1px #B7BABC; color:#333;}
