@@ -146,34 +146,34 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilter
 		if(!is_null($this->noDistributionProfiles))
 		{
 			if($this->noDistributionProfiles)
-				return '^' . kContentDistributionManager::getSearchStringNoDistributionProfiles() . '$';
+				return kContentDistributionManager::getSearchStringNoDistributionProfiles();
 			else
-				$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionProfile() . '$';
+				$conditions[] = kContentDistributionManager::getSearchStringDistributionProfile();
 		}
 		
 		if(!is_null($this->distributionProfileId))
-			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId) . '$';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionProfile($this->distributionProfileId) . '"';
 		
 		if(!is_null($this->distributionSunStatus))
-			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId) . '$';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionSunStatus($this->distributionSunStatus, $this->distributionProfileId) . '"';
 		
 		if(!is_null($this->entryDistributionFlag))
-			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId) . '$';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionFlag($this->entryDistributionFlag, $this->distributionProfileId) . '"';
 		
 		if(!is_null($this->entryDistributionStatus))
-			$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId) . '$';
+			$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionStatus($this->entryDistributionStatus, $this->distributionProfileId) . '"';
 			
 		if(!is_null($this->hasEntryDistributionValidationErrors))
 		{
 			if($this->hasEntryDistributionValidationErrors)
-				$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId) . '$';
+				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId) . '"';
 			else
-				$conditions[] = '-' . kContentDistributionManager::getSearchStringDistributionHasValidationError($this->distributionProfileId);
+				$conditions[] = kContentDistributionManager::getSearchStringDistributionHasNoValidationError($this->distributionProfileId);
 		}
 
 		if(!is_null($this->entryDistributionValidationErrors))
 			foreach($this->entryDistributionValidationErrors as $validationError)
-				$conditions[] = '^' . kContentDistributionManager::getSearchStringDistributionValidationError($validationError, $this->distributionProfileId) . '$';
+				$conditions[] = '"' . kContentDistributionManager::getSearchStringDistributionValidationError($validationError, $this->distributionProfileId) . '"';
 			
 		if(!count($conditions))
 			return null;

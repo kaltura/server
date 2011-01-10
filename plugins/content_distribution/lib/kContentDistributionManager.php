@@ -331,7 +331,7 @@ class kContentDistributionManager
 		if($distributionProfileId)
 			return "contentDistProfile $distributionProfileId";
 			
-		return "contentDistProfile";
+		return "contentDistProfile $distributionProfileId";
 	}
 	
 	public static function getSearchStringDistributionSunStatus($distributionSunStatus, $distributionProfileId = null)
@@ -372,6 +372,15 @@ class kContentDistributionManager
 			return "entryDistHasErr $distributionProfileId";
 			
 		return "entryDistHasErr";
+	}
+	
+	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null)
+	{
+		$ret = "contentDistProfile";
+		if($distributionProfileId)
+			$ret = "\"contentDistProfile $distributionProfileId\"";
+			
+		return "$ret -entryDistHasErr";
 	}
 	
 	public static function getEntrySearchValues(entry $entry)
