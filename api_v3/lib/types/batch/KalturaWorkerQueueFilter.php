@@ -21,7 +21,7 @@ class KalturaWorkerQueueFilter extends KalturaObject
 	
     
 	/**
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType;
 	
@@ -34,4 +34,3 @@ class KalturaWorkerQueueFilter extends KalturaObject
     
 }
 
-?>
