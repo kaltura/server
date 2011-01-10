@@ -13,7 +13,7 @@ function toArrayRecursive(KalturaPropertyInfo $propInfo)
 $subClasses = array();
 try
 {
-	KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(KALTURA_API_PATH, "cache", "KalturaClassInheritMap.cache"));
+	KalturaTypeReflector::setClassInheritMapPath(KAutoloader::buildPath(kConf::get("cache_root_path"), "api_v3", "KalturaClassInheritMap.cache"));
 	if(!KalturaTypeReflector::hasClassInheritMapCache())
 	{
 		$config = new Zend_Config_Ini("../../config/testme.ini");
