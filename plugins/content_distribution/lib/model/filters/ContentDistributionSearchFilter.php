@@ -33,6 +33,12 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilter
 	protected $entryDistributionFlag;
 	
 	/**
+	 * enum from KalturaEntryDistributionStatus
+	 * @var int
+	 */
+	protected $entryDistributionStatus;
+	
+	/**
 	 * @var bool
 	 */
 	protected $hasEntryDistributionValidationErrors;
