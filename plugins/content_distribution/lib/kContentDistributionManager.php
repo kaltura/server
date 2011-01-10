@@ -326,9 +326,12 @@ class kContentDistributionManager
 		return "contentDistNoProfiles";
 	}
 	
-	public static function getSearchStringDistributionProfile($distributionProfileId)
+	public static function getSearchStringDistributionProfile($distributionProfileId = null)
 	{
-		return "contentDistProfile $distributionProfileId";
+		if($distributionProfileId)
+			return "contentDistProfile $distributionProfileId";
+			
+		return "contentDistProfile";
 	}
 	
 	public static function getSearchStringDistributionSunStatus($distributionSunStatus, $distributionProfileId = null)
