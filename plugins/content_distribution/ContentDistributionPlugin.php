@@ -245,7 +245,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getContentDistributionFileSyncObjectTypeCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('ContentDistributionFileSyncObjectType', $value);
+		return kPluginableEnumsManager::apiToCore('FileSyncObjectType', $value);
 	}
 	
 	/**
