@@ -26,7 +26,6 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The source type of the entry 
 	 *
 	 * @var KalturaSourceType
-	 * @readonly
 	 */
 	public $sourceType;
 	
