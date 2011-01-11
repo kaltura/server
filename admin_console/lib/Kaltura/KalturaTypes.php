@@ -225,14 +225,6 @@ class KalturaUser extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $isRootAdmin = null;
-
-	/**
-	 * 
-	 *
 	 * @var string
 	 */
 	public $roleIds = null;
@@ -349,7 +341,6 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var KalturaEntryType
-	 * @readonly
 	 */
 	public $type = null;
 
@@ -2135,7 +2126,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The source type of the entry 
 	 *
 	 * @var KalturaSourceType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $sourceType = null;
 
@@ -2143,7 +2134,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The search provider type used to import this entry
 	 *
 	 * @var KalturaSearchProviderType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderType = null;
 
@@ -2151,7 +2142,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The ID of the media in the importing site
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderId = null;
 
@@ -3547,7 +3538,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var KalturaDistributionErrorType
+	 * @var KalturaBatchJobErrorTypes
 	 * @readonly
 	 */
 	public $errorType = null;
@@ -4779,6 +4770,13 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 *
 	 * @var string
 	 */
+	public $jobSubTypeNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $onStressDivertToIn = null;
 
 	/**
@@ -4885,7 +4883,7 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType = null;
 
