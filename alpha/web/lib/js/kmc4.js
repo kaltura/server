@@ -109,13 +109,13 @@ $(window).load(function(){
 			// nullify flash object inside div kcw
 		},
 		openChangePwd : function() {
-			$("#kcms")[0].alert("openChangePwd");
+			kmc.utils.secureIframe('password', true);
 		},
 		openChangeEmail : function() {
-			$("#kcms")[0].alert("openChangeEmail");
+			kmc.utils.secureIframe('email', true);
 		},
 		openChangeName : function() {
-			$("#kcms")[0].alert("openChangeName");
+			kmc.utils.secureIframe('name');
 		}
 	}
 
@@ -352,6 +352,38 @@ $(window).load(function(){
 			$("#server_frame").attr("src", url);
 			$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 			$("#server_wrap").show();
+		},
+		
+		secureIframe : function(action, small) {
+			kalturaCloseModalBox();
+			
+			// Set title
+			var title;
+			switch(action) {
+				case "password": 
+					title = "Change Password";
+					break;
+				case "email": 
+					title = "Change Email Address";
+					break;
+				case "name":
+					title = "Edit Name";
+					break;
+			}
+			
+			var url = kmc.vars.service_url + "/secure_form.php?action=" + action;
+			var modal_width = 400;
+			var modal_height = (small) ? 200 : 220;
+			$("#flash_wrap").css("visibility","hidden");
+			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
+			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
+							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
+							  ' height="' + modal_height + '" width="' + modal_width + '"></iframe></div></div>';
+			$("#mbContent").addClass("new");
+			$("#close").click(function() {
+				kmc.utils.closeModal();
+				return false;
+			});
 		}
 		
 	}
