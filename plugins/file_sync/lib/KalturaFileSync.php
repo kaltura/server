@@ -283,7 +283,17 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 			}
 			else
 			{
-				$mimeType = mime_content_type($path);
+				$mimeType = null;
+				if(function_exists('mime_content_type'))
+				{
+					$mimeType = mime_content_type($path);
+				}
+				elseif(function_exists('finfo_open'))
+				{
+					$finfo = new finfo(FILEINFO_MIME_TYPE, null);
+					$mimeType = $finfo->file($path);
+				}
+					
 				KalturaLog::debug("File path [$path] mime type [$mimeType]");
 				if(strpos($mimeType, 'text') !== false)
 					$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
