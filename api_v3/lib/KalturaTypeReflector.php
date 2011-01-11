@@ -75,6 +75,11 @@ class KalturaTypeReflector
 	 */
 	private $_abstract = false;
 	
+	
+	private $_permissions = array();
+	
+	private $_comments = null;
+	
 	/**
 	 * Contructs new type reflector instance
 	 *
@@ -94,9 +99,13 @@ class KalturaTypeReflector
 	    $comments = $reflectClass->getDocComment();
 	    if($comments)
 	    {
+	    	$this->_comments = $comments;
 	    	$commentsParser = new KalturaDocCommentParser($comments);
 	    	$this->_deprecated = $commentsParser->deprecated;
 	    	$this->_abstract = $commentsParser->abstract;
+	    	if (!is_null($commentsParser->permissions)) {
+	    		$this->_permissions = explode(',',$commentsParser->permissions);
+	    	}
 	    }
 	    
 	    if(!$reflectClass->isAbstract())
@@ -205,6 +214,9 @@ class KalturaTypeReflector
 								
 							if ($parsedDocComment->filter)
 								$prop->setFilters($parsedDocComment->filter);
+								
+							if ($parsedDocComment->permissions)
+								$prop->setPermissions($parsedDocComment->permissions);
 						}
 					}
 				}
@@ -617,5 +629,20 @@ class KalturaTypeReflector
 			return self::$_classInheritMap[$class];
 			
 		return array();
+	}
+	
+	public function requiresReadPermission()
+	{
+		return in_array(KalturaPropertyInfo::READ_PERMISSION_NAME, $this->_permissions);
+	}
+	
+	public function requiresUpdatePermission()
+	{
+		return in_array(KalturaPropertyInfo::UPDATE_PERMISSION_NAME, $this->_permissions);
+	}
+	
+	public function requiresInsertPermission()
+	{
+		return in_array(KalturaPropertyInfo::INSERT_PERMISSION_NAME, $this->_permissions);
 	}
 }

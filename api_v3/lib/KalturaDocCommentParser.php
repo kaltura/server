@@ -36,6 +36,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_DYNAMIC_TYPE = "/\\@dynamicType (\\w*)/i";
     
+    const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
+    
     /**
      * @var bool
      */
@@ -137,6 +139,11 @@ class KalturaDocCommentParser
     public $dynamicType;
     
     /**
+     * @var string
+     */
+    public $permissions;
+    
+    /**
      * Parse a docComment
      *
      * @param string $comment
@@ -206,6 +213,10 @@ class KalturaDocCommentParser
         $result = null;
         if (preg_match(self::DOCCOMMENT_DYNAMIC_TYPE, $comment, $result))
             $this->dynamicType = $result[1];
+            
+        $result = null;
+        if (preg_match(self::DOCCOMMENT_PERMISSIONS, $comment, $result))
+        	$this->permissions = $result[1]; 
             
         $result = null;
         $error_array = array();

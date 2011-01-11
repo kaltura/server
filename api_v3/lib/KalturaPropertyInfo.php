@@ -16,6 +16,11 @@ class KalturaPropertyInfo
 	private $_description;
 	private $_filters = array();
 	private $_dynamicType = null;
+	private $_permissions = array();
+	
+	const READ_PERMISSION_NAME = 'read';
+	const UPDATE_PERMISSION_NAME = 'update';
+	const INSERT_PERMISSION_NAME = 'insert';	
 	
 	public function KalturaPropertyInfo($type, $name = '')
 	{
@@ -200,6 +205,41 @@ class KalturaPropertyInfo
 	public function getFilters()
 	{
 		return $this->_filters;
+	}
+	
+	
+	public function setPermissions($permissions)
+	{
+		if (is_array($permissions))
+			$this->_permissions = $permissions;
+		else
+			$this->_permissions = explode(",", $permissions);
+		
+		foreach($this->_permissions as &$permission)
+		{
+			$permission = trim($permission);
+		}
+	}
+	
+	
+	public function getPermissions()
+	{
+		return $this->_permissions;
+	}
+	
+	public function requiresReadPermission()
+	{
+		return in_array(self::READ_PERMISSION_NAME, $this->_permissions);
+	}
+	
+	public function requiresUpdatePermission()
+	{
+		return in_array(self::UPDATE_PERMISSION_NAME, $this->_permissions);
+	}
+	
+	public function requiresInsertPermission()
+	{
+		return in_array(self::INSERT_PERMISSION_NAME, $this->_permissions);
 	}
 
 	public function toArray($withSubTypes = false)
