@@ -13,6 +13,8 @@ class ContentDistributionFileSyncObjectType implements IKalturaPluginEnum, FileS
 	{
 		return array(
 			'GENERIC_DISTRIBUTION_ACTION' => self::GENERIC_DISTRIBUTION_ACTION,
+			'ENTRY_DISTRIBUTION' => self::ENTRY_DISTRIBUTION,
+			'DISTRIBUTION_PROFILE' => self::DISTRIBUTION_PROFILE,
 		);
 	}
 }
