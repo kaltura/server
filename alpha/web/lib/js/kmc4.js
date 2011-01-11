@@ -342,6 +342,7 @@ $(window).load(function(){
 		
 		showFlash : function() {
 			$("#server_wrap").hide();
+			$("#server_frame").removeAttr('src');
 			$("#flash_wrap").css("visibility","visible");
 			$("#server_wrap").css("margin-top", 0);
 		}, 
