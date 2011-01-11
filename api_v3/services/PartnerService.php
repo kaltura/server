@@ -12,9 +12,17 @@ class PartnerService extends KalturaBaseService
 	/**
 	 * @ignore
 	 */
-	public function initService ($partner_id , $puser_id , $ks_str , $service_name , $action )
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService ($partner_id , $puser_id , $ks_str , $service_name , $action );
+		parent::initService($serviceName, $actionName);
+	}
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'register') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
 	}
 
 	/**

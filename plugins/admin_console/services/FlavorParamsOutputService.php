@@ -8,9 +8,9 @@
  */
 class FlavorParamsOutputService extends KalturaBaseService
 {
-	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		parent::initService($serviceName, $actionName);
 
 		// since plugin might be using KS impersonation, we need to validate the requesting
 		// partnerId from the KS and not with the $_POST one

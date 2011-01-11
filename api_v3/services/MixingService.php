@@ -10,6 +10,15 @@
  */
 class MixingService extends KalturaEntryService
 {
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
 	/**
 	 * Adds a new mix.
 	 * If the dataContent is null, a default timeline will be created.

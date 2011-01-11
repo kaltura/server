@@ -8,9 +8,9 @@
  */
 class UserRoleService extends KalturaBaseService
 {
-	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		parent::initService($serviceName, $actionName);
 		
 		myPartnerUtils::addPartnerToCriteria(new UserRolePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());

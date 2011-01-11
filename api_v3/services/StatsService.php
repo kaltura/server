@@ -11,6 +11,22 @@ class StatsService extends KalturaBaseService
 {
 	const SEPARATOR = ",";
 	
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'collect') {
+			return false;
+		}
+		if ($actionName === 'kmcCollect') {
+			return false;
+		}
+		if ($actionName === 'reportKceRrror') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
+	
 	/**
 	 * Will write to the event log a single line representing the event
 	 * 
@@ -34,6 +50,7 @@ control id
 seek
 new point
 referrer
+	
 	
 	 * KalturaStatsEvent $event
 	 * 

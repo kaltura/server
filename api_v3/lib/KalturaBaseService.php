@@ -24,19 +24,24 @@ abstract class KalturaBaseService
 	/**
 	 * @var KalturaPartner
 	 */
-	private $operating_artner = null;
+	private $operating_partner = null;
 	 
-	private $force_ticket_check = true;
+	
 	protected $private_partner_data = null; /// will be used internally and from the actual services for setting the
 	
-	private $apply_specific_partner = null;
-	
 	protected $impersonatedPartnerId = null;
+	
+	protected $serviceName = null;
+	
+	protected $actionName = null;
+	
+	protected $partnerGroup = null;
 	
 	public function __construct()
 	{
 		DbManager::setConfig(kConf::getDB());
 		DbManager::initialize();
+		//TODO: initialize $this->serviceName here instead of in initService method
 	}	
 
 	
@@ -45,263 +50,94 @@ abstract class KalturaBaseService
 		DbManager::shutdown();
 	}
 	
-	// TODO - no need to set the service_name - it should be known to the service !
-	public function initService ( $partner_id , $puser_id , $ks_str , $service_name , $action )
+	
+	/**
+	 * Should return true or false for allowing/disallowing kaltura network filter for the given action.
+	 * Can be extended to to partner specific checks etc...
+	 * @return true if "kaltura network" is enabled for the given action or false otherwise
+	 * @param string $actionName action name
+	 */
+	protected function kalturaNetworkAllowed($actionName)
 	{
-		$this->impersonatedPartnerId = $partner_id;
+		return false;
+	}
+	
+	protected function partnerRequired($actionName)
+	{
+		return true;
+	}
 		
+	public function initService($serviceName, $actionName)
+	{	
+		// init service and action name
+		$this->serviceName = $serviceName;
+		$this->actionName  = $actionName;
+		
+		// impersonated partner = partner parameter from the request
+		$this->impersonatedPartnerId = kCurrentContext::$partner_id;
+		
+		$this->ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
+		
+		// operating partner = partner from the request or the ks partner
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$this->partner = PartnerPeer::retrieveByPK( $partnerId );
+		if (!$this->partner) { $this->partner = null; }		
+
+		// check if current aciton is allowed and if private partner data access is allowed
+		$allowPrivatePartnerData = false;
+		$actionPermitted = $this->isPermitted($allowPrivatePartnerData);
+		
+		// action not permitted at all, not even kaltura network
+		if (!$actionPermitted) {
+			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN);
+		}
+		
+		// init partner filter parameters
+		$this->private_partner_data = $allowPrivatePartnerData;
+		$this->partnerGroup = kPermissionManager::getPartnerGroup($this->serviceName, $this->actionName);
+		
+		// apply partner filters according to current context and permissions
 		myPartnerUtils::resetAllFilters();
-		$arr = list ( $partner_id , $uid , $private_partner_data ) = $this->validateTicketSetPartner ( $partner_id , $puser_id , $ks_str , $service_name , $action);
-		$this->private_partner_data = $private_partner_data;
-		$this->validateIp ( );
-		
-		myPartnerUtils::applyPartnerFilters ( $partner_id , $private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
+		myPartnerUtils::applyPartnerFilters($partnerId ,$this->private_partner_data ,$this->partnerGroup ,$this->kalturaNetworkAllowed($this->actionName));
 	}
 	
 /* >--------------------- Security and config settings ----------------------- */
-	// TODO - no need to set the service_name - it should be known to the service !
-	public function validateTicketSetPartner ( $partner_id , $puser_id , $ks_str  , $service_name , $action )
-	{
-		$ks = null;
-		if ( $ks_str )
+
+	/**
+	 * Check if current action is permitted for current context (ks/partner/user)
+	 * @param bool $allowPrivatePartnerData true if access to private partner data is allowed, false otherwise (kaltura network)
+	 * @throws APIErrors::MISSING_KS
+	 */
+	protected function isPermitted(&$allowPrivatePartnerData)
+	{		
+		// if no partner defined but required -> error MISSING_KS
+		if (!$this->partner && $this->partnerRequired($this->actionName))
 		{
-			// 	1. crack the ks -
-			try 
-			{ 
-				$ks = kSessionUtils::crackKs ( $ks_str );
-			}
-			catch(Exception $ex)
-			{
-				if (strpos($ex->getMessage(), "INVALID_STR") !== null)
-					throw new KalturaAPIException(APIErrors::INVALID_KS, $ks_str, ks::INVALID_STR, ks::getErrorStr(ks::INVALID_STR));
-				else 
-					throw $ex;
-			}
-			
-			// 2. extract partner_id
-			$ks_partner_id= $ks->partner_id;
-			$master_partner_id = $ks->master_partner_id;
-			if(!$master_partner_id)
-				$master_partner_id = $ks_partner_id;
-			
-			// set the apply_specific_partner_id to know if we should work on a specifi partner or not
-			$apply_specific_partner_id = $partner_id;
-			if ( !$partner_id ) 
-				$partner_id = $ks_partner_id;
-
-			
-			$GLOBALS["partnerId"] = $partner_id; // set for logger
-			
-			// use the user from the ks if not explicity set 
-			if ( ! $puser_id ) $puser_id = $ks->user;
-			
-			// 3. retrieve partner
-			$ks_partner = PartnerPeer::retrieveByPK( $ks_partner_id );
-			// the service_confgi is assumed to be the one of the operating_partner == ks_partner
-
-			if ( ! $ks_partner )
-			{
-				throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $ks_partner_id );
-			}
-			$this->setServiceConfigFromPartner( $ks_partner , $service_name , $action );
-			
-			// 4. validate ticket per service for the ticket's partner
-			$ticket_type = $this->ticketType();
-			if ( $ticket_type == kSessionUtils::REQUIED_TICKET_NOT_ACCESSIBLE )
-			{
-				// partner cannot access this service
-				if($ks_partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
-				{
-					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
-				}
-				elseif($ks_partner->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
-				{
-					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_FULLY_BLOCKED);
-				}
-				else
-				{
-					throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
-				}
-			}
-			
-			// 2009-07-13 - Roman & Liron - removed this check because if a session was passed we can (and maybe should) validate it anyway.
-			// 				This fix is needed for search service (which doesn't require a session) but when calling it with a session, we can't get the user id  
-			//if ( $this->force_ticket_check && $ticket_type != kSessionUtils::REQUIED_TICKET_NONE )
-			//{
-				// TODO - which user is this ? from the ks ? from the puser_id ? 
-				$ks_puser_id = $ks->user;
-				
-			kCurrentContext::$ks = $ks_str;
-			kCurrentContext::$partner_id = $partner_id;
-			kCurrentContext::$ks_partner_id = $ks_partner_id;
-			kCurrentContext::$master_partner_id = $master_partner_id;
-			kCurrentContext::$uid = $puser_id;
-			kCurrentContext::$ks_uid = $ks_puser_id;
-							
-				//$ks = null;
-				$res = kSessionUtils::validateKSession2 ( $ticket_type , $ks_partner_id , $ks_puser_id , $ks_str , $ks );
-
-				if ( 0 >= $res )
-				{
-					// chaned this to be an exception rather than an error
-					switch($res)
-					{
-						case ks::INVALID_STR:
-							KalturaLog::err("Required ticket type [$ticket_type] actual ticket type [$ks->type]");
-							break;
-											
-						case ks::INVALID_PARTNER:
-							KalturaLog::err("Wrong partner [$ks_partner_id] actual partner [$ks->partner_id]");
-							break;
-											
-						case ks::INVALID_USER:
-							KalturaLog::err("Wrong user [$ks_puser_id] actual user [$ks->user]");
-							break;
-											
-						case ks::INVALID_TYPE:
-							KalturaLog::err("Required ticket type [$ticket_type] actual ticket type [$ks->type]");
-							break;
-											
-						case ks::EXPIRED:
-							KalturaLog::err("KS Expired [" . date('Y-m-d H:i:s', $ks->valid_until) . "]");
-							break;
-											
-						case ks::LOGOUT:
-							KalturaLog::err("KS already logged out");
-							break;
-					}
-					throw new KalturaAPIException ( APIErrors::INVALID_KS , $ks_str , $res , ks::getErrorStr( $res ));
-				}
-				$this->ks = $ks;
-			//}
-				
-			// 5. see partner is allowed to access the desired partner (if himself - easy, else - should appear in the partnerGroup)
-			$allow_access = myPartnerUtils::allowPartnerAccessPartner ( $ks_partner_id , $this->partnerGroup() , $partner_id );
-			if ( ! $allow_access )
-			{
-				throw new KalturaAPIException ( APIErrors::PARTNER_ACCESS_FORBIDDEN , $ks_partner_id , $partner_id ); 
-			}
-			
-			
-			if ( $apply_specific_partner_id && $apply_specific_partner_id != $ks_partner_id )
-			{
-				// this will make sure that the partnerGourp will be set to this specific partner and all the 
-				// impersonating will be done specifically
-				$this->apply_specific_partner = $apply_specific_partner_id;
-			}
-			
-			// 6. set the partner to be the desired partner and the operating_partner to be the one from the ks
-			$this->partner = PartnerPeer::retrieveByPK( $partner_id );
-			$this->operating_partner = $ks_partner;
-			// the config is that of the ks_partner NOT of the partner
-			// $this->setServiceConfigFromPartner( $ks_partner ); - was already set above to extract the ks
-			// TODO - should change  service_config to be the one of the partner_id ?? 
-
-			// 7. if ok - return the partner_id to be used from this point onwards 
-			return array ( $partner_id , $puser_id , true ); // allow private_partner_data
+			throw new KalturaAPIException(APIErrors::MISSING_KS);
 		}
-		else
+		
+		// check if actions is permitted for current context
+		$isActionPermitted = kPermissionManager::isActionPermitted($this->serviceName, $this->actionName);
+		
+		// if action permitted - no problem to access action and the private partner data
+		if ($isActionPermitted) {
+			$allowPrivatePartnerData = true; // allow private partner data
+			return true; // action permitted with access to partner private data
+		}
+		
+		// action not permitted for current user - check if kaltura network is allowed
+		if (!kCurrentContext::$ks && $this->kalturaNetworkAllowed($this->actionName))
 		{
-			// no ks_str
-	 		// 1. extract partner by partner_id +
-			// 2. retrieve partner
-	 		$this->partner = PartnerPeer::retrieveByPK( $partner_id );
-			if ( ! $this->partner )
-			{
-				$this->partner = null;
-				{
-					// go to the default config 
-					$this->setServiceConfigFromPartner( null , $service_name , $action );
-				}
-				
-				if ( $this->requirePartner() )
-				{
-					throw new KalturaAPIException ( APIErrors::MISSING_KS , $partner_id );
-				}
-			}
-
-			kCurrentContext::$ks = $ks;			
-			kCurrentContext::$partner_id = $partner_id;
-			kCurrentContext::$ks_partner_id = null;
-			kCurrentContext::$uid = $puser_id;
-			kCurrentContext::$ks_uid = null;	
-					
-			// 3. make sure the service can be accessed with no ticket
- 			$this->setServiceConfigFromPartner( $this->partner , $service_name , $action  );
-			$ticket_type = $this->ticketType();
-			if ( $ticket_type == kSessionUtils::REQUIED_TICKET_NOT_ACCESSIBLE )
-			{
-				// partner cannot access this service
-				if($this->partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
-				{
-					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
-				}
-				elseif($this->partner->getStatus() == Partner::PARTNER_STATUS_FULL_BLOCK)
-				{
-					throw new KalturaAPIException (APIErrors::SERVICE_FORBIDDEN_FULLY_BLOCKED);
-				}
-				else
-				{
-					throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN );
-				}
-			}
-			if ( $this->force_ticket_check && $ticket_type != kSessionUtils::REQUIED_TICKET_NONE )
-			{
-				// NEW: 2008-12-28
-				// Instead of throwing an exception, see if the service allows KN.
-				// If so - a relativly week partner access 
-				if ( $this->kalturaNetwork() )
-				{
-					// if the service supports KN - continue without private data 
-					return array ( $partner_id , $puser_id , false ); // DONT allow private_partner_data
-				}
-				
-				// chaned this to be an exception rather than an error
-				throw new KalturaAPIException ( APIErrors::MISSING_KS  );
-			}
-			
-			// 4. set the partner & operating_partner to be the one-and-only partner of this session
-			$this->operating_partner = $this->partner;
-			return array ( $partner_id , $puser_id , true ); // allow private_partner_data			
+			// if the service action support kaltura network - continue without private data
+			$allowPrivatePartnerData = false; // DO NOT allow private partner data
+			return true; // action permitted (without private partner data)
 		}
+		
+		// action not permitted, not even without private partner data access
+		return false;
 	}
-
-	private function validateIp ( )
-	{
-		if ( ! $this->matchIp() ) return; // no need to match the IP
-		$ip_to_match = $this->getPartner()->getMatchIp();
-		if ( ! $ip_to_match ) return ; // althogh the service requires the match - the partner didn't specify the ip prefix.
-		$user_ip = null;
-		if ( ! requestUtils::validateIp( $ip_to_match , $user_ip ) )
-		{
-			throw new KalturaAPIException( APIErrors::ACCESS_FORBIDDEN_FROM_UNKNOWN_IP , $user_ip );		
-		}
-	}
-	
-	// use the new service config - the files and content will be different from ps2
-	// in the config file - names are always lower case
-	private function setServiceConfigFromPartner (  $partner , $service , $action )
-	{
-		$service_name = strtolower( "$service.$action" );
-		try 
-		{
-			$this->service_config = KalturaServiceConfig::getServiceConfigForPartner ( $partner );
-			$this->service_config->setServiceName ( $service_name );
-		}
-		catch(Exception $ex)
-		{
-			if (strpos(strtolower($ex->getMessage()), "unknown service") !== false)
-				throw new KalturaAPIException(KalturaErrors::INVALID_SERVICE_CONFIGURATION ,$service , $action );
-			else
-				throw $ex;
-		}
-	}
-	
-	private function getServiceConfig ()
-	{
-		return $this->service_config;
-	}	
-	
+		
+		
 	// can be used from derived classes to set additionl filter that don't automatically happen in applyPartnerFilters  
 	protected function applyPartnerFilterForClass ( $peer )//, $partner_id= null )
 	{
@@ -310,8 +146,9 @@ abstract class KalturaBaseService
 		else
 			$partner_id = Partner::PARTNER_THAT_DOWS_NOT_EXIST;
 			
-		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
+		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($this->actionName)  );
 	}	
+	
 	
 	protected function applyPartnerFilterForClassNoKalturaNetwork ( $peer )
 	{
@@ -323,16 +160,12 @@ abstract class KalturaBaseService
 	}
 /* <--------------------- Security and config settings ----------------------- */	
 	
-	protected function ticketType ()		{		return $this->getServiceConfig()->getTicketType();	}
-	protected function requirePartner () 	{ 		return $this->getServiceConfig()->getRequirePartner();	}
-	protected function kalturaNetwork() 	{ 		return $this->getServiceConfig()->getKalturaNetwork();	}
-	protected function matchIp() 			{ 		return $this->getServiceConfig()->getMatchIp();	}
+	/**
+	 * @return A comma seperated string of partner ids to which current context is allowed to access
+	 */
 	protected function partnerGroup() 		
 	{ 		
-		// this will make sure that we apply the filter on a very specific partner rather than the whole group
-		if ( $this->apply_specific_partner )
-			return $this->apply_specific_partner;
-		return $this->getServiceConfig()->getPartnerGroup();	
+		return $this->partnerGroup;
 	}
 	
 	/**

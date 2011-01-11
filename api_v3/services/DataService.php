@@ -9,6 +9,16 @@
  */
 class DataService extends KalturaEntryService
 {
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
+	
 	/**
 	 * Adds a new data entry
 	 * 

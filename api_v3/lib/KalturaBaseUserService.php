@@ -3,9 +3,27 @@
 class KalturaBaseUserService extends KalturaBaseService 
 {
 	
-	public function initService ($partner_id , $puser_id , $ks_str , $service_name , $action )
+	protected function partnerRequired($actionName)
 	{
-		parent::initService ($partner_id , $puser_id , $ks_str , $service_name , $action );
+		if ($actionName === 'loginByLoginId') {
+			return false;
+		}
+		if ($actionName === 'updatLoginData') {
+			return false;
+		}
+		if ($actionName === 'resetPassword') {
+			return false;
+		}
+		if ($actionName === 'setInitialPassword') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
+	
+	public function initService($serviceName, $actionName)
+	{
+		parent::initService ($serviceName, $actionName);
 		parent::applyPartnerFilterForClass ( new kuserPeer() );
 	}	
 	

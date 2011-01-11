@@ -10,10 +10,38 @@
  */
 class PlaylistService extends KalturaEntryService
 {
-	public function initService ($partner_id , $puser_id , $ks_str , $service_name , $action )
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService ($partner_id , $puser_id , $ks_str , $service_name , $action );
+		parent::initService($serviceName, $actionName);
 		parent::applyPartnerFilterForClassNoKalturaNetwork ( new accessControlPeer() );
+	}
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'executeFromContent') {
+			return true;
+		}
+		if ($actionName === 'executeFromFilters') {
+			return true;
+		}
+		if ($actionName === 'getStatsFromContent') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'executeFromContent') {
+			return false;
+		}
+		if ($actionName === 'executeFromFilters') {
+			return false;
+		}
+		if ($actionName === 'execute') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
 	}
 	
 	/**

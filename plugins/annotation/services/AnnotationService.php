@@ -7,10 +7,10 @@
  */
 class AnnotationService extends KalturaBaseService
 {	
-	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
-		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetwork()  );
+		parent::initService($serviceName, $actionName);
+		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($action) );
 				
 		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);

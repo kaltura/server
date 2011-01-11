@@ -9,6 +9,15 @@
  */
 class SystemService extends KalturaBaseService 
 {
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'ping') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
 	/**
 	 *
 	 * 

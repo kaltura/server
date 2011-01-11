@@ -7,9 +7,9 @@
  */
 class AccessControlService extends KalturaBaseService
 {
-	public function initService($partnerId, $puserId, $ksStr, $serviceName, $action)
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService($partnerId, $puserId, $ksStr, $serviceName, $action);
+		parent::initService($serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new accessControlPeer()); 	
 	}
 	

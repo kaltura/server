@@ -104,8 +104,11 @@ class KalturaDispatcher
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		
+		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
+		kPermissionManager::init(kConf::get('enable_cache'));
+				
 		// initialize the service before invoking the action on it
-		$serviceInstance->initService ( $p , $userId , $ksStr , $reflector->getServiceName() , $action );
+		$serviceInstance->initService ($reflector->getServiceName(), $action);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");

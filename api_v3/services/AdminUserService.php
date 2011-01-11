@@ -8,6 +8,24 @@
  */
 class AdminUserService extends KalturaBaseUserService 
 {
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'updatePassword') {
+			return false;
+		}
+		if ($actionName === 'resetPassword') {
+			return false;
+		}
+		if ($actionName === 'login') {
+			return false;
+		}
+		if ($actionName === 'setInitialPassword') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}	
+	
 
 	/**
 	 * keep backward compatibility with changed error codes

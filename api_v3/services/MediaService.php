@@ -9,6 +9,32 @@
  */
 class MediaService extends KalturaEntryService
 {
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'convert') {
+			return true;
+		}
+		if ($actionName === 'addFromEntry') {
+			return true;
+		}
+		if ($actionName === 'addFromFlavorAsset') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'flag') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
 	/**
 	 * Adds new media entry by importing an HTTP or FTP URL.
 	 * The entry will be queued for import and then for conversion.

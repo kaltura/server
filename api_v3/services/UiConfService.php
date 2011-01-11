@@ -13,11 +13,22 @@ class UiConfService extends KalturaBaseService
 	/**
 	 * @ignore
 	 */
-	public function initService ($partnerId , $puserId , $ksStr , $serviceName , $action )
+	public function initService($serviceName, $actionName)
 	{
-		parent::initService ($partnerId , $puserId , $ksStr , $serviceName , $action );
-		if(strtolower($action) != 'listtemplates')
+		parent::initService($serviceName, $actionName);
+		if(strtolower($actionName) != 'listtemplates')
 			parent::applyPartnerFilterForClass ( new uiConfPeer() ); 	
+	}
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'clone') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
 	/**

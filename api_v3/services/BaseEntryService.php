@@ -9,6 +9,27 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
+	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'getContextData') {
+			return true;
+		}
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'flag') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
+	
     /**
      * Generic add entry using an uploaded file, should be used when the uploaded entry type is not known
      *
