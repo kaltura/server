@@ -8,11 +8,13 @@ class myServiceConfig
 {
 	const DEFAULT_COFIG_TABLE_FILE_NAME = "services.ct";
 	
-	private static $secondary_config_tables = null;
+	public static $secondary_config_tables = null;
 	
-	private static $path = null;
-	private static $strict_mode = true;
-	private static $default_config_table = null;
+	public static $path = null;
+	public static $strict_mode = true;
+	public static $default_config_table = null;
+	
+	public $all_config_tables = null;
 //	private $config_table = null;
 	private $config_chain = null;
 	
@@ -97,7 +99,7 @@ class myServiceConfig
 	
 
 	
-	public function myServiceConfig ( $file_name , $service_name = null )
+	public function myServiceConfig ( $file_name , $service_name = null, $useDefualt = true )
 	{
 		$path = $this->getPath();
 		
@@ -119,13 +121,17 @@ class myServiceConfig
 		}
 		
 		// always append the defualt to the end
-		$config_table_list[] = $path.$this->getDefaultName() ;
+		if ($useDefualt) {
+			$config_table_list[] = $path.$this->getDefaultName() ;
+		}
 
 		 // don't use the common path feature - add it to each config file separatly
 		$this->config_chain = new kConfigTableChain( $config_table_list , null );  
 		$tables =  $this->config_chain->getTables();
 		self::$default_config_table = end ( $tables );
 
+		$this->all_config_tables = $tables;
+		
 		if ( $service_name )
 		{
 			$this->setServiceName( $service_name );
@@ -147,7 +153,7 @@ class myServiceConfig
 	public function getNeedKuserFromPuser()	{	return $this->get ( "nkfp" ); 		}
 	public function getCreateUserOnDemand()	{	return $this->get ( "cuod" );		}
 	public function getAllowEmptyPuser()	{	return $this->get ( "aep" );		}
-	public function getReadWrite()			{	return $this->get ( "wr" );			}
+	//public function getReadWrite()			{	return $this->get ( "wr" );			}
 	public function getPartnerGroup()		{	return $this->get ( "pg" );			}
 	public function getKalturaNetwork()		{	return $this->get ( "kn" );			}
 	public function getMatchIp()			{	return $this->get ( "mip" );		}
@@ -167,6 +173,16 @@ class myServiceConfig
 	public function getServices ( )
 	{
 		return self::$default_config_table->listPks();	
+	}
+	
+	public function getAllServices ( )
+	{
+		$services = array();	
+		foreach ($this->all_config_tables as $cur)
+		{
+			$services = array_merge($services, $cur->listPks());
+		}
+		return $services;
 	}
 	
 	public function isSetService ( $service_name )
