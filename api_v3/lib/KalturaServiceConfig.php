@@ -1,7 +1,7 @@
 <?php
 class KalturaServiceConfig extends myServiceConfig
 {
-	public function __construct($file_name , $service_name = null, $load_plugins = true)
+	public function __construct($file_name , $service_name = null, $load_plugins = true, $useDefualt = true)
 	{
 	    KalturaServiceConfig::setStrictMode(false);
 	    
@@ -16,7 +16,7 @@ class KalturaServiceConfig extends myServiceConfig
 		    	KalturaServiceConfig::addSecondaryConfigTables($serviceConfig);
 	    }
 	    
-		parent::myServiceConfig($file_name , $service_name);
+		parent::myServiceConfig($file_name , $service_name, $useDefualt);
 	} 
 	
 	public static function getServiceConfigForPartner ( $partner )
