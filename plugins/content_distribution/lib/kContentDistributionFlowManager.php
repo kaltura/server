@@ -276,6 +276,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType(null);
+		$entryDistribution->setErrorNumber(null);
+		$entryDistribution->setErrorDescription(null);
+		
 		$entryDistribution->setRemoteId($data->getRemoteId());
 		$entryDistribution->setSubmittedAt(time());
 		$entryDistribution->setStatus(EntryDistributionStatus::READY);
@@ -330,6 +335,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType(null);
+		$entryDistribution->setErrorNumber(null);
+		$entryDistribution->setErrorDescription(null);
+		
 		$entryDistribution->setStatus(EntryDistributionStatus::READY);
 		$entryDistribution->setDirtyStatus(null);
 	
@@ -382,6 +392,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType(null);
+		$entryDistribution->setErrorNumber(null);
+		$entryDistribution->setErrorDescription(null);
+		
 		$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
 		$entryDistribution->setDirtyStatus(null);
 		
@@ -443,6 +458,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType($dbBatchJob->getErrType());
+		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+		
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_SUBMITTING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
@@ -464,6 +484,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType($dbBatchJob->getErrType());
+		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+		
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
@@ -485,6 +510,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
 			return $dbBatchJob;
 		}
+		
+		$entryDistribution->setErrorType($dbBatchJob->getErrType());
+		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+		
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_DELETING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
