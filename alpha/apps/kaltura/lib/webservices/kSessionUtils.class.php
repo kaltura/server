@@ -172,6 +172,16 @@ class kSessionUtils
 		return $res;
 	}
 	
+	public static function validateKSessionNoTicket($partner_id, $puser_id, $ks_str, &$ks)
+	{
+		if ( !$ks_str )
+		{
+			return false;
+		}
+		$ks = ks::fromSecureString( $ks_str );
+		return $ks->isValid( $partner_id, $puser_id, false );
+	}
+	
 	/**
 		validate the time and data of the ks
 		If the puser_id was set in the KS, it is expected to be equal to the puser_id here
@@ -348,12 +358,15 @@ class ks
 		return $decoded_str;
 	}
 
-	public function isValid( $partner_id , $puser_id , $type )
+	
+	public function isValid( $partner_id , $puser_id , $type = false)
 	{
 		if ( ! $this->valid_string ) return self::INVALID_STR;
 		if ( ! $this->matchPartner ( $partner_id ) ) return self::INVALID_PARTNER;
 		if ( ! $this->matchUser ( $puser_id ) ) return self::INVALID_USER;
-		if ( ! $this->type == $type  ) return self::INVALID_TYPE;
+		if ($type !== false) { // do not check ks type
+			if ( ! $this->type == $type  ) return self::INVALID_TYPE;
+		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 	
 		if($this->original_str)
