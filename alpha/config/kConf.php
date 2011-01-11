@@ -30,7 +30,7 @@ class kConf extends kConfLocal
 
 				"delivery_block_countries" => "", // comma separated
 				
-				"enable_cache" => true,
+				"enable_cache" => false,
 				
 				"terms_of_use_uri" => "index.php/terms",
 			
@@ -100,7 +100,7 @@ class kConf extends kConfLocal
 				"kdp3_wrapper_version" => 'v32.0',
 				"kmc_secured_login" => false,
 				
-				"kmc_version" => 'v4.0.2',
+				"kmc_version" => 'v4.0.3',
 				
 				"paypal_data" => array (),
 				
