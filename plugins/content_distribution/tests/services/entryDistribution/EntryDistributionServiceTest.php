@@ -1,11 +1,12 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../../../../../tests/base/bootstrap.php');
+require_once(dirname(__FILE__) . '/EntryDistributionServiceBaseTest.php');
 
 /**
- * EntryDistributionService test case.
+ * entryDistribution service test case.
  */
-class EntryDistributionServiceTest extends KalturaApiUnitTestCase
+class EntryDistributionServiceTest extends EntryDistributionServiceBaseTest
 {
 	/**
 	 * Tests EntryDistributionService->addAction()
@@ -48,150 +49,146 @@ class EntryDistributionServiceTest extends KalturaApiUnitTestCase
 		KalturaLog::debug("Returns Entry Distribution ID [$resultEntryDistribution->id]");
 		return $resultEntryDistribution->id;
 	}
-	
+
 	/**
-	 * Tests EntryDistributionService->getAction()
-	 * @param int $id - returned from testAdd
-	 * @return int
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaEntryDistribution $entryDistribution, KalturaEntryDistribution $reference)
+	{
+		parent::validateAdd($entryDistribution, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet(KalturaEntryDistribution $reference, $id)
+	{
+		parent::validateGet($reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Tests entryDistribution->validate action
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
 	 * @depends testAdd with data set #0
-	 */
-	public function testGet($id)
-	{
-		KalturaLog::debug("testGet [" . print_r($id, true) . "]");
-		$resultEntryDistribution = $this->client->entryDistribution->get($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
-	}
-	
-	/**
-	 * Tests EntryDistributionService->validateAction()
-	 * @param int $id
-	 * @return int
-	 * @depends testGet
-	 */
-	public function testValidate($id)
-	{
-		$resultEntryDistribution = $this->client->entryDistribution->validate($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;	
-	}
-	
-	/**
-	 * Tests EntryDistributionService->updateAction()
-	 * @param KalturaEntryDistribution $entryDistribution
-	 * @param int $id - returned from testValidate
-	 * @return int
-	 * @depends testValidate
 	 * @dataProvider provideData
 	 */
-	public function testUpdate(KalturaEntryDistribution $entryDistribution, $id)
+	public function testValidate(KalturaEntryDistribution $reference, $id)
 	{
-		$resultEntryDistribution = $this->client->entryDistribution->update($id, $entryDistribution);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
+		$resultObject = $this->client->entryDistribution->validate($id, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
 	}
-	
+
 	/**
-	 * Tests EntryDistributionService->listAction()
-	 * @param KalturaEntryDistributionFilter $entryDistributionFilter
-	 * @param KalturaFilterPager $pager
-	 * @dataProvider provideData
+	 * Validates testUpdate results
 	 */
-	public function testList(KalturaEntryDistributionFilter $entryDistributionFilter, KalturaFilterPager $pager = null)
+	protected function validateUpdate(KalturaEntryDistribution $entryDistribution, KalturaEntryDistribution $reference, $id)
 	{
-		$entryDistributionList = $this->client->entryDistribution->listAction($entryDistributionFilter, $pager);
-		$this->assertType('KalturaEntryDistributionListResponse', $entryDistributionList);
-		$this->assertNotEquals($entryDistributionList->totalCount, 0);
-		$this->assertEquals($entryDistributionList->totalCount, count($entryDistributionList->objects));
+		parent::validateUpdate($entryDistribution, $reference);
+		// TODO - add your own validations here
 	}
-	
+
 	/**
-	 * Tests EntryDistributionService->submitAddAction()
-	 * @param int $id
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+		parent::validateDelete();
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null, KalturaEntryDistributionListResponse $reference)
+	{
+		parent::validateList($filter, $pager, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Tests entryDistribution->submitAdd action
 	 * @param bool $submitWhenReady
-	 * @return int
-	 * @depends testUpdate with data set #0
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testSubmitAdd($submitWhenReady, $id)
+	public function testSubmitAdd($submitWhenReady = null, KalturaEntryDistribution $reference, $id)
 	{
-		$resultEntryDistribution = $this->client->entryDistribution->submitAdd($id, $submitWhenReady);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
+		$resultObject = $this->client->entryDistribution->submitAdd($id, $submitWhenReady, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
 	}
-	
+
 	/**
-	 * Tests EntryDistributionService->submitUpdateAction()
+	 * Tests entryDistribution->submitUpdate action
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testSubmitUpdate(KalturaEntryDistribution $reference, $id)
+	{
+		$resultObject = $this->client->entryDistribution->submitUpdate($id, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Tests entryDistribution->submitFetchReport action
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testSubmitFetchReport(KalturaEntryDistribution $reference, $id)
+	{
+		$resultObject = $this->client->entryDistribution->submitFetchReport($id, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Tests entryDistribution->submitDelete action
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testSubmitDelete(KalturaEntryDistribution $reference, $id)
+	{
+		$resultObject = $this->client->entryDistribution->submitDelete($id, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Tests entryDistribution->retrySubmit action
+	 * @param KalturaEntryDistribution $reference
+	 * @param int id - returned from testAdd
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testRetrySubmit(KalturaEntryDistribution $reference, $id)
+	{
+		$resultObject = $this->client->entryDistribution->retrySubmit($id, $reference);
+		$this->assertType('KalturaEntryDistribution', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
 	 * @param int $id
 	 * @return int
-	 * @depends testSubmitAdd with data set #0
-	 * @expectedException KalturaException
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
 	 */
-	public function testSubmitUpdate($id)
+	public function testFinished($id)
 	{
-		$resultEntryDistribution = $this->client->entryDistribution->submitUpdate($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
+		return $id;
 	}
-	
-	/**
-	 * Tests EntryDistributionService->submitFetchReportAction()
-	 * @param int $id
-	 * @return int
-	 * @depends testSubmitAdd with data set #0
-	 * @expectedException KalturaException
-	 * 
-	 */
-	public function testSubmitFetchReport($id)
-	{
-		$resultEntryDistribution = $this->client->entryDistribution->submitFetchReport($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
-	}
-	
-	/**
-	 * Tests EntryDistributionService->submitDeleteAction()
-	 * @param int $id
-	 * @return int
-	 * @depends testSubmitAdd with data set #0
-	 * @expectedException KalturaException
-	 */
-	public function testSubmitDelete($id)
-	{
-		$resultEntryDistribution = $this->client->entryDistribution->submitDelete($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
-	}
-	
-	/**
-	 * Tests EntryDistributionService->retrySubmitAction()
-	 * @param int $id
-	 * @return int
-	 * @depends testSubmitAdd with data set #0
-	 */
-	public function testRetrySubmit($id)
-	{
-		$resultEntryDistribution = $this->client->entryDistribution->retrySubmit($id);
-		$this->assertType('KalturaEntryDistribution', $resultEntryDistribution);
-		$this->assertNotNull($resultEntryDistribution->id);
-		return $resultEntryDistribution->id;
-	}
-	
-	/**
-	 * Tests EntryDistributionService->deleteAction()
-	 * @param int $id
-	 * @return int
-	 * @depends testRetrySubmit
-	 */
-	public function testDelete($id)
-	{
-		$this->client->entryDistribution->delete($id);
-	}
+
 }

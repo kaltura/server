@@ -7,46 +7,114 @@ abstract class DistributionProfileServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
 	 * Tests distributionProfile->add action
-	 * @param KalturaDistributionProfile $distributionProfile
+	 * @param KalturaDistributionProfile $distributionProfile 
+	 * @param KalturaDistributionProfile $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaDistributionProfile $distributionProfile)
+	public function testAdd(KalturaDistributionProfile $distributionProfile, KalturaDistributionProfile $reference)
 	{
 		$resultObject = $this->client->distributionProfile->add($distributionProfile);
 		$this->assertType('KalturaDistributionProfile', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($distributionProfile, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaDistributionProfile $distributionProfile, KalturaDistributionProfile $reference)
+	{
 	}
 
 	/**
 	 * Tests distributionProfile->get action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testAdd with data set #0
-	 */
-	public function testGet($id)
-	{
-		$resultObject = $this->client->distributionProfile->get($id);
-		$this->assertType('KalturaDistributionProfile', $resultObject);
-		$this->assertNotNull($resultObject->id);
-		return $resultObject->id;
-	}
-
-	/**
-	 * Tests distributionProfile->update action
-	 * @param KalturaDistributionProfile $distributionProfile
+	 * @param KalturaDistributionProfile $reference 
 	 * @param int id - returned from testAdd
 	 * @return int
 	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testUpdate(KalturaDistributionProfile $distributionProfile, $id)
+	public function testGet(KalturaDistributionProfile $reference, $id)
+	{
+		$resultObject = $this->client->distributionProfile->get($id);
+		$this->assertType('KalturaDistributionProfile', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateGet($reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet(KalturaDistributionProfile $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests distributionProfile->update action
+	 * @param KalturaDistributionProfile $distributionProfile 
+	 * @param KalturaDistributionProfile $reference 
+	 * @param int id - returned from testAdd
+	 * @return int
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testUpdate(KalturaDistributionProfile $distributionProfile, KalturaDistributionProfile $reference, $id)
 	{
 		$resultObject = $this->client->distributionProfile->update($id, $distributionProfile);
 		$this->assertType('KalturaDistributionProfile', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateUpdate($distributionProfile, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate(KalturaDistributionProfile $distributionProfile, KalturaDistributionProfile $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests distributionProfile->delete action
+	 * @param int id - returned from testAdd
+	 * @depends testFinished
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->distributionProfile->delete($id);
+		$this->validateDelete();
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+	}
+
+	/**
+	 * Tests distributionProfile->list action
+	 * @param KalturaDistributionProfileFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param KalturaDistributionProfileListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaDistributionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProfileListResponse $reference)
+	{
+		$resultObject = $this->client->distributionProfile->list($filter, $pager);
+		$this->assertType('KalturaDistributionProfileListResponse', $resultObject);
+		$this->validateList($filter, $pager, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaDistributionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProfileListResponse $reference)
+	{
 	}
 
 	/**
@@ -55,29 +123,5 @@ abstract class DistributionProfileServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 */
 	abstract public function testFinished($id);
-
-	/**
-	 * Tests distributionProfile->delete action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testFinished
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->distributionProfile->delete($id);
-	}
-
-	/**
-	 * Tests distributionProfile->list action
-	 * @param KalturaDistributionProfileFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @dataProvider provideData
-	 */
-	public function testList(KalturaDistributionProfileFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$resultObject = $this->client->distributionProfile->listAction($filter, $pager);
-		$this->assertType('KalturaDistributionProfileListResponse', $resultObject);
-		$this->assertNotEquals($resultObject->totalCount, 0);
-	}
 
 }
