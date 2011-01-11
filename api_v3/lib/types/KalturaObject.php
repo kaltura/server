@@ -27,12 +27,20 @@ class KalturaObject
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		$properties = $reflector->getProperties();
 		
+		if ($reflector->requiresReadPermission() && !kPermissionManager::getReadPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			return false; // current user has no permission for accessing this object class
+		}
+		
 		foreach ( $this->getMapBetweenObjects() as $this_prop => $object_prop )
 		{
 			if ( is_numeric( $this_prop) ) 
 			    $this_prop = $object_prop;
 			    
 			if(!isset($properties[$this_prop]) || $properties[$this_prop]->isWriteOnly())
+				continue;
+				
+			// ignore property if it requires a read permission which the current user does not have
+			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted(get_class($this), $this_prop))
 				continue;
 				
             $getter_callback = array ( $source_object ,"get{$object_prop}"  );
@@ -162,6 +170,10 @@ class KalturaObject
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		$properties = $reflector->getProperties();
 		
+		if ($reflector->requiresInsertPermission()&& !kPermissionManager::getInsertPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, get_class($this));
+		}
+		
 		foreach($properties as $property)
 		{
 			$propertyName = $property->getName();
@@ -169,6 +181,13 @@ class KalturaObject
 			{
 				if ($this->$propertyName !== null)
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName($propertyName));
+			}
+			// property requires insert permissions, verify that the current user has it
+			if ($property->requiresInsertPermission())
+			{
+				if (!kPermissionManager::getInsertPermitted(get_class($this), $propertyName)) {
+					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+				}
 			}
 		}
 	}
@@ -179,6 +198,10 @@ class KalturaObject
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		$properties = $reflector->getProperties();
 		
+		if ($reflector->requiresUpdatePermission()&& !kPermissionManager::getUpdatePermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, get_class($this));
+		}
+		
 		foreach($properties as $property)
 		{
 			$propertyName = $property->getName();
@@ -186,6 +209,13 @@ class KalturaObject
 			{
 				if ($this->$propertyName !== null)
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName($propertyName));
+			}
+			// property requires update permissions, verify that the current user has it
+			if ($property->requiresUpdatePermission())
+			{
+				if (!kPermissionManager::getUpdatePermitted(get_class($this), $propertyName)) {
+					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+				}
 			}
 		}
 		
