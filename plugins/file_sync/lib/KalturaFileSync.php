@@ -280,6 +280,10 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 			{
 				$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
 			}
+			elseif(strpos(mime_content_type($this->fileRoot . $this->filePath), 'text') !== false)
+			{
+				$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
+			}
 			$this->fileDiscSize = filesize($this->fileRoot . $this->filePath);
 		}
 		
