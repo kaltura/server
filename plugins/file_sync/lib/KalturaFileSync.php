@@ -277,28 +277,10 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		if($this->isCurrentDc)
 		{
 			$path = $this->fileRoot . $this->filePath;
-			if($source_object->getObjectType() == FileSyncObjectType::FLAVOR_ASSET && $source_object->getObjectSubType() == flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG)
-			{
-				$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
-			}
-			else
-			{
-				$mimeType = null;
-				if(function_exists('mime_content_type'))
-				{
-					$mimeType = mime_content_type($path);
-				}
-				elseif(function_exists('finfo_open'))
-				{
-					$finfo = new finfo(FILEINFO_MIME_TYPE, null);
-					$mimeType = $finfo->file($path);
-				}
-					
-				KalturaLog::debug("File path [$path] mime type [$mimeType]");
-				if(strpos($mimeType, 'text') !== false)
-					$this->fileContent = kFileSyncUtils::getContentsByFileSync($source_object);
-			}
 			$this->fileDiscSize = filesize($path);
+			$content = file_get_contents($path, false, null, 0, 1024);
+			if(ctype_print($content))
+				$this->fileContent = $content;
 		}
 		
 		if($this->fileType == KalturaFileSyncType::LINK)
