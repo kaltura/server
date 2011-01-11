@@ -7,46 +7,114 @@ abstract class GenericDistributionProviderActionServiceBaseTest extends KalturaA
 {
 	/**
 	 * Tests genericDistributionProviderAction->add action
-	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction
+	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction 
+	 * @param KalturaGenericDistributionProviderAction $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaGenericDistributionProviderAction $genericDistributionProviderAction)
+	public function testAdd(KalturaGenericDistributionProviderAction $genericDistributionProviderAction, KalturaGenericDistributionProviderAction $reference)
 	{
 		$resultObject = $this->client->genericDistributionProviderAction->add($genericDistributionProviderAction);
 		$this->assertType('KalturaGenericDistributionProviderAction', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($genericDistributionProviderAction, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaGenericDistributionProviderAction $genericDistributionProviderAction, KalturaGenericDistributionProviderAction $reference)
+	{
 	}
 
 	/**
 	 * Tests genericDistributionProviderAction->get action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testAdd with data set #0
-	 */
-	public function testGet($id)
-	{
-		$resultObject = $this->client->genericDistributionProviderAction->get($id);
-		$this->assertType('KalturaGenericDistributionProviderAction', $resultObject);
-		$this->assertNotNull($resultObject->id);
-		return $resultObject->id;
-	}
-
-	/**
-	 * Tests genericDistributionProviderAction->update action
-	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction
+	 * @param KalturaGenericDistributionProviderAction $reference 
 	 * @param int id - returned from testAdd
 	 * @return int
 	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testUpdate(KalturaGenericDistributionProviderAction $genericDistributionProviderAction, $id)
+	public function testGet(KalturaGenericDistributionProviderAction $reference, $id)
+	{
+		$resultObject = $this->client->genericDistributionProviderAction->get($id);
+		$this->assertType('KalturaGenericDistributionProviderAction', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateGet($reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet(KalturaGenericDistributionProviderAction $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests genericDistributionProviderAction->update action
+	 * @param KalturaGenericDistributionProviderAction $genericDistributionProviderAction 
+	 * @param KalturaGenericDistributionProviderAction $reference 
+	 * @param int id - returned from testAdd
+	 * @return int
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testUpdate(KalturaGenericDistributionProviderAction $genericDistributionProviderAction, KalturaGenericDistributionProviderAction $reference, $id)
 	{
 		$resultObject = $this->client->genericDistributionProviderAction->update($id, $genericDistributionProviderAction);
 		$this->assertType('KalturaGenericDistributionProviderAction', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateUpdate($genericDistributionProviderAction, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate(KalturaGenericDistributionProviderAction $genericDistributionProviderAction, KalturaGenericDistributionProviderAction $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests genericDistributionProviderAction->delete action
+	 * @param int id - returned from testAdd
+	 * @depends testFinished
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->genericDistributionProviderAction->delete($id);
+		$this->validateDelete();
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+	}
+
+	/**
+	 * Tests genericDistributionProviderAction->list action
+	 * @param KalturaGenericDistributionProviderActionFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param KalturaGenericDistributionProviderActionListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
+	{
+		$resultObject = $this->client->genericDistributionProviderAction->list($filter, $pager);
+		$this->assertType('KalturaGenericDistributionProviderActionListResponse', $resultObject);
+		$this->validateList($filter, $pager, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
+	{
 	}
 
 	/**
@@ -55,29 +123,5 @@ abstract class GenericDistributionProviderActionServiceBaseTest extends KalturaA
 	 * @return int
 	 */
 	abstract public function testFinished($id);
-
-	/**
-	 * Tests genericDistributionProviderAction->delete action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testFinished
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->genericDistributionProviderAction->delete($id);
-	}
-
-	/**
-	 * Tests genericDistributionProviderAction->list action
-	 * @param KalturaGenericDistributionProviderActionFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @dataProvider provideData
-	 */
-	public function testList(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$resultObject = $this->client->genericDistributionProviderAction->listAction($filter, $pager);
-		$this->assertType('KalturaGenericDistributionProviderActionListResponse', $resultObject);
-		$this->assertNotEquals($resultObject->totalCount, 0);
-	}
 
 }
