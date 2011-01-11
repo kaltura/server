@@ -350,7 +350,7 @@ $(window).load(function(){
 		openIframe : function(url) {
 			$("#flash_wrap").css("visibility","hidden");
 			$("#server_frame").attr("src", url);
-			$("#server_wrap").css("margin-top", "-"+ $("#flash_wrap").height() +"px");
+			$("#server_wrap").css("margin-top", "-"+ ($("#flash_wrap").height() + 2) +"px");
 			$("#server_wrap").show();
 		}
 		
