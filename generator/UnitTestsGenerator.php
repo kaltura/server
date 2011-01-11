@@ -4,6 +4,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	private $_txtBase = "";
 	private $_txtTest = "";
 	private $_txtIni = "";
+	private $lastDependencyTest = "testFunction";
 	
 	protected function writeHeader(){}
 	protected function writeFooter(){}
@@ -78,7 +79,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeIni("[config]");
 		$this->writeIni("source                                            = ini");
-		$this->writeIni("serviceUrl                                        = http://www.kaltura.com/");
+		$this->writeIni("serviceUrl                                        = http://localhost/");
 		$this->writeIni("partnerId                                         = 100");
 		$this->writeIni("clientTag                                         = unitTest");
 		$this->writeIni("curlTimeout                                       = 90");
@@ -116,8 +117,28 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	
 	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
 	{
-		$this->writeBase("}");
+		$this->writeTest("	/**");
+		$this->writeTest("	 * Called when all tests are done");
+		$this->writeTest("	 * @param int \$id");
+		$this->writeTest("	 * @return int");
+		$this->writeTest("	 * @depends {$this->lastDependencyTest} - TODO: replace {$this->lastDependencyTest} with last test function that uses that id");
+		$this->writeTest("	 */");
+		$this->writeTest("	public function testFinished(\$id)");
+		$this->writeTest("	{");
+		$this->writeTest("		return \$id;");
+		$this->writeTest("	}");
+		$this->writeTest("");
 		$this->writeTest("}");
+		
+	
+		$this->writeBase("	/**");
+		$this->writeBase("	 * Called when all tests are done");
+		$this->writeBase("	 * @param int \$id");
+		$this->writeBase("	 * @return int");
+		$this->writeBase("	 */");
+		$this->writeBase("	abstract public function testFinished(\$id);");
+		$this->writeBase("");
+		$this->writeBase("}");
 		
 		$serviceName = $serviceReflector->getServiceName();
 		$serviceClass = $serviceReflector->getServiceClass();
@@ -134,22 +155,33 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeToFile("$testPath/{$serviceClass}Test.php.ini", $this->_txtIni, false);
 	}
 
-	protected function writeServiceAddAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector)
+	protected function writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector = null, $testReturnedType = 'int')
 	{
-		$this->writeIni("");
-		$this->writeIni("[testAdd]");
-
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Tests {$serviceName}->add action");
+		$actionName = ucfirst($action);
 		
+		$this->writeIni("");
+		$this->writeIni("[test{$actionName}]");
+		
+		$this->writeBase("	/**");
+		$this->writeBase("	 * Tests {$serviceName}->{$action} action");
+	
 		$testParams = array();
 		$testValues = array();
+		$validateValues = array();
+		$addId = false;
 		foreach($actionParams as $actionParam)
 		{
 			$paramType = $actionParam->getType();
 			$paramName = $actionParam->getName();
+			if($paramType == 'int' && $paramName == 'id')
+			{
+				$addId = true;
+				$testValues[] = '$id';
+				$this->writeIni("test1.$paramName.type = dependency");
+				continue;
+			}
 		
-			if($actionParam->isSimpleType())
+			if($actionParam->isSimpleType() || $actionParam->isEnum())
 			{
 				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
 			}
@@ -164,109 +196,22 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
 				foreach($actionParamProperties as $actionParamProperty)
 				{
-					if($actionParamProperty->isReadOnly())
-						continue;
-						
-					$propertyType = $actionParamProperty->getType();
-					$propertyName = $actionParamProperty->getName();
-					
-					if($actionParamProperty->isSimpleType())
-						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
-					else
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
-				}
-			}
-		
-			$this->writeBase("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
-				$testParam = "\$$paramName";
-			else
-				$testParam = "$paramType \$$paramName";
-				
-			if($actionParam->isOptional())
-			{
-				if($actionParam->getDefaultValue())
-				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
-					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
-				}
-				else
-				{
-					$testParam .= " = null";
-				}
-			}
-				
-			$testParams[] = $testParam;
-			$testValues[] = "\$$paramName";
-		}
-		$testParams = implode(', ', $testParams);
-		$testValues = implode(', ', $testValues);
-			
-		$outputType = $outputTypeReflector->getType();
-		
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 * @dataProvider provideData");
-		$this->writeBase("	 */");
-		$this->writeBase("	public function testAdd($testParams)");
-		$this->writeBase("	{");
-		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->add($testValues);");
-		$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
-		$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
-		$this->writeBase("		return \$resultObject->id;");
-		$this->writeBase("	}");
-		$this->writeBase("");
-	}
-	
-	protected function writeServiceUpdateAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector)
-	{
-		$this->writeIni("");
-		$this->writeIni("[testUpdate]");
-	
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Tests {$serviceName}->update action");
-		
-		$testParams = array();
-		$testValues = array();
-		$addId = false;
-		foreach($actionParams as $actionParam)
-		{
-			$paramType = $actionParam->getType();
-			$paramName = $actionParam->getName();
-			if($paramType == 'int' && $paramName == 'id')
-			{
-				$addId = true;
-				$testValues[] = '$id';
-				$this->writeIni("test1.$paramName.type = dependency");
-				continue;
-			}
-		
-			if($actionParam->isSimpleType())
-			{
-				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
-			}
-			else
-			{
-				$this->writeIni("test1.$paramName.type = $paramType");
-				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
-				foreach($actionParamProperties as $actionParamProperty)
-				{
 					if($actionParamProperty->isReadOnly() || $actionParamProperty->isInsertOnly())
 						continue;
 						
 					$propertyType = $actionParamProperty->getType();
 					$propertyName = $actionParamProperty->getName();
 					
-					if($actionParamProperty->isSimpleType())
+					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
 						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
 					else
 						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
 				}
 			}
 			
-			$this->writeBase("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
+			$paramDesc = $actionParam->getDescription();
+			$this->writeBase("	 * @param $paramType \$$paramName $paramDesc");
+			if($actionParam->isSimpleType() || $actionParam->isEnum())
 				$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
@@ -288,55 +233,25 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				
 			$testParams[] = $testParam;
 			$testValues[] = "\$$paramName";
+			$validateValues[] = "\$$paramName";
 		}
-		if($addId)
+		
+		if($outputTypeReflector)
 		{
-			$this->writeBase("	 * @param int id - returned from testAdd");
-			$testParams[] = '$id';
-		}
-			
-		$testParams = implode(', ', $testParams);
-		$testValues = implode(', ', $testValues);
-				
-		$outputType = $outputTypeReflector->getType();
-		
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 * @depends testAdd with data set #0");
-		$this->writeBase("	 * @dataProvider provideData");
-		$this->writeBase("	 */");
-		$this->writeBase("	public function testUpdate($testParams)");
-		$this->writeBase("	{");
-		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->update($testValues);");
-		$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
-		$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
-		$this->writeBase("		return \$resultObject->id;");
-		$this->writeBase("	}");
-		$this->writeBase("");
-	}
-	
-	protected function writeServiceListAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector)
-	{
-		$this->writeIni("");
-		$this->writeIni("[testList]");
-	
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Tests {$serviceName}->list action");
-		
-		$testParams = array();
-		$testValues = array();
-		foreach($actionParams as $actionParam)
-		{
-			$paramType = $actionParam->getType();
-			$paramName = $actionParam->getName();
-		
-			if($actionParam->isSimpleType())
+			$paramType = $outputTypeReflector->getType();
+			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
 			{
-				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
+				$this->writeIni("test1.reference = " . $outputTypeReflector->getDefaultValue());
+			}
+			elseif($outputTypeReflector->isFile())
+			{
+				$this->writeIni("test1.reference.type = file");
+				$this->writeIni("test1.reference.path = ");
 			}
 			else
 			{
-				$this->writeIni("test1.$paramName.type = $paramType");
-				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
+				$this->writeIni("test1.reference.type = $paramType");
+				$actionParamProperties = $outputTypeReflector->getTypeReflector()->getProperties();
 				foreach($actionParamProperties as $actionParamProperty)
 				{
 					if($actionParamProperty->isReadOnly())
@@ -345,271 +260,114 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					$propertyType = $actionParamProperty->getType();
 					$propertyName = $actionParamProperty->getName();
 					
-					if($actionParamProperty->isSimpleType())
-						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
+					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
 					else
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
+						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
 				}
 			}
 			
-			$this->writeBase("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
-				$testParam = "\$$paramName";
+			$paramDesc = $outputTypeReflector->getDescription();
+			$this->writeBase("	 * @param $paramType \$reference $paramDesc");
+			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+				$testParam = "\$reference";
 			else
-				$testParam = "$paramType \$$paramName";
+				$testParam = "$paramType \$reference";
 				
-			if($actionParam->isOptional())
+			if($outputTypeReflector->isOptional())
 			{
-				if($actionParam->getDefaultValue())
+				if($outputTypeReflector->getDefaultValue())
 				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
+					if($outputTypeReflector->getType() == 'string')
+						$testParam .= " = '" . $outputTypeReflector->getDefaultValue() . "'";
 					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
+						$testParam .= " = " . $outputTypeReflector->getDefaultValue();
 				}
 				else
 				{
 					$testParam .= " = null";
 				}
 			}
-				
 			$testParams[] = $testParam;
-			$testValues[] = "\$$paramName";
+			$validateValues[] = "\$reference";
 		}
-			
-		$testParams = implode(', ', $testParams);
-		$testValues = implode(', ', $testValues);
-			
-		$outputType = $outputTypeReflector->getType();
 		
-		$this->writeBase("	 * @dataProvider provideData");
-		$this->writeBase("	 */");
-		$this->writeBase("	public function testList($testParams)");
-		$this->writeBase("	{");
-		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->listAction($testValues);");
-		$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
-		$this->writeBase("		\$this->assertNotEquals(\$resultObject->totalCount, 0);");
-		$this->writeBase("	}");
-		$this->writeBase("");
-	}
-	
-	protected function writeServiceGetAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector)
-	{
-		$this->writeIni("");
-		$this->writeIni("[testGet]");
-		
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Tests {$serviceName}->get action");
-		
-		$testParams = array();
-		$testValues = array();
-		$addId = false;
-		foreach($actionParams as $actionParam)
-		{
-			$paramType = $actionParam->getType();
-			$paramName = $actionParam->getName();
-			if($paramType == 'int' && $paramName == 'id')
-			{
-				$addId = true;
-				$testValues[] = '$id';
-				$this->writeIni("test1.$paramName.type = dependency");
-				continue;
-			}
-		
-			if($actionParam->isSimpleType())
-			{
-				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
-			}
-			else
-			{
-				$this->writeIni("test1.$paramName.type = $paramType");
-				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
-				foreach($actionParamProperties as $actionParamProperty)
-				{
-					if($actionParamProperty->isReadOnly())
-						continue;
-						
-					$propertyType = $actionParamProperty->getType();
-					$propertyName = $actionParamProperty->getName();
-					
-					if($actionParamProperty->isSimpleType())
-						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
-					else
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
-				}
-			}
-			
-			$this->writeBase("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
-				$testParam = "\$$paramName";
-			else
-				$testParam = "$paramType \$$paramName";
-				
-			if($actionParam->isOptional())
-			{
-				if($actionParam->getDefaultValue())
-				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
-					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
-				}
-				else
-				{
-					$testParam .= " = null";
-				}
-			}
-				
-			$testParams[] = $testParam;
-			$testValues[] = "\$$paramName";
-		}
 		if($addId)
 		{
 			$this->writeBase("	 * @param int id - returned from testAdd");
 			$testParams[] = '$id';
 		}
-			
+		
 		$testParams = implode(', ', $testParams);
 		$testValues = implode(', ', $testValues);
+		$validateValues = implode(', ', $validateValues);
 			
-		$outputType = $outputTypeReflector->getType();
+		$outputType = null;
+		if($outputTypeReflector)
+			$outputType = $outputTypeReflector->getType();
 		
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 * @depends testAdd with data set #0");
+		if($testReturnedType)
+		{
+			$this->lastDependencyTest = "test{$actionName}";
+			$this->writeBase("	 * @return $testReturnedType");
+		}
+		
+		if($addId)
+		{
+			if($testReturnedType)
+				$this->writeBase("	 * @depends testAdd with data set #0");
+			else
+				$this->writeBase("	 * @depends testFinished");
+		}
+		
+		$this->writeBase("	 * @dataProvider provideData");
 		$this->writeBase("	 */");
-		$this->writeBase("	public function testGet($testParams)");
+		$this->writeBase("	public function test{$actionName}($testParams)");
 		$this->writeBase("	{");
-		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->get($testValues);");
+		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->{$action}($testValues);");
+		if($outputType)
 		$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
+		if($testReturnedType)
 		$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
+		$this->writeBase("		\$this->validate{$actionName}($validateValues);");
+		if($testReturnedType)
 		$this->writeBase("		return \$resultObject->id;");
 		$this->writeBase("	}");
 		$this->writeBase("");
-	}
-	
-	protected function writeServiceDeleteAction($serviceId, $serviceName, $action, $actionParams)
-	{
-		$this->writeIni("");
-		$this->writeIni("[testDelete]");
+		
+		$this->writeBase("	/**");
+		$this->writeBase("	 * Validates test{$actionName} results");
+		$this->writeBase("	 */");
+		$this->writeBase("	protected function validate{$actionName}($testParams)");
+		$this->writeBase("	{");
+		// TODO - add compare based on object type
+		$this->writeBase("	}");
+		$this->writeBase("");
 		
 		$this->writeTest("	/**");
-		$this->writeTest("	 * Called when all tests are done");
-		$this->writeTest("	 * @param int \$id");
-		$this->writeTest("	 * @return int");
-		$this->writeTest("	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id");
+		$this->writeTest("	 * Validates test{$actionName} results");
 		$this->writeTest("	 */");
-		$this->writeTest("	public function testFinished(\$id)");
+		$this->writeTest("	protected function validate{$actionName}($testParams)");
 		$this->writeTest("	{");
-		$this->writeTest("		return \$id;");
+		$this->writeTest("		parent::validate{$actionName}($validateValues);");
+		$this->writeTest("		// TODO - add your own validations here");
 		$this->writeTest("	}");
 		$this->writeTest("");
-		
-	
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Called when all tests are done");
-		$this->writeBase("	 * @param int \$id");
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 */");
-		$this->writeBase("	abstract public function testFinished(\$id);");
-		$this->writeBase("");
-	
-		$this->writeBase("	/**");
-		$this->writeBase("	 * Tests {$serviceName}->delete action");
-		
-		$testParams = array();
-		$testValues = array();
-		$addId = false;
-		foreach($actionParams as $actionParam)
-		{
-			$paramType = $actionParam->getType();
-			$paramName = $actionParam->getName();
-			if($paramType == 'int' && $paramName == 'id')
-			{
-				$addId = true;
-				$testValues[] = '$id';
-				$this->writeIni("test1.$paramName.type = dependency");
-				continue;
-			}
-		
-			if($actionParam->isSimpleType())
-			{
-				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
-			}
-			else
-			{
-				$this->writeIni("test1.$paramName.type = $paramType");
-				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
-				foreach($actionParamProperties as $actionParamProperty)
-				{
-					if($actionParamProperty->isReadOnly())
-						continue;
-						
-					$propertyType = $actionParamProperty->getType();
-					$propertyName = $actionParamProperty->getName();
-					
-					if($actionParamProperty->isSimpleType())
-						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
-					else
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
-				}
-			}
-			
-			$this->writeBase("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
-				$testParam = "\$$paramName";
-			else
-				$testParam = "$paramType \$$paramName";
-				
-			if($actionParam->isOptional())
-			{
-				if($actionParam->getDefaultValue())
-				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
-					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
-				}
-				else
-				{
-					$testParam .= " = null";
-				}
-			}
-							
-			$testParams[] = $testParam;
-			$testValues[] = "\$$paramName";
-		}
-		if($addId)
-		{
-			$this->writeBase("	 * @param int id - returned from testAdd");
-			$testParams[] = '$id';
-		}
-			
-		$testParams = implode(', ', $testParams);
-		$testValues = implode(', ', $testValues);
-			
-		$this->writeBase("	 * @return int");
-		$this->writeBase("	 * @depends testFinished");
-		$this->writeBase("	 */");
-		$this->writeBase("	public function testDelete($testParams)");
-		$this->writeBase("	{");
-		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->delete($testValues);");
-		$this->writeBase("	}");
-		$this->writeBase("");
 	}
-			
+	
 	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector)
 	{
 		KalturaLog::info("Generates action [$serviceName.$action]");
 		if($action == 'add')
-			return $this->writeServiceAddAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
+			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 		if($action == 'update')
-			return $this->writeServiceUpdateAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
+			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 		if($action == 'list')
-			return $this->writeServiceListAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
+			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector, null);
 		if($action == 'get')
-			return $this->writeServiceGetAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
+			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 		if($action == 'delete')
-			return $this->writeServiceDeleteAction($serviceId, $serviceName, $action, $actionParams);
+			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, null, null);
 			
 		$actionName = ucfirst($action);
 		
@@ -634,7 +392,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			}
 			
 			$this->writeTest("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType())
+			if($actionParam->isSimpleType() || $actionParam->isEnum())
 				$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
@@ -657,6 +415,61 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$testParams[] = $testParam;
 			$testValues[] = "\$$paramName";
 		}
+		
+		if($outputTypeReflector)
+		{
+			$paramType = $outputTypeReflector->getType();
+			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+			{
+				$this->writeIni("test1.reference = " . $outputTypeReflector->getDefaultValue());
+			}
+			elseif($outputTypeReflector->isFile())
+			{
+				$this->writeIni("test1.reference.type = file");
+				$this->writeIni("test1.reference.path = ");
+			}
+			else
+			{
+				$this->writeIni("test1.reference.type = $paramType");
+				$actionParamProperties = $outputTypeReflector->getTypeReflector()->getProperties();
+				foreach($actionParamProperties as $actionParamProperty)
+				{
+					if($actionParamProperty->isReadOnly())
+						continue;
+						
+					$propertyType = $actionParamProperty->getType();
+					$propertyName = $actionParamProperty->getName();
+					
+					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
+					else
+						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+				}
+			}
+			$this->writeTest("	 * @param $paramType \$reference");
+			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+				$testParam = "\$reference";
+			else
+				$testParam = "$paramType \$reference";
+				
+			if($outputTypeReflector->isOptional())
+			{
+				if($outputTypeReflector->getDefaultValue())
+				{
+					if($outputTypeReflector->getType() == 'string')
+						$testParam .= " = '" . $outputTypeReflector->getDefaultValue() . "'";
+					else
+						$testParam .= " = " . $outputTypeReflector->getDefaultValue();
+				}
+				else
+				{
+					$testParam .= " = null";
+				}
+			}
+			$testParams[] = $testParam;
+			$testValues[] = "\$reference";	
+		}
+		
 		if($addId)
 		{
 			$this->writeTest("	 * @param int id - returned from testAdd");
@@ -681,6 +494,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeTest("		\$resultObject = \$this->client->{$serviceName}->{$action}($testValues);");
 		if($outputType)
 		$this->writeTest("		\$this->assertType('$outputType', \$resultObject);");
+		$this->writeTest("		// TODO - add here your own validations");
 		$this->writeTest("	}");
 		$this->writeTest("");
 	}
