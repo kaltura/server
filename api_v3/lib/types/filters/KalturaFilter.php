@@ -90,6 +90,12 @@ class KalturaFilter extends KalturaObject
 		 		
 			$value = $this->$this_prop;
 			$propertyInfo = $typeReflector->getProperty($this_prop);
+			if(!$propertyInfo)
+			{
+				KalturaLog::alert("Cannot load property info for attribute [$this_prop] in object [" . get_class($this) . "] try delete the cache");
+				continue;
+			}
+			
 			if($propertyInfo->isDynamicEnum())
 			{
 				$propertyType = $propertyInfo->getType();
