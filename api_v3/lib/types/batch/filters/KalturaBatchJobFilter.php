@@ -100,6 +100,12 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 			$jobSubTypeIn = $this->toDynamicJobSubTypeValues($jobType, $this->jobSubTypeIn);
 			$batchJobFilter->set('_in_job_sub_type', $jobSubTypeIn);
 		}
+	
+		if(!is_null($jobType) && !is_null($this->jobSubTypeNotIn))
+		{
+			$jobSubTypeNotIn = $this->toDynamicJobSubTypeValues($jobType, $this->jobSubTypeNotIn);
+			$batchJobFilter->set('_notin_job_sub_type', $jobSubTypeNotIn);
+		}
 		
 		return $batchJobFilter;
 	}
