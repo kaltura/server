@@ -30,7 +30,7 @@ class kConf extends kConfLocal
 
 				"delivery_block_countries" => "", // comma separated
 				
-				"enable_cache" => false,
+				"enable_cache" => true,
 				
 				"terms_of_use_uri" => "index.php/terms",
 			
