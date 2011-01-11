@@ -341,13 +341,12 @@ $(window).load(function(){
 		},
 		
 		showFlash : function() {
+			$("#server_wrap").hide();
 			$("#flash_wrap").css("visibility","visible");
 			$("#server_wrap").css("margin-top", 0);
-			$("#server_wrap").hide();
 		}, 
 		
 		openIframe : function(url) {
-			kmc.vars.frame
 			$("#flash_wrap").css("visibility","hidden");
 			$("#server_frame").attr("src", url);
 			$("#server_wrap").css("margin-top", "-"+ $("#flash_wrap").height() +"px");
