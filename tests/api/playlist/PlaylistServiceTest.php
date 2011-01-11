@@ -9,38 +9,76 @@ require_once(dirname(__FILE__) . '/PlaylistServiceBaseTest.php');
 class PlaylistServiceTest extends PlaylistServiceBaseTest
 {
 	/**
-	 * Called when all tests are done
-	 * @param int $id
-	 * @return int
-	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id
+	 * Validates testAdd results
 	 */
-	public function testFinished($id)
+	protected function validateAdd(KalturaPlaylist $playlist, $updateStats = null, KalturaPlaylist $reference)
 	{
-		return $id;
+		parent::validateAdd($playlist, $updateStats, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet($id, $version = -1, KalturaPlaylist $reference)
+	{
+		parent::validateGet($id, $version, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate($id, KalturaPlaylist $playlist, $updateStats = null, KalturaPlaylist $reference)
+	{
+		parent::validateUpdate($id, $playlist, $updateStats, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+		parent::validateDelete($id);
+		// TODO - add your own validations here
 	}
 
 	/**
 	 * Tests playlist->clone action
 	 * @param string $id
 	 * @param KalturaPlaylist $newPlaylist
+	 * @param KalturaPlaylist $reference
 	 * @dataProvider provideData
 	 */
-	public function testClone($id, KalturaPlaylist $newPlaylist = null)
+	public function testClone($id, KalturaPlaylist $newPlaylist = null, KalturaPlaylist $reference)
 	{
-		$resultObject = $this->client->playlist->clone($id, $newPlaylist);
+		$resultObject = $this->client->playlist->clone($id, $newPlaylist, $reference);
 		$this->assertType('KalturaPlaylist', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaPlaylistFilter $filter = null, KalturaFilterPager $pager = null, KalturaPlaylistListResponse $reference)
+	{
+		parent::validateList($filter, $pager, $reference);
+		// TODO - add your own validations here
 	}
 
 	/**
 	 * Tests playlist->execute action
 	 * @param string $id
 	 * @param string $detailed
+	 * @param KalturaBaseEntryArray $reference
 	 * @dataProvider provideData
 	 */
-	public function testExecute($id, $detailed = null)
+	public function testExecute($id, $detailed = null, KalturaBaseEntryArray $reference)
 	{
-		$resultObject = $this->client->playlist->execute($id, $detailed);
+		$resultObject = $this->client->playlist->execute($id, $detailed, $reference);
 		$this->assertType('KalturaBaseEntryArray', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -48,12 +86,14 @@ class PlaylistServiceTest extends PlaylistServiceBaseTest
 	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
 	 * @param string $detailed
+	 * @param KalturaBaseEntryArray $reference
 	 * @dataProvider provideData
 	 */
-	public function testExecuteFromContent(KalturaPlaylistType $playlistType, $playlistContent, $detailed = null)
+	public function testExecuteFromContent($playlistType, $playlistContent, $detailed = null, KalturaBaseEntryArray $reference)
 	{
-		$resultObject = $this->client->playlist->executeFromContent($playlistType, $playlistContent, $detailed);
+		$resultObject = $this->client->playlist->executeFromContent($playlistType, $playlistContent, $detailed, $reference);
 		$this->assertType('KalturaBaseEntryArray', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -61,24 +101,39 @@ class PlaylistServiceTest extends PlaylistServiceBaseTest
 	 * @param KalturaMediaEntryFilterForPlaylistArray $filters
 	 * @param int $totalResults
 	 * @param string $detailed
+	 * @param KalturaBaseEntryArray $reference
 	 * @dataProvider provideData
 	 */
-	public function testExecuteFromFilters(KalturaMediaEntryFilterForPlaylistArray $filters, $totalResults, $detailed = null)
+	public function testExecuteFromFilters(KalturaMediaEntryFilterForPlaylistArray $filters, $totalResults, $detailed = null, KalturaBaseEntryArray $reference)
 	{
-		$resultObject = $this->client->playlist->executeFromFilters($filters, $totalResults, $detailed);
+		$resultObject = $this->client->playlist->executeFromFilters($filters, $totalResults, $detailed, $reference);
 		$this->assertType('KalturaBaseEntryArray', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests playlist->getStatsFromContent action
 	 * @param KalturaPlaylistType $playlistType
 	 * @param string $playlistContent
+	 * @param KalturaPlaylist $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetStatsFromContent(KalturaPlaylistType $playlistType, $playlistContent)
+	public function testGetStatsFromContent($playlistType, $playlistContent, KalturaPlaylist $reference)
 	{
-		$resultObject = $this->client->playlist->getStatsFromContent($playlistType, $playlistContent);
+		$resultObject = $this->client->playlist->getStatsFromContent($playlistType, $playlistContent, $reference);
 		$this->assertType('KalturaPlaylist', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

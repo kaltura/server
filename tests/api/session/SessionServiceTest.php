@@ -16,12 +16,14 @@ class SessionServiceTest extends SessionServiceBaseTest
 	 * @param int $partnerId
 	 * @param int $expiry
 	 * @param string $privileges
+	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testStart($secret, $userId = null, KalturaSessionType $type = null, $partnerId = -1, $expiry = 86400, $privileges = null)
+	public function testStart($secret, $userId = null, $type = null, $partnerId = -1, $expiry = 86400, $privileges = null, $reference)
 	{
-		$resultObject = $this->client->session->start($secret, $userId, $type, $partnerId, $expiry, $privileges);
+		$resultObject = $this->client->session->start($secret, $userId, $type, $partnerId, $expiry, $privileges, $reference);
 		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -31,6 +33,7 @@ class SessionServiceTest extends SessionServiceBaseTest
 	public function testEnd()
 	{
 		$resultObject = $this->client->session->end();
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -42,24 +45,39 @@ class SessionServiceTest extends SessionServiceBaseTest
 	 * @param int $partnerId
 	 * @param int $expiry
 	 * @param string $privileges
+	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testImpersonate($secret, $impersonatedPartnerId, $userId = null, KalturaSessionType $type = null, $partnerId = -1, $expiry = 86400, $privileges = null)
+	public function testImpersonate($secret, $impersonatedPartnerId, $userId = null, $type = null, $partnerId = -1, $expiry = 86400, $privileges = null, $reference)
 	{
-		$resultObject = $this->client->session->impersonate($secret, $impersonatedPartnerId, $userId, $type, $partnerId, $expiry, $privileges);
+		$resultObject = $this->client->session->impersonate($secret, $impersonatedPartnerId, $userId, $type, $partnerId, $expiry, $privileges, $reference);
 		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests session->startWidgetSession action
 	 * @param string $widgetId
 	 * @param int $expiry
+	 * @param KalturaStartWidgetSessionResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testStartWidgetSession($widgetId, $expiry = 86400)
+	public function testStartWidgetSession($widgetId, $expiry = 86400, KalturaStartWidgetSessionResponse $reference)
 	{
-		$resultObject = $this->client->session->startWidgetSession($widgetId, $expiry);
+		$resultObject = $this->client->session->startWidgetSession($widgetId, $expiry, $reference);
 		$this->assertType('KalturaStartWidgetSessionResponse', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

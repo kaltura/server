@@ -9,25 +9,52 @@ require_once(dirname(__FILE__) . '/EmailIngestionProfileServiceBaseTest.php');
 class EmailIngestionProfileServiceTest extends EmailIngestionProfileServiceBaseTest
 {
 	/**
-	 * Tests EmailIngestionProfile->getByEmailAddress action
-	 * @param string $emailAddress
-	 * @dataProvider provideData
+	 * Validates testAdd results
 	 */
-	public function testGetByEmailAddress($emailAddress)
+	protected function validateAdd(KalturaEmailIngestionProfile $EmailIP, KalturaEmailIngestionProfile $reference)
 	{
-		$resultObject = $this->client->EmailIngestionProfile->getByEmailAddress($emailAddress);
-		$this->assertType('KalturaEmailIngestionProfile', $resultObject);
+		parent::validateAdd($EmailIP, $reference);
+		// TODO - add your own validations here
 	}
 
 	/**
-	 * Called when all tests are done
-	 * @param int $id
-	 * @return int
-	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id
+	 * Tests EmailIngestionProfile->getByEmailAddress action
+	 * @param string $emailAddress
+	 * @param KalturaEmailIngestionProfile $reference
+	 * @dataProvider provideData
 	 */
-	public function testFinished($id)
+	public function testGetByEmailAddress($emailAddress, KalturaEmailIngestionProfile $reference)
 	{
-		return $id;
+		$resultObject = $this->client->EmailIngestionProfile->getByEmailAddress($emailAddress, $reference);
+		$this->assertType('KalturaEmailIngestionProfile', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet(KalturaEmailIngestionProfile $reference, $id)
+	{
+		parent::validateGet($reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate(KalturaEmailIngestionProfile $EmailIP, KalturaEmailIngestionProfile $reference, $id)
+	{
+		parent::validateUpdate($EmailIP, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+		parent::validateDelete();
+		// TODO - add your own validations here
 	}
 
 	/**
@@ -37,12 +64,25 @@ class EmailIngestionProfileServiceTest extends EmailIngestionProfileServiceBaseT
 	 * @param int $emailProfId
 	 * @param string $fromAddress
 	 * @param string $emailMsgId
+	 * @param KalturaMediaEntry $reference
 	 * @dataProvider provideData
 	 */
-	public function testAddMediaEntry(KalturaMediaEntry $mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId)
+	public function testAddMediaEntry(KalturaMediaEntry $mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->EmailIngestionProfile->addMediaEntry($mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId);
+		$resultObject = $this->client->EmailIngestionProfile->addMediaEntry($mediaEntry, $uploadTokenId, $emailProfId, $fromAddress, $emailMsgId, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

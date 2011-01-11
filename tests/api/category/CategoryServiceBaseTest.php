@@ -7,46 +7,113 @@ abstract class CategoryServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
 	 * Tests category->add action
-	 * @param KalturaCategory $category
+	 * @param KalturaCategory $category 
+	 * @param KalturaCategory $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaCategory $category)
+	public function testAdd(KalturaCategory $category, KalturaCategory $reference)
 	{
 		$resultObject = $this->client->category->add($category);
 		$this->assertType('KalturaCategory', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($category, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaCategory $category, KalturaCategory $reference)
+	{
 	}
 
 	/**
 	 * Tests category->get action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testAdd with data set #0
-	 */
-	public function testGet($id)
-	{
-		$resultObject = $this->client->category->get($id);
-		$this->assertType('KalturaCategory', $resultObject);
-		$this->assertNotNull($resultObject->id);
-		return $resultObject->id;
-	}
-
-	/**
-	 * Tests category->update action
-	 * @param KalturaCategory $category
+	 * @param KalturaCategory $reference 
 	 * @param int id - returned from testAdd
 	 * @return int
 	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testUpdate(KalturaCategory $category, $id)
+	public function testGet(KalturaCategory $reference, $id)
+	{
+		$resultObject = $this->client->category->get($id);
+		$this->assertType('KalturaCategory', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateGet($reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet(KalturaCategory $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests category->update action
+	 * @param KalturaCategory $category 
+	 * @param KalturaCategory $reference 
+	 * @param int id - returned from testAdd
+	 * @return int
+	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
+	 */
+	public function testUpdate(KalturaCategory $category, KalturaCategory $reference, $id)
 	{
 		$resultObject = $this->client->category->update($id, $category);
 		$this->assertType('KalturaCategory', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateUpdate($category, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate(KalturaCategory $category, KalturaCategory $reference, $id)
+	{
+	}
+
+	/**
+	 * Tests category->delete action
+	 * @param int id - returned from testAdd
+	 * @depends testFinished
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->category->delete($id);
+		$this->validateDelete();
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
+	}
+
+	/**
+	 * Tests category->list action
+	 * @param KalturaCategoryFilter $filter 
+	 * @param KalturaCategoryListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
+	{
+		$resultObject = $this->client->category->list($filter);
+		$this->assertType('KalturaCategoryListResponse', $resultObject);
+		$this->validateList($filter, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
+	{
 	}
 
 	/**
@@ -55,28 +122,5 @@ abstract class CategoryServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 */
 	abstract public function testFinished($id);
-
-	/**
-	 * Tests category->delete action
-	 * @param int id - returned from testAdd
-	 * @return int
-	 * @depends testFinished
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->category->delete($id);
-	}
-
-	/**
-	 * Tests category->list action
-	 * @param KalturaCategoryFilter $filter
-	 * @dataProvider provideData
-	 */
-	public function testList(KalturaCategoryFilter $filter = null)
-	{
-		$resultObject = $this->client->category->listAction($filter);
-		$this->assertType('KalturaCategoryListResponse', $resultObject);
-		$this->assertNotEquals($resultObject->totalCount, 0);
-	}
 
 }

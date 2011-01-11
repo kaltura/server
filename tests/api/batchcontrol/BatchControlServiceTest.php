@@ -13,12 +13,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param KalturaScheduler $scheduler
 	 * @param KalturaSchedulerStatusArray $schedulerStatuses
 	 * @param KalturaWorkerQueueFilterArray $workerQueueFilters
+	 * @param KalturaSchedulerStatusResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testReportStatus(KalturaScheduler $scheduler, KalturaSchedulerStatusArray $schedulerStatuses, KalturaWorkerQueueFilterArray $workerQueueFilters)
+	public function testReportStatus(KalturaScheduler $scheduler, KalturaSchedulerStatusArray $schedulerStatuses, KalturaWorkerQueueFilterArray $workerQueueFilters, KalturaSchedulerStatusResponse $reference)
 	{
-		$resultObject = $this->client->batchcontrol->reportStatus($scheduler, $schedulerStatuses, $workerQueueFilters);
+		$resultObject = $this->client->batchcontrol->reportStatus($scheduler, $schedulerStatuses, $workerQueueFilters, $reference);
 		$this->assertType('KalturaSchedulerStatusResponse', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -29,12 +31,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param string $configParamPart
 	 * @param int $workerConfigId
 	 * @param string $workerName
+	 * @param KalturaSchedulerConfig $reference
 	 * @dataProvider provideData
 	 */
-	public function testConfigLoaded(KalturaScheduler $scheduler, $configParam, $configValue, $configParamPart = null, $workerConfigId = null, $workerName = null)
+	public function testConfigLoaded(KalturaScheduler $scheduler, $configParam, $configValue, $configParamPart = null, $workerConfigId = null, $workerName = null, KalturaSchedulerConfig $reference)
 	{
-		$resultObject = $this->client->batchcontrol->configLoaded($scheduler, $configParam, $configValue, $configParamPart, $workerConfigId, $workerName);
+		$resultObject = $this->client->batchcontrol->configLoaded($scheduler, $configParam, $configValue, $configParamPart, $workerConfigId, $workerName, $reference);
 		$this->assertType('KalturaSchedulerConfig', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -42,12 +46,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param int $schedulerId
 	 * @param int $adminId
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testStopScheduler($schedulerId, $adminId, $cause)
+	public function testStopScheduler($schedulerId, $adminId, $cause, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->stopScheduler($schedulerId, $adminId, $cause);
+		$resultObject = $this->client->batchcontrol->stopScheduler($schedulerId, $adminId, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -55,12 +61,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param int $workerId
 	 * @param int $adminId
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testStopWorker($workerId, $adminId, $cause)
+	public function testStopWorker($workerId, $adminId, $cause, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->stopWorker($workerId, $adminId, $cause);
+		$resultObject = $this->client->batchcontrol->stopWorker($workerId, $adminId, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -69,12 +77,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param int $batchIndex
 	 * @param int $adminId
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testKill($workerId, $batchIndex, $adminId, $cause)
+	public function testKill($workerId, $batchIndex, $adminId, $cause, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->kill($workerId, $batchIndex, $adminId, $cause);
+		$resultObject = $this->client->batchcontrol->kill($workerId, $batchIndex, $adminId, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -82,12 +92,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param int $workerId
 	 * @param int $adminId
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testStartWorker($workerId, $adminId, $cause = null)
+	public function testStartWorker($workerId, $adminId, $cause = null, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->startWorker($workerId, $adminId, $cause);
+		$resultObject = $this->client->batchcontrol->startWorker($workerId, $adminId, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -98,12 +110,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param string $configValue
 	 * @param string $configParamPart
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testSetSchedulerConfig($schedulerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null)
+	public function testSetSchedulerConfig($schedulerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->setSchedulerConfig($schedulerId, $adminId, $configParam, $configValue, $configParamPart, $cause);
+		$resultObject = $this->client->batchcontrol->setSchedulerConfig($schedulerId, $adminId, $configParam, $configValue, $configParamPart, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -114,12 +128,14 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param string $configValue
 	 * @param string $configParamPart
 	 * @param string $cause
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testSetWorkerConfig($workerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null)
+	public function testSetWorkerConfig($workerId, $adminId, $configParam, $configValue, $configParamPart = null, $cause = null, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->setWorkerConfig($workerId, $adminId, $configParam, $configValue, $configParamPart, $cause);
+		$resultObject = $this->client->batchcontrol->setWorkerConfig($workerId, $adminId, $configParam, $configValue, $configParamPart, $cause, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -127,65 +143,88 @@ class BatchControlServiceTest extends BatchControlServiceBaseTest
 	 * @param int $commandId
 	 * @param KalturaControlPanelCommandStatus $status
 	 * @param string $errorDescription
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testSetCommandResult($commandId, KalturaControlPanelCommandStatus $status, $errorDescription = null)
+	public function testSetCommandResult($commandId, $status, $errorDescription = null, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->setCommandResult($commandId, $status, $errorDescription);
+		$resultObject = $this->client->batchcontrol->setCommandResult($commandId, $status, $errorDescription, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests batchcontrol->listCommands action
 	 * @param KalturaControlPanelCommandFilter $filter
 	 * @param KalturaFilterPager $pager
+	 * @param KalturaControlPanelCommandListResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testListCommands(KalturaControlPanelCommandFilter $filter = null, KalturaFilterPager $pager = null)
+	public function testListCommands(KalturaControlPanelCommandFilter $filter = null, KalturaFilterPager $pager = null, KalturaControlPanelCommandListResponse $reference)
 	{
-		$resultObject = $this->client->batchcontrol->listCommands($filter, $pager);
+		$resultObject = $this->client->batchcontrol->listCommands($filter, $pager, $reference);
 		$this->assertType('KalturaControlPanelCommandListResponse', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests batchcontrol->getCommand action
 	 * @param int $commandId
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetCommand($commandId)
+	public function testGetCommand($commandId, KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->getCommand($commandId);
+		$resultObject = $this->client->batchcontrol->getCommand($commandId, $reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests batchcontrol->listSchedulers action
+	 * @param KalturaSchedulerListResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testListSchedulers()
+	public function testListSchedulers(KalturaSchedulerListResponse $reference)
 	{
-		$resultObject = $this->client->batchcontrol->listSchedulers();
+		$resultObject = $this->client->batchcontrol->listSchedulers($reference);
 		$this->assertType('KalturaSchedulerListResponse', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests batchcontrol->listWorkers action
+	 * @param KalturaSchedulerWorkerListResponse $reference
 	 * @dataProvider provideData
 	 */
-	public function testListWorkers()
+	public function testListWorkers(KalturaSchedulerWorkerListResponse $reference)
 	{
-		$resultObject = $this->client->batchcontrol->listWorkers();
+		$resultObject = $this->client->batchcontrol->listWorkers($reference);
 		$this->assertType('KalturaSchedulerWorkerListResponse', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests batchcontrol->getFullStatus action
+	 * @param KalturaControlPanelCommand $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetFullStatus()
+	public function testGetFullStatus(KalturaControlPanelCommand $reference)
 	{
-		$resultObject = $this->client->batchcontrol->getFullStatus();
+		$resultObject = $this->client->batchcontrol->getFullStatus($reference);
 		$this->assertType('KalturaControlPanelCommand', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

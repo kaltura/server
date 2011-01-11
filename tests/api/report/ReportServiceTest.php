@@ -14,12 +14,14 @@ class ReportServiceTest extends ReportServiceBaseTest
 	 * @param KalturaReportInputFilter $reportInputFilter
 	 * @param string $dimension
 	 * @param string $objectIds
+	 * @param KalturaReportGraphArray $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetGraphs(KalturaReportType $reportType, KalturaReportInputFilter $reportInputFilter, $dimension = null, $objectIds = null)
+	public function testGetGraphs($reportType, KalturaReportInputFilter $reportInputFilter, $dimension = null, $objectIds = null, KalturaReportGraphArray $reference)
 	{
-		$resultObject = $this->client->report->getGraphs($reportType, $reportInputFilter, $dimension, $objectIds);
+		$resultObject = $this->client->report->getGraphs($reportType, $reportInputFilter, $dimension, $objectIds, $reference);
 		$this->assertType('KalturaReportGraphArray', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -27,12 +29,14 @@ class ReportServiceTest extends ReportServiceBaseTest
 	 * @param KalturaReportType $reportType
 	 * @param KalturaReportInputFilter $reportInputFilter
 	 * @param string $objectIds
+	 * @param KalturaReportTotal $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetTotal(KalturaReportType $reportType, KalturaReportInputFilter $reportInputFilter, $objectIds = null)
+	public function testGetTotal($reportType, KalturaReportInputFilter $reportInputFilter, $objectIds = null, KalturaReportTotal $reference)
 	{
-		$resultObject = $this->client->report->getTotal($reportType, $reportInputFilter, $objectIds);
+		$resultObject = $this->client->report->getTotal($reportType, $reportInputFilter, $objectIds, $reference);
 		$this->assertType('KalturaReportTotal', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -42,12 +46,14 @@ class ReportServiceTest extends ReportServiceBaseTest
 	 * @param KalturaFilterPager $pager
 	 * @param string $order
 	 * @param string $objectIds
+	 * @param KalturaReportTable $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetTable(KalturaReportType $reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null)
+	public function testGetTable($reportType, KalturaReportInputFilter $reportInputFilter, KalturaFilterPager $pager, $order = null, $objectIds = null, KalturaReportTable $reference)
 	{
-		$resultObject = $this->client->report->getTable($reportType, $reportInputFilter, $pager, $order, $objectIds);
+		$resultObject = $this->client->report->getTable($reportType, $reportInputFilter, $pager, $order, $objectIds, $reference);
 		$this->assertType('KalturaReportTable', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -61,12 +67,25 @@ class ReportServiceTest extends ReportServiceBaseTest
 	 * @param KalturaFilterPager $pager
 	 * @param string $order
 	 * @param string $objectIds
+	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testGetUrlForReportAsCsv($reportTitle, $reportText, $headers, KalturaReportType $reportType, KalturaReportInputFilter $reportInputFilter, $dimension = null, KalturaFilterPager $pager = null, $order = null, $objectIds = null)
+	public function testGetUrlForReportAsCsv($reportTitle, $reportText, $headers, $reportType, KalturaReportInputFilter $reportInputFilter, $dimension = null, KalturaFilterPager $pager = null, $order = null, $objectIds = null, $reference)
 	{
-		$resultObject = $this->client->report->getUrlForReportAsCsv($reportTitle, $reportText, $headers, $reportType, $reportInputFilter, $dimension, $pager, $order, $objectIds);
+		$resultObject = $this->client->report->getUrlForReportAsCsv($reportTitle, $reportText, $headers, $reportType, $reportInputFilter, $dimension, $pager, $order, $objectIds, $reference);
 		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testUpdate - TODO: replace testUpdate with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

@@ -9,25 +9,61 @@ require_once(dirname(__FILE__) . '/UserServiceBaseTest.php');
 class UserServiceTest extends UserServiceBaseTest
 {
 	/**
-	 * Tests user->getByLoginId action
-	 * @param string $loginId
-	 * @dataProvider provideData
+	 * Validates testAdd results
 	 */
-	public function testGetByLoginId($loginId)
+	protected function validateAdd(KalturaUser $user, KalturaUser $reference)
 	{
-		$resultObject = $this->client->user->getByLoginId($loginId);
-		$this->assertType('KalturaUser', $resultObject);
+		parent::validateAdd($user, $reference);
+		// TODO - add your own validations here
 	}
 
 	/**
-	 * Called when all tests are done
-	 * @param int $id
-	 * @return int
-	 * @depends testFunction - TODO: replace testFunction with last test function that uses that id
+	 * Validates testUpdate results
 	 */
-	public function testFinished($id)
+	protected function validateUpdate($userId, KalturaUser $user, KalturaUser $reference)
 	{
-		return $id;
+		parent::validateUpdate($userId, $user, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet($userId, KalturaUser $reference)
+	{
+		parent::validateGet($userId, $reference);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Tests user->getByLoginId action
+	 * @param string $loginId
+	 * @param KalturaUser $reference
+	 * @dataProvider provideData
+	 */
+	public function testGetByLoginId($loginId, KalturaUser $reference)
+	{
+		$resultObject = $this->client->user->getByLoginId($loginId, $reference);
+		$this->assertType('KalturaUser', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($userId)
+	{
+		parent::validateDelete($userId);
+		// TODO - add your own validations here
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
+	{
+		parent::validateList($filter, $pager, $reference);
+		// TODO - add your own validations here
 	}
 
 	/**
@@ -38,6 +74,7 @@ class UserServiceTest extends UserServiceBaseTest
 	public function testNotifyBan($userId)
 	{
 		$resultObject = $this->client->user->notifyBan($userId);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -47,12 +84,14 @@ class UserServiceTest extends UserServiceBaseTest
 	 * @param string $password
 	 * @param int $expiry
 	 * @param string $privileges
+	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testLogin($partnerId, $userId, $password, $expiry = 86400, $privileges = '*')
+	public function testLogin($partnerId, $userId, $password, $expiry = 86400, $privileges = '*', $reference)
 	{
-		$resultObject = $this->client->user->login($partnerId, $userId, $password, $expiry, $privileges);
+		$resultObject = $this->client->user->login($partnerId, $userId, $password, $expiry, $privileges, $reference);
 		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -62,12 +101,14 @@ class UserServiceTest extends UserServiceBaseTest
 	 * @param int $partnerId
 	 * @param int $expiry
 	 * @param string $privileges
+	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testLoginByLoginId($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
+	public function testLoginByLoginId($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $reference)
 	{
-		$resultObject = $this->client->user->loginByLoginId($loginId, $password, $partnerId, $expiry, $privileges);
+		$resultObject = $this->client->user->loginByLoginId($loginId, $password, $partnerId, $expiry, $privileges, $reference);
 		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -81,6 +122,7 @@ class UserServiceTest extends UserServiceBaseTest
 	public function testUpdateLoginData($oldLoginId, $password, $newLoginId = null, $newPassword = null)
 	{
 		$resultObject = $this->client->user->updateLoginData($oldLoginId, $password, $newLoginId, $newPassword);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -91,6 +133,7 @@ class UserServiceTest extends UserServiceBaseTest
 	public function testResetPassword($email)
 	{
 		$resultObject = $this->client->user->resetPassword($email);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -102,6 +145,7 @@ class UserServiceTest extends UserServiceBaseTest
 	public function testSetInitialPassword($hashKey, $newPassword)
 	{
 		$resultObject = $this->client->user->setInitialPassword($hashKey, $newPassword);
+		// TODO - add here your own validations
 	}
 
 	/**
@@ -109,24 +153,39 @@ class UserServiceTest extends UserServiceBaseTest
 	 * @param string $userId
 	 * @param string $loginId
 	 * @param string $password
+	 * @param KalturaUser $reference
 	 * @dataProvider provideData
 	 */
-	public function testEnableLogin($userId, $loginId, $password = null)
+	public function testEnableLogin($userId, $loginId, $password = null, KalturaUser $reference)
 	{
-		$resultObject = $this->client->user->enableLogin($userId, $loginId, $password);
+		$resultObject = $this->client->user->enableLogin($userId, $loginId, $password, $reference);
 		$this->assertType('KalturaUser', $resultObject);
+		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests user->disableLogin action
 	 * @param string $userId
 	 * @param string $loginId
+	 * @param KalturaUser $reference
 	 * @dataProvider provideData
 	 */
-	public function testDisableLogin($userId = null, $loginId = null)
+	public function testDisableLogin($userId = null, $loginId = null, KalturaUser $reference)
 	{
-		$resultObject = $this->client->user->disableLogin($userId, $loginId);
+		$resultObject = $this->client->user->disableLogin($userId, $loginId, $reference);
 		$this->assertType('KalturaUser', $resultObject);
+		// TODO - add here your own validations
+	}
+
+	/**
+	 * Called when all tests are done
+	 * @param int $id
+	 * @return int
+	 * @depends testGet - TODO: replace testGet with last test function that uses that id
+	 */
+	public function testFinished($id)
+	{
+		return $id;
 	}
 
 }

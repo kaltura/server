@@ -7,46 +7,111 @@ abstract class UserServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
 	 * Tests user->add action
-	 * @param KalturaUser $user
+	 * @param KalturaUser $user 
+	 * @param KalturaUser $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaUser $user)
+	public function testAdd(KalturaUser $user, KalturaUser $reference)
 	{
 		$resultObject = $this->client->user->add($user);
 		$this->assertType('KalturaUser', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($user, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaUser $user, KalturaUser $reference)
+	{
 	}
 
 	/**
 	 * Tests user->update action
-	 * @param string $userId
-	 * @param KalturaUser $user
+	 * @param string $userId 
+	 * @param KalturaUser $user Id
+	 * @param KalturaUser $reference 
 	 * @return int
-	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($userId, KalturaUser $user)
+	public function testUpdate($userId, KalturaUser $user, KalturaUser $reference)
 	{
 		$resultObject = $this->client->user->update($userId, $user);
 		$this->assertType('KalturaUser', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateUpdate($userId, $user, $reference);
 		return $resultObject->id;
 	}
 
 	/**
-	 * Tests user->get action
-	 * @param string $userId
-	 * @return int
-	 * @depends testAdd with data set #0
+	 * Validates testUpdate results
 	 */
-	public function testGet($userId)
+	protected function validateUpdate($userId, KalturaUser $user, KalturaUser $reference)
+	{
+	}
+
+	/**
+	 * Tests user->get action
+	 * @param string $userId 
+	 * @param KalturaUser $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testGet($userId, KalturaUser $reference)
 	{
 		$resultObject = $this->client->user->get($userId);
 		$this->assertType('KalturaUser', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateGet($userId, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet($userId, KalturaUser $reference)
+	{
+	}
+
+	/**
+	 * Tests user->delete action
+	 * @param string $userId 
+	 * @dataProvider provideData
+	 */
+	public function testDelete($userId)
+	{
+		$resultObject = $this->client->user->delete($userId);
+		$this->validateDelete($userId);
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($userId)
+	{
+	}
+
+	/**
+	 * Tests user->list action
+	 * @param KalturaUserFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param KalturaUserListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
+	{
+		$resultObject = $this->client->user->list($filter, $pager);
+		$this->assertType('KalturaUserListResponse', $resultObject);
+		$this->validateList($filter, $pager, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
+	{
 	}
 
 	/**
@@ -55,29 +120,5 @@ abstract class UserServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 */
 	abstract public function testFinished($id);
-
-	/**
-	 * Tests user->delete action
-	 * @param string $userId
-	 * @return int
-	 * @depends testFinished
-	 */
-	public function testDelete($userId)
-	{
-		$resultObject = $this->client->user->delete($userId);
-	}
-
-	/**
-	 * Tests user->list action
-	 * @param KalturaUserFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @dataProvider provideData
-	 */
-	public function testList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		$resultObject = $this->client->user->listAction($filter, $pager);
-		$this->assertType('KalturaUserListResponse', $resultObject);
-		$this->assertNotEquals($resultObject->totalCount, 0);
-	}
 
 }

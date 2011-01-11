@@ -7,16 +7,43 @@ abstract class FlavorAssetServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
 	 * Tests flavorAsset->get action
-	 * @param string $id
+	 * @param string $id 
+	 * @param KalturaFlavorAsset $reference 
 	 * @return int
-	 * @depends testAdd with data set #0
+	 * @dataProvider provideData
 	 */
-	public function testGet($id)
+	public function testGet($id, KalturaFlavorAsset $reference)
 	{
 		$resultObject = $this->client->flavorAsset->get($id);
 		$this->assertType('KalturaFlavorAsset', $resultObject);
 		$this->assertNotNull($resultObject->id);
+		$this->validateGet($id, $reference);
 		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testGet results
+	 */
+	protected function validateGet($id, KalturaFlavorAsset $reference)
+	{
+	}
+
+	/**
+	 * Tests flavorAsset->delete action
+	 * @param string $id 
+	 * @dataProvider provideData
+	 */
+	public function testDelete($id)
+	{
+		$resultObject = $this->client->flavorAsset->delete($id);
+		$this->validateDelete($id);
+	}
+
+	/**
+	 * Validates testDelete results
+	 */
+	protected function validateDelete($id)
+	{
 	}
 
 	/**
@@ -25,16 +52,5 @@ abstract class FlavorAssetServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 */
 	abstract public function testFinished($id);
-
-	/**
-	 * Tests flavorAsset->delete action
-	 * @param string $id
-	 * @return int
-	 * @depends testFinished
-	 */
-	public function testDelete($id)
-	{
-		$resultObject = $this->client->flavorAsset->delete($id);
-	}
 
 }
