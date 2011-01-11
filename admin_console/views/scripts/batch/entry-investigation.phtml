@@ -738,7 +738,7 @@
 								<tr class="additionalData" id="tr_thumb_data_<?php echo $thumbAsset->id; ?>" style="display: none">
 									<td colspan="18">
 										<?php 
-											if($enableActions && !$thumbAsset->isOriginal)
+											if($enableActions)
 											{
 												?>
 													<button onclick="doRegenerate('<?php echo $thumbAsset->id; ?>');"><?php echo $this->translate('entry-investigate thumb regenerate'); ?></button>
