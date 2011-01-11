@@ -116,16 +116,9 @@ else
 					uiconf_id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
-			versions			: {
-					//dashboard		:	"<?php //echo $kmc_dashboard_version ?>",
-					//content			:	"<?php //echo $kmc_content_version ?>",
-					//appstudio		:	"<?php //echo $kmc_appstudio_version ?>",
-					//account			:	"<?php //echo $kmc_account_version ?>", // "Settings" tab
-					//reports			:	"<?php //echo $kmc_rna_version ?>"
-			},
 			//appstudio_uiconfid	: "<?php //echo $appstudio_uiconfs_templates->getId(); ?>",
 			//reports_drilldown	: "<?php //echo $reports_uiconfs_drilldown->getId(); ?>",
-			enable_live			: "<?php echo $enable_live_streaming; ?>",
+			//enable_live			: "<?php echo $enable_live_streaming; ?>",
 			next_state			: { module : "dashboard", subtab : "default" },
 			disableurlhashing	: "<?php echo $disableurlhashing; ?>",
 			players_list		: <?php echo $ui_confs_player; ?>,
@@ -136,7 +129,7 @@ else
 			//content_moderate_uiconf	 : "<?php //echo $content_uiconfs_moderation->getId(); ?>",
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
 			appstudio_templatesXmlUrl: <?php echo ($appstudio_templatesXmlUrl ? '"'.$appstudio_templatesXmlUrl.'"' : "false"); ?>,
-			enableAds		 : <?php echo $enable_vast ?>,
+			//enableAds		 : <?php echo $enable_vast ?>,
 			appStudioExampleEntry : "<?php echo $appStudioExampleEntry ?>", 
 			appStudioExamplePlayList0	 : "<?php echo $appStudioExamplePlayList0 ?>",
 			appStudioExamplePlayList1	 : "<?php echo $appStudioExamplePlayList1 ?>"
@@ -147,7 +140,9 @@ else
 
 	<div id="kmcHeader"	<?php if($templatePartnerId) echo 'class="whiteLabel"'; ?>>
 	 <div id="logo"></div>
-     <ul>
+     <ul id="hTabs">
+     	<li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> Loading...</li>
+<?php /* Old HTML Tabs
       <li><a id="dashboard" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#dashboard|''"><span>Dashboard</span></a></li>
       <li><a id="content" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#content|Manage"><span>Content</span></a></li>
      <?php if ( kConf::get ( "kmc_display_customize_tab" ) ) { ?>
@@ -167,6 +162,7 @@ else
 	 <li><a id="admin" href="http://kaldev.kaltura.com/index.php/kmc/kmc2#admin|usersTab"><span>Administration</span></a></li>
 	 <?php } ?>
 <!--	 <li><a id="Advertising" href="#"><span>Advertising</span></a></li>-->
+*/ ?>
 	 </ul>
 
      <div id="user_links">
