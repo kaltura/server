@@ -30,4 +30,10 @@ class KalturaInvestigateEntryData extends KalturaObject
 	 * @readonly
 	 */
 	public $thumbAssets;
+	
+	/**
+	 * @var KalturaTrackEntryArray
+	 * @readonly
+	 */
+	public $tracks;
 }
