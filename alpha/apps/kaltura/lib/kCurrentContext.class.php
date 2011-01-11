@@ -11,6 +11,11 @@ class kCurrentContext
 	public static $ks;
 	
 	/**
+	 * @var ks
+	 */
+	public static $ks_object;
+	
+	/**
 	 * @var int
 	 */
 	public static $partner_id;
@@ -75,6 +80,16 @@ class kCurrentContext
 	 */
 	public static $user_ip;
 	
+	/**
+	 * @var bool
+	 */
+	public static $is_admin_session;
+	
+	/**
+	 * @var bool
+	 */
+	public static $ksPartnerUserInitialized = false;
+	
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)
@@ -99,5 +114,51 @@ class kCurrentContext
 		}
 		
 		return false;
+	}
+	
+	
+	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
+	{		
+		if (!$ksString)
+		{
+			kCurrentContext::$ks = null;
+			kCurrentContext::$ks_partner_id = null;
+			kCurrentContext::$ks_uid = null;
+			kCurrentContext::$master_partner_id = null;
+			kCurrentContext::$partner_id = $requestedPartnerId;
+			kCurrentContext::$uid = $requestedPuserId;
+			kCurrentContext::$is_admin_session = false;
+		}
+		else
+		{
+			try { $ksObj = kSessionUtils::crackKs ( $ksString ); }
+			catch(Exception $ex)
+			{
+				if (strpos($ex->getMessage(), "INVALID_STR") !== null)
+					//TODO: throw different type of error
+					throw new KalturaAPIException(APIErrors::INVALID_KS, $ksString, ks::INVALID_STR, ks::getErrorStr(ks::INVALID_STR));
+				else 
+					throw $ex;
+			}
+		
+			kCurrentContext::$ks = $ksString;
+			kCurrentContext::$ks_object = $ksObj;
+			kCurrentContext::$ks_partner_id = $ksObj->partner_id;
+			kCurrentContext::$ks_uid = $ksObj->user;
+			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
+			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
+			kCurrentContext::$partner_id = $requestedPartnerId;
+			kCurrentContext::$uid = $requestedPuserId;
+		}
+
+		// set partner ID for logger
+		if (kCurrentContext::$partner_id) {
+			$GLOBALS["partnerId"] = kCurrentContext::$partner_id;
+		}
+		else if (kCurrentContext::$ks_partner_id) {
+			$GLOBALS["partnerId"] = kCurrentContext::$ks_partner_id;
+		}
+		
+		self::$ksPartnerUserInitialized = true;
 	}
 }
