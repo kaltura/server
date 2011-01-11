@@ -853,6 +853,30 @@ return array(
 	'KalturaDistributionErrorType::MISSING_THUMBNAIL' => 'Missing Thumbnail',
 	'KalturaDistributionErrorType::MISSING_METADATA' => 'Missing Metadata',
 	'KalturaDistributionErrorType::INVALID_DATA' => 'Invalid Data',
+	
+	'KalturaTrackEntryEventType::UPLOADED_FILE' => 'Uploaded File',
+	'KalturaTrackEntryEventType::WEBCAM_COMPLETED' => 'Webcam Completed',
+	'KalturaTrackEntryEventType::IMPORT_STARTED' => 'Import Started',
+	'KalturaTrackEntryEventType::ADD_ENTRY' => 'Add Entry',
+	'KalturaTrackEntryEventType::UPDATE_ENTRY' => 'Update Entry',
+	'KalturaTrackEntryEventType::DELETED_ENTRY' => 'Deleted Entry',
+
+	'entry-investigate track entry title' => 'Entry Track objects',
+	'entry-investigate track entry id th' => 'ID',
+	'entry-investigate track entry trackEventType th' => 'Event Type',
+	'entry-investigate track entry psVersion th' => 'PS Version',
+	'entry-investigate track entry context th' => 'Context',
+	'entry-investigate track entry hostName th' => 'Host Name',
+	'entry-investigate track entry uid th' => 'User ID',
+	'entry-investigate track entry changedProperties th' => 'Changes',
+	'entry-investigate track entry paramStr1 th' => 'Param 1',
+	'entry-investigate track entry paramStr2 th' => 'Param 2',
+	'entry-investigate track entry paramStr3 th' => 'Param 3',
+	'entry-investigate track entry ks th' => 'KS',
+	'entry-investigate track entry description th' => 'Description',
+	'entry-investigate track entry createdAt th' => 'Create Time',
+	'entry-investigate track entry updatedAt th' => 'Update Time',
+	'entry-investigate track entry userIp th' => 'User IP',
 );
 
 

@@ -2167,6 +2167,19 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
 		return $resultObject;
 	}
+
+	function getTracks($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("adminconsole_entryadmin", "getTracks", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaTrackEntryListResponse");
+		return $resultObject;
+	}
 }
 
 class KalturaFilesyncImportBatchService extends KalturaServiceBase

@@ -607,6 +607,14 @@ class BatchController extends Zend_Controller_Action
 		}
 		$investigateData->entry = $entry;
 		
+		try{
+			$trackList = $client->entryAdmin->getTracks($entryId);
+			$investigateData->tracks = $trackList->objects;
+		}
+		catch(Exception $e){
+			$errors[] = 'Tracks not found: ' . $e->getMessage();
+		}
+		
 		$filter = new Kaltura_BatchJobFilter();
 		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;

@@ -1989,6 +1989,130 @@ class KalturaInvestigateThumbAssetData extends KalturaObjectBase
 
 }
 
+class KalturaTrackEntry extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaTrackEntryEventType
+	 */
+	public $trackEventType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $psVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $context = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $hostName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $uid = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $changedProperties = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr1 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr2 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr3 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ks = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIp = null;
+
+
+}
+
 class KalturaInvestigateEntryData extends KalturaObjectBase
 {
 	/**
@@ -2030,6 +2154,14 @@ class KalturaInvestigateEntryData extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $thumbAssets;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaTrackEntry
+	 * @readonly
+	 */
+	public $tracks;
 
 
 }
@@ -7258,6 +7390,27 @@ abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
 {
+
+}
+
+class KalturaTrackEntryListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaTrackEntry
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
 
 }
 
