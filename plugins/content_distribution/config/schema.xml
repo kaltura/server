@@ -50,7 +50,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="remote_id" type="varchar" size="31" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="plays" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="views" type="integer" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="validation_errors" type="varchar" size="1023" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="validation_errors" type="longvarchar" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_type" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_number" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="error_description" type="varchar" size="255" />
