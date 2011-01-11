@@ -17,6 +17,7 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 		$filter->entryIdEqual = $entryId;
 		
 		$distributions = array();
+		$distributionFileSyncs = array();
 		$errDescription = null;
 		try
 		{
@@ -30,8 +31,38 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 			$errDescription = $e->getMessage();
 		}
 		
+		$distributionIds = array();
+		foreach($distributions as $distribution)
+		{
+			$distributionFileSyncs[$distribution->id] = array();
+			$distributionIds[] = $distribution->id;
+		}
+	
+		if(count($distributionIds))
+		{
+			try
+			{
+				$filter = new KalturaFileSyncFilter();
+				$filter->fileObjectTypeEqual = KalturaFileSyncObjectType::ENTRY_DISTRIBUTION;
+				$filter->objectIdIn = implode(',', $distributionIds);
+				
+				$pager = new KalturaFilterPager();
+				$pager->pageSize = 100;
+				
+				$fileSyncList = $client->fileSync->listAction($filter, $pager);
+				$fileSyncs = $fileSyncList->objects;
+				foreach($fileSyncs as $fileSync)
+					$distributionFileSyncs[$fileSync->objectId][] = $fileSync;			
+			}
+			catch (Exception $e)
+			{
+				$errDescription = $e->getMessage();
+			}
+		}
+		
 		return array(
 			'distributions' => $distributions,
+			'distributionFileSyncs' => $distributionFileSyncs,
 			'errDescription' => $errDescription,
 		);
 	}
