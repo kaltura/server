@@ -43,4 +43,25 @@ class EntryAdminService extends KalturaBaseService
 
 		return $entry;
 	}
+
+	/**
+	 * Get base entry by ID with no filters.
+	 * 
+	 * @action getTracks
+	 * @param string $entryId Entry id
+	 * @return KalturaTrackEntryListResponse
+	 */
+	function getTracksAction($entryId)
+	{
+		$c = new Criteria();
+		$c->add(TrackEntryPeer::ENTRY_ID, $entryId);
+		
+		$dbList = TrackEntryPeer::doSelect($c);
+		
+		$list = KalturaTrackEntryArray::fromDbArray($dbList);
+		$response = new KalturaTrackEntryListResponse();
+		$response->objects = $list;
+		$response->totalCount = count($dbList);
+		return $response;
+	}
 }
