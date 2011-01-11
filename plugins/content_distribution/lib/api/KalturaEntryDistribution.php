@@ -127,7 +127,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	public $validationErrors;
 
 	/**
-	 * @var KalturaDistributionErrorType
+	 * @var KalturaBatchJobErrorTypes
 	 * @readonly
 	 */
 	public $errorType;
