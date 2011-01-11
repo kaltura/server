@@ -26,6 +26,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The source type of the entry 
 	 *
 	 * @var KalturaSourceType
+	 * @insertonly
 	 */
 	public $sourceType;
 	
@@ -33,7 +34,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The search provider type used to import this entry
 	 *
 	 * @var KalturaSearchProviderType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderType;
 
@@ -41,7 +42,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The ID of the media in the importing site
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderId;
 
