@@ -595,10 +595,10 @@ class kPermissionManager
 		if ($param_name === kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER) {
 			return true;
 		}
-		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::READ][$object_name])) {
+		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name])) {
 			return true;
 		}
-		return in_array($param_name, self::$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::READ][$object_name]);
+		return in_array($param_name, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name]);
 		
 	}
 	
