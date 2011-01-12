@@ -20,15 +20,13 @@
 		});
 
 		$(document).ready(function() {
-			serviceListItems = $('li.service > a');
-			for (i = 0; i < serviceListItems.length; i++)
-			{
-				if (serviceListItems[i].text.toLowerCase() == '<?php echo $inputService ?>')
+			$('li.service > a').each(function(index) {
+				if ($(this).text().toLowerCase() == '<?php echo $inputService ?>')
 				{
-					serviceListItems[i].parentNode.className = 'service expended';
+					$(this).parent().addClass('service expended');
 				}
-			}
-			});
+			});				
+		});
 	</script>
 </head>
 <body>
