@@ -27,7 +27,7 @@ $role->setStrId(UserRoleId::PARTNER_ADMIN_ROLE);
 $role->setDescription('Full control over publisher account and user management functionalities');
 $role->setPermissionNames(UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD);
 $role->setStatus(UserRoleStatus::ACTIVE);
-$role->setTags('kmc');
+$role->setTags('kmc,partner_admin');
 $role->setPartnerId(0);
 $userRoles[] = $role;
 
