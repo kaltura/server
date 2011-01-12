@@ -404,6 +404,13 @@ class KalturaSyndicationFeedRenderer
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
+				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
+			{
+				continue;
+			}
+			
 			$this->writeOpenXmlNode('item',2); // open ITEM
 			$this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
 			$this->writeFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
@@ -473,9 +480,6 @@ class KalturaSyndicationFeedRenderer
 			return null;
 	
 		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($kalturaEntry->id,$this->syndicationFeed->flavorParamId);
-		// in case no flavorAsset was found (with respect to $this->syndicationFeed->flavorParamId), retreive highest bitrate flavoeAsset
-		if(!$flavorAsset)
-			$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($kalturaEntry->id);
 		if (!$flavorAsset)
 			return null;
 					
@@ -546,6 +550,13 @@ class KalturaSyndicationFeedRenderer
 		{
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
+				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
+			{
+				continue;
+			}
+			
 			$entryDescription = $this->stringToSafeXml($e->description);
 			if(!$entryDescription) 
 				$entryDescription = $this->stringToSafeXml($e->name);
@@ -707,7 +718,8 @@ class KalturaSyndicationFeedRenderer
 			$e= new KalturaMediaEntry();
 			$e->fromObject($entry);
 			// in case no video player is requested by user and the entry is mix, skip it	
-			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
+			if (($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed) ||
+				($entry->getType() !== entryType::MIX && $this->getFlavorAssetUrl($e) == null))
 			{
 				continue;
 			}
