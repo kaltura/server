@@ -7,7 +7,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 #-- annotation
 #-----------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `annotation`;
+
 
 
 CREATE TABLE `annotation`
