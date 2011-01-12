@@ -27,15 +27,15 @@ if ($inputPage)
 }
 else if ($inputService && $inputAction)
 {
-	$cacheKey = "$inputService/$inputAction";
+	$cacheKey = "actions/$inputService/$inputAction";
 }
 else if ($inputService)
 {
-	$cacheKey = $inputService;
+	$cacheKey = "services/$inputService";
 }
 else if ($inputObject)
 {
-	$cacheKey = $inputObject;
+	$cacheKey = "objects/$inputObject";
 }
 else
 {
