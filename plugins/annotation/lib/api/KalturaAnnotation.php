@@ -16,6 +16,13 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	public $entryId;
 	
 	/**
+	 * @var int
+	 * @readonly
+	 * 
+	 */
+	public $partnerId;
+	
+	/**
 	 * @var string
 	 * @filter eq,in
 	 */
@@ -73,8 +80,9 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	private static $map_between_objects = array
 	(
 		"id",
-		"parentId",
 		"entryId",
+		"partnerId",
+		"parentId",
 		"createdAt",
 		"updatedAt",
 		"text",
