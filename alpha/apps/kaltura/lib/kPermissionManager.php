@@ -40,6 +40,16 @@ class kPermissionManager
 	// -- Cache handling methods --
 	// ----------------------------
 	
+	
+	private static function useCache()
+	{
+		if (self::$useCache && function_exists('apc_fetch') && function_exists('apc_store'))
+		{
+			return true;
+		}
+		return false;	
+	}
+	
 	/**
 	 * @param int $roleId
 	 * @return cache key name for the given role id
@@ -52,7 +62,7 @@ class kPermissionManager
 		if (is_null($partnerId)) {
 			$partnerId = 'null';
 		}
-		$key = 'role_'.$roleId.'partner_'.$partnerId;
+		$key = 'role_'.$roleId.'_partner_'.$partnerId;
 		return $key;
 	}
 	
@@ -62,7 +72,7 @@ class kPermissionManager
 	 */
 	private static function getFromCache($key)
 	{
-		if (!self::$useCache)
+		if (!self::useCache())
 		{
 			return null;
 		}
@@ -82,7 +92,7 @@ class kPermissionManager
 	 */
 	private static function storeInCache($key, $value)
 	{
-		if (!self::$useCache)
+		if (!self::useCache())
 		{
 			return false;
 		}
