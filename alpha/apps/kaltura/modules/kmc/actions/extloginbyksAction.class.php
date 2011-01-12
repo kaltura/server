@@ -2,29 +2,6 @@
 class extloginbyksAction extends kalturaAction
 {
 	
-	protected function addError ( $error_code )
-	{
-		if ( is_array ( $error_code ) )
-		{
-			$args = $error_code;
-			$error_code = $error_code[0];
-		}
-		else
-		{
-			$args = func_get_args();
-		}
-		array_shift($args);
-		
-		$error = explode(",", $error_code, 2);
-		
-		$error_code = $error[0];
-		$error_message = $error[1];
-
-		$formated_desc = @call_user_func_array('sprintf', array_merge((array)$error_message, $args)); 
-		
-		$this->error[] = array("code" => $error_code, "desc" => $formated_desc);
-	}
-	
 	private function dieOnError($error_code)
 	{
 		if ( is_array ( $error_code ) )
