@@ -305,6 +305,17 @@ $this->benchmarkEnd( "signature" );
 		try
 		{
 			$arr = list ( $partner_id , $subp_id , $uid , $private_partner_data ) = $this->validateTicketSetPartner ( $partner_id , $subp_id , $puser_id , $ks_str );
+			
+			// if PS2 permission validation is enabled for the current partner, only the actions defined in kConf's parameter "ps2_actions_not_blocked_by_permissions" will be allowed
+			$currentPartner = $this->getPartner();
+			if ($currentPartner && $currentPartner->getEnabledService(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION))
+			{
+				if (!in_array(strtolower(get_class($this)), kConf::get('ps2_actions_not_blocked_by_permissions')))
+				{
+					$this->addException( APIErrors::SERVICE_FORBIDDEN );
+				}
+			}
+			
 			$this->private_partner_data = $private_partner_data;
 //print_r ( $arr ); 
 			// TODO - validate the matchIp is ok with the user's IP
@@ -512,6 +523,7 @@ $this->benchmarkEnd( "signature" );
 			{
 				$this->addException( APIErrors::UNKNOWN_PARTNER_ID , $ks_partner_id );
 			}
+			
 			$this->setServiceConfigFromPartner( $ks_partner );
 			if ( $ks_partner && ! $ks_partner->getStatus() )
 			{
