@@ -1537,6 +1537,20 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 	 */
 	public $requiredThumbDimensions;
 
+	/**
+	 * If entry distribution sunrise not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunriseDefaultOffset = null;
+
+	/**
+	 * If entry distribution sunset not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunsetDefaultOffset = null;
+
 
 }
 
