@@ -397,7 +397,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
 		
-		$entryDistribution->setStatus(EntryDistributionStatus::DELETED);
+		$entryDistribution->setStatus(EntryDistributionStatus::REMOVED);
 		$entryDistribution->setDirtyStatus(null);
 		
 		if($data->getResults())
