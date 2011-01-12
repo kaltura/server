@@ -93,7 +93,7 @@ class PermissionService extends KalturaBaseService
 	 */	
 	public function updateAction($permissionName, KalturaPermission $permission)
 	{
-		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId()));
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->partnerGroup()));
 		
 		if (!$dbPermission) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
