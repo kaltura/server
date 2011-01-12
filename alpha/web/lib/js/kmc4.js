@@ -109,13 +109,13 @@ $(window).load(function(){
 			// nullify flash object inside div kcw
 		},
 		openChangePwd : function() {
-			kmc.utils.secureIframe('password', true);
+			kmc.utils.secureIframe('password');
 		},
-		openChangeEmail : function() {
-			kmc.utils.secureIframe('email', true);
+		openChangeEmail : function(email) {
+			kmc.utils.secureIframe('email', { email: email } );
 		},
-		openChangeName : function() {
-			kmc.utils.secureIframe('name');
+		openChangeName : function(fname, lname) {
+			kmc.utils.secureIframe('name', { fname: fname, lname: lname } );
 		}
 	}
 
@@ -340,6 +340,11 @@ $(window).load(function(){
 			}
 		},
 		
+		setTab : function(module){
+			$("#kmcHeader ul li a").removeClass("active");
+			$("a#" + module).addClass("active");
+		},		
+		
 		showFlash : function() {
 			$("#server_wrap").hide();
 			$("#server_frame").removeAttr('src');
@@ -354,7 +359,7 @@ $(window).load(function(){
 			$("#server_wrap").show();
 		},
 		
-		secureIframe : function(action, small) {
+		secureIframe : function(action, fields) {
 			kalturaCloseModalBox();
 			
 			// Set title
@@ -371,9 +376,17 @@ $(window).load(function(){
 					break;
 			}
 			
+			// set url
 			var url = kmc.vars.service_url + "/secure_form.php?action=" + action;
+			// pass in the fields
+			for(var i in fields) {
+				url += '&' + i + '=' + fields[i];
+			}
+			// change http to https
+			url = url.replace("http", "https");
+			
 			var modal_width = 400;
-			var modal_height = (small) ? 200 : 220;
+			var modal_height = 160;
 			$("#flash_wrap").css("visibility","hidden");
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
@@ -467,19 +480,6 @@ $(window).load(function(){
 			location.hash = module + "|" + subtab;
 			document.title = "KMC > " + module + ((subtab && subtab != "") ? " > " + subtab + " |" : "");
 //			document.title = "KMC > " + module.charAt(0).toUpperCase() + module.slice(1) + ((subtab && subtab != "") ? " > " + subtab + " |" : "");
-		},
-		setTab : function(module){
-//			if(module == "reports") {
-//				module = "Analytics";
-//			}
-//			else if(module == "account"){
-//				module = "Settings";
-//			}
-//			else {
-//				module = module.substring(0,1).toUpperCase() + module.substring(1); // capitalize 1st letter
-//			}
-			$("#kmcHeader ul li a").removeClass("active");
-			$("a#" + module).addClass("active");
 		},
 		readUrlHash : function() {
 			var module = "dashboard", // @todo: change to kmc.vars.default_state.module ?
@@ -619,7 +619,6 @@ $(window).load(function(){
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><button id="select_code">' +
 							 '<span>Select Code</span></button></div></div></div>';
-			console.log('here');
 //			alert(modal_html);
 			kmc.vars.jw = false;
 			kmc.vars.silverlight = false;
@@ -1185,9 +1184,9 @@ $(window).load(function(){
 //function openCw (ks ,conversion_quality) {
 //	kmc.functions.openKcw();
 // }
- function expiredF() { // @todo: change all modules
-	kmc.utils.expired();
- }
+// function expiredF() { // @todo: change all modules
+//	kmc.utils.expired();
+// }
 // function selectPlaylistContent(params) { // @todo: change call in appstudio
 // function selectPlaylistContent(uiconf_id,is_playlist) {
 //		alert("kmc.mediator.selectContent("+uiconf_id+","+is_playlist+")");
@@ -1232,6 +1231,23 @@ function playerAdded() { // called from appstudio
 
 $(function() {
 	kmc.mediator.loadKmc();
+	
+	$('#change_partners').change(function(e) {
+		window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value; 
+	});
+	
+	/*
+	$('#change_partner').click(function() {
+		$('#partners_list').slideDown('fast').show();
+
+		$('#change_partner').hover(function() {  
+        }, function(){  
+        	$('#partners_list').slideUp('slow');   
+        });  		
+	
+		return false;
+	});
+	*/
 })
 
 kmc.vars.kmc_swf = {

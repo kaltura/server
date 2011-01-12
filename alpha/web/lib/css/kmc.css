@@ -18,7 +18,7 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
       #loading img { margin: 11px 10px 0 0; border: 0; }
    #kmcHeader div#user_links { margin-top:-2px; #margin-top:-16px; float:right; text-align:right; font: normal 10px arial,sans-serif; color:#ccc;}
     div.login #kmcHeader div { margin-top:13px;}
-     div#user_links span { float:right; color:#fff;}
+     /* div#user_links span { float:right; color:#fff;} */
 	 div#user_links a { color:#A6E7F6;}
 	 div#user_links a:hover { color:#A6E7F6; text-decoration:underline;}
 #mask { height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
@@ -209,3 +209,13 @@ fieldset{ border:0 none; position:relative; }
 		  button span { margin-top:-1px;}
 		}
 	/* end webkit */
+	
+#change_partner {
+	cursor: pointer;
+}
+#partners_list {
+	display: none; position: absolute; top: 32px; right: 115px; width: 130px; z-index:100;
+}
+#partners_list ul { width: auto; margin: auto; padding: auto; }
+#partners_list ul li { background: #000; width: 130px; text-align: left; padding: 4px 0 4px 10px; }
+#partners_list ul li a { padding: 0; margin: 0; height: auto; color: #fff; font-weight: normal; }
