@@ -169,6 +169,37 @@ class kConf extends kConfLocal
 				"no_save_of_last_login_partner_for_partner_ids" => array(0, -1, -2, 99),
 
 				"temp_folder" => '/opt/kaltura/tmp',
+				
+				'ps2_actions_not_blocked_by_permissions' => array(
+					'adminlogin',
+					'resetadminpassword',
+					'executeplaylist',
+					'reporterror',
+					'searchautodata',
+					'addentry',
+					'searchmediainfo',
+					'checknotifications',
+					'getdataentry',
+					'getentry',
+					'getkshow',
+					'getallentires',
+					'updatedataentry',
+					'getentries',
+					'listmyentires',
+					'getallentries',
+					'getmetadata',
+					'setmetadata',
+					'setroughcutname',
+					'getrelatedkshows',
+					'setentrythumbnail',
+					'collectstats',
+					'reporterror',
+					'addentry',
+					'getuiConf',
+					'uploadjpeg',
+					'getentry',
+					'getkshow',
+				),
 			)
 		);
 		
