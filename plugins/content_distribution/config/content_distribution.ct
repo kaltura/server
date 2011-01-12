@@ -37,12 +37,12 @@ entrydistribution.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_
 entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 entrydistribution.validate													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
-entrydistribution.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.update													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.submitadd													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.submitfetchreport											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
-entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_MODIFY
+entrydistribution.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_WHERE
+entrydistribution.update													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_WHERE
+entrydistribution.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_WHERE
+entrydistribution.submitadd													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
+entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
+entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_REMOVE
+entrydistribution.submitfetchreport											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
+entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
 
