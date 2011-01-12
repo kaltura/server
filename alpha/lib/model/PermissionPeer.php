@@ -202,19 +202,19 @@ class PermissionPeer extends BasePermissionPeer
 		PermissionPeer::setUseCriteriaFilter(true);
 		
 		if ($checkDependency) {
-			$allPermissions = self::filterDependencies($allPermissions);
+			$allPermissions = self::filterDependencies($allPermissions, $partnerId);
 		}
 				
 		return $allPermissions;
 	}
 	
 	
-	public static function filterDependenciesByNames($permissionNames)
+	public static function filterDependenciesByNames($permissionNames, $partnerId)
 	{
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, explode(',', $permissionNames), Criteria::IN);
 		$permissionObjects = PermissionPeer::doSelect($c);
-		$permissionObjects = PermissionPeer::filterDependencies($permissionObjects);
+		$permissionObjects = PermissionPeer::filterDependencies($permissionObjects, $partnerId);
 		$permissionNames = array();
 		foreach ($permissionObjects as $object)
 		{
@@ -224,10 +224,17 @@ class PermissionPeer extends BasePermissionPeer
 		return $permissionNames;
 	}
 	
-	public static function filterDependencies($permissions)
+	public static function filterDependencies($permissions, $partnerId)
 	{
-		$checkDependency = true;
+		$c = new Criteria();
+		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::PLUGIN, PermissionType::SPECIAL_FEATURE), Criteria::IN);
+		$c->addSelectColumn(PermissionPeer::NAME);
+		$stmt = PermissionPeer::doSelectStmt($c);
+		$additionalPartnerPermissionNames = $stmt->fetchAll(PDO::FETCH_COLUMN);
+	
 		
+		$checkDependency = true;
 		while ($checkDependency)
 		{
 			$checkDependency = false;
@@ -235,7 +242,7 @@ class PermissionPeer extends BasePermissionPeer
 			foreach ($permissions as $permission)
 			{
 				// create an array of permission names to assist the check
-				$permissionNames[] = $permission->getName();
+				$permissionNames[$permission->getId()] = $permission->getName();
 			}
 			foreach ($permissions as $key => $permission)
 			{
@@ -250,7 +257,7 @@ class PermissionPeer extends BasePermissionPeer
 							// invalid text
 							continue;
 						}
-						if (!in_array($dependPermission, $permissionNames)) {
+						if (!in_array($dependPermission, $permissionNames) && !in_array($dependPermission, $additionalPartnerPermissionNames)) {
 							// current permission depends on a non existing permission
 							unset($permissions[$key]);
 							$checkDependency = true; // need to recheck because we have delete a permission

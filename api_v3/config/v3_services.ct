@@ -56,7 +56,7 @@ widget.list							|			|2		|1	|0		|0		|1		|	|		|	|   |WIDGET_ADMIN
 partner.register					|			|0		|0	|0		|0		|1		|	|		|	|   |
 partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ACCOUNT_UPDATE_SETTINGS
 partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
-partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE
+partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,ANALYTICS_BASE
 partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|ACCOUNT_BASE
 
 adminuser.updatepassword			|			|0		|0	|0		|0		|1		|	|		|	|   |
@@ -375,7 +375,7 @@ category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEG
 category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE
 category.update						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
 category.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
-category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE
+category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE,ANALYTICS_BASE
 
 upload.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 upload.getuploadedfiletokenbyfilename|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD

@@ -111,12 +111,25 @@ genericdistributionprovideraction.deletebyproviderid						|			|2		|1	|0		|0		|1	
 permission.add						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permission.delete					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permission.update					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+permission.get						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+permission.list						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+
 
 permissionitem.add					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permissionitem.delete				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permissionitem.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permissionitem.update				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 permissionitem.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+
+
+userrole.add						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+userrole.delete			    		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+userrole.get						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+userrole.list						|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+userrole.update				    	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+userrole.clone				    	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
+
+
 
 systempartner.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 systempartner.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE

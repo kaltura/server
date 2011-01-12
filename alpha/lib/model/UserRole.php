@@ -57,7 +57,7 @@ class UserRole extends BaseUserRole
 		}
 		else if ($filterDependencies)
 		{
-			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames);
+			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames, $this->getPartnerId());
 		}
 		return $permissionNames;
 		
