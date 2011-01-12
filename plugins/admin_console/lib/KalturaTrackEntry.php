@@ -39,7 +39,7 @@ class KalturaTrackEntry extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $uid;
+	public $userId;
 
 	/**
 	 * @var string
@@ -95,7 +95,7 @@ class KalturaTrackEntry extends KalturaObject
 		"partnerId",
 		"entryId",
 		"hostName",
-		"uid",
+		"userId" => "uid",
 		"changedProperties",
 		"paramStr1",
 		"paramStr2",
