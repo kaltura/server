@@ -97,7 +97,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
 	 */
-	public function getUpdateRequiredEntryFields()
+	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
 		if(kConf::hasParam('msn_update_required_entry_fields'))
 			return kConf::get('msn_update_required_entry_fields');
@@ -108,7 +108,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
 	 */
-	public function getUpdateRequiredMetadataXPaths()
+	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
 		if(kConf::hasParam('msn_update_required_metadata_xpaths'))
 			return kConf::get('msn_update_required_metadata_xpaths');

@@ -105,7 +105,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
 	 */
-	public function getUpdateRequiredEntryFields()
+	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
 //		e.g.
 //		maybe should be taken from local config or kConf
@@ -117,7 +117,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
 	 */
-	public function getUpdateRequiredMetadataXPaths()
+	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
 //		e.g.
 //		maybe should be taken from local config or kConf
