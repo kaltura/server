@@ -188,7 +188,9 @@ class kPermissionManager
 		$roleUpdatedAt = null;
 		if (!is_null($roleId))
 		{
+			UserRolePeer::setUseCriteriaFilter(false);
 			$dbRole = UserRolePeer::retrieveByPK($roleId);
+			UserRolePeer::setUseCriteriaFilter(true);
 			
 			if (!$dbRole)
 			{
