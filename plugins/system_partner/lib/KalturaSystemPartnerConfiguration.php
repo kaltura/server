@@ -118,6 +118,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $enableAnnotation;
 	
 	/**
+	 * @var bool
+	 */
+	public $enablePs2PermissionValidation;
+	/**
 	 * @var int
 	 */
 	public $defThumbOffset;
@@ -126,6 +130,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $adminLoginUsersQuota;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -172,6 +177,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		if(class_exists('AnnotationPlugin'))
 			$this->enableAnnotation = $source_object->getPluginEnabled(AnnotationPlugin::getPluginName());
+			
+		$this->enablePs2PermissionValidation = $source_object->getEnabledService(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -190,6 +197,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if(class_exists('AnnotationPlugin'))
 			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
 				
+		$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
+
 		return $object_to_fill;
 	}
 }

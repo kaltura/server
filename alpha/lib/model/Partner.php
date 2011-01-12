@@ -851,12 +851,12 @@ class Partner extends BasePartner
 	} 
 	
 	
-	private function setEnabledService($enabled, $permissionName)
+	public function setEnabledService($enabled, $permissionName)
 	{
 		$this->setEnabledServices[$permissionName] = $enabled;
 	}
 	
-	private function getEnabledService($permissionName)
+	public function getEnabledService($permissionName)
 	{
 		if (isset($this->setEnabledServices[$permissionName]))
 		{

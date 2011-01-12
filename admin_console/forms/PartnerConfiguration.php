@@ -102,6 +102,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_508_players'))),
 		));
 		
+		$this->addElement('checkbox', 'enable_ps2_permission_validation', array(
+			'label'	  => 'PS2 permission validation',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_ps2_permission_validation'))),
+		));
+		
 		$this->addElement('checkbox', 'enable_metadata', array(
 			'label'	  => 'Metadata',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_metadata'))),
