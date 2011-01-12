@@ -56,7 +56,7 @@
 						$serviceId = $serviceReflector->getServiceId();
 						$actions = $serviceReflector->getActions();
 					?>
-					<li class="service">
+					<li class="service" id="service_<?php echo $serviceId; ?>">
 						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceReflector->getServiceName(); ?></a>
 						<ul class="actions">
 						<?php foreach($actions as $actionId => $actionName): ?>
