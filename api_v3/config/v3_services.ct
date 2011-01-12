@@ -100,8 +100,8 @@ media.updatethumbnailfromurl		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_
 media.updatethumbnailfromsourceentry|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 media.requestconversion				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_RECONVERT
 media.flag							|			|0		|0	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
-media.reject						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
-media.approve						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
+media.reject						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_APPROVE_REJECT
+media.approve						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_APPROVE_REJECT
 media.listflags						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
 media.anonymousrank					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_METADATA
 
@@ -147,8 +147,8 @@ baseentry.updatethumbnailjpeg		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE
 baseentry.updatethumbnailfromurl	|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 baseentry.updatethumbnailfromsourceentry	|	|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 baseentry.flag						|			|0		|0	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
-baseentry.reject					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
-baseentry.approve					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
+baseentry.reject					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_APPROVE_REJECT
+baseentry.approve					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_APPROVE_REJECT
 baseentry.listflags					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_BASE
 baseentry.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_METADATA
 

@@ -45,6 +45,7 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MODERATE_BASE, 'Basic moderation', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MODERATE_METADATA, 'Moderate metadata', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MODERATE_CUSTOM_DATA, 'Moderate custom data', PermissionPeer::getPermissionNameFromPluginName(MetadataPlugin::getPluginName())),
+	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MODERATE_APPROVE_REJECT, 'Approve/Reject content', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::PLAYLIST_BASE, 'Playlist access', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::PLAYLIST_ADD, 'Add playlists', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::PLAYLIST_UPDATE, 'Modify playlists', null),
