@@ -203,6 +203,7 @@ class EntryDistributionService extends KalturaBaseService
 			EntryDistributionStatus::PENDING,
 			EntryDistributionStatus::QUEUED,
 			EntryDistributionStatus::READY,
+			EntryDistributionStatus::REMOVED,
 		);
 		
 		if(!in_array($dbEntryDistribution->getStatus(), $validStatus))
@@ -284,8 +285,6 @@ class EntryDistributionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, $id);
 		
 		$validStatus = array(
-			EntryDistributionStatus::ERROR_DELETING,
-			EntryDistributionStatus::ERROR_UPDATING,
 			EntryDistributionStatus::READY,
 		);
 		
