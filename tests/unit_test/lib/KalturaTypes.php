@@ -1627,6 +1627,20 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 	 */
 	public $requiredThumbDimensions;
 
+	/**
+	 * If entry distribution sunrise not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunriseDefaultOffset = null;
+
+	/**
+	 * If entry distribution sunset not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunsetDefaultOffset = null;
+
 
 }
 
@@ -1799,7 +1813,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var KalturaDistributionErrorType
+	 * @var KalturaBatchJobErrorTypes
 	 * @readonly
 	 */
 	public $errorType = null;
@@ -2779,14 +2793,6 @@ class KalturaUser extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
-	 * @readonly
-	 */
-	public $isRootAdmin = null;
-
-	/**
-	 * 
-	 *
 	 * @var string
 	 */
 	public $roleIds = null;
@@ -2898,7 +2904,6 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var KalturaEntryType
-	 * @insertonly
 	 */
 	public $type = null;
 
@@ -4526,7 +4531,7 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType = null;
 
@@ -6488,7 +6493,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The source type of the entry 
 	 *
 	 * @var KalturaSourceType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $sourceType = null;
 
@@ -6496,7 +6501,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The search provider type used to import this entry
 	 *
 	 * @var KalturaSearchProviderType
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderType = null;
 
@@ -6504,7 +6509,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * The ID of the media in the importing site
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $searchProviderId = null;
 
@@ -11266,6 +11271,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	/**
 	 * 
 	 *
+	 * @var bool
+	 */
+	public $enablePs2PermissionValidation = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $defThumbOffset = null;
@@ -11440,6 +11452,151 @@ class KalturaMediaInfoListResponse extends KalturaObjectBase
 	 * 
 	 *
 	 * @var array of KalturaMediaInfo
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaTrackEntry extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaTrackEntryEventType
+	 */
+	public $trackEventType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $psVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $context = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $hostName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $uid = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $changedProperties = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr1 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr2 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr3 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ks = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIp = null;
+
+
+}
+
+class KalturaTrackEntryListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaTrackEntry
 	 * @readonly
 	 */
 	public $objects;
