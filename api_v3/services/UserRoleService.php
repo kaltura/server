@@ -67,7 +67,9 @@ class UserRoleService extends KalturaBaseService
 	public function getAction($userRoleId)
 	{
 		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array (0, $this->getPartnerId()), Criteria::IN);
+		$allowedPartnerIds = explode(',', $this->partnerGroup());
+		$allowedPartnerIds[] = PartnerPeer::GLOBAL_PARTNER;
+		$c->addAnd(UserRolePeer::PARTNER_ID, $allowedPartnerIds, Criteria::IN);
 		$c->addAnd(UserRolePeer::ID, $userRoleId);
 		$c->addAnd(UserRolePeer::STATUS, KalturaUserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		
