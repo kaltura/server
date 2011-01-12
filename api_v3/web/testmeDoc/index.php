@@ -102,7 +102,7 @@ else
 {
 	ob_start();
 	
-	require_once("header.php");
+	require_once("left_pane.php");
 		
 	$out = ob_get_contents();
 	ob_end_clean();
