@@ -95,7 +95,7 @@ class kConfLocal
 				
 				// ce only settings
 				"kaltura_activation_key" => false,
-				"replace_passwords" => @REPLACE_PASSWORDS@,
+				"replace_passwords" => "@REPLACE_PASSWORDS@",
 				"kaltura_version" => "@KALTURA_VERSION@",
 				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",
 				"usage_tracking_optin" => @USAGE_TRACKING_OPTIN@,
