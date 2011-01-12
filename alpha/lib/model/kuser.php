@@ -764,6 +764,22 @@ class kuser extends Basekuser
 		return UserLoginDataPeer::retrieveByPK($loginDataId);
 	}
 	
+	public function getAllowedPartnerIds()
+	{
+		$currentLoginDataId = $this->getLoginDataId();
+		if (!$currentLoginDataId) {
+			return array($this->getPartnerId());
+		}
+		$c = new Criteria();
+		$c->addSelectColumn(kuserPeer::PARTNER_ID);
+		$c->addAnd(kuserPeer::LOGIN_DATA_ID, $currentLoginDataId, Criteria::EQUAL);
+		kuserPeer::setUseCriteriaFilter(false);
+		$stmt = kuserPeer::doSelectStmt($c);
+		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		kuserPeer::setUseCriteriaFilter(true);
+		return $ids;
+	}
+	
 
 	
 	// -- start of deprecated functions
