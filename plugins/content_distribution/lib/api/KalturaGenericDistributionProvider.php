@@ -106,8 +106,8 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		$object->setDeleteInsteadUpdate($this->deleteInsteadUpdate);
 		$object->setIntervalBeforeSunrise($this->intervalBeforeSunrise);
 		$object->setIntervalBeforeSunset($this->intervalBeforeSunset);
-		$object->setUpdateRequiredEntryFields($this->updateRequiredEntryFields);
-		$object->setUpdateRequiredMetadataXpaths($this->updateRequiredMetadataXPaths);
+		$object->setUpdateRequiredEntryFields(explode(',', $this->updateRequiredEntryFields));
+		$object->setUpdateRequiredMetadataXpaths(explode(',', $this->updateRequiredMetadataXPaths));
 		
 		$thumbDimensions = array();
 		if($this->optionalThumbDimensions)
@@ -135,6 +135,9 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 		
 		$this->optionalThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getOptionalThumbDimensionsObjects());
 		$this->requiredThumbDimensions = KalturaDistributionThumbDimensionsArray::fromDbArray($sourceObject->getRequiredThumbDimensionsObjects());
+		
+		$this->updateRequiredEntryFields = implode(',', $sourceObject->getUpdateRequiredEntryFields());
+		$this->updateRequiredMetadataXPaths = implode(',', $sourceObject->getUpdateRequiredMetadataXPaths());
 	}
 		 
 	public function getMapBetweenObjects()

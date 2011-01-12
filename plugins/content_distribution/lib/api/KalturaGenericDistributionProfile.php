@@ -25,7 +25,17 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * @var KalturaGenericDistributionProfileAction
 	 */
-	public $fetchReportAction;	
+	public $fetchReportAction;
+	
+	/**
+	 * @var string
+	 */
+	public $updateRequiredEntryFields;
+	
+	/**
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -95,6 +105,9 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 			}
 		}
 		
+		$object->setUpdateRequiredEntryFields(explode(',', $this->updateRequiredEntryFields));
+		$object->setUpdateRequiredMetadataXpaths(explode(',', $this->updateRequiredMetadataXPaths));
+		
 		return $object;		
 	}
 
@@ -139,5 +152,8 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	            }
 			}
 		}
+		
+		$this->updateRequiredEntryFields = implode(',', $object->getUpdateRequiredEntryFields());
+		$this->updateRequiredMetadataXPaths = implode(',', $object->getUpdateRequiredMetadataXPaths());
 	}
 }

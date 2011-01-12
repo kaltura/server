@@ -91,17 +91,47 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
 	 */
-	public function getUpdateRequiredEntryFields()
+	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS);
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS);
+		if(!$ret)
+			$ret = array();
+			
+		if($distributionProfileId)
+		{
+			DistributionProfilePeer::setUseCriteriaFilter(false);
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			DistributionProfilePeer::setUseCriteriaFilter(true);
+			if($distributionProfile && ($distributionProfile instanceof GenericDistributionProfile))
+			{
+				$profileFields = $distributionProfile->getUpdateRequiredEntryFields();
+				$ret = array_unique(array_merge($ret, $profileFields));
+			}
+		}
+		return $ret;
 	}
 	
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
 	 */
-	public function getUpdateRequiredMetadataXPaths()
+	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS);
+		$ret = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS);
+		if(!$ret)
+			$ret = array();
+			
+		if($distributionProfileId)
+		{
+			DistributionProfilePeer::setUseCriteriaFilter(false);
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			DistributionProfilePeer::setUseCriteriaFilter(true);
+			if($distributionProfile && ($distributionProfile instanceof GenericDistributionProfile))
+			{
+				$profileFields = $distributionProfile->getUpdateRequiredMetadataXPaths();
+				$ret = array_unique(array_merge($ret, $profileFields));
+			}
+		}
+		return $ret;
 	}
 	
 	/* (non-PHPdoc)

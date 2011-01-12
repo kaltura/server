@@ -12,6 +12,8 @@ class GenericDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_FTP_PASSIVE_MODE = 'ftpPassiveMode';
 	const CUSTOM_DATA_HTTP_FIELD_NAME = 'httpFieldName';
 	const CUSTOM_DATA_HTTP_FILE_NAME = 'httpFileName';
+	const CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS = "updateRequiredEntryFields";
+	const CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS = "updateRequiredMetadataXPaths";
 	
 
 	/* (non-PHPdoc)
@@ -61,6 +63,8 @@ class GenericDistributionProfile extends DistributionProfile
 	public function getFtpPassiveMode($action)		{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_PASSIVE_MODE, $action);}
 	public function getHttpFieldName($action)		{return $this->getFromCustomData(self::CUSTOM_DATA_HTTP_FIELD_NAME, $action);}
 	public function getHttpFileName($action)		{return $this->getFromCustomData(self::CUSTOM_DATA_HTTP_FILE_NAME, $action);}
+	public function getUpdateRequiredEntryFields()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS);}
+	public function getUpdateRequiredMetadataXPaths(){return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS);}
 	
 	public function setGenericProviderId($v)		{$this->putInCustomData(self::CUSTOM_DATA_GENERIC_PROVIDER_ID, $v);}
 		
@@ -72,4 +76,7 @@ class GenericDistributionProfile extends DistributionProfile
 	public function setFtpPassiveMode($v, $action)	{$this->putInCustomData(self::CUSTOM_DATA_FTP_PASSIVE_MODE, $v, $action);}
 	public function setHttpFieldName($v, $action)	{$this->putInCustomData(self::CUSTOM_DATA_HTTP_FIELD_NAME, $v, $action);}
 	public function setHttpFileName($v, $action)	{$this->putInCustomData(self::CUSTOM_DATA_HTTP_FILE_NAME, $v, $action);}
+	public function setUpdateRequiredEntryFields($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS, $v);}
+	public function setUpdateRequiredMetadataXpaths($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS, $v);}
+	
 }
