@@ -10,6 +10,21 @@ class kmc4Action extends kalturaAction
 	
 	const SYSTEM_DEFAULT_PARTNER = 0;
 	
+	private function getPartnersArray($partnerIds)
+	{
+		$allowed = array();
+		$c = new Criteria();
+		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
+		PartnerPeer::setUseCriteriaFilter(false);
+		$partners = PartnerPeer::doSelect($c);
+		PartnerPeer::setUseCriteriaFilter(true);
+		foreach ($partners as $partner)
+		{
+			$allowed[] = array('id' => $partner->getId(), 'name' => $partner->getName());
+		}
+		return $allowed;
+	}
+	
 	public function execute ( ) 
 	{
 		
@@ -28,14 +43,20 @@ class kmc4Action extends kalturaAction
 		$this->screen_name = $this->getP ( "screen_name" );
 		$this->email = $this->getP ( "email" );
 
-
+		
 		/** if no KS found, redirect to login page **/
 		if (!$this->ks)
 		{
 			$this->redirect( "kmc/kmc" );
 			die();
 		}
+		$ksObj = kSessionUtils::crackKs($this->ks);
+		
 	/** END - check parameters and verify user is logged-in **/
+		
+	/** Get array of allowed partners for the current user **/
+		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
+		$this->allowedPartners = $this->getPartnersArray($currentUser->getAllowedPartnerIds());
 
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
