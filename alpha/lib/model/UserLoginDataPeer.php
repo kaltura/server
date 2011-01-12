@@ -304,7 +304,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
-		return self::userLogin($loginData, $password, $partnerId);
+		return self::userLogin($loginData, $password, $partnerId, true);
 	}
 	
 	// user login by login_email
@@ -314,11 +314,28 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
-		return self::userLogin($loginData, $password, $partnerId);
+		return self::userLogin($loginData, $password, $partnerId, true);
+	}
+	
+	// user login by ks
+	public static function userLoginByKs($ks, $requestedPartnerId)
+	{
+		$ksObj = kSessionUtils::crackKs($ks);
+		
+		$ksUserId = $ksObj->user;
+		$ksPartnerId = $ksObj->partner_id;
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid($ksPartnerId, $ksUserId, true);
+		if (!$kuser)
+		{
+			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
+		}
+			
+		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false);  // don't validate password		
 	}
 	
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData, $password, $partnerId = null)
+	private static function userLogin(UserLoginData $loginData, $password, $partnerId = null, $validatePassword = true)
 	{
 		$requestedPartner = $partnerId;
 		
@@ -327,7 +344,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}		
 		
 		// check if password is valid
-		if (!$loginData->isPasswordValid($password)) 
+		if ($validatePassword && !$loginData->isPasswordValid($password)) 
 		{
 			if (time() < $loginData->getLoginBlockedUntil(null)) 
 			{
