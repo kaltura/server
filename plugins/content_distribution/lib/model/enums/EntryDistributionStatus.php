@@ -11,4 +11,5 @@ interface EntryDistributionStatus extends BaseEnum
 	const ERROR_SUBMITTING = 7;
 	const ERROR_UPDATING = 8;
 	const ERROR_DELETING = 9;
+	const REMOVED = 10;
 }
