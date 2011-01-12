@@ -79,12 +79,14 @@ class kPermissionManager
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
 		$value = apc_fetch($key); // try to fetch from cache
 		if ($value) {
+			KalturaLog::debug("Found an APC cache value for key [$key]");
 			$value = unserialize($value);
+			return $value;
 		}
 		else {
 			KalturaLog::debug("No APC cache value found for key [$key]");
+			return null;
 		}
-		return $value;
 	}
 	
 	/**
@@ -102,11 +104,43 @@ class kPermissionManager
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
 		$value = serialize($value);
 		$success = apc_store($key, $value); // try to store in cache
-		if (!$success) {
+
+		if ($success)
+		{
+			KalturaLog::debug("New value stored in APC cache for key [$key]");
+			return true;
+		}
+		else
+		{
 			KalturaLog::debug("No APC cache value stored for key [$key]");
 			return false;
 		}
-		return true;
+	}
+	
+	
+	/**
+	 * Delete a value stored in APC cache with the given key
+	 * @param string $key stored key
+	 */
+	private static function deleteFromCache($key)
+	{
+		if (!self::useCache())
+		{
+			return null;
+		}
+		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
+		
+		$success = apc_delete($key);
+		if ($success) {
+			KalturaLog::debug("Successfully deleted stored APC cache value for key [$key]");
+			return true;
+		}
+		else
+		{
+			KalturaLog::debug("Cannot delete APC cache value for key [$key]");
+			return false;
+		}
+		
 	}
 	
 	
@@ -165,7 +199,8 @@ class kPermissionManager
 		}
 		
 		// get role from cache
-		$cacheRole = self::getFromCache(self::getRoleIdKey($roleId, self::$operatingPartnerId));
+		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
+		$cacheRole = self::getFromCache($roleCacheKey);
 		
 		// compare updatedAt between DB and cache
 		if ( ($cacheRole && isset($cacheRole['updatedAt']) && $cacheRole['updatedAt'] >= $roleUpdatedAt )
@@ -177,13 +212,14 @@ class kPermissionManager
 			return $map; // initialization from cache finished
 		}
 		
-		// cache is not updated - init from DB
+		// cache is not updated - delete stored value and re-init from DB
+		self::deleteFromCache($roleCacheKey);
 		$map = self::getPermissionsFromDb($dbRole);
 		
 		// update cache
 		$cacheRole = $map;
 		$cacheRole['updatedAt'] = $roleUpdatedAt;
-		self::storeInCache(self::getRoleIdKey($roleId, self::$operatingPartnerId), $cacheRole);
+		self::storeInCache($roleCacheKey, $cacheRole);
 		
 		return $map;
 	}
@@ -358,6 +394,13 @@ class kPermissionManager
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
 		self::$adminSession = kCurrentContext::$is_admin_session ? kCurrentContext::$is_admin_session : false;
 			
+		// clear instance pools
+		UserRolePeer::clearInstancePool();
+		PermissionPeer::clearInstancePool();
+		PermissionItemPeer::clearInstancePool();
+		PermissionToPermissionItemPeer::clearInstancePool();
+		kuserPeer::clearInstancePool();
+		
 		// if ks defined - check that it is valid
 		self::errorIfKsNotValid();
 		
@@ -372,13 +415,7 @@ class kPermissionManager
 
 		// init permissions map
 		self::initPermissionsMap();
-				
-		
-		UserRolePeer::clearInstancePool();
-		PermissionPeer::clearInstancePool();
-		PermissionItemPeer::clearInstancePool();
-		kuserPeer::clearInstancePool();
-				
+								
 		// initialization done
 		self::$initialized = true;
 		return true;
