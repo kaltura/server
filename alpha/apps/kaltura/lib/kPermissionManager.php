@@ -81,6 +81,9 @@ class kPermissionManager
 		if ($value) {
 			$value = unserialize($value);
 		}
+		else {
+			KalturaLog::debug("No APC cache value found for key [$key]");
+		}
 		return $value;
 	}
 	
@@ -100,7 +103,7 @@ class kPermissionManager
 		$value = serialize($value);
 		$success = apc_store($key, $value); // try to store in cache
 		if (!$success) {
-			KalturaLog::debug("No APC cache value found for key [$key]");
+			KalturaLog::debug("No APC cache value stored for key [$key]");
 			return false;
 		}
 		return true;
