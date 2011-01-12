@@ -240,9 +240,12 @@ else
 				/* hack for filters order by */
 				$filterEnumOrder = str_replace("Filter", "OrderBy", $object);
 				$description =  
-				"This parameter sets the order criteria by which objects will be retrieved. 
-				This parameter should by set according to the following enumeration: 
-				<a href=\"?object=$filterEnumOrder\">$filterEnumOrder</a>.";
+				"This parameter sets the order criteria by which objects will be retrieved. ";
+				if (class_exists($filterEnumOrder))
+				{
+					$description .= "This parameter should by set according to the following enumeration: 
+						<a href=\"?object=$filterEnumOrder\">$filterEnumOrder</a>.";
+				}
 			}
 			else
 			{
