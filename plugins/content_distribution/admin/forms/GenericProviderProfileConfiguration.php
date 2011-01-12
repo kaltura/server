@@ -1,6 +1,8 @@
 <?php 
 class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfiguration
 {
+	private static $metadataProfileFields;
+	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
@@ -10,8 +12,38 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			$this->getActionObject($object, 'submit', $properties);
 			$this->getActionObject($object, 'update', $properties);
 			$this->getActionObject($object, 'delete', $properties);
-			$this->getActionObject($object, 'report', $properties, 'fetchReport');
+			$this->getActionObject($object, 'report', $properties, 'fetchReportAction');
 		}
+		
+		$updateRequiredEntryFields = array();
+		$updateRequiredMetadataXpaths = array();
+		
+		$entryFields = array_keys($this->getEntryFields());
+		$metadataXpaths = array_keys($this->getMetadataFields());
+		
+		foreach($properties as $property => $value)
+		{
+			if(!$value)
+				continue;
+				
+			$matches = null;
+			if(preg_match('/update_required_entry_fields_(\d+)$/', $property, $matches))
+			{
+				$index = $matches[1];
+				if(isset($entryFields[$index]))
+					$updateRequiredEntryFields[] = $entryFields[$index];
+			}
+		
+			if(preg_match('/update_required_metadata_xpaths_(\d+)$/', $property, $matches))
+			{
+				$index = $matches[1];
+				if(isset($metadataXpaths[$index]))
+					$updateRequiredMetadataXpaths[] = $metadataXpaths[$index];
+			}
+		}
+		
+		$object->updateRequiredEntryFields = implode(',', $updateRequiredEntryFields);
+		$object->updateRequiredMetadataXPaths = implode(',', $updateRequiredMetadataXpaths);
 		
 		return $object;
 	}
@@ -26,6 +58,147 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			$this->populateFromActionObject($object, 'update', $add_underscore);
 			$this->populateFromActionObject($object, 'delete', $add_underscore);
 			$this->populateFromActionObject($object, 'report', $add_underscore, 'fetchReportAction');
+			
+			$entryFields = array_keys($this->getEntryFields());
+			$metadataXpaths = array_keys($this->getMetadataFields());
+			
+			$updateRequiredEntryFields = explode(',', $object->updateRequiredEntryFields);
+			$updateRequiredMetadataXPaths = explode(',', $object->updateRequiredMetadataXPaths);
+		
+			foreach($updateRequiredEntryFields as $entryField)
+			{
+				$index = array_search($entryField, $entryFields);
+				if($index !== false)
+					$this->setDefault("update_required_entry_fields_{$index}", true);
+			}
+			foreach($updateRequiredMetadataXPaths as $metadataXpath)
+			{
+				$index = array_search($metadataXpath, $metadataXpaths);
+				if($index !== false)
+					$this->setDefault("update_required_metadata_xpaths_{$index}", true);
+			}
+		}
+	}
+
+	protected function getMetadataFields()
+	{
+		if(count(self::$metadataProfileFields))
+			return self::$metadataProfileFields;
+			
+		self::$metadataProfileFields = array();
+		$client = Kaltura_ClientHelper::getClient();
+		Kaltura_ClientHelper::impersonate($this->partnerId);
+		
+		try
+		{
+			$metadataProfileList = $client->metadataProfile->listAction();
+			foreach($metadataProfileList->objects as $metadataProfile)
+			{
+				$metadataFieldList = $client->metadataProfile->listFields($metadataProfile->id);
+				foreach($metadataFieldList->objects as $metadataField)
+					self::$metadataProfileFields[$metadataField->xPath] = $metadataField->label;
+			}
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return array();
+		}
+		
+		Kaltura_ClientHelper::unimpersonate();
+		
+		return self::$metadataProfileFields;
+	}
+	
+	protected function getEntryFields()
+	{
+		return array(
+			'entry.KSHOW_ID' => 'Kaltura Show',
+			'entry.KUSER_ID' => 'Kaltura User',
+			'entry.NAME' => 'Name',
+			'entry.DATA' => 'Data',
+			'entry.THUMBNAIL' => 'Thumbnail',
+			'entry.COMMENTS' => 'Comments',
+			'entry.TOTAL_RANK' => 'Total Rank',
+			'entry.RANK' => 'Rank',
+			'entry.TAGS' => 'Tags',
+			'entry.STATUS' => 'Status',
+			'entry.LENGTH_IN_MSECS' => 'Duration',
+			'entry.DISPLAY_IN_SEARCH' => 'Display in Search',
+			'entry.GROUP_ID' => 'Group',
+			'entry.PARTNER_DATA' => 'Partner Data',
+			'entry.DESCRIPTION' => 'Description',
+			'entry.MEDIA_DATE' => 'Media Date',
+			'entry.ADMIN_TAGS' => 'Admin Tags',
+			'entry.MODERATION_STATUS' => 'Moderation Status',
+			'entry.MODERATION_COUNT' => 'Moderation Count',
+			'entry.PUSER_ID' => 'Partner User',
+			'entry.ACCESS_CONTROL_ID' => 'Access Control',
+			'entry.CATEGORIES_IDS' => 'Categories',
+			'entry.START_DATE' => 'Start Date',
+			'entry.END_DATE' => 'End Date',
+			'moderate' => 'Moderate',
+			'current_kshow_version' => 'Current Show Version',
+			'hasDownload' => 'Has Download',
+			'encodingIP1' => 'Encoding IP 1',
+			'encodingIP2' => 'Encoding IP 2',
+			'streamUsername' => 'Stream Username',
+			'streamPassword' => 'Stream Password',
+			'offlineMessage' => 'Offline Message',
+			'streamRemoteId' => 'Stream Remote ID',
+			'streamRemoteBackupId' => 'Stream Remote Backup ID',
+			'streamUrl' => 'Stream Url',
+			'streamBitrates' => 'Stream Bitrates',
+			'ismVersion' => 'ISM Version',
+			'height' => 'Height',
+			'width' => 'Width',
+			'security_policy' => 'Security Policy',
+		);
+	}
+
+	protected function addEntryFields()
+	{
+		$this->addElement('hidden', 'crossLineEntryFields', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+		
+		$element = new Zend_Form_Element_Hidden('addEntryFields');
+		$element->setLabel('Entry fields that require update');
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$this->addElements(array($element));
+
+		$index = 0;
+		foreach($this->getEntryFields() as $field => $fieldName)
+		{
+			$this->addElement('checkbox', "update_required_entry_fields_{$index}", array(
+				'label'	  => $fieldName,
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+			));
+			$index++;
+		}
+	}
+
+	protected function addMetadataFields()
+	{
+		$this->addElement('hidden', 'crossLineMetadataFields', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+		
+		$element = new Zend_Form_Element_Hidden('addMetadataFields');
+		$element->setLabel('Metadata nodes that require update');
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+		$this->addElements(array($element));
+
+		$index = 0;
+		foreach($this->getMetadataFields() as $xPath => $fieldName)
+		{
+			$this->addElement('checkbox', "update_required_metadata_xpaths_{$index}", array(
+				'label'	  => $fieldName,
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+			));
+			$index++;
 		}
 	}
 	
@@ -61,7 +234,7 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 	public function populateFromActionObject($object, $action, $add_underscore = true, $attributeName = null)
 	{
 		if(is_null($attributeName))
-			$attributeName = $action;
+			$attributeName = "{$action}Action";
 			
 		if(!$object->$attributeName)
 			return;
@@ -124,6 +297,9 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			foreach($genericDistributionProviderList->objects as $genericDistributionProvider)
 				$element->addMultiOption($genericDistributionProvider->id, $genericDistributionProvider->name);
 		}
+		
+		$this->addEntryFields();
+		$this->addMetadataFields();
 	}
 	
 	/**

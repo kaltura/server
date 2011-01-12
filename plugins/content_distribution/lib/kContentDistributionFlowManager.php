@@ -588,7 +588,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			$updateRequiredMetadataXPaths = $distributionProvider->getUpdateRequiredMetadataXPaths();
+			$updateRequiredMetadataXPaths = $distributionProvider->getUpdateRequiredMetadataXPaths($distributionProfileId);
 			$updateRequired = false;
 			
 			foreach($updateRequiredMetadataXPaths as $updateRequiredMetadataXPath)
@@ -721,7 +721,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields();
+			$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields($distributionProfileId);
 			$updateRequired = false;
 			
 			foreach($updateRequiredEntryFields as $updateRequiredEntryField)

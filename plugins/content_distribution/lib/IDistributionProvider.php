@@ -58,11 +58,11 @@ interface IDistributionProvider
 	 * returns array of entry fields, columns or custom data attributes that require updating of the remote destination
 	 * @return array
 	 */
-	public function getUpdateRequiredEntryFields();
+	public function getUpdateRequiredEntryFields($distributionProfileId = null);
 	
 	/**
 	 * returns array of xPaths that require updating of the remote destination
 	 * @return array
 	 */
-	public function getUpdateRequiredMetadataXPaths();
+	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null);
 }
