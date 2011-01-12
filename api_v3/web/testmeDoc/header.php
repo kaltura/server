@@ -1,5 +1,4 @@
 <?php 
-	require_once("../../bootstrap.php"); 
 
 	$config = new Zend_Config_Ini("../../config/testme.ini");
 	$indexConfig = $config->get('testmedoc');
@@ -7,11 +6,7 @@
 	$include = $indexConfig->get("include");
 	$exclude = $indexConfig->get("exclude");
 	$additional = $indexConfig->get("additional");
-	
-	$currentService = @$_GET["service"];
-	$currentAction = @$_GET["action"];
-	$currentObject = @$_GET["object"];
-	
+		
 	$clientGenerator = new DummyForDocsClientGenerator();
 	$clientGenerator->setIncludeOrExcludeList($include, $exclude);
 	$clientGenerator->setAdditionalList($additional);
@@ -40,37 +35,6 @@
 	$objects = $clientGenerator->getObjects();
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<title>Kaltura - TestMe Console Documentation</title>
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<script type="text/javascript" src="../testme/js/jquery-1.3.1.min.js"></script>
-	<script type="text/javascript" src="../testme/js/jquery.scrollTo-min.js"></script>
-	<!-- <script type="text/javascript" src="js/main.js"></script> -->
-	<script type="text/javascript">
-		$(function() {
-			$(window).resize(function(){
-				$(".left").css("height", $("body").outerHeight() - $("#kmcSubMenu").outerHeight({ "margin": true }) - 10);
-				$(".right").css("height", $("body").outerHeight() - $("#kmcSubMenu").outerHeight({ "margin": true }) - 10);
-			});
-			$(window).resize();
-			<?php if ($currentObject): ?>
-			$(".left").scrollTo({top: 0, left: 0});
-			$(".left").scrollTo($("#object_<?php echo $currentObject;?>"), 0, {axis:'y'});
-			<?php endif; ?>
-		});
-	</script>
-</head>
-<body>
-	<ul id="kmcSubMenu">
- 	<li>
-     <a href="../testme/index.php">Test Console</a>
-    </li>
-    <li class="active">
-     <a href="#">API Documentation</a>
-    </li>
-   </ul>
 	<div class="left">
 		<div class="left-content">
 			<div id="general">
@@ -92,7 +56,7 @@
 						$serviceId = $serviceReflector->getServiceId();
 						$actions = $serviceReflector->getActions();
 					?>
-					<li class="service<?php echo($currentService == $serviceId) ? " expended": ""?>">
+					<li class="service">
 						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceReflector->getServiceName(); ?></a>
 						<ul class="actions">
 						<?php foreach($actions as $actionId => $actionName): ?>
@@ -160,6 +124,3 @@
 			</div>
 		</div>
 	</div>
-
-	<div class="right">
-		<div id="doc" >

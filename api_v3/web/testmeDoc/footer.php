@@ -1,5 +1,2 @@
-</div>
-	</div>
-
 </body>
 </html>

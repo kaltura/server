@@ -36,6 +36,7 @@ body div#wrap {float:left; width:100%;}
 table { width:100%; }
 table th,
 table td { text-align:left; padding:4px; }
+table td.inheritedFrom { background: #D3DFEE;}
 
 table th.service_action_title { background-color:#D3DFEE; color:#000; border-bottom:3px solid #7BA0CD;}
 

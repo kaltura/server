@@ -14,7 +14,7 @@ try
 }
 catch(Exception $ex)
 {
-	die('Action "'.$action.'" does not exists for service "'.$service.'"');
+	die('Action "'.$action.'" does not exist for service "'.$service.'"');
 }
 $actionInfo = $serviceReflector->getActionInfo($action);
 
