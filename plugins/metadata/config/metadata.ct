@@ -20,7 +20,7 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-metadataprofile.list				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_BASE
+metadataprofile.list				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_BASE,CONTENT_MANAGE_BASE
 metadataprofile.add					|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_ADD
 metadataprofile.addfromfile			|			|2		|1	|1		|2		|1		|	|		|	|   |CUSTOM_DATA_PROFILE_ADD
 metadataprofile.delete				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_DELETE

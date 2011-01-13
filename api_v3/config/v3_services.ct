@@ -315,7 +315,7 @@ conversionprofile.add				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_ADD
 conversionprofile.get				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 conversionprofile.update			|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 conversionprofile.delete			|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_DELETE
-conversionprofile.list				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
+conversionprofile.list				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE
 conversionprofile.addflavorparams	|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 conversionprofile.removeflavorparams|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 
@@ -323,7 +323,7 @@ flavorparams.add					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_ADD
 flavorparams.get					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE
 flavorparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 flavorparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_DELETE
-flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE
+flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE
 flavorparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 flavorparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 
@@ -369,7 +369,7 @@ accesscontrol.add					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_C
 accesscontrol.get					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_CONTROL
 accesscontrol.update				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_CONTROL
 accesscontrol.delete				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_CONTROL
-accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_CONTROL
+accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ACCESS_CONTROL,CONTENT_MANAGE_BASE
 
 category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
 category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE
