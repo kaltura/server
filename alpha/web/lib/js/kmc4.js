@@ -329,6 +329,8 @@ $(window).load(function(){
 							return false;
 							break;
 						case "ChangePartner" :
+							alert('stop!');
+							return false;
 							kmc.utils.changePartner();
 							return false;
 							break;
