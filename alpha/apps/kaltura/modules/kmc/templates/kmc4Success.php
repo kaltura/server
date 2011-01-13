@@ -167,13 +167,12 @@ else
      <div id="user_links">
       <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
-	      <?php if(count($allowedPartners) => 1) { ?>
+	      <?php if(count($allowedPartners) > 1) { ?>
 			<select id="change_partners" style="margin-top: -6px; background: #000; color: #fff;">
 			<?php foreach($allowedPartners as $p){ ?>
 	      		<option value="<?php echo $p['id']?>"<?php if($p['id'] == $partner_id) { 
 	      			echo ' selected="selected"'; } ?>><?php echo $p['name']; ?></option>
 	      	<?php } ?>
-	      	<option>Partner 2</option><option>Partner 3</option>
 	      	</select>      		      
 	      <?php /*
 	      <span id="change_partner"><?php echo $screen_name ?> V      
