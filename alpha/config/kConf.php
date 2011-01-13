@@ -172,7 +172,7 @@ class kConf extends kConfLocal
 				
 				'ps2_actions_not_blocked_by_permissions' => array(
 					// should list action class names lowercase!
-					'mymultieequest',
+					'mymultirequest',
 					'adminloginaction',
 					'resetadminpasswordaction',
 					'executeplaylistaction',
