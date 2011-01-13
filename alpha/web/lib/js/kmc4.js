@@ -412,11 +412,13 @@ $(window).load(function(){
 			var modal_height = 180;
 			var title = 'Change Partner';
 			var content = 'Please choose partner:<br /><br />';
+			var pid = 0;
 			
 			var partners_count = kmc.vars.allowed_partners.length;
 			for( var i=0; i < partners_count; i++ ) {
-				content += '<input type="radio" name="pid" value="' + kmc.vars.allowed_partners[i].id + '" /> &nbsp;';
-				content += kmc.vars.allowed_partners[i].name + '<br />';
+				pid = kmc.vars.allowed_partners[i].id;
+				content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" /> &nbsp;';
+				content += '<label for="cp' + pid + '">' + kmc.vars.allowed_partners[i].name + '</label><br />';
 			}
 			content += '<br /><input type="button" value=" Go " />';
 			
@@ -426,7 +428,7 @@ $(window).load(function(){
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-							  '<b>' + title + '</b></div> <div id="modal_content">' + content + '</div></div>';
+							  '<b>' + title + '</b></div> <div id="modal_content" style="width: '+modal_width+'px; height: '+modal_height+'px'">' + content + '</div></div>';
 			$("#mbContent").addClass("new");
 			$("#close").click(function() {
 				kmc.utils.closeModal();
