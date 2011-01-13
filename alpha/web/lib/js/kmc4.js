@@ -325,6 +325,9 @@ $(window).load(function(){
 						case "Support" :
 							kmc.utils.openSupport(this);
 							return false;
+						case "change_partner" :
+							kmc.utils.changePartner();
+							return false;
 						default :
 							go_to = { moduleName : tab, subtab : subtab };
 							break;
@@ -406,10 +409,12 @@ $(window).load(function(){
 			var content = 'Please choose partner:<br />';
 			
 			var partners_count = kmc.vars.allowed_partners.length;
-			for(var i; i <= partners_count; i++) {
+			for( var i; i <= partners_count; i++ ) {
 				content += kmc.vars.allowed_partners[i].name + '<br />';
 			}
 			content += '<input type="button" value=" Go " />';
+			
+			//window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value;
 			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
@@ -1255,18 +1260,6 @@ function playerAdded() { // called from appstudio
 
 $(function() {
 	kmc.mediator.loadKmc();
-	
-	/*
-	$('#change_partners').change(function(e) {
-		window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value; 
-	});
-	*/
-	
-	$('#change_partner').click(function() {
-		kmc.utils.changePartner();
-		return false;
-	});
-
 })
 
 kmc.vars.kmc_swf = {
