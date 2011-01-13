@@ -407,7 +407,7 @@ $(window).load(function(){
 		},
 		
 		changePartner : function() {
-			/*
+			
 			var modal_width = 300;
 			var modal_height = 180;
 			var title = 'Change Partner';
@@ -415,6 +415,7 @@ $(window).load(function(){
 			
 			var partners_count = kmc.vars.allowed_partners.length;
 			console.log(kmc.vars.allowed_partners);
+			/*
 			for( var i=0; i <= partners_count; i++ ) {
 				console.log(kmc.vars.allowed_partners[i]);
 				content += kmc.vars.allowed_partners[i].name + '<br />';
