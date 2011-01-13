@@ -319,15 +319,19 @@ $(window).load(function(){
 						case "Quickstart Guide" :
 							this.href = kmc.vars.quickstart_guide;
 							return true;
+							break;
 						case "Logout" :
 							kmc.utils.logout();
 							return false;
+							break;
 						case "Support" :
 							kmc.utils.openSupport(this);
 							return false;
+							break;
 						case "ChangePartner" :
 							kmc.utils.changePartner();
 							return false;
+							break;
 						default :
 							go_to = { moduleName : tab, subtab : subtab };
 							break;
