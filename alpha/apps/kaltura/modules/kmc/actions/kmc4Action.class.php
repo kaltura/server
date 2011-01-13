@@ -56,7 +56,7 @@ class kmc4Action extends kalturaAction
 		
 	/** Get array of allowed partners for the current user **/
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
-		$this->allowedPartners = $this->getPartnersArray($currentUser->getAllowedPartnerIds());
+		$this->allowedPartners = json_encode( $this->getPartnersArray($currentUser->getAllowedPartnerIds()) );
 
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
