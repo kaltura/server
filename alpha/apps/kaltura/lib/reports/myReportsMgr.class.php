@@ -667,6 +667,14 @@ class myReportsMgr
 		// the diff between user and server timezones 
 		$time_shift = round($input_filter->timeZoneOffset / 60);
 		
+		// add time zone offset to the time shift
+		$dateTimeZoneServer = new DateTimeZone(date_default_timezone_get());
+		$dateTimeZoneUTC = new DateTimeZone("UTC");
+		$dateTimeServer = new DateTime("now", $dateTimeZoneServer);
+		$timeOffsetSeconds = $dateTimeZoneUTC->getOffset($dateTimeServer);
+		$timeOffset = round($timeOffsetSeconds / 360); // convert to hours
+		$time_shift += $timeOffset;
+		
 		date_default_timezone_set('UTC');
 				
 		// removing hours, minutes and seconds from the date  
