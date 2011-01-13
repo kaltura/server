@@ -400,7 +400,6 @@ $(window).load(function(){
 		},
 		
 		changePartner : function() {
-			/*
 			var modal_width = 300;
 			var modal_height = 180;
 			var title = 'Change Partner';
@@ -415,7 +414,6 @@ $(window).load(function(){
 				kmc.utils.closeModal();
 				return false;
 			});	
-			*/	
 		}
 		
 	}
