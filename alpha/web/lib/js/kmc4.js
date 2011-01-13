@@ -389,7 +389,7 @@ $(window).load(function(){
 				url += '&' + i + '=' + fld;
 			}
 			// change http to https
-			//url = url.replace("http", "https");
+			url = url.replace("http", "https");
 			
 			var modal_width = 400;
 			var modal_height = 160;
