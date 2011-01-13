@@ -274,6 +274,8 @@ class kContentDistributionManager
 		$entryDistribution->setPartnerId($entry->getPartnerId());
 		$entryDistribution->setDistributionProfileId($distributionProfile->getId());
 		$entryDistribution->setStatus(EntryDistributionStatus::PENDING);
+		
+		// TODO - take defaults from the distribution profile
 		$entryDistribution->setSunrise($entry->getStartDate(null));
 		$entryDistribution->setSunset($entry->getEndDate(null));
 		

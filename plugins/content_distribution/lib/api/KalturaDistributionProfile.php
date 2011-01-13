@@ -109,6 +109,18 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 	 */
 	public $requiredThumbDimensions;
 	
+	/**
+	 * If entry distribution sunrise not specified that will be the default since entry creation time, in seconds
+	 * @var int
+	 */
+	public $sunriseDefaultOffset;
+	
+	/**
+	 * If entry distribution sunset not specified that will be the default since entry creation time, in seconds
+	 * @var int
+	 */
+	public $sunsetDefaultOffset;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -129,6 +141,8 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 		'autoCreateThumb',
 		'optionalFlavorParamsIds',
 		'requiredFlavorParamsIds',
+		'sunriseDefaultOffset',
+		'sunsetDefaultOffset',
 	 );
 		 
 	public function getMapBetweenObjects()

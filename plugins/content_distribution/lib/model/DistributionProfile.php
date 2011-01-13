@@ -17,6 +17,8 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	const FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG = 1;
 	
 	const CUSTOM_DATA_FIELD_CONFIG_VERSION = "configVersion";
+	const CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET = "sunriseDefaultOffset";
+	const CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET = "sunsetDefaultOffset";
 	
 	/**
 	 * @return IDistributionProvider
@@ -308,7 +310,12 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $ret;
 	}
 	
-	public function getConfigVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}
+	public function getConfigVersion()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}	
+	public function getSunriseDefaultOffset()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
+	public function getSunsetDefaultOffset()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}
+
 	public function incrementConfigVersion()	{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_VERSION);}
+	public function setSunriseDefaultOffset($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET, $v);}
+	public function setSunsetDefaultOffset($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET, $v);}
 	
 } // DistributionProfile

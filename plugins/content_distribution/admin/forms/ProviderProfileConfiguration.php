@@ -55,10 +55,27 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 			'value'			=> $this->providerType,
 		));
 		
-		$this->addElement('hidden', 'crossLine1', array(
+		$this->addElement('hidden', 'crossLine01', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
+		
+//		TODO - redefine the UI
+//		
+//		$this->addElement('text', 'sunrise_default_offset', array(
+//			'label'			=> 'Sunrise Default Offset (seconds since entry creation):',
+//			'filters'		=> array('StringTrim'),
+//		));
+//		
+//		$this->addElement('text', 'sunset_default_offset', array(
+//			'label'			=> 'Sunset Default Offset (seconds since entry creation):',
+//			'filters'		=> array('StringTrim'),
+//		));
+//		
+//		$this->addElement('hidden', 'crossLine02', array(
+//			'lable'			=> 'line',
+//			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+//		));
 		
 		$this->addProviderElements();
 		$this->addProfileAction('submit');
