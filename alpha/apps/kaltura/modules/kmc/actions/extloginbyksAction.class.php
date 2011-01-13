@@ -80,7 +80,7 @@ class extloginbyksAction extends kalturaAction
 		$partner_id = $partner->getId();
 		$subp_id = $partner->getSubpId() ;
 		$admin_puser_id = $adminKuser->getPuserId();
-		$screen_name = $adminKuser->getScreenName();
+		$screen_name = $adminKuser->getFullName();
 		
 		$ks = null;
 		
