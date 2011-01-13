@@ -478,7 +478,9 @@ class kuserPeer extends BasekuserPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
-		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
+		if (!$existingUser) {
+			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
+		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
 		$contactLink = kConf::get('contact_url');
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');

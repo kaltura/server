@@ -520,7 +520,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			KalturaLog::debug('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
-			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet) {
+			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet()) {
 				$existingData->setLastLoginPartnerId($partnerId);
 				$existingData->save();
 			}
