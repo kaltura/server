@@ -1,5 +1,5 @@
 <?php
-class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectDataChangedEventConsumer
+class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectDataChangedEventConsumer
 {
 	/**
 	 * @param BaseObject $object
@@ -23,6 +23,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			return self::onEntryDistributionChanged($object, $modifiedColumns);
 		
 		return true;
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if should continue to the next consumer
+	 */
+	public function objectCreated(BaseObject $object)
+	{
+		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+			return self::onAssetReady($object);
 	}
 	
 	/**
