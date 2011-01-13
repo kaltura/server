@@ -673,7 +673,7 @@ class myReportsMgr
 		$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
 		$timeOffsetSeconds = $dateTimeZoneServer->getOffset($dateTimeUTC);
 		$timeOffset = round($timeOffsetSeconds / 3600); // convert to hours
-		$time_shift -= $timeOffset;
+		$time_shift += $timeOffset;
 		
 		date_default_timezone_set('UTC');
 				
