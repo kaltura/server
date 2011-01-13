@@ -159,7 +159,7 @@ if( count($allowedPartners) > 1 ) {
      <div id="user_links">
       <span>Hi <?php echo $screen_name; ?> &nbsp;&nbsp;<?php echo $currentAccount; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
-	  <?php if( count($allowedPartners) > 1) { ?><a id="change_partner" href="#">Change Account</a> &nbsp; | &nbsp;<?php } ?> 
+	  <?php if( count($allowedPartners) > 1) { ?><a id="ChangePartner" href="#change_partner">Change Account</a> &nbsp; | &nbsp;<?php } ?> 
       <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
 	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
       <?php } ?>
