@@ -32,7 +32,7 @@ uiconf.list							|			|1,2	|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE
 uiconf.listtemplates				|			|2		|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE
 
 user.add							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_USER_ADD
-user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
 user.update							|			|2		|1	|2		|1		|1		|	|		|	|   |ADMIN_USER_UPDATE
 user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |ADMIN_USER_DELETE
 user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
@@ -390,13 +390,13 @@ xinternal.xaddbulkdownload			|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_D
 
 userrole.add						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 userrole.delete			    		|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_DELETE
-userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
 userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
 userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_UPDATE
 userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 
 permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
-permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
 
 
 ---------------------------------------------------------------------------------------------------

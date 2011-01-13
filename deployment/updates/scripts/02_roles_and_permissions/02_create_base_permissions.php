@@ -100,7 +100,8 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::AUDIT_TRAIL_BASE, 'Audit trail base', PermissionPeer::getPermissionNameFromPluginName(AuditPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::AUDIT_TRAIL_ADD, 'Audit trail add', PermissionPeer::getPermissionNameFromPluginName(AuditPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::SYSTEM_FILESYNC, 'Filesync actions', null),
-		
+	array (0, PermissionType::EXTERNAL,PermissionName::KMC_ACCESS, 'KMC access', null),	
+	
 	// system admin and admin console permissions
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_BASE, 'Base system admin permission', null),
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PUBLISHER_BASE, 'Base system admin permission', null),
@@ -124,6 +125,10 @@ $permissionsData = array (
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY, 'Base system admin permission', null),
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PERMISSIONS_MANAGE, 'Base system admin permission', null),
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_INTERNAL, 'System internal actions', null),
+	
+	// template partner
+	array (99, PermissionType::SPECIAL_FEATURE,PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION, 'PS2 permissions validation', null),
+	
 );
 
 //------------------------------------------------------
