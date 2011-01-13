@@ -325,7 +325,7 @@ $(window).load(function(){
 						case "Support" :
 							kmc.utils.openSupport(this);
 							return false;
-						case "change_partner" :
+						case "ChangePartner" :
 							kmc.utils.changePartner();
 							return false;
 						default :
@@ -385,7 +385,7 @@ $(window).load(function(){
 				url += '&' + i + '=' + fld;
 			}
 			// change http to https
-			url = url.replace("http", "https");
+			//url = url.replace("http", "https");
 			
 			var modal_width = 400;
 			var modal_height = 160;
