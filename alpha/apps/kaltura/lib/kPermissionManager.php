@@ -559,7 +559,7 @@ class kPermissionManager
 					break;
 									
 				case ks::INVALID_USER:
-					KalturaLog::err('Wrong user ['.self::$ksPartnerId.'] actual user ['.$ksObj->user.']');
+					KalturaLog::err('Wrong user ['.self::$ksUserId.'] actual user ['.$ksObj->user.']');
 					break;
 																		
 				case ks::EXPIRED:
