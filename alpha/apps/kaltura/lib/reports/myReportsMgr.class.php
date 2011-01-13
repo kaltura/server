@@ -675,6 +675,8 @@ class myReportsMgr
 		$timeOffset = round($timeOffsetSeconds / 3600); // convert to hours
 		$time_shift += $timeOffset;
 		
+		$time_shift *= -1; // Don't ask me why but it works that way
+		
 		date_default_timezone_set('UTC');
 				
 		// removing hours, minutes and seconds from the date  
