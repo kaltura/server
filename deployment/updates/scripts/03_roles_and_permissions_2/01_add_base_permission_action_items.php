@@ -113,7 +113,7 @@ function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionP
 			// add the permission item to all its defined permission objects
 			$c = new Criteria();
 			$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-			$c->addAnd(PermissionPeer::TYPE, PermissionType::API_ACCESS, Criteria::EQUAL);
+			$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
 			$permission = PermissionPeer::doSelectOne($c);
 			
 			if (!$permission) {
