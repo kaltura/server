@@ -152,6 +152,7 @@ fieldset{ border:0 none; position:relative; }
 	    #modal dt { width:110px; margin-bottom:5px; float:left; clear:both; font-weight:bold;}
 	    #modal dd { width:270px; margin-bottom:5px; overflow:hidden;}
 	  #modal_content input { width: auto; }
+	  #modal_content label { cursor: pointer; }
 
 	/* jw */
 	#modal input { background:#F7F7F7;}

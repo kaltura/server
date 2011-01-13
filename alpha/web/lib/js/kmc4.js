@@ -411,8 +411,8 @@ $(window).load(function(){
 			var modal_width = 300;
 			var modal_height = 180;
 			var size = 'width: ' + modal_width + 'px; height: ' + modal_height + 'px';
-			var title = 'Change Partner';
-			var content = 'Please choose partner:<br /><br />';
+			var title = 'Change Account';
+			var content = '<br />Please choose partner:<br /><br />';
 			var pid = 0;
 			
 			var partners_count = kmc.vars.allowed_partners.length;
@@ -421,9 +421,7 @@ $(window).load(function(){
 				content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" /> &nbsp;';
 				content += '<label for="cp' + pid + '">' + kmc.vars.allowed_partners[i].name + '</label><br />';
 			}
-			content += '<br /><input type="button" value=" Go " />';
-			
-			//window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value;
+			content += '<br /><input id="do_change_partner" type="button" value=" Go " />';
 			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
@@ -435,6 +433,12 @@ $(window).load(function(){
 				kmc.utils.closeModal();
 				return false;
 			});	
+			
+			$("#do_change_partner").click(function() {
+				var pid = $('input[name=pid]:radio').val();
+				window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + pid;
+			});
+			
 			return false;
 		}
 		
