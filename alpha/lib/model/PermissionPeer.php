@@ -214,7 +214,9 @@ class PermissionPeer extends BasePermissionPeer
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, explode(',', $permissionNames), Criteria::IN);
 		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		PermissionPeer::setUseCriteriaFilter(false);
 		$permissionObjects = PermissionPeer::doSelect($c);
+		PermissionPeer::setUseCriteriaFilter(true);
 		$permissionObjects = PermissionPeer::filterDependencies($permissionObjects, $partnerId);
 		$permissionNames = array();
 		foreach ($permissionObjects as $object)
