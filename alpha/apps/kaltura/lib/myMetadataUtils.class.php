@@ -130,8 +130,6 @@ class myMetadataUtils
 				$content = self::addVersionInfo($content, $version_info);
 			}
 			
-			kFileSyncUtils::file_put_contents($show_entry_data_key, $content, true);
-
 			//fixme $content = myFlvStreamer::modifiedByKeditor ( $content );
 
 			// total_duration is in seconds with 2 digits after the decimal point
@@ -141,6 +139,8 @@ class myMetadataUtils
 			$show_entry->setModifiedAt(time());		// update the modified_at date
 			$show_entry->save();
 
+			kFileSyncUtils::file_put_contents($show_entry_data_key, $content, true);
+			
 			$xml_content = kFileSyncUtils::file_get_contents( $show_entry_data_key ); // replaced__getFileContent
 			
 			$update_kshow = true;
