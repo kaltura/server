@@ -404,6 +404,13 @@ $(window).load(function(){
 			var modal_height = 180;
 			var title = 'Change Partner';
 			var content = 'Please choose partner:<br />';
+			
+			var partners_count = kmc.vars.allowed_partners.length;
+			for(var i; i <= partners_count; i++) {
+				content += kmc.vars.allowed_partners[i].name + '<br />';
+			}
+			content += '<input type="button" value=" Go " />';
+			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
@@ -1256,8 +1263,8 @@ $(function() {
 	*/
 	
 	$('#change_partner').click(function() {
-		console.log(kmc.vars.allowed_partners);
-		//kmc.utils.changePartner();
+		kmc.utils.changePartner();
+		return false;
 	});
 
 })
