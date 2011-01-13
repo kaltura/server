@@ -407,6 +407,7 @@ $(window).load(function(){
 		},
 		
 		changePartner : function() {
+			/*
 			var modal_width = 300;
 			var modal_height = 180;
 			var title = 'Change Partner';
@@ -421,7 +422,7 @@ $(window).load(function(){
 			content += '<input type="button" value=" Go " />';
 			
 			//window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value;
-			/*
+			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
