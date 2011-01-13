@@ -418,10 +418,17 @@ $(window).load(function(){
 			var partners_count = kmc.vars.allowed_partners.length;
 			for( var i=0; i < partners_count; i++ ) {
 				pid = kmc.vars.allowed_partners[i].id;
-				content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" /> &nbsp;';
-				content += '<label for="cp' + pid + '">' + kmc.vars.allowed_partners[i].name + '</label><br />';
+				if( kmc.vars.partner_id == pid ) {
+					var selected = ' checked="checked"';
+					var bolded = ' style="font-weight: bold"';
+				} else {
+					var selected = '';
+					var bolded = '';
+				}
+				content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" ' + selected + '/> &nbsp;';
+				content += '<label for="cp' + pid + '"' + bolded + '>' + kmc.vars.allowed_partners[i].name + '</label><br />';
 			}
-			content += '<br /><input id="do_change_partner" type="button" value=" Go " />';
+			content += '<br /><input id="do_change_partner" type="button" value=" Go " style="width: 100px;" />';
 			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
