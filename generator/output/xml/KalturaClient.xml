@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1294397907">
-  <!-- Generated on date 07/01/11 10:58:27 -->
+<xml apiVersion="3.1.1" generatedDate="1294848753">
+  <!-- Generated on date 12/01/11 16:12:33 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -413,6 +413,12 @@
       <const name="ERROR_SUBMITTING" value="7"/>
       <const name="ERROR_UPDATING" value="8"/>
       <const name="ERROR_DELETING" value="9"/>
+      <const name="REMOVED" value="10"/>
+    </enum>
+    <enum name="KalturaEntryDistributionSunStatus" enumType="int">
+      <const name="BEFORE_SUNRISE" value="1"/>
+      <const name="AFTER_SUNRISE" value="2"/>
+      <const name="AFTER_SUNSET" value="3"/>
     </enum>
     <enum name="KalturaEntryModerationStatus" enumType="int">
       <const name="PENDING_MODERATION" value="1"/>
@@ -449,6 +455,9 @@
       <const name="FLAVOR_ASSET" value="4"/>
       <const name="METADATA" value="5"/>
       <const name="METADATA_PROFILE" value="6"/>
+      <const name="GENERIC_DISTRIBUTION_ACTION" value="contentDistribution.GenericDistributionAction"/>
+      <const name="ENTRY_DISTRIBUTION" value="contentDistribution.EntryDistribution"/>
+      <const name="DISTRIBUTION_PROFILE" value="contentDistribution.DistributionProfile"/>
     </enum>
     <enum name="KalturaFileSyncOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -907,6 +916,7 @@
       <const name="FEATURE_LIVE_STREAM" value="FEATURE_LIVE_STREAM"/>
       <const name="FEATURE_VAST" value="FEATURE_VAST"/>
       <const name="FEATURE_SILVERLIGHT" value="FEATURE_SILVERLIGHT"/>
+      <const name="FEATURE_PS2_PERMISSIONS_VALIDATION" value="FEATURE_PS2_PERMISSIONS_VALIDATION"/>
       <const name="USER_SESSION_PERMISSION" value="BASE_USER_SESSION_PERMISSION"/>
       <const name="ALWAYS_ALLOWED_ACTIONS" value="ALWAYS_ALLOWED_ACTIONS"/>
       <const name="SYSTEM_BASE_ACTIONS" value="SYSTEM_BASE_ACTIONS"/>
@@ -938,7 +948,9 @@
       <const name="CONTENT_INGEST_BULK_UPLOAD" value="CONTENT_INGEST_BULK_UPLOAD"/>
       <const name="CONTENT_INGEST_FEED" value="CONTENT_INGEST_FEED"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_BASE" value="CONTENT_MANAGE_DISTRIBUTION_BASE"/>
-      <const name="CONTENT_MANAGE_DISTRIBUTION_MODIFY" value="CONTENT_MANAGE_DISTRIBUTION_MODIFY"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_WHERE" value="CONTENT_MANAGE_DISTRIBUTION_WHERE"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_SEND" value="CONTENT_MANAGE_DISTRIBUTION_SEND"/>
+      <const name="CONTENT_MANAGE_DISTRIBUTION_REMOVE" value="CONTENT_MANAGE_DISTRIBUTION_REMOVE"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY"/>
       <const name="CONTENT_MANAGE_VIRUS_SCAN" value="CONTENT_MANAGE_VIRUS_SCAN"/>
@@ -961,6 +973,7 @@
       <const name="CONTENT_MODERATE_BASE" value="CONTENT_MODERATE_BASE"/>
       <const name="CONTENT_MODERATE_METADATA" value="CONTENT_MODERATE_METADATA"/>
       <const name="CONTENT_MODERATE_CUSTOM_DATA" value="CONTENT_MODERATE_CUSTOM_DATA"/>
+      <const name="CONTENT_MODERATE_APPROVE_REJECT" value="CONTENT_MODERATE_APPROVE_REJECT"/>
       <const name="PLAYLIST_BASE" value="PLAYLIST_BASE"/>
       <const name="PLAYLIST_ADD" value="PLAYLIST_ADD"/>
       <const name="PLAYLIST_UPDATE" value="PLAYLIST_UPDATE"/>
@@ -1267,6 +1280,14 @@
     </enum>
     <enum name="KalturaThumbParamsOrderBy" enumType="string"/>
     <enum name="KalturaThumbParamsOutputOrderBy" enumType="string"/>
+    <enum name="KalturaTrackEntryEventType" enumType="int">
+      <const name="UPLOADED_FILE" value="1"/>
+      <const name="WEBCAM_COMPLETED" value="2"/>
+      <const name="IMPORT_STARTED" value="3"/>
+      <const name="ADD_ENTRY" value="4"/>
+      <const name="UPDATE_ENTRY" value="5"/>
+      <const name="DELETED_ENTRY" value="6"/>
+    </enum>
     <enum name="KalturaTubeMogulSyndicationFeedCategories" enumType="string">
       <const name="ARTS_AND_ANIMATION" value="Arts &amp;amp; Animation"/>
       <const name="COMEDY" value="Comedy"/>
@@ -1456,6 +1477,15 @@
     <class name="KalturaMetadataSearchItem" base="KalturaSearchOperator">
       <property name="metadataProfileId" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaContentDistributionSearchItem" base="KalturaSearchItem">
+      <property name="noDistributionProfiles" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="distributionProfileId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="distributionSunStatus" type="int" enumType="KalturaEntryDistributionSunStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryDistributionFlag" type="int" enumType="KalturaEntryDistributionFlag" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryDistributionStatus" type="int" enumType="KalturaEntryDistributionStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="hasEntryDistributionValidationErrors" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryDistributionValidationErrors" type="string" readOnly="0" insertOnly="0" description="Comma seperated validation error types&#13;"/>
+    </class>
     <class name="KalturaAuditTrailInfo" abstract="1"/>
     <class name="KalturaAuditTrailChangeItem">
       <property name="descriptor" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1535,7 +1565,6 @@
       <property name="statusUpdatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="deletedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="loginEnabled" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="isRootAdmin" type="bool" readOnly="1" insertOnly="0" description=""/>
       <property name="roleIds" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaDynamicEnum"/>
@@ -1552,7 +1581,7 @@
       <property name="status" type="string" enumType="KalturaEntryStatus" readOnly="1" insertOnly="0" description=""/>
       <property name="moderationStatus" type="int" enumType="KalturaEntryModerationStatus" readOnly="1" insertOnly="0" description="Entry moderation status&#10;"/>
       <property name="moderationCount" type="int" readOnly="1" insertOnly="0" description="Number of moderation requests waiting for this entry&#10;"/>
-      <property name="type" type="string" enumType="KalturaEntryType" readOnly="1" insertOnly="0" description="The type of the entry, this is auto filled by the derived entry object&#10;"/>
+      <property name="type" type="string" enumType="KalturaEntryType" readOnly="0" insertOnly="0" description="The type of the entry, this is auto filled by the derived entry object&#10;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Entry creation date as Unix timestamp (In seconds)&#10;"/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description="Entry update date as Unix timestamp (In seconds)&#10;"/>
       <property name="rank" type="float" readOnly="1" insertOnly="0" description="Calculated rank&#10;"/>
@@ -1808,9 +1837,9 @@
     <class name="KalturaMediaEntry" base="KalturaPlayableEntry">
       <property name="mediaType" type="int" enumType="KalturaMediaType" readOnly="0" insertOnly="1" description="The media type of the entry&#10;"/>
       <property name="conversionQuality" type="string" readOnly="0" insertOnly="1" description="Override the default conversion quality  &#10;"/>
-      <property name="sourceType" type="int" enumType="KalturaSourceType" readOnly="1" insertOnly="0" description="The source type of the entry &#13;"/>
-      <property name="searchProviderType" type="int" enumType="KalturaSearchProviderType" readOnly="1" insertOnly="0" description="The search provider type used to import this entry&#13;"/>
-      <property name="searchProviderId" type="string" readOnly="1" insertOnly="0" description="The ID of the media in the importing site&#13;"/>
+      <property name="sourceType" type="int" enumType="KalturaSourceType" readOnly="0" insertOnly="1" description="The source type of the entry &#13;"/>
+      <property name="searchProviderType" type="int" enumType="KalturaSearchProviderType" readOnly="0" insertOnly="1" description="The search provider type used to import this entry&#13;"/>
+      <property name="searchProviderId" type="string" readOnly="0" insertOnly="1" description="The ID of the media in the importing site&#13;"/>
       <property name="creditUserName" type="string" readOnly="0" insertOnly="0" description="The user name used for credits&#13;"/>
       <property name="creditUrl" type="string" readOnly="0" insertOnly="0" description="The URL for credits&#13;"/>
       <property name="mediaDate" type="int" readOnly="1" insertOnly="0" description="The media date extracted from EXIF data (For images) as Unix timestamp (In seconds)&#13;"/>
@@ -2489,6 +2518,7 @@
       <property name="jobTypeNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="jobSubTypeEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="jobSubTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="jobSubTypeNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="onStressDivertToIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="statusEqual" type="int" enumType="KalturaBatchJobStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2619,7 +2649,7 @@
     <class name="KalturaWorkerQueueFilter">
       <property name="schedulerId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="workerId" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="jobType" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="jobType" type="string" enumType="KalturaBatchJobType" readOnly="0" insertOnly="0" description=""/>
       <property name="filter" type="KalturaBatchJobFilter" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaFileExistsResponse">
@@ -2782,6 +2812,7 @@
       <property name="enableContentDistribution" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableAuditTrail" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="enableAnnotation" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="enablePs2PermissionValidation" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="defThumbOffset" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="adminLoginUsersQuota" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -2831,6 +2862,29 @@
     <class name="KalturaMediaInfoFilter" base="KalturaMediaInfoBaseFilter"/>
     <class name="KalturaMediaInfoListResponse">
       <property name="objects" type="array" arrayType="KalturaMediaInfo" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaTrackEntry">
+      <property name="id" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="trackEventType" type="int" enumType="KalturaTrackEntryEventType" readOnly="0" insertOnly="0" description=""/>
+      <property name="psVersion" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="context" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="hostName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="uid" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="changedProperties" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="paramStr1" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="paramStr2" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="paramStr3" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="ks" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIp" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaTrackEntryListResponse">
+      <property name="objects" type="array" arrayType="KalturaTrackEntry" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAuditTrailBaseFilter" abstract="1" base="KalturaFilter">
@@ -2955,6 +3009,8 @@
       <property name="requiredFlavorParamsIds" type="string" readOnly="0" insertOnly="0" description="Comma separated flavor params ids that required to be readt before submission&#13;"/>
       <property name="optionalThumbDimensions" type="array" arrayType="KalturaDistributionThumbDimensions" readOnly="0" insertOnly="0" description="Thumbnail dimensions that should be submitted if ready&#13;"/>
       <property name="requiredThumbDimensions" type="array" arrayType="KalturaDistributionThumbDimensions" readOnly="0" insertOnly="0" description="Thumbnail dimensions that required to be readt before submission&#13;"/>
+      <property name="sunriseDefaultOffset" type="int" readOnly="0" insertOnly="0" description="If entry distribution sunrise not specified that will be the default since entry creation time, in seconds&#13;"/>
+      <property name="sunsetDefaultOffset" type="int" readOnly="0" insertOnly="0" description="If entry distribution sunset not specified that will be the default since entry creation time, in seconds&#13;"/>
     </class>
     <class name="KalturaDistributionProfileBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2992,7 +3048,7 @@
       <property name="plays" type="int" readOnly="1" insertOnly="0" description="The plays as retrieved from the remote destination reports&#13;"/>
       <property name="views" type="int" readOnly="1" insertOnly="0" description="The views as retrieved from the remote destination reports&#13;"/>
       <property name="validationErrors" type="array" arrayType="KalturaDistributionValidationError" readOnly="1" insertOnly="0" description=""/>
-      <property name="errorType" type="int" enumType="KalturaDistributionErrorType" readOnly="1" insertOnly="0" description=""/>
+      <property name="errorType" type="int" enumType="KalturaBatchJobErrorTypes" readOnly="1" insertOnly="0" description=""/>
       <property name="errorNumber" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="errorDescription" type="string" readOnly="1" insertOnly="0" description=""/>
     </class>
@@ -5150,6 +5206,10 @@
         <param name="version" type="int" optional="1" default="-1" description="Desired version of the data&#13;"/>
         <result type="KalturaBaseEntry"/>
       </action>
+      <action name="getTracks" description="Get base entry by ID with no filters.&#10;">
+        <param name="entryId" type="string" optional="0" description="Entry id&#13;"/>
+        <result type="KalturaTrackEntryListResponse"/>
+      </action>
     </service>
     <service id="multicenters_filesyncimportbatch" name="filesyncImportBatch" description="">
       <action name="getExclusiveFileSyncImportJobs" description="batch getExclusiveFileSyncImportJob action allows to get a BatchJob of type FILESYNC_IMPORT &#10;">
@@ -6338,6 +6398,9 @@
         <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
         <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
         <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateSunStatus" description="updates entry distribution sun status in the search engine&#10;">
+        <result/>
       </action>
       <action name="createRequiredJobs" description="creates all required jobs according to entry distribution dirty flags &#10;">
         <result/>
