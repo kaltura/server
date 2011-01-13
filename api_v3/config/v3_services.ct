@@ -56,7 +56,7 @@ widget.list							|			|2		|1	|0		|0		|1		|	|		|	|   |WIDGET_ADMIN
 partner.register					|			|0		|0	|0		|0		|1		|	|		|	|   |
 partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ACCOUNT_UPDATE_SETTINGS
 partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
-partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,ANALYTICS_BASE
+partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,INTEGRATION_BASE,KMC_ACCESS
 partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|ACCOUNT_BASE
 
 adminuser.updatepassword			|			|0		|0	|0		|0		|1		|	|		|	|   |

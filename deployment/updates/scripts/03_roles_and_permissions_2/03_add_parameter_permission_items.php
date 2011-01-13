@@ -31,6 +31,8 @@ $permissionItems = array(
 	array('object' => 'KalturaLiveStreamAdminEntry', 'parameter' => kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, 'action' => ApiParameterPermissionItemAction::READ, 'permission' => PermissionName::CONTENT_MANAGE_BASE),
 	array('object' => 'KalturaLiveStreamAdminEntry', 'parameter' => kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, 'action' => ApiParameterPermissionItemAction::INSERT, 'permission' => PermissionName::CONTENT_MANAGE_BASE),
 	array('object' => 'KalturaLiveStreamAdminEntry', 'parameter' => kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, 'action' => ApiParameterPermissionItemAction::UPDATE, 'permission' => PermissionName::CONTENT_MANAGE_BASE),
+	array('object' => 'KalturaPartner', 'parameter' => 'secret', 'action' => ApiParameterPermissionItemAction::READ, 'permission' => PermissionName::INTEGRATION_BASE),
+	array('object' => 'KalturaPartner', 'parameter' => 'adminSecret', 'action' => ApiParameterPermissionItemAction::READ, 'permission' => PermissionName::INTEGRATION_BASE),
 );
 
 // add all to required permissions

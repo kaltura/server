@@ -156,12 +156,14 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @readonly
+	 * @requiresPermission read
 	 */
 	public $secret;
 	
 	/**
 	 * @var string
 	 * @readonly
+	 * @requiresPermission read
 	 */
 	public $adminSecret;
 	
