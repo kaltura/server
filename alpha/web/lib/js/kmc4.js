@@ -421,7 +421,7 @@ $(window).load(function(){
 			content += '<input type="button" value=" Go " />';
 			
 			//window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value;
-			
+			/*
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
@@ -432,6 +432,8 @@ $(window).load(function(){
 				kmc.utils.closeModal();
 				return false;
 			});	
+			*/
+			return false;
 		}
 		
 	}
