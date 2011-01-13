@@ -86,6 +86,7 @@ else
 			kmc_version		: "<?php echo $kmc_swf_version; ?>",
 			kmc_general_uiconf	: "<?php echo $kmc_general->getId(); ?>", 
 			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
+			allowed_partners : "<?php echo $allowedPartners; ?>",
 		  /* END new vars KMC4 */
 		
 			service_url		: "<?php echo $service_url; ?>",
@@ -167,26 +168,7 @@ else
      <div id="user_links">
       <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
-	      <?php if(count($allowedPartners) > 1) { ?>
-			<select id="change_partners" style="margin: -10px 10px 0 0; background: #000; color: #fff;">
-			<?php foreach($allowedPartners as $p){ ?>
-	      		<option value="<?php echo $p['id']?>"<?php if($p['id'] == $partner_id) { 
-	      			echo ' selected="selected"'; } ?>><?php echo $p['name']; ?></option>
-	      	<?php } ?>
-	      	</select>
-	      <?php /*
-	      <span id="change_partner"><?php echo $screen_name ?> V      
-	      <div id="partners_list">
-	      	<ul>
-	      		<?php foreach($allowedPartners as $p){ ?>
-	      		<li<?php if($p['id'] == $partner_id) { echo ' style="font-weight: bold"'; } ?>>
-	      		<a href="/index.php/kmc/extloginbyks/ks/<?php echo $ks; ?>/partner_id/<?php echo $partner_id; ?>"><?php echo $p['name']; ?></a></li>
-	      		<?php } ?>
-	      	</ul>
-	      </div>
-	      </span> &nbsp;&nbsp;|&nbsp;&nbsp;
-	      */ ?> 	      	               
-	      <?php  } ?>   
+	  <a id="change_partner" href="#">Change Partner</a> &nbsp; | &nbsp; 
       <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
 	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
       <?php } ?>
