@@ -411,17 +411,14 @@ $(window).load(function(){
 			var modal_width = 300;
 			var modal_height = 180;
 			var title = 'Change Partner';
-			var content = 'Please choose partner:<br />';
+			var content = 'Please choose partner:<br /><br />';
 			
 			var partners_count = kmc.vars.allowed_partners.length;
-			console.log(kmc.vars.allowed_partners);
-			
 			for( var i=0; i < partners_count; i++ ) {
-				console.log(kmc.vars.allowed_partners[i].name);
-				//content += kmc.vars.allowed_partners[i].name + '<br />';
+				content += '<input type="radio" name="pid" value="' + kmc.vars.allowed_partners[i].id + '" /> &nbsp;';
+				content += kmc.vars.allowed_partners[i].name + '<br />';
 			}
-			content += '<input type="button" value=" Go " />';
-			/*
+			content += '<br /><input type="button" value=" Go " />';
 			
 			//window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value;
 			
@@ -435,7 +432,6 @@ $(window).load(function(){
 				kmc.utils.closeModal();
 				return false;
 			});	
-			*/
 			return false;
 		}
 		
