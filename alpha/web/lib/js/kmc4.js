@@ -341,6 +341,7 @@ $(window).load(function(){
 		},
 		
 		setTab : function(module){
+			console.log("a#" + module);
 			$("#kmcHeader ul li a").removeClass("active");
 			$("a#" + module).addClass("active");
 		},		
@@ -380,7 +381,8 @@ $(window).load(function(){
 			var url = kmc.vars.service_url + "/secure_form.php?action=" + action;
 			// pass in the fields
 			for(var i in fields) {
-				url += '&' + i + '=' + fields[i];
+				var fld = (fields[i]) ? fields[i] : '';
+				url += '&' + i + '=' + fld;
 			}
 			// change http to https
 			//url = url.replace("http", "https");
