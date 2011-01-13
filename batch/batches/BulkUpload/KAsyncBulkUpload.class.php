@@ -561,7 +561,6 @@ class KAsyncBulkUpload extends KBatchBase
 			$mediaEntry->name = $bulkUploadResult->title;
 			$mediaEntry->description = $bulkUploadResult->description;
 			$mediaEntry->tags = $bulkUploadResult->tags;
-			$mediaEntry->partnerId = $job->partnerId;
 			$mediaEntry->userId = $bulkUploadJobData->userId;
 			$mediaEntry->conversionQuality = $bulkUploadJobData->conversionProfileId;
 			
