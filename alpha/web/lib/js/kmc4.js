@@ -442,7 +442,7 @@ $(window).load(function(){
 			});	
 			
 			$("#do_change_partner").click(function() {
-				var pid = $('input[name=pid]:radio').value;
+				var pid = $('input[name=pid]:radio:checked').val();
 				var url = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + pid;
 				console.log(url);
 				//window.location.href = url;
