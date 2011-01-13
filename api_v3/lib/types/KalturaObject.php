@@ -20,6 +20,14 @@ class KalturaObject
 	{
 		return array();
 	}
+	
+	private function getDeclaringClassName($propertyName)
+	{
+		$reflection = new ReflectionProperty(get_class($this), $propertyName);
+		$declaringClass = $reflection->getDeclaringClass();
+		$className = $declaringClass->getName();
+		return $className;
+	}
 		
 
 	public function fromObject ( $source_object  )
@@ -40,7 +48,7 @@ class KalturaObject
 				continue;
 				
 			// ignore property if it requires a read permission which the current user does not have
-			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted(get_class($this), $this_prop))
+			if ($properties[$this_prop]->requiresReadPermission() && !kPermissionManager::getReadPermitted($this->getDeclaringClassName($this_prop), $this_prop))
 				continue;
 				
             $getter_callback = array ( $source_object ,"get{$object_prop}"  );
@@ -185,7 +193,7 @@ class KalturaObject
 			// property requires insert permissions, verify that the current user has it
 			if ($property->requiresInsertPermission())
 			{
-				if (!kPermissionManager::getInsertPermitted(get_class($this), $propertyName)) {
+				if (!kPermissionManager::getInsertPermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 				}
 			}
@@ -213,7 +221,7 @@ class KalturaObject
 			// property requires update permissions, verify that the current user has it
 			if ($property->requiresUpdatePermission())
 			{
-				if (!kPermissionManager::getUpdatePermitted(get_class($this), $propertyName)) {
+				if (!kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 				}
 			}
