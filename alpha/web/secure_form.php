@@ -268,6 +268,7 @@ HTML;
 			$user->firstName = $_POST['fname'];
 			$user->lastName = $_POST['lname'];
 			$results = $client->user->update($this->userId, $user);
+			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
 			// Show success message
 			$this->showSuccess();
