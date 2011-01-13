@@ -416,8 +416,8 @@ $(window).load(function(){
 			var partners_count = kmc.vars.allowed_partners.length;
 			console.log(kmc.vars.allowed_partners);
 			
-			for( var i=0; i <= partners_count; i++ ) {
-				console.log(kmc.vars.allowed_partners[i]);
+			for( var i=0; i < partners_count; i++ ) {
+				console.log(kmc.vars.allowed_partners[i].name);
 				//content += kmc.vars.allowed_partners[i].name + '<br />';
 			}
 			content += '<input type="button" value=" Go " />';
