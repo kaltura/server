@@ -168,7 +168,7 @@ else
      <div id="user_links">
       <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
-	  <a id="change_partner" href="#">Change Partner</a> &nbsp; | &nbsp; 
+	  <?php if( $allowedPartnersCount > 1) { ?><a id="change_partner" href="#">Change Partner</a> &nbsp; | &nbsp;<?php } ?> 
       <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
 	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
       <?php } ?>
