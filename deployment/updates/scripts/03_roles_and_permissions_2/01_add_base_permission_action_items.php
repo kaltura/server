@@ -84,12 +84,11 @@ function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionP
 		$c = new Criteria();
 		$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceName, Criteria::EQUAL);
 		$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName, Criteria::EQUAL);
-		$existingItem = PermissionItemPeer::doSelectOne($c);
-		if ($existingItem) {
-			$msg = '***** NOTICE - Permission item for ['.$serviceActionName.'] already exists with id ['.$existingItem->getId().']';
+		$permissionItem = PermissionItemPeer::doSelectOne($c);
+		if ($permissionItem) {
+			$msg = '***** NOTICE - Permission item for ['.$serviceActionName.'] already exists with id ['.$permissionItem->getId().']';
 			KalturaLog::alert($msg);
 			echo $msg.PHP_EOL;
-			$permissionItem = $existingItem;
 		}
 		else {
 			// create a new api action permission item and save it
