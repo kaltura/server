@@ -410,6 +410,7 @@ $(window).load(function(){
 			
 			var modal_width = 300;
 			var modal_height = 180;
+			var size = 'width: ' + modal_width + 'px; height: ' + modal_height + 'px';
 			var title = 'Change Partner';
 			var content = 'Please choose partner:<br /><br />';
 			var pid = 0;
@@ -428,7 +429,7 @@ $(window).load(function(){
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-							  '<b>' + title + '</b></div> <div id="modal_content" style="width: '+modal_width+'px; height: '+modal_height+'px'">' + content + '</div></div>';
+							  '<b>' + title + '</b></div> <div id="modal_content" style="' + size + '">' + content + '</div></div>';
 			$("#mbContent").addClass("new");
 			$("#close").click(function() {
 				kmc.utils.closeModal();
