@@ -173,6 +173,7 @@ else
 	      		<option value="<?php echo $p['id']?>"<?php if($p['id'] == $partner_id) { 
 	      			echo ' selected="selected"'; } ?>><?php echo $p['name']; ?></option>
 	      	<?php } ?>
+	      	<option>Partner 2</option><option>Partner 3</option>
 	      	</select>
 	      <?php /*
 	      <span id="change_partner"><?php echo $screen_name ?> V      
