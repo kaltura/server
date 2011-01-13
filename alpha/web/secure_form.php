@@ -20,7 +20,7 @@ class secForm {
 	var $curAction;
 	
 	function secForm() {
-		echo '<pre>'; echo base64_decode($_COOKIE['kmcks']); exit();
+		echo '<pre>'; print_r( explode(";", base64_decode($_COOKIE['kmcks'])) ); exit();
 		// Get data from cookies
 		$this->email = $_COOKIE['email'];
 		$this->partnerId = $_COOKIE['pid'];
