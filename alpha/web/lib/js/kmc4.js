@@ -341,7 +341,6 @@ $(window).load(function(){
 		},
 		
 		setTab : function(module){
-			console.log("a#" + module);
 			$("#kmcHeader ul li a").removeClass("active");
 			$("a#" + module).addClass("active");
 		},		
@@ -385,7 +384,7 @@ $(window).load(function(){
 				url += '&' + i + '=' + fld;
 			}
 			// change http to https
-			//url = url.replace("http", "https");
+			url = url.replace("http", "https");
 			
 			var modal_width = 400;
 			var modal_height = 160;
