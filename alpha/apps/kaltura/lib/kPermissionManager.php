@@ -390,11 +390,11 @@ class kPermissionManager
 		self::$useCache = $useCache ? true : false;
 
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
-		self::$requestedPartnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : null;
-		self::$ksPartnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : null;
-		self::$ksUserId = kCurrentContext::$ks_uid ? kCurrentContext::$ks_uid : null;
+		self::$requestedPartnerId = !is_null(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
+		self::$ksPartnerId = !is_null(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
+		self::$ksUserId = !is_null(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
-		self::$adminSession = kCurrentContext::$is_admin_session ? kCurrentContext::$is_admin_session : false;
+		self::$adminSession = !is_null(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 			
 		// clear instance pools
 		UserRolePeer::clearInstancePool();
