@@ -574,7 +574,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
+			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
 				continue;
 		
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
@@ -592,19 +592,20 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
-					continue;
-					
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
-				
-				if(count($validationErrors))
-					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-					
-				self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+			
+				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+				{
+					if(count($validationErrors))
+						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+	
+					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+				}
 				continue;
 			}
 		
@@ -862,10 +863,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
-				continue;
-				
-			if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() != EntryDistributionStatus::PENDING)
 				continue;
 				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
@@ -876,11 +874,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 			$entryDistribution->setValidationErrorsArray($validationErrors);
 			$entryDistribution->save();
+			continue;
 			
-			if(count($validationErrors))
-				KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-				
-			self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+			{
+				if(count($validationErrors))
+					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+
+				if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+					self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+			}
 		}
 		
 		return true;
