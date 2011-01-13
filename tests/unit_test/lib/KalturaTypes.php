@@ -2043,6 +2043,20 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	 */
 	public $fetchReportAction;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredEntryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths = null;
+
 
 }
 
