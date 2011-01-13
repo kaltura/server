@@ -428,7 +428,7 @@ $(window).load(function(){
 				content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" ' + selected + '/> &nbsp;';
 				content += '<label for="cp' + pid + '"' + bolded + '>' + kmc.vars.allowed_partners[i].name + '</label><br />';
 			}
-			content += '<br /><input id="do_change_partner" type="button" value=" Go " style="width: 100px;" />';
+			content += '<br /><div class="center"><input id="do_change_partner" type="button" value=" Go " style="width: 100px;" /></div>';
 			
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
