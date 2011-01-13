@@ -564,15 +564,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if(!$previousXml && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
+			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
 				continue;
-				
-			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
-			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
-				continue;
-			}
-				
+		
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
@@ -580,7 +574,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
-
+			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
 			{
@@ -588,64 +582,89 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				continue;
 			}
 			
-			$updateRequiredMetadataXPaths = $distributionProvider->getUpdateRequiredMetadataXPaths($distributionProfileId);
-			$updateRequired = false;
-			
-			foreach($updateRequiredMetadataXPaths as $updateRequiredMetadataXPath)
+			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
-				KalturaLog::debug("Query xPath [$updateRequiredMetadataXPath] on metadata xml");
-				
-				$xPath = new DOMXpath($xml);
-				$newElements = $xPath->query($updateRequiredMetadataXPath);
-				
-				$oldElements = null;
-				if($previousXml)
-				{
-					$xPath = new DOMXpath($previousXml);
-					$oldElements = $xPath->query($updateRequiredMetadataXPath);
-				}
-				
-				if(is_null($newElements) && is_null($oldElements))
+				if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					continue;
 					
-				if(is_null($newElements) || is_null($oldElements))
-				{
-					$updateRequired = true;
-				}
-				elseif($newElements->length == $oldElements->length)
-				{
-					for($index = 0; $index < $newElements->length; $index++)
-					{
-						$newValue = $newElements->item($index)->textContent;
-						$oldValue = $oldElements->item($index)->textContent;
-						
-						if($newValue != $oldValue)
-						{
-							$updateRequired = true;
-							break;
-						}
-					}
-				}
-			
-				if($updateRequired)
-					break;
-			}
-			
-			if(!$updateRequired)
-			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] update not required");
-				continue;	
-			}
-			
-			if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
-			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
-				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
+				
+				if(count($validationErrors))
+					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+					
+				self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 				continue;
 			}
-			
-			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		
+			if($entryDistribution->getStatus() == EntryDistributionStatus::READY)
+			{
+				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+					continue;
+				}
+
+				$updateRequiredMetadataXPaths = $distributionProvider->getUpdateRequiredMetadataXPaths($distributionProfileId);
+				$updateRequired = false;
+				
+				foreach($updateRequiredMetadataXPaths as $updateRequiredMetadataXPath)
+				{
+					KalturaLog::debug("Query xPath [$updateRequiredMetadataXPath] on metadata xml");
+					
+					$xPath = new DOMXpath($xml);
+					$newElements = $xPath->query($updateRequiredMetadataXPath);
+					
+					$oldElements = null;
+					if($previousXml)
+					{
+						$xPath = new DOMXpath($previousXml);
+						$oldElements = $xPath->query($updateRequiredMetadataXPath);
+					}
+					
+					if(is_null($newElements) && is_null($oldElements))
+						continue;
+						
+					if(is_null($newElements) XOR is_null($oldElements))
+					{
+						$updateRequired = true;
+					}
+					elseif($newElements->length == $oldElements->length)
+					{
+						for($index = 0; $index < $newElements->length; $index++)
+						{
+							$newValue = $newElements->item($index)->textContent;
+							$oldValue = $oldElements->item($index)->textContent;
+							
+							if($newValue != $oldValue)
+							{
+								$updateRequired = true;
+								break;
+							}
+						}
+					}
+				
+					if($updateRequired)
+						break;
+				}
+				
+				if(!$updateRequired)
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] update not required");
+					continue;	
+				}
+				
+				if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+					$entryDistribution->save();
+					continue;
+				}
+				
+				self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+			}
 		}
 		
 		return true;
