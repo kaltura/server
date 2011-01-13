@@ -36,7 +36,6 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_WHERE, 'Where to distribute', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_SEND, 'Distribution submit', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_REMOVE, 'Distribution remove', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
-	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE, 'Distribution profile base', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY, 'Distribution profile manage', PermissionPeer::getPermissionNameFromPluginName(ContentDistributionPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_VIRUS_SCAN, 'Virus scan actions', PermissionPeer::getPermissionNameFromPluginName(VirusScanPlugin::getPluginName())),
 	array (0, PermissionType::API_ACCESS,PermissionName::CONTENT_MANAGE_DOWNLOAD, 'Content download', null),
