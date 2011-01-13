@@ -668,12 +668,12 @@ class myReportsMgr
 		$time_shift = round($input_filter->timeZoneOffset / 60);
 		
 		// add time zone offset to the time shift
-		$dateTimeZoneServer = new DateTimeZone(date_default_timezone_get());
+		$dateTimeZoneServer = new DateTimeZone(kConf::get('date_default_timezone'));
 		$dateTimeZoneUTC = new DateTimeZone("UTC");
-		$dateTimeServer = new DateTime("now", $dateTimeZoneServer);
-		$timeOffsetSeconds = $dateTimeZoneUTC->getOffset($dateTimeServer);
-		$timeOffset = round($timeOffsetSeconds / 360); // convert to hours
-		$time_shift += $timeOffset;
+		$dateTimeUTC = new DateTime("now", $dateTimeZoneUTC);
+		$timeOffsetSeconds = $dateTimeZoneServer->getOffset($dateTimeUTC);
+		$timeOffset = round($timeOffsetSeconds / 3600); // convert to hours
+		$time_shift -= $timeOffset;
 		
 		date_default_timezone_set('UTC');
 				
