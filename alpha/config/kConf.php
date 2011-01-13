@@ -183,7 +183,7 @@ class kConf extends kConfLocal
 					'getdataentryaction',
 					'getentryaction',
 					'getkshowaction',
-					'getallentiresaction',
+					'getallentriesaction',
 					'updatedataentryaction',
 					'getentriesaction',
 					'listmyentiresaction',
