@@ -197,7 +197,7 @@ class kConf extends kConfLocal
 					'collectstatsaction',
 					'reporterroraction',
 					'addentryaction',
-					'getuiConfaction',
+					'getuiconfaction',
 					'uploadjpegaction',
 					'getentryaction',
 					'getkshowaction',
