@@ -168,7 +168,7 @@ else
       <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
 	      <?php if(count($allowedPartners) > 0) { ?>
-			<select id="change_partners" style="margin-top: -6px; background: #000; color: #fff;">
+			<select id="change_partners" style="margin: -8px 10px 0 0; background: #000; color: #fff;">
 			<?php foreach($allowedPartners as $p){ ?>
 	      		<option value="<?php echo $p['id']?>"<?php if($p['id'] == $partner_id) { 
 	      			echo ' selected="selected"'; } ?>><?php echo $p['name']; ?></option>
