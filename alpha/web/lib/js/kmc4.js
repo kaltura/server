@@ -359,9 +359,7 @@ $(window).load(function(){
 			$("#server_wrap").show();
 		},
 		
-		secureIframe : function(action, fields) {
-			kalturaCloseModalBox();
-			
+		secureIframe : function(action, fields) {			
 			// Set title
 			var title;
 			switch(action) {
@@ -389,6 +387,7 @@ $(window).load(function(){
 			var modal_width = 400;
 			var modal_height = 160;
 			$("#flash_wrap").css("visibility","hidden");
+			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
@@ -398,6 +397,23 @@ $(window).load(function(){
 				kmc.utils.closeModal();
 				return false;
 			});
+		},
+		
+		changePartner : function() {
+			var modal_width = 300;
+			var modal_height = 180;
+			var title = 'Change Partner';
+			var content = 'Please choose partner:<br />';
+			$("#flash_wrap").css("visibility","hidden");
+			kalturaCloseModalBox();
+			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
+			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
+							  '<b>' + title + '</b></div> <div id="modal_content">' + content + '</div></div>';
+			$("#mbContent").addClass("new");
+			$("#close").click(function() {
+				kmc.utils.closeModal();
+				return false;
+			});			
 		}
 		
 	}
@@ -1233,22 +1249,17 @@ function playerAdded() { // called from appstudio
 $(function() {
 	kmc.mediator.loadKmc();
 	
+	/*
 	$('#change_partners').change(function(e) {
 		window.location.href = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + this.value; 
 	});
-	
-	/*
-	$('#change_partner').click(function() {
-		$('#partners_list').slideDown('fast').show();
-
-		$('#change_partner').hover(function() {  
-        }, function(){  
-        	$('#partners_list').slideUp('slow');   
-        });  		
-	
-		return false;
-	});
 	*/
+	
+	$('#change_partner').click(function() {
+		console.log(kmc.vars.allowed_partners);
+		//kmc.utils.changePartner();
+	});
+
 })
 
 kmc.vars.kmc_swf = {
