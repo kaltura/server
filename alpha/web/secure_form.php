@@ -99,8 +99,9 @@ class secForm {
 	
 	function errorDiv() {
 		if( isset($this->error) && !empty($this->error) ) { 
+			return '<pre>' . print_r($_COOKIE);
 			//return '<div class="error">' . $this->error . '</div><br />';
-			return '<script>alert(' . json_encode($this->error) . ');</script>'; 
+			//return '<script>alert(' . json_encode($this->error) . ');</script>'; 
 		} else {
 			return '';
 		}		
