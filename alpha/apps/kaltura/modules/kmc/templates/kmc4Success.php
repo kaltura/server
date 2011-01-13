@@ -86,7 +86,7 @@ else
 			kmc_version		: "<?php echo $kmc_swf_version; ?>",
 			kmc_general_uiconf	: "<?php echo $kmc_general->getId(); ?>", 
 			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
-			allowed_partners 		: <?php echo $allowedPartners; ?>,
+			allowed_partners 		: <?php echo json_encode($allowedPartners); ?>,
 		  /* END new vars KMC4 */
 		
 			service_url		: "<?php echo $service_url; ?>",
@@ -142,33 +142,24 @@ else
 	 <div id="logo"></div>
      <ul id="hTabs">
      	<li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> Loading...</li>
-<?php /* Old HTML Tabs
-      <li><a id="dashboard" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#dashboard|''"><span>Dashboard</span></a></li>
-      <li><a id="content" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#content|Manage"><span>Content</span></a></li>
-     <?php if ( kConf::get ( "kmc_display_customize_tab" ) ) { ?>
-	  <li><a id="studio" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#appstudio|''"><span>Studio</span></a></li>
-	 <?php } ?>
-	 <?php if ( kConf::get ( "kmc_display_account_tab" ) ) { ?>
-      <li><a id="account" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#settings|Account Settings"><span>Settings</span></a></li>
-	 <?php } ?>
-	 <?php if ( kConf::get ( "kmc_display_server_tab" ) ) { ?>
-      <li><a id="server" href="<?php echo $service_url; ?>/api_v3/system/batchwatch.php" target="_server"><span>Server</span></a></li>
-	 <?php } ?>
-	 <?php if ( kConf::get ( "kmc_display_developer_tab" ) ) { ?>
-      <li><a id="developer" href="<?php echo $service_url; ?>/api_v3/testme/index.php"><span>Developer</span></a></li>
-	 <?php } ?>
-	 <?php if ($allow_reports) { ?>
-	 <li><a id="analytics" href="<?php echo $service_url; ?>/index.php/kmc/kmc2#reports|Bandwidth Usage Reports"><span>Analytics</span></a></li>
-	 <li><a id="admin" href="http://kaldev.kaltura.com/index.php/kmc/kmc2#admin|usersTab"><span>Administration</span></a></li>
-	 <?php } ?>
-<!--	 <li><a id="Advertising" href="#"><span>Advertising</span></a></li>-->
-*/ ?>
 	 </ul>
-<?php //echo '<pre>'; print_r($allowedPartners); exit(); ?>
+<?php 
+if( count($allowedPartners) > 1 ) { 
+	foreach( $allowedPartners => $p ) {
+		if($p['id'] == $partner_id) {
+			$accountName = $p['name'];
+			break;
+		}
+	}
+	$currentAccount = '( Account: '.  $accountName .' )';
+} else {
+	$currentAccount = ' ';
+}
+?>
      <div id="user_links">
-      <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
+      <span>Hi <?php echo $screen_name ?> &nbsp;&nbsp;<?php echo $currentAccount; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
 	      <?php if (!$templatePartnerId) { ?>
-	  <?php if( $allowedPartnersCount > 1) { ?><a id="change_partner" href="#">Change Partner</a> &nbsp; | &nbsp;<?php } ?> 
+	  <?php if( count($allowedPartners) > 1) { ?><a id="change_partner" href="#">Change Account</a> &nbsp; | &nbsp;<?php } ?> 
       <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
 	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
       <?php } ?>
