@@ -305,9 +305,15 @@ body#monitoring-xymon {}
 	#filters ul li { list-style: none inside none; margin-left:0px;}
 	#filters button { margin: 20px auto 5px; display:block;}
 
+	iframe {border: 0px;}
+	
 	#index-testme { }
 	 #index-testme #wrapper { padding:0; margin-top:-1px;}
-	 #index-testme #sub-header { display:none;}
+	 ;#index-testme #sub-header { display:none;}
+
+	#index-testme-doc { }
+	 #index-testme-doc #wrapper { padding:0; margin-top:-1px;}
+	 ;#index-testme-doc #sub-header { display:none;}	
 
 	table.ui-datepicker-calendar { min-width:100%;}
 	img.ui-datepicker-trigger { cursor:pointer;}
@@ -401,6 +407,7 @@ body#monitoring-enable-disable table table, body#monitoring-enable-disable table
  body#monitoring-enable-disable select { width:auto !important; height:auto !important;}
  body#monitoring-enable-disable input[type="checkbox"] { margin:0;}
 
-body#index-testme #wrapper { display:block;}
+body#index-testme #wrapper { display:block;} 
+body#index-testme-doc #wrapper { display:block;}
 
 table table td.commandLines { width }
