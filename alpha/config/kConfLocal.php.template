@@ -109,6 +109,7 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "FileSyncPlugin"; // Should be enabled only on servers that run admin console
 		// self::$map['default_plugins'][] = "SystemPartnerPlugin"; // Should be enabled only on servers that run admin console
 		// self::$map['default_plugins'][] = "AdminConsolePlugin"; // Should be enabled only on servers that run admin console
+		// self::$map['default_plugins'][] = "KalturaInternalToolsPlugin"; // Should be enabled only on servers that run admin console
 		// self::$map['default_plugins'][] = "MultiCentersPlugin"; // Should be enabled on multiple data centers
 		// self::$map['default_plugins'][] = "AuditPlugin"; // Should be enabled only if audit trail support required
 		// self::$map['default_plugins'][] = "VirusScanPlugin";
