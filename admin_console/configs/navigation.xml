@@ -102,5 +102,17 @@
 		<controller>index</controller>
 		<action>testme</action>
 
+		<pages>
+			<testme>
+				<label>Test Console</label>
+				<controller>index</controller>
+				<action>testme</action>
+			</testme>
+			<testme-doc>
+				<label>API Documentation</label>
+				<controller>index</controller>
+				<action>testme-doc</action>
+			</testme-doc>
+		</pages>
 	</developer>
 </configdata>
