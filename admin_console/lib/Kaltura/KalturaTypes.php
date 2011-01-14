@@ -2045,7 +2045,7 @@ class KalturaTrackEntry extends KalturaObjectBase
 	 *
 	 * @var string
 	 */
-	public $uid = null;
+	public $userId = null;
 
 	/**
 	 * 
@@ -7445,6 +7445,67 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+class KalturaInternalToolsSession extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partner_id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $valid_until = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partner_pattern = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaSessionType
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $error = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rand = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $user = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $privileges = null;
 
 
 }
