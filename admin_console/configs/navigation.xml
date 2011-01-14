@@ -113,6 +113,11 @@
 				<controller>index</controller>
 				<action>testme-doc</action>
 			</testme-doc>
+			<apc>
+				<label>APC</label>
+				<controller>index</controller>
+				<action>apc</action>
+			</apc>
 		</pages>
 	</developer>
 </configdata>
