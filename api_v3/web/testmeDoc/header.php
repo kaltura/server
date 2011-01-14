@@ -1,12 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Kaltura - TestMe Console Documentation</title>
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<script type="text/javascript" src="../testme/js/jquery-1.3.1.min.js"></script>
-	<script type="text/javascript" src="../testme/js/jquery.scrollTo-min.js"></script>
-	<!-- <script type="text/javascript" src="js/main.js"></script> -->
-	<script type="text/javascript">
+<title>Kaltura - TestMe Console Documentation</title>
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+<script type="text/javascript" src="../testme/js/jquery-1.3.1.min.js"></script>
+<script type="text/javascript" src="../testme/js/jquery.scrollTo-min.js"></script>
+<!-- <script type="text/javascript" src="js/main.js"></script> -->
+<script type="text/javascript">
 		$(function() {
 			$(window).resize(function(){
 				$(".left").css("height", $("body").outerHeight() - $("#kmcSubMenu").outerHeight({ "margin": true }) - 10);
@@ -30,12 +30,21 @@
 		<?php } ?>
 	</script>
 </head>
-<body>
-	<ul id="kmcSubMenu">
- 	<li>
-     <a href="../testme/index.php">Test Console</a>
-    </li>
-    <li class="active">
-     <a href="#">API Documentation</a>
-    </li>
-   </ul>
+<?php
+
+if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
+{
+	?>
+		<body class="body-bg">
+		<ul id="kmcSubMenu">
+			<li><a href="../testme/index.php">Test Console</a></li>
+			<li class="active"><a href="#">API Documentation</a></li>
+		</ul>
+	<?php
+}
+else 
+{
+	?>
+		<body>
+	<?php
+}

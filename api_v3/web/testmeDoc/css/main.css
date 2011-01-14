@@ -13,7 +13,8 @@
 
 body, html { margin:0; padding:0; height: 100%; overflow: hidden; }
 pre { background-color:#F9F9F9; border:1px dashed #4F81BD; color:black; line-height:1.1em; padding:1em; }
-body { margin: 6px 15px; background: #f7f7f7 url(../images/bg.png) repeat-x; font: normal 12px arial,sans-serif; }
+body { margin: 6px 15px; background: #f7f7f7; font: normal 12px arial,sans-serif; }
+.body-bg { background: url(../images/bg.png) repeat-x; }
 body div#wrap {float:left; width:100%;}
 .left { float:left; width: 280px; overflow-y: scroll; overflow-x:hidden; height: 100%; }
 .left .left-content { padding: 10px; }
