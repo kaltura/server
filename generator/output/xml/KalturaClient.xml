@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1294848753">
-  <!-- Generated on date 12/01/11 16:12:33 -->
+<xml apiVersion="3.1.1" generatedDate="1294937441">
+  <!-- Generated on date 13/01/11 16:50:41 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -922,6 +922,7 @@
       <const name="SYSTEM_BASE_ACTIONS" value="SYSTEM_BASE_ACTIONS"/>
       <const name="SYSTEM_FILESYNC" value="SYSTEM_FILESYNC"/>
       <const name="SYSTEM_INTERNAL" value="SYSTEM_INTERNAL"/>
+      <const name="KMC_ACCESS" value="KMC_ACCESS"/>
       <const name="SYSTEM_ADMIN_BASE" value="SYSTEM_ADMIN_BASE"/>
       <const name="SYSTEM_ADMIN_PUBLISHER_BASE" value="SYSTEM_ADMIN_PUBLISHER_BASE"/>
       <const name="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS" value="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS"/>
@@ -951,7 +952,6 @@
       <const name="CONTENT_MANAGE_DISTRIBUTION_WHERE" value="CONTENT_MANAGE_DISTRIBUTION_WHERE"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_SEND" value="CONTENT_MANAGE_DISTRIBUTION_SEND"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_REMOVE" value="CONTENT_MANAGE_DISTRIBUTION_REMOVE"/>
-      <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_BASE"/>
       <const name="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY" value="CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY"/>
       <const name="CONTENT_MANAGE_VIRUS_SCAN" value="CONTENT_MANAGE_VIRUS_SCAN"/>
       <const name="CONTENT_MANAGE_MIX" value="CONTENT_MANAGE_MIX"/>
@@ -2872,7 +2872,7 @@
       <property name="partnerId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="hostName" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="uid" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userId" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="changedProperties" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="paramStr1" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="paramStr2" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2886,6 +2886,16 @@
     <class name="KalturaTrackEntryListResponse">
       <property name="objects" type="array" arrayType="KalturaTrackEntry" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaInternalToolsSession">
+      <property name="partner_id" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="valid_until" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partner_pattern" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="type" type="int" enumType="KalturaSessionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="error" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="rand" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="user" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="privileges" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAuditTrailBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -5209,6 +5219,20 @@
       <action name="getTracks" description="Get base entry by ID with no filters.&#10;">
         <param name="entryId" type="string" optional="0" description="Entry id&#13;"/>
         <result type="KalturaTrackEntryListResponse"/>
+      </action>
+    </service>
+    <service id="kalturainternaltools_kalturainternaltools" name="KalturaInternalTools" description="Internal Tools Service&#10;"/>
+    <service id="kalturainternaltools_kalturainternaltoolssystemhelper" name="kalturaInternalToolsSystemHelper" description="Internal Tools Service&#10;">
+      <action name="fromSecureString" description="KS from Secure String&#10;">
+        <param name="str" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaInternalToolsSession"/>
+      </action>
+      <action name="iptocountry" description="from ip to country&#10;">
+        <param name="remote_addr" type="string" optional="0" description="&#13;"/>
+        <result type="string"/>
+      </action>
+      <action name="getRemoteAddress" description="">
+        <result type="string"/>
       </action>
     </service>
     <service id="multicenters_filesyncimportbatch" name="filesyncImportBatch" description="">
