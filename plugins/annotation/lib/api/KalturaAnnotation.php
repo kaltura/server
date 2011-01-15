@@ -116,7 +116,7 @@ class KalturaAnnotation extends KalturaObject implements IFilterable
 	 */
 	public function validateParentId(KalturaAnnotation $annotation, $annotationId = null)
 	{
-		if ($annotation->parentId === null || $annotation->parentId === "")
+		if ($annotation->parentId === null || $annotation->parentId === "" || $annotation->parentId === "0")
 		{
 			$annotation->parentId = 0;
 		}
