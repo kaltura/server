@@ -16,7 +16,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				return self::onEntryChanged($object, $modifiedColumns);
 		}
 		
-		if($object instanceof asset && in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof asset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
 			return self::onAssetReady($object);
 		
 		if($object instanceof EntryDistribution)
