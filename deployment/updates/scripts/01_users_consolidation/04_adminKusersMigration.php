@@ -42,8 +42,6 @@ while(count($users))
 			echo '!!! Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!';
 			continue;
 		}
-		$user->setEmail($partner->getAdminEmail());
-		$user->setFullName($partner->getAdminName());
 		
 		list($firstName, $lastName) = kString::nameSplit($user->getFullName());
 		
