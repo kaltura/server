@@ -66,6 +66,11 @@ abstract class KalturaBaseService
 	{
 		return true;
 	}
+	
+	protected function globalPartnerAllowed($actionName)
+	{
+		return false;
+	} 
 		
 	public function initService($serviceName, $actionName)
 	{	
@@ -89,12 +94,15 @@ abstract class KalturaBaseService
 		
 		// action not permitted at all, not even kaltura network
 		if (!$actionPermitted) {
-			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN); //TODO: should sometimes thorow MISSING_KS instead
 		}
 		
 		// init partner filter parameters
 		$this->private_partner_data = $allowPrivatePartnerData;
 		$this->partnerGroup = kPermissionManager::getPartnerGroup($this->serviceName, $this->actionName);
+		if ($this->globalPartnerAllowed($this->actionName)) {
+			$this->partnerGroup = PartnerPeer::GLOBAL_PARTNER.','.trim($this->partnerGroup,',');
+		}
 		
 		// apply partner filters according to current context and permissions
 		myPartnerUtils::resetAllFilters();

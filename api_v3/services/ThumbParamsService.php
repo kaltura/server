@@ -19,6 +19,17 @@ class ThumbParamsService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance()); // note that partner 0 is defined as partner group in service.ct
 	}
 	
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'list') {
+			return true;
+		}
+		return parent::globalPartnerAllowed($actionName);
+	}
+	
 	/**
 	 * Add new Thumb Params
 	 * 

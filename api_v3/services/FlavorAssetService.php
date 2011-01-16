@@ -19,6 +19,14 @@ class FlavorAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
 	}
 	
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($actionName === 'getFlavorAssetsWithParams') {
+			return true;
+		}
+		return parent::globalPartnerAllowed($actionName);
+	}
+	
 	/**
 	 * Get Flavor Asset by ID
 	 * 
