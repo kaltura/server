@@ -690,10 +690,10 @@ $(window).load(function(){
 			});
 			$("#delivery_type").change(function(){
 				kmc.vars.embed_code_delivery_type = this.value;
-				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id);
+				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors);
 			});
 			$("#player_select").change(function(){
-				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates);
+				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, has_mobile_flavors);
 			});
 			
 			$("#html5_support").change(function(){
