@@ -182,6 +182,16 @@ return array(
 	'KalturaFileSyncObjectType::FLAVOR_ASSET::CONVERT_LOG' => 'Convert Log',
 	'KalturaFileSyncObjectType::FLAVOR_ASSET::NET_STORAGE_ASSET' => 'Net-Storage Asset',
 
+	'KalturaFileSyncObjectType::METADATA::DATA' => 'Data',
+	
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::SUBMIT_RESULTS' => 'Submit Results',
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::UPDATE_RESULTS' => 'Update Results',
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::DELETE_RESULTS' => 'Delete Results',
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::SUBMIT_DATA' => 'Submit Data',
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::UPDATE_DATA' => 'Update Data',
+	'KalturaFileSyncObjectType::ENTRY_DISTRIBUTION::DELETE_DATA' => 'Delete Data',
+				
+				
 	'KalturaControlPanelCommandType::STOP' => 'Stop',
 	'KalturaControlPanelCommandType::START' => 'Start',
 	'KalturaControlPanelCommandType::CONFIG' => 'Set Configuration',
