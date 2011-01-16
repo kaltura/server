@@ -39,11 +39,6 @@ class UserRolePeer extends BaseUserRolePeer
 	{
 		$ids = explode(',', trim($idsString));
 		
-		if (count($ids) <= 0)
-		{
-			throw new kPermissionException('', kPermissionException::ROLE_ID_MISSING);
-		}
-		
 		if (count($ids) > 1)
 		{
 			throw new kPermissionException('', kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED);	
@@ -64,14 +59,4 @@ class UserRolePeer extends BaseUserRolePeer
 		return $userRole;
 	}
 		
-	public static function getDefaultRoleForUser(kuser $user)
-	{
-		if ($user->getIsAdmin()) {
-			return UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
-		}
-		else {
-			return UserRolePeer::getByStrId(UserRoleId::BASE_USER_SESSION_ROLE);
-		}
-	}
-
 } // UserRolePeer
