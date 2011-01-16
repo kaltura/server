@@ -23,6 +23,7 @@ if(!$lastUser)
 	$lastUser = 0;
 
 $users = getUsers($lastUser, $userLimitEachLoop);
+$partner = PartnerPeer::retrieveByPK($admin_console_partner_id);
 
 while(count($users))
 {
@@ -103,8 +104,15 @@ while(count($users))
 			KalturaLog::log('Saving new kuser with the following parameters: ');
 			KalturaLog::log(print_r($new_kuser, true));			
 			$new_kuser->save(); // save
+			if ($user->getIsPrimary())
+			{
+				KalturaLog::log('Setting new kuser id ['.$new_kuser->getId().'] as account owner for partner [-2]');
+				$partner->setAccountOwnerKuserId($new_kuser->getId());
+				$partner->save();
+			}
 		}
-		else {
+		else
+		{
 			KalturaLog::log('DRY RUN - records are not being saved: ');
 			if (!$new_kuser->getLoginDataId())
 			{
