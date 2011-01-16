@@ -79,6 +79,9 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				$data = KalturaPluginManager::loadObject('KalturaJobData', $jobType);
 		}
 		
+		if(!$data)
+			return null;
+			
 		$jobSubTypeArray = explode(baseObjectFilter::IN_SEPARATOR, $jobSubTypeIn);
 		$dbJobSubTypeArray = array();
 		foreach($jobSubTypeArray as $jobSubType)
