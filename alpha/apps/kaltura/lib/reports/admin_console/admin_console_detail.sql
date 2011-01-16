@@ -48,7 +48,7 @@ FROM
 (
 	SELECT
 		aggr_partner.partner_id, 
-		SUM(aggr_partner.count_bandwidth ) count_media_all_time,
+		(SUM(aggr_partner.count_video ) + SUM(aggr_partner.count_audio ) + SUM(aggr_partner.count_mix )+ SUM(aggr_partner.count_image )) count_media_all_time,
 		SUM(aggr_partner.count_bandwidth ) count_bandwidth_all_time,
 		SUM(aggr_partner.count_storage ) count_storage_all_time
 	FROM 
