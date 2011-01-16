@@ -825,9 +825,9 @@ $(window).load(function(){
 								'video management</a> <a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> ' +
 								'<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a>',
 			media_seo_info :	'<a rel="media:thumbnail" href="http://{CDN_HOST}/p/{PARTNER_ID}/sp/{PARTNER_ID}00/thumbnail{ENTRY_ID}/width/120/height/90/bgcolor/000000/type/2" /> ' +
-								'<span property="dc:description" content="{DESCRIPTION}" /><span property="media:title" content="{NAME}" /> ' +
-								'<span property="media:width" content="{WIDTH}" /><span property="media:height" content="{HEIGHT}" /> ' +
-								'<span property="media:type" content="application/x-shockwave-flash" />',
+								'<span property="dc:description" content="{DESCRIPTION}"></span><span property="media:title" content="{NAME}"></span> ' +
+								'<span property="media:width" content="{WIDTH}"></span><span property="media:height" content="{HEIGHT}"></span> ' +
+								'<span property="media:type" content="application/x-shockwave-flash"></span>',
 							// removed <span property="media:duration" content="{DURATION}" />
 			// (variables used: {WIDTH} {HEIGHT} {HOST} {CDN_HOST} {UICONF_ID} {VER} {ENTRY_ID} {SILVERLIGHT} + Missing id and name
 			silverlight :	'<object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="{WIDTH}" height="{HEIGHT}"> <param name="source" ' +
