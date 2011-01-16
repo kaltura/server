@@ -1365,10 +1365,11 @@ class BatchService extends KalturaBaseService
 	
 	protected function getExclusiveJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null, $jobType)
 	{
-		if (!is_null($filter))
-			$jobsFilter = $filter->toFilter($jobType);
-		
 		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
+		
+		if (!is_null($filter))
+			$jobsFilter = $filter->toFilter($dbJobType);
+		
 		return kBatchExclusiveLock::getExclusiveJobs($lockKey->toObject(), $maxExecutionTime, $numberOfJobs, $dbJobType, $jobsFilter);
 	}	
 	
