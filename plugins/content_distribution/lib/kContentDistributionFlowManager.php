@@ -874,7 +874,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 			$entryDistribution->setValidationErrorsArray($validationErrors);
 			$entryDistribution->save();
-			continue;
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 			{
