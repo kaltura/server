@@ -313,7 +313,7 @@ $this->benchmarkEnd( "signature" );
 				if (!in_array(strtolower(get_class($this)), kConf::get('ps2_actions_not_blocked_by_permissions')))
 				{
 					KalturaLog::log('PS2 action '.get_class($this).' is being blocked for partner '.$currentPartner->getId().' defined with FEATURE_PS2_PERMISSIONS_VALIDATION enabled');
-					$this->addException( APIErrors::SERVICE_FORBIDDEN );
+					$this->addException( APIErrors::SERVICE_FORBIDDEN, get_class($this) );
 				}
 			}
 			

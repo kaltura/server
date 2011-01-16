@@ -13,7 +13,7 @@ class GenericDistributionProviderActionService extends KalturaBaseService
 		myPartnerUtils::addPartnerToCriteria(new GenericDistributionProviderActionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!ContentDistributionPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
 	/**

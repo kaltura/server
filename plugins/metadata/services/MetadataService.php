@@ -16,7 +16,7 @@ class MetadataService extends KalturaBaseService
 //		myPartnerUtils::addPartnerToCriteria(new FileSyncPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
 	

@@ -13,7 +13,7 @@ class EntryAdminService extends KalturaBaseService
 		parent::initService($serviceName, $actionName);
 
 		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 
 	/**

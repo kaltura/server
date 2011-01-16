@@ -13,7 +13,7 @@ class AnnotationService extends KalturaBaseService
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($action) );
 				
 		if(!AnnotationPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
 	/**

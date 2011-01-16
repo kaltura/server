@@ -94,7 +94,7 @@ abstract class KalturaBaseService
 		
 		// action not permitted at all, not even kaltura network
 		if (!$actionPermitted) {
-			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN); //TODO: should sometimes thorow MISSING_KS instead
+			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
 		}
 		
 		// init partner filter parameters

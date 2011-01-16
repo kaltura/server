@@ -14,7 +14,7 @@ class DistributionProviderService extends KalturaBaseService
 			myPartnerUtils::addPartnerToCriteria(new GenericDistributionProviderPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!ContentDistributionPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
 	

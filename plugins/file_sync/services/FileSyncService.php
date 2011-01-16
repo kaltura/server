@@ -13,7 +13,7 @@ class FileSyncService extends KalturaBaseService
 		// since plugin might be using KS impersonation, we need to validate the requesting
 		// partnerId from the KS and not with the $_POST one
 		if(!FileSyncPlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN);
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
 	
 	/**
