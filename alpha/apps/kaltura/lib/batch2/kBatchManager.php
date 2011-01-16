@@ -206,7 +206,7 @@ class kBatchManager
 		}
 		
 		return $mediaInfoDb;
-	}
+	} 
 	
 	// common to all the jobs using the BatchJob table 
 	public static function freeExclusiveBatchJob($id, kExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
