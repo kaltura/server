@@ -317,8 +317,8 @@ HTML;
 		#wrapper { padding: 0 10px; }
 		.left { float: left; text-align: left; width: 140px; margin: 5px 0; padding: 4px 0 0 0; }
 		.right { float: left; text-align: left; margin: 5px 20px 5px 0; padding: 0; }
-		.current { padding-top: 4px; padding-left: 2px; width: 155px; }
-		.note { font-size: 11px; }
+		.current { padding-top: 4px; padding-left: 2px; width: 155px; color: #666666; }
+		.note { font-size: 11px; color: #999999; }
 		.center { text-align: center; }
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
