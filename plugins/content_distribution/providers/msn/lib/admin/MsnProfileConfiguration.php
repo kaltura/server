@@ -13,7 +13,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			if($object->movFlavorParamsId)
 			{
 				if(!in_array($object->movFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->movFlavorParamsId;
+					$requiredFlavorParamsIds[] = $object->movFlavorParamsId ? $object->movFlavorParamsId : '0';
 					
 				$flavorKey = array_search($object->movFlavorParamsId, $optionalFlavorParamsIds);
 				if($flavorKey !== false)
@@ -23,7 +23,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			if($object->flvFlavorParamsId)
 			{
 				if(!in_array($object->flvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->flvFlavorParamsId;
+					$requiredFlavorParamsIds[] = $object->flvFlavorParamsId ? $object->flvFlavorParamsId : '0';
 					
 				$flavorKey = array_search($object->flvFlavorParamsId, $optionalFlavorParamsIds);
 				if($flavorKey !== false)
@@ -33,7 +33,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			if($object->wmvFlavorParamsId)
 			{
 				if(!in_array($object->wmvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->wmvFlavorParamsId;
+					$requiredFlavorParamsIds[] = $object->wmvFlavorParamsId ? $object->wmvFlavorParamsId : '0';
 					
 				$flavorKey = array_search($object->wmvFlavorParamsId, $optionalFlavorParamsIds);
 				if($flavorKey !== false)
