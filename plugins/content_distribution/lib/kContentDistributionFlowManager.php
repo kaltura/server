@@ -863,7 +863,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() != EntryDistributionStatus::PENDING)
+			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING)
 				continue;
 				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
