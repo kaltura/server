@@ -669,8 +669,8 @@ $(window).load(function(){
 							 '<div class="embed_code_div"><div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
-							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><button id="select_code">' +
-							 '<span>Select Code</span></button></div></div></div>';
+							 '<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><div class="center"><button id="select_code">' +
+							 '<span>Select Code</span></button></div></div></div></div>';
 //			alert(modal_html);
 			kmc.vars.jw = false;
 			kmc.vars.silverlight = false;

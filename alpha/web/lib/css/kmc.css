@@ -146,7 +146,7 @@ fieldset{ border:0 none; position:relative; }
 	  #modal button#select_code:hover { #background-position: -66px -177px;}
 	   #modal button span { height:20px; padding: 4px 0 0 15px; margin: 1px 1px 0 0; float:left; white-space:nowrap; background:transparent url(../images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
 	   #modal button:hover span { background-position: 0 -178px;}
-	   @-moz-document url-prefix() { #modal button span { margin-top: 0;} }
+	   @-moz-document url-prefix() { #modal button span { margin-top: 0; margin-left: -3px; } }
 
 	   #modal dl { margin: 15px 0 10px 10px;}
 	    #modal dt { width:110px; margin-bottom:5px; float:left; clear:both; font-weight:bold;}
