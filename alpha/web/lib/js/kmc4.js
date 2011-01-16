@@ -391,7 +391,7 @@ $(window).load(function(){
 			// change http to https
 			url = url.replace("http", "https");
 			
-			var modal_width = 400;
+			var modal_width = 370;
 			var modal_height = 160;
 			$("#flash_wrap").css("visibility","hidden");
 			kalturaCloseModalBox();
