@@ -13,7 +13,16 @@ class KalturaPermissionItemArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaPermissionItem();
+			if ($obj->getType() == PermissionItemType::API_ACTION_ITEM) {
+				$nObj = new KalturaApiActionPermissionItem();
+			}
+			else if ($obj->getType() == PermissionItemType::API_PARAMETER_ITEM) {
+				$nObj = new KalturaApiParameterPermissionItem();
+			}
+			else {
+				KalturaLog::crit('Unknown permission item type ['.$obj->getType().'] defined with id ['.$obj->getId().'] - skipping!');
+				continue;
+			}
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
