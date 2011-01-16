@@ -165,6 +165,7 @@ fieldset{ border:0 none; position:relative; }
 	#modal div.description li { margin-bottom:3px;}
 	#modal div.description ul input { width:99px; height:16px; padding:1px; border: solid 1px #9B9B9B; background:#fff;}
 	#modal div.right { float: right; margin: 6px 18px 6px 0; }
+	#modal div.center { text-align: center; }
 	#modal input#html5_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
 	.red { color: #ff0000; }
@@ -208,7 +209,7 @@ fieldset{ border:0 none; position:relative; }
 	 /* webkit */
 		@media screen and (-webkit-min-device-pixel-ratio:0)
 		{
-		  #modal button { display: inline; }
+		  #modal button#select_code { display: inline; }
 		}
 	/* end webkit */
 	
