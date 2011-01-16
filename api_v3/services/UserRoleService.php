@@ -14,7 +14,18 @@ class UserRoleService extends KalturaBaseService
 		
 		myPartnerUtils::addPartnerToCriteria(new UserRolePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-	}	
+	}
+	
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'list') {
+			return true;
+		}
+		return parent::globalPartnerAllowed($actionName);
+	}
 
 	
 	/**
@@ -66,16 +77,7 @@ class UserRoleService extends KalturaBaseService
 	 */		
 	public function getAction($userRoleId)
 	{
-		$c = new Criteria();
-		$allowedPartnerIds = explode(',', $this->partnerGroup());
-		$allowedPartnerIds[] = PartnerPeer::GLOBAL_PARTNER;
-		$c->addAnd(UserRolePeer::PARTNER_ID, $allowedPartnerIds, Criteria::IN);
-		$c->addAnd(UserRolePeer::ID, $userRoleId);
-		$c->addAnd(UserRolePeer::STATUS, KalturaUserRoleStatus::DELETED, Criteria::NOT_EQUAL);
-		
-		UserRolePeer::setUseCriteriaFilter(false);
-		$dbUserRole = UserRolePeer::doSelectOne($c);
-		UserRolePeer::setUseCriteriaFilter(true);
+		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
 		
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
@@ -86,7 +88,7 @@ class UserRoleService extends KalturaBaseService
 		
 		return $userRole;
 	}
-
+	
 
 	/**
 	 * Update an existing KalturaUserRole object
@@ -174,20 +176,14 @@ class UserRoleService extends KalturaBaseService
 			$filter = new KalturaUserRoleFilter();
 			
 		$userRoleFilter = $filter->toObject();
-		
-		UserRolePeer::setUseCriteriaFilter(false);
 
 		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array (0, $this->getPartnerId()), Criteria::IN);
-		$c->addAnd(UserRolePeer::STATUS, KalturaUserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		$userRoleFilter->attachToCriteria($c);
 		$count = UserRolePeer::doCount($c);
 		
 		if ($pager)
 			$pager->attachToCriteria($c);
 		$list = UserRolePeer::doSelect($c);
-		
-		UserRolePeer::setUseCriteriaFilter(true);
 		
 		$response = new KalturaUserRoleListResponse();
 		$response->objects = KalturaUserRoleArray::fromDbArray($list);
