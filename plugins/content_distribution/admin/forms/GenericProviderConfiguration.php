@@ -9,6 +9,7 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 		
 		$client = Kaltura_ClientHelper::getClient();
 		$filter = new KalturaGenericDistributionProviderActionFilter();
+		$filter->genericDistributionProviderIdEqual = $object->id;
 		
 		$actionsList = null;
 		try
