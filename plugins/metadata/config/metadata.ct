@@ -32,7 +32,7 @@ metadataprofile.listfields			|			|1		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PR
 metadataprofile.revert				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_UPDATE
 
 
-metadata.list						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
+metadata.list						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MANAGE_BASE
 metadata.add						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
 metadata.addfromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
 metadata.addfromurl					|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
