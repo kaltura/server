@@ -140,7 +140,7 @@ class UserRoleService extends KalturaBaseService
 	{
 		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
 	
-		if (!$dbUserRole) {
+		if (!$dbUserRole || $dbUserRole->getPartnerId() == PartnerPeer::GLOBAL_PARTNER) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
 		}
 
