@@ -208,7 +208,7 @@ fieldset{ border:0 none; position:relative; }
 	 /* webkit */
 		@media screen and (-webkit-min-device-pixel-ratio:0)
 		{
-		  #modal button span { margin-top:-1px; display: inline; }
+		  #modal button { display: inline; }
 		}
 	/* end webkit */
 	
