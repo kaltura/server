@@ -92,7 +92,7 @@ media.addfromflavorasset			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UP
 media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
 media.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 media.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
-media.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
+media.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 media.count							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 media.updatethumbnail				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 media.updatethumbnailjpeg			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
@@ -119,7 +119,7 @@ mixing.add							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 mixing.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
-mixing.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
+mixing.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 mixing.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 mixing.clone						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.appendmediaentry				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
@@ -132,10 +132,10 @@ data.add							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
 data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
-data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
+data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 
 baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
-baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
+baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
 baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
