@@ -1176,7 +1176,8 @@
 
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
-		
+
+		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
 		$('#actionJobId').val(jobId);
 		$('#actionJobType').val(jobType);
 		$('#submitAction').val('retry');
