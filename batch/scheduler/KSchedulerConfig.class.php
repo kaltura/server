@@ -248,6 +248,8 @@ class KSchedulerConfig
 			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes; //1;
 			$task->minPriority = $taskData->minPriority; //1;
 			$task->maxPriority = $taskData->maxPriority; //1;
+			$task->jobSubTypeIn = $taskData->jobSubTypeIn; //1;
+			$task->jobSubTypeNotIn = $taskData->jobSubTypeNotIn; //1;
 			
 			$task->setPartnerId($this->getPartnerId());
 			$task->setSecret($this->getSecret());
