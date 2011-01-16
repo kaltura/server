@@ -315,9 +315,9 @@ HTML;
 		html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
 		body { background:#F8F8F8; font: 13px arial,sans-serif; }
 		#wrapper { padding: 0 10px; }
-		.left { float: left; text-align: left; margin: 5px 0; padding: 4px 0 0 0; }
-		.right { float: right; text-align: left; margin: 5px 0; padding: 0; }
-		.current { padding-top: 4px; width: 155px; }
+		.left { float: left; text-align: left; width: 140px; margin: 5px 0; padding: 4px 0 0 0; }
+		.right { float: left; text-align: left; margin: 5px 20px 5px 0; padding: 0; }
+		.current { padding-top: 4px; padding-left: 1px; width: 155px; }
 		.note { font-size: 11px; }
 		.center { text-align: center; }
 		.clear { clear: both; }
