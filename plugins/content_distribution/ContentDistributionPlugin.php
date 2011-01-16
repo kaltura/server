@@ -170,16 +170,16 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return new KalturaDistributionSubmitJobData();
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return new KalturaDistributionUpdateJobData();
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return new KalturaDistributionDeleteJobData();
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return new KalturaDistributionFetchReportJobData();
 		}
 		
@@ -224,16 +224,16 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	
 		if($baseClass == 'KalturaJobData')
 		{
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
 				return 'KalturaDistributionSubmitJobData';
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
 				return 'KalturaDistributionUpdateJobData';
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
 				return 'KalturaDistributionDeleteJobData';
 				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 				return 'KalturaDistributionFetchReportJobData';
 		}
 		
