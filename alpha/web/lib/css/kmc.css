@@ -135,7 +135,6 @@ fieldset{ border:0 none; position:relative; }
 		#titlebar a#help { background-position: -177px -152px;}
 	  #modal span#entry_id { padding-left:3px; color:#555;}
 	 #modal_content { padding: 11px 12px;}
-	 #modal content a { color: #009acc; }
 	 #modal .embed_code_div { display: none; }
 	  #modal #player_wrap { min-height:290px; min-width:400px; padding-bottom:8px;  margin: 10px auto 0;}
 	  #modal textarea#embed_code { border: solid 1px #B7BABC; /*9B9B9B;*/ -moz-border-radius:6px; -webkit-border-radius:6px;}
@@ -163,14 +162,15 @@ fieldset{ border:0 none; position:relative; }
 	#modal input#html5_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
 	.red { color: #ff0000; }
-	#modal input, textarea { color: #777; }	  
+	#modal input, textarea { color: #777; }
+	#modal div.note { clear: both; font-size: 11px; color: #999 }	  
+	#modal div.note a { color: #009acc; }
 
 	/* jw */
 	#modal input { background:#F7F7F7;}
 	#modal a.license { margin: 0 5px;}
 	#modal div.label { min-width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold;}
 	 #modal div#rtmp.label { margin-top:3px;}
-	#modal div.note { clear: both; font-size: 11px; color: #999 }
 	#modal div.description { width:300px; margin: 10px 0 5px; float:left;}
 	#modal div.description ul { margin-top:2px; display:none;}
 	#modal div.description li { margin-bottom:3px;}
