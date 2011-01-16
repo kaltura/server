@@ -322,7 +322,7 @@ HTML;
 		.center { text-align: center; }
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
-		input { font-size: 13px; width: 160px; }
+		input { font-size: 13px; width: 160px; height: 20px; }
 		</style>
 	</head>
 	<body>
