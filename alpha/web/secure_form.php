@@ -183,7 +183,7 @@ HTML;
 			<div class="left">Password:</div>
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
-			<div class="note">Password is required for editing your email address.</div><br />
+			<div class="note">* Password is required for editing your email address.</div><br />
 			<div class="center"><input type="submit" value="Save Changes" /></div><br />
 			{$this->errorDiv()}			
 		</form>
