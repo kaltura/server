@@ -242,14 +242,16 @@ class KSchedulerConfig
 			$task->baseLocalPath = $taskData->baseLocalPath;	  
 			$task->baseSharedPath = $taskData->baseSharedPath;	  
 			$task->baseTempLocalPath = $taskData->baseTempLocalPath;	  
-			$task->baseTempSharedPath = $taskData->baseTempSharedPath;
-			$task->params = $taskData->params; //1;
-			$task->partnerGroups = $taskData->partnerGroups; //1;
-			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes; //1;
-			$task->minPriority = $taskData->minPriority; //1;
-			$task->maxPriority = $taskData->maxPriority; //1;
-			$task->jobSubTypeIn = $taskData->jobSubTypeIn; //1;
-			$task->jobSubTypeNotIn = $taskData->jobSubTypeNotIn; //1;
+			$task->baseTempSharedPath = $taskData->baseTempSharedPath;	  
+			$task->minCreatedAtMinutes = $taskData->minCreatedAtMinutes;
+			
+			$task->params = $taskData->params;
+			if($taskData->filter)
+			{
+				$task->filter = new KalturaBatchJobFilter();
+				foreach($taskData->filter as $attr => $value)
+					$task->filter->$attr = $value;
+			}
 			
 			$task->setPartnerId($this->getPartnerId());
 			$task->setSecret($this->getSecret());
@@ -352,16 +354,17 @@ class KSchedularTaskConfig
 	public $baseSharedPath;
 	public $baseTempLocalPath;
 	public $baseTempSharedPath;
+	public $minCreatedAtMinutes;
+	
+	/**
+	 * @var array
+	 */
 	public $params;
 	
-	// our additional parameters
-	public $partnerGroups;
-	public $minCreatedAtMinutes;
-	public $minPriority;
-	public $maxPriority;
-	public $jobSubTypeIn;
-	public $jobSubTypeNotIn;
-	
+	/**
+	 * @var KalturaBatchJobFilter
+	 */
+	public $filter;
 	
 	// these params are not coming from the config, but set by the scheduler before new batch execution
 	private $taskIndex;

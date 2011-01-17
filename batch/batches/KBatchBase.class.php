@@ -72,27 +72,14 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	protected function getFilter()
 	{
 		$filter = new KalturaBatchJobFilter();
-		
-		if($this->partnerGroups && $this->partnerGroups != '*')
-			$filter->workGroupIdIn = $this->partnerGroups;
-		
-		if ($this->taskConfig->minPriority && is_numeric($this->taskConfig->minPriority))
-			$filter->priorityGreaterThanOrEqual = $this->taskConfig->minPriority;
-		
-		if ($this->taskConfig->maxPriority && is_numeric($this->taskConfig->maxPriority))
-			$filter->priorityLessThanOrEqual = $this->taskConfig->maxPriority;
+		if($this->taskConfig->filter)
+			$filter = $this->taskConfig->filter;
 		
 		if ($this->taskConfig->minCreatedAtMinutes && is_numeric($this->taskConfig->minCreatedAtMinutes))
 		{
 			$minCreatedAt = time() - ($this->taskConfig->minCreatedAtMinutes * 60);
 			$filter->createdAtLessThanOrEqual = $minCreatedAt;
 		}
-		
-		if ($this->taskConfig->jobSubTypeIn)
-			$filter->jobSubTypeIn = $this->taskConfig->jobSubTypeIn;
-		
-		if ($this->taskConfig->jobSubTypeNotIn)
-			$filter->jobSubTypeNotIn = $this->taskConfig->jobSubTypeNotIn;
 		
 		return $filter;
 	}
