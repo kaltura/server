@@ -35,7 +35,7 @@ user.add							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_USER_ADD
 user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
 user.update							|			|2		|1	|2		|1		|1		|	|		|	|   |ADMIN_USER_UPDATE
 user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |ADMIN_USER_DELETE
-user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,ACCOUNT_BASE
 user.notifyban						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
 
 user.login							|			|0		|1	|0		|0		|1		|	|		|	|   |
@@ -54,7 +54,7 @@ widget.update						|			|2		|1	|0		|0		|1		|	|		|	|   |WIDGET_ADMIN
 widget.list							|			|2		|1	|0		|0		|1		|	|		|	|   |WIDGET_ADMIN
 
 partner.register					|			|0		|0	|0		|0		|1		|	|		|	|   |
-partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ACCOUNT_UPDATE_SETTINGS
+partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ACCOUNT_UPDATE_SETTINGS,INTEGRATION_UPDATE_SETTINGS
 partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
 partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,INTEGRATION_BASE,KMC_ACCESS
 partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|ACCOUNT_BASE
@@ -74,7 +74,7 @@ playlist.update						|			|2		|1	|1		|1		|1		|	|		|	|   |PLAYLIST_UPDATE
 playlist.get						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE
 playlist.delete						|			|2		|1	|1		|0		|1		|	|		|	|   |PLAYLIST_DELETE
 playlist.clone						|			|2	    |1	|1		|1		|1		|	|		|	|   |PLAYLIST_ADD
-playlist.list						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE,CONTENT_MODERATE_BASE
+playlist.list						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE,CONTENT_MODERATE_BASE,STUDIO_SELECT_CONTENT
 playlist.execute					|			|0		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
 playlist.executefromcontent			|			|2		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
 playlist.executefromfilters			|			|2		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
@@ -331,7 +331,7 @@ thumbparams.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 thumbparams.get						|			|2		|1	|1		|2		|1		|	|0,		|	|   |CONTENT_MANAGE_THUMBNAIL
 thumbparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 thumbparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
-thumbparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |CONTENT_MANAGE_THUMBNAIL
+thumbparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |CONTENT_MANAGE_THUMBNAIL,TRANSCODING_BASE
 thumbparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 thumbparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 
@@ -391,7 +391,7 @@ xinternal.xaddbulkdownload			|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_D
 userrole.add						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 userrole.delete			    		|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_DELETE
 userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
-userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,ACCOUNT_BASE
 userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_UPDATE
 userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 
