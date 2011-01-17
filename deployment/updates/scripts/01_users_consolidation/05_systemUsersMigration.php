@@ -107,7 +107,7 @@ while(count($users))
 			if ($user->getIsPrimary())
 			{
 				KalturaLog::log('Setting new kuser id ['.$new_kuser->getId().'] as account owner for partner [-2]');
-				$partner->setAccountOwnerKuserId($new_kuser->getId());
+				$partner->setAccountOwnerKuserId($new_kuser->getId(), false);
 				$partner->save();
 			}
 		}
