@@ -123,7 +123,7 @@ class secForm {
 			<div class="left">Retry New Password:</div>
 			<div class="right"><input type="password" name="retry_new_password" /></div>
 			<br class="clear" /><br />
-			<div class="center"><input type="submit" value=" Save " /></div><br />
+			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
 			{$this->errorDiv()}
 		</form>
 HTML;
@@ -184,7 +184,7 @@ HTML;
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
 			<div class="note">* Password is required for editing your email address.</div><br />
-			<div class="center"><input type="submit" value=" Save " /></div><br />
+			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
 			{$this->errorDiv()}			
 		</form>
 HTML;
@@ -238,7 +238,7 @@ HTML;
 			<div class="left">Edit Last Name:</div>
 			<div class="right"><input type="text" name="lname" value="{$this->lname}" /></div>
 			<br class="clear" /><br />
-			<div class="center"><input type="submit" value=" Save " /></div><br />
+			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
 			{$this->errorDiv()}			
 		</form>
 HTML;
@@ -323,6 +323,7 @@ HTML;
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
 		input { font-size: 13px; width: 160px; height: 25px; }
+		#submit {  } 
 		</style>
 	</head>
 	<body>
