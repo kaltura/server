@@ -7,6 +7,13 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 	 */
 	protected $client;
 	
+	/**
+	 * 
+	 * Creates a new Kaltura API Unit Test Case
+	 * @param unknown_type $name
+	 * @param array $data
+	 * @param unknown_type $dataName
+	 */
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
 		parent::__construct($name, $data, $dataName);
@@ -78,19 +85,95 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 		$kalturaConfiguration->curlTimeout = $testConfig->curlTimeout;
 		$kalturaConfiguration->setLogger($this);
 		
-		$this->client = new KalturaClient($kalturaConfiguration);
-		
-		if($testConfig->startSession)
-		{
-			$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-			$this->client->setKs($ks);
-			KalturaLog::info("Session started [$ks]");
-		}		
+		//TODO: unmark this
+//		$this->client = new KalturaClient($kalturaConfiguration);
+//		
+//		if($testConfig->startSession)
+//		{
+//			$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+//			$this->client->setKs($ks);
+//			KalturaLog::info("Session started [$ks]");
+//		}
 	}
 	
+	/**
+	 * Logs a given message
+	 * @see IKalturaLogger::log()
+	 */
 	public function log($msg)
 	{
 		KalturaLog::log($msg);
+	}
+
+	/**
+	 * 
+	 * Compares two API objects and notify the PHPUnit and kaltura listeners 
+	 * @param KalturaObjectBase $object1
+	 * @param KalturaObjectBase $object2
+	 */
+	public static function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields)
+	{
+		//Use reflection to compare the objects
+		$outputReferenceReflector = new ReflectionClass($outputReference);
+		$properties = $outputReferenceReflector->getProperties(ReflectionProperty::IS_PUBLIC);
+		
+		$newErrors = array();
+		
+		foreach ($properties as $property)
+		{
+			$propertyName = $property->getName();
+			
+			//Start the phpunit timer so we can gather performance data
+			PHPUnit_Util_Timer::start();
+			
+			//If the field is in the valid failure list then we skip him 
+			if(in_array($propertyName, $validErrorFields))
+			{
+				continue;
+			}
+			else 
+			{
+				$expectedValue = $property->getValue($outputReference);
+				$actualValue = $property->getValue($actualResult);
+				
+				//if this is an array we need to change it to a string
+				try {
+					$currentFailure = new unitTestFailure($propertyName, $actualValue, $expectedValue);
+					$this->assertEquals($expectedValue, $actualValue, $currentFailure);
+				}
+				catch (PHPUnit_Framework_AssertionFailedError $e) {
+					$this->hasFailures  = true;
+					$this->currentFailure = $currentFailure;
+					$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+				}
+				catch (Exception $e) {
+					$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+				}
+			}
+		}
+	
+		return $newErrors;
+	}
+
+	/**
+	 * 
+	 * Gets the parameters for creating a new kaltura client and returns the new client
+	 * @param int $partnerId
+	 * @param string $secret
+	 * @param string $configServiceUrl
+	 * @return KalturaClient - a new api client 
+	 */
+	public function getClient($partnerId, $secret, $configServiceUrl)
+	{
+		$config = new KalturaConfiguration((int)$partnerId);
+
+		//Add the server url (into the test additional data)
+		$config->serviceUrl = $configServiceUrl;
+		$client = new KalturaClient($config);
+		$ks = $client->session->start($secret, null, KalturaSessionType::ADMIN, (int)$partnerId, null, null);
+		$client->setKs($ks);
+
+		return $client;
 	}
 }
 

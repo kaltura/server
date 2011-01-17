@@ -12,7 +12,7 @@ catch (Exception $e)
 	 * @author Roni
 	 *
 	 */
-	class KDLUnitTest extends UnitTestBase
+	class KDLUnitTest extends KalturaUnitTestCase
 	{
 		/**
 		 * 

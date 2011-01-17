@@ -21,6 +21,10 @@ KAutoloader::setClassPath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "unit_test", "*"),
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "unit_test", "lib", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "base", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "tests", "roles_and_permissions", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "lib", "*"),
+	KAutoloader::buildPath(KALTURA_ROOT_PATH, "api_v3", "services", "*")
 ));
 
 //Add the zend phpunit support 

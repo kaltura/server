@@ -142,7 +142,6 @@ class UnitTestDataObject
 			}
 			else // object is Kaltura object base
 			{
-				//TODO: serialize the kaltura object into XML.
 				$reflector = new ReflectionClass($data->dataObject);
 				$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
 				foreach ($properties as $property)

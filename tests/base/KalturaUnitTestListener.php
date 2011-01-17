@@ -21,13 +21,13 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time) {
 		
-		if($test instanceof UnitTestBase)
+		if($test instanceof KalturaUnitTestCase)
 			if($test->currentFailure != null)
 			{
 				if(KalturaUnitTestListener::$failures == null)
 				{
 					KalturaUnitTestListener::$failures = new testsFailures();
-					KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure($test->data);
+					KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure($test->getInputs());
 				}
 				
 				$currentTestFailures = end(KalturaUnitTestListener::$failures->failures);
@@ -73,7 +73,7 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 				
 		if(KalturaUnitTestListener::$failures != null)
 		{
-			fwrite(UnitTestBase::$failureObjectsFile, KalturaUnitTestListener::$failures->toXml());
+			fwrite(KalturaUnitTestCase::$failureObjectsFile, KalturaUnitTestListener::$failures->toXml());
 		}
 	}
 

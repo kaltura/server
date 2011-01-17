@@ -8,7 +8,7 @@ require_once (dirname(__FILE__) . '/../bootstrap.php');
  * @author Roni
  *
  */
-class testCaseFailure
+class KalturaUnitTestCaseFailure
 {
 	/**
 	 * 
@@ -93,7 +93,7 @@ class testCaseFailure
 	 * @param string $rootNodeName - default to 'data'
 	 * @return DOMDocument - the xml for the given error
 	 */
-	public static function toXml(testCaseFailure $failure, $rootNodeName = 'data')
+	public static function toXml(KalturaUnitTestCaseFailure $failure, $rootNodeName = 'data')
 	{
 		if(count($failure->failures) == 0)
 		{
@@ -110,8 +110,22 @@ class testCaseFailure
 		{
 			//TODO: add support for non propel objects
 			$node = $xml->createElement("Input");
-			$node->setAttribute("type", get_class($inputValue));
-			$node->setAttribute(get_class($inputValue)."Id", $inputValue->getId());
+			
+			$type = gettype($inputValue);
+			if(class_exists($inputValue))
+			{
+				$type = get_class($inputValue);
+			} 
+			$node->setAttribute("type", $type);
+			
+			$id = $inputValue;
+			
+			if($inputValue instanceof BaseObject)
+			{
+				$id = $inputValue->getId();
+			}
+			
+			$node->setAttribute($type."Id", $id);
 			$inputsNode->appendChild($node);
 		}
 		

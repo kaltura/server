@@ -22,7 +22,41 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 */
 	protected $dataSource;
 
+	/**
+	 * 
+	 * Indicates wheter the test has failures
+	 * @var bool
+	 */
+	public $hasFailures = false;
 	
+	/**
+	 * 
+	 * The unit test failures 
+	 * @var testFailures
+	 */
+	public static $failures = null;
+	
+	/**
+	 * 
+	 * All the failures object will be parsed here so we can use them later for failure reporting and unittest overriding
+	 * @var unknown_type
+	 */
+	public static $failureObjectsFile = null;
+		
+	/**
+	 * 
+	 * Holds the current failure in the test
+	 * @var KalturaUnitTestCaseFailure
+	 */
+	public $currentFailure = null;
+	
+	/**
+	 * 
+	 * Creates a new Kaltura Unit Test Object
+	 * @param unknown_type $name
+	 * @param array $data
+	 * @param unknown_type $dataName
+	 */
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
 		parent::__construct($name, $data, $dataName);
@@ -61,6 +95,16 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			mkdir($this->outputFolder, 777, true);
 		}
 	}
+	
+	/**
+	 * 
+	 * Returns the inputs for the test
+	 */
+	public function getInputs()
+	{
+		return $this->data;
+	}
+	
 	
 	/**
 	 * @param Zend_Config $testConfig
@@ -219,6 +263,147 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			return $this->provideTestData($className, $methodName);
 			
 		throw new Exception('Calling method not found');
+	}
+
+	/**
+	 * Overrides runTest method for the phpunit framework
+	 * @see PHPUnit_Framework_TestCase::runTest()
+	 */
+	public function runTest()
+	{
+		//Do this section only once per test file and not for test... so we can initiate all the tests 
+		//TODO: HOW to do nice :) and also how to know if this is a new test class or a new test or just another input
+		$this->currentFailure = null;
+		
+		if(KalturaUnitTestCase::$failureObjectsFile == null)
+		{
+			$class = get_class($this);
+
+			$classPath = KAutoloader::getClassFilePath($class);
+//			KalturaUnitTestCase::$failureFile = fopen(dirname($classPath) . "/testsData/{$this->name}.result", "w+");
+			KalturaUnitTestCase::$failureObjectsFile = fopen(dirname($classPath) . "/testsData/{$this->name}.failures", "w+");
+			$this->result->addListener(new KalturaUnitTestListener());
+		}
+		
+		parent::runTest();
+	}
+	
+	/**
+	 * 
+	 * The unit test data provider (gets the data for the different unit tests)
+	 * @param string $dataFilePath - the data file path (with the objects)
+	 * @return array<array>();
+	 */
+	public static function provider($dataFilePath)
+	{
+		$simpleXML = kXml::openXmlFile($dataFilePath);
+				
+		$inputsForUnitTests = array();
+		
+		foreach ($simpleXML->UnitTestsData->UnitTestData as $unitTestData)
+		{
+			$inputs = array();
+			
+			foreach ($unitTestData->Inputs->Input as $input)
+			{
+				$object = UnitTestDataObject::fromXml($input);
+
+				//Go to the last and current input and add the variable
+				array_push($inputs, $object);
+			}
+			
+			foreach ($unitTestData->OutputReferences->OutputReference as $output)
+			{
+				$object = UnitTestDataObject::fromXml($output);
+
+				//Go to the last and current input and add the variable
+				array_push($inputs, $object);
+			}
+			
+			$inputsForUnitTests[] = $inputs;
+		}
+		
+		return $inputsForUnitTests; 
+	}
+
+	/**
+	 * 
+	 * Compares two propel objects and notifies the PHPUnit / Kaltura's listeners
+	 * @param BaseObject $outputReference
+	 * @param BaseObject $newResult
+	 * @return array<> $newErrors, if the objects are equal
+	 */
+	public function comparePropelObjectsByFields($outputReference, $newResult, $validErrorFields)
+	{
+		//Gets the data peer of the object (used to geting all the obejct feilds)
+		$dataPeer = $outputReference->getPeer(); 
+		
+		$outputReferenceId = $outputReference->getId();
+		$newResultId = $newResult->getId();
+		
+		//Gets all object feilds
+		$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
+		
+		$newErrors = array();
+		
+		//Create the xml elements by all fields and their values
+		foreach ($fields as $field)
+		{
+			PHPUnit_Util_Timer::start();
+			
+			//If the field is in the valid failure list then we skip him 
+			if(in_array($field, $validErrorFields))
+			{
+				continue;
+			}
+			else 
+			{
+				$expectedValue = $outputReference->getByName($field);
+				$actualValue = $newResult->getByName($field);
+				
+				//if this is an array we need to change it to a string
+				$this->compareOnField($field, $actualValue, $expectedValue);
+//				try {
+//					$currentFailure = new unitTestFailure($field, $actualValue, $expectedValue);
+//					$this->assertEquals($expectedValue, $actualValue, $currentFailure);
+//				}
+//				catch (PHPUnit_Framework_AssertionFailedError $e) {
+//					$this->hasFailures  = true;
+//					$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+//				}
+//				catch (Exception $e) {
+//					$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+//				}
+			}
+		}
+
+		return $newErrors;
+	}
+	
+	/**
+	 * 
+	 * Compares the $actualValue with the $expectedValue on the given field / property, no Exception is thrown
+	 * @param string $fieldName
+	 * @param unknown_type $actualValue
+	 * @param unknown_type $expectedResult
+	 * @throws no exception can be thrown (for mass compares)
+	 */
+	public function compareOnField($fieldName, $actualValue, $expectedValue)
+	{
+		try 
+		{
+			$this->currentFailure = new unitTestFailure($fieldName, $actualValue, $expectedValue);
+			$this->assertEquals($expectedValue, $actualValue, $this->currentFailure);
+		}
+		catch (PHPUnit_Framework_AssertionFailedError $e) 
+		{
+			$this->hasFailures  = true;
+			$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+		}
+		catch (Exception $e) 
+		{
+			$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+		}
 	}
 }
 

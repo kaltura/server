@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Description>Test the get action for the media service on a specific id</Description>
+  <UnitTestsData>
+    <UnitTestData>
+      <Description>test data 1 - MBR</Description>
+      <Inputs>
+        <Input type="string" partnerId="193" secret="1af9794120591b09a1a5f65931e2dc4b" serviceUrl="newkaldev.kaltura.dev"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>

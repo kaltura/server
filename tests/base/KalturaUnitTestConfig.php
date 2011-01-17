@@ -21,6 +21,7 @@ class KalturaUnitTestConfig extends Zend_Config_Ini
 	
 	private function configArrayToIni($config, $parentPrefix = '', $level = 0)
 	{
+		//config must be an instance of array and Zend_Config
 		if(!is_array($config) && !($config instanceof Zend_Config))
 			return '';
 			
@@ -50,4 +51,3 @@ class KalturaUnitTestConfig extends Zend_Config_Ini
 		return $str;
 	}
 }
-
