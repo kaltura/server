@@ -40,6 +40,11 @@ function isObjectNameValid($object)
 	return TRUE;
 }
 
+function comparePropNames($prop1, $prop2)
+{
+	return strcmp($prop1->getName(), $prop2->getName());
+}
+
 if (!isObjectNameValid($object))
 {
 	die('Object "'.$object.'" not found');
@@ -145,12 +150,8 @@ else
 		{
 			continue;
 		}
-
-		$comparePropNames = function($prop1, $prop2) {
-    		return strcmp($prop1->getName(), $prop2->getName());
-		};
 		
-		usort($properties, $comparePropNames);
+		usort($properties, 'comparePropNames');
 		
 		$classProperties[$curClass] = $properties;
 	}

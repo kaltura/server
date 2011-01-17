@@ -1,5 +1,15 @@
 <?php 
 
+	function compareTypeNames($obj1, $obj2) 
+	{
+		return strcmp($obj1->getType(), $obj2->getType());
+	}
+	
+	function compareServiceNames($obj1, $obj2)
+	{
+		return strcmp($obj1->getServiceName(), $obj2->getServiceName());
+	}
+
 	$config = new Zend_Config_Ini("../../config/testme.ini");
 	$indexConfig = $config->get('testmedoc');
 	
@@ -34,21 +44,13 @@
 	$filters = $clientGenerator->getFilters();
 	$objects = $clientGenerator->getObjects();
 
-	// sort alphabetically
-	$compareTypeNames = function($obj1, $obj2) {
-		return strcmp($obj1->getType(), $obj2->getType());
-	};
-	
-	$compareServiceNames = function($obj1, $obj2) {
-		return strcmp($obj1->getServiceName(), $obj2->getServiceName());
-	};
-	
-	usort($services, $compareServiceNames);
-	usort($objects, $compareTypeNames);
-	usort($filters, $compareTypeNames);
-	usort($arrays, $compareTypeNames);
-	usort($enums, $compareTypeNames);
-	usort($stringEnums, $compareTypeNames);
+	// sort alphabetically	
+	usort($services, 'compareServiceNames');
+	usort($objects, 'compareTypeNames');
+	usort($filters, 'compareTypeNames');
+	usort($arrays, 'compareTypeNames');
+	usort($enums, 'compareTypeNames');
+	usort($stringEnums, 'compareTypeNames');
 		
 ?>
 	<div class="left">
