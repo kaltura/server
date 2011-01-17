@@ -219,12 +219,8 @@ class kXml
 		}
 		catch(Exception $e)
 		{
-			if(UnitTestBase::$failureFile != null)
-			{
-				//TODO: exception handling
-				print("Unable to load file : " . $xmlFilePath. " as xml.\n Error: " . $e->getMessage());
-				die();
-			}
+			//TODO: exception handling
+			throw new Exception("Unable to load file : " . $xmlFilePath. " as xml.\n Error: " . $e->getMessage());
 		}
 		
 		return $simpleXML;
