@@ -23,7 +23,7 @@ if(file_exists($lastUserFile)) {
 if(!$lastUser)
 	$lastUser = 0;
 
-$users = getUsers($lastUser, $userLimitEachLoop);
+$users = getAdminUsers($lastUser, $userLimitEachLoop);
 
 while(count($users))
 {
@@ -35,8 +35,8 @@ while(count($users))
 
 		$lastUser = $user->getId();
 		KalturaLog::log('-- kuser id ' . $lastUser);
-			
-		$userRole = UserRolePeer::getDefaultRoleForUser($user);
+		
+		$userRole = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
 		$user->setRoleIds($userRole->getId());
 
 		if (!$dryRun) {
@@ -57,12 +57,13 @@ $msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
 KalturaLog::log($msg);
 echo $msg;
 
-function getUsers($lastUser, $userLimitEachLoop)
+function getAdminUsers($lastUser, $userLimitEachLoop)
 {
 	kuserPeer::clearInstancePool();
 	UserRolePeer::clearInstancePool();
 	$c = new Criteria();
-	$c->add(kuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
+	$c->addAnd(kuserPeer::ID, $lastUser, Criteria::GREATER_THAN);
+	$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
 	$c->addAscendingOrderByColumn(kuserPeer::ID);
 	$c->setLimit($userLimitEachLoop);
 	kuserPeer::setUseCriteriaFilter(false);
