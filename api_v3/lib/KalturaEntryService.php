@@ -271,9 +271,11 @@ class KalturaEntryService extends KalturaBaseService
    	 */
 	protected function checkAndSetValidUser(KalturaBaseEntry $entry, entry $dbEntry)
 	{
+		KalturaLog::debug("API user id [{$entry->userId}] DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
 		// for new entry, kuser ID is null - set it from service scope
 		if($dbEntry->getKuserId() === null)
 		{
+			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setKuserId($this->getKuser()->getId());
 			return;
 		}
@@ -312,7 +314,8 @@ class KalturaEntryService extends KalturaBaseService
 		// first step is to make sure the user exists
 		$puserKuser = PuserKuserPeer::createPuserKuser($this->getPartnerId(), $this->getPartnerId() * 100, $entry->userId, $entry->userId, $entry->userId, true);
 		// second step is simply changing the userID on the entry
-		$dbEntry->setKuserId($puserKuser->getKuserId());		
+		$dbEntry->setKuserId($puserKuser->getKuserId());	
+		KalturaLog::debug("Set kuser id [" . $puserKuser->getKuserId() . "] line [" . __LINE__ . "]");	
 	}
 	
 	/**
