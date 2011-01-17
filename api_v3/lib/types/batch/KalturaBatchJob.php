@@ -34,7 +34,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     
 	/**
 	 * @var int
-	 * @filter in
+	 * @filter eq,in,notin
 	 */
     public $onStressDivertTo;
     
@@ -46,22 +46,25 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 
     /**
 	 * @var KalturaBatchJobStatus
-	 * @filter eq,in,order
+	 * @filter eq,in,notin,order
 	 */
     public $status;
     
     /**
 	 * @var int
+	 * @filter eq
 	 */
     public $abort;
     
     /**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
     public $checkAgainTimeout;
 
     /**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
     public $progress;
     
@@ -77,12 +80,13 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     
     /**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
     public $updatesCount ;
     
     /**
 	 * @var int
-	 * @filter gte,lte
+	 * @filter gte,lte,eq,in,notin,order
 	 */
     public $priority ;
     
@@ -90,6 +94,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     /**
      * The id of identical job
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $twinJobId;
     
@@ -97,6 +102,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     /**
      * The id of the bulk upload job that initiated this job
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $bulkJobId;
     
@@ -104,6 +110,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     /**
      * When one job creates another - the parent should set this parentJobId to be its own id.
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $parentJobId;
     
@@ -111,6 +118,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     /**
      * The id of the root parent job
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $rootJobId;
     
@@ -133,62 +141,70 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
     
     /**
 	 * @var KalturaBatchJobErrorTypes
-	 * @filter in
+	 * @filter eq,in,notin
 	 */    
     public $errType;
     
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $errNumber;
     
     
     /**
 	 * @var int
-	 * @filter lt,gt
+	 * @filter lt,gt,order
 	 */    
     public $fileSize;
     
     
     /**
 	 * @var bool
+	 * @filter eq
 	 */    
     public $lastWorkerRemote;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $schedulerId;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $workerId;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $batchIndex;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $lastSchedulerId;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $lastWorkerId;
 	
     
     /**
 	 * @var int
+	 * @filter eq,in,notin
 	 */    
     public $dc;
 

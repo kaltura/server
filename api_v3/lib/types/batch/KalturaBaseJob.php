@@ -19,7 +19,7 @@ class KalturaBaseJob extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $partnerId;	
 	
@@ -34,6 +34,7 @@ class KalturaBaseJob extends KalturaObject implements IFilterable
     /**
 	 * @var int
 	 * @readonly 
+	 * @filter gte,lte,order
 	 */
     public $updatedAt;
     
@@ -47,19 +48,21 @@ class KalturaBaseJob extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly 
+	 * @filter gte,lte,order
 	 */	
 	public $processorExpiration;
 	
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter order
+	 * @filter gte,lte,order
 	 */	
 	public $executionAttempts;
 	
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter gte,lte,order
 	 */	
 	public $lockVersion;
 
