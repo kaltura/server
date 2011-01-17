@@ -137,7 +137,7 @@ class uiConfDeployment
 		//Iterate through all sections (statics, general, kmc, kcw...)
 		foreach ($confObj as $sectionName=> $sectionValue)
 		{
-			//if we are in the widgets section (like kmc, kcw, kse)
+			//If we are in the widgets section (like kmc, kcw, kse)
 			if($sectionName != "general" && count($sectionValue->widgets))
 			{
 				//Set section values
@@ -158,9 +158,9 @@ class uiConfDeployment
 					//Create the ui conf from the xml
 					$uiConf = uiConfDeployment::populateUiconfFromConfig($widgetValue, $baseSwfUrl, $swfName, $objectType, uiConfDeployment::$arguments['disableUrlHashing']);
 				
-					if($uiConf) //if the ui conf was generated successfully 
+					if($uiConf) //If the ui conf was generated successfully 
 					{
-						//then we need to insert the ui conf to the DB (so we can get his id)
+						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
 						
 						if(isset($widgetValue->features))
@@ -171,22 +171,24 @@ class uiConfDeployment
 						//Add this id to the dependencies data array
 						$uiConfIds[$widgetIdentifier] = $uiconf_id;
 
-						//Then update him with the dependencies
-						foreach($widgetValue->dependencies as $dependencyName => $dependencyValue)
+						//If the widget has dependencies
+						if(isset($widgetValue->dependencies))
 						{
-							if(isset($uiConfIds[$dependencyValue])) // if the ui conf id was set already then we can set the dependencies
+							//Then update him with the dependencies
+							foreach($widgetValue->dependencies as $dependencyName => $dependencyValue)
 							{
-								$dependUiConfValue = $uiConfIds[$dependencyValue];
-								
-								uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
-							}
-							else
-							{ 
-								echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}" . PHP_EOL;
+								if(isset($uiConfIds[$dependencyValue])) // If the ui conf id was set already then we can set the dependencies
+								{
+									$dependUiConfValue = $uiConfIds[$dependencyValue];
+									
+									uiConfDeployment::updateUIConfFile($uiConf, $dependUiConfValue, "@@{$dependencyValue}@@"); // set new value instead of the dependency
+								}
+								else
+								{ 
+									echo "Missing dependency: {$dependencyName} = {$dependencyValue} for widget: {$widgetName}" . PHP_EOL;
+								}
 							}
 						}
-						
-						
 					}
 					else
 					{
