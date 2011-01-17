@@ -93,10 +93,13 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 		// when we finish a test we need to see if there were no errors in the test we need to clean him from the failure object
 		if(!$test->hasFailures)
 		{
-			if(KalturaUnitTestListener::$failures->failures != null)
+			if(KalturaUnitTestListener::$failures != null)
 			{
-				//remove from result object
-				array_pop(KalturaUnitTestListener::$failures->failures);
+				if(KalturaUnitTestListener::$failures->failures != null)
+				{
+					//remove from result object
+					array_pop(KalturaUnitTestListener::$failures->failures);
+				}
 			}
 		}
 	}
