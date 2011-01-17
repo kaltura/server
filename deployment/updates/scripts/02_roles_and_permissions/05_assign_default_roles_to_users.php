@@ -50,7 +50,7 @@ while(count($users))
 		file_put_contents($lastUserFile, $lastUser);
 	}
 	
-	$users = getUsers($lastUser, $userLimitEachLoop);
+	$users = getAdminUsers($lastUser, $userLimitEachLoop);
 }
 
 $msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
