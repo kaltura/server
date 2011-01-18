@@ -539,7 +539,7 @@ KTestMe.prototype = {
 		
 		var leftBoxLeftMargin = jQuery(".left").css("margin-left").replace("px", "");
 		leftBoxLeftMargin = Number(leftBoxLeftMargin);
-		this.resultWidth = jQuery("body").innerWidth() - leftBoxWidth - leftBoxLeftMargin - leftBoxRightMargin - 20;
+		this.resultWidth = jQuery("body").innerWidth() - leftBoxWidth - leftBoxLeftMargin - leftBoxRightMargin - 21;
 	},
 	
 	initCodeExample: function(generator) {
