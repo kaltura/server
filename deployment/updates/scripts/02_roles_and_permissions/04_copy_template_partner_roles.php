@@ -14,7 +14,7 @@ require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
 $lastPartnerFile = 'role_copy_last_partner';
-$lastPartner = -10;
+$lastPartner = 0;
 if(file_exists($lastPartnerFile)) {
 	$lastPartner = file_get_contents($lastPartnerFile);
 	KalturaLog::log('last partner file already exists with value - '.$lastPartner);
