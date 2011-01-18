@@ -187,6 +187,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 */
 	public $roleIds;
 
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $roleNames;
+
 	
 
 	private static $map_between_objects = array
@@ -216,6 +222,7 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"statusUpdatedAt",
 		"deletedAt",
 		"roleIds",
+		"roleNames" => "userRoleNames"
 	);
 
 	public function getMapBetweenObjects ( )
