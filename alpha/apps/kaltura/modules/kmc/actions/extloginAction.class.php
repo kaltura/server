@@ -9,6 +9,30 @@ class extloginAction extends kalturaAction
 		$this->ks = $this->getP ( "ks" );
 		$this->screen_name = $this->getP ( "screen_name" );
 		
+		// crack KS
+		$ksObj = null;
+		if ($this->ks)
+		{
+			try { $ksObj = kSessionUtils::crackKs($this->ks); }
+			catch (Exception $e) { $ksObj = null; };
+		}
+		
+		// if no user id defined -> get from ks
+		if (!$this->uid && $ksObj)
+		{
+			$this->uid = $ksObj->user;
+		}
+		
+		// if no screen name defined -> get kuser object
+		if (!$this->screen_name && $this->partner_id && $this->uid)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $this->uid, true);
+			if ($kuser) {
+				$this->screen_name = $kuser->getScreenName();
+			}
+		}		
+		
+		
 		$exp = 0;
 		$path = "/";
 		
