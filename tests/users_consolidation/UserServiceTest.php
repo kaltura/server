@@ -251,7 +251,8 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($newUser->email, $createdUser->email);
 		$this->assertEquals($newUser->firstName, $createdUser->firstName);
 		$this->assertEquals($newUser->lastName, $createdUser->lastName);
-		
+		$this->assertNull($createdUser->roleIds);
+				
 		// check the user returned from the api
 		$getUser = $this->client->user->get($newUser->id);
 		$this->assertNotNull($getUser);
@@ -277,6 +278,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($newUser->email, $createdUser->email);
 		$this->assertEquals($newUser->firstName, $createdUser->firstName);
 		$this->assertEquals($newUser->lastName, $createdUser->lastName);
+		$this->assertNull($createdUser->roleIds);
 		
 		$dbUser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $newUser->id);
 		$this->assertNotNull($dbUser);
