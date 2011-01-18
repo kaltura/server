@@ -25,7 +25,7 @@ class Form_NewUser extends Zend_Form
 			'validators' 	=> array()
 		));
 		
-		// Add an first name element
+		// Add an last name element
 		$this->addElement('text', 'last_name', array(
 			'label'			=> 'Last Name:',
 			'required'		=> true,
@@ -41,9 +41,22 @@ class Form_NewUser extends Zend_Form
 			'decorators' => array('ViewHelper')
 		));
 		
-		$role = new Kaltura_Form_Element_EnumSelect('role', array('enum' => 'KalturaAdminConsoleUserRole'));
-		$role->setLabel('Role:');
-		$this->addElements(array($role));
+
+		$this->addElement('select', 'role', array(
+			'label'			=> 'Role:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$element = $this->getElement('role');
+		
+		$client = Kaltura_ClientHelper::getClient();
+		$userRoles = $client->userRole->listAction();
+		if ($userRoles && isset($userRoles->objects)) {
+			$userRoles = $userRoles->objects;
+			foreach($userRoles as $role) {
+				$element->addMultiOption($role->id, $role->name);
+			}
+		}	
 		
 		$this->setDecorators(array(
 			'FormElements',
