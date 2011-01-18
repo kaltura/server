@@ -1259,6 +1259,180 @@ class KalturaPartnerService extends KalturaServiceBase
 	}
 }
 
+class KalturaPermissionItemService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaPermissionItem $permissionItem)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItem", $permissionItem->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function get($permissionItemId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->queueServiceActionCall("permissionitem", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function update($permissionItemId, KalturaPermissionItem $permissionItem)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->addParam($kparams, "permissionItem", $permissionItem->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function delete($permissionItemId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionItemId", $permissionItemId);
+		$this->client->queueServiceActionCall("permissionitem", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItem");
+		return $resultObject;
+	}
+
+	function listAction(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("permissionitem", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPremissionItemListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaPermissionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaPermission $permission)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permission", $permission->toParams());
+		$this->client->queueServiceActionCall("permission", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function get($permissionName)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->queueServiceActionCall("permission", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function update($permissionName, KalturaPermission $permission)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->addParam($kparams, "permission", $permission->toParams());
+		$this->client->queueServiceActionCall("permission", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function delete($permissionName)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "permissionName", $permissionName);
+		$this->client->queueServiceActionCall("permission", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermission");
+		return $resultObject;
+	}
+
+	function listAction(KalturaPermissionFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("permission", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaPermissionListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaSessionService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function end()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("session", "end", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+}
+
 class KalturaThumbAssetService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -1313,6 +1487,96 @@ class KalturaThumbParamsService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaThumbParamsListResponse");
+		return $resultObject;
+	}
+}
+
+class KalturaUserRoleService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUserRole $userRole)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRole", $userRole->toParams());
+		$this->client->queueServiceActionCall("userrole", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function get($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function update($userRoleId, KalturaUserRole $userRole)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->addParam($kparams, "userRole", $userRole->toParams());
+		$this->client->queueServiceActionCall("userrole", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function delete($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
+		return $resultObject;
+	}
+
+	function listAction(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("userrole", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRoleListResponse");
+		return $resultObject;
+	}
+
+	function cloneAction($userRoleId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userRoleId", $userRoleId);
+		$this->client->queueServiceActionCall("userrole", "clone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUserRole");
 		return $resultObject;
 	}
 }
@@ -2178,52 +2442,6 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaTrackEntryListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function fromSecureString($str)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "str", $str);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
-		return $resultObject;
-	}
-
-	function iptocountry($remote_addr)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "remote_addr", $remote_addr);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function getRemoteAddress()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
@@ -3410,6 +3628,52 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 	}
 }
 
+class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function fromSecureString($str)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "str", $str);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
+		return $resultObject;
+	}
+
+	function iptocountry($remote_addr)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "remote_addr", $remote_addr);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function getRemoteAddress()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+}
+
 class KalturaDistributionProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -4036,6 +4300,27 @@ class KalturaClient extends KalturaClientBase
 	public $partner = null;
 
 	/**
+	 * PermissionItem service lets you create and manage permission items
+	 *
+	 * @var KalturaPermissionItemService
+	 */
+	public $permissionItem = null;
+
+	/**
+	 * Permission service lets you create and manage user permissions
+	 *
+	 * @var KalturaPermissionService
+	 */
+	public $permission = null;
+
+	/**
+	 * Session service
+	 *
+	 * @var KalturaSessionService
+	 */
+	public $session = null;
+
+	/**
 	 * Retrieve information and invoke actions on Thumb Asset
 	 *
 	 * @var KalturaThumbAssetService
@@ -4048,6 +4333,13 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaThumbParamsService
 	 */
 	public $thumbParams = null;
+
+	/**
+	 * UserRole service lets you create and manage user permissions
+	 *
+	 * @var KalturaUserRoleService
+	 */
+	public $userRole = null;
 
 	/**
 	 * Manage partner users on Kaltura's side
@@ -4121,14 +4413,6 @@ class KalturaClient extends KalturaClientBase
 	public $entryAdmin = null;
 
 	/**
-	 * Internal Tools Service
-	 * 
-	 *
-	 * @var KalturaKalturaInternalToolsSystemHelperService
-	 */
-	public $kalturaInternalToolsSystemHelper = null;
-
-	/**
 	 * 
 	 *
 	 * @var KalturaFilesyncImportBatchService
@@ -4141,6 +4425,14 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaVirusScanProfileService
 	 */
 	public $virusScanProfile = null;
+
+	/**
+	 * Internal Tools Service
+	 * 
+	 *
+	 * @var KalturaKalturaInternalToolsSystemHelperService
+	 */
+	public $kalturaInternalToolsSystemHelper = null;
 
 	/**
 	 * Distribution Profile service
@@ -4219,8 +4511,12 @@ class KalturaClient extends KalturaClientBase
 		$this->flavorParams = new KalturaFlavorParamsService($this);
 		$this->jobs = new KalturaJobsService($this);
 		$this->partner = new KalturaPartnerService($this);
+		$this->permissionItem = new KalturaPermissionItemService($this);
+		$this->permission = new KalturaPermissionService($this);
+		$this->session = new KalturaSessionService($this);
 		$this->thumbAsset = new KalturaThumbAssetService($this);
 		$this->thumbParams = new KalturaThumbParamsService($this);
+		$this->userRole = new KalturaUserRoleService($this);
 		$this->user = new KalturaUserService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataProfile = new KalturaMetadataProfileService($this);
@@ -4231,9 +4527,9 @@ class KalturaClient extends KalturaClientBase
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($this);
 		$this->mediaInfo = new KalturaMediaInfoService($this);
 		$this->entryAdmin = new KalturaEntryAdminService($this);
-		$this->kalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService($this);
 		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
 		$this->virusScanProfile = new KalturaVirusScanProfileService($this);
+		$this->kalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService($this);
 		$this->distributionProfile = new KalturaDistributionProfileService($this);
 		$this->entryDistribution = new KalturaEntryDistributionService($this);
 		$this->distributionProvider = new KalturaDistributionProviderService($this);
