@@ -935,7 +935,7 @@ class kuser extends Basekuser
 	private $roleIdsChanged = false;
 				
 	/**
-	 * @return array Array of role IDs associated to the current kuser
+	 * @return string Comma seperated string of role names associated to the current user
 	 */
 	public function getUserRoleNames()
 	{		
@@ -948,6 +948,9 @@ class kuser extends Basekuser
 		return $names;
 	}
 	
+	/**
+	 * @return string Comma seperated string of role ids associated to the current user
+	 */
 	public function getRoleIds()
 	{
 		if (is_null($this->roleIds))
