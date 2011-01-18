@@ -8,12 +8,13 @@
 				<th><?php echo $this->translate('Admin ID'); ?></th>
 				<th><?php echo $this->translate('Email Address'); ?></th>
 				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Role'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="5">
+			<td colspan="6">
 			<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -34,6 +35,7 @@
 						(<?php echo implode($titles, ', '); ?>)
 					<?php endif; ?>
 				</td>
+				<td><?php echo $user->roleNames.' ('.$user->roleIds.')'; ?></td>
 				<td>
 					<?php $disabled = (($user->email == $this->myEmail) || ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary)) ? ' disabled="disabled"' : ''; ?>
 					<select class="options" onchange="doAction(this.value, <?php echo $user->id; ?>)"<?php echo $disabled; ?>>
