@@ -428,7 +428,7 @@ class BatchController extends Zend_Controller_Action
 			return;
 		}
 		
-		$adminId = Zend_Auth::getInstance()->getIdentity()->id;
+		$adminId = Zend_Auth::getInstance()->getIdentity()->getUser()->id;
 		
 		$action = $request->getParam('hdnAction', false);
 		if($action)

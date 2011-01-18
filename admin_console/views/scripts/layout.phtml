@@ -24,7 +24,7 @@
 	<?php endif; ?>
 	<div id="user_links">
 		<?php if (Zend_Auth::getInstance()->hasIdentity()): ?>
-			<span>Hi <?php echo Zend_Auth::getInstance()->getIdentity()->firstName; ?></span><br />
+			<span>Hi <?php echo Zend_Auth::getInstance()->getIdentity()->getUser()->firstName; ?></span><br />
 			<!--
 			<a href="javascript:alert('link to be provided')">Quick Start Guide</a> &nbsp;| &nbsp;
 			<a href="javascript:alert('link to be provided')">Support</a> &nbsp;| &nbsp;

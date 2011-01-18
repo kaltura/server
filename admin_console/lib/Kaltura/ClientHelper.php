@@ -3,24 +3,6 @@ class Kaltura_ClientHelper
 {
 	private static $client = null;
 	
-	private static function createKS($partnerId, $adminSecret, $sessionType = KalturaSessionType::ADMIN, $expiry = 7200)
-	{
-		$puserId = '';
-		$privileges = '';
-		
-		$rand = rand(0, 32000);
-		$rand = microtime(true);
-		$expiry = time() + $expiry;
-		$fields = array($partnerId, '', $expiry, $sessionType, $rand, $puserId, $privileges);
-		$str = implode(";", $fields);
-		
-		$salt = $adminSecret;
-		$hashed_str = self::hash($salt, $str) . "|" . $str;
-		$decoded_str = base64_encode($hashed_str);
-		
-		return $decoded_str;
-	}
-	
 	private static function hash($salt, $str)
 	{
 		return sha1($salt . $str);
@@ -60,11 +42,14 @@ class Kaltura_ClientHelper
 	
 	public static function getKs()
 	{
-		$settings = Zend_Registry::get('config')->settings;
-		$partnerId = $settings->partnerId;
-		$secret = $settings->secret;
-		$sessionExpiry = $settings->sessionExpiry;
-		$ks = self::createKS($partnerId, $secret, KalturaSessionType::ADMIN, $sessionExpiry);
+		if (Zend_Auth::getInstance()->hasIdentity())
+		{
+			$ks = Zend_Auth::getInstance()->getIdentity()->getKs();
+		}
+		else
+		{
+			$ks = null;
+		}
 		
 		return $ks;
 	}

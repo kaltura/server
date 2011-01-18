@@ -12,7 +12,7 @@ class UserController extends Zend_Controller_Action
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
-		$this->view->myEmail = Zend_Auth::getInstance()->getIdentity()->email;
+		$this->view->myEmail = Zend_Auth::getInstance()->getIdentity()->getUser()->email;
 		$this->view->paginator = $paginator;
 	}
 	
@@ -47,15 +47,8 @@ class UserController extends Zend_Controller_Action
 		{
 			$client = Kaltura_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
-			$array = array(
-				'email' => $request->getPost('email'),
-				'expiry' => time() + 60*60*24 // 24 hours
-			);
-			$config = Zend_Registry::get('config');
-			$token = kString::signString(serialize($array), $config->settings->secret);
-			$url = $this->view->serverUrl($this->_helper->url('reset-password-link', 'user', null, array('token' => $token)));
-			
-			$client->user->resetPassword($array['email']); // ask to reset password
+
+			$client->user->resetPassword($userEmail); // ask to reset password
 			//TODO: fix it so that reset password link will lead to admin console instead of kmc!
 			
 			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
@@ -69,11 +62,13 @@ class UserController extends Zend_Controller_Action
 	
 	public function resetPasswordLinkAction()
 	{
+		die('Not yet implemented');
+		
 		$request = $this->getRequest();
 		$token = $request->get('token');
 		$config = Zend_Registry::get('config');
-		$result = kString::crackString($token, $config->settings->secret);
-		$array = unserialize($result);
+		//$result = kString::crackString($token, $config->settings->secret);
+		//$array = unserialize($result);
 		if (!is_array($array) || !isset($array['email']) || !isset($array['expiry']) || ($array['expiry']) <= time())
 		{
 			$invalidToken = true;
@@ -86,9 +81,7 @@ class UserController extends Zend_Controller_Action
 		
 		
 		if ($request->isPost())
-		{
-			
-			
+		{			
 			// redirect to display the message, and to hide the url with the token
 			$this->_helper->redirector('reset-password-ok', 'user');
 			$form->hideForm();
@@ -145,6 +138,8 @@ class UserController extends Zend_Controller_Action
 	public function logoutAction()
 	{
 		Zend_Session::forgetMe();
+		$client = Kaltura_ClientHelper::getClient();
+		$client->session->end();
 		Zend_Auth::getInstance()->clearIdentity();
 		$this->_helper->redirector('index', 'index');
 	}
@@ -196,9 +191,7 @@ class UserController extends Zend_Controller_Action
 				$user->status = KalturaUserStatus::ACTIVE;
 				$user->id = $user->email;
 				$user->isAdmin = true;
-				$partnerData = new Kaltura_AdminConsoleUserPartnerData();
-				$partnerData->role = $request->getPost('role');
-				$user->partnerData = serialize($partnerData);
+				$user->roleIds = $request->getPost('role');
 				$client->user->add($user);
 				$this->_helper->redirector('index');
 			}
@@ -237,7 +230,7 @@ class UserController extends Zend_Controller_Action
 			try
 			{
 				$client->user->updateLoginData(
-					$identity->email,
+					$identity->getUser()->email,
 					$request->getPost('old_password'),
 					$request->getPost('email_address'),
 					$request->getPost('new_password')
