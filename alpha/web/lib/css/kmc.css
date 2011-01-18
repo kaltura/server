@@ -4,7 +4,7 @@ html { height: 100%;}
 
 body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;*/
  a { text-decoration:none;}
-  #kmcHeader { min-width: 960px; height:29px; padding: 4px 7px 0; background: url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;}
+  #kmcHeader { min-width: 980px; height:29px; padding: 4px 7px 0; background: url(../images/kmc/kmc_sprite.png) repeat-x scroll 0 -29px;}
    #kmcHeader div#logo { width:115px; height:30px; margin-top:-3px; float:left; background: url(../images/kmc/kmc_sprite.png) no-repeat 1px 3px;}
     #kmcHeader.whiteLabel div#logo { background: url(../images/kmc/whitelabel_logo.png) no-repeat 0 0;}
    #kmcHeader ul { height:29px; margin: -4px 0 0 50px; float:left;}
@@ -161,10 +161,10 @@ fieldset{ border:0 none; position:relative; }
 	#modal div.center { text-align: center; }
 	#modal input#html5_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
-	.red { color: #ff0000; }
 	#modal input, textarea { color: #777; }
 	#modal div.note { clear: both; font-size: 11px; color: #999 }	  
 	#modal div.note a { color: #009acc; }
+	#modal div.red { color: #ff0000; }	   	
 
 	/* jw */
 	#modal input { background:#F7F7F7;}
