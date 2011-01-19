@@ -124,12 +124,13 @@ class KAsyncImport extends KBatchBase
 				$destFile = realpath($rootPath) . "/$uniqid";
 				KalturaLog::debug("destFile [$destFile]");
 				
-				$ext = pathinfo($sourceUrl, PATHINFO_EXTENSION);
-				$extArr = explode('?', $ext); // remove query string
-				$ext = reset($extArr);
+				$qpos = strpos($sourceUrl, "?");
+				if ($qpos !== false)
+					$sourceUrlPath = substr($sourceUrl, 0, $qpos);
+				$ext = pathinfo($sourceUrlPath, PATHINFO_EXTENSION);
 				if(strlen($ext))
 					$destFile .= ".$ext";
-					
+				
 				$data->destFileLocalPath = $destFile;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2, $data);
 			}
