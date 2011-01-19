@@ -609,7 +609,7 @@ $(window).load(function(){
 							 (kmc.vars.jw ? jw_nomix_box_html : '') +							 
 							 (kmc.vars.jw ? jw_options_html : '') +
 							 ((kmc.vars.silverlight || live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, has_mobile_flavors)) + 
+							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, uiconf_id, has_mobile_flavors)) + 
 							 '<div class="embed_code_div"><div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
@@ -697,10 +697,10 @@ $(window).load(function(){
 			return html;
 		},
 		
-		buildHTML5Option : function(entry_id, partner_id, has_mobile_flavors) {
+		buildHTML5Option : function(entry_id, partner_id, uiconf_id, has_mobile_flavors) {
 			//console.log('buildHTML5Option');
 			//console.log(arguments);
-			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id;
+			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id + ':' + uiconf_id;
 			var url_text = url.replace(/http:\/\/|www./ig, '');
 			var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
 			if(has_mobile_flavors) {
