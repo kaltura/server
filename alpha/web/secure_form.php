@@ -268,6 +268,7 @@ HTML;
 			$user = new KalturaUser();
 			$user->firstName = $_POST['fname'];
 			$user->lastName = $_POST['lname'];
+			echo $this->userId; exit();
 			$results = $client->user->update($this->userId, $user);
 			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
