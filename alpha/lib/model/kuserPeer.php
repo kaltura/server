@@ -403,7 +403,7 @@ class kuserPeer extends BasekuserPeer
 	{
 		$partnerId = $user->getPartnerId();
 		$creatorUserName = 'Unknown';
-		if (!is_null(kCurrentContext::$uid))
+		if (!is_null(kCurrentContext::$ks_uid))
 		{
 			$creatorUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$uid);
 			if ($creatorUser) {
@@ -495,12 +495,12 @@ class kuserPeer extends BasekuserPeer
 		if ($existingUser)
 		{
 			$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
 		}
 		else
 		{
 			$mailType = self::KALTURA_NEW_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
 		}		
 		
 		// add mail job
