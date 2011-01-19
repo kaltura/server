@@ -428,6 +428,16 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
+			
+			if (!$user)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+			}
+			
+			if (!$user->getIsAdmin() && !$password) {
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'password');
+			}
+			
 			$user->enableLogin($loginId, $password, true);	
 			$user->save();
 		}
