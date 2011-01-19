@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class MetadataSearchFilter extends AdvancedSearchFilter
+class MetadataSearchFilter extends AdvancedSearchFilterOperator
 {
 	const KMC_FIELD_TYPE_TEXT = 'textType';
 	const KMC_FIELD_TYPE_LIST = 'listType';

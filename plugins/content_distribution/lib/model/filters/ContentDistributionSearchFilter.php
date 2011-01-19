@@ -3,7 +3,7 @@
  * @package lib.model
  * @subpackage filters
  */
-class ContentDistributionSearchFilter extends AdvancedSearchFilter
+class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 {
 	/**
 	 * @var string

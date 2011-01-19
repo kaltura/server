@@ -501,7 +501,7 @@ class SolrEntryCriteria extends KalturaCriteria
 	protected function applyFilter(entryFilter $filter)
 	{
 		$advancedSearch = $filter->getAdvancedSearch();
-		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilter)
+		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilterItem)
 		{
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
 			$advancedSearch->apply($filter, $this, $this->whereClause, $this->whereClause);
