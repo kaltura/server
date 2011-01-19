@@ -37,6 +37,9 @@ class KalturaSearchOperator extends KalturaSearchItem
 //		KalturaLog::debug("To object: type [$this->type] items [" . count($this->items) . "]");
 		
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
+		if(!$object_to_fill)
+			return null;
+			
 		if($this->items)
 			$object_to_fill->setItems($this->items->toObjectsArray());
 		
