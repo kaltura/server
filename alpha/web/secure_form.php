@@ -276,6 +276,7 @@ HTML;
 			exit();
 			
 		} catch( Exception $e ){
+			echo '<pre>'; print_r($e); exit();
 			// Show error
 			$this->error = $e->getMessage();
 			$this->showChangeName();
