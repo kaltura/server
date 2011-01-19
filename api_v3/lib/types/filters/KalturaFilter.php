@@ -119,12 +119,15 @@ class KalturaFilter extends KalturaObject
 		 	$object_to_fill->set($filter_prop_name, $value);
 		 }		
 		 		
-		if(is_object($this->advancedSearch) && $this->advancedSearch instanceof KalturaSearchItem)
+		if(is_object($this->advancedSearch))
 		{
-//			KalturaLog::debug("Advanced Search [" . print_r($this->advancedSearch, true) . "]");
-			$advancedSearch = $this->advancedSearch->toObject();
-			if($advancedSearch)
-				$object_to_fill->setAdvancedSearch($advancedSearch);
+			KalturaLog::debug("Advanced Search [" . print_r($this->advancedSearch, true) . "]");
+			if($this->advancedSearch instanceof KalturaSearchItem)
+			{
+				$advancedSearch = $this->advancedSearch->toObject();
+				if($advancedSearch)
+					$object_to_fill->setAdvancedSearch($advancedSearch);
+			}
 		}
 			
 		return $object_to_fill;		
@@ -188,7 +191,7 @@ class KalturaFilter extends KalturaObject
 	    $this->orderBy = $newOrderBy;
 	
 	    $advancedSearch = $source_object->getAdvancedSearch();
-		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilter)
+		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilterItem)
 		{
 			$apiClass = $advancedSearch->getKalturaClass();
 			if(!class_exists($apiClass))
