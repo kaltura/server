@@ -249,7 +249,7 @@ HTML;
 	function doChangeName() {
 		// Set current action
 		$this->curAction = 'name';		
-		
+		echo $this->userId; exit();
 		// Checks if we have empty fields
 		$required = array('fname', 'lname');
 		foreach($required as $req) {
