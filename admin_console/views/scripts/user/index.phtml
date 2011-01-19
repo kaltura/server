@@ -38,7 +38,7 @@
 				<td><?php echo $user->roleNames.' ('.$user->roleIds.')'; ?></td>
 				<td>
 					<?php $disabled = (($user->email == $this->myEmail) || ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary)) ? ' disabled="disabled"' : ''; ?>
-					<select class="options" onchange="doAction(this.value, <?php echo $user->id; ?>)"<?php echo $disabled; ?>>
+					<select class="options" onchange="doAction(this.value, '<?php echo $user->id; ?>') "<?php echo $disabled; ?>>
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if ($user->email != $this->myEmail): ?>
 							<?php if ($user->status === KalturaUserStatus::ACTIVE): ?>
