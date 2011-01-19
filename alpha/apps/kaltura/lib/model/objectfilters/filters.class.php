@@ -15,7 +15,7 @@ abstract class baseObjectFilter extends myBaseObject
 	public $fields;
 	
 	/**
-	 * @var AdvancedSearchFilter
+	 * @var AdvancedSearchFilterItem
 	 */
 	protected $advancedSearch;
 
@@ -920,13 +920,13 @@ abstract class baseObjectFilter extends myBaseObject
 		}
 	}	
 	
-	public function setAdvancedSearch(AdvancedSearchFilter $advancedSearch)
+	public function setAdvancedSearch(AdvancedSearchFilterItem $advancedSearch)
 	{
 		$this->advancedSearch = $advancedSearch;
 	}	
 	
 	/**
-	 * @return AdvancedSearchFilter
+	 * @return AdvancedSearchFilterItem
 	 */
 	public function getAdvancedSearch()
 	{
@@ -935,7 +935,7 @@ abstract class baseObjectFilter extends myBaseObject
 	
 	public function addAdvancedSearchToXml(SimpleXMLElement &$xmlElement)
 	{
-		if(!is_object($this->advancedSearch) || !$this->advancedSearch instanceof AdvancedSearchFilter)
+		if(!is_object($this->advancedSearch) || !$this->advancedSearch instanceof AdvancedSearchFilterItem)
 			return;
 		
 		$advancedXmlElement = $xmlElement->addChild('advancedSearch');

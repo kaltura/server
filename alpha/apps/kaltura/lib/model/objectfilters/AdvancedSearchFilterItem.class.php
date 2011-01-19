@@ -7,6 +7,11 @@ class AdvancedSearchFilterItem
 	 */
 	protected $kalturaClass;
 	
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
+	{
+		
+	}
+	
 	public function addToXml(SimpleXMLElement &$xmlElement)
 	{
 		$xmlElement->addAttribute('kalturaClass', $this->kalturaClass);

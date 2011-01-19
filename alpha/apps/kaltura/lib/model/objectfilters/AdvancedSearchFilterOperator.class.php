@@ -1,6 +1,6 @@
 <?php
 
-abstract class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
+class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 {
 	const SEARCH_AND = 1;
 	const SEARCH_OR = 2;
