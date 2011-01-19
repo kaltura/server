@@ -227,7 +227,7 @@ if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 	</form>
 	<p>&nbsp;</p>
 </div><!--wrapper-->
-	<?
+	<?php
 	}
 }
 else {
