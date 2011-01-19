@@ -221,7 +221,12 @@ class myInsertEntryHelper
 		}
 		
 		if ($ext == null)
-			$ext = strtolower(pathinfo($entry_fullPath, PATHINFO_EXTENSION));
+		{
+			$qpos = strpos($entry_fullPath, "?");
+			if ($qpos !== false)
+				$entry_fullPathTmp = substr($entry_fullPath, 0, $qpos);
+			$ext = strtolower(pathinfo($entry_fullPathTmp, PATHINFO_EXTENSION));
+		}
 		
 			// save the Trackentry
 		TrackEntry::addTrackEntry( $te );
