@@ -35,10 +35,10 @@ class KalturaSearchOperator extends KalturaSearchItem
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 //		KalturaLog::debug("To object: type [$this->type] items [" . count($this->items) . "]");
-		
-		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 		if(!$object_to_fill)
-			return null;
+			$object_to_fill = new AdvancedSearchFilterOperator();
+			
+		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 			
 		if($this->items)
 			$object_to_fill->setItems($this->items->toObjectsArray());
