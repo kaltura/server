@@ -36,7 +36,8 @@ if( ! $sf_params->has('p') || $sf_params->has['e'] ) {
 <!-- <script type="text/javascript" src="http://html5.kaltura.org/js"></script> -->
 <script src="/html5/html5lib/v1.0/mwEmbedLoader.php"></script> 
 <script type="text/javascript">
-var partnerId = <?php echo $sf_params->get('p'); ?>
+var partnerId = <?php echo $sf_params->get('p'); ?>;
+var uiConf = <?php echo $sf_params->get('u'); ?>;
 
 mw.ready( function(){
 
@@ -49,6 +50,7 @@ mw.ready( function(){
 		kalturaIframeEmbed('videoContainer', { 
 			entry_id: entryId, 
 			wid: '_' + partnerId,
+			uiconf_id: uiConf,
 			p: partnerId 
 		}, {
 			hash: mw.getKalturaIframeHash(), 
