@@ -341,10 +341,15 @@ abstract class SphinxCriteria extends KalturaCriteria
 	protected function applyFilter(baseObjectFilter $filter)
 	{
 		$advancedSearch = $filter->getAdvancedSearch();
-		if(is_object($advancedSearch) && $advancedSearch instanceof AdvancedSearchFilterItem)
+		if(is_object($advancedSearch))
 		{
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
-			$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause);
+			if($advancedSearch instanceof AdvancedSearchFilterItem)
+				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause);
+		}
+		else
+		{
+			KalturaLog::debug('No advanced filter found');
 		}
 		
 		$this->applyFilterFields($filter);
