@@ -276,7 +276,6 @@ HTML;
 			exit();
 			
 		} catch( Exception $e ){
-			echo $this->userId; exit();
 			// Show error
 			$this->error = $e->getMessage();
 			$this->showChangeName();
