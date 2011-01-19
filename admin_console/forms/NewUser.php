@@ -45,12 +45,15 @@ class Form_NewUser extends Zend_Form
 		$this->addElement('select', 'role', array(
 			'label'			=> 'Role:',
 			'filters'		=> array('StringTrim'),
+			'required'		=> true,
 		));
 		
 		$element = $this->getElement('role');
 		
 		$client = Kaltura_ClientHelper::getClient();
-		$userRoles = $client->userRole->listAction();
+		$filter = new KalturaUserRoleFilter();
+		$filter->tagsMultiLikeAnd = 'admin_console';
+		$userRoles = $client->userRole->listAction($filter);
 		if ($userRoles && isset($userRoles->objects)) {
 			$userRoles = $userRoles->objects;
 			foreach($userRoles as $role) {
