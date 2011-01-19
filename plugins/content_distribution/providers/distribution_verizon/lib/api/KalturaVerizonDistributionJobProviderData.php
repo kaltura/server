@@ -16,6 +16,11 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $distributionProfileId;
 
+
+	/**
+	 * @var string
+	 */
+	public $deleteOp = '';
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{

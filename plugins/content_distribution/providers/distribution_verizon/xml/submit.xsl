@@ -6,6 +6,7 @@
 	<xsl:output omit-xml-declaration="no" method="xml" />
 	<xsl:variable name="distributionProfileId" />
 	<xsl:variable name="metadataProfileId" />	
+	<xsl:variable name="deleteOp"/>	
 
 	<xsl:template name="implode">
 		<xsl:param name="items" />
@@ -90,19 +91,35 @@
 				<msdp:year><xsl:value-of select="php:function('date', 'Y', sum(createdAt))" /></msdp:year>
 				<msdp:liveDate>
 					<xsl:choose>
-						<xsl:when test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise) > 0">
-							<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
+						<xsl:when test="$deleteOp = ''">
+							<xsl:choose>
+								<xsl:when test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise) > 0">
+									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000')" />
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000')" />
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-2*86400)" />
 						</xsl:otherwise>
 					</xsl:choose>
 				</msdp:liveDate>
-				<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
-					<msdp:endDate>
-						<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
-					</msdp:endDate>
-				</xsl:if>
+				<xsl:choose>
+					<xsl:when test="$deleteOp = ''">
+						<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
+							<msdp:endDate>
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
+							</msdp:endDate>
+						</xsl:if>
+					</xsl:when>
+					<xsl:otherwise>						
+						<msdp:endDate>
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-86400)" />
+						</msdp:endDate>
+					</xsl:otherwise>
+				</xsl:choose>
 				<msdp:purchaseEndDate />
 				<msdp:priority>1</msdp:priority>
 				<msdp:allowStreaming>Y</msdp:allowStreaming>

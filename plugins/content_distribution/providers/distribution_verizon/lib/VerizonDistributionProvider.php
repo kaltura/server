@@ -123,6 +123,7 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateDeleteXML($entryId, KalturaVerizonDistributionJobProviderData $providerData)
 	{
+		$providerData->$deleteOp='1';
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{
