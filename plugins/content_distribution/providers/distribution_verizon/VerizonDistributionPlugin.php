@@ -209,16 +209,6 @@ class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		// append VERIZON specific report statistics
-		$status = $mrss->addChild('status');
-		
-		$status->addChild('emailed', $entryDistribution->getFromCustomData('emailed'));
-		$status->addChild('rated', $entryDistribution->getFromCustomData('rated'));
-		$status->addChild('blogged', $entryDistribution->getFromCustomData('blogged'));
-		$status->addChild('reviewed', $entryDistribution->getFromCustomData('reviewed'));
-		$status->addChild('bookmarked', $entryDistribution->getFromCustomData('bookmarked'));
-		$status->addChild('playbackFailed', $entryDistribution->getFromCustomData('playbackFailed'));
-		$status->addChild('timeSpent', $entryDistribution->getFromCustomData('timeSpent'));
-		$status->addChild('recommended', $entryDistribution->getFromCustomData('recommended'));
 	}
 
 	/**

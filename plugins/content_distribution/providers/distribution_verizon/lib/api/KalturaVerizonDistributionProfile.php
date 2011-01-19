@@ -15,6 +15,11 @@ class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $domain;
+
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -24,6 +29,7 @@ class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
 		'username',
 		'password',
 		'domain',
+		'metadataProfileId',
 	 );
 		 
 	public function getMapBetweenObjects()

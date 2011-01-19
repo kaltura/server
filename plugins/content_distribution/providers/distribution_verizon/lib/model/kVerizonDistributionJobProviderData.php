@@ -22,80 +22,9 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	private $metadataProfileId;
 	
 	/**
-	 * @var string
-	 */
-	private $movFlavorAssetId;
-	
-	/**
-	 * @var string
-	 */
-	private $flvFlavorAssetId;
-	
-	/**
-	 * @var string
-	 */
-	private $wmvFlavorAssetId;
-	
-	/**
-	 * @var string
-	 */
-	private $thumbAssetId;
-	
-	/**
 	 * @var int
 	 */
-	private $emailed;
-	
-	/**
-	 * @var int
-	 */
-	private $rated;
-	
-	/**
-	 * @var int
-	 */
-	private $blogged;
-	
-	/**
-	 * @var int
-	 */
-	private $reviewed;
-	
-	/**
-	 * @var int
-	 */
-	private $bookmarked;
-	
-	/**
-	 * @var int
-	 */
-	private $playbackFailed;
-	
-	/**
-	 * @var int
-	 */
-	private $timeSpent;
-	
-	/**
-	 * @var int
-	 */
-	private $recommended;
-
-	/**
-	 * @return the $emailed
-	 */
-	public function getEmailed()
-	{
-		return $this->emailed;
-	}
-
-	/**
-	 * @return the $rated
-	 */
-	public function getRated()
-	{
-		return $this->rated;
-	}
+	private $distributionProfileId;
 
 	public function __construct(kDistributionJobData $distributionJobData = null)
 	{
@@ -103,115 +32,27 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	}
 
 	/**
-	 * @return the $blogged
+	 * @return the $metadataProfileId
 	 */
-	public function getBlogged()
+	public function getMetadataProfileId()
 	{
-		return $this->blogged;
+		return $this->metadataProfileId;
+	}
+	
+	/**
+	 * @return the $distributionProfileId
+	 */
+	public function getDistributionProfileId()
+	{
+		return $this->distributionProfileId;
 	}
 
 	/**
-	 * @return the $reviewed
+	 * @param int $distributionProfileId
 	 */
-	public function getReviewed()
+	public function setDistributionProfileId($distributionProfileId)
 	{
-		return $this->reviewed;
-	}
-
-	/**
-	 * @return the $bookmarked
-	 */
-	public function getBookmarked()
-	{
-		return $this->bookmarked;
-	}
-
-	/**
-	 * @return the $playbackFailed
-	 */
-	public function getPlaybackFailed()
-	{
-		return $this->playbackFailed;
-	}
-
-	/**
-	 * @return the $timeSpent
-	 */
-	public function getTimeSpent()
-	{
-		return $this->timeSpent;
-	}
-
-	/**
-	 * @return the $recommended
-	 */
-	public function getRecommended()
-	{
-		return $this->recommended;
-	}
-
-	/**
-	 * @param int $emailed
-	 */
-	public function setEmailed($emailed)
-	{
-		$this->emailed = $emailed;
-	}
-
-	/**
-	 * @param int $rated
-	 */
-	public function setRated($rated)
-	{
-		$this->rated = $rated;
-	}
-
-	/**
-	 * @param int $blogged
-	 */
-	public function setBlogged($blogged)
-	{
-		$this->blogged = $blogged;
-	}
-
-	/**
-	 * @param int $reviewed
-	 */
-	public function setReviewed($reviewed)
-	{
-		$this->reviewed = $reviewed;
-	}
-
-	/**
-	 * @param int $bookmarked
-	 */
-	public function setBookmarked($bookmarked)
-	{
-		$this->bookmarked = $bookmarked;
-	}
-
-	/**
-	 * @param int $playbackFailed
-	 */
-	public function setPlaybackFailed($playbackFailed)
-	{
-		$this->playbackFailed = $playbackFailed;
-	}
-
-	/**
-	 * @param int $timeSpent
-	 */
-	public function setTimeSpent($timeSpent)
-	{
-		$this->timeSpent = $timeSpent;
-	}
-
-	/**
-	 * @param int $recommended
-	 */
-	public function setRecommended($recommended)
-	{
-		$this->recommended = $recommended;
+		$this->distributionProfileId = $distributionProfileId;
 	}
 	
 	/**

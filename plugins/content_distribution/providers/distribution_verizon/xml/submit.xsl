@@ -5,6 +5,7 @@
 
 	<xsl:output omit-xml-declaration="no" method="xml" />
 	<xsl:variable name="distributionProfileId" />
+	<xsl:variable name="metadataProfileId" />	
 
 	<xsl:template name="implode">
 		<xsl:param name="items" />
@@ -25,14 +26,14 @@
 			<xsl:if test="@flavorAssetId = $flavorAssetId">
 				<item>
 					<title>
-						<xsl:if test="count(/item/customData/metadata/shortTitle) > 0">
-							<xsl:value-of select="/item/customData/metadata/shortTitle" />
+						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
+							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
 						</xsl:if>
 					</title>
 					<link>None</link>
 					<description>
-						<xsl:if test="count(/item/customData/metadata/shortDescription) > 0">
-							<xsl:value-of select="/item/customData/metadata/shortDescription" />
+						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
+							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
 						</xsl:if>
 					</description>
 					<msdp:encode>Y</msdp:encode>
@@ -49,15 +50,15 @@
 			<xsl:attribute name="xsi:schemaLocation">http://www.real.com/msdp VCastRSS.xsd</xsl:attribute>
 			<channel>
 				<title>
-					<xsl:if test="count(customData/metadata/shortTitle) > 0">
-						<xsl:value-of select="customData/metadata/shortTitle" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
 					</xsl:if>
 				</title>
 				<link>None</link>
 				<msdp:externalid><xsl:value-of select="entryId" /></msdp:externalid>
 				<shortdescription>
-					<xsl:if test="count(customData/metadata/shortDescription) > 0">
-						<xsl:value-of select="customData/metadata/shortDescription" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
 					</xsl:if>
 				</shortdescription>
 				<description><xsl:value-of select="description" /></description>
@@ -72,8 +73,8 @@
 					<xsl:value-of select="php:function('date', 'Y-m-d', sum(createdAt))" />
 				</pubDate>
 				<category>
-					<xsl:if test="count(customData/metadata/verizonCategory) > 0">
-						<xsl:value-of select="customData/metadata/verizonCategory" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory" />
 					</xsl:if>
 				</category>
 				<msdp:topStory>00:00:00</msdp:topStory>
@@ -81,8 +82,8 @@
 				<generator />
 				<rating>None</rating>
 				<msdp:copyright>
-					<xsl:if test="count(customData/metadata/copyright) > 0">
-						<xsl:value-of select="customData/metadata/copyright" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/copyright) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/copyright" />
 					</xsl:if>
 				</msdp:copyright>
 				<msdp:entitlement>BASIC</msdp:entitlement>
@@ -110,13 +111,13 @@
 				<msdp:downloadPriceCode>283</msdp:downloadPriceCode>
 				<msdp:allowFastForwarding>Y</msdp:allowFastForwarding>
 				<msdp:provider>
-					<xsl:if test="count(customData/metadata/verizonProvider) > 0">
-						<xsl:value-of select="customData/metadata/verizonProvider" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProvider) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProvider" />
 					</xsl:if>					
  				</msdp:provider>
 				<msdp:providerid>
-					<xsl:if test="count(customData/metadata/verizonProviderId) > 0">
-						<xsl:value-of select="customData/metadata/verizonProviderId" />
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProviderId) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProviderId" />
 					</xsl:if>	
 				</msdp:providerid>
 				<msdp:alertCode></msdp:alertCode>

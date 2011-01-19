@@ -1,6 +1,7 @@
 <?php
 
-define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../'));
+define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../../..'));
+echo KALTURA_ROOT_PATH;
 require_once(KALTURA_ROOT_PATH . '/infra/bootstrap_base.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
@@ -31,7 +32,7 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_20enb9ht';
+$entryId = '0_s0hymwue';
 
 if(isset($argv[1]))
 	$entryId = $argv[1];
@@ -53,21 +54,21 @@ KalturaLog::debug("MRSS [$mrss]");
 
 $distributionJobData = new KalturaDistributionSubmitJobData();
 
-$dbDistributionProfile = DistributionProfilePeer::retrieveByPK(15);
-$distributionProfile = new KalturaGenericDistributionProfile();
+$dbDistributionProfile = DistributionProfilePeer::retrieveByPK(2);
+$distributionProfile = new KalturaVerizonDistributionProfile();
 $distributionProfile->fromObject($dbDistributionProfile);
 $distributionJobData->distributionProfileId = $distributionProfile->id;
 
 
 $distributionJobData->distributionProfile = $distributionProfile;
 
-$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(12);
+$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(2);
 $entryDistribution = new KalturaEntryDistribution();
 $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
 
-$providerData = new KalturaGenericDistributionJobProviderData($distributionJobData);
+$providerData = new KalturaVerizonDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;
 
 file_put_contents('out.xml', $providerData->xml);

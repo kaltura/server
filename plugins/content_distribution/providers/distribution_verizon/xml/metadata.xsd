@@ -19,7 +19,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
-				<xsd:element name="shortTitle" minOccurs="0" maxOccurs="1">
+				<xsd:element name="ShortTitle" minOccurs="0" maxOccurs="1">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
@@ -35,7 +35,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
-				<xsd:element name="shortDescription" minOccurs="0" maxOccurs="1">
+				<xsd:element name="ShortDescription" minOccurs="0" maxOccurs="1">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
@@ -51,7 +51,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
-				<xsd:element name="verizonCategory" minOccurs="0" maxOccurs="1" type="textType">
+				<xsd:element name="VerizonCategory" minOccurs="0" maxOccurs="1" type="textType">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
@@ -62,7 +62,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:element>
-				<xsd:element name="verizonProvider" minOccurs="0" maxOccurs="1" type="textType">
+				<xsd:element name="VerizonProvider" minOccurs="0" maxOccurs="1" type="textType">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
@@ -73,7 +73,7 @@
 						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:element>
-				<xsd:element name="verizonProviderId" minOccurs="0" maxOccurs="1" type="textType">
+				<xsd:element name="VerizonProviderId" minOccurs="0" maxOccurs="1" type="textType">
 					<xsd:annotation>
 						<xsd:documentation />
 						<xsd:appinfo>
