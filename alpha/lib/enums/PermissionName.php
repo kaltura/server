@@ -19,7 +19,7 @@ interface PermissionName extends BaseEnum
 	const SYSTEM_FILESYNC = 'SYSTEM_FILESYNC';
 	const SYSTEM_INTERNAL = 'SYSTEM_INTERNAL';
 	const KMC_ACCESS = 'KMC_ACCESS';
-	const KMC_CONTENT_READ_ONLY = 'KMC_CONTENT_READ_ONLY';
+	const KMC_READ_ONLY = 'KMC_READ_ONLY';
 	
 	// system admin and admin console permissions
 	

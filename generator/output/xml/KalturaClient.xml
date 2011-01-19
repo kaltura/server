@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1294937441">
-  <!-- Generated on date 13/01/11 16:50:41 -->
+<xml apiVersion="3.1.1" generatedDate="1295449614">
+  <!-- Generated on date 19/01/11 17:06:54 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -11,6 +11,12 @@
       <const name="ID_DESC" value="-id"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
+    <enum name="KalturaAnnotationOrderBy" enumType="string">
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
     </enum>
     <enum name="KalturaApiActionPermissionItemOrderBy" enumType="string">
       <const name="ID_ASC" value="+id"/>
@@ -123,8 +129,14 @@
     <enum name="KalturaBaseJobOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="PROCESSOR_EXPIRATION_ASC" value="+processorExpiration"/>
+      <const name="PROCESSOR_EXPIRATION_DESC" value="-processorExpiration"/>
       <const name="EXECUTION_ATTEMPTS_ASC" value="+executionAttempts"/>
       <const name="EXECUTION_ATTEMPTS_DESC" value="-executionAttempts"/>
+      <const name="LOCK_VERSION_ASC" value="+lockVersion"/>
+      <const name="LOCK_VERSION_DESC" value="-lockVersion"/>
     </enum>
     <enum name="KalturaBaseSyndicationFeedOrderBy" enumType="string">
       <const name="PLAYLIST_ID_ASC" value="+playlistId"/>
@@ -147,14 +159,30 @@
     <enum name="KalturaBatchJobOrderBy" enumType="string">
       <const name="STATUS_ASC" value="+status"/>
       <const name="STATUS_DESC" value="-status"/>
+      <const name="CHECK_AGAIN_TIMEOUT_ASC" value="+checkAgainTimeout"/>
+      <const name="CHECK_AGAIN_TIMEOUT_DESC" value="-checkAgainTimeout"/>
+      <const name="PROGRESS_ASC" value="+progress"/>
+      <const name="PROGRESS_DESC" value="-progress"/>
+      <const name="UPDATES_COUNT_ASC" value="+updatesCount"/>
+      <const name="UPDATES_COUNT_DESC" value="-updatesCount"/>
+      <const name="PRIORITY_ASC" value="+priority"/>
+      <const name="PRIORITY_DESC" value="-priority"/>
       <const name="QUEUE_TIME_ASC" value="+queueTime"/>
       <const name="QUEUE_TIME_DESC" value="-queueTime"/>
       <const name="FINISH_TIME_ASC" value="+finishTime"/>
       <const name="FINISH_TIME_DESC" value="-finishTime"/>
+      <const name="FILE_SIZE_ASC" value="+fileSize"/>
+      <const name="FILE_SIZE_DESC" value="-fileSize"/>
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="PROCESSOR_EXPIRATION_ASC" value="+processorExpiration"/>
+      <const name="PROCESSOR_EXPIRATION_DESC" value="-processorExpiration"/>
       <const name="EXECUTION_ATTEMPTS_ASC" value="+executionAttempts"/>
       <const name="EXECUTION_ATTEMPTS_DESC" value="-executionAttempts"/>
+      <const name="LOCK_VERSION_ASC" value="+lockVersion"/>
+      <const name="LOCK_VERSION_DESC" value="-lockVersion"/>
     </enum>
     <enum name="KalturaBatchJobStatus" enumType="int">
       <const name="PENDING" value="0"/>
@@ -350,8 +378,6 @@
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
       <const name="HULU" value="huluDistribution.HULU"/>
-      <const name="COMCAST" value="comcastDistribution.COMCAST"/>
-      <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -684,8 +710,14 @@
     <enum name="KalturaMailJobOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="PROCESSOR_EXPIRATION_ASC" value="+processorExpiration"/>
+      <const name="PROCESSOR_EXPIRATION_DESC" value="-processorExpiration"/>
       <const name="EXECUTION_ATTEMPTS_ASC" value="+executionAttempts"/>
       <const name="EXECUTION_ATTEMPTS_DESC" value="-executionAttempts"/>
+      <const name="LOCK_VERSION_ASC" value="+lockVersion"/>
+      <const name="LOCK_VERSION_DESC" value="-lockVersion"/>
     </enum>
     <enum name="KalturaMailJobStatus" enumType="int">
       <const name="PENDING" value="1"/>
@@ -837,8 +869,14 @@
     <enum name="KalturaNotificationOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="PROCESSOR_EXPIRATION_ASC" value="+processorExpiration"/>
+      <const name="PROCESSOR_EXPIRATION_DESC" value="-processorExpiration"/>
       <const name="EXECUTION_ATTEMPTS_ASC" value="+executionAttempts"/>
       <const name="EXECUTION_ATTEMPTS_DESC" value="-executionAttempts"/>
+      <const name="LOCK_VERSION_ASC" value="+lockVersion"/>
+      <const name="LOCK_VERSION_DESC" value="-lockVersion"/>
     </enum>
     <enum name="KalturaNotificationStatus" enumType="int">
       <const name="PENDING" value="1"/>
@@ -923,6 +961,7 @@
       <const name="SYSTEM_FILESYNC" value="SYSTEM_FILESYNC"/>
       <const name="SYSTEM_INTERNAL" value="SYSTEM_INTERNAL"/>
       <const name="KMC_ACCESS" value="KMC_ACCESS"/>
+      <const name="KMC_READ_ONLY" value="KMC_READ_ONLY"/>
       <const name="SYSTEM_ADMIN_BASE" value="SYSTEM_ADMIN_BASE"/>
       <const name="SYSTEM_ADMIN_PUBLISHER_BASE" value="SYSTEM_ADMIN_PUBLISHER_BASE"/>
       <const name="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS" value="SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS"/>
@@ -1002,6 +1041,9 @@
       <const name="CUSTOM_DATA_PROFILE_ADD" value="CUSTOM_DATA_PROFILE_ADD"/>
       <const name="CUSTOM_DATA_PROFILE_UPDATE" value="CUSTOM_DATA_PROFILE_UPDATE"/>
       <const name="CUSTOM_DATA_PROFILE_DELETE" value="CUSTOM_DATA_PROFILE_DELETE"/>
+      <const name="CUSTOM_DATA_FIELD_ADD" value="CUSTOM_DATA_FIELD_ADD"/>
+      <const name="CUSTOM_DATA_FIELD_UPDATE" value="CUSTOM_DATA_FIELD_UPDATE"/>
+      <const name="CUSTOM_DATA_FIELD_DELETE" value="CUSTOM_DATA_FIELD_DELETE"/>
       <const name="ADMIN_BASE" value="ADMIN_BASE"/>
       <const name="ADMIN_USER_ADD" value="ADMIN_USER_ADD"/>
       <const name="ADMIN_USER_UPDATE" value="ADMIN_USER_UPDATE"/>
@@ -1566,6 +1608,7 @@
       <property name="deletedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="loginEnabled" type="bool" readOnly="1" insertOnly="0" description=""/>
       <property name="roleIds" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="roleNames" type="string" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaDynamicEnum"/>
     <class name="KalturaBaseEntry">
@@ -2507,8 +2550,17 @@
       <property name="idGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="processorExpirationGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="processorExpirationLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="executionAttemptsGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="executionAttemptsLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="lockVersionGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="lockVersionLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaBaseJobFilter" base="KalturaBaseJobBaseFilter"/>
     <class name="KalturaBatchJobBaseFilter" abstract="1" base="KalturaBaseJobFilter">
@@ -2519,18 +2571,67 @@
       <property name="jobSubTypeEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="jobSubTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="jobSubTypeNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="onStressDivertToEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="onStressDivertToIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="onStressDivertToNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="statusEqual" type="int" enumType="KalturaBatchJobStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="abortEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="checkAgainTimeoutGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="checkAgainTimeoutLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="progressGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="progressLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatesCountGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatesCountLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="priorityGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="priorityLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="priorityEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="priorityIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="priorityNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="twinJobIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="twinJobIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="twinJobIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="bulkJobIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="bulkJobIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="bulkJobIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentJobIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentJobIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentJobIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="rootJobIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="rootJobIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="rootJobIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="queueTimeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="queueTimeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="finishTimeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="finishTimeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="errTypeEqual" type="int" enumType="KalturaBatchJobErrorTypes" readOnly="0" insertOnly="0" description=""/>
       <property name="errTypeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="errTypeNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="errNumberEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="errNumberIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="errNumberNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="fileSizeLessThan" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="fileSizeGreaterThan" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastWorkerRemoteEqual" type="bool" readOnly="0" insertOnly="0" description=""/>
+      <property name="schedulerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="schedulerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="schedulerIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="workerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="workerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="workerIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="batchIndexEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="batchIndexIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="batchIndexNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastSchedulerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastSchedulerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastSchedulerIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastWorkerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastWorkerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="lastWorkerIdNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dcEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="dcIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="dcNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaBatchJobFilter" base="KalturaBatchJobBaseFilter"/>
     <class name="KalturaBaseJob">
@@ -2887,16 +2988,6 @@
       <property name="objects" type="array" arrayType="KalturaTrackEntry" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaInternalToolsSession">
-      <property name="partner_id" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="valid_until" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="partner_pattern" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="type" type="int" enumType="KalturaSessionType" readOnly="0" insertOnly="0" description=""/>
-      <property name="error" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="rand" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="user" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="privileges" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
     <class name="KalturaAuditTrailBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2996,6 +3087,16 @@
     <class name="KalturaVirusScanProfileListResponse">
       <property name="objects" type="array" arrayType="KalturaVirusScanProfile" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaInternalToolsSession">
+      <property name="partner_id" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="valid_until" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partner_pattern" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="type" type="int" enumType="KalturaSessionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="error" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="rand" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="user" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="privileges" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaDistributionThumbDimensions">
       <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -3175,6 +3276,37 @@
     <class name="KalturaGenericDistributionProviderActionFilter" base="KalturaGenericDistributionProviderActionBaseFilter"/>
     <class name="KalturaGenericDistributionProviderActionListResponse">
       <property name="objects" type="array" arrayType="KalturaGenericDistributionProviderAction" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationFilter" base="KalturaAnnotationBaseFilter"/>
+    <class name="KalturaAnnotation">
+      <property name="id" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="parentId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="text" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="startTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="endTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userId" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationListResponse">
+      <property name="objects" type="array" arrayType="KalturaAnnotation" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSearchCondition" base="KalturaSearchItem">
@@ -5221,20 +5353,6 @@
         <result type="KalturaTrackEntryListResponse"/>
       </action>
     </service>
-    <service id="kalturainternaltools_kalturainternaltools" name="KalturaInternalTools" description="Internal Tools Service&#10;"/>
-    <service id="kalturainternaltools_kalturainternaltoolssystemhelper" name="kalturaInternalToolsSystemHelper" description="Internal Tools Service&#10;">
-      <action name="fromSecureString" description="KS from Secure String&#10;">
-        <param name="str" type="string" optional="0" description="&#13;"/>
-        <result type="KalturaInternalToolsSession"/>
-      </action>
-      <action name="iptocountry" description="from ip to country&#10;">
-        <param name="remote_addr" type="string" optional="0" description="&#13;"/>
-        <result type="string"/>
-      </action>
-      <action name="getRemoteAddress" description="">
-        <result type="string"/>
-      </action>
-    </service>
     <service id="multicenters_filesyncimportbatch" name="filesyncImportBatch" description="">
       <action name="getExclusiveFileSyncImportJobs" description="batch getExclusiveFileSyncImportJob action allows to get a BatchJob of type FILESYNC_IMPORT &#10;">
         <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
@@ -6134,6 +6252,20 @@
         <result type="KalturaFileExistsResponse"/>
       </action>
     </service>
+    <service id="kalturainternaltools_kalturainternaltools" name="KalturaInternalTools" description="Internal Tools Service&#10;"/>
+    <service id="kalturainternaltools_kalturainternaltoolssystemhelper" name="kalturaInternalToolsSystemHelper" description="Internal Tools Service&#10;">
+      <action name="fromSecureString" description="KS from Secure String&#10;">
+        <param name="str" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaInternalToolsSession"/>
+      </action>
+      <action name="iptocountry" description="from ip to country&#10;">
+        <param name="remote_addr" type="string" optional="0" description="&#13;"/>
+        <result type="string"/>
+      </action>
+      <action name="getRemoteAddress" description="">
+        <result type="string"/>
+      </action>
+    </service>
     <service id="contentdistribution_distributionprofile" name="distributionProfile" description="Distribution Profile service&#13;">
       <action name="add" description="Add new Distribution Profile&#10;">
         <param name="distributionProfile" type="KalturaDistributionProfile" optional="0" description="&#13;"/>
@@ -6825,6 +6957,30 @@
       <action name="logConversion" description="Add the data to the flavor asset conversion log, creates it if doesn't exists&#10;">
         <param name="flavorAssetId" type="string" optional="0" description="&#13;"/>
         <param name="data" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="checkFileExists" description="batch checkFileExists action check if the file exists&#10;">
+        <param name="localPath" type="string" optional="0" description="&#13;"/>
+        <param name="size" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaFileExistsResponse"/>
+      </action>
+    </service>
+    <service id="annotation_annotation" name="annotation" description="Annotation service - Video Annotation&#13;">
+      <action name="list" description="List annotation objects by filter and pager&#10;">
+        <param name="filter" type="KalturaAnnotationFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaAnnotationListResponse"/>
+      </action>
+      <action name="add" description="Allows you to add an annotation object and Annotation content associated with Kaltura object&#10;">
+        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+      <action name="get" description="Retrieve an Annotation object by id&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+      <action name="delete" description="delete annotation by id, and delete all children annotations&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
         <result/>
       </action>
     </service>

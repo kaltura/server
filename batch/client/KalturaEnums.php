@@ -77,8 +77,14 @@ class KalturaBaseJobOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const PROCESSOR_EXPIRATION_ASC = "+processorExpiration";
+	const PROCESSOR_EXPIRATION_DESC = "-processorExpiration";
 	const EXECUTION_ATTEMPTS_ASC = "+executionAttempts";
 	const EXECUTION_ATTEMPTS_DESC = "-executionAttempts";
+	const LOCK_VERSION_ASC = "+lockVersion";
+	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
 class KalturaBaseSyndicationFeedOrderBy
@@ -122,14 +128,30 @@ class KalturaBatchJobOrderBy
 {
 	const STATUS_ASC = "+status";
 	const STATUS_DESC = "-status";
+	const CHECK_AGAIN_TIMEOUT_ASC = "+checkAgainTimeout";
+	const CHECK_AGAIN_TIMEOUT_DESC = "-checkAgainTimeout";
+	const PROGRESS_ASC = "+progress";
+	const PROGRESS_DESC = "-progress";
+	const UPDATES_COUNT_ASC = "+updatesCount";
+	const UPDATES_COUNT_DESC = "-updatesCount";
+	const PRIORITY_ASC = "+priority";
+	const PRIORITY_DESC = "-priority";
 	const QUEUE_TIME_ASC = "+queueTime";
 	const QUEUE_TIME_DESC = "-queueTime";
 	const FINISH_TIME_ASC = "+finishTime";
 	const FINISH_TIME_DESC = "-finishTime";
+	const FILE_SIZE_ASC = "+fileSize";
+	const FILE_SIZE_DESC = "-fileSize";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const PROCESSOR_EXPIRATION_ASC = "+processorExpiration";
+	const PROCESSOR_EXPIRATION_DESC = "-processorExpiration";
 	const EXECUTION_ATTEMPTS_ASC = "+executionAttempts";
 	const EXECUTION_ATTEMPTS_DESC = "-executionAttempts";
+	const LOCK_VERSION_ASC = "+lockVersion";
+	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
 class KalturaBatchJobStatus
@@ -350,8 +372,6 @@ class KalturaDistributionProviderType
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
 	const HULU = "huluDistribution.HULU";
-	const COMCAST = "comcastDistribution.COMCAST";
-	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 }
 
 class KalturaDurationType
@@ -580,8 +600,14 @@ class KalturaMailJobOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const PROCESSOR_EXPIRATION_ASC = "+processorExpiration";
+	const PROCESSOR_EXPIRATION_DESC = "-processorExpiration";
 	const EXECUTION_ATTEMPTS_ASC = "+executionAttempts";
 	const EXECUTION_ATTEMPTS_DESC = "-executionAttempts";
+	const LOCK_VERSION_ASC = "+lockVersion";
+	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
 class KalturaMailJobStatus
@@ -725,8 +751,14 @@ class KalturaNotificationOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const PROCESSOR_EXPIRATION_ASC = "+processorExpiration";
+	const PROCESSOR_EXPIRATION_DESC = "-processorExpiration";
 	const EXECUTION_ATTEMPTS_ASC = "+executionAttempts";
 	const EXECUTION_ATTEMPTS_DESC = "-executionAttempts";
+	const LOCK_VERSION_ASC = "+lockVersion";
+	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
 class KalturaNotificationStatus
@@ -822,6 +854,7 @@ class KalturaPermissionName
 	const SYSTEM_FILESYNC = "SYSTEM_FILESYNC";
 	const SYSTEM_INTERNAL = "SYSTEM_INTERNAL";
 	const KMC_ACCESS = "KMC_ACCESS";
+	const KMC_READ_ONLY = "KMC_READ_ONLY";
 	const SYSTEM_ADMIN_BASE = "SYSTEM_ADMIN_BASE";
 	const SYSTEM_ADMIN_PUBLISHER_BASE = "SYSTEM_ADMIN_PUBLISHER_BASE";
 	const SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS = "SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS";
@@ -901,6 +934,9 @@ class KalturaPermissionName
 	const CUSTOM_DATA_PROFILE_ADD = "CUSTOM_DATA_PROFILE_ADD";
 	const CUSTOM_DATA_PROFILE_UPDATE = "CUSTOM_DATA_PROFILE_UPDATE";
 	const CUSTOM_DATA_PROFILE_DELETE = "CUSTOM_DATA_PROFILE_DELETE";
+	const CUSTOM_DATA_FIELD_ADD = "CUSTOM_DATA_FIELD_ADD";
+	const CUSTOM_DATA_FIELD_UPDATE = "CUSTOM_DATA_FIELD_UPDATE";
+	const CUSTOM_DATA_FIELD_DELETE = "CUSTOM_DATA_FIELD_DELETE";
 	const ADMIN_BASE = "ADMIN_BASE";
 	const ADMIN_USER_ADD = "ADMIN_USER_ADD";
 	const ADMIN_USER_UPDATE = "ADMIN_USER_UPDATE";
