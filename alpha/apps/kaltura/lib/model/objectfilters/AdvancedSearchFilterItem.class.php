@@ -9,7 +9,12 @@ class AdvancedSearchFilterItem
 	
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
 	{
-		
+		$matchClause[] = $this->getCondition();
+	}
+	
+	public function getCondition()
+	{
+		return null;
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)

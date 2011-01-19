@@ -30,7 +30,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $this->metadataProfileId;
 	}
 	
-	public function getCondition($xPaths = null)
+	public function getCondition()
+	{
+		return $this->doGetCondition();
+	}
+	
+	public function doGetCondition($xPaths = null)
 	{
 		if($this->condition)
 			return $this->condition;
@@ -65,7 +70,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				}
 				elseif($item instanceof MetadataSearchFilter)
 				{
-					$condition = $item->getCondition($xPaths);
+					$condition = $item->doGetCondition($xPaths);
 				}
 				
 				if($condition)

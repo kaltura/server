@@ -59,7 +59,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		{
 			foreach($this->items as $item)
 			{
-				if($item instanceof AdvancedSearchFilterOperator)
+				if($item instanceof AdvancedSearchFilterItem)
 				{
 					$condition = $item->getCondition();
 					if($condition)
@@ -83,7 +83,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		
 		$condition = $this->getCondition();
 		if($condition && strlen($condition))
-			$matchClause[] = $condition;
+			$matchClause[] = "@plugins_data $condition";
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
