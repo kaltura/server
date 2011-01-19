@@ -56,7 +56,16 @@ class PermissionItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionItemId);
 		}
 			
-		$permissionItem = new KalturaPermissionItem();
+		if ($dbPermissionItem->getType() == PermissionItemType::API_ACTION_ITEM) {
+			$permissionItem = new KalturaApiActionPermissionItem();
+		}
+		else if ($dbPermissionItem->getType() == PermissionItemType::API_PARAMETER_ITEM) {
+			$permissionItem = new KalturaApiParameterPermissionItem();
+		}
+		else {
+			$permissionItem = new KalturaPermissionItem();
+		}
+		
 		$permissionItem->fromObject($dbPermissionItem);
 		
 		return $permissionItem;
