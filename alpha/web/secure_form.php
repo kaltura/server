@@ -266,6 +266,7 @@ HTML;
 			
 			// Changing name
 			$user = new KalturaUser();
+			$user->id = $this->userId;
 			$user->firstName = $_POST['fname'];
 			$user->lastName = $_POST['lname'];
 			$results = $client->user->update($this->userId, $user);
@@ -276,7 +277,7 @@ HTML;
 			exit();
 			
 		} catch( Exception $e ){
-			echo '<pre>'; print_r($e); exit();
+			//echo '<pre>'; print_r($e); exit();
 			// Show error
 			$this->error = $e->getMessage();
 			$this->showChangeName();
