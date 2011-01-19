@@ -23,7 +23,7 @@ name																		|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags
 distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
 distributionprofile.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
-distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,CONTENT_MODERATE_BASE,KMC_CONTENT_READ_ONLY
+distributionprofile.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY
 distributionprofile.listbypartner											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
 
@@ -34,7 +34,7 @@ distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONT
 
 
 entrydistribution.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
-entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,KMC_CONTENT_READ_ONLY
+entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,KMC_READ_ONLY
 entrydistribution.validate													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
 entrydistribution.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_WHERE

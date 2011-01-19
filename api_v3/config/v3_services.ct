@@ -28,11 +28,11 @@ uiconf.update						|			|2		|1	|0		|0		|1		|rw |		|	|	|STUDIO_UPDATE_UICONF
 uiconf.get							|			|0		|1	|0		|0		|1		|r 	|		|1	|	|STUDIO_BASE
 uiconf.delete						|			|2		|1	|0		|0		|1		|r 	|		|	|	|STUDIO_DELETE_UICONF
 uiconf.clone						|			|2		|1	|0		|0		|1		|r 	|		|1	|	|STUDIO_ADD_UICONF
-uiconf.list							|			|1,2	|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE,KMC_CONTENT_READ_ONLY
-uiconf.listtemplates				|			|2		|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE,KMC_CONTENT_READ_ONLY
+uiconf.list							|			|1,2	|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE,KMC_READ_ONLY
+uiconf.listtemplates				|			|2		|1	|0		|0		|1		|r 	|		|	|	|STUDIO_BASE,KMC_READ_ONLY
 
 user.add							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_USER_ADD
-user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
+user.get							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_READ_ONLY
 user.update							|			|2		|1	|2		|1		|1		|	|		|	|   |ADMIN_USER_UPDATE
 user.delete							|			|2		|1	|1		|0		|1		|	|		|	|   |ADMIN_USER_DELETE
 user.list							|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,ACCOUNT_BASE
@@ -56,7 +56,7 @@ widget.list							|			|2		|1	|0		|0		|1		|	|		|	|   |WIDGET_ADMIN
 partner.register					|			|0		|0	|0		|0		|1		|	|		|	|   |
 partner.update						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ACCOUNT_UPDATE_SETTINGS,INTEGRATION_UPDATE_SETTINGS
 partner.getsecrets					|			|0		|1	|0		|0		|1		|	|		|	|   |
-partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,INTEGRATION_BASE,KMC_ACCESS
+partner.getinfo						|			|2		|1	|0		|0		|1		|	|		|	|   |ACCOUNT_BASE,ADMIN_BASE,INTEGRATION_BASE,KMC_READ_ONLY
 partner.getusage					|			|2		|1	|0		|0		|1		|r	|		|	|	|ACCOUNT_BASE
 
 adminuser.updatepassword			|			|0		|0	|0		|0		|1		|	|		|	|   |
@@ -74,7 +74,7 @@ playlist.update						|			|2		|1	|1		|1		|1		|	|		|	|   |PLAYLIST_UPDATE
 playlist.get						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE
 playlist.delete						|			|2		|1	|1		|0		|1		|	|		|	|   |PLAYLIST_DELETE
 playlist.clone						|			|2	    |1	|1		|1		|1		|	|		|	|   |PLAYLIST_ADD
-playlist.list						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE,CONTENT_MODERATE_BASE,STUDIO_SELECT_CONTENT,KMC_CONTENT_READ_ONLY
+playlist.list						|			|1,2	|1	|0		|0		|1		|	|		|	|   |PLAYLIST_BASE,CONTENT_MODERATE_BASE,STUDIO_SELECT_CONTENT,KMC_READ_ONLY
 playlist.execute					|			|0		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
 playlist.executefromcontent			|			|2		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
 playlist.executefromfilters			|			|2		|0	|0		|0		|1		|	|		|1	|   |PLAYLIST_BASE
@@ -124,7 +124,7 @@ mixing.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 mixing.clone						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.appendmediaentry				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.requestflattening			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,CONTENT_MANAGE_RECONVERT
-mixing.getmixesbymediaid			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,KMC_CONTENT_READ_ONLY
+mixing.getmixesbymediaid			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,KMC_READ_ONLY
 mixing.getreadymediaentries			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_METADATA
 
@@ -135,7 +135,7 @@ data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 
 baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
-baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE,KMC_CONTENT_READ_ONLY
+baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE,KMC_READ_ONLY
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
 baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
@@ -323,7 +323,7 @@ flavorparams.add					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_ADD
 flavorparams.get					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE
 flavorparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 flavorparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_DELETE
-flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,KMC_CONTENT_READ_ONLY
+flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY
 flavorparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 flavorparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 
@@ -336,16 +336,16 @@ thumbparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_M
 thumbparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
 
 flavorasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
-flavorasset.getbyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,KMC_CONTENT_READ_ONLY
+flavorasset.getbyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 flavorasset.getwebplayablebyentryid |			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 flavorasset.convert 				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_RECONVERT
 flavorasset.reconvert 				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_RECONVERT
 flavorasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
-flavorasset.getflavorassetswithparams|			|2		|1	|1		|2		|1		|	|0,		|	|   |CONTENT_MANAGE_BASE,KMC_CONTENT_READ_ONLY
+flavorasset.getflavorassetswithparams|			|2		|1	|1		|2		|1		|	|0,		|	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 flavorasset.getdownloadurl			|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DOWNLOAD
 
 thumbasset.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
-thumbasset.getbyentryid				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL,KMC_CONTENT_READ_ONLY
+thumbasset.getbyentryid				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL,KMC_READ_ONLY
 thumbasset.servebyentryid 			|			|0		|1	|0		|0		|1		|r	|		|	|	|CONTENT_MANAGE_THUMBNAIL
 thumbasset.serve		 			|			|0		|1	|0		|0		|1		|r	|		|	|	|CONTENT_MANAGE_THUMBNAIL
 thumbasset.setasdefault 			|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUMBNAIL
@@ -369,13 +369,13 @@ accesscontrol.add					|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_ADD
 accesscontrol.get					|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_BASE
 accesscontrol.update				|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_UPDATE
 accesscontrol.delete				|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_DELETE
-accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_BASE,KMC_CONTENT_READ_ONLY
+accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_BASE,KMC_READ_ONLY
 
 category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
 category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE
 category.update						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
 category.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
-category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE,ANALYTICS_BASE,CONTENT_MODERATE_BASE,KMC_CONTENT_READ_ONLY
+category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE,ANALYTICS_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY
 
 upload.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 upload.getuploadedfiletokenbyfilename|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
@@ -390,13 +390,13 @@ xinternal.xaddbulkdownload			|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_D
 
 userrole.add						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 userrole.delete			    		|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_DELETE
-userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
+userrole.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_READ_ONLY
 userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,ACCOUNT_BASE
 userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_UPDATE
 userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 
 permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
-permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_ACCESS
+permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_READ_ONLY
 
 
 ---------------------------------------------------------------------------------------------------
