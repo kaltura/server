@@ -133,6 +133,7 @@ data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
 data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
+data.serve							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 
 baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE,KMC_READ_ONLY
