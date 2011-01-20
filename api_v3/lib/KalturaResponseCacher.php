@@ -168,10 +168,23 @@ class KalturaResponseCacher
 		if (!$this->shouldCache())
 			return;
 	
+		$this->createDirForPath($this->_cacheLogFilePath);
+		$this->createDirForPath($this->_cacheDataFilePath);
+			
 		file_put_contents($this->_cacheLogFilePath, "cachekey: $this->_cacheKey\n".print_r($this->_params, true)."\n".$response);
 		file_put_contents($this->_cacheDataFilePath, $response);
 		if(!is_null($contentType)) {
+			$this->createDirForPath($this->_cacheHeadersFilePath);
 			file_put_contents($this->_cacheHeadersFilePath, $contentType);
+		}
+	}
+	
+	private function createDirForPath($filePath)
+	{
+		$dirname = dirname($filePath);
+		if (!is_dir($dirname))
+		{
+			mkdir($dirname, 0777);
 		}
 	}
 	
