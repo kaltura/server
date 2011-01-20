@@ -67,6 +67,41 @@ class FlavorAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * List Flavor Assets by filter and pager
+	 * 
+	 * @action list
+	 * @param KalturaAssetFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaFlavorAssetListResponse
+	 */
+	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaAssetFilter();
+
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$flavorAssetFilter = new AssetFilter();
+		
+		$filter->toObject($flavorAssetFilter);
+
+		$c = new Criteria();
+		$flavorAssetFilter->attachToCriteria($c);
+		
+		$totalCount = flavorAssetPeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = flavorAssetPeer::doSelect($c);
+		
+		$list = KalturaFlavorAssetArray::fromDbArray($dbList);
+		$response = new KalturaFlavorAssetListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;    
+	}
+	
+	/**
 	 * Get web playable Flavor Assets for Entry
 	 * 
 	 * @action getWebPlayableByEntryId

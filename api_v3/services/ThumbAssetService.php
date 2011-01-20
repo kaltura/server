@@ -350,6 +350,41 @@ class ThumbAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * List Thumbnail Assets by filter and pager
+	 * 
+	 * @action list
+	 * @param KalturaAssetFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaThumbAssetListResponse
+	 */
+	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaAssetFilter();
+
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$thumbAssetFilter = new AssetFilter();
+		
+		$filter->toObject($thumbAssetFilter);
+
+		$c = new Criteria();
+		$thumbAssetFilter->attachToCriteria($c);
+		
+		$totalCount = thumbAssetPeer::doCount($c);
+		
+		$pager->attachToCriteria($c);
+		$dbList = thumbAssetPeer::doSelect($c);
+		
+		$list = KalturaThumbAssetArray::fromDbArray($dbList);
+		$response = new KalturaThumbAssetListResponse();
+		$response->objects = $list;
+		$response->totalCount = $totalCount;
+		return $response;    
+	}
+	
+	/**
 	 * @action addFromUrl
 	 * @param string $entryId
 	 * @param string $url

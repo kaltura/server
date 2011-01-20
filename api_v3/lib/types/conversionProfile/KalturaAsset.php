@@ -1,11 +1,12 @@
 <?php
-class KalturaAsset extends KalturaObject 
+class KalturaAsset extends KalturaObject implements IFilterable
 {
 	/**
 	 * The ID of the Flavor Asset
 	 * 
 	 * @var string
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $id;
 	
@@ -14,12 +15,14 @@ class KalturaAsset extends KalturaObject
 	 * 
 	 * @var string
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $entryId;
 	
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $partnerId;
 	
@@ -28,6 +31,7 @@ class KalturaAsset extends KalturaObject
 	 * 
 	 * @var KalturaFlavorAssetStatus
 	 * @readonly 
+	 * @filter eq,in,notin
 	 */
 	public $status;
 	
@@ -44,6 +48,7 @@ class KalturaAsset extends KalturaObject
 	 * 
 	 * @var int
 	 * @readonly
+	 * @filter gte,lte,order
 	 */
 	public $size;
 	
@@ -64,18 +69,21 @@ class KalturaAsset extends KalturaObject
 	
 	/**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	
 	/**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	
 	/**
 	 * @var int
+	 * @filter gte,lte,order
 	 */
 	public $deletedAt;
 	
