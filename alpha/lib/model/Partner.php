@@ -734,10 +734,7 @@ class Partner extends BasePartner
 				throw new kUserException('', kUserException::USER_NOT_FOUND);
 			}
 			$kuserRoles = explode(',', $kuser->getRoleIds());
-			$c = new Criteria();
-			$c->addAnd(UserRolePeer::ID, $this->getAdminSessionRoleId(), Criteria::EQUAL);
-			$adminUserRole = UserRolePeer::doSelectOne($c);
-			if (!in_array($adminUserRole->getId(), $kuserRoles)) {
+			if (!in_array($this->getAdminSessionRoleId(), $kuserRoles)) {
 				throw new kPermissionException('', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
 			}
 		}	

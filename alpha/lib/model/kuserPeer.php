@@ -370,8 +370,8 @@ class kuserPeer extends BasekuserPeer
 		// check if roles are valid - may throw exceptions
 		if (!$user->getRoleIds() && $user->getIsAdmin()) {
 			// assign default role according to user type admin / normal
-			$userRole = $user->getPartner()->getAdminSessionRoleId();
-			$user->setRoleIds($userRole->getId());
+			$userRoleId = $user->getPartner()->getAdminSessionRoleId();
+			$user->setRoleIds($userRoleId);
 		}
 		UserRolePeer::testValidRolesForUser($user->getRoleIds());
 		

@@ -108,7 +108,7 @@ foreach ($serviceConfigFiles as $file)
 				$userKsPermission = getOrCreateSessionPermission($partner->getId(), 'user');
 				$userKsPermission->addPermissionItem($permissionItem->getId(), true);
 				$userKsRole->setPermissionNames(PermissionName::USER_SESSION_PERMISSION.','.$userKsPermission->getName());
-				$partner->getUserSessionRoleId($userKsRole->getId());
+				$partner->setUserSessionRoleId($userKsRole->getId());
 				$partner->save();
 			}
 		}
