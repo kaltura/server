@@ -55,15 +55,6 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 
 
 	/**
-	 * @return the $metadataProfileId
-	 */
-	public function getMetadataProfileId()
-	{
-		return $this->metadataProfileId;
-	}
-
-
-	/**
 	 * @param int $metadataProfileId
 	 */
 	public function setMetadataProfileId($metadataProfileId)
