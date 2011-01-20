@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- https://help.theplatform.com/display/ingest/addContent+adapter -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:php="http://php.net/xsl" version="1.0">
 
 	<xsl:output omit-xml-declaration="no" method="xml" />
