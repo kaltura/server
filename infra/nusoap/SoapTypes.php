@@ -1,6 +1,34 @@
 <?php
 
-class SoapArray implements ArrayAccess, Iterator
+class SoapObject
+{
+	protected function getAttributeType($attributeName)
+	{
+		return null;
+	}
+	
+	public function fromArray(array $result)
+	{
+		foreach($result as $field => $value)
+		{
+			if(is_array($value))
+			{
+				$attributeType = $this->getAttributeType($field);
+				if($attributeType)
+				{
+					$this->$field = new $attributeType();
+					$this->$field->fromArray($value);
+				}
+			}
+			else
+			{
+				$this->$field = $value;
+			}
+		}
+	}
+}
+
+class SoapArray extends SoapObject implements ArrayAccess, Iterator
 {
 	private $array = array();
 	private $class = "";
@@ -85,5 +113,23 @@ class SoapArray implements ArrayAccess, Iterator
 	public function getType()
 	{
 		return $this->class;
+	}
+	
+	public function fromArray(array $result)
+	{
+		$class = $this->class;
+		foreach($result as $value)
+		{
+			if(is_array($value))
+			{
+				$obj = new $class();
+				$obj->fromArray($value);
+				$this[] = $obj;
+			}
+			else
+			{
+				$this[] = $value;
+			}
+		}
 	}
 }
