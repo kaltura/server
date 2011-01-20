@@ -103,7 +103,13 @@ class UserRoleService extends KalturaBaseService
 	 */	
 	public function updateAction($userRoleId, KalturaUserRole $userRole)
 	{
-		$dbUserRole = UserRolePeer::retrieveByPK($userRoleId);
+		/* critera is used here instead of retrieveByPk on purpose!
+		   if the current context is assigned to a partner 0 role, then retrieveByPk will return it from cache even though partner 0 is not in
+		   the partner group for the current action and context */
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::ID, $userRoleId, Criteria::EQUAL);
+		$c->addAnd(UserRolePeer::PARTNER_ID, $this->partnerGroup(), Criteria::IN);
+		$dbUserRole = UserRolePeer::doSelectOne($c);
 	
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
