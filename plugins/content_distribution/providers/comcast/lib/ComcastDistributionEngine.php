@@ -2,33 +2,11 @@
 class ComcastDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit
 {
-	const FIELD_XML = 'xml';
-	const FIELD_EMAIL = 'emailAddress';
-	const FIELD_PASSWORD = 'password';
-	const FIELD_ACCOUNT = 'account';
-	
-	private $submitPath = 'http://admin.theplatform.com/API/urn:service';
-	private $updatePath = '';
-	private $deletePath = '';
-	private $fetchReportPath = '';
-	
-	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
-		if($taskConfig->params->comcastSubmitPath)
-			$this->submitPath = $taskConfig->params->comcastSubmitPath;
-			
-		if($taskConfig->params->comcastUpdatePath)
-			$this->updatePath = $taskConfig->params->comcastUpdatePath;
-			
-		if($taskConfig->params->comcastDeletePath)
-			$this->deletePath = $taskConfig->params->comcastDeletePath;
-			
-		if($taskConfig->params->comcastFetchReportPath)
-			$this->fetchReportPath = $taskConfig->params->comcastFetchReportPath;
 	}
 
 	/* (non-PHPdoc)
@@ -42,74 +20,124 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaComcastDistributionJobProviderData))
 			throw new Exception("Provider data must be of type KalturaComcastDistributionJobProviderData");
 		
-		$results = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
-		$matches = null;
-		if(preg_match('/<uuid[^>]*>([^<]+)<\/uuid>/', $results, $matches))
-		{
-			$data->remoteId = $matches[1];
-		}
-		else 
-		{
-			throw new Exception("No uuid returned from Comcast");
-		}
-		
 		return false;
 	}
 
-	/**
-	 * @param string $path
-	 * @param KalturaDistributionJobData $data
-	 * @param KalturaComcastDistributionProfile $distributionProfile
-	 * @param KalturaComcastDistributionJobProviderData $providerData
-	 * @throws Exception
-	 */
-	protected function handleSend($url, KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile, KalturaComcastDistributionJobProviderData $providerData)
+	protected function newCustomDataElement($title, $value = '')
 	{
-		$params = array(
-			self::FIELD_XML => $providerData->xml,
-			self::FIELD_EMAIL => $distributionProfile->email,
-			self::FIELD_PASSWORD => $distributionProfile->password,
-			self::FIELD_ACCOUNT => $distributionProfile->account,
-		);
+		$customDataElement = new ComcastCustomDataElement();
+		$customDataElement->title = $title;
+		$customDataElement->value = $value;
+		return $customDataElement;
+	}
+	
+	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaComcastDistributionProfile $distributionProfile, KalturaComcastDistributionJobProviderData $providerData)
+	{
+		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		
-		foreach($params as $param => $value)
-			KalturaLog::debug("post param [$param] value [$value]");
+		$entry = $this->getEntry($data->entryDistribution->entryId);
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->entryId);
+		
+		$media = new ComcastMedia();
+		$media->contentType = ComcastContentType::_VIDEO;
+		$media->language = ComcastLanguage::_ENGLISH;
+		$media->rating = 'G';
+		
+		$media->album = $distributionProfile->album;
+		$media->author = $distributionProfile->author;
+		$media->keywords = $distributionProfile->keywords;
+		
+		$media->airdate = $data->entryDistribution->sunrise;
+		$media->availableDate = $data->entryDistribution->sunrise;
+		$media->expirationDate = $data->entryDistribution->sunset;
+		
+		$categories = $this->findMetadataValue($metadataObjects, 'ComcastCategory', true);
+		$media->categories = new ComcastArrayOfstring();
+		foreach($categories as $category)
+			$media->categories[] = $category;
 			
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, false);
+		$media->copyright = $this->findMetadataValue($metadataObjects, 'copyright');
 		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-
-//		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-//		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, true);
+		$media->formats = new ComcastArrayOfFormat();
+		$media->formats = ComcastFormat::_FLV;
 		
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+		$media->externalID = $entry->id;
+		$media->length = $entry->duration;
+		$media->title = $entry->name;
+		$media->description = $entry->description;
 		
-		$results = curl_exec($ch);
-		if(!$results)
+		$media->customData = new ComcastCustomData();
+		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
+		$media->customData[] = $this->newCustomDataElement('Link Href');
+		$media->customData[] = $this->newCustomDataElement('Link Text');
+		
+		$thumbAssets = $this->getThumbAssets($data->entryDistribution->thumbAssetIds);
+		if($thumbAssets && count($thumbAssets))
 		{
-			$errNumber = curl_errno($ch);
-			$errDescription = curl_error($ch);
-			
-			curl_close($ch);
-		
-			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
+			foreach($thumbAssets as $thumbAsset)
+			{
+				if($thumbAsset->width == 72 && $thumbAsset->height = 92)
+				{				
+					$media->thumbnailURL = $this->getThumbAssetUrl($thumbAsset->id);
+					break;
+				}
+			}
 		}
-		curl_close($ch);
-		KalturaLog::debug("Comcast HTTP response:\n$results\n");
-		$data->sentData = $providerData->xml;
-		$data->results = $results;
 		
-		$matches = null;
-		if(preg_match('/<faultstring[^>]*>([^<]+)<\/faultstring>/', $results, $matches))
-			throw new Exception("Comcast Error [" . $matches[1] . "]");
+		$mediaFiles = new ComcastMediaFileList();
 		
-		return $results;
+		$mediaFile = new ComcastMediaFile();
+		//$mediaFile->template = new ComcastArrayOfMediaFileField();
+		$mediaFile->allowRelease = true;
+		$mediaFile->bitrate = $flavorAsset1_Bitrate;
+		$mediaFile->contentType = ComcastContentType::_VIDEO;
+		$mediaFile->format = ComcastFormat::_FLV;
+		$mediaFile->length = $flavorAsset1_Duration;
+		$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
+		$mediaFile->originalLocation = $flavorAsset1_URL;
+		$mediaFile->height = $flavorAsset1_Width;
+		$mediaFile->width = $flavorAsset1_Height;
+		$mediaFiles[] = $mediaFile;
+		
+		
+		$mediaFile = new ComcastMediaFile();
+		//$mediaFile->template = new ComcastArrayOfMediaFileField();
+		$mediaFile->allowRelease = true;
+		$mediaFile->bitrate = $flavorAsset2_Bitrate;
+		$mediaFile->contentType = ComcastContentType::_VIDEO;
+		$mediaFile->format = ComcastFormat::_FLV;
+		$mediaFile->length = $flavorAsset2_Duration;
+		$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
+		$mediaFile->originalLocation = $flavorAsset2_URL;
+		$mediaFile->height = $flavorAsset2_Width;
+		$mediaFile->width = $flavorAsset2_Height;
+		$mediaFiles[] = $mediaFile;
+		
+		
+		$options = new ComcastAddContentOptions();
+		$options->generateThumbnail = false;
+		$options->publish = false;
+		$options->deleteSource = false;
+		
+				
+
+		$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);
+		
+		$data->sentData = $comcastMediaService->request;
+		$data->results = $comcastMediaService->response;
+		
+		if($comcastAddContentResults->mediaID)
+		{
+			$data->remoteId = $comcastAddContentResults->mediaID;
+		}
+		
+		if(isset($comcastAddContentResults->faultcode) || isset($comcastAddContentResults->faultstring))
+		{
+			$err = "addContent failed with code [$comcastAddContentResults->faultcode] and message [$comcastAddContentResults->faultstring]";
+			KalturaLog::err($err);
+			throw new Exception($err);
+		}
+		
+		return false;
 	}
 }
