@@ -174,7 +174,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @requiresPermission read
 	 */
 	public $downloadUrl;
 	
