@@ -703,7 +703,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!$distributionProfile)
 		{
 			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
-			continue;
+			return true;
 		}
 
 		if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
@@ -711,10 +711,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 			$entryDistribution->save();
-			continue;
+			return true;
 		}
 		
 		self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		return true;
 	}
 	
 	/**
