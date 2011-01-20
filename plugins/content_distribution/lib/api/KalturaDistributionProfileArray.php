@@ -11,6 +11,11 @@ class KalturaDistributionProfileArray extends KalturaTypedArray
 		foreach ($arr as $obj)
 		{
     		$nObj = KalturaDistributionProfileFactory::createKalturaDistributionProfile($obj->getProviderType());
+    		if(!$nObj)
+    		{
+    			KalturaLog::err("Distribution Profile Factory could not find matching profile type for provider [" . $obj->getProviderType() . "]");
+    			continue;
+    		}
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
