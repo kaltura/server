@@ -31,16 +31,22 @@
 
 $(window).load(function(){
 	kmc.utils.activateHeader();
- 
 	$(window).wresize(kmc.utils.resize);
 	kmc.vars.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
 });
 
 /* kmc and kmc.vars defined in script block in kmc2success.php */
 
+	// For debug enable to true
+	kmc.vars.debug = true;
+	
 	// kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Quick_Start_Guide__Butterfly.pdf#";
 	kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
 
+	kmc.log = function(str) {
+		if(kmc.vars.debug) { console.log(str); }
+	};
+	
 	kmc.functions = {
 		expired : function() {
 			// @todo: why no cookie killing ?
@@ -355,7 +361,7 @@ $(window).load(function(){
 		},
 		
 		checkIframeHash : function() {
-			console.log( $("#sec_iframe").attr('src') );
+			kmc.log( $("#sec_iframe").attr('src') );
 		},
 		
 		changePartner : function() {
@@ -396,7 +402,7 @@ $(window).load(function(){
 			$("#do_change_partner").click(function() {
 				var pid = $('input[name=pid]:radio:checked').val();
 				var url = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + pid;
-				//console.log(url);
+				//kmc.log(url);
 				window.location.href = url;
 			});
 			
@@ -524,8 +530,8 @@ $(window).load(function(){
 
 		// called from p&e dropdown, from content.swf and from appstudio.swf
 		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors) {
-		//console.log('doPreviewEmbed');
-		//console.log(arguments);
+		kmc.log('doPreviewEmbed');
+		kmc.log(arguments);
 		// entry/playlist id, description, true/ false (or nothing or "" or null), uiconf id, live_bitrates obj or boolean, is_mix
 //			alert("doPreviewEmbed: id="+id+", name="+name+", description="+description+", is_playlist="+is_playlist+", uiconf_id="+uiconf_id);
 
@@ -535,7 +541,7 @@ $(window).load(function(){
 				description = kmc.utils.escapeQuotes(description); // @todo: move to "// JW" block
 
 				if(kmc.vars.current_uiconf) { // set by kmc.mediator.selectContent called from appstudio's "select content" action
-//					console.log(kmc.vars.current_uiconf); alert("kmc.vars.current_uiconf logged");
+//					kmc.log(kmc.vars.current_uiconf); alert("kmc.vars.current_uiconf logged");
 //					console.log("is_playlist=",is_playlist);
 					if((is_playlist && kmc.vars.current_uiconf.is_playlist) || (!is_playlist && !kmc.vars.current_uiconf.is_playlist)) { // @todo: minor optimization possible
 						var uiconf_id = kmc.vars.current_uiconf.uiconf_id;
