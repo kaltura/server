@@ -75,7 +75,7 @@ class kuser extends Basekuser
 			
 			if ($this->isRootUser())
 			{
-				$adminRole = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
+				$adminRole = $this->getPartner()->getAdminSessionRoleId();
 				if (!(in_array($adminRole->getId(), $idsArray)))
 				{
 				 	throw new kPermissionException('Account owner must be set with a partner administrator role', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);	

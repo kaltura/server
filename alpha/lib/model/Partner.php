@@ -603,10 +603,37 @@ class Partner extends BasePartner
 		return $this->getFromCustomData('pass_reset_url_prefix');
 	}
 	
+	public function setAdminSessionRoleId($roleId)
+	{
+		$userRole = UserRolePeer::retrieveByPK($roleId);
+		if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+		{
+			throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+		}
+		$this->putInCustomData('admin_session_role_id', $roleId);
+	}
+		
+	public function getAdminSessionRoleId()
+	{
+		$id = $this->getFromCustomData('admin_session_role_id');
+		if (!$id) {
+			$role = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
+			$id = $role->getId();
+		}
+		return $id;
+	}
+	
+	
 	public function setUserSessionRoleId($roleId)
 	{
+		$userRole = UserRolePeer::retrieveByPK($roleId);
+		if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+		{
+			throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+		}
 		$this->putInCustomData('user_session_role_id', $roleId);
 	}
+	
 	
 	public function getUserSessionRoleId()
 	{
@@ -708,7 +735,7 @@ class Partner extends BasePartner
 			}
 			$kuserRoles = explode(',', $kuser->getRoleIds());
 			$c = new Criteria();
-			$c->addAnd(UserRolePeer::STR_ID, UserRoleId::PARTNER_ADMIN_ROLE, Criteria::EQUAL);
+			$c->addAnd(UserRolePeer::ID, $this->getAdminSessionRoleId(), Criteria::EQUAL);
 			$adminUserRole = UserRolePeer::doSelectOne($c);
 			if (!in_array($adminUserRole->getId(), $kuserRoles)) {
 				throw new kPermissionException('', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);

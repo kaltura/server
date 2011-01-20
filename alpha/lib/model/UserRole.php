@@ -47,7 +47,11 @@ class UserRole extends BaseUserRole
 		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD)
 		{
 			$permissionNames = '';
-			$permissions = PermissionPeer::getAllValidForPartner(kCurrentContext::$ks_partner_id, $filterDependencies);
+			$currentPartnerId = kCurrentContext::$partner_id;
+			if (is_null($currentPartnerId) || $currentPartnerId === '') {
+				$currentPartnerId = kCurrentContext::$ks_partner_id;
+			}
+			$permissions = PermissionPeer::getAllValidForPartner($currentPartnerId, $filterDependencies);
 			foreach ($permissions as $permission)
 			{
 				$permissionNames .= $permission->getName().',';	

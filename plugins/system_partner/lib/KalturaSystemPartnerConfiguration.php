@@ -131,6 +131,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $adminLoginUsersQuota;
 	
+	/**
+	 * @var string
+	 */
+	public $userSessionRoleId;
+	
+	/**
+	 * @var string
+	 */
+	public $adminSessionRoleId;
+	
+	/**
+	 * @var string
+	 */
+	public $alwaysAllowedPermissionNames;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -155,6 +170,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"enable508Players",
 		"defThumbOffset",
 		"adminLoginUsersQuota",
+		"userSessionRoleId",
+		"adminSessionRoleId",
+		"alwaysAllowedPermissionNames",
 	);
 
 	public function getMapBetweenObjects()

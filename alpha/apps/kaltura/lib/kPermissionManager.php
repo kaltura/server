@@ -365,6 +365,14 @@ class kPermissionManager
 		}		
 	}
 	
+	private static function isEmpty($value)
+	{
+		if (is_null($value) || $value === '') {
+			return true;
+		}
+		return false;
+	}
+	
 	
 	// --------------------
 	// -- Public methods --
@@ -390,11 +398,11 @@ class kPermissionManager
 		self::$useCache = $useCache ? true : false;
 
 		// copy kCurrentContext parameters (kCurrentContext::init should have been executed before)
-		self::$requestedPartnerId = !is_null(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
-		self::$ksPartnerId = !is_null(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
-		self::$ksUserId = !is_null(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
+		self::$requestedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
+		self::$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
+		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
 		self::$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : null;
-		self::$adminSession = !is_null(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
+		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 			
 		// clear instance pools
 		UserRolePeer::clearInstancePool();
@@ -445,7 +453,7 @@ class kPermissionManager
 			{
 				if (self::$adminSession) {
 					// there is only one partner admin role defined in the system
-					$roleIds = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE)->getId();
+					$roleIds = self::$operatingPartner->getAdminSessionRoleId();
 				}
 				else {
 					// a partner may have special defined user session roles - get them from partner object
