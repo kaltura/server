@@ -124,4 +124,57 @@ class DataService extends KalturaEntryService
 		$response->totalCount = $totalCount;
 		return $response;
 	}
+	
+	/**
+	 * serve action returan the file from dataContent field.
+	 * 
+	 * @action serve
+	 * @param string $entryId Data entry id
+	 * @param int $version Desired version of the data
+	 * @param bool $forceProxy force to get the content without redirect
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function serveAction($entryId, $version = -1, $forceProxy = false)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DATA)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$ksObj = $this->getKs();
+		$ks = ($ksObj) ? $ksObj->getOriginalString() : null;
+		$securyEntryHelper = new KSecureEntryHelper($dbEntry, $ks, null);
+		$securyEntryHelper->validateForDownload();	
+		
+		if ( ! $version || $version == -1 ) $version = null;
+		
+		$fileName = $dbEntry->getName();
+		
+		$syncKey = $dbEntry->getSyncKey( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+			$mimeType = kFile::mimeType($filePath);
+			kFile::dumpFile($filePath, $mimeType);
+		}
+		else
+		{
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KalturaLog::info("Redirecting to [$remoteUrl]");
+			if($forceProxy)
+			{
+				kFile::dumpUrl($remoteUrl);
+			}
+			else
+			{
+				// or redirect if no proxy
+				header("Location: $remoteUrl");
+			}
+		}	
+	}
 }
