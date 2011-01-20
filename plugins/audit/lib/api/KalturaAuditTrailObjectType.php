@@ -28,4 +28,5 @@ class KalturaAuditTrailObjectType extends KalturaStringEnum
 	const WIDGET = widgetPeer::OM_CLASS;
 	const METADATA = MetadataPeer::OM_CLASS;
 	const METADATA_PROFILE = MetadataProfilePeer::OM_CLASS;
+	const USER_LOGIN_DATA = UserLoginDataPeer::OM_CLASS;
 }
