@@ -342,10 +342,20 @@ $(window).load(function(){
 							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
 							  ' height="' + modal_height + '" width="' + modal_width + '"></iframe></div></div>';
 			$("#mbContent").addClass("new");
+			
+			// Check iframe location to decect hash changes
+			//var iframeInterval = setInterval ( "kmc.utils.checkIframeHash()", 5000 );
+			
 			$("#close").click(function() {
+				//clearInterval(iframeInterval); // Stop the checkIframeHash
 				kmc.utils.closeModal();
 				return false;
 			});
+
+		},
+		
+		checkIframeHash : function() {
+			console.log( $("#sec_iframe").attr('src') );
 		},
 		
 		changePartner : function() {
@@ -514,8 +524,8 @@ $(window).load(function(){
 
 		// called from p&e dropdown, from content.swf and from appstudio.swf
 		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors) {
-		console.log('doPreviewEmbed');
-		console.log(arguments);
+		//console.log('doPreviewEmbed');
+		//console.log(arguments);
 		// entry/playlist id, description, true/ false (or nothing or "" or null), uiconf id, live_bitrates obj or boolean, is_mix
 //			alert("doPreviewEmbed: id="+id+", name="+name+", description="+description+", is_playlist="+is_playlist+", uiconf_id="+uiconf_id);
 
