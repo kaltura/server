@@ -24,15 +24,23 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'label'			=> 'Description:',
 			'filters'		=> array('StringTrim'),
 		));
-		 
+		
+		// change to read only
 		$this->addElement('text', 'admin_name', array(
 			'label'			=> 'Administrator Name:',
 			'filters'		=> array('StringTrim'),
+			'readonly'		=> true,
+			'ignore' 		=> true,
+			'disable'       => 'disable',
 		));
-		 
+		
+		// change to read only		 
 		$this->addElement('text', 'admin_email', array(
 			'label'			=> 'Administrator E-Mail:',
 			'filters'		=> array('StringTrim'),
+			'readonly'		=> true,
+			'ignore' 		=> true,
+			'disable'       => 'disable',
 		));
 		 
 		$this->addElement('text', 'host', array(
