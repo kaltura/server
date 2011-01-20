@@ -272,8 +272,8 @@ class KalturaEntryService extends KalturaBaseService
 	protected function checkAndSetValidUser(KalturaBaseEntry $entry, entry $dbEntry)
 	{
 		KalturaLog::debug("API user id [{$entry->userId}] DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
-		// for new entry, kuser ID is null - set it from service scope
-		if($dbEntry->getKuserId() === null)
+		// for new entry, puser ID is null - set it from service scope
+		if($dbEntry->getPuserId() === null)
 		{
 			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
 			$dbEntry->setKuserId($this->getKuser()->getId());
