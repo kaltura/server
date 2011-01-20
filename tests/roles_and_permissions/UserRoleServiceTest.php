@@ -147,37 +147,37 @@ class UserRoleServiceTest extends PHPUnit_Framework_TestCase {
 		$exceptionThrown = false;
 		try { $this->addRoleWrap(new KalturaUserRole()); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// clone action
 		$exceptionThrown = false;
 		try { $this->client->userRole->cloneAction(rand(0, 10)); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// delete action
 		$exceptionThrown = false;
 		try { $this->client->userRole->delete(rand(0, 10)); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// get action
 		$exceptionThrown = false;
 		try { $this->client->userRole->get(rand(0, 10)); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// list action
 		$exceptionThrown = false;
 		try { $this->client->userRole->listAction(); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// update action
 		$exceptionThrown = false;
 		try { $this->client->userRole->update(rand(0, 10), new KalturaUserRole()); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 	}
 	
 	
