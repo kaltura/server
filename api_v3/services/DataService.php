@@ -129,6 +129,7 @@ class DataService extends KalturaEntryService
 	 * serve action returan the file from dataContent field.
 	 * 
 	 * @action serve
+	 * @serverOnly
 	 * @param string $entryId Data entry id
 	 * @param int $version Desired version of the data
 	 * @param bool $forceProxy force to get the content without redirect
