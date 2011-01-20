@@ -398,9 +398,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 				}
 			}
 			
-			$kuser = null;
+			// if kuser was found, keep status for following exception message
+			$kuserStatus = $kuser ? $kuser->getStatus() : null;
+			
 			// if no specific partner was requested, but last logged in partner is not available, login to first found partner
-			$kuser = self::findFirstValidKuser($loginData->getId(), $partnerId); // throws exception on error
+			$kuser = null;
+			$kuser = self::findFirstValidKuser($loginData->getId(), $partnerId);
+			
+			if (!$kuser) {
+				if ($kuserStatus === KuserStatus::BLOCKED) {
+					throw new kUserException('', kUserException::USER_IS_BLOCKED);
+				}
+				throw new kUserException('', kUserException::USER_NOT_FOUND);
+			}
 		}
 		
 		if ($kuser->getIsAdmin() && !in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'))) {
@@ -443,7 +453,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			return $kuser;
 		}
 		
-		throw new kUserException('', kUserException::USER_NOT_FOUND);
+		return null;
 	}
 	
 	/**

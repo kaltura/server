@@ -295,5 +295,7 @@
 		const CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER = "CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER,Login cannot be disabled for admin users";
 		
 		const USER_ROLE_NOT_FOUND = "USER_ROLE_NOT_FOUND,User role not found";
+		
+		const USER_WRONG_PASSWORD = "USER_WRONG_PASSWORD,Wrong password supplied";
 	}
 ?>

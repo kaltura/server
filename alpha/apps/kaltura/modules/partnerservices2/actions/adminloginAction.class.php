@@ -82,7 +82,7 @@ class adminloginAction extends defPartnerservices2Action
 				return null;
 			}
 			else if ($code == kUserException::WRONG_PASSWORD) {
-				$this->addError  (APIErrors::ADMIN_KUSER_NOT_FOUND);
+				$this->addError  (APIErrors::USER_WRONG_PASSWORD);
 				return null;
 			}
 			else if ($code == kUserException::USER_IS_BLOCKED) {
