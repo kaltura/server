@@ -97,6 +97,7 @@ class secForm {
 		return $str;
 	}
 	
+	// Handle errors
 	function errorDiv() {
 		if( isset($this->error) && !empty($this->error) ) { 
 			//echo '<pre>'; print_r($_COOKIE); exit();
@@ -107,6 +108,7 @@ class secForm {
 		}		
 	}
 
+	// Show Change Password Form
 	function showChangePassword() {
 		$this->pageTitle = 'Change Password';
 		$this->showHead();
@@ -131,6 +133,7 @@ HTML;
 		$this->showFoot();
 	}
 		
+	// Do Change Password
 	function doChangePassword() {
 		// Set current action
 		$this->curAction = 'password';
@@ -167,6 +170,7 @@ HTML;
 		}
 	}
 	
+	// Show Change Email Form
 	function showChangeEmail() {
 		$this->pageTitle = 'Change Email Address';
 		$this->showHead();
@@ -192,6 +196,7 @@ HTML;
 		$this->showFoot();
 	}
 	
+	// Do Change Email
 	function doChangeEmail() {
 		// Set current action
 		$this->curAction = 'email';	
@@ -222,6 +227,7 @@ HTML;
 		}		
 	}
 	
+	// Show Change Name Form
 	function showChangeName() {
 		$this->pageTitle = 'Change Username'; 
 		$this->showHead();
@@ -246,6 +252,7 @@ HTML;
 		$this->showFoot();
 	}
 	
+	// Do Change Name
 	function doChangeName() {
 		// Set current action
 		$this->curAction = 'name';		
@@ -285,6 +292,7 @@ HTML;
 		}		
 	}
 	
+	// Show Success Message
 	function showSuccess() {
 		$this->pageTitle = 'Changes were saved!'; 
 		$this->showHead();
@@ -293,8 +301,8 @@ HTML;
 			$buttonScript = 'parent.kmc.utils.closeModal();';
 			$headScript = '';
 		} else {
-			$buttonScript = 'parent.window.location.reload(); parent.kmc.utils.closeModal();';
-			$headScript = "<script>parent.$('#close').unbind('click'); parent.$('#close').click(function () { parent.window.location.reload(); parent.kmc.utils.closeModal(); return false; });</script>";			
+			//$buttonScript = 'parent.window.location.reload(); parent.kmc.utils.closeModal();';
+			//$headScript = "<script>parent.$('#close').unbind('click'); parent.$('#close').click(function () { parent.window.location.reload(); parent.kmc.utils.closeModal(); return false; });</script>";			
 		}
 	
 		echo <<<HTML
@@ -306,6 +314,7 @@ HTML;
 		$this->showFoot();
 	}	
 	
+	// Show Layout Header
 	function showHead() {
 	
 	 echo <<<HTML
@@ -334,6 +343,7 @@ HTML;
 	
 	}
 	
+	// Show Layout Footer
 	function showFoot() {
 	
 	 echo <<<HTML
