@@ -57,6 +57,7 @@ class SoapArray extends SoapObject implements ArrayAccess, Iterator
 	{
 		switch($this->class)
 		{
+			case 'anyType':
 			case 'string':
 				if(!is_string($value))
 					throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
@@ -69,8 +70,14 @@ class SoapArray extends SoapObject implements ArrayAccess, Iterator
 				break;
 				
 			default:
-				if (!($value instanceof $this->class))
+				if (is_string($value) && is_string($offset))
+				{
+					$this->$offset = $value;
+				}
+				elseif (!($value instanceof $this->class))
+				{
 					throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
+				}
 		}
 		
 		if ($offset === null)
@@ -115,20 +122,32 @@ class SoapArray extends SoapObject implements ArrayAccess, Iterator
 		return $this->class;
 	}
 	
+	public function toArray()
+	{
+		return $this->array;
+	}
+	
 	public function fromArray(array $result)
 	{
 		$class = $this->class;
-		foreach($result as $value)
+		foreach($result as $field => $value)
 		{
-			if(is_array($value))
+			if(is_int($field))
 			{
-				$obj = new $class();
-				$obj->fromArray($value);
-				$this[] = $obj;
+				if(is_array($value))
+				{
+					$obj = new $class();
+					$obj->fromArray($value);
+					$this[] = $obj;
+				}
+				else
+				{
+					$this[] = $value;
+				}
 			}
 			else
 			{
-				$this[] = $value;
+				$this->$field = $value;
 			}
 		}
 	}
