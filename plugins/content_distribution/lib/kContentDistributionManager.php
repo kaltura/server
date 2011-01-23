@@ -124,6 +124,18 @@ class kContentDistributionManager
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
 			
+		$validStatus = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isDeleteEnabled())
 			return self::addSubmitDeleteJob($entryDistribution, $distributionProfile);
@@ -150,6 +162,18 @@ class kContentDistributionManager
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
 			
+		$validStatus = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -176,6 +200,16 @@ class kContentDistributionManager
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
 			
+		$validStatus = array(
+			EntryDistributionStatus::READY,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isReportsEnabled())
 			return self::addFetchReportJob($entryDistribution, $distributionProfile);
@@ -194,6 +228,22 @@ class kContentDistributionManager
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
 			return null;
 			
+		$validStatus = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_SUBMITTING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::PENDING,
+			EntryDistributionStatus::QUEUED,
+			EntryDistributionStatus::READY,
+			EntryDistributionStatus::REMOVED,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
 		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
