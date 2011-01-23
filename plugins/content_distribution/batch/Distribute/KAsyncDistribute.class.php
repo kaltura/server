@@ -73,6 +73,7 @@ abstract class KAsyncDistribute extends KBatchBase
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, 'Error: Cannot create DistributeEngine of type ['.$job->jobSubType.']', KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
+			$job = $this->updateJob($job, "Engine found [" . get_class($this->engine) . "]", KalturaBatchJobStatus::QUEUED);
 						
 			$closed = $this->execute($data);
 			if($closed)
