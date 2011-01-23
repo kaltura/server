@@ -132,12 +132,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $adminLoginUsersQuota;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $userSessionRoleId;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $adminSessionRoleId;
 	
