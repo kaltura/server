@@ -138,8 +138,8 @@ data.serve							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 baseentry.addfromuploadedfile 		|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE,KMC_READ_ONLY
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
-baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
-baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
+baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
+baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
 baseentry.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.getbyids					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
@@ -338,7 +338,7 @@ thumbparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_THUM
 
 flavorasset.get						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 flavorasset.getbyentryid 			|			|1,2	|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
-flavorasset.getwebplayablebyentryid |			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
+flavorasset.getwebplayablebyentryid |			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 flavorasset.convert 				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_RECONVERT
 flavorasset.reconvert 				|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_RECONVERT
 flavorasset.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
