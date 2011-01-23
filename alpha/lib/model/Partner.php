@@ -605,10 +605,16 @@ class Partner extends BasePartner
 	
 	public function setAdminSessionRoleId($roleId)
 	{
-		$userRole = UserRolePeer::retrieveByPK($roleId);
-		if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+		if ($roleId)
 		{
-			throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+			$userRole = UserRolePeer::retrieveByPK($roleId);
+			if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+			{
+				throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+			}
+		}
+		else {
+			$roleId = null;
 		}
 		$this->putInCustomData('admin_session_role_id', $roleId);
 	}
@@ -626,10 +632,16 @@ class Partner extends BasePartner
 	
 	public function setUserSessionRoleId($roleId)
 	{
-		$userRole = UserRolePeer::retrieveByPK($roleId);
-		if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+		if ($roleId)
 		{
-			throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+			$userRole = UserRolePeer::retrieveByPK($roleId);
+			if (!$userRole || !in_array($userRole->getPartnerId(),array($this->getId(),PartnerPeer::GLOBAL_PARTNER) ) )
+			{
+				throw new kPermissionException("A user role with ID [$roleId] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+			}
+		}
+		else {
+			$roleId = null;
 		}
 		$this->putInCustomData('user_session_role_id', $roleId);
 	}
