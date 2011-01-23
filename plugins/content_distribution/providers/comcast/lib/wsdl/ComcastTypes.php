@@ -1,6 +1,5 @@
 <?php
 
-
 class ComcastPermissionList extends SoapArray
 {				
 	public function __construct()
@@ -8,8 +7,13 @@ class ComcastPermissionList extends SoapArray
 		parent::__construct("ComcastPermission");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPermission extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -27,6 +31,11 @@ class ComcastPermission extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPermissionField
 	 **/
@@ -83,7 +92,7 @@ class ComcastPermission extends ComcastBusinessObject
 	public $userOwner;
 				
 }
-	
+
 class ComcastRoleList extends SoapArray
 {				
 	public function __construct()
@@ -91,8 +100,13 @@ class ComcastRoleList extends SoapArray
 		parent::__construct("ComcastRole");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRole extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -110,6 +124,11 @@ class ComcastRole extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRoleField
 	 **/
@@ -166,7 +185,7 @@ class ComcastRole extends ComcastBusinessObject
 	public $title;
 				
 }
-	
+
 class ComcastCapability extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -182,6 +201,11 @@ class ComcastCapability extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastAPIObject
 	 **/
@@ -193,7 +217,7 @@ class ComcastCapability extends SoapObject
 	public $capabilityType;
 				
 }
-	
+
 class ComcastArrayOfCapability extends SoapArray
 {				
 	public function __construct()
@@ -201,8 +225,13 @@ class ComcastArrayOfCapability extends SoapArray
 		parent::__construct("ComcastCapability");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastUserList extends SoapArray
 {				
 	public function __construct()
@@ -210,8 +239,13 @@ class ComcastUserList extends SoapArray
 		parent::__construct("ComcastUser");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastUser extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -231,6 +265,11 @@ class ComcastUser extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfUserField
 	 **/
@@ -302,7 +341,7 @@ class ComcastUser extends ComcastBusinessObject
 	public $userName;
 				
 }
-	
+
 class ComcastAccountList extends SoapArray
 {				
 	public function __construct()
@@ -310,8 +349,13 @@ class ComcastAccountList extends SoapArray
 		parent::__construct("ComcastAccount");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAccount extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -391,6 +435,11 @@ class ComcastAccount extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfAccountField
 	 **/
@@ -1172,7 +1221,7 @@ class ComcastAccount extends ComcastBusinessObject
 	public $writeActionLimit;
 				
 }
-	
+
 class ComcastCustomFieldList extends SoapArray
 {				
 	public function __construct()
@@ -1180,8 +1229,13 @@ class ComcastCustomFieldList extends SoapArray
 		parent::__construct("ComcastCustomField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomField extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1207,6 +1261,11 @@ class ComcastCustomField extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCustomFieldField
 	 **/
@@ -1308,7 +1367,7 @@ class ComcastCustomField extends ComcastBusinessObject
 	public $title;
 				
 }
-	
+
 class ComcastLocationList extends SoapArray
 {				
 	public function __construct()
@@ -1316,8 +1375,13 @@ class ComcastLocationList extends SoapArray
 		parent::__construct("ComcastLocation");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastLocation extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1337,6 +1401,11 @@ class ComcastLocation extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfLocationField
 	 **/
@@ -1403,7 +1472,7 @@ class ComcastLocation extends ComcastStatusObject
 	public $userName;
 				
 }
-	
+
 class ComcastServerList extends SoapArray
 {				
 	public function __construct()
@@ -1411,8 +1480,13 @@ class ComcastServerList extends SoapArray
 		parent::__construct("ComcastServer");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastServer extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1442,6 +1516,11 @@ class ComcastServer extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfServerField
 	 **/
@@ -1683,7 +1762,7 @@ class ComcastServer extends ComcastStatusObject
 	public $userName;
 				
 }
-	
+
 class ComcastSystemTaskList extends SoapArray
 {				
 	public function __construct()
@@ -1691,8 +1770,13 @@ class ComcastSystemTaskList extends SoapArray
 		parent::__construct("ComcastSystemTask");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastSystemTask extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1712,6 +1796,11 @@ class ComcastSystemTask extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemTaskField
 	 **/
@@ -1813,7 +1902,7 @@ class ComcastSystemTask extends ComcastStatusObject
 	public $taskType;
 				
 }
-	
+
 class ComcastCustomCommandList extends SoapArray
 {				
 	public function __construct()
@@ -1821,8 +1910,13 @@ class ComcastCustomCommandList extends SoapArray
 		parent::__construct("ComcastCustomCommand");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomCommand extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1840,6 +1934,11 @@ class ComcastCustomCommand extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCustomCommandField
 	 **/
@@ -1966,7 +2065,7 @@ class ComcastCustomCommand extends ComcastBusinessObject
 	public $windowWidth;
 				
 }
-	
+
 class ComcastDirectoryList extends SoapArray
 {				
 	public function __construct()
@@ -1974,8 +2073,13 @@ class ComcastDirectoryList extends SoapArray
 		parent::__construct("ComcastDirectory");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDirectory extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -1989,6 +2093,11 @@ class ComcastDirectory extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfDirectoryField
 	 **/
@@ -2050,7 +2159,7 @@ class ComcastDirectory extends ComcastStatusObject
 	public $userName;
 				
 }
-	
+
 class ComcastJobList extends SoapArray
 {				
 	public function __construct()
@@ -2058,8 +2167,13 @@ class ComcastJobList extends SoapArray
 		parent::__construct("ComcastJob");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastJob extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2073,6 +2187,11 @@ class ComcastJob extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfJobField
 	 **/
@@ -2109,7 +2228,7 @@ class ComcastJob extends ComcastStatusObject
 	public $title;
 				
 }
-	
+
 class ComcastSystemStatus extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2123,6 +2242,11 @@ class ComcastSystemStatus extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemStatusField
 	 **/
@@ -2194,7 +2318,7 @@ class ComcastSystemStatus extends ComcastBusinessObject
 	public $webXML;
 				
 }
-	
+
 class ComcastSystemRequestLog extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2220,6 +2344,11 @@ class ComcastSystemRequestLog extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemRequestLogField
 	 **/
@@ -2356,7 +2485,7 @@ class ComcastSystemRequestLog extends ComcastBusinessObject
 	public $totalSuccessfulRequestCount;
 				
 }
-	
+
 class ComcastIDSet extends SoapArray
 {				
 	public function __construct()
@@ -2364,8 +2493,13 @@ class ComcastIDSet extends SoapArray
 		parent::__construct("long");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomData extends SoapArray
 {				
 	public function __construct()
@@ -2373,9 +2507,14 @@ class ComcastCustomData extends SoapArray
 		parent::__construct("ComcastCustomDataElement");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
-class ComcastBusinessObject extends SoapObject
+
+abstract class ComcastBusinessObject extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
 	{
@@ -2388,6 +2527,11 @@ class ComcastBusinessObject extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var long
 	 **/
@@ -2474,8 +2618,8 @@ class ComcastBusinessObject extends SoapObject
 	public $customData;
 				
 }
-	
-class ComcastStatusObject extends ComcastBusinessObject
+
+abstract class ComcastStatusObject extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
 	{
@@ -2490,6 +2634,11 @@ class ComcastStatusObject extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var boolean
 	 **/
@@ -2516,7 +2665,7 @@ class ComcastStatusObject extends ComcastBusinessObject
 	public $statusMessage;
 				
 }
-	
+
 class ComcastCustomDataElement extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2530,6 +2679,11 @@ class ComcastCustomDataElement extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2541,7 +2695,7 @@ class ComcastCustomDataElement extends SoapObject
 	public $value;
 				
 }
-	
+
 class ComcastArrayOfCustomDataElement extends SoapArray
 {				
 	public function __construct()
@@ -2549,9 +2703,14 @@ class ComcastArrayOfCustomDataElement extends SoapArray
 		parent::__construct("ComcastCustomDataElement");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
-class ComcastFieldValue extends SoapObject
+
+abstract class ComcastFieldValue extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
 	{
@@ -2562,8 +2721,13 @@ class ComcastFieldValue extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastBooleanValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2575,13 +2739,18 @@ class ComcastBooleanValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var boolean
 	 **/
 	public $value;
 				
 }
-	
+
 class ComcastHTMLValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2593,13 +2762,18 @@ class ComcastHTMLValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
 	public $text;
 				
 }
-	
+
 class ComcastHyperlinkValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2611,6 +2785,11 @@ class ComcastHyperlinkValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2632,7 +2811,7 @@ class ComcastHyperlinkValue extends ComcastFieldValue
 	public $target;
 				
 }
-	
+
 class ComcastImageValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2644,6 +2823,11 @@ class ComcastImageValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2670,7 +2854,7 @@ class ComcastImageValue extends ComcastFieldValue
 	public $target;
 				
 }
-	
+
 class ComcastLargeTextValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2682,13 +2866,18 @@ class ComcastLargeTextValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
 	public $text;
 				
 }
-	
+
 class ComcastTextValue extends ComcastFieldValue
 {				
 	protected function getAttributeType($attributeName)
@@ -2700,13 +2889,18 @@ class ComcastTextValue extends ComcastFieldValue
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
 	public $text;
 				
 }
-	
+
 class ComcastQuery extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2724,6 +2918,11 @@ class ComcastQuery extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2745,7 +2944,7 @@ class ComcastQuery extends SoapObject
 	public $and;
 				
 }
-	
+
 class ComcastArrayOfQuery extends SoapArray
 {				
 	public function __construct()
@@ -2753,8 +2952,13 @@ class ComcastArrayOfQuery extends SoapArray
 		parent::__construct("ComcastQuery");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRange extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2766,6 +2970,11 @@ class ComcastRange extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var long
 	 **/
@@ -2777,7 +2986,7 @@ class ComcastRange extends SoapObject
 	public $endIndex;
 				
 }
-	
+
 class ComcastIDList extends SoapArray
 {				
 	public function __construct()
@@ -2785,8 +2994,13 @@ class ComcastIDList extends SoapArray
 		parent::__construct("long");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfCountry extends SoapArray
 {				
 	public function __construct()
@@ -2794,8 +3008,13 @@ class ComcastArrayOfCountry extends SoapArray
 		parent::__construct("ComcastCountry");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfAPIObject extends SoapArray
 {				
 	public function __construct()
@@ -2803,8 +3022,13 @@ class ComcastArrayOfAPIObject extends SoapArray
 		parent::__construct("ComcastAPIObject");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfAdminView extends SoapArray
 {				
 	public function __construct()
@@ -2812,8 +3036,13 @@ class ComcastArrayOfAdminView extends SoapArray
 		parent::__construct("ComcastAdminView");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDigest extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2825,6 +3054,11 @@ class ComcastDigest extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2876,7 +3110,7 @@ class ComcastDigest extends SoapObject
 	public $digestAlgorithm;
 				
 }
-	
+
 class ComcastKeySettings extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2888,6 +3122,11 @@ class ComcastKeySettings extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -2914,7 +3153,7 @@ class ComcastKeySettings extends SoapObject
 	public $useHexKey;
 				
 }
-	
+
 class ComcastJobHeader extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -2926,13 +3165,18 @@ class ComcastJobHeader extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
 	public $job;
 				
 }
-	
+
 class ComcastFieldState extends SoapObject
 {				
 	const _U = 'U';
@@ -2954,8 +3198,13 @@ class ComcastFieldState extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAPIObject extends SoapObject
 {				
 	const _ACCOUNT = 'Account';
@@ -3031,8 +3280,13 @@ class ComcastAPIObject extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAuthorizationMethod extends SoapObject
 {				
 	const _DIRECTORY = 'Directory';
@@ -3050,8 +3304,13 @@ class ComcastAuthorizationMethod extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastTimeZone extends SoapObject
 {				
 	const _LINEISLANDS = 'LineIslands';
@@ -3215,8 +3474,13 @@ class ComcastTimeZone extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastTimeUnits extends SoapObject
 {				
 	const _MINUTES = 'minutes';
@@ -3240,8 +3504,13 @@ class ComcastTimeUnits extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastLanguage extends SoapObject
 {				
 	const _CUNKNOWND = 'CUnknownD';
@@ -3501,8 +3770,13 @@ class ComcastLanguage extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStatus extends SoapObject
 {				
 	const _ERROR = 'Error';
@@ -3528,8 +3802,13 @@ class ComcastStatus extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStatusDetail extends SoapObject
 {				
 	const _APPLYINGDRM = 'ApplyingDRM';
@@ -3671,8 +3950,13 @@ class ComcastStatusDetail extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCountry extends SoapObject
 {				
 	const _CUNKNOWND = 'CUnknownD';
@@ -4170,8 +4454,13 @@ class ComcastCountry extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEncoding extends SoapObject
 {				
 	const _ARABIC_CASMO_708D = 'Arabic CASMO 708D';
@@ -4251,8 +4540,13 @@ class ComcastEncoding extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomFieldType extends SoapObject
 {				
 	const _BOOLEAN = 'Boolean';
@@ -4276,8 +4570,13 @@ class ComcastCustomFieldType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastTaskType extends SoapObject
 {				
 	const _ADDEXTERNALRELEASE = 'AddExternalRelease';
@@ -4319,8 +4618,13 @@ class ComcastTaskType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfstring extends SoapArray
 {				
 	public function __construct()
@@ -4328,8 +4632,13 @@ class ComcastArrayOfstring extends SoapArray
 		parent::__construct("string");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfanyType extends SoapArray
 {				
 	public function __construct()
@@ -4337,8 +4646,13 @@ class ComcastArrayOfanyType extends SoapArray
 		parent::__construct("anyType");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPermissionTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4354,6 +4668,11 @@ class ComcastPermissionTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPermissionField
 	 **/
@@ -4365,7 +4684,7 @@ class ComcastPermissionTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastRoleTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4381,6 +4700,11 @@ class ComcastRoleTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRoleField
 	 **/
@@ -4392,7 +4716,7 @@ class ComcastRoleTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastUserTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4408,6 +4732,11 @@ class ComcastUserTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfUserField
 	 **/
@@ -4419,7 +4748,7 @@ class ComcastUserTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastAccountTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4435,6 +4764,11 @@ class ComcastAccountTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfAccountField
 	 **/
@@ -4446,7 +4780,7 @@ class ComcastAccountTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastCustomFieldTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4462,6 +4796,11 @@ class ComcastCustomFieldTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCustomFieldField
 	 **/
@@ -4473,7 +4812,7 @@ class ComcastCustomFieldTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastLocationTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4489,6 +4828,11 @@ class ComcastLocationTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfLocationField
 	 **/
@@ -4500,7 +4844,7 @@ class ComcastLocationTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastServerTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4516,6 +4860,11 @@ class ComcastServerTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfServerField
 	 **/
@@ -4527,7 +4876,7 @@ class ComcastServerTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastSystemTaskTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4543,6 +4892,11 @@ class ComcastSystemTaskTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemTaskField
 	 **/
@@ -4554,7 +4908,7 @@ class ComcastSystemTaskTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastCustomCommandTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4570,6 +4924,11 @@ class ComcastCustomCommandTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCustomCommandField
 	 **/
@@ -4581,7 +4940,7 @@ class ComcastCustomCommandTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastDirectoryTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4597,6 +4956,11 @@ class ComcastDirectoryTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfDirectoryField
 	 **/
@@ -4608,7 +4972,7 @@ class ComcastDirectoryTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastJobTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4624,6 +4988,11 @@ class ComcastJobTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfJobField
 	 **/
@@ -4635,7 +5004,7 @@ class ComcastJobTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastSystemStatusTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4651,6 +5020,11 @@ class ComcastSystemStatusTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemStatusField
 	 **/
@@ -4662,7 +5036,7 @@ class ComcastSystemStatusTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastSystemRequestLogTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -4678,6 +5052,11 @@ class ComcastSystemRequestLogTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfSystemRequestLogField
 	 **/
@@ -4689,7 +5068,7 @@ class ComcastSystemRequestLogTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastArrayOfPermissionField extends SoapArray
 {				
 	public function __construct()
@@ -4697,8 +5076,13 @@ class ComcastArrayOfPermissionField extends SoapArray
 		parent::__construct("ComcastPermissionField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfRoleField extends SoapArray
 {				
 	public function __construct()
@@ -4706,8 +5090,13 @@ class ComcastArrayOfRoleField extends SoapArray
 		parent::__construct("ComcastRoleField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfUserField extends SoapArray
 {				
 	public function __construct()
@@ -4715,8 +5104,13 @@ class ComcastArrayOfUserField extends SoapArray
 		parent::__construct("ComcastUserField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfFormat extends SoapArray
 {				
 	public function __construct()
@@ -4724,8 +5118,13 @@ class ComcastArrayOfFormat extends SoapArray
 		parent::__construct("ComcastFormat");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfNotificationAction extends SoapArray
 {				
 	public function __construct()
@@ -4733,8 +5132,13 @@ class ComcastArrayOfNotificationAction extends SoapArray
 		parent::__construct("ComcastNotificationAction");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfAccountField extends SoapArray
 {				
 	public function __construct()
@@ -4742,8 +5146,13 @@ class ComcastArrayOfAccountField extends SoapArray
 		parent::__construct("ComcastAccountField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfCustomFieldField extends SoapArray
 {				
 	public function __construct()
@@ -4751,8 +5160,13 @@ class ComcastArrayOfCustomFieldField extends SoapArray
 		parent::__construct("ComcastCustomFieldField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfLocationField extends SoapArray
 {				
 	public function __construct()
@@ -4760,8 +5174,13 @@ class ComcastArrayOfLocationField extends SoapArray
 		parent::__construct("ComcastLocationField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfServerField extends SoapArray
 {				
 	public function __construct()
@@ -4769,8 +5188,13 @@ class ComcastArrayOfServerField extends SoapArray
 		parent::__construct("ComcastServerField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfSystemTaskField extends SoapArray
 {				
 	public function __construct()
@@ -4778,8 +5202,13 @@ class ComcastArrayOfSystemTaskField extends SoapArray
 		parent::__construct("ComcastSystemTaskField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfCapabilityType extends SoapArray
 {				
 	public function __construct()
@@ -4787,8 +5216,13 @@ class ComcastArrayOfCapabilityType extends SoapArray
 		parent::__construct("ComcastCapabilityType");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfCustomCommandField extends SoapArray
 {				
 	public function __construct()
@@ -4796,8 +5230,13 @@ class ComcastArrayOfCustomCommandField extends SoapArray
 		parent::__construct("ComcastCustomCommandField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfDirectoryField extends SoapArray
 {				
 	public function __construct()
@@ -4805,8 +5244,13 @@ class ComcastArrayOfDirectoryField extends SoapArray
 		parent::__construct("ComcastDirectoryField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfJobField extends SoapArray
 {				
 	public function __construct()
@@ -4814,8 +5258,13 @@ class ComcastArrayOfJobField extends SoapArray
 		parent::__construct("ComcastJobField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfSystemStatusField extends SoapArray
 {				
 	public function __construct()
@@ -4823,8 +5272,13 @@ class ComcastArrayOfSystemStatusField extends SoapArray
 		parent::__construct("ComcastSystemStatusField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfSystemRequestLogField extends SoapArray
 {				
 	public function __construct()
@@ -4832,8 +5286,13 @@ class ComcastArrayOfSystemRequestLogField extends SoapArray
 		parent::__construct("ComcastSystemRequestLogField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPermissionField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -4897,8 +5356,13 @@ class ComcastPermissionField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRoleField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -4962,8 +5426,13 @@ class ComcastRoleField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastUserField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5033,8 +5502,13 @@ class ComcastUserField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAccountField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5388,8 +5862,13 @@ class ComcastAccountField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomFieldField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5471,8 +5950,13 @@ class ComcastCustomFieldField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastLocationField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5550,8 +6034,13 @@ class ComcastLocationField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastServerField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5699,8 +6188,13 @@ class ComcastServerField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastSystemTaskField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5792,8 +6286,13 @@ class ComcastSystemTaskField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCustomCommandField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5885,8 +6384,13 @@ class ComcastCustomCommandField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDirectoryField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -5962,8 +6466,13 @@ class ComcastDirectoryField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastJobField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -6029,8 +6538,13 @@ class ComcastJobField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastSystemStatusField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -6100,8 +6614,13 @@ class ComcastSystemStatusField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastSystemRequestLogField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -6197,8 +6716,13 @@ class ComcastSystemRequestLogField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPermissionSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6214,6 +6738,11 @@ class ComcastPermissionSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastPermissionField
 	 **/
@@ -6230,7 +6759,7 @@ class ComcastPermissionSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastRoleSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6246,6 +6775,11 @@ class ComcastRoleSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastRoleField
 	 **/
@@ -6262,7 +6796,7 @@ class ComcastRoleSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastUserSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6278,6 +6812,11 @@ class ComcastUserSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastUserField
 	 **/
@@ -6294,7 +6833,7 @@ class ComcastUserSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastAccountSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6310,6 +6849,11 @@ class ComcastAccountSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastAccountField
 	 **/
@@ -6326,7 +6870,7 @@ class ComcastAccountSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastCustomFieldSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6342,6 +6886,11 @@ class ComcastCustomFieldSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastCustomFieldField
 	 **/
@@ -6358,7 +6907,7 @@ class ComcastCustomFieldSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastLocationSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6374,6 +6923,11 @@ class ComcastLocationSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastLocationField
 	 **/
@@ -6390,7 +6944,7 @@ class ComcastLocationSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastServerSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6406,6 +6960,11 @@ class ComcastServerSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastServerField
 	 **/
@@ -6422,7 +6981,7 @@ class ComcastServerSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastSystemTaskSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6438,6 +6997,11 @@ class ComcastSystemTaskSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastSystemTaskField
 	 **/
@@ -6454,7 +7018,7 @@ class ComcastSystemTaskSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastCustomCommandSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6470,6 +7034,11 @@ class ComcastCustomCommandSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastCustomCommandField
 	 **/
@@ -6486,7 +7055,7 @@ class ComcastCustomCommandSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastDirectorySort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6502,6 +7071,11 @@ class ComcastDirectorySort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastDirectoryField
 	 **/
@@ -6518,7 +7092,7 @@ class ComcastDirectorySort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastJobSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -6534,6 +7108,11 @@ class ComcastJobSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastJobField
 	 **/
@@ -6550,7 +7129,7 @@ class ComcastJobSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastCapabilityType extends SoapObject
 {				
 	const _FULLCONTROL = 'FullControl';
@@ -6578,8 +7157,13 @@ class ComcastCapabilityType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastFormat extends SoapObject
 {				
 	const _UNKNOWN = 'Unknown';
@@ -6697,8 +7281,13 @@ class ComcastFormat extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDelivery extends SoapObject
 {				
 	const _ALL = 'All';
@@ -6726,8 +7315,13 @@ class ComcastDelivery extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastServerIcon extends SoapObject
 {				
 	const _ABACAST = 'Abacast';
@@ -6807,8 +7401,13 @@ class ComcastServerIcon extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastProtectionLevel extends SoapObject
 {				
 	const _DRM = 'DRM';
@@ -6828,8 +7427,13 @@ class ComcastProtectionLevel extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastNotificationAction extends SoapObject
 {				
 	const _ADD = 'Add';
@@ -6847,8 +7451,13 @@ class ComcastNotificationAction extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPaymentGateway extends SoapObject
 {				
 	const _CUSTOM = 'Custom';
@@ -6868,8 +7477,13 @@ class ComcastPaymentGateway extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAdminView extends SoapObject
 {				
 	const _ACCOUNTS = 'Accounts';
@@ -6943,8 +7557,13 @@ class ComcastAdminView extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDayOfWeek extends SoapObject
 {				
 	const _SUNDAY = 'Sunday';
@@ -6970,8 +7589,13 @@ class ComcastDayOfWeek extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCreditCardType extends SoapObject
 {				
 	const _AMERICANEXPRESS = 'AmericanExpress';
@@ -6997,8 +7621,13 @@ class ComcastCreditCardType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastContactInfo extends SoapObject
 {				
 	const _HIDDEN = 'Hidden';
@@ -7016,8 +7645,13 @@ class ComcastContactInfo extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontPageType extends SoapObject
 {				
 	const _CATEGORIES = 'Categories';
@@ -7041,8 +7675,13 @@ class ComcastStorefrontPageType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastSystemRequestType extends SoapObject
 {				
 	const _API = 'API';
@@ -7082,8 +7721,13 @@ class ComcastSystemRequestType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastMedia extends ComcastContent
 {				
 	protected function getAttributeType($attributeName)
@@ -7101,6 +7745,11 @@ class ComcastMedia extends ComcastContent
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfMediaField
 	 **/
@@ -7147,7 +7796,7 @@ class ComcastMedia extends ComcastContent
 	public $thumbnailMediaFileID;
 				
 }
-	
+
 class ComcastPossibleReleaseSettings extends SoapArray
 {				
 	public function __construct()
@@ -7155,9 +7804,14 @@ class ComcastPossibleReleaseSettings extends SoapArray
 		parent::__construct("ComcastPossibleReleaseSetting");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
-class ComcastContent extends ComcastStatusObject
+
+abstract class ComcastContent extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
 	{
@@ -7220,6 +7874,11 @@ class ComcastContent extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -7521,7 +8180,7 @@ class ComcastContent extends ComcastStatusObject
 	public $usagePlans;
 				
 }
-	
+
 class ComcastPossibleReleaseSetting extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -7541,6 +8200,11 @@ class ComcastPossibleReleaseSetting extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var long
 	 **/
@@ -7592,7 +8256,7 @@ class ComcastPossibleReleaseSetting extends SoapObject
 	public $encodingProfileTitle;
 				
 }
-	
+
 class ComcastMediaFileList extends SoapArray
 {				
 	public function __construct()
@@ -7600,8 +8264,13 @@ class ComcastMediaFileList extends SoapArray
 		parent::__construct("ComcastMediaFile");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastMediaFile extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -7635,6 +8304,11 @@ class ComcastMediaFile extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfMediaFileField
 	 **/
@@ -7951,7 +8625,7 @@ class ComcastMediaFile extends ComcastStatusObject
 	public $width;
 				
 }
-	
+
 class ComcastAddContentOptions extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -7971,6 +8645,11 @@ class ComcastAddContentOptions extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var boolean
 	 **/
@@ -8012,7 +8691,7 @@ class ComcastAddContentOptions extends SoapObject
 	public $deleteSource;
 				
 }
-	
+
 class ComcastRelease extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -8104,6 +8783,11 @@ class ComcastRelease extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfReleaseField
 	 **/
@@ -8655,7 +9339,7 @@ class ComcastRelease extends ComcastStatusObject
 	public $contentCustomData;
 				
 }
-	
+
 class ComcastChoiceList extends SoapArray
 {				
 	public function __construct()
@@ -8663,8 +9347,13 @@ class ComcastChoiceList extends SoapArray
 		parent::__construct("ComcastChoice");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastChoice extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -8718,6 +9407,11 @@ class ComcastChoice extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfChoiceField
 	 **/
@@ -8994,7 +9688,7 @@ class ComcastChoice extends ComcastStatusObject
 	public $choiceType;
 				
 }
-	
+
 class ComcastRestrictionList extends SoapArray
 {				
 	public function __construct()
@@ -9002,8 +9696,13 @@ class ComcastRestrictionList extends SoapArray
 		parent::__construct("ComcastRestriction");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRestriction extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9031,6 +9730,11 @@ class ComcastRestriction extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRestrictionField
 	 **/
@@ -9132,7 +9836,7 @@ class ComcastRestriction extends ComcastBusinessObject
 	public $useAirdate;
 				
 }
-	
+
 class ComcastCategoryList extends SoapArray
 {				
 	public function __construct()
@@ -9140,8 +9844,13 @@ class ComcastCategoryList extends SoapArray
 		parent::__construct("ComcastCategory");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCategory extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9177,6 +9886,11 @@ class ComcastCategory extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCategoryField
 	 **/
@@ -9308,7 +10022,7 @@ class ComcastCategory extends ComcastStatusObject
 	public $treeOrder;
 				
 }
-	
+
 class ComcastMediaList extends SoapArray
 {				
 	public function __construct()
@@ -9316,8 +10030,13 @@ class ComcastMediaList extends SoapArray
 		parent::__construct("ComcastMedia");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPlaylistList extends SoapArray
 {				
 	public function __construct()
@@ -9325,8 +10044,13 @@ class ComcastPlaylistList extends SoapArray
 		parent::__construct("ComcastPlaylist");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPlaylist extends ComcastContent
 {				
 	protected function getAttributeType($attributeName)
@@ -9342,6 +10066,11 @@ class ComcastPlaylist extends ComcastContent
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPlaylistField
 	 **/
@@ -9363,7 +10092,7 @@ class ComcastPlaylist extends ComcastContent
 	public $shufflePlay;
 				
 }
-	
+
 class ComcastReleaseList extends SoapArray
 {				
 	public function __construct()
@@ -9371,8 +10100,13 @@ class ComcastReleaseList extends SoapArray
 		parent::__construct("ComcastRelease");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRequestList extends SoapArray
 {				
 	public function __construct()
@@ -9380,8 +10114,13 @@ class ComcastRequestList extends SoapArray
 		parent::__construct("ComcastRequest");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRequest extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9411,6 +10150,11 @@ class ComcastRequest extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRequestField
 	 **/
@@ -9652,7 +10396,7 @@ class ComcastRequest extends ComcastBusinessObject
 	public $userName;
 				
 }
-	
+
 class ComcastEncodingProfileList extends SoapArray
 {				
 	public function __construct()
@@ -9660,8 +10404,13 @@ class ComcastEncodingProfileList extends SoapArray
 		parent::__construct("ComcastEncodingProfile");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEncodingProfile extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9687,6 +10436,11 @@ class ComcastEncodingProfile extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEncodingProfileField
 	 **/
@@ -9873,7 +10627,7 @@ class ComcastEncodingProfile extends ComcastStatusObject
 	public $videoKeyFrameInterval;
 				
 }
-	
+
 class ComcastAssetTypeList extends SoapArray
 {				
 	public function __construct()
@@ -9881,8 +10635,13 @@ class ComcastAssetTypeList extends SoapArray
 		parent::__construct("ComcastAssetType");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAssetType extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9900,6 +10659,11 @@ class ComcastAssetType extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfAssetTypeField
 	 **/
@@ -9946,7 +10710,7 @@ class ComcastAssetType extends ComcastBusinessObject
 	public $title;
 				
 }
-	
+
 class ComcastCodec extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -9966,6 +10730,11 @@ class ComcastCodec extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastContentType
 	 **/
@@ -9997,7 +10766,7 @@ class ComcastCodec extends SoapObject
 	public $possibleTargetForats;
 				
 }
-	
+
 class ComcastAddContentResults extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -10013,6 +10782,11 @@ class ComcastAddContentResults extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var long
 	 **/
@@ -10029,7 +10803,7 @@ class ComcastAddContentResults extends SoapObject
 	public $releaseIDs;
 				
 }
-	
+
 class ComcastCodecs extends SoapArray
 {				
 	public function __construct()
@@ -10037,8 +10811,13 @@ class ComcastCodecs extends SoapArray
 		parent::__construct("ComcastCodec");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPossibleAudioEncodings extends SoapArray
 {				
 	public function __construct()
@@ -10046,8 +10825,13 @@ class ComcastPossibleAudioEncodings extends SoapArray
 		parent::__construct("ComcastPossibleAudioEncoding");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPossibleAudioEncoding extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -10063,6 +10847,11 @@ class ComcastPossibleAudioEncoding extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var long
 	 **/
@@ -10099,7 +10888,7 @@ class ComcastPossibleAudioEncoding extends SoapObject
 	public $sampleRate;
 				
 }
-	
+
 class ComcastArrayOfRestrictionField extends SoapArray
 {				
 	public function __construct()
@@ -10107,8 +10896,13 @@ class ComcastArrayOfRestrictionField extends SoapArray
 		parent::__construct("ComcastRestrictionField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfCategoryField extends SoapArray
 {				
 	public function __construct()
@@ -10116,8 +10910,13 @@ class ComcastArrayOfCategoryField extends SoapArray
 		parent::__construct("ComcastCategoryField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfChoiceField extends SoapArray
 {				
 	public function __construct()
@@ -10125,8 +10924,13 @@ class ComcastArrayOfChoiceField extends SoapArray
 		parent::__construct("ComcastChoiceField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfMediaField extends SoapArray
 {				
 	public function __construct()
@@ -10134,8 +10938,13 @@ class ComcastArrayOfMediaField extends SoapArray
 		parent::__construct("ComcastMediaField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfMediaFileField extends SoapArray
 {				
 	public function __construct()
@@ -10143,8 +10952,13 @@ class ComcastArrayOfMediaFileField extends SoapArray
 		parent::__construct("ComcastMediaFileField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfPlaylistField extends SoapArray
 {				
 	public function __construct()
@@ -10152,8 +10966,13 @@ class ComcastArrayOfPlaylistField extends SoapArray
 		parent::__construct("ComcastPlaylistField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfReleaseField extends SoapArray
 {				
 	public function __construct()
@@ -10161,8 +10980,13 @@ class ComcastArrayOfReleaseField extends SoapArray
 		parent::__construct("ComcastReleaseField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfRequestField extends SoapArray
 {				
 	public function __construct()
@@ -10170,8 +10994,13 @@ class ComcastArrayOfRequestField extends SoapArray
 		parent::__construct("ComcastRequestField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfEncodingProfileField extends SoapArray
 {				
 	public function __construct()
@@ -10179,8 +11008,13 @@ class ComcastArrayOfEncodingProfileField extends SoapArray
 		parent::__construct("ComcastEncodingProfileField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfAssetTypeField extends SoapArray
 {				
 	public function __construct()
@@ -10188,8 +11022,13 @@ class ComcastArrayOfAssetTypeField extends SoapArray
 		parent::__construct("ComcastAssetTypeField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfBitrateMode extends SoapArray
 {				
 	public function __construct()
@@ -10197,8 +11036,13 @@ class ComcastArrayOfBitrateMode extends SoapArray
 		parent::__construct("ComcastBitrateMode");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastContentType extends SoapObject
 {				
 	const _ANIMATION = 'Animation';
@@ -10226,8 +11070,13 @@ class ComcastContentType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastExpression extends SoapObject
 {				
 	const _FULL = 'Full';
@@ -10247,8 +11096,13 @@ class ComcastExpression extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastMediaFileType extends SoapObject
 {				
 	const _EXTERNAL = 'External';
@@ -10264,8 +11118,13 @@ class ComcastMediaFileType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastContentClass extends SoapObject
 {				
 	const _MEDIA = 'Media';
@@ -10281,8 +11140,13 @@ class ComcastContentClass extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastChoiceType extends SoapObject
 {				
 	const _DYNAMIC = 'Dynamic';
@@ -10300,8 +11164,13 @@ class ComcastChoiceType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRestrictionField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -10383,8 +11252,13 @@ class ComcastRestrictionField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastCategoryField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -10488,8 +11362,13 @@ class ComcastCategoryField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastChoiceField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -10647,8 +11526,13 @@ class ComcastChoiceField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastMediaField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -10838,8 +11722,13 @@ class ComcastMediaField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastMediaFileField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -11017,8 +11906,13 @@ class ComcastMediaFileField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPlaylistField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -11198,8 +12092,13 @@ class ComcastPlaylistField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastReleaseField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -11469,8 +12368,13 @@ class ComcastReleaseField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRequestField extends SoapObject
 {				
 	const _AFFILIATE = 'affiliate';
@@ -11576,8 +12480,13 @@ class ComcastRequestField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastBitrateMode extends SoapObject
 {				
 	const _CONSTANT = 'Constant';
@@ -11595,8 +12504,13 @@ class ComcastBitrateMode extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEncodingProvider extends SoapObject
 {				
 	const _COMMANDLINE = 'CommandLine';
@@ -11642,8 +12556,13 @@ class ComcastEncodingProvider extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastHinting extends SoapObject
 {				
 	const _NONE = 'None';
@@ -11661,8 +12580,13 @@ class ComcastHinting extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEncodingProfileField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -11788,8 +12712,13 @@ class ComcastEncodingProfileField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAssetTypeField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -11849,8 +12778,13 @@ class ComcastAssetTypeField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastRestrictionTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -11866,6 +12800,11 @@ class ComcastRestrictionTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRestrictionField
 	 **/
@@ -11877,7 +12816,7 @@ class ComcastRestrictionTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastCategoryTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -11893,6 +12832,11 @@ class ComcastCategoryTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfCategoryField
 	 **/
@@ -11904,7 +12848,7 @@ class ComcastCategoryTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastChoiceTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -11922,6 +12866,11 @@ class ComcastChoiceTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfChoiceField
 	 **/
@@ -11938,7 +12887,7 @@ class ComcastChoiceTemplate extends SoapObject
 	public $contentCustomFields;
 				
 }
-	
+
 class ComcastMediaTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -11954,6 +12903,11 @@ class ComcastMediaTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfMediaField
 	 **/
@@ -11965,7 +12919,7 @@ class ComcastMediaTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastMediaFileTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -11981,6 +12935,11 @@ class ComcastMediaFileTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfMediaFileField
 	 **/
@@ -11992,7 +12951,7 @@ class ComcastMediaFileTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastPlaylistTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12008,6 +12967,11 @@ class ComcastPlaylistTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPlaylistField
 	 **/
@@ -12019,7 +12983,7 @@ class ComcastPlaylistTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastReleaseTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12037,6 +13001,11 @@ class ComcastReleaseTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfReleaseField
 	 **/
@@ -12053,7 +13022,7 @@ class ComcastReleaseTemplate extends SoapObject
 	public $contentCustomFields;
 				
 }
-	
+
 class ComcastRequestTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12069,6 +13038,11 @@ class ComcastRequestTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfRequestField
 	 **/
@@ -12080,7 +13054,7 @@ class ComcastRequestTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastEncodingProfileTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12096,6 +13070,11 @@ class ComcastEncodingProfileTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEncodingProfileField
 	 **/
@@ -12107,7 +13086,7 @@ class ComcastEncodingProfileTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastAssetTypeTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12123,6 +13102,11 @@ class ComcastAssetTypeTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfAssetTypeField
 	 **/
@@ -12134,7 +13118,7 @@ class ComcastAssetTypeTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastRestrictionSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12150,6 +13134,11 @@ class ComcastRestrictionSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastRestrictionField
 	 **/
@@ -12166,7 +13155,7 @@ class ComcastRestrictionSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastCategorySort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12182,6 +13171,11 @@ class ComcastCategorySort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastCategoryField
 	 **/
@@ -12198,7 +13192,7 @@ class ComcastCategorySort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastChoiceSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12214,6 +13208,11 @@ class ComcastChoiceSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastChoiceField
 	 **/
@@ -12230,7 +13229,7 @@ class ComcastChoiceSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastMediaSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12246,6 +13245,11 @@ class ComcastMediaSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastMediaField
 	 **/
@@ -12262,7 +13266,7 @@ class ComcastMediaSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastMediaFileSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12278,6 +13282,11 @@ class ComcastMediaFileSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastMediaFileField
 	 **/
@@ -12294,7 +13303,7 @@ class ComcastMediaFileSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastPlaylistSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12310,6 +13319,11 @@ class ComcastPlaylistSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastPlaylistField
 	 **/
@@ -12326,7 +13340,7 @@ class ComcastPlaylistSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastReleaseSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12342,6 +13356,11 @@ class ComcastReleaseSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastReleaseField
 	 **/
@@ -12358,7 +13377,7 @@ class ComcastReleaseSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastRequestSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12374,6 +13393,11 @@ class ComcastRequestSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastRequestField
 	 **/
@@ -12390,7 +13414,7 @@ class ComcastRequestSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastEncodingProfileSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12406,6 +13430,11 @@ class ComcastEncodingProfileSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastEncodingProfileField
 	 **/
@@ -12422,7 +13451,7 @@ class ComcastEncodingProfileSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastAssetTypeSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12438,6 +13467,11 @@ class ComcastAssetTypeSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastAssetTypeField
 	 **/
@@ -12454,7 +13488,7 @@ class ComcastAssetTypeSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastEndUserList extends SoapArray
 {				
 	public function __construct()
@@ -12462,8 +13496,13 @@ class ComcastEndUserList extends SoapArray
 		parent::__construct("ComcastEndUser");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUser extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12487,6 +13526,11 @@ class ComcastEndUser extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserField
 	 **/
@@ -12643,7 +13687,7 @@ class ComcastEndUser extends ComcastStatusObject
 	public $userName;
 				
 }
-	
+
 class ComcastEndUserPermissionList extends SoapArray
 {				
 	public function __construct()
@@ -12651,8 +13695,13 @@ class ComcastEndUserPermissionList extends SoapArray
 		parent::__construct("ComcastEndUserPermission");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserPermission extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12672,6 +13721,11 @@ class ComcastEndUserPermission extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserPermissionField
 	 **/
@@ -12833,7 +13887,7 @@ class ComcastEndUserPermission extends ComcastStatusObject
 	public $totalPlays;
 				
 }
-	
+
 class ComcastLicenseList extends SoapArray
 {				
 	public function __construct()
@@ -12841,8 +13895,13 @@ class ComcastLicenseList extends SoapArray
 		parent::__construct("ComcastLicense");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastLicense extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -12890,6 +13949,11 @@ class ComcastLicense extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfLicenseField
 	 **/
@@ -13151,7 +14215,7 @@ class ComcastLicense extends ComcastStatusObject
 	public $useDRM;
 				
 }
-	
+
 class ComcastPortalList extends SoapArray
 {				
 	public function __construct()
@@ -13159,8 +14223,13 @@ class ComcastPortalList extends SoapArray
 		parent::__construct("ComcastPortal");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPortal extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -13222,6 +14291,11 @@ class ComcastPortal extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPortalField
 	 **/
@@ -13743,7 +14817,7 @@ class ComcastPortal extends ComcastStatusObject
 	public $useEmailAddressAsUserName;
 				
 }
-	
+
 class ComcastStorefrontPageList extends SoapArray
 {				
 	public function __construct()
@@ -13751,8 +14825,13 @@ class ComcastStorefrontPageList extends SoapArray
 		parent::__construct("ComcastStorefrontPage");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontPage extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -13782,6 +14861,11 @@ class ComcastStorefrontPage extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfStorefrontPageField
 	 **/
@@ -14023,7 +15107,7 @@ class ComcastStorefrontPage extends ComcastStatusObject
 	public $useExistingLicenses;
 				
 }
-	
+
 class ComcastStorefrontList extends SoapArray
 {				
 	public function __construct()
@@ -14031,8 +15115,13 @@ class ComcastStorefrontList extends SoapArray
 		parent::__construct("ComcastStorefront");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefront extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14076,6 +15165,11 @@ class ComcastStorefront extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfStorefrontField
 	 **/
@@ -14372,7 +15466,7 @@ class ComcastStorefront extends ComcastStatusObject
 	public $useEmailAddressAsUserName;
 				
 }
-	
+
 class ComcastUsagePlanList extends SoapArray
 {				
 	public function __construct()
@@ -14380,8 +15474,13 @@ class ComcastUsagePlanList extends SoapArray
 		parent::__construct("ComcastUsagePlan");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastUsagePlan extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14405,6 +15504,11 @@ class ComcastUsagePlan extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfUsagePlanField
 	 **/
@@ -14466,7 +15570,7 @@ class ComcastUsagePlan extends ComcastBusinessObject
 	public $title;
 				
 }
-	
+
 class ComcastEndUserTransactionList extends SoapArray
 {				
 	public function __construct()
@@ -14474,8 +15578,13 @@ class ComcastEndUserTransactionList extends SoapArray
 		parent::__construct("ComcastEndUserTransaction");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserTransaction extends ComcastStatusObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14499,6 +15608,11 @@ class ComcastEndUserTransaction extends ComcastStatusObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserTransactionField
 	 **/
@@ -14705,7 +15819,7 @@ class ComcastEndUserTransaction extends ComcastStatusObject
 	public $templateLicenseID;
 				
 }
-	
+
 class ComcastPriceList extends SoapArray
 {				
 	public function __construct()
@@ -14713,8 +15827,13 @@ class ComcastPriceList extends SoapArray
 		parent::__construct("ComcastPrice");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPrice extends ComcastBusinessObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14728,6 +15847,11 @@ class ComcastPrice extends ComcastBusinessObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPriceField
 	 **/
@@ -14779,7 +15903,7 @@ class ComcastPrice extends ComcastBusinessObject
 	public $specialRenewalPrice;
 				
 }
-	
+
 class ComcastWMRMSignatureKeys extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14791,6 +15915,11 @@ class ComcastWMRMSignatureKeys extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -14812,7 +15941,7 @@ class ComcastWMRMSignatureKeys extends SoapObject
 	public $signedPublicKey;
 				
 }
-	
+
 class ComcastDRMChallengeState extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14826,6 +15955,11 @@ class ComcastDRMChallengeState extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -14847,7 +15981,7 @@ class ComcastDRMChallengeState extends SoapObject
 	public $licenseStates;
 				
 }
-	
+
 class ComcastDRMLicenseState extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14861,6 +15995,11 @@ class ComcastDRMLicenseState extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var Comcastboolean
 	 **/
@@ -14872,7 +16011,7 @@ class ComcastDRMLicenseState extends SoapObject
 	public $keyID;
 				
 }
-	
+
 class ComcastArrayOfDRMLicenseState extends SoapArray
 {				
 	public function __construct()
@@ -14880,8 +16019,13 @@ class ComcastArrayOfDRMLicenseState extends SoapArray
 		parent::__construct("ComcastDRMLicenseState");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastDRMRevocationOptions extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14899,6 +16043,11 @@ class ComcastDRMRevocationOptions extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var string
 	 **/
@@ -14920,7 +16069,7 @@ class ComcastDRMRevocationOptions extends SoapObject
 	public $endUserIDs;
 				
 }
-	
+
 class ComcastArrayOfStorefrontOrder extends SoapArray
 {				
 	public function __construct()
@@ -14928,8 +16077,13 @@ class ComcastArrayOfStorefrontOrder extends SoapArray
 		parent::__construct("ComcastStorefrontOrder");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14945,6 +16099,11 @@ class ComcastEndUserTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserField
 	 **/
@@ -14956,7 +16115,7 @@ class ComcastEndUserTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastEndUserPermissionTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14972,6 +16131,11 @@ class ComcastEndUserPermissionTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserPermissionField
 	 **/
@@ -14983,7 +16147,7 @@ class ComcastEndUserPermissionTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastLicenseTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -14999,6 +16163,11 @@ class ComcastLicenseTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfLicenseField
 	 **/
@@ -15010,7 +16179,7 @@ class ComcastLicenseTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastPortalTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15026,6 +16195,11 @@ class ComcastPortalTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPortalField
 	 **/
@@ -15037,7 +16211,7 @@ class ComcastPortalTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastStorefrontPageTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15053,6 +16227,11 @@ class ComcastStorefrontPageTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfStorefrontPageField
 	 **/
@@ -15064,7 +16243,7 @@ class ComcastStorefrontPageTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastStorefrontTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15080,6 +16259,11 @@ class ComcastStorefrontTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfStorefrontField
 	 **/
@@ -15091,7 +16275,7 @@ class ComcastStorefrontTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastUsagePlanTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15107,6 +16291,11 @@ class ComcastUsagePlanTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfUsagePlanField
 	 **/
@@ -15118,7 +16307,7 @@ class ComcastUsagePlanTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastEndUserTransactionTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15134,6 +16323,11 @@ class ComcastEndUserTransactionTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfEndUserTransactionField
 	 **/
@@ -15145,7 +16339,7 @@ class ComcastEndUserTransactionTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastPriceTemplate extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15161,6 +16355,11 @@ class ComcastPriceTemplate extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfPriceField
 	 **/
@@ -15172,7 +16371,7 @@ class ComcastPriceTemplate extends SoapObject
 	public $customFields;
 				
 }
-	
+
 class ComcastArrayOfEndUserField extends SoapArray
 {				
 	public function __construct()
@@ -15180,8 +16379,13 @@ class ComcastArrayOfEndUserField extends SoapArray
 		parent::__construct("ComcastEndUserField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfEndUserPermissionField extends SoapArray
 {				
 	public function __construct()
@@ -15189,8 +16393,13 @@ class ComcastArrayOfEndUserPermissionField extends SoapArray
 		parent::__construct("ComcastEndUserPermissionField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfLicenseField extends SoapArray
 {				
 	public function __construct()
@@ -15198,8 +16407,13 @@ class ComcastArrayOfLicenseField extends SoapArray
 		parent::__construct("ComcastLicenseField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfPortalField extends SoapArray
 {				
 	public function __construct()
@@ -15207,8 +16421,13 @@ class ComcastArrayOfPortalField extends SoapArray
 		parent::__construct("ComcastPortalField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfStorefrontPageField extends SoapArray
 {				
 	public function __construct()
@@ -15216,8 +16435,13 @@ class ComcastArrayOfStorefrontPageField extends SoapArray
 		parent::__construct("ComcastStorefrontPageField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfStorefrontField extends SoapArray
 {				
 	public function __construct()
@@ -15225,8 +16449,13 @@ class ComcastArrayOfStorefrontField extends SoapArray
 		parent::__construct("ComcastStorefrontField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfUsagePlanField extends SoapArray
 {				
 	public function __construct()
@@ -15234,8 +16463,13 @@ class ComcastArrayOfUsagePlanField extends SoapArray
 		parent::__construct("ComcastUsagePlanField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfEndUserTransactionField extends SoapArray
 {				
 	public function __construct()
@@ -15243,8 +16477,13 @@ class ComcastArrayOfEndUserTransactionField extends SoapArray
 		parent::__construct("ComcastEndUserTransactionField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOfPriceField extends SoapArray
 {				
 	public function __construct()
@@ -15252,8 +16491,13 @@ class ComcastArrayOfPriceField extends SoapArray
 		parent::__construct("ComcastPriceField");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontOrder extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15267,6 +16511,11 @@ class ComcastStorefrontOrder extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastStorefrontOrderType
 	 **/
@@ -15318,7 +16567,7 @@ class ComcastStorefrontOrder extends SoapObject
 	public $couponCode;
 				
 }
-	
+
 class ComcastStorefrontOrderOptions extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -15332,6 +16581,11 @@ class ComcastStorefrontOrderOptions extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastArrayOfstring
 	 **/
@@ -15343,7 +16597,7 @@ class ComcastStorefrontOrderOptions extends SoapObject
 	public $endUserIPAddress;
 				
 }
-	
+
 class ComcastEndUserField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -15457,8 +16711,13 @@ class ComcastEndUserField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserPermissionField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -15574,8 +16833,13 @@ class ComcastEndUserPermissionField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastAuthentication extends SoapObject
 {				
 	const _EXTERNAL = 'External';
@@ -15593,8 +16857,13 @@ class ComcastAuthentication extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastLicenseField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -15750,8 +17019,13 @@ class ComcastLicenseField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPortalField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16011,8 +17285,13 @@ class ComcastPortalField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontPageField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16160,8 +17439,13 @@ class ComcastStorefrontPageField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16331,8 +17615,13 @@ class ComcastStorefrontField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastUsagePlanField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16398,8 +17687,13 @@ class ComcastUsagePlanField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserTransactionType extends SoapObject
 {				
 	const _ADDED = 'Added';
@@ -16433,8 +17727,13 @@ class ComcastEndUserTransactionType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserTransactionField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16568,8 +17867,13 @@ class ComcastEndUserTransactionField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastPriceField extends SoapObject
 {				
 	const _ID = 'ID';
@@ -16631,8 +17935,13 @@ class ComcastPriceField extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastStorefrontOrderType extends SoapObject
 {				
 	const _CATEGORY = 'Category';
@@ -16652,8 +17961,13 @@ class ComcastStorefrontOrderType extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastEndUserSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16669,6 +17983,11 @@ class ComcastEndUserSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastEndUserField
 	 **/
@@ -16685,7 +18004,7 @@ class ComcastEndUserSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastEndUserPermissionSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16701,6 +18020,11 @@ class ComcastEndUserPermissionSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastEndUserPermissionField
 	 **/
@@ -16717,7 +18041,7 @@ class ComcastEndUserPermissionSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastLicenseSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16733,6 +18057,11 @@ class ComcastLicenseSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastLicenseField
 	 **/
@@ -16749,7 +18078,7 @@ class ComcastLicenseSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastPortalSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16765,6 +18094,11 @@ class ComcastPortalSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastPortalField
 	 **/
@@ -16781,7 +18115,7 @@ class ComcastPortalSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastStorefrontPageSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16797,6 +18131,11 @@ class ComcastStorefrontPageSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastStorefrontPageField
 	 **/
@@ -16813,7 +18152,7 @@ class ComcastStorefrontPageSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastStorefrontSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16829,6 +18168,11 @@ class ComcastStorefrontSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastStorefrontField
 	 **/
@@ -16845,7 +18189,7 @@ class ComcastStorefrontSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastUsagePlanSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16861,6 +18205,11 @@ class ComcastUsagePlanSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastUsagePlanField
 	 **/
@@ -16877,7 +18226,7 @@ class ComcastUsagePlanSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastEndUserTransactionSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16893,6 +18242,11 @@ class ComcastEndUserTransactionSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastEndUserTransactionField
 	 **/
@@ -16909,7 +18263,7 @@ class ComcastEndUserTransactionSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastPriceSort extends SoapObject
 {				
 	protected function getAttributeType($attributeName)
@@ -16925,6 +18279,11 @@ class ComcastPriceSort extends SoapObject
 		}
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 	/**
 	 * @var ComcastPriceField
 	 **/
@@ -16941,7 +18300,7 @@ class ComcastPriceSort extends SoapObject
 	public $tieBreaker;
 				
 }
-	
+
 class ComcastArrayOflong extends SoapArray
 {				
 	public function __construct()
@@ -16949,8 +18308,13 @@ class ComcastArrayOflong extends SoapArray
 		parent::__construct("long");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
 class ComcastArrayOffloat extends SoapArray
 {				
 	public function __construct()
@@ -16958,5 +18322,11 @@ class ComcastArrayOffloat extends SoapArray
 		parent::__construct("float");	
 	}
 					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
 }
-	
+
+

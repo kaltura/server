@@ -43,7 +43,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return long
 	 **/
-	public function authenticate(ComcastIDSet $directoryIDs, $userName, $password, $IPAddress)
+	public function authenticate(array $directoryIDs, $userName, $password, $IPAddress)
 	{
 		$params = array();
 		
@@ -63,7 +63,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addPermissions(ComcastPermissionList $objects)
+	public function addPermissions(array $objects)
 	{
 		$params = array();
 		
@@ -127,7 +127,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastAddContentOptions $options
 	 * 
 	 **/
-	public function setContent(ComcastMedia $media, ComcastMediaFileList $mediaFiles, ComcastAddContentOptions $options)
+	public function setContent(ComcastMedia $media, array $mediaFiles, ComcastAddContentOptions $options)
 	{
 		$params = array();
 		
@@ -145,7 +145,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastChoiceList $objects
 	 * 
 	 **/
-	public function setChoices(ComcastChoiceList $objects)
+	public function setChoices(array $objects)
 	{
 		$params = array();
 		
@@ -161,7 +161,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastPermissionList $objects
 	 * 
 	 **/
-	public function setPermissions(ComcastPermissionList $objects)
+	public function setPermissions(array $objects)
 	{
 		$params = array();
 		
@@ -227,7 +227,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addAccounts(ComcastAccountList $objects)
+	public function addAccounts(array $objects)
 	{
 		$params = array();
 		
@@ -243,7 +243,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastAccountList $objects
 	 * 
 	 **/
-	public function setAccounts(ComcastAccountList $objects)
+	public function setAccounts(array $objects)
 	{
 		$params = array();
 		
@@ -282,7 +282,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteAccounts(ComcastIDSet $IDs)
+	public function deleteAccounts(array $IDs)
 	{
 		$params = array();
 		
@@ -347,7 +347,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addRoles(ComcastRoleList $objects)
+	public function addRoles(array $objects)
 	{
 		$params = array();
 		
@@ -363,7 +363,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastRoleList $objects
 	 * 
 	 **/
-	public function setRoles(ComcastRoleList $objects)
+	public function setRoles(array $objects)
 	{
 		$params = array();
 		
@@ -379,7 +379,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteRoles(ComcastIDSet $IDs)
+	public function deleteRoles(array $IDs)
 	{
 		$params = array();
 		
@@ -413,7 +413,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyRoles(ComcastIDList $IDs)
+	public function copyRoles(array $IDs)
 	{
 		$params = array();
 		
@@ -461,7 +461,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addRestrictions(ComcastRestrictionList $objects)
+	public function addRestrictions(array $objects)
 	{
 		$params = array();
 		
@@ -477,7 +477,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastRestrictionList $objects
 	 * 
 	 **/
-	public function setRestrictions(ComcastRestrictionList $objects)
+	public function setRestrictions(array $objects)
 	{
 		$params = array();
 		
@@ -516,7 +516,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteRestrictions(ComcastIDSet $IDs)
+	public function deleteRestrictions(array $IDs)
 	{
 		$params = array();
 		
@@ -550,7 +550,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyRestrictions(ComcastIDList $IDs)
+	public function copyRestrictions(array $IDs)
 	{
 		$params = array();
 		
@@ -598,7 +598,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addCustomFields(ComcastCustomFieldList $objects)
+	public function addCustomFields(array $objects)
 	{
 		$params = array();
 		
@@ -614,7 +614,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastCustomFieldList $objects
 	 * 
 	 **/
-	public function setCustomFields(ComcastCustomFieldList $objects)
+	public function setCustomFields(array $objects)
 	{
 		$params = array();
 		
@@ -653,7 +653,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteCustomFields(ComcastIDSet $IDs)
+	public function deleteCustomFields(array $IDs)
 	{
 		$params = array();
 		
@@ -718,7 +718,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addLocations(ComcastLocationList $objects)
+	public function addLocations(array $objects)
 	{
 		$params = array();
 		
@@ -734,7 +734,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastLocationList $objects
 	 * 
 	 **/
-	public function setLocations(ComcastLocationList $objects)
+	public function setLocations(array $objects)
 	{
 		$params = array();
 		
@@ -790,7 +790,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteLocations(ComcastIDSet $IDs)
+	public function deleteLocations(array $IDs)
 	{
 		$params = array();
 		
@@ -837,7 +837,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deletePermissions(ComcastIDSet $IDs)
+	public function deletePermissions(array $IDs)
 	{
 		$params = array();
 		
@@ -902,7 +902,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addServers(ComcastServerList $objects)
+	public function addServers(array $objects)
 	{
 		$params = array();
 		
@@ -935,7 +935,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteServers(ComcastIDSet $IDs)
+	public function deleteServers(array $IDs)
 	{
 		$params = array();
 		
@@ -974,7 +974,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastServerList $objects
 	 * 
 	 **/
-	public function setServers(ComcastServerList $objects)
+	public function setServers(array $objects)
 	{
 		$params = array();
 		
@@ -1022,7 +1022,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addSystemTasks(ComcastSystemTaskList $objects)
+	public function addSystemTasks(array $objects)
 	{
 		$params = array();
 		
@@ -1055,7 +1055,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteSystemTasks(ComcastIDSet $IDs)
+	public function deleteSystemTasks(array $IDs)
 	{
 		$params = array();
 		
@@ -1094,7 +1094,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastSystemTaskList $objects
 	 * 
 	 **/
-	public function setSystemTasks(ComcastSystemTaskList $objects)
+	public function setSystemTasks(array $objects)
 	{
 		$params = array();
 		
@@ -1111,7 +1111,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addUsers(ComcastUserList $objects)
+	public function addUsers(array $objects)
 	{
 		$params = array();
 		
@@ -1144,7 +1144,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteUsers(ComcastIDSet $IDs)
+	public function deleteUsers(array $IDs)
 	{
 		$params = array();
 		
@@ -1160,7 +1160,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastUserList $objects
 	 * 
 	 **/
-	public function setUsers(ComcastUserList $objects)
+	public function setUsers(array $objects)
 	{
 		$params = array();
 		
@@ -1208,7 +1208,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addCustomCommands(ComcastCustomCommandList $objects)
+	public function addCustomCommands(array $objects)
 	{
 		$params = array();
 		
@@ -1225,7 +1225,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyCustomCommands(ComcastIDList $IDs)
+	public function copyCustomCommands(array $IDs)
 	{
 		$params = array();
 		
@@ -1258,7 +1258,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteCustomCommands(ComcastIDSet $IDs)
+	public function deleteCustomCommands(array $IDs)
 	{
 		$params = array();
 		
@@ -1297,7 +1297,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastCustomCommandList $objects
 	 * 
 	 **/
-	public function setCustomCommands(ComcastCustomCommandList $objects)
+	public function setCustomCommands(array $objects)
 	{
 		$params = array();
 		
@@ -1345,7 +1345,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addDirectories(ComcastDirectoryList $objects)
+	public function addDirectories(array $objects)
 	{
 		$params = array();
 		
@@ -1362,7 +1362,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyDirectories(ComcastIDList $IDs)
+	public function copyDirectories(array $IDs)
 	{
 		$params = array();
 		
@@ -1395,7 +1395,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteDirectories(ComcastIDSet $IDs)
+	public function deleteDirectories(array $IDs)
 	{
 		$params = array();
 		
@@ -1434,7 +1434,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastDirectoryList $objects
 	 * 
 	 **/
-	public function setDirectories(ComcastDirectoryList $objects)
+	public function setDirectories(array $objects)
 	{
 		$params = array();
 		
@@ -1482,7 +1482,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addCategories(ComcastCategoryList $objects)
+	public function addCategories(array $objects)
 	{
 		$params = array();
 		
@@ -1515,7 +1515,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteCategories(ComcastIDSet $IDs)
+	public function deleteCategories(array $IDs)
 	{
 		$params = array();
 		
@@ -1554,7 +1554,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastCategoryList $objects
 	 * 
 	 **/
-	public function setCategories(ComcastCategoryList $objects)
+	public function setCategories(array $objects)
 	{
 		$params = array();
 		
@@ -1602,7 +1602,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addChoices(ComcastChoiceList $objects)
+	public function addChoices(array $objects)
 	{
 		$params = array();
 		
@@ -1619,7 +1619,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyChoices(ComcastIDList $IDs)
+	public function copyChoices(array $IDs)
 	{
 		$params = array();
 		
@@ -1652,7 +1652,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteChoices(ComcastIDSet $IDs)
+	public function deleteChoices(array $IDs)
 	{
 		$params = array();
 		
@@ -1723,7 +1723,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addMedia(ComcastMediaList $objects)
+	public function addMedia(array $objects)
 	{
 		$params = array();
 		
@@ -1756,7 +1756,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteMedia(ComcastIDSet $IDs)
+	public function deleteMedia(array $IDs)
 	{
 		$params = array();
 		
@@ -1795,7 +1795,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastMediaList $objects
 	 * 
 	 **/
-	public function setMedia(ComcastMediaList $objects)
+	public function setMedia(array $objects)
 	{
 		$params = array();
 		
@@ -1843,7 +1843,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addMediaFiles(ComcastMediaFileList $objects)
+	public function addMediaFiles(array $objects)
 	{
 		$params = array();
 		
@@ -1876,7 +1876,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteMediaFiles(ComcastIDSet $IDs)
+	public function deleteMediaFiles(array $IDs)
 	{
 		$params = array();
 		
@@ -1915,7 +1915,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastMediaFileList $objects
 	 * 
 	 **/
-	public function setMediaFiles(ComcastMediaFileList $objects)
+	public function setMediaFiles(array $objects)
 	{
 		$params = array();
 		
@@ -1963,7 +1963,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addPlaylists(ComcastPlaylistList $objects)
+	public function addPlaylists(array $objects)
 	{
 		$params = array();
 		
@@ -1980,7 +1980,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyPlaylists(ComcastIDList $IDs)
+	public function copyPlaylists(array $IDs)
 	{
 		$params = array();
 		
@@ -2013,7 +2013,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deletePlaylists(ComcastIDSet $IDs)
+	public function deletePlaylists(array $IDs)
 	{
 		$params = array();
 		
@@ -2052,7 +2052,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastPlaylistList $objects
 	 * 
 	 **/
-	public function setPlaylists(ComcastPlaylistList $objects)
+	public function setPlaylists(array $objects)
 	{
 		$params = array();
 		
@@ -2100,7 +2100,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addReleases(ComcastReleaseList $objects)
+	public function addReleases(array $objects)
 	{
 		$params = array();
 		
@@ -2133,7 +2133,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteReleases(ComcastIDSet $IDs)
+	public function deleteReleases(array $IDs)
 	{
 		$params = array();
 		
@@ -2172,7 +2172,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastReleaseList $objects
 	 * 
 	 **/
-	public function setReleases(ComcastReleaseList $objects)
+	public function setReleases(array $objects)
 	{
 		$params = array();
 		
@@ -2262,7 +2262,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addEncodingProfiles(ComcastEncodingProfileList $objects)
+	public function addEncodingProfiles(array $objects)
 	{
 		$params = array();
 		
@@ -2279,7 +2279,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyEncodingProfiles(ComcastIDList $IDs)
+	public function copyEncodingProfiles(array $IDs)
 	{
 		$params = array();
 		
@@ -2312,7 +2312,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteEncodingProfiles(ComcastIDSet $IDs)
+	public function deleteEncodingProfiles(array $IDs)
 	{
 		$params = array();
 		
@@ -2351,7 +2351,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastEncodingProfileList $objects
 	 * 
 	 **/
-	public function setEncodingProfiles(ComcastEncodingProfileList $objects)
+	public function setEncodingProfiles(array $objects)
 	{
 		$params = array();
 		
@@ -2399,7 +2399,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addEndUsers(ComcastEndUserList $objects)
+	public function addEndUsers(array $objects)
 	{
 		$params = array();
 		
@@ -2432,7 +2432,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteEndUsers(ComcastIDSet $IDs)
+	public function deleteEndUsers(array $IDs)
 	{
 		$params = array();
 		
@@ -2471,7 +2471,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastEndUserList $objects
 	 * 
 	 **/
-	public function setEndUsers(ComcastEndUserList $objects)
+	public function setEndUsers(array $objects)
 	{
 		$params = array();
 		
@@ -2519,7 +2519,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addEndUserPermissions(ComcastEndUserPermissionList $objects)
+	public function addEndUserPermissions(array $objects)
 	{
 		$params = array();
 		
@@ -2552,7 +2552,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteEndUserPermissions(ComcastIDSet $IDs)
+	public function deleteEndUserPermissions(array $IDs)
 	{
 		$params = array();
 		
@@ -2591,7 +2591,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastEndUserPermissionList $objects
 	 * 
 	 **/
-	public function setEndUserPermissions(ComcastEndUserPermissionList $objects)
+	public function setEndUserPermissions(array $objects)
 	{
 		$params = array();
 		
@@ -2639,7 +2639,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addLicenses(ComcastLicenseList $objects)
+	public function addLicenses(array $objects)
 	{
 		$params = array();
 		
@@ -2656,7 +2656,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyLicenses(ComcastIDList $IDs)
+	public function copyLicenses(array $IDs)
 	{
 		$params = array();
 		
@@ -2689,7 +2689,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteLicenses(ComcastIDSet $IDs)
+	public function deleteLicenses(array $IDs)
 	{
 		$params = array();
 		
@@ -2728,7 +2728,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastLicenseList $objects
 	 * 
 	 **/
-	public function setLicenses(ComcastLicenseList $objects)
+	public function setLicenses(array $objects)
 	{
 		$params = array();
 		
@@ -2776,7 +2776,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addPortals(ComcastPortalList $objects)
+	public function addPortals(array $objects)
 	{
 		$params = array();
 		
@@ -2793,7 +2793,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyPortals(ComcastIDList $IDs)
+	public function copyPortals(array $IDs)
 	{
 		$params = array();
 		
@@ -2826,7 +2826,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deletePortals(ComcastIDSet $IDs)
+	public function deletePortals(array $IDs)
 	{
 		$params = array();
 		
@@ -2865,7 +2865,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastPortalList $objects
 	 * 
 	 **/
-	public function setPortals(ComcastPortalList $objects)
+	public function setPortals(array $objects)
 	{
 		$params = array();
 		
@@ -2913,7 +2913,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addStorefrontPages(ComcastStorefrontPageList $objects)
+	public function addStorefrontPages(array $objects)
 	{
 		$params = array();
 		
@@ -2930,7 +2930,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyStorefrontPages(ComcastIDList $IDs)
+	public function copyStorefrontPages(array $IDs)
 	{
 		$params = array();
 		
@@ -2963,7 +2963,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteStorefrontPages(ComcastIDSet $IDs)
+	public function deleteStorefrontPages(array $IDs)
 	{
 		$params = array();
 		
@@ -3002,7 +3002,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastStorefrontPageList $objects
 	 * 
 	 **/
-	public function setStorefrontPages(ComcastStorefrontPageList $objects)
+	public function setStorefrontPages(array $objects)
 	{
 		$params = array();
 		
@@ -3050,7 +3050,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addStorefronts(ComcastStorefrontList $objects)
+	public function addStorefronts(array $objects)
 	{
 		$params = array();
 		
@@ -3067,7 +3067,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyStorefronts(ComcastIDList $IDs)
+	public function copyStorefronts(array $IDs)
 	{
 		$params = array();
 		
@@ -3100,7 +3100,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteStorefronts(ComcastIDSet $IDs)
+	public function deleteStorefronts(array $IDs)
 	{
 		$params = array();
 		
@@ -3139,7 +3139,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastStorefrontList $objects
 	 * 
 	 **/
-	public function setStorefronts(ComcastStorefrontList $objects)
+	public function setStorefronts(array $objects)
 	{
 		$params = array();
 		
@@ -3187,7 +3187,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addUsagePlans(ComcastUsagePlanList $objects)
+	public function addUsagePlans(array $objects)
 	{
 		$params = array();
 		
@@ -3204,7 +3204,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyUsagePlans(ComcastIDList $IDs)
+	public function copyUsagePlans(array $IDs)
 	{
 		$params = array();
 		
@@ -3237,7 +3237,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteUsagePlans(ComcastIDSet $IDs)
+	public function deleteUsagePlans(array $IDs)
 	{
 		$params = array();
 		
@@ -3276,7 +3276,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastUsagePlanList $objects
 	 * 
 	 **/
-	public function setUsagePlans(ComcastUsagePlanList $objects)
+	public function setUsagePlans(array $objects)
 	{
 		$params = array();
 		
@@ -3324,7 +3324,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addEndUserTransactions(ComcastEndUserTransactionList $objects)
+	public function addEndUserTransactions(array $objects)
 	{
 		$params = array();
 		
@@ -3357,7 +3357,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteEndUserTransactions(ComcastIDSet $IDs)
+	public function deleteEndUserTransactions(array $IDs)
 	{
 		$params = array();
 		
@@ -3396,7 +3396,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastEndUserTransactionList $objects
 	 * 
 	 **/
-	public function setEndUserTransactions(ComcastEndUserTransactionList $objects)
+	public function setEndUserTransactions(array $objects)
 	{
 		$params = array();
 		
@@ -3444,7 +3444,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addPrices(ComcastPriceList $objects)
+	public function addPrices(array $objects)
 	{
 		$params = array();
 		
@@ -3477,7 +3477,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deletePrices(ComcastIDSet $IDs)
+	public function deletePrices(array $IDs)
 	{
 		$params = array();
 		
@@ -3516,7 +3516,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastPriceList $objects
 	 * 
 	 **/
-	public function setPrices(ComcastPriceList $objects)
+	public function setPrices(array $objects)
 	{
 		$params = array();
 		
@@ -3564,7 +3564,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addAssetTypes(ComcastAssetTypeList $objects)
+	public function addAssetTypes(array $objects)
 	{
 		$params = array();
 		
@@ -3580,7 +3580,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastAssetTypeList $objects
 	 * 
 	 **/
-	public function setAssetTypes(ComcastAssetTypeList $objects)
+	public function setAssetTypes(array $objects)
 	{
 		$params = array();
 		
@@ -3596,7 +3596,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteAssetTypes(ComcastIDSet $IDs)
+	public function deleteAssetTypes(array $IDs)
 	{
 		$params = array();
 		
@@ -3613,7 +3613,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyAssetTypes(ComcastIDList $IDs)
+	public function copyAssetTypes(array $IDs)
 	{
 		$params = array();
 		
@@ -3701,7 +3701,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function addJobs(ComcastJobList $objects)
+	public function addJobs(array $objects)
 	{
 		$params = array();
 		
@@ -3734,7 +3734,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
-	public function deleteJobs(ComcastIDSet $IDs)
+	public function deleteJobs(array $IDs)
 	{
 		$params = array();
 		
@@ -3773,7 +3773,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastJobList $objects
 	 * 
 	 **/
-	public function setJobs(ComcastJobList $objects)
+	public function setJobs(array $objects)
 	{
 		$params = array();
 		
@@ -3821,7 +3821,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getMediaOwners(ComcastArrayOfstring $PIDs)
+	public function getMediaOwners(array $PIDs)
 	{
 		$params = array();
 		
@@ -3872,7 +3872,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getPlaylistOwners(ComcastArrayOfstring $PIDs)
+	public function getPlaylistOwners(array $PIDs)
 	{
 		$params = array();
 		
@@ -3889,7 +3889,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getReleaseOwners(ComcastArrayOfstring $PIDs)
+	public function getReleaseOwners(array $PIDs)
 	{
 		$params = array();
 		
@@ -3927,7 +3927,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getPortalOwners(ComcastArrayOfstring $PIDs)
+	public function getPortalOwners(array $PIDs)
 	{
 		$params = array();
 		
@@ -3944,7 +3944,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getStorefrontOwners(ComcastArrayOfstring $PIDs)
+	public function getStorefrontOwners(array $PIDs)
 	{
 		$params = array();
 		
@@ -3993,7 +3993,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfCapability
 	 **/
-	public function getMissingCapabilities(ComcastArrayOfCapability $capabilities)
+	public function getMissingCapabilities(array $capabilities)
 	{
 		$params = array();
 		
@@ -4011,7 +4011,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfCapability
 	 **/
-	public function getMissingConsoleCapabilities(ComcastArrayOfCapability $capabilities, $userID)
+	public function getMissingConsoleCapabilities(array $capabilities, $userID)
 	{
 		$params = array();
 		
@@ -4122,7 +4122,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return long
 	 **/
-	public function combineMedia(ComcastIDSet $IDs, $masterID)
+	public function combineMedia(array $IDs, $masterID)
 	{
 		$params = array();
 		
@@ -4144,7 +4144,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return long
 	 **/
-	public function addMediaWithFiles(ComcastMedia $media, ComcastMediaFileList $mediaFiles, ComcastArrayOfstring $encodingProfileTitles, ComcastDelivery $createReleases, $releaseOutletAccount)
+	public function addMediaWithFiles(ComcastMedia $media, array $mediaFiles, array $encodingProfileTitles, ComcastDelivery $createReleases, $releaseOutletAccount)
 	{
 		$params = array();
 		
@@ -4170,7 +4170,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return long
 	 **/
-	public function addMediaWithFilesAndThumbnail(ComcastMedia $media, ComcastMediaFileList $mediaFiles, $generateThumbnail, ComcastArrayOfstring $encodingProfileTitles, ComcastDelivery $createReleases, $releaseOutletAccount)
+	public function addMediaWithFilesAndThumbnail(ComcastMedia $media, array $mediaFiles, $generateThumbnail, array $encodingProfileTitles, ComcastDelivery $createReleases, $releaseOutletAccount)
 	{
 		$params = array();
 		
@@ -4197,7 +4197,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastAddContentResults
 	 **/
-	public function addClippedMedia(ComcastMedia $media, $sourceMediaFileID, $startTime, $endTime, ComcastIDList $encodingProfileIDs, $storageServerID)
+	public function addClippedMedia(ComcastMedia $media, $sourceMediaFileID, $startTime, $endTime, array $encodingProfileIDs, $storageServerID)
 	{
 		$params = array();
 		
@@ -4221,7 +4221,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastAddContentResults
 	 **/
-	public function addContent(ComcastMedia $media, ComcastMediaFileList $mediaFiles, ComcastAddContentOptions $options)
+	public function addContent(ComcastMedia $media, array $mediaFiles, ComcastAddContentOptions $options)
 	{
 		$params = array();
 		
@@ -4240,7 +4240,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $accountIDs
 	 * 
 	 **/
-	public function publishMedia(ComcastIDSet $IDs, ComcastIDSet $accountIDs)
+	public function publishMedia(array $IDs, array $accountIDs)
 	{
 		$params = array();
 		
@@ -4259,7 +4259,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function generateThumbnailMediaFiles(ComcastIDList $sourceMediaFileIDs, $thumbnailServerID)
+	public function generateThumbnailMediaFiles(array $sourceMediaFileIDs, $thumbnailServerID)
 	{
 		$params = array();
 		
@@ -4279,7 +4279,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function encodeMediaFiles($sourceMediaFileID, ComcastIDList $encodingProfileIDs, $storageServerID)
+	public function encodeMediaFiles($sourceMediaFileID, array $encodingProfileIDs, $storageServerID)
 	{
 		$params = array();
 		
@@ -4302,7 +4302,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function encodeClippedMediaFiles($sourceMediaFileID, ComcastIDList $encodingProfileIDs, $storageServerID, $startTime, $endTime)
+	public function encodeClippedMediaFiles($sourceMediaFileID, array $encodingProfileIDs, $storageServerID, $startTime, $endTime)
 	{
 		$params = array();
 		
@@ -4324,7 +4324,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function copyMediaFiles(ComcastIDList $IDs, ComcastIDList $storageServerIDs)
+	public function copyMediaFiles(array $IDs, array $storageServerIDs)
 	{
 		$params = array();
 		
@@ -4342,7 +4342,7 @@ class ComcastMediaService extends ComcastClient
 	 * @param ComcastIDSet $accountIDs
 	 * 
 	 **/
-	public function publishPlaylists(ComcastIDSet $IDs, ComcastIDSet $accountIDs)
+	public function publishPlaylists(array $IDs, array $accountIDs)
 	{
 		$params = array();
 		
@@ -4516,7 +4516,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMLicenseResponses($systemInfo, ComcastIDList $releaseIDs, $expirationDate, $maximumPlays, $timeAllowed, ComcastTimeUnits $timeAllowedUnits, $timeAllowedStart, $replaceQuotesWith, $maximumBurns, $maximumTransfersToDevice, $disableOnPC, $disableOnClockRollback)
+	public function getWMRMLicenseResponses($systemInfo, array $releaseIDs, $expirationDate, $maximumPlays, $timeAllowed, ComcastTimeUnits $timeAllowedUnits, $timeAllowedStart, $replaceQuotesWith, $maximumBurns, $maximumTransfersToDevice, $disableOnPC, $disableOnClockRollback)
 	{
 		$params = array();
 		
@@ -4547,7 +4547,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMLicenseResponsesEx($systemInfo, ComcastIDList $releaseIDs, ComcastLicense $license, $replaceQuotesWith)
+	public function getWMRMLicenseResponsesEx($systemInfo, array $releaseIDs, ComcastLicense $license, $replaceQuotesWith)
 	{
 		$params = array();
 		
@@ -4587,7 +4587,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMHeaders(ComcastIDList $releaseIDs, $replaceQuotesWith)
+	public function getWMRMHeaders(array $releaseIDs, $replaceQuotesWith)
 	{
 		$params = array();
 		
@@ -4608,7 +4608,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMLicenseResponsesForEndUser($systemInfo, ComcastIDList $releaseIDs, $endUserID, $replaceQuotesWith)
+	public function getWMRMLicenseResponsesForEndUser($systemInfo, array $releaseIDs, $endUserID, $replaceQuotesWith)
 	{
 		$params = array();
 		
@@ -4696,7 +4696,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMLicenseResponsesForEndUserPermissions($systemInfo, ComcastIDList $releaseIDs, ComcastIDList $endUserPermissionIDs, $replaceQuotesWith)
+	public function getWMRMLicenseResponsesForEndUserPermissions($systemInfo, array $releaseIDs, array $endUserPermissionIDs, $replaceQuotesWith)
 	{
 		$params = array();
 		
@@ -4751,7 +4751,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOfstring
 	 **/
-	public function getWMRMParentLicenseResponses($systemInfo, ComcastIDList $parentLicenseIDs, $endUserID, $replaceQuotesWith)
+	public function getWMRMParentLicenseResponses($systemInfo, array $parentLicenseIDs, $endUserID, $replaceQuotesWith)
 	{
 		$params = array();
 		
@@ -4927,7 +4927,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastArrayOffloat
 	 **/
-	public function priceStorefrontOrders($endUserID, ComcastArrayOfStorefrontOrder $orders, ComcastArrayOfstring $couponCodes, $endUserIPAddress)
+	public function priceStorefrontOrders($endUserID, array $orders, array $couponCodes, $endUserIPAddress)
 	{
 		$params = array();
 		
@@ -4950,7 +4950,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function placeStorefrontOrders($endUserID, ComcastArrayOfStorefrontOrder $orders, ComcastArrayOfstring $couponCodes, $endUserIPAddress)
+	public function placeStorefrontOrders($endUserID, array $orders, array $couponCodes, $endUserIPAddress)
 	{
 		$params = array();
 		
@@ -4976,7 +4976,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function placeStorefrontOrdersWithCard($endUserID, ComcastArrayOfStorefrontOrder $orders, ComcastStorefrontOrderOptions $options, $creditCardNumber, $creditCardExpirationMonth, $creditCardExpirationYear, $creditCardSecurityCode)
+	public function placeStorefrontOrdersWithCard($endUserID, array $orders, ComcastStorefrontOrderOptions $options, $creditCardNumber, $creditCardExpirationMonth, $creditCardExpirationYear, $creditCardSecurityCode)
 	{
 		$params = array();
 		
@@ -5001,7 +5001,7 @@ class ComcastMediaService extends ComcastClient
 	 * 
 	 * @return ComcastIDList
 	 **/
-	public function placeStorefrontOrdersUsingCardToken($endUserID, ComcastArrayOfStorefrontOrder $orders, ComcastStorefrontOrderOptions $options)
+	public function placeStorefrontOrdersUsingCardToken($endUserID, array $orders, ComcastStorefrontOrderOptions $options)
 	{
 		$params = array();
 		
