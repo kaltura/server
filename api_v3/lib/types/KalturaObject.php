@@ -185,16 +185,18 @@ class KalturaObject
 		foreach($properties as $property)
 		{
 			$propertyName = $property->getName();
-			if ($property->isReadOnly())
+			if ($this->$propertyName !== null)
 			{
-				if ($this->$propertyName !== null)
+				if ($property->isReadOnly())
+				{
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName($propertyName));
-			}
-			// property requires insert permissions, verify that the current user has it
-			if ($property->requiresInsertPermission())
-			{
-				if (!kPermissionManager::getInsertPermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
-					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+				}
+				// property requires insert permissions, verify that the current user has it
+				if ($property->requiresInsertPermission())
+				{
+					if (!kPermissionManager::getInsertPermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
+						throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+					}
 				}
 			}
 		}
@@ -213,16 +215,19 @@ class KalturaObject
 		foreach($properties as $property)
 		{
 			$propertyName = $property->getName();
-			if ($property->isReadOnly() || $property->isInsertOnly())
+			
+			if ($this->$propertyName !== null)
 			{
-				if ($this->$propertyName !== null)
+				if ($property->isReadOnly() || $property->isInsertOnly())
+				{
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName($propertyName));
-			}
-			// property requires update permissions, verify that the current user has it
-			if ($property->requiresUpdatePermission())
-			{
-				if (!kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
-					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+				}
+				// property requires update permissions, verify that the current user has it
+				if ($property->requiresUpdatePermission())
+				{
+					if (!kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
+						throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+					}
 				}
 			}
 		}
