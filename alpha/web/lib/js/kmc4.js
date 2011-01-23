@@ -542,7 +542,7 @@ $(window).load(function(){
 
 				if(kmc.vars.current_uiconf) { // set by kmc.mediator.selectContent called from appstudio's "select content" action
 //					kmc.log(kmc.vars.current_uiconf); alert("kmc.vars.current_uiconf logged");
-//					console.log("is_playlist=",is_playlist);
+//					cokmc.log(s_playlist=",is_playlist);
 					if((is_playlist && kmc.vars.current_uiconf.is_playlist) || (!is_playlist && !kmc.vars.current_uiconf.is_playlist)) { // @todo: minor optimization possible
 						var uiconf_id = kmc.vars.current_uiconf.uiconf_id;
 //						alert("doPreviewEmbed says:\nkmc.vars.current_uiconf true -> uiconf_id = "+uiconf_id);
@@ -598,7 +598,7 @@ $(window).load(function(){
 			var embed_code, preview_player,
 			id_type = is_playlist ? "Playlist " + (id == "multitab_playlist" ? "Name" : "ID") : "Embedding",
 			uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
-//			console.log("uiconf_details="+uiconf_details);
+//			kmc.log("uiconf_details="+uiconf_details);
 			if(kmc.vars.jw) {
 				embed_code = kmc.preview_embed.jw.buildJWEmbed(id, name, description, is_playlist, uiconf_id);
 				preview_player = embed_code.replace('flvclipper', 'flvclipper/ks/' + kmc.vars.ks);
@@ -672,8 +672,8 @@ $(window).load(function(){
 		}, // doPreviewEmbed
 
 		buildLiveBitrates : function(name,live_bitrates) {
-			//console.log('buildLiveBitrates');
-			//console.log(arguments);
+			//kmc.log('buildLiveBitrates');
+			//kmc.log(arguments);
 			var bitrates = "",
 			len = live_bitrates.length,
 			i;
@@ -714,8 +714,8 @@ $(window).load(function(){
 		},
 		
 		buildHTML5Option : function(entry_id, partner_id, uiconf_id, has_mobile_flavors) {
-			//console.log('buildHTML5Option');
-			//console.log(arguments);
+			//kmc.log('buildHTML5Option');
+			//kmc.log(arguments);
 			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id + ':' + uiconf_id;
 			var url_text = url.replace(/http:\/\/|www./ig, '');
 			var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
@@ -733,7 +733,7 @@ $(window).load(function(){
 		// for content|Manage->drilldown->flavors->preview
 		// flavor_details = json:
 		doFlavorPreview : function(entry_id, entry_name, flavor_details) {
-//			console.log(flavor_details);
+//			kmc.log(flavor_details);
 //			alert("doFlavorPreview(entry_id="+entry_id+", entry_name="+entry_name+", flavor_details logged)");
 			entry_name = kmc.utils.escapeQuotes(entry_name);
 //			var flavor_asset_name = kmc.utils.escapeQuotes(flavor_details.flavor_name) || "unknown";
@@ -807,7 +807,7 @@ $(window).load(function(){
 			uiconf_details = (typeof uiconf == "object") ? uiconf : kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist),  // getUiconfDetails returns json
 			cache_st = kmc.preview_embed.setCacheStartTime(),
 			embed_code;
-//			console.log(uiconf_details); alert("uiconf_details logged");
+//			kmc.log(uiconf_details); alert("uiconf_details logged");
 //			alert("cache_st = " + cache_st);
 			embed_code = (html5) ? kmc.preview_embed.embed_code_template.iframe_tag : kmc.preview_embed.embed_code_template.object_tag;
 			if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
@@ -820,7 +820,7 @@ $(window).load(function(){
 			if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 				embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
 				embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars);
-//				console.log(uiconf_details.swf_version); alert("uiconf_details.swf_version logged");
+//				kmc.log(uiconf_details.swf_version); alert("uiconf_details.swf_version logged");
 				if(uiconf_details.swf_version.indexOf("v3") == -1) { // not kdp3
 					embed_code = embed_code.replace("playlistAPI.autoContinue","k_pl_autoContinue");
 					embed_code = embed_code.replace("playlistAPI.autoInsert","k_pl_autoInsertMedia");
