@@ -251,7 +251,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($newUser->email, $createdUser->email);
 		$this->assertEquals($newUser->firstName, $createdUser->firstName);
 		$this->assertEquals($newUser->lastName, $createdUser->lastName);
-		$this->assertNull($createdUser->roleIds);
+		$this->assertEquals('', $createdUser->roleIds);
 				
 		// check the user returned from the api
 		$getUser = $this->client->user->get($newUser->id);
@@ -278,7 +278,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($newUser->email, $createdUser->email);
 		$this->assertEquals($newUser->firstName, $createdUser->firstName);
 		$this->assertEquals($newUser->lastName, $createdUser->lastName);
-		$this->assertNull($createdUser->roleIds);
+		$this->assertEquals('', $createdUser->roleIds);
 		
 		$dbUser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $newUser->id);
 		$this->assertNotNull($dbUser);
@@ -386,7 +386,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$exceptionThrown = false;
 		try { $createdUser = $this->addUser($newUser); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// test failure to add same user ID twice
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -617,7 +617,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$exceptionThrown = false;
 		try { $this->client->user->update($newUser->id, $newUser2); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		//try to update email/first_name/last_name for user in all partners
 		$this->startSession(KalturaSessionType::ADMIN, null);
@@ -682,7 +682,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase {
 		$exceptionThrown = false;
 		try { $this->client->user->delete($newUser->id); }
 		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_KS');
+		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
 		
 		// check that can get user
 		$this->startSession(KalturaSessionType::ADMIN, null);
