@@ -403,4 +403,117 @@ class EntryDistributionService extends KalturaBaseService
 		$entryDistribution->fromObject($dbEntryDistribution);
 		return $entryDistribution;
 	}
+
+	/**
+	 * Serves entry distribution sent data
+	 *  
+	 * @action serveSentData
+	 * @serverOnly
+	 * @param int $id
+	 * @param KalturaDistributionAction $actionType
+	 *  
+	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
+	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
+	 */
+	public function serveSentDataAction($id, $actionType)
+	{
+		$dbEntryDistribution = EntryDistributionPeer::retrieveByPK($id);
+		if (!$dbEntryDistribution)
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, $id);
+		
+		$fileName = "{$id}_{$actionType}_sent.xml";
+		$fileSubType = null;
+		switch($actionType)
+		{
+			case KalturaDistributionAction::SUBMIT:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA;
+				break;
+			case KalturaDistributionAction::UPDATE:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA;
+				break;
+			case KalturaDistributionAction::DELETE:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA;
+				break;
+		}
+		if(!$fileSubType)
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $id);
+		
+		return $this->serveFile($dbEntryDistribution, $fileSubType, $fileName);
+	}
+
+	/**
+	 * Serves entry distribution returned data
+	 *  
+	 * @action serveReturnedData
+	 * @serverOnly
+	 * @param int $id
+	 * @param KalturaDistributionAction $actionType
+	 *  
+	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
+	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
+	 */
+	public function serveReturnedDataAction($id, $actionType)
+	{
+		$dbEntryDistribution = EntryDistributionPeer::retrieveByPK($id);
+		if (!$dbEntryDistribution)
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND, $id);
+		
+		$fileName = "{$id}_{$actionType}_return.xml";
+		$fileSubType = null;
+		switch($actionType)
+		{
+			case KalturaDistributionAction::SUBMIT:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS;
+				break;
+			case KalturaDistributionAction::UPDATE:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS;
+				break;
+			case KalturaDistributionAction::DELETE:
+				$fileSubType = EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS;
+				break;
+		}
+		if(!$fileSubType)
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $id);
+		
+		return $this->serveFile($dbEntryDistribution, $fileSubType, $fileName);
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param int $fileSubType
+	 * @param string $fileName
+	 * @param bool $forceProxy
+	 * @throws KalturaAPIException
+	 */
+	protected function serveFile(EntryDistribution $entryDistribution, $fileSubType, $fileName, $forceProxy = false)
+	{
+		$syncKey = $entryDistribution->getSyncKey($fileSubType);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $entryDistribution->getId(), $fileSubType);
+
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+			$mimeType = kFile::mimeType($filePath);
+			kFile::dumpFile($filePath, $mimeType);
+		}
+		else
+		{
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KalturaLog::info("Redirecting to [$remoteUrl]");
+			if($forceProxy)
+			{
+				kFile::dumpUrl($remoteUrl);
+			}
+			else
+			{
+				// or redirect if no proxy
+				header("Location: $remoteUrl");
+			}
+		}	
+	}
 }
