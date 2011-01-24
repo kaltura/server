@@ -114,7 +114,12 @@ class UniqueId
 	public function __toString()
 	{
 		if (self::$_uniqueId === null)
+		{
 			self::$_uniqueId = (string)rand();
+			// add a the unique id to Apache's internal variable so we can later log it using the %{KalturaLog_UniqueId}n placeholder
+			// within the LogFormat apache directive. This way each access_log record can be matched with its kaltura log lines
+			apache_note("KalturaLog_UniqueId", self::$_uniqueId);
+		}
 			
 		return self::$_uniqueId;
 	}
