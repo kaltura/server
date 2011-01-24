@@ -143,6 +143,42 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $errorDescription;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitResultsLog;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitSentDataLog;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateResultsLog;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateSentDataLog;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteResultsLog;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteSentDataLog;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -205,6 +241,13 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		$this->submittedAt = $sourceObject->getSubmittedAt(null);
             
 		$this->validationErrors = KalturaDistributionValidationErrorArray::fromDbArray($sourceObject->getValidationErrors());
+		
+		$this->hasSubmitResultsLog = (bool)$sourceObject->getSubmitResultsVersion();
+		$this->hasSubmitSentDataLog = (bool)$sourceObject->getSubmitDataVersion();
+		$this->hasUpdateResultsLog = (bool)$sourceObject->getUpdateResultsVersion();
+		$this->hasUpdateSentDataLog = (bool)$sourceObject->getUpdateDataVersion();
+		$this->hasDeleteResultsLog = (bool)$sourceObject->getDeleteResultsVersion();
+		$this->hasDeleteSentDataLog = (bool)$sourceObject->getDeleteDataVersion();
 	}
 
 	public function getExtraFilters()
