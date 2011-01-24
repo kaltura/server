@@ -8,11 +8,10 @@ pwd
 if [ $# -eq 0 ]; then
 	echo "No specific date requested, taking today"
 	WHEN=$(date +%Y-%m-%d)
-	WHEN2=$(date -d "yesterday" +%Y-%m-%d)
 
-#elif [ $# -eq 1 ]; then
-#	echo "You requested $1"
-#	WHEN=$1
+elif [ $# -eq 1 ]; then
+	echo "You requested $1"
+	WHEN=$1
 else
 	echo "Invalid user input"
 	exit 1;
