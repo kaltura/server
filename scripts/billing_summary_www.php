@@ -15,7 +15,7 @@ if ($handle) {
 	        if (preg_match_all("/\"GET \/p\/(\d+)\/.*?\" 200 (\d+)/", $line, $matches))
         {
         	//print $matches[0][0].":".$matches[1][0].":".$matches[2][0]."\n";
-        	$partner_id = $matches[1][0];
+        	$partner_id = intval($matches[1][0]);
         	
         	$contentSize = $matches[2][0];
         	$contentSize = $contentSize / 1024;
