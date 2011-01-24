@@ -1,7 +1,10 @@
 <?php
 class ComcastDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit,
-	IDistributionEngineCloseSubmit
+	IDistributionEngineCloseSubmit, 
+	IDistributionEngineUpdate,
+	IDistributionEngineDelete,
+	IDistributionEngineReport
 {
 	private static $containerFormatMap = array(
 		'flash video' => ComcastFormat::_FLV,
@@ -77,7 +80,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaComcastDistributionJobProviderData))
 			throw new Exception("Provider data must be of type KalturaComcastDistributionJobProviderData");
 		
-		return false;
+		return $this->doSubmit($data, $data->distributionProfile, $data->providerData);
 	}
 
 	protected function newCustomDataElement($title, $value = '')
@@ -213,5 +216,35 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);
 		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineUpdate::update()
+	 */
+	public function update(KalturaDistributionUpdateJobData $data)
+	{
+		// TODO
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		$distributionProfile = $data->distributionProfile;
+		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
+		
+		$ids = array($data->remoteId);
+		$comcastMediaService->deleteMedia($ids);
+		
+		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineReport::fetchReport()
+	 */
+	public function fetchReport(KalturaDistributionFetchReportJobData $data)
+	{
+		// TODO
 	}
 }
