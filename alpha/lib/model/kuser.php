@@ -73,7 +73,7 @@ class kuser extends Basekuser
 				}
 			}
 			
-			if ($this->isRootUser())
+			if ($this->getIsAccountOwner())
 			{
 				$adminRoleId = $this->getPartner()->getAdminSessionRoleId();
 				if (!(in_array($adminRoleId, $idsArray)))
@@ -129,7 +129,7 @@ class kuser extends Basekuser
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
 		
-		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->isRootUser() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
+		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->getIsAccountOwner() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
 		
@@ -741,7 +741,7 @@ class kuser extends Basekuser
 	 */
 	public function setStatus($status)
 	{
-		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED) && $this->isRootUser()) {
+		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED) && $this->getIsAccountOwner()) {
 			throw new kUserException('', kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 		}
 				
@@ -898,7 +898,8 @@ class kuser extends Basekuser
 		return $this;
 	}
 	
-	public function isRootUser()
+	
+	public function getIsAccountOwner()
 	{
 		if ($this->isNew()) {
 			return false;

@@ -192,6 +192,12 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $roleNames;
+	
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $isAccountOwner;
 
 	
 
@@ -222,7 +228,8 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"statusUpdatedAt",
 		"deletedAt",
 		"roleIds",
-		"roleNames" => "userRoleNames"
+		"roleNames" => "userRoleNames",
+		"isAccountOwner",
 	);
 
 	public function getMapBetweenObjects ( )
