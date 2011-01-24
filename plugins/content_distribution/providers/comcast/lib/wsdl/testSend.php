@@ -15,7 +15,7 @@ $password = 'Roman1234';
 
 $mediaService = new ComcastMediaService($userName, $password);
 
-$entryId = '0_n4qy9nh4';
+$entryId = '0_n4qy9nh6';
 $entryDuration = 26749;
 $thumbnailURL = 'http://62.90.210.41:81/p/140/sp/14000/thumbnail/entry_id/0_n4qy9nh3/version/100000';
 $entryTitle = 'test to comcast';
