@@ -29,6 +29,27 @@ abstract class FlavorAssetServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
+	 * Tests flavorAsset->list action
+	 * @param KalturaAssetFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param KalturaFlavorAssetListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
+	{
+		$resultObject = $this->client->flavorAsset->list($filter, $pager);
+		$this->assertType('KalturaFlavorAssetListResponse', $resultObject);
+		$this->validateList($filter, $pager, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
+	{
+	}
+
+	/**
 	 * Tests flavorAsset->delete action
 	 * @param string $id 
 	 * @dataProvider provideData

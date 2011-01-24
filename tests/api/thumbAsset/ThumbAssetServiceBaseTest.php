@@ -29,6 +29,27 @@ abstract class ThumbAssetServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
+	 * Tests thumbAsset->list action
+	 * @param KalturaAssetFilter $filter 
+	 * @param KalturaFilterPager $pager 
+	 * @param KalturaThumbAssetListResponse $reference 
+	 * @dataProvider provideData
+	 */
+	public function testList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbAssetListResponse $reference)
+	{
+		$resultObject = $this->client->thumbAsset->list($filter, $pager);
+		$this->assertType('KalturaThumbAssetListResponse', $resultObject);
+		$this->validateList($filter, $pager, $reference);
+	}
+
+	/**
+	 * Validates testList results
+	 */
+	protected function validateList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbAssetListResponse $reference)
+	{
+	}
+
+	/**
 	 * Tests thumbAsset->delete action
 	 * @param string $thumbAssetId 
 	 * @dataProvider provideData
