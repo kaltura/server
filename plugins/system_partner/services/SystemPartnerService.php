@@ -180,16 +180,29 @@ class SystemPartnerService extends KalturaBaseService
 	/**
 	 * @action getAdminSession
 	 * @param int $partnerId
+	 * @param string $userId
 	 * @return string
 	 */
-	public function getAdminSessionAction($partnerId)
+	public function getAdminSessionAction($partnerId, $userId = null)
 	{
 		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
+		
+		if (!$userId) {
+			$userId = $dbPartner->getAdminUserId();
+		}
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+		if (!$kuser) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
+		if (!$kuser->getIsAdmin()) {
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_ADMIN, $userId);
+		}
 			
 		$ks = "";
-		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $dbPartner->getAdminUserId(), $ks, 86400, 2, "", "*");
+		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $userId, $ks, 86400, 2, "", "*");
 		return $ks;
 	}
 	
