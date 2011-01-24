@@ -345,7 +345,7 @@ $(window).load(function(){
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-							  '<b>' + title + '</b></div> <div id="modal_content"><iframe onLoad="alert(this.contentWindow.location);" id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
+							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
 							  ' height="' + modal_height + '" width="' + modal_width + '"></iframe></div></div>';
 			$("#mbContent").addClass("new");
 			
