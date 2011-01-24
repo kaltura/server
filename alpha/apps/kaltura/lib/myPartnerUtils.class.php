@@ -1259,12 +1259,18 @@ class myPartnerUtils
 			KalturaLog::log ( "blockInactivePartner: BLOCK_PARNTER_STATUS partner [$partnerId] status [$status]" );
 			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_ACTIVE);
 		}
-		
+
 		// take blocked-countries country code from partner custom data
 		$blockContries = $partner->getDelivryBlockCountries();
 		// if not set on partner custom data - take from kConf
 		if(empty($blockContries) || is_null($blockContries))
 		{
+			// don't auto block paying partners
+			if ($partner->getPartnerPackage() > PartnerPackages::PARTNER_PACKAGE_FREE)
+			{
+					return;
+			}
+			
 			$blockContries = kConf::get ("delivery_block_countries" );
 		}
 		if ($blockContries)
