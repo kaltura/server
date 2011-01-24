@@ -33,8 +33,13 @@ class ComcastClient extends nusoap_client
 	{
 		if ($this->getError())
 		{
-			echo("ComcastClient error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]");
-			//KalturaLog::err("ComcastClient error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]");
+			$err = "Error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]";
+			if(class_exists('KalturaLog'))
+				KalturaLog::err($err);
+			else 
+				echo $err;
+				
+			throw new Exception($this->getError());
 		}
 	}
 	
