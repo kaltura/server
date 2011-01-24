@@ -345,15 +345,15 @@ $(window).load(function(){
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
+							  '<b>' + title + '</b></div> <div id="modal_content"><iframe onLoad="alert(this.contentWindow.location);" id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
 							  ' height="' + modal_height + '" width="' + modal_width + '"></iframe></div></div>';
 			$("#mbContent").addClass("new");
 			
 			// Check iframe location to decect hash changes
-			//var iframeInterval = setInterval ( "kmc.utils.checkIframeHash()", 5000 );
+			var iframeInterval = setInterval ( "kmc.utils.checkIframeHash()", 5000 );
 			
 			$("#close").click(function() {
-				//clearInterval(iframeInterval); // Stop the checkIframeHash
+				clearInterval(iframeInterval); // Stop the checkIframeHash
 				kmc.utils.closeModal();
 				return false;
 			});
@@ -361,7 +361,7 @@ $(window).load(function(){
 		},
 		
 		checkIframeHash : function() {
-			kmc.log( $("#sec_iframe").attr('src') );
+			console.log( $("#sec_iframe").attr('src') );
 		},
 		
 		changePartner : function() {
