@@ -42,6 +42,18 @@ class KalturaApiParameterPermissionItemOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+class KalturaAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
+}
+
 class KalturaAssetParamsOrderBy
 {
 }
@@ -390,7 +402,7 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
+	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 }
 
 class KalturaDocumentType
@@ -526,6 +538,18 @@ class KalturaFileSyncType
 	const FILE = 1;
 	const LINK = 2;
 	const URL = 3;
+}
+
+class KalturaFlavorAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
 }
 
 class KalturaFlavorAssetStatus
@@ -1227,6 +1251,18 @@ class KalturaStorageServePriority
 	const KALTURA_FIRST = 2;
 	const EXTERNAL_FIRST = 3;
 	const EXTERNAL_ONLY = 4;
+}
+
+class KalturaThumbAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
 }
 
 class KalturaThumbCropType
