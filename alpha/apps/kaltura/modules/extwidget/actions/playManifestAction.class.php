@@ -46,6 +46,10 @@ class playManifestAction extends kalturaAction
 	 */
 	private $protocol = null;
 	
+	/**
+	 * @var int
+	 */
+	private $maxBitrate = null;
 	
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
@@ -78,6 +82,22 @@ class playManifestAction extends kalturaAction
 				</manifest>";
 					
 		// <drmMetadata url=\"$metaDataUrl\"/>
+	}
+	
+	private function removeMaxBitrateFlavors($flavors)
+	{
+		if (!$this->maxBitrate)			
+			return $flavors;
+			
+		$returnedFlavors = array();		
+			
+		foreach ($flavors as $flavor){
+			if ($flavor->getBitrate() <= $this->maxBitrate){
+				$returnedFlavors[] = $flavor;
+			}
+		}
+	
+		return $returnedFlavors;
 	}
 	
 	private function buildFlavorsArray(&$duration, $oneOnly = false)
@@ -121,6 +141,8 @@ class playManifestAction extends kalturaAction
 			if(!count($flavorAssets) && $tag == flavorParams::TAG_MBR)
 				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
 		}
+		
+		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 		
 		$flavors = array();
 		$durationSet = false;
@@ -254,7 +276,7 @@ class playManifestAction extends kalturaAction
 	{
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-
+		
 		switch($this->entry->getType())
 		{
 			case entryType::MEDIA_CLIP:
@@ -268,7 +290,6 @@ class playManifestAction extends kalturaAction
 					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
 						$duration = $this->entry->getDurationInt();
 						$flavors = $this->buildFlavorsArray($duration, true);
-						
 						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration);
 				}
 				
@@ -305,6 +326,8 @@ class playManifestAction extends kalturaAction
 					if(!count($flavorAssets))
 						$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
 				}
+
+				$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
 				
 				if(!$this->storageId)
 				{
@@ -540,6 +563,7 @@ class playManifestAction extends kalturaAction
 		$this->entryId = $this->getRequestParameter ( "entryId", null );
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
+		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
 		
 		$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
 		if ( ! $this->entry )
@@ -592,6 +616,7 @@ class playManifestAction extends kalturaAction
 		}
 				
 		$xml = null;
+	
 		switch($this->format)
 		{
 			case StorageProfile::PLAY_FORMAT_HTTP:
