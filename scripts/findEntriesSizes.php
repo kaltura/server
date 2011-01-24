@@ -18,7 +18,7 @@
 
 require_once ( dirname(__FILE__)."/define.php" );
 
-ini_set( "memory_limit","512M" );
+ini_set( "memory_limit","1024M" );
 
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
@@ -109,6 +109,7 @@ while(1)
 		$i++;
 	}
 	unset($entries);
+	entryPeer::clearInstancePool();
 	fprintf($stderr, "$i\r");
 }
 
