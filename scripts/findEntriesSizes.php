@@ -108,6 +108,7 @@ while(1)
 		
 		$i++;
 	}
+	unset($entries);
 	fprintf($stderr, "$i\r");
 }
 
