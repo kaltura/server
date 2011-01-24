@@ -47,7 +47,7 @@
 							<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
 							<?php endif; ?>
 							<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
-
+							<option value="change role"><?php echo $this->translate('Change role'); ?></option>
 						<?php endif; ?>
 					</select>
 				</td>
@@ -68,6 +68,9 @@ function doAction(action, userId) {
 		case 'remove':
 			remove(userId);
 			break;
+		case 'change role':
+			changeRole(userId);
+			break;
 	}
 }
 function block(userId) {
@@ -76,6 +79,11 @@ function block(userId) {
 
 function unblock(userId) {
 	changeStatus(userId, 'unblock');
+}
+
+function changeRole(userId) {
+	var url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'change-role', 'userId' => ''), null, true); ?>' + userId;
+	document.location = url;
 }
 
 function changeStatus(userId, status) {

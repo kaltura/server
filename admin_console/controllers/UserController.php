@@ -175,6 +175,27 @@ class UserController extends Zend_Controller_Action
 		echo $this->_helper->json('ok', false);
 	}
 	
+	public function changeRoleAction()
+	{
+		$request = $this->getRequest();
+		$userId = $this->_getParam('userId');
+		
+		$client = Kaltura_ClientHelper::getClient();
+		$user = $client->user->get($userId);
+		
+		$changeRoleForm = new Form_ChangeUserRole();
+		$changeRoleForm->getElement('name')->setValue($user->fullName);
+		$changeRoleForm->getElement('email')->setValue($user->email);
+		$changeRoleForm->getElement('currentRole')->setValue($user->roleNames);
+				
+		if ($request->isPost())
+		{
+			$this->proccessChangeRoleForm($changeRoleForm);
+		}
+		$this->view->changeRoleForm = $changeRoleForm;
+		
+	}
+	
 	private function proccessNewUserForm(Form_NewUser $form)
 	{
 		$request = $this->getRequest();
@@ -276,6 +297,47 @@ class UserController extends Zend_Controller_Action
 				else {
 					throw $ex;
 				}				
+			}
+		}
+		else
+		{
+			$form->populate($formData);
+		}
+	}
+	
+	
+	private function proccessChangeRoleForm(Form_ChangeUserRole $form)
+	{
+		$request = $this->getRequest();
+		$formData = $request->getPost();
+		if ($form->isValid($formData))
+		{
+			try
+			{
+				$client = Kaltura_ClientHelper::getClient();
+				
+				$userId = $request->getParam('userId');
+				$roleId = $request->getPost('role');
+				
+				$user = new KalturaUser();
+				$user->roleIds = $roleId;
+				$client->user->update($userId, $user); // call api user->update
+				$this->_helper->redirector('index');
+			}
+			catch(Exception $ex)
+			{
+				if ($ex->getCode() === 'INVALID_USER_ID')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'LOGIN_DATA_NOT_FOUND')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'USER_ROLE_NOT_FOUND')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE')
+					$form->setDescription($ex->getMessage());
+				else
+					throw $ex;
 			}
 		}
 		else

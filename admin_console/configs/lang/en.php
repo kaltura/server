@@ -253,6 +253,7 @@ return array(
 	'users chnage settings' => 'Fill in the form below to change your password.',
 	'invalid password' => 'Invalid password',
 	'credentials saved' => 'Your credentials were successfully changed',
+	'user change role' => 'Here you can change the role of an admin console user.',
 
 
 
