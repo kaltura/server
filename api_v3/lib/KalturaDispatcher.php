@@ -50,6 +50,9 @@ class KalturaDispatcher
 		
 		// TODO clear default filters
 		// TODO call all memory cleaner plugins
+		
+		if(function_exists('gc_collect_cycles')) // php 5.3 and above
+			gc_collect_cycles();
 	}
 	
 	public function dispatch($service, $action, $params = array()) 
