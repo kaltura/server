@@ -35,6 +35,18 @@ class KalturaApiParameterPermissionItemOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+class KalturaAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
+}
+
 class KalturaAssetParamsOrderBy
 {
 }
@@ -371,7 +383,7 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
+	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 }
 
 class KalturaDurationType
@@ -486,6 +498,29 @@ class KalturaFileSyncType
 	const FILE = 1;
 	const LINK = 2;
 	const URL = 3;
+}
+
+class KalturaFlavorAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
+}
+
+class KalturaFlavorAssetStatus
+{
+	const ERROR = -1;
+	const QUEUED = 0;
+	const CONVERTING = 1;
+	const READY = 2;
+	const DELETED = 3;
+	const NOT_APPLICABLE = 4;
+	const TEMP = 5;
 }
 
 class KalturaFlavorParamsOrderBy
@@ -1090,6 +1125,18 @@ class KalturaSourceType
 	const URL = 5;
 	const SEARCH_PROVIDER = 6;
 	const AKAMAI_LIVE = 29;
+}
+
+class KalturaThumbAssetOrderBy
+{
+	const SIZE_ASC = "+size";
+	const SIZE_DESC = "-size";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const DELETED_AT_ASC = "+deletedAt";
+	const DELETED_AT_DESC = "-deletedAt";
 }
 
 class KalturaThumbCropType

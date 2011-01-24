@@ -6201,6 +6201,135 @@ class KalturaNotificationFilter extends KalturaNotificationBaseFilter
 
 }
 
+abstract class KalturaAssetBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorAssetStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sizeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sizeLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $deletedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $deletedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaAssetFilter extends KalturaAssetBaseFilter
+{
+
+}
+
 abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 {
 	/**
@@ -6287,6 +6416,16 @@ class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
 
 }
 
+abstract class KalturaFlavorAssetBaseFilter extends KalturaAssetFilter
+{
+
+}
+
+class KalturaFlavorAssetFilter extends KalturaFlavorAssetBaseFilter
+{
+
+}
+
 abstract class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
 {
 
@@ -6368,6 +6507,16 @@ abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 }
 
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
+{
+
+}
+
+abstract class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
+{
+
+}
+
+class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 {
 
 }
@@ -7925,6 +8074,14 @@ class KalturaDataEntry extends KalturaBaseEntry
 	 * @var string
 	 */
 	public $dataContent = null;
+
+	/**
+	 * indicator whether to return the object for get action with the dataContent field.
+	 *
+	 * @var bool
+	 * @insertonly
+	 */
+	public $retrieveDataContentByGet = null;
 
 
 }
