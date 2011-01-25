@@ -53,7 +53,7 @@ while(count($users))
 	$users = getAdminUsers($lastUser, $userLimitEachLoop);
 }
 
-$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+$msg = 'Done - ' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
 KalturaLog::log($msg);
 echo $msg;
 

@@ -70,7 +70,7 @@ while(count($roles))
 	$roles = getUserRoles($lastRole, $roleLimitEachLoop);
 }
 
-$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+$msg = 'Done - ' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
 KalturaLog::log($msg);
 echo $msg;
 

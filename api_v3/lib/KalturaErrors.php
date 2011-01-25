@@ -243,5 +243,6 @@ class KalturaErrors extends APIErrors
 
 	const PROPERTY_VALIDATION_NO_INSERT_PERMISSION = "PROPERTY_VALIDATION_NO_INSERT_PERMISSION,Current user does not have permission to insert property \"%s\"";
 	
+	const USER_NOT_ADMIN = "USER_NOT_ADMIN,User [%s] is not admin";
 	
 }

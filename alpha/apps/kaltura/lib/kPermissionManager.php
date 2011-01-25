@@ -247,9 +247,10 @@ class kPermissionManager
 		// add always allowed permissions
 		if (self::$operatingPartner) {
 			$alwaysAllowed = self::$operatingPartner->getAlwaysAllowedPermissionNames();
+			$alwaysAllowed = explode(',', $alwaysAllowed);
 		}
 		else {
-			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);
+			$alwaysAllowed = PermissionName::ALWAYS_ALLOWED_ACTIONS;
 		}
 		$permissionNames = array_merge($permissionNames, $alwaysAllowed);
 				

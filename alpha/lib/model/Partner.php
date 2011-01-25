@@ -657,17 +657,20 @@ class Partner extends BasePartner
 		return $id;
 	}
 	
-	public function setAlwaysAllowedPermissionNames(array $names)
+	public function setAlwaysAllowedPermissionNames($names)
 	{
-		$names = implode(',', $names);
+		$names = trim($names, ',');
 		$this->putInCustomData('always_allowed_permission_names', $names);
 	}
 	
 	public function getAlwaysAllowedPermissionNames()
 	{
 		$names = $this->getFromCustomData('always_allowed_permission_names');
-		$names = explode(',', $names);
-		$names[] = PermissionName::ALWAYS_ALLOWED_ACTIONS;
+		$namesArray = explode(',', $names);
+		if (!count($namesArray) || !in_array(PermissionName::ALWAYS_ALLOWED_ACTIONS, $namesArray)) {
+			$names = PermissionName::ALWAYS_ALLOWED_ACTIONS.','.$names;
+		}
+		$names = trim($names, ',');
 		return $names;
 	}
 	

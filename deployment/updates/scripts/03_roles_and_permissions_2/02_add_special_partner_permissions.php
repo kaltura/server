@@ -121,7 +121,9 @@ foreach ($serviceConfigFiles as $file)
 				$noKsPermission = getOrCreateSessionPermission($partner->getId(), 'no');
 				$noKsPermission->addPermissionItem($permissionItem->getId(), true);
 				$currentPerms = $partner->getAlwaysAllowedPermissionNames();
+				$currentPerms = explode(',', $currentPerms);
 				$currentPerms[] = $noKsPermission->getName();
+				$currentPerms = implode(',', $currentPerms);
 				$partner->setAlwaysAllowedPermissionNames($currentPerms);
 				$partner->save();
 			}

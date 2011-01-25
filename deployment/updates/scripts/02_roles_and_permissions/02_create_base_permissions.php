@@ -166,7 +166,7 @@ foreach ($allPermissions as $permission)
 	}
 }
 
-$msg = 'Done' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
+$msg = 'Done - ' . ($dryRun ? 'DRY RUN!' : 'REAL RUN!');
 KalturaLog::log($msg);
 echo $msg;
 //------------------------------------------------------
