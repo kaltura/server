@@ -72,7 +72,7 @@ class KalturaPluginManager
 			return true;
 			
 		// TODO remove call_user_func after moving to php 5.3
-		$pendingPlugins = call_user_func("$pluginClass::dependsOn");
+		$pendingPlugins = call_user_func(array($pluginClass, 'dependsOn'));
 //		$pendingPlugins = $pluginClass::dependsOn();
 		if(!$pendingPlugins || !count($pendingPlugins))
 			return true;
@@ -98,7 +98,7 @@ class KalturaPluginManager
 			if($pendingPluginMinVersion && $pendingPluginReplection->implementsInterface('IKalturaVersion'))
 			{
 				// TODO remove call_user_func after moving to php 5.3
-				$pendingPluginVersion = call_user_func("$pendingPluginClass::getVersion");
+				$pendingPluginVersion = call_user_func(array($pendingPluginClass, 'getVersion'));
 //				$pendingPluginVersion = $pendingPluginClass::getVersion();
 				if(!$pendingPluginVersion->isCompatible($pendingPluginMinVersion))
 					return false;
@@ -107,7 +107,7 @@ class KalturaPluginManager
 			// adds tested plugin name to the list of validated in order to avoid endless recursion
 			$tempValidatedPlugins = $validatedPlugins;
 			// TODO remove call_user_func after moving to php 5.3
-			$tempValidatedPlugins[] = call_user_func("$pluginClass::getPluginName");
+			$tempValidatedPlugins[] = call_user_func(array($pluginClass, 'getPluginName'));
 //			$tempValidatedPlugins[] = $pluginClass::getPluginName();
 			if(!self::isValid($pendingPluginClass, $tempValidatedPlugins))
 				return false;
@@ -191,7 +191,7 @@ class KalturaPluginManager
 				continue;
 				
 			// TODO remove call_user_func after moving to php 5.3
-			$pluginName = call_user_func("$pluginClass::getPluginName");
+			$pluginName = call_user_func(array($pluginClass, 'getPluginName'));
 //			$pluginName = $pluginClass::getPluginName();
 			self::$plugins[$pluginName] = $pluginClass;
 		}
