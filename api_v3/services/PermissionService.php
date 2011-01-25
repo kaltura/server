@@ -13,7 +13,18 @@ class PermissionService extends KalturaBaseService
 		parent::initService($serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-	}	
+	}
+	
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'list') {
+			return true;
+		}
+		return parent::globalPartnerAllowed($actionName);
+	}
 
 	
 	/**
@@ -68,7 +79,7 @@ class PermissionService extends KalturaBaseService
 	 */		
 	public function getAction($permissionName)
 	{
-		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId(), PartnerPeer::GLOBAL_PARTNER));
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, explode(',', $this->partnerGroup()));
 		
 		if (!$dbPermission) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
@@ -93,7 +104,7 @@ class PermissionService extends KalturaBaseService
 	 */	
 	public function updateAction($permissionName, KalturaPermission $permission)
 	{
-		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->partnerGroup()));
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, explode(',', $this->partnerGroup()));
 		
 		if (!$dbPermission) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
@@ -119,7 +130,7 @@ class PermissionService extends KalturaBaseService
 	 */		
 	public function deleteAction($permissionName)
 	{
-		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->getPartnerId()));
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, array($this->partnerGroup()));
 		
 		if (!$dbPermission) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
@@ -151,15 +162,12 @@ class PermissionService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$permissionFilter->attachToCriteria($c);
-		$c->addAnd(PermissionPeer::PARTNER_ID, array($this->getPartnerId(), PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
-		PermissionPeer::setUseCriteriaFilter(false);
 		$count = PermissionPeer::doCount($c);
 		
 		if ($pager)
 			$pager->attachToCriteria($c);
 		
 		$list = PermissionPeer::doSelect($c);
-		PermissionPeer::setUseCriteriaFilter(true);
 		
 		$response = new KalturaPermissionListResponse();
 		$response->objects = KalturaPermissionArray::fromDbArray($list);
