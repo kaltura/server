@@ -89,7 +89,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 					else if ($propertyInfo->isDynamicEnum())
 					{
 						$propertyType = $propertyInfo->getType();
-						$enumType = call_user_func("$propertyType::getEnumClass");
+						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 						$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 					}
 					
@@ -140,7 +140,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	                if($properties[$this_prop]->isDynamicEnum())
 	                {
 						$propertyType = $properties[$this_prop]->getType();
-						$enumType = call_user_func("$propertyType::getEnumClass");
+						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 	                	$value = kPluginableEnumsManager::coreToApi($enumType, $value);
 	                }
 	                	
