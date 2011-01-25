@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api
+ */
 class ContentDistributionErrors extends KalturaErrors
 {
 	const DISTRIBUTION_PROVIDER_NOT_FOUND = "DISTRIBUTION_PROVIDER_NOT_FOUND,Distrbution provider type not found [%s]";

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaGenericDistributionProviderAction extends KalturaObject implements IFilterable
 {
 	/**

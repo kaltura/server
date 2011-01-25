@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaEntryDistributionArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

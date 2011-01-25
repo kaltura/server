@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.comcastDistribution
+ * @subpackage api.objects
+ */
 class KalturaComcastDistributionProfile extends KalturaDistributionProfile
 {
 	/**

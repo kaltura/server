@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 {
 	/**

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaEntryDistribution extends KalturaObject implements IFilterable
 {
 	/**

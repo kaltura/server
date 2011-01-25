@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.youTubeDistribution
+ * @subpackage api.objects
+ */
 class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**

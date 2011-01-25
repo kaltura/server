@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage api.objects
+ */
 class KalturaHuluDistributionProfile extends KalturaDistributionProfile
 {
 	/**

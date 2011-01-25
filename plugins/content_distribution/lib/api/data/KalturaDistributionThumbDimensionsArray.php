@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaDistributionThumbDimensionsArray extends KalturaTypedArray
 {
 	public static function fromDbArray(array $arr)

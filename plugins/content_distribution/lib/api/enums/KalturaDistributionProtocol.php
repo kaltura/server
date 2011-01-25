@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.enum
+ */
 class KalturaDistributionProtocol extends KalturaEnum
 {
 	const FTP = 1;

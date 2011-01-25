@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage api.objects
+ */
 class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 {
 	/**

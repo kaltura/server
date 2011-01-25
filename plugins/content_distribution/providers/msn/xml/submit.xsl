@@ -13,11 +13,11 @@
 	<xsl:template match="item">
 
 		<video xmlns="urn:schemas-microsoft-com:msnvideo:catalog">
-			<uuid>
-				<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+			<xsl:if test="count(distribution[@provider='MSN']/remoteId) > 0">
+				<uuid>
 					<xsl:value-of select="distribution[@provider='MSN']/remoteId" />
-				</xsl:if>
-			</uuid>
+				</uuid>
+			</xsl:if>
 			<providerId>
 				<xsl:value-of select="entryId" />
 			</providerId>

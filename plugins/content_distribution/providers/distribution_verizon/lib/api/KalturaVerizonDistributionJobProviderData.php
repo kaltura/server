@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage api.objects
+ */
 class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**

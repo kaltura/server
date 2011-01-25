@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage api.objects
+ */
 class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**

@@ -1,5 +1,7 @@
 <?php
 /**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
  * @abstract
  */
 class KalturaDistributionProfile extends KalturaObject implements IFilterable

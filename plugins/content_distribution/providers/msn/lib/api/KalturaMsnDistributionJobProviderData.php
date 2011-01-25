@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage api.objects
+ */
 class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**

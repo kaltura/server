@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage api.objects
+ */
 class KalturaDistributionProfileListResponse extends KalturaObject
 {
 	/**
