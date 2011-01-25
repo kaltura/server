@@ -43,11 +43,25 @@ class ComcastDistributionProfile extends DistributionProfile
 			return $validationErrors;
 		}
 		
-		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
-		if(!$metadata)
+		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		if(!count($metadatas))
 		{
 			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
 			return $validationErrors;
+		}
+		
+		$values = $this->findMetadataValue($metadatas, self::METADATA_FIELD_CATEGORY);
+		
+		if(!count($values))
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			
+		foreach($values as $value)
+		{
+			if(!strlen($value))
+			{
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY);
+				return $validationErrors;
+			}
 		}
 		
 		return $validationErrors;
