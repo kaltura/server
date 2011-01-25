@@ -308,7 +308,7 @@ class KalturaTypeReflector
 			{
 				$type = $this->getType();
 				// TODO remove call_user_func after moving to php 5.3
-				$baseEnumName = call_user_func("$type::getEnumClass");
+				$baseEnumName = call_user_func(array($type, 'getEnumClass'));
 //				$baseEnumName = $type::getEnumClass();
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
 				foreach($pluginInstances as $pluginInstance)
@@ -318,7 +318,7 @@ class KalturaTypeReflector
 					foreach($enums as $enum)
 					{
 						// TODO remove call_user_func after moving to php 5.3
-						$enumConstans = call_user_func("$enum::getAdditionalValues");
+						$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
 //						$enumConstans = $enum::getAdditionalValues();
 						foreach($enumConstans as $name => $value)
 						{
@@ -506,7 +506,7 @@ class KalturaTypeReflector
 			$type = $this->getType();
 			
 			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func("$type::getEnumClass");
+			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
 	//		$baseEnumName = $type::getEnumClass();
 	 
 			$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
@@ -515,7 +515,7 @@ class KalturaTypeReflector
 			foreach($enums as $enum)
 			{		
 				// TODO remove call_user_func after moving to php 5.3
-				$enumConstans = call_user_func("$enum::getAdditionalValues");
+				$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
 	//			$enumConstans = $enum::getAdditionalValues();
 				if(in_array($valueName, $enumConstans))
 					return true;
