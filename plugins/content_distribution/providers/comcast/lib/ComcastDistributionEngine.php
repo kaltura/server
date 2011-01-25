@@ -206,16 +206,44 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		
 		$template = new ComcastMediaTemplate();
+		$template->fields[] = array();
+		$template->fields[] = ComcastMediaField::_ID;
+		$template->fields[] = ComcastMediaField::_STATUS;
+		$template->fields[] = ComcastMediaField::_STATUSDESCRIPTION;
+		$template->fields[] = ComcastMediaField::_STATUSDETAIL;
+		$template->fields[] = ComcastMediaField::_STATUSMESSAGE;
+		
 		$query = new ComcastQuery();
-		$query->parameterNames = new ComcastArrayOfstring();
-		$query->parameterNames[] = 'ID';
-		$query->parameterValues = new ComcastArrayOfstring();
-		$query->parameterValues[] = $data->remoteId;
+		$query->name = 'ByIDs';
+		$query->parameterNames = array('IDs');
+		$ids = new soapval('item', 'IDSet', array($data->remoteId), false, 'ns12');
+		$query->parameterValues = array($ids);
+		
 		$sort = new ComcastMediaSort();
 		$range = new ComcastRange();
 		
 		$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);
-		
+		foreach($comcastMediaList as $comcastMedia)
+		{
+			if($comcastMedia->ID != $data->remoteId)
+				continue;
+				
+			switch($comcastMedia->status)
+			{
+				case ComcastStatus::_ERROR:
+					throw new Exception("Comcast error description [$comcastMedia->statusDescription] message [$comcastMedia->statusMessage] detail [$comcastMedia->statusDetail]");
+								
+				case ComcastStatus::_INPROGRESS:
+				case ComcastStatus::_RETAINED:
+				case ComcastStatus::_UNAPPROVED:
+					return false;
+								
+				case ComcastStatus::_DISABLED:
+				case ComcastStatus::_WARNING:
+				case ComcastStatus::_OK:
+					return true;
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)
