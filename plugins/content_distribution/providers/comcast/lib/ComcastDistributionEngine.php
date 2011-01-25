@@ -77,10 +77,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaComcastDistributionProfile))
 			throw new Exception("Distribution profile must be of type KalturaComcastDistributionProfile");
 	
-		if(!$data->providerData || !($data->providerData instanceof KalturaComcastDistributionJobProviderData))
-			throw new Exception("Provider data must be of type KalturaComcastDistributionJobProviderData");
-		
-		return $this->doSubmit($data, $data->distributionProfile, $data->providerData);
+		return $this->doSubmit($data, $data->distributionProfile);
 	}
 
 	protected function newCustomDataElement($title, $value = '')
@@ -100,7 +97,12 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		return ComcastFormat::_UNKNOWN;
 	}
 	
-	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaComcastDistributionProfile $distributionProfile, KalturaComcastDistributionJobProviderData $providerData)
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaComcastDistributionProfile $distributionProfile
+	 * @return ComcastMedia
+	 */
+	public function getComcastMedia(KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
 		$entry = $this->getEntry($data->entryDistribution->entryId);
 		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->entryId);
@@ -138,6 +140,13 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media->customData[] = $this->newCustomDataElement('Link Href');
 		$media->customData[] = $this->newCustomDataElement('Link Text');
 		
+		return $media;
+	}
+	
+	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaComcastDistributionProfile $distributionProfile)
+	{	
+		$media = $this->getComcastMedia($data, $distributionProfile);
+	
 		$thumbAssets = $this->getThumbAssets($data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
 		{
@@ -151,7 +160,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			}
 		}
 		
-		$mediaFiles = new ComcastMediaFileList();
+		$mediaFiles = array();
 		
 		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->flavorAssetIds);
 		foreach($flavorAssets as $flavorAsset)
@@ -185,13 +194,6 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		if($comcastAddContentResults->mediaID)
 		{
 			$data->remoteId = $comcastAddContentResults->mediaID;
-		}
-		
-		if(isset($comcastAddContentResults->faultcode) || isset($comcastAddContentResults->faultstring))
-		{
-			$err = "addContent failed with code [$comcastAddContentResults->faultcode] and message [$comcastAddContentResults->faultstring]";
-			KalturaLog::err($err);
-			throw new Exception($err);
 		}
 		
 		return false;
@@ -251,7 +253,31 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		// TODO
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaComcastDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaComcastDistributionProfile");
+	
+		return $this->doUpdate($data, $data->distributionProfile);
+	}
+	
+	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaComcastDistributionProfile $distributionProfile)
+	{
+		$media = $this->getComcastMedia($data, $distributionProfile);
+		$media->ID = $data->remoteId;
+	
+		$mediaFiles = array();
+		
+		$options = new ComcastAddContentOptions();
+		$options->generateThumbnail = false;
+		$options->publish = false;
+		$options->deleteSource = false;
+
+		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
+		$comcastAddContentResults = $comcastMediaService->setContent($media, $mediaFiles, $options);
+		
+		$data->sentData = $comcastMediaService->request;
+		$data->results = $comcastMediaService->response;
+		
+		return true;
 	}
 	
 	/* (non-PHPdoc)
