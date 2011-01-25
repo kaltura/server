@@ -437,9 +437,9 @@ class kPermissionManager
 	private static function initRoleIds()
 	{
 		$roleIds = null;
-		if (!self::$operatingPartner)
+		if (!self::$operatingPartner || !self::$ksString)
 		{
-			// no partner -> no role
+			// no partner or session -> no role
 			$roleIds = null;
 		}
 		else
@@ -462,7 +462,9 @@ class kPermissionManager
 				}
 			}
 			
-			$roleIds = explode(',', trim($roleIds, ','));
+			if ($roleIds) {
+				$roleIds = explode(',', trim($roleIds, ','));
+			}
 		}
 		
 		self::$roleIds = $roleIds;		
