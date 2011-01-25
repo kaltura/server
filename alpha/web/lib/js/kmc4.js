@@ -337,7 +337,7 @@ $(window).load(function(){
 				url += '&' + i + '=' + fld;
 			}
 			// change http to https
-			//url = url.replace("http", "https");
+			url = url.replace("http", "https");
 			
 			var modal_width = 370;
 			var modal_height = 160;
@@ -355,6 +355,7 @@ $(window).load(function(){
 		 
 		    // setup a callback to handle the dispatched MessageEvent. if window.postMessage is supported the passed
 		    // event will have .data, .origin and .source properties. otherwise, it will only have the .data property.
+		    var from_domain = kmc.vars.service_url.replace("http", "https");
 		    XD.receiveMessage(function(message){
 		        if(message.data == "reload") {
 		        	kmc.utils.closeModal();
@@ -362,7 +363,7 @@ $(window).load(function(){
 		        } else {
 		        	kmc.utils.closeModal();
 		        }
-		    }, kmc.vars.service_url);
+		    }, from_domain);
 			
 			$("#close").click(function() {
 				kmc.utils.closeModal();
