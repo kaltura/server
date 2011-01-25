@@ -110,7 +110,7 @@ abstract class DistributionEngine implements IDistributionEngine
 			$xml->loadXML($metadata->xml);
 			$nodes = $xml->getElementsByTagName($field);
 			foreach($nodes as $node)
-				$results = $node->textContent;
+				$results[] = $node->textContent;
 		}
 		
 		if(!$asArray)
