@@ -285,6 +285,31 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $validationErrors;
 	}
 
+
+	/**
+	 * @param array<Metadata> $metadataObjects
+	 * @param string $field
+	 * @return array|string
+	 */
+	protected function findMetadataValue(array $metadataObjects, $field)
+	{
+		$results = array();
+		foreach($metadataObjects as $metadata)
+		{
+			$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$xmlContent = kFileSyncUtils::file_get_contents($key, true, false);
+			
+			$xml = new DOMDocument();
+			$xml->loadXML($xmlContent);
+			
+			$nodes = $xml->getElementsByTagName($field);
+			foreach($nodes as $node)
+				$results[] = $node->textContent;
+		}
+		
+		return $results;
+	}
+	
 	protected function createValidationError($action, $type, $data = null)
 	{
 		$validationError = new kDistributionValidationError();
