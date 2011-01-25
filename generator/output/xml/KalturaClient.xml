@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1295539458">
-  <!-- Generated on date 20/01/11 11:04:18 -->
+<xml apiVersion="3.1.1" generatedDate="1295938594">
+  <!-- Generated on date 25/01/11 08:56:34 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -38,6 +38,16 @@
       <const name="CREATED_AT_DESC" value="-createdAt"/>
       <const name="UPDATED_AT_ASC" value="+updatedAt"/>
       <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaAssetOrderBy" enumType="string">
+      <const name="SIZE_ASC" value="+size"/>
+      <const name="SIZE_DESC" value="-size"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="DELETED_AT_ASC" value="+deletedAt"/>
+      <const name="DELETED_AT_DESC" value="-deletedAt"/>
     </enum>
     <enum name="KalturaAssetParamsOrderBy" enumType="string"/>
     <enum name="KalturaAssetParamsOutputOrderBy" enumType="string"/>
@@ -312,6 +322,8 @@
       <const name="PDF_CREATOR" value="202"/>
       <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
       <const name="FAST_START" value="fastStart.FastStart"/>
+      <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
+      <const name="AVIDEMUX" value="avidemux.Avidemux"/>
     </enum>
     <enum name="KalturaConversionProfileOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -375,6 +387,8 @@
     <enum name="KalturaDistributionProviderOrderBy" enumType="string"/>
     <enum name="KalturaDistributionProviderType" enumType="string">
       <const name="GENERIC" value="1"/>
+      <const name="MSN" value="msnDistribution.MSN"/>
+      <const name="HULU" value="huluDistribution.HULU"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string">
       <const name="NAME_ASC" value="+name"/>
@@ -505,6 +519,16 @@
       <const name="FILE" value="1"/>
       <const name="LINK" value="2"/>
       <const name="URL" value="3"/>
+    </enum>
+    <enum name="KalturaFlavorAssetOrderBy" enumType="string">
+      <const name="SIZE_ASC" value="+size"/>
+      <const name="SIZE_DESC" value="-size"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="DELETED_AT_ASC" value="+deletedAt"/>
+      <const name="DELETED_AT_DESC" value="-deletedAt"/>
     </enum>
     <enum name="KalturaFlavorAssetStatus" enumType="int">
       <const name="ERROR" value="-1"/>
@@ -1311,6 +1335,16 @@
       <const name="ITUNES" value="3"/>
       <const name="TUBE_MOGUL" value="4"/>
     </enum>
+    <enum name="KalturaThumbAssetOrderBy" enumType="string">
+      <const name="SIZE_ASC" value="+size"/>
+      <const name="SIZE_DESC" value="-size"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="DELETED_AT_ASC" value="+deletedAt"/>
+      <const name="DELETED_AT_DESC" value="-deletedAt"/>
+    </enum>
     <enum name="KalturaThumbCropType" enumType="int">
       <const name="RESIZE" value="1"/>
       <const name="RESIZE_WITH_PADDING" value="2"/>
@@ -1606,6 +1640,7 @@
       <property name="loginEnabled" type="bool" readOnly="1" insertOnly="0" description=""/>
       <property name="roleIds" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="roleNames" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="isAccountOwner" type="bool" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaDynamicEnum"/>
     <class name="KalturaBaseEntry">
@@ -1911,6 +1946,30 @@
       <property name="isWeb" type="bool" readOnly="0" insertOnly="0" description="True if this Flavor Asset is playable in KDP&#10;"/>
       <property name="containerFormat" type="string" readOnly="0" insertOnly="0" description="The container format&#10;"/>
       <property name="videoCodecId" type="string" readOnly="0" insertOnly="0" description="The video codec&#10;"/>
+    </class>
+    <class name="KalturaAssetBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaFlavorAssetStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusNotIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="sizeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="sizeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="deletedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="deletedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAssetFilter" base="KalturaAssetBaseFilter"/>
+    <class name="KalturaFlavorAssetListResponse">
+      <property name="objects" type="array" arrayType="KalturaFlavorAsset" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAssetParams">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Flavor Params&#10;"/>
@@ -2296,6 +2355,10 @@
       <property name="scaleHeight" type="float" readOnly="0" insertOnly="0" description=""/>
       <property name="backgroundColor" type="string" readOnly="0" insertOnly="0" description="Hexadecimal value&#13;"/>
       <property name="sourceParamsId" type="int" readOnly="0" insertOnly="0" description="Id of the flavor params or the thumbnail params to be used as source for the thumbnail creation&#13;"/>
+    </class>
+    <class name="KalturaThumbAssetListResponse">
+      <property name="objects" type="array" arrayType="KalturaThumbAsset" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaThumbParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
     <class name="KalturaThumbParamsFilter" base="KalturaThumbParamsBaseFilter"/>
@@ -2914,8 +2977,8 @@
       <property name="enablePs2PermissionValidation" type="bool" readOnly="0" insertOnly="0" description=""/>
       <property name="defThumbOffset" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="adminLoginUsersQuota" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="userSessionRoleId" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="adminSessionRoleId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userSessionRoleId" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="adminSessionRoleId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="alwaysAllowedPermissionNames" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSystemPartnerPackage">
@@ -3088,6 +3151,16 @@
     <class name="KalturaVirusScanProfileListResponse">
       <property name="objects" type="array" arrayType="KalturaVirusScanProfile" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaInternalToolsSession">
+      <property name="partner_id" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="valid_until" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partner_pattern" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="type" type="int" enumType="KalturaSessionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="error" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="rand" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="user" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="privileges" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaDistributionThumbDimensions">
       <property name="width" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -3270,7 +3343,7 @@
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAnnotationBaseFilter" abstract="1" base="KalturaFilter">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="parentIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="parentIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3350,10 +3423,14 @@
       <property name="assetVersionEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAssetParamsOutputFilter" base="KalturaAssetParamsOutputBaseFilter"/>
+    <class name="KalturaFlavorAssetBaseFilter" abstract="1" base="KalturaAssetFilter"/>
+    <class name="KalturaFlavorAssetFilter" base="KalturaFlavorAssetBaseFilter"/>
     <class name="KalturaMediaFlavorParamsBaseFilter" abstract="1" base="KalturaFlavorParamsFilter"/>
     <class name="KalturaMediaFlavorParamsFilter" base="KalturaMediaFlavorParamsBaseFilter"/>
     <class name="KalturaMediaFlavorParamsOutputBaseFilter" abstract="1" base="KalturaFlavorParamsOutputFilter"/>
     <class name="KalturaMediaFlavorParamsOutputFilter" base="KalturaMediaFlavorParamsOutputBaseFilter"/>
+    <class name="KalturaThumbAssetBaseFilter" abstract="1" base="KalturaAssetFilter"/>
+    <class name="KalturaThumbAssetFilter" base="KalturaThumbAssetBaseFilter"/>
     <class name="KalturaLiveStreamAdminEntryBaseFilter" abstract="1" base="KalturaLiveStreamEntryFilter"/>
     <class name="KalturaLiveStreamAdminEntryFilter" base="KalturaLiveStreamAdminEntryBaseFilter"/>
     <class name="KalturaAdminUserBaseFilter" abstract="1" base="KalturaUserFilter"/>
@@ -3823,6 +3900,11 @@
       <action name="getByEntryId" description="Get Flavor Assets for Entry&#10;">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <result type="array" arrayType="KalturaFlavorAsset"/>
+      </action>
+      <action name="list" description="List Flavor Assets by filter and pager&#10;">
+        <param name="filter" type="KalturaAssetFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaFlavorAssetListResponse"/>
       </action>
       <action name="getWebPlayableByEntryId" description="Get web playable Flavor Assets for Entry&#10;">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
@@ -4371,6 +4453,11 @@
       <action name="getByEntryId" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <result type="array" arrayType="KalturaThumbAsset"/>
+      </action>
+      <action name="list" description="List Thumbnail Assets by filter and pager&#10;">
+        <param name="filter" type="KalturaAssetFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaThumbAssetListResponse"/>
       </action>
       <action name="addFromUrl" description="">
         <param name="entryId" type="string" optional="0" description="&#13;"/>
@@ -5297,6 +5384,7 @@
       </action>
       <action name="getAdminSession" description="">
         <param name="partnerId" type="int" optional="0" description="&#13;"/>
+        <param name="userId" type="string" optional="1" default="" description="&#13;"/>
         <result type="string"/>
       </action>
       <action name="updateConfiguration" description="">
@@ -5342,6 +5430,437 @@
       <action name="getTracks" description="Get base entry by ID with no filters.&#10;">
         <param name="entryId" type="string" optional="0" description="Entry id&#13;"/>
         <result type="KalturaTrackEntryListResponse"/>
+      </action>
+    </service>
+    <service id="multicenters_filesyncimportbatch" name="filesyncImportBatch" description="">
+      <action name="getExclusiveFileSyncImportJobs" description="batch getExclusiveFileSyncImportJob action allows to get a BatchJob of type FILESYNC_IMPORT &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveFileSyncImportJob" description="batch updateExclusiveFileSyncImportJob action updates a BatchJob of type FILESYNC_IMPORT that was claimed using the getExclusiveFileSyncImportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveFileSyncImportJob" description="batch freeExclusiveFileSyncImportJob action frees a BatchJob of type FILESYNC_IMPORT that was claimed using the getExclusiveFileSyncImportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism&#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveAlmostDoneFileSyncImportJobs" description="batch getExclusiveAlmostDoneFileSyncImportJobs action allows to get a BatchJob of type BULKUPLOAD that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveImportJobs" description="batch getExclusiveImportJob action allows to get a BatchJob of type IMPORT &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveImportJob" description="batch updateExclusiveImportJob action updates a BatchJob of type IMPORT that was claimed using the getExclusiveImportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveImportJob" description="batch freeExclusiveImportJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveImportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism&#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveBulkUploadJobs" description="batch getExclusiveBulkUploadJob action allows to get a BatchJob of type BULKUPLOAD &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneBulkUploadJobs" description="batch getExclusiveAlmostDoneBulkUploadJobs action allows to get a BatchJob of type BULKUPLOAD that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveBulkUploadJob" description="batch updateExclusiveBulkUploadJob action updates a BatchJob of type BULKUPLOAD that was claimed using the getExclusiveBulkUploadJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description=""/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveBulkUploadJob" description="batch freeExclusiveBulkUploadJob action frees a BatchJob of type BULKUPLOAD that was claimed using the getExclusiveBulkUploadJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="addBulkUploadResult" description="batch addBulkUploadResultAction action adds KalturaBulkUploadResult to the DB&#10;">
+        <param name="bulkUploadResult" type="KalturaBulkUploadResult" optional="0" description="The results to save to the DB&#13;"/>
+        <param name="pluginDataArray" type="array" arrayType="KalturaBulkUploadPluginData" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaBulkUploadResult"/>
+      </action>
+      <action name="getBulkUploadLastResult" description="batch getBulkUploadLastResultAction action returns the last result of the bulk upload&#10;">
+        <param name="bulkUploadJobId" type="int" optional="0" description="The id of the bulk upload job&#13;"/>
+        <result type="KalturaBulkUploadResult"/>
+      </action>
+      <action name="updateBulkUploadResults" description="batch updateBulkUploadResults action adds KalturaBulkUploadResult to the DB&#10;">
+        <param name="bulkUploadJobId" type="int" optional="0" description="The id of the bulk upload job&#13;"/>
+        <result type="int"/>
+      </action>
+      <action name="getExclusiveAlmostDoneConvertCollectionJobs" description="batch getExclusiveAlmostDoneConvertCollectionJobs action allows to get a BatchJob of type CONVERT_COLLECTION that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneConvertProfileJobs" description="batch getExclusiveAlmostDoneConvertProfileJobs action allows to get a BatchJob of type CONVERT_PROFILE that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveConvertCollectionJob" description="batch updateExclusiveConvertCollectionJobAction action updates a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <param name="flavorsData" type="array" arrayType="KalturaConvertCollectionFlavorData" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveConvertProfileJob" description="batch updateExclusiveConvertProfileJobAction action updates a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveConvertCollectionJob" description="batch freeExclusiveConvertCollectionJobAction action frees a BatchJob of type CONVERT_COLLECTION that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="freeExclusiveConvertProfileJob" description="batch freeExclusiveConvertProfileJobAction action frees a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveConvertCollectionJobs" description="batch getExclusiveConvertCollectionJob action allows to get a BatchJob of type CONVERT_COLLECTION &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveConvertJobs" description="batch getExclusiveConvertJob action allows to get a BatchJob of type CONVERT &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneConvertJobs" description="batch getExclusiveAlmostDoneConvertJobsAction action allows to get a BatchJob of type CONVERT that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveConvertJob" description="batch updateExclusiveConvertJob action updates a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveConvertJobSubType" description="batch updateExclusiveConvertJobSubType action updates the sub type for a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="subType" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveConvertJob" description="batch freeExclusiveConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusivePostConvertJobs" description="batch getExclusivePostConvertJob action allows to get a BatchJob of type POSTCONVERT &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusivePostConvertJob" description="batch updateExclusivePostConvertJob action updates a BatchJob of type POSTCONVERT that was claimed using the getExclusivePostConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusivePostConvertJob" description="batch freeExclusivePostConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusivePostConvertJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveCaptureThumbJobs" description="batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveCaptureThumbJob" description="batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveCaptureThumbJob" description="batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveExtractMediaJobs" description="batch getExclusiveExtractMediaJob action allows to get a BatchJob of type EXTRACT_MEDIA &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveExtractMediaJob" description="batch updateExclusiveExtractMediaJob action updates a BatchJob of type EXTRACT_MEDIA that was claimed using the getExclusiveExtractMediaJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="addMediaInfo" description="batch addMediaInfoAction action saves a media info object&#10;">
+        <param name="mediaInfo" type="KalturaMediaInfo" optional="0" description="&#13;"/>
+        <result type="KalturaMediaInfo"/>
+      </action>
+      <action name="freeExclusiveExtractMediaJob" description="batch freeExclusiveExtractMediaJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveExtractMediaJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveStorageExportJobs" description="batch getExclusiveStorageExportJob action allows to get a BatchJob of type STORAGE_EXPORT &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveStorageExportJob" description="batch updateExclusiveStorageExportJob action updates a BatchJob of type STORAGE_EXPORT that was claimed using the getExclusiveStorageExportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveStorageExportJob" description="batch freeExclusiveStorageExportJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveStorageExportJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveStorageDeleteJobs" description="batch getExclusiveStorageDeleteJob action allows to get a BatchJob of type STORAGE_DELETE &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveStorageDeleteJob" description="batch updateExclusiveStorageDeleteJob action updates a BatchJob of type StorageDelete that was claimed using the getExclusiveStorageDeleteJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveStorageDeleteJob" description="batch freeExclusiveStorageDeleteJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveStorageDeleteJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveNotificationJobs" description="batch getExclusiveNotificationJob action allows to get a BatchJob of type NOTIFICATION &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="KalturaBatchGetExclusiveNotificationJobsResponse"/>
+      </action>
+      <action name="updateExclusiveNotificationJob" description="batch updateExclusiveNotificationJob action updates a BatchJob of type NOTIFICATION that was claimed using the getExclusiveNotificationJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveNotificationJob" description="batch freeExclusiveNotificationJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveNotificationJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveMailJobs" description="batch getExclusiveMailJob action allows to get a BatchJob of type MAIL &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveMailJob" description="batch updateExclusiveMailJob action updates a BatchJob of type MAIL that was claimed using the getExclusiveMailJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveMailJob" description="batch freeExclusiveMailJob action frees a BatchJob of type MAIL that was claimed using the getExclusiveMailJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveBulkDownloadJobs" description="batch getExclusiveBulkDownloadJobs action allows to get a BatchJob of type BULKDOWNLOAD&#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneBulkDownloadJobs" description="batch getExclusiveAlmostDoneBulkDownloadJobs action allows to get a BatchJob of type BULKDOWNLOAD that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveBulkDownloadJob" description="batch updateExclusiveBulkDownloadJob action updates a BatchJob of type BULKDOWNLOAD that was claimed using the getExclusiveBulkDownloadJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveBulkDownloadJob" description="batch freeExclusiveBulkDownloadJob action frees a BatchJob of type BULKDOWNLOAD that was claimed using the getExclusiveBulkDownloadJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveProvisionProvideJobs" description="batch getExclusiveProvisionProvideJobs action allows to get a BatchJob of type ProvisionProvide&#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneProvisionProvideJobs" description="batch getExclusiveAlmostDoneProvisionProvideJobs action allows to get a BatchJob of type ProvisionProvide that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveProvisionProvideJob" description="batch updateExclusiveProvisionProvideJob action updates a BatchJob of type ProvisionProvide that was claimed using the getExclusiveProvisionProvideJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveProvisionProvideJob" description="batch freeExclusiveProvisionProvideJob action frees a BatchJob of type ProvisionProvide that was claimed using the getExclusiveProvisionProvideJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getExclusiveProvisionDeleteJobs" description="batch getExclusiveProvisionDeleteJobs action allows to get a BatchJob of type ProvisionDelete&#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDoneProvisionDeleteJobs" description="batch getExclusiveAlmostDoneProvisionDeleteJobs action allows to get a BatchJob of type ProvisionDelete that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveProvisionDeleteJob" description="batch updateExclusiveProvisionDeleteJob action updates a BatchJob of type ProvisionDelete that was claimed using the getExclusiveProvisionDeleteJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="freeExclusiveProvisionDeleteJob" description="batch freeExclusiveProvisionDeleteJob action frees a BatchJob of type ProvisionDelete that was claimed using the getExclusiveProvisionDeleteJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="resetJobExecutionAttempts" description="batch resetJobExecutionAttempts action resets the execution attempts of the job &#10;">
+        <param name="id" type="int" optional="0" description="The id of the job&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism&#13;"/>
+        <param name="jobType" type="string" enumType="KalturaBatchJobType" optional="0" description="The type of the job  &#13;"/>
+        <result/>
+      </action>
+      <action name="freeExclusiveJob" description="batch freeExclusiveJobAction action allows to get a generic BatchJob &#10;">
+        <param name="id" type="int" optional="0" description="The id of the job&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism&#13;"/>
+        <param name="jobType" type="string" enumType="KalturaBatchJobType" optional="0" description="The type of the job  &#13;"/>
+        <param name="resetExecutionAttempts" type="bool" optional="1" default="false" description="Resets the job execution attampts to zero  &#13;"/>
+        <result type="KalturaFreeJobResponse"/>
+      </action>
+      <action name="getQueueSize" description="batch getQueueSize action get the queue size for job type &#10;">
+        <param name="workerQueueFilter" type="KalturaWorkerQueueFilter" optional="0" description="The worker filter  &#13;"/>
+        <result type="int"/>
+      </action>
+      <action name="getExclusiveJobs" description="batch getExclusiveJobsAction action allows to get a BatchJob &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <param name="jobType" type="string" enumType="KalturaBatchJobType" optional="1" default="null" description="The type of the job - could be a custom extended type&#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="getExclusiveAlmostDone" description="batch getExclusiveAlmostDone action allows to get a BatchJob that wait for remote closure &#10;">
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="maxExecutionTime" type="int" optional="0" description="The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.&#13;"/>
+        <param name="numberOfJobs" type="int" optional="0" description="The maximum number of jobs to return. &#13;"/>
+        <param name="filter" type="KalturaBatchJobFilter" optional="1" default="null" description="Set of rules to fetch only rartial list of jobs  &#13;"/>
+        <param name="jobType" type="string" enumType="KalturaBatchJobType" optional="1" default="null" description="The type of the job - could be a custom extended type&#13;"/>
+        <result type="array" arrayType="KalturaBatchJob"/>
+      </action>
+      <action name="updateExclusiveJob" description="batch updateExclusiveJobAction action updates a BatchJob of extended type that was claimed using the getExclusiveJobs&#10;">
+        <param name="id" type="int" optional="0" description="The id of the job to free&#13;"/>
+        <param name="lockKey" type="KalturaExclusiveLockKey" optional="0" description="The unique lock key from the batch-process. Is used for the locking mechanism  &#13;"/>
+        <param name="job" type="KalturaBatchJob" optional="0" description="&#13;"/>
+        <result type="KalturaBatchJob"/>
+      </action>
+      <action name="cleanExclusiveJobs" description="batch cleanExclusiveJobs action mark as fatal error all expired jobs&#10;">
+        <result type="int"/>
+      </action>
+      <action name="logConversion" description="Add the data to the flavor asset conversion log, creates it if doesn't exists&#10;">
+        <param name="flavorAssetId" type="string" optional="0" description="&#13;"/>
+        <param name="data" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="checkFileExists" description="batch checkFileExists action check if the file exists&#10;">
+        <param name="localPath" type="string" optional="0" description="&#13;"/>
+        <param name="size" type="int" optional="0" description="&#13;"/>
+        <result type="KalturaFileExistsResponse"/>
       </action>
     </service>
     <service id="audit_audittrail" name="auditTrail" description="Audit Trail service&#13;">
@@ -5810,6 +6329,20 @@
         <param name="localPath" type="string" optional="0" description="&#13;"/>
         <param name="size" type="int" optional="0" description="&#13;"/>
         <result type="KalturaFileExistsResponse"/>
+      </action>
+    </service>
+    <service id="kalturainternaltools_kalturainternaltools" name="KalturaInternalTools" description="Internal Tools Service&#10;"/>
+    <service id="kalturainternaltools_kalturainternaltoolssystemhelper" name="kalturaInternalToolsSystemHelper" description="Internal Tools Service&#10;">
+      <action name="fromSecureString" description="KS from Secure String&#10;">
+        <param name="str" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaInternalToolsSession"/>
+      </action>
+      <action name="iptocountry" description="from ip to country&#10;">
+        <param name="remote_addr" type="string" optional="0" description="&#13;"/>
+        <result type="string"/>
+      </action>
+      <action name="getRemoteAddress" description="">
+        <result type="string"/>
       </action>
     </service>
     <service id="contentdistribution_distributionprofile" name="distributionProfile" description="Distribution Profile service&#13;">

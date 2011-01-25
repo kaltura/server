@@ -2811,6 +2811,22 @@ class KalturaUser extends KalturaObjectBase
 	 */
 	public $roleIds = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $roleNames = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isAccountOwner = null;
+
 
 }
 
@@ -4364,6 +4380,13 @@ abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $partnerIdNotIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual = null;
@@ -4374,6 +4397,62 @@ abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $processorExpirationGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $processorExpirationLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $executionAttemptsGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $executionAttemptsLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $lockVersionGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $lockVersionLessThanOrEqual = null;
 
 
 }
@@ -4437,9 +4516,23 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 *
+	 * @var int
+	 */
+	public $onStressDivertToEqual = null;
+
+	/**
+	 * 
+	 *
 	 * @var string
 	 */
 	public $onStressDivertToIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $onStressDivertToNotIn = null;
 
 	/**
 	 * 
@@ -4458,6 +4551,62 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $statusNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $abortEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $checkAgainTimeoutGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $checkAgainTimeoutLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $progressGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $progressLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatesCountGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatesCountLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $priorityGreaterThanOrEqual = null;
@@ -4468,6 +4617,111 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 * @var int
 	 */
 	public $priorityLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $priorityEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $priorityIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $priorityNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $twinJobIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $twinJobIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $twinJobIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bulkJobIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $bulkJobIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $bulkJobIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $parentJobIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentJobIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentJobIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rootJobIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $rootJobIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $rootJobIdNotIn = null;
 
 	/**
 	 * 
@@ -4500,9 +4754,44 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	/**
 	 * 
 	 *
+	 * @var KalturaBatchJobErrorTypes
+	 */
+	public $errTypeEqual = null;
+
+	/**
+	 * 
+	 *
 	 * @var string
 	 */
 	public $errTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $errTypeNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $errNumberEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $errNumberIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $errNumberNotIn = null;
 
 	/**
 	 * 
@@ -4517,6 +4806,139 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 	 * @var int
 	 */
 	public $fileSizeGreaterThan = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $lastWorkerRemoteEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $schedulerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $schedulerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $schedulerIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $workerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $workerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $workerIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $batchIndexEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $batchIndexIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $batchIndexNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $lastSchedulerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastSchedulerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastSchedulerIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $lastWorkerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastWorkerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $lastWorkerIdNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $dcEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dcNotIn = null;
 
 
 }
@@ -6164,6 +6586,14 @@ class KalturaDataEntry extends KalturaBaseEntry
 	 */
 	public $dataContent = null;
 
+	/**
+	 * indicator whether to return the object for get action with the dataContent field.
+	 *
+	 * @var bool
+	 * @insertonly
+	 */
+	public $retrieveDataContentByGet = null;
+
 
 }
 
@@ -6749,6 +7179,156 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * @var string
 	 */
 	public $videoCodecId = null;
+
+
+}
+
+abstract class KalturaAssetBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorAssetStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusNotIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sizeGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sizeLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $deletedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $deletedAtLessThanOrEqual = null;
+
+
+}
+
+class KalturaAssetFilter extends KalturaAssetBaseFilter
+{
+
+}
+
+class KalturaFlavorAssetListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaFlavorAsset
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
 
 
 }
@@ -8670,6 +9250,27 @@ class KalturaThumbAsset extends KalturaAsset
 	 * @readonly
 	 */
 	public $height = null;
+
+
+}
+
+class KalturaThumbAssetListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaThumbAsset
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
 
 
 }
@@ -11303,6 +11904,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 */
 	public $adminLoginUsersQuota = null;
 
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $userSessionRoleId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $adminSessionRoleId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $alwaysAllowedPermissionNames = null;
+
 
 }
 
@@ -11622,67 +12244,6 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
-
-
-}
-
-class KalturaInternalToolsSession extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partner_id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $valid_until = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partner_pattern = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSessionType
-	 */
-	public $type = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $error = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $rand = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $user = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $privileges = null;
 
 
 }
@@ -12352,6 +12913,67 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+class KalturaInternalToolsSession extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partner_id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $valid_until = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partner_pattern = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaSessionType
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $error = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rand = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $user = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $privileges = null;
 
 
 }
@@ -13094,6 +13716,201 @@ class KalturaGenericDistributionProviderActionListResponse extends KalturaObject
 
 }
 
+abstract class KalturaAnnotationBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdIn = null;
+
+
+}
+
+class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
+{
+
+}
+
+class KalturaAnnotation extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $text = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $startTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $endTime = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $userId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerData = null;
+
+
+}
+
+class KalturaAnnotationListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaAnnotation
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
 class KalturaSearchCondition extends KalturaSearchItem
 {
 	/**
@@ -13325,6 +14142,16 @@ class KalturaAssetParamsOutputFilter extends KalturaAssetParamsOutputBaseFilter
 
 }
 
+abstract class KalturaFlavorAssetBaseFilter extends KalturaAssetFilter
+{
+
+}
+
+class KalturaFlavorAssetFilter extends KalturaFlavorAssetBaseFilter
+{
+
+}
+
 abstract class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 
@@ -13341,6 +14168,16 @@ abstract class KalturaMediaFlavorParamsOutputBaseFilter extends KalturaFlavorPar
 }
 
 class KalturaMediaFlavorParamsOutputFilter extends KalturaMediaFlavorParamsOutputBaseFilter
+{
+
+}
+
+abstract class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
+{
+
+}
+
+class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 {
 
 }

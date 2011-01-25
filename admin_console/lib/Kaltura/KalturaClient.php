@@ -2286,10 +2286,11 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getAdminSession($partnerId)
+	function getAdminSession($partnerId, $userId = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "userId", $userId);
 		$this->client->queueServiceActionCall("systempartner_systempartner", "getAdminSession", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -2442,52 +2443,6 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaTrackEntryListResponse");
-		return $resultObject;
-	}
-}
-
-class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function fromSecureString($str)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "str", $str);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
-		return $resultObject;
-	}
-
-	function iptocountry($remote_addr)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "remote_addr", $remote_addr);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function getRemoteAddress()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
@@ -3674,6 +3629,52 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 	}
 }
 
+class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function fromSecureString($str)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "str", $str);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
+		return $resultObject;
+	}
+
+	function iptocountry($remote_addr)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "remote_addr", $remote_addr);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function getRemoteAddress()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+}
+
 class KalturaDistributionProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -4413,14 +4414,6 @@ class KalturaClient extends KalturaClientBase
 	public $entryAdmin = null;
 
 	/**
-	 * Internal Tools Service
-	 * 
-	 *
-	 * @var KalturaKalturaInternalToolsSystemHelperService
-	 */
-	public $kalturaInternalToolsSystemHelper = null;
-
-	/**
 	 * 
 	 *
 	 * @var KalturaFilesyncImportBatchService
@@ -4433,6 +4426,14 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaVirusScanProfileService
 	 */
 	public $virusScanProfile = null;
+
+	/**
+	 * Internal Tools Service
+	 * 
+	 *
+	 * @var KalturaKalturaInternalToolsSystemHelperService
+	 */
+	public $kalturaInternalToolsSystemHelper = null;
 
 	/**
 	 * Distribution Profile service
@@ -4527,9 +4528,9 @@ class KalturaClient extends KalturaClientBase
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($this);
 		$this->mediaInfo = new KalturaMediaInfoService($this);
 		$this->entryAdmin = new KalturaEntryAdminService($this);
-		$this->kalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService($this);
 		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
 		$this->virusScanProfile = new KalturaVirusScanProfileService($this);
+		$this->kalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService($this);
 		$this->distributionProfile = new KalturaDistributionProfileService($this);
 		$this->entryDistribution = new KalturaEntryDistributionService($this);
 		$this->distributionProvider = new KalturaDistributionProviderService($this);
