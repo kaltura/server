@@ -26,14 +26,11 @@ $template->fields[] = ComcastMediaField::_STATUSDETAIL;
 $template->fields[] = ComcastMediaField::_STATUSMESSAGE;
 
 $query = new ComcastQuery();
-$query->name = 'Media';
-//$query->parameterNames[] = 'byMediaId';
-$query->parameterNames = array('byMediaId');
-//$query->parameterNames = array('byExists');
-//$query->parameterValues = array('1761167136');
-$query->parameterValues = array('1761382272');
-//$query->parameterValues = array('true');
-//$query->and= array();
+$query->name = 'ByIDs';
+$query->parameterNames = array('IDs');
+
+$ids = new soapval('item', 'IDSet', array(1761382272), false, 'ns12');
+$query->parameterValues = array($ids);
 
 $sort = new ComcastMediaSort();
 $sort->field = ComcastMediaField::_ID;
@@ -43,8 +40,15 @@ $range = new ComcastRange();
 //$range->startIndex = 1;
 //$range->endIndex = 10;
 
-$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);
-file_put_contents('err.log', $comcastMediaService->getError());
+try
+{
+	$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);
+}
+catch(Exception $e)
+{
+	echo "Error: " . $e->getMessage();
+	file_put_contents('err.log', $comcastMediaService->getError());
+}
 file_put_contents('request.xml', $comcastMediaService->request);
 file_put_contents('response.xml', $comcastMediaService->responseData);
 
