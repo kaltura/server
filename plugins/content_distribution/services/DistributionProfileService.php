@@ -3,6 +3,8 @@
  * Distribution Profile service
  *
  * @service distributionProfile
+ * @package plugins.contentDistribution
+ * @subpackage api.services
  */
 class DistributionProfileService extends KalturaBaseService
 {

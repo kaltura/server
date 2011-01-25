@@ -3,6 +3,8 @@
  * Distribution Provider service
  *
  * @service distributionProvider
+ * @package plugins.contentDistribution
+ * @subpackage api.services
  */
 class DistributionProviderService extends KalturaBaseService
 {

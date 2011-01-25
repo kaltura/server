@@ -3,6 +3,8 @@
  * Entry Distribution service
  *
  * @service entryDistribution
+ * @package plugins.contentDistribution
+ * @subpackage api.services
  */
 class EntryDistributionService extends KalturaBaseService
 {

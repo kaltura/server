@@ -3,6 +3,8 @@
  * Generic Distribution Provider Actions service
  *
  * @service genericDistributionProviderAction
+ * @package plugins.contentDistribution
+ * @subpackage api.services
  */
 class GenericDistributionProviderActionService extends KalturaBaseService
 {

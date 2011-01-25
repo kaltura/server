@@ -1,8 +1,8 @@
 <?php
 /**
  * @service contentDistributionBatch
- * @package api
- * @subpackage services
+ * @package plugins.contentDistribution
+ * @subpackage api.services
  */
 class ContentDistributionBatchService extends BatchService 
 {
