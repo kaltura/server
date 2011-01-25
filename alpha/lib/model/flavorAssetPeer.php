@@ -79,6 +79,31 @@ class flavorAssetPeer extends assetPeer
 	}
 	
 	/**
+	 * Retrieve a single object by id.
+	 *
+	 * @param      int $id the id.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     thumbAsset
+	 */
+	public static function retrieveById($id, $con = null)
+	{
+		self::getInstance();
+		return parent::retrieveById($id, $con);
+	}
+	
+	/**
+	 * Retrieve by IDs instead of INT_ID
+	 * @param $ids
+	 * @param $con
+	 * @return array<flavorAsset>
+	 */
+	public static function retrieveByIds($ids, $con = null)
+	{
+		self::getInstance();
+		return parent::retrieveByIds($ids, $con);
+	}
+	
+	/**
 	 * 
 	 * @return flavorAsset
 	 */

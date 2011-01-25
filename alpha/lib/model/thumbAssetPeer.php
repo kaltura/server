@@ -105,6 +105,18 @@ class thumbAssetPeer extends assetPeer
 	}
 	
 	/**
+	 * Retrieve by IDs instead of INT_ID
+	 * @param $ids
+	 * @param $con
+	 * @return array<flavorAsset>
+	 */
+	public static function retrieveByIds($ids, $con = null)
+	{
+		self::getInstance();
+		return parent::retrieveByIds($ids, $con);
+	}
+	
+	/**
 	 * 
 	 * @return thumbAsset
 	 */
