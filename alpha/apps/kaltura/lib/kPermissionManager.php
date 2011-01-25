@@ -250,7 +250,7 @@ class kPermissionManager
 			$alwaysAllowed = explode(',', $alwaysAllowed);
 		}
 		else {
-			$alwaysAllowed = PermissionName::ALWAYS_ALLOWED_ACTIONS;
+			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);
 		}
 		$permissionNames = array_merge($permissionNames, $alwaysAllowed);
 				
