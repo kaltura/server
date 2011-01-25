@@ -71,6 +71,16 @@ class KalturaTypeReflector
 	private $_deprecated = false;
 	
 	/**
+	 * @var string
+	 */
+	private $_package;
+	
+	/**
+	 * @var string
+	 */
+	private $_subpackage;
+	
+	/**
 	 * @var bool
 	 */
 	private $_abstract = false;
@@ -102,6 +112,8 @@ class KalturaTypeReflector
 	    	$this->_comments = $comments;
 	    	$commentsParser = new KalturaDocCommentParser($comments);
 	    	$this->_deprecated = $commentsParser->deprecated;
+	    	$this->_package = $commentsParser->package;
+	    	$this->_subpackage = $commentsParser->subpackage;
 	    	$this->_abstract = $commentsParser->abstract;
 	    	if (!is_null($commentsParser->permissions)) {
 	    		$this->_permissions = explode(',',$commentsParser->permissions);
@@ -544,6 +556,22 @@ class KalturaTypeReflector
 		return $reflectionClass->implementsInterface("IFilterable");
 	}
 	
+	/**
+	 * @return string package
+	 */
+	public function getPackage()
+	{
+		return $this->_package;
+	}
+
+	/**
+	 * @return string subpackage
+	 */
+	public function getSubpackage()
+	{
+		return $this->_subpackage;
+	}
+
 	public function getInstance()
 	{
 		return $this->_instance;

@@ -70,6 +70,11 @@ class KalturaServiceReflector
 		return $this->_serviceId;
 	}
 	
+	public function getPackage()
+	{
+		return $this->_docCommentParser->package;
+	}
+	
 	public function isDeprecated()
 	{
 		return $this->_docCommentParser->deprecated;
