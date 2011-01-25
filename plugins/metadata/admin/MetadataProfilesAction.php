@@ -36,7 +36,7 @@ class MetadataProfilesAction extends KalturaAdminConsolePlugin
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
 		/*
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("metadataProfile", "listAction", $partnerFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("metadataProfile", "listAction", null, $partnerFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);

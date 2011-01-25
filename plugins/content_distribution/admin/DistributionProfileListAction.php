@@ -59,7 +59,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("distributionProfile", "listByPartner", $partnerFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("distributionProfile", "listByPartner", null, $partnerFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);

@@ -33,7 +33,7 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 		$genericProviderFilter = new KalturaGenericDistributionProviderFilter();
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("genericDistributionProvider", "listAction", $genericProviderFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("genericDistributionProvider", "listAction", null, $genericProviderFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
