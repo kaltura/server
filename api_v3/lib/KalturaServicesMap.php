@@ -84,6 +84,9 @@ class KalturaServicesMap
 		$cachedFile = '';
 		$cachedFile .= ('<?php' . PHP_EOL);
 		$cachedFile .= ('self::$services = ' . var_export($serviceMap, true) . ';' . PHP_EOL);
+		if (!is_dir(dirname($cacheFilePath))) {
+			mkdir(dirname($cacheFilePath), 0777);
+		}
 		file_put_contents($cacheFilePath, $cachedFile);
 	}
 }
