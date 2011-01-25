@@ -89,7 +89,7 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::ADMIN_ROLE_DELETE, 'Delete roles', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ADMIN_PUBLISHER_MANAGE, 'Manage publishers', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ADMIN_WHITE_BRANDING, 'Manage whitebranding', null),
-	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_BASE, 'Analytics access', null),
+	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_BASE, 'Analytics access', PermissionName::FEATURE_ANALYTICS_TAB),
 	array (0, PermissionType::API_ACCESS,PermissionName::WIDGET_ADMIN, 'Widget admin', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_SEND_DATA, 'Send analytics data', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::SYSTEM_BASE_ACTIONS, 'Basic system actions', null),
