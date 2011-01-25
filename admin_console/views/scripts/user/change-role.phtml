@@ -1,5 +1,2 @@
-
-<p><?php echo $this->translate('user change role'); ?></p>
-	<?php
-		echo $this->changeRoleForm;
-	?>
+<?php $this->form->setAction($this->url(array('controller' => 'user', 'action' => 'change-role'))); ?>
+<?php echo $this->form; ?>

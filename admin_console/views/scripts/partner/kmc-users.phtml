@@ -1,0 +1,49 @@
+<p><b><?php echo 'Publisher ID: '.$this->partnerId; ?></b></p>
+<p><?php echo $this->translate('partner-kmc-users intro text'); ?></p>
+<div id="list_kmc_users_panel" class="panel">
+	<table>
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('User ID'); ?></th>
+				<th><?php echo $this->translate('User Name'); ?></th>
+				<th><?php echo $this->translate('Email Address'); ?></th>
+				<th><?php echo $this->translate('Role'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="5">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $user): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $user->id; ?></td>
+				<td><?php echo $user->fullName; ?></td>
+				<td><?php echo $user->email; ?></td>
+				<td>
+					<?php
+						echo $user->roleNames;
+						if ($user->isAccountOwner) {
+							echo ' (Account owner)';
+						}					
+					?>
+				
+				</td>
+				<td><button type="button" onclick="kmcLogin(<?php echo $user->partnerId; ?>,'<?php echo $user->id; ?>')">Login</button></td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+
+function kmcLogin(partnerId, userId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-redirect', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
+	window.open(url);
+}
+
+</script>

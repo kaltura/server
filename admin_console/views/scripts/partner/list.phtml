@@ -38,6 +38,7 @@
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
+						<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
 							<?php if (Kaltura_AclHelper::getCurrentRole() == Kaltura_AclHelper::ROLE_ADMINISTRATOR): ?>
 								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
@@ -86,6 +87,40 @@ function doAction(action, partnerId) {
 		f.apply(this, arguments);
 	}
 	jQuery('select.options').val('');
+}
+
+function kmcUsers(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-users', 'partner_id' => '')); ?>' + partnerId;
+	
+	jQuery('#partner-kmc-users-dialog').remove();
+	var dialogDiv = jQuery('<div id="partner-kmc-users-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 1133,
+		height: 500,
+		title: "<?php echo $this->translate('Publisher\'s Users list'); ?>",
+		buttons: {
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery('#frmPaginator1').submit();
+		}	
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(function() { 
+				dialogDiv.dialog('close');
+			}); 
+		}
+	);
 }
 
 function manage(partnerId) {

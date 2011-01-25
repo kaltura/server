@@ -51,7 +51,7 @@ class BatchController extends Zend_Controller_Action
 		$filter = new Kaltura_BatchJobFilter();
 		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", $filter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage(20);
@@ -209,7 +209,7 @@ class BatchController extends Zend_Controller_Action
 		
 		$inProgressFilter = clone $filter;
 		$inProgressFilter->statusIn = implode(',', $inProgressStatuses);
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", $inProgressFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $inProgressFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request, 'inProgressPage');
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
@@ -218,7 +218,7 @@ class BatchController extends Zend_Controller_Action
 		
 		$inQueueFilter = clone $filter;
 		$inQueueFilter->statusIn = implode(',', $inQueueStatuses);
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", $inQueueFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $inQueueFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request, 'inQueuePage');
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
@@ -405,7 +405,7 @@ class BatchController extends Zend_Controller_Action
 		if(!$filter->hasJobTypeFilter())
 			$filter->jobTypeIn = implode(',', $defaultJobTypes);
 		
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", $filter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));

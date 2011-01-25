@@ -80,7 +80,7 @@ class PartnerController extends Zend_Controller_Action
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "listAction", $partnerFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "listAction", null, $partnerFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -92,7 +92,7 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->form = $form;
 		$this->view->paginator = $paginator;
 	}
-	
+		
 	public function updateStorageStatusAction()
 	{
 		$this->_helper->viewRenderer->setNoRender();
@@ -116,8 +116,9 @@ class PartnerController extends Zend_Controller_Action
 	public function kmcRedirectAction()
 	{
 		$partnerId = $this->_getParam('partner_id');
+		$userId = $this->_getParam('user_id');
 		$client = Kaltura_ClientHelper::getClient();
-		$ks = $client->systemPartner->getAdminSession($partnerId);
+		$ks = $client->systemPartner->getAdminSession($partnerId, $userId);
 		$subp_id = ((int)$partnerId)*100;
 		
 		$url = null;
@@ -326,7 +327,7 @@ class PartnerController extends Zend_Controller_Action
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("storageProfile", "listByPartner", $partnerFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("storageProfile", "listByPartner", null, $partnerFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -337,6 +338,31 @@ class PartnerController extends Zend_Controller_Action
 		// set view
 		$this->view->form = $form;
 		$this->view->newForm = $newForm;
+		$this->view->paginator = $paginator;
+	}
+	
+	
+	public function kmcUsersAction()
+	{
+		$this->_helper->layout->disableLayout();
+
+		$partnerId = $this->_getParam('partner_id');
+		if (!$partnerId) {
+			//TODO: error
+		}
+		
+		$page = $this->_getParam('page', 1);
+		$pageSize = $this->_getParam('pageSize', 10);
+		
+		$filter = new KalturaUserFilter();
+		$filter->isAdminEqual = true;
+		$filter->partnerIdEqual = $partnerId;
+		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", $partnerId, $filter);
+		$paginator = new Kaltura_Paginator($paginatorAdapter);
+		$paginator->setCurrentPageNumber($page);
+		$paginator->setItemCountPerPage($pageSize);
+		
+		$this->view->partnerId = $partnerId;
 		$this->view->paginator = $paginator;
 	}
 }

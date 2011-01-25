@@ -12,6 +12,11 @@ class Kaltura_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	protected $action;
 	
 	/**
+	 * @var int
+	 */
+	protected $impersonatedPartnerId;
+	
+	/**
 	 * @var array
 	 */
 	protected $args;
@@ -26,11 +31,12 @@ class Kaltura_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	 *
 	 * @param Zend_Db_Select $select The select query
 	 */
-	public function __construct($service, $action/* $args*/)
+	public function __construct($service, $action, $impersonatedPartnerId/* $args*/)
 	{
 		$this->service = $service;
 		$this->action = $action;
-		$this->args = array_slice(func_get_args(), 2);
+		$this->impersonatedPartnerId = $impersonatedPartnerId;
+		$this->args = array_slice(func_get_args(), 3);
 	}
 
 	/**
@@ -65,6 +71,9 @@ class Kaltura_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	protected function callService($offset, $itemCountPerPage)
 	{
 		$client = Kaltura_ClientHelper::getClient();
+		if ($this->impersonatedPartnerId) {
+			Kaltura_ClientHelper::impersonate($this->impersonatedPartnerId);
+		}
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = (int)($offset / $itemCountPerPage) + 1;
 		$pager->pageSize = $itemCountPerPage;

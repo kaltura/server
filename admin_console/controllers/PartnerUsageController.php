@@ -28,7 +28,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "getUsage", $partnerFilter, $usageFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "getUsage", null, $partnerFilter, $usageFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);

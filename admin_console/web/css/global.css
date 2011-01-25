@@ -415,3 +415,12 @@ body#index-testme #wrapper { display:block;}
 body#index-testme-doc #wrapper { display:block;}
 
 table table td.commandLines { width }
+
+
+#change-user-role-dialog input, 
+#change-user-role-dialog select { width: 160px}
+
+#change-user-role-dialog input { border:none; background:#fff; }
+
+#list_kmc_users_panel button { position: static; }
+#list_kmc_users_panel table { width: auto; min-width: 0px; }

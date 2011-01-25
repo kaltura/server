@@ -29,15 +29,14 @@
 					<?php echo $user->firstName; ?> <?php echo $user->lastName; ?>
 					<?php $titles = array(); ?>
 					<?php if ($user->email == $this->myEmail) { $titles[] = $this->translate('you'); }; ?>
-					<?php $partnerData = unserialize($user->partnerData); ?>
-					<?php if ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary) { $titles[] = $this->translate('primary'); }; ?>
+					<?php if ($user->isAccountOwner) { $titles[] = $this->translate('primary'); }; ?>
 					<?php if (count($titles)): ?>
 						(<?php echo implode($titles, ', '); ?>)
 					<?php endif; ?>
 				</td>
 				<td><?php echo $user->roleNames.' ('.$user->roleIds.')'; ?></td>
 				<td>
-					<?php $disabled = (($user->email == $this->myEmail) || ($partnerData && isset($partnerData->isPrimary) && $partnerData->isPrimary)) ? ' disabled="disabled"' : ''; ?>
+					<?php $disabled = (($user->email == $this->myEmail) || ($user->isAccountOwner)) ? ' disabled="disabled"' : ''; ?>
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->id; ?>') "<?php echo $disabled; ?>>
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if ($user->email != $this->myEmail): ?>
@@ -83,7 +82,40 @@ function unblock(userId) {
 
 function changeRole(userId) {
 	var url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'change-role', 'userId' => ''), null, true); ?>' + userId;
-	document.location = url;
+	//document.location = url;
+
+	jQuery('#change-user-role-dialog').remove();
+	var dialogDiv = jQuery('<div id="change-user-role-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 500,
+		height: 300,
+		title: '<?php echo $this->translate('Change Role'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('form').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery('#frmPaginator1').submit();
+		}	
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(function() { 
+				dialogDiv.dialog('close');
+			}); 
+		}
+	);
 }
 
 function changeStatus(userId, status) {

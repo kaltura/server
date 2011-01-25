@@ -7,14 +7,17 @@ class Form_ChangeUserRole extends Zend_Form
 		$this->setMethod('post');
 		$this->setAttrib('class', 'form');
 		
+		$this->setDescription('user change role');
+		$this->loadDefaultDecorators();
+		$this->addDecorator('Description', array('placement' => 'prepend'));
+		
+		
 		// Add a name element
 		$this->addElement('text', 'name', array(
 			'label'			=> 'User Name:',
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
-			'helper' 		=> 'formNote',
 		));
 		
 		// Add an email address element
@@ -23,8 +26,6 @@ class Form_ChangeUserRole extends Zend_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
-			'helper' 		=> 'formNote',
 		));
 		
 		// Add a current role element
@@ -33,8 +34,6 @@ class Form_ChangeUserRole extends Zend_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
-			'helper' 		=> 'formNote',
 		));
 		
 		// Add a new role element
@@ -56,21 +55,6 @@ class Form_ChangeUserRole extends Zend_Form
 				$element->addMultiOption($role->id, $role->name);
 			}
 		}
-		
-		// Add the submit button
-		$this->addElement('button', 'submit', array(
-			'type' => 'submit',
-			'ignore'	=> true,
-			'label'		=> 'Save',
-			'decorators' => array('ViewHelper')
-		));
-				
-		$this->setDecorators(array(
-			'FormElements',
-			array('HtmlTag', array('tag' => 'dl')),
-			array('Description', array('placement' => 'prepend')),
-			'Fieldset',
-			'Form',
-		));
+	
 	}
 }

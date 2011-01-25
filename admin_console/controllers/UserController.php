@@ -7,7 +7,7 @@ class UserController extends Zend_Controller_Action
 		$pageSize = $this->_getParam('pageSize', 10);
 		
 		$filter = new KalturaUserFilter();
-		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", $filter);
+		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", null, $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
@@ -177,22 +177,23 @@ class UserController extends Zend_Controller_Action
 	
 	public function changeRoleAction()
 	{
+		$this->_helper->layout->disableLayout();
 		$request = $this->getRequest();
 		$userId = $this->_getParam('userId');
 		
 		$client = Kaltura_ClientHelper::getClient();
 		$user = $client->user->get($userId);
 		
-		$changeRoleForm = new Form_ChangeUserRole();
-		$changeRoleForm->getElement('name')->setValue($user->fullName);
-		$changeRoleForm->getElement('email')->setValue($user->email);
-		$changeRoleForm->getElement('currentRole')->setValue($user->roleNames);
+		$form = new Form_ChangeUserRole();
+		$form->getElement('name')->setValue($user->fullName);
+		$form->getElement('email')->setValue($user->email);
+		$form->getElement('currentRole')->setValue($user->roleNames);
 				
 		if ($request->isPost())
 		{
-			$this->proccessChangeRoleForm($changeRoleForm);
+			$this->proccessChangeRoleForm($form);
 		}
-		$this->view->changeRoleForm = $changeRoleForm;
+		$this->view->form = $form;
 		
 	}
 	

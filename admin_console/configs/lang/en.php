@@ -801,6 +801,10 @@ return array(
 	'partner-create form adult' => 'Includes adult content?',
 	'partner-create form create' => 'Create',
 
+	// partner-kmc-users
+	'partner-kmc-users intro text' => 'From here you can log into the KMC as a specific user of this publisher account.',
+	'Publisher\'s Users list' => 'Publisher\'s Users list',
+
 	'Account Specific Setup Configuration' => 'Publisher Specific Configuration',
 
 	'batch in-progress more-info tooltip' => 'See more information about this task.',
