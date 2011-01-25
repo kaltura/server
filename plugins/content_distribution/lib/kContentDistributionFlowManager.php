@@ -131,7 +131,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onDistributionSubmitJobUpdated(BatchJob $dbBatchJob, kDistributionSubmitJobData $data, BatchJob $twinJob = null)
 	{
-		if($data->getResults() && $data->getSentData())
+		if($data->getRemoteId() || ($data->getResults() && $data->getSentData()))
 		{
 			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 			if(!$entryDistribution)
@@ -145,6 +145,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($data->getSentData())
 				$entryDistribution->incrementSubmitDataVersion();
+				
+			if($data->getRemoteId())
+				$entryDistribution->setRemoteId($data->getRemoteId());
 				
 			$entryDistribution->save();
 			
@@ -380,8 +383,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setErrorType(null);
 		$entryDistribution->setErrorNumber(null);
 		$entryDistribution->setErrorDescription(null);
-		
-		$entryDistribution->setRemoteId($data->getRemoteId());
 		$entryDistribution->setSubmittedAt(time());
 		$entryDistribution->setStatus(EntryDistributionStatus::READY);
 		$entryDistribution->setDirtyStatus(null);
@@ -894,6 +895,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
 			return true;
 			
+		$entry = $asset->getentry();
+		if(!$entry)
+			return true;
+			
 		KalturaLog::debug("Asset [" . $asset->getId() . "] of entry [" . $asset->getEntryId() . "] ready");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
@@ -906,6 +911,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if(!$distributionProfile)
 				continue;
 				
+			kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+			kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+			
 			$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 			$entryDistribution->setValidationErrorsArray($validationErrors);
 			$entryDistribution->save();
