@@ -99,13 +99,13 @@ class KalturaFilter extends KalturaObject
 			if($propertyInfo->isDynamicEnum())
 			{
 				$propertyType = $propertyInfo->getType();
-				$enumType = call_user_func("$propertyType::getEnumClass");
+				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
 			elseif($propertyInfo->getDynamicType())
 			{
 				$propertyType = $propertyInfo->getDynamicType();
-				$enumType = call_user_func("$propertyType::getEnumClass");
+				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				
 				$values = explode(',', $value);
 				$finalValues = array();
@@ -149,13 +149,13 @@ class KalturaFilter extends KalturaObject
                 if($property->isDynamicEnum())
                 {
 					$propertyType = $property->getType();
-					$enumType = call_user_func("$propertyType::getEnumClass");
+					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
                 	$value = kPluginableEnumsManager::coreToApi($enumType, $value);
                 }
                 elseif($property->getDynamicType())
                 {
 					$propertyType = $property->getDynamicType();
-					$enumType = call_user_func("$propertyType::getEnumClass");
+					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
                 	$values = explode(',', $value);
                 	$finalValues = array();
                 	foreach($values as $val)
