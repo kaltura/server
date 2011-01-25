@@ -63,7 +63,15 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		    $description = $this->fixDescription($description);
 		    
 			$serviceElement->setAttribute("description", $description);
-			
+		
+			$package = $serviceReflector->getPackage();
+			if(is_string($package))
+			{
+				$packages = explode('.', $package, 2);
+				if(count($packages) == 2 && $packages[0] == 'plugins')
+					$serviceElement->setAttribute("plugin", $packages[1]);
+			}
+		
 			$actions = $serviceReflector->getActions();
 			$actions = array_keys($actions);
 			foreach($actions as $action)
@@ -99,12 +107,20 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	private function getEnumElement(KalturaTypeReflector $typeReflector)
 	{
 	    $enumElement = $this->_doc->createElement("enum");
-	    $enumElement->setAttribute("name", $typeReflector->getType()); 
+	    $enumElement->setAttribute("name", $typeReflector->getType());
     	if ($typeReflector->isEnum())
 			$enumElement->setAttribute("enumType", "int");
 		else if ($typeReflector->isStringEnum())
 			$enumElement->setAttribute("enumType", "string");
 			
+		$package = $typeReflector->getPackage();
+		if(is_string($package))
+		{
+			$packages = explode('.', $package, 2);
+			if(count($packages) == 2 && $packages[0] == 'plugins')
+				$enumElement->setAttribute("plugin", $packages[1]);
+		}
+		
 		$contants = $typeReflector->getConstants();
 		foreach($contants as $contant)
 		{
@@ -140,6 +156,14 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
             $classElement->setAttribute("base", $parentType);    		        
 	    }
 	    
+		$package = $typeReflector->getPackage();
+		if(is_string($package))
+		{
+			$packages = explode('.', $package, 2);
+			if(count($packages) == 2 && $packages[0] == 'plugins')
+				$classElement->setAttribute("plugin", $packages[1]);
+		}
+		
 	    $properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
 		{
