@@ -297,20 +297,22 @@ HTML;
 		$this->pageTitle = 'Changes were saved!'; 
 		$this->showHead();
 		
+		// When changing password we only closing the modal
+		// Otherwise clode the modal & reload the page
 		if($this->curAction == 'password') {
-			$buttonScript = 'parent.kmc.utils.closeModal();';
-			$headScript = '';
+			$msg = "close";
 		} else {
-			//$buttonScript = 'parent.window.location.reload(); parent.kmc.utils.closeModal();';
-			//$headScript = "<script>parent.$('#close').unbind('click'); parent.$('#close').click(function () { parent.window.location.reload(); parent.kmc.utils.closeModal(); return false; });</script>";			
+			$msg = "reload";			
 		}
 	
+		// We're using postMessage to pass data to the parent document
 		echo <<<HTML
-		{$headScript}
-		<br /><br /><br /><div class="center">Changes were saved successfully!<br /><br />
-		<input type="button" value=" Close " onclick="{$buttonScript}" /></div><br />
+<script type="text/javascript" src="/lib/js/postmessage.js"></script>
+<script type="text/javascript">
+var parent_url = decodeURIComponent(document.location.hash.replace(/^#/, ''));
+XD.postMessage("{$msg}", parent_url, parent);
+</script>
 HTML;
-			
 		$this->showFoot();
 	}	
 	
