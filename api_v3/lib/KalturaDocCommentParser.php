@@ -21,8 +21,8 @@ class KalturaDocCommentParser
     const DOCCOMMENT_ACTION = "/\\@action\\s?(\\w*)/";
     const DOCCOMMENT_ACTION_ERRORS = "/\\@throws (.*)::(.*)/";
     
-    const DOCCOMMENT_PACKAGE = "/\\@package (\\w*)/";
-    const DOCCOMMENT_SUBPACKAGE = "/\\@subpackage (\\w*)/";
+    const DOCCOMMENT_PACKAGE = "/\\@package ([.\\w]*)/";
+    const DOCCOMMENT_SUBPACKAGE = "/\\@subpackage ([.\\w]*)/";
     
     const DOCCOMMENT_CLIENT_GENERATOR = "/\\@clientgenerator (\\w*)/";
     
