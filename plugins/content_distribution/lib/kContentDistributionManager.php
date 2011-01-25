@@ -312,38 +312,55 @@ class kContentDistributionManager
 		return null;
 	}
 	
-	/**
-	 * @param entry $entry
-	 * @param DistributionProfile $distributionProfile
-	 * @return EntryDistribution
-	 */
-	public static function createEntryDistribution(entry $entry, DistributionProfile $distributionProfile)
+	public static function assignFlavorAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
 	{
-		$entryDistribution = new EntryDistribution();
-		$entryDistribution->setEntryId($entry->getId());
-		$entryDistribution->setPartnerId($entry->getPartnerId());
-		$entryDistribution->setDistributionProfileId($distributionProfile->getId());
-		$entryDistribution->setStatus(EntryDistributionStatus::PENDING);
-		
-		// TODO - take defaults from the distribution profile
-		$entryDistribution->setSunrise($entry->getStartDate(null));
-		$entryDistribution->setSunset($entry->getEndDate(null));
-		
 		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
 		$optionalFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
 		$flavorParamsIds = array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds);
-		if(is_array($flavorParamsIds))
+		$flavorAssetIds = array();
+		if(!is_array($flavorParamsIds))
+			return;
+			
+		$assignedFlavorAssetIds = $entryDistribution->getFlavorAssetIds();
+		if($assignedFlavorAssetIds)
 		{
-			$flavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
-			$entryDistribution->setFlavorAssetIds($flavorAssetIds);
+			$flavorAssetIds = explode(',', $assignedFlavorAssetIds);
+			$assignedFlavorAssets = flavorAssetPeer::retrieveByIds($flavorAssetIds);
+			foreach($assignedFlavorAssets as $assignedFlavorAsset)
+			{					
+				$flavorParamsKey = array_search($assignedFlavorAsset->getFlavorParamsId(), $flavorParamsIds);
+				if($flavorParamsKey !== false)
+					unset($flavorParamsIds[$flavorParamsKey]);
+			}
 		}
-		
+		$newFlavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
+		foreach($newFlavorAssetIds as $newFlavorAssetId)
+			$flavorAssetIds[] = $newFlavorAssetId;
+			
+		$entryDistribution->setFlavorAssetIds($flavorAssetIds);
+	}
+	
+	public static function assignThumbAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
+	{
+		$thumbAssetsIds = array();
 		$thumbDimensions = $distributionProfile->getThumbDimensionsObjects();
 		$thumbDimensionsWithKeys = array();
 		foreach($thumbDimensions as $thumbDimension)
 			$thumbDimensionsWithKeys[$thumbDimension->getKey()] = $thumbDimension;
 		
-		$thumbAssetsIds = array();
+		$assignedThumbAssetIds = $entryDistribution->getThumbAssetIds();
+		if($assignedThumbAssetIds)
+		{
+			$thumbAssetsIds = explode(',', $assignedThumbAssetIds);
+			$assignedThumbAssets = thumbAssetPeer::retrieveByIds($thumbAssetsIds);
+			foreach($assignedThumbAssets as $assignedThumbAsset)
+			{					
+				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
+				if(isset($thumbDimensionsWithKeys[$key]))
+					unset($thumbDimensionsWithKeys[$key]);
+			}
+		}
+		
 		$requiredThumbParamsIds = $distributionProfile->getAutoCreateThumbArray();
 		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
 		foreach($thumbAssets as $thumbAsset)
@@ -364,6 +381,27 @@ class kContentDistributionManager
 			}
 		}
 		$entryDistribution->setThumbAssetIds($thumbAssetsIds);
+	}
+	
+	/**
+	 * @param entry $entry
+	 * @param DistributionProfile $distributionProfile
+	 * @return EntryDistribution
+	 */
+	public static function createEntryDistribution(entry $entry, DistributionProfile $distributionProfile)
+	{
+		$entryDistribution = new EntryDistribution();
+		$entryDistribution->setEntryId($entry->getId());
+		$entryDistribution->setPartnerId($entry->getPartnerId());
+		$entryDistribution->setDistributionProfileId($distributionProfile->getId());
+		$entryDistribution->setStatus(EntryDistributionStatus::PENDING);
+		
+		// TODO - take defaults from the distribution profile
+		$entryDistribution->setSunrise($entry->getStartDate(null));
+		$entryDistribution->setSunset($entry->getEndDate(null));
+		
+		self::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+		self::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
 		
 		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 		$entryDistribution->setValidationErrorsArray($validationErrors);
