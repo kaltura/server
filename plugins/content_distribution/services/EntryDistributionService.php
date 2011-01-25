@@ -99,6 +99,13 @@ class EntryDistributionService extends KalturaBaseService
 		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
 		
+		$dbEntry = entryPeer::retrieveByPK($dbEntryDistribution->getEntryId());
+		if($dbEntry)
+		{
+			kContentDistributionManager::assignFlavorAssets($dbEntryDistribution, $dbEntry, $dbDistributionProfile);
+			kContentDistributionManager::assignThumbAssets($dbEntryDistribution, $dbEntry, $dbDistributionProfile);
+		}
+		
 		$validationErrors = $dbDistributionProfile->validateForSubmission($dbEntryDistribution, DistributionAction::SUBMIT);
 		$dbEntryDistribution->setValidationErrorsArray($validationErrors);
 		$dbEntryDistribution->save();
