@@ -403,7 +403,7 @@ class kuserPeer extends BasekuserPeer
 	{
 		$partnerId = $user->getPartnerId();
 		$creatorUserName = 'Unknown';
-	if (!is_null(kCurrentContext::$ks_uid))
+		if (!is_null(kCurrentContext::$ks_uid))
 		{
 			$creatorUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid);
 			if ($creatorUser) {
