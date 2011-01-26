@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.annotation
+ * @subpackage api.filters.enum
  */
 class KalturaAnnotationOrderBy extends KalturaStringEnum
 {

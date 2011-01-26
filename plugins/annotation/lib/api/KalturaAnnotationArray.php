@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.annotation
+ * @subpackage api.objects
+ */
 class KalturaAnnotationArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

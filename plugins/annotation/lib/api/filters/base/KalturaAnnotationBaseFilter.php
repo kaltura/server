@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters.base
+ * @package plugins.annotation
+ * @subpackage api.filters.base
  * @abstract
  */
 class KalturaAnnotationBaseFilter extends KalturaFilter
@@ -41,7 +41,7 @@ class KalturaAnnotationBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
 	public $idEqual;
 

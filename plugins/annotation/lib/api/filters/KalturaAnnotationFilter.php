@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.annotation
+ * @subpackage api.filters
  */
 class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 {
