@@ -1390,6 +1390,19 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaFlavorAssetListResponse");
 		return $resultObject;
 	}
+
+	function getDownloadUrl($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("flavorasset", "getDownloadUrl", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
 }
 
 class KalturaJobsService extends KalturaServiceBase
