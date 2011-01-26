@@ -2485,6 +2485,22 @@ class KalturaMetadataService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
+	function listAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("metadata_metadata", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMetadataListResponse");
+		return $resultObject;
+	}
+
 	function invalidate($id)
 	{
 		$kparams = array();
