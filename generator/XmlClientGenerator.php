@@ -97,11 +97,41 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$servicesElement->appendChild($serviceElement);
 		}
 		
+	    $pluginsElement = $this->_doc->createElement("plugins");
+	    $this->appendPlugins($pluginsElement);
+		
 		$this->_xmlElement->appendChild($enumsElement);
 		$this->_xmlElement->appendChild($classesElement);
 		$this->_xmlElement->appendChild($servicesElement);
-		
+		$this->_xmlElement->appendChild($pluginsElement);
+	    
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
+	}
+	
+	private function appendPlugins(DOMElement $pluginsElement)
+	{
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
+		foreach($pluginInstances as $pluginInstance)
+	    	$this->appendPlugin($pluginsElement, $pluginInstance);
+	}
+	
+	private function appendPlugin(DOMElement $pluginsElement, IKalturaPlugin $pluginInstance)
+	{
+    	$pluginElement = $this->_doc->createElement("plugin");
+    	$pluginElement->setAttribute('name', $pluginInstance->getPluginName());
+    	$this->appendPluginServices($pluginElement, $pluginInstance);
+    	$pluginsElement->appendChild($pluginElement);
+	}
+	
+	private function appendPluginServices(DOMElement &$pluginElement, IKalturaServices $pluginInstance)
+	{
+    	$servicesMap = $pluginInstance->getServicesMap();
+    	foreach($servicesMap as $service => $serviceClass)
+    	{
+    		$pluginServiceElement = $this->_doc->createElement("pluginService");
+    		$pluginServiceElement->setAttribute('name', $service);
+    		$pluginElement->appendChild($pluginServiceElement);
+    	}
 	}
 	
 	private function getEnumElement(KalturaTypeReflector $typeReflector)
