@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.contentDistribution
+ * @subpackage api.filters.enum
  */
 class KalturaGenericDistributionProviderActionOrderBy extends KalturaStringEnum
 {

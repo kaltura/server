@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.contentDistribution
- * @subpackage api.objects
+ * @subpackage api.filters.enum
  */
 class KalturaDistributionProfileOrderBy extends KalturaStringEnum
 {
