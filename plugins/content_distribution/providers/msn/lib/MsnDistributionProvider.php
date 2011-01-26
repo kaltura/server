@@ -201,6 +201,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			KalturaLog::err("No MRSS returned for entry [$entryId]");
 			return null;
 		}
+		KalturaLog::debug("mrss[$mrss]");
 			
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($mrss))
@@ -234,6 +235,7 @@ class MsnDistributionProvider implements IDistributionProvider
 				KalturaLog::debug("Set variable [$name] to [{$providerData->$name}]");
 			}
 		}
+		KalturaLog::debug("xsl[" . $xsl->saveXML() . "]");
 
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
