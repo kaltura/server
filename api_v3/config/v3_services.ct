@@ -40,7 +40,7 @@ user.notifyban						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
 
 user.login							|			|0		|1	|0		|0		|1		|	|		|	|   |
 user.loginbyloginid			        |			|0		|0	|0		|0		|1		|	|		|	|   |
-user.getbyloginid                   |   		|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
+user.getbyloginid                   |   		|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,SYSTEM_ADMIN_BASE
 user.updatelogindata		        |			|0		|0	|0		|0		|1		|	|		|	|   |ADMIN_USER_UPDATE
 user.resetpassword				    |			|0		|0	|0		|0		|1		|	|		|	|   |
 user.setinitialpassword 		    |			|0		|0	|0		|0		|1		|	|		|	|   |
