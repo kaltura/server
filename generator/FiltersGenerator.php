@@ -83,8 +83,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
-		$this->appendLine(" * @package api");
-		$this->appendLine(" * @subpackage filters");
+		$this->appendLine(" * @package " . $type->getPackage());
+		$this->appendLine(" * @subpackage api.filters");
 		$this->appendLine(" */");
 		$this->appendLine("class $filterClassName extends $filterBaseClassName");
 		$this->appendLine("{");
@@ -117,8 +117,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
-		$this->appendLine(" * @package api");
-		$this->appendLine(" * @subpackage filters.base");
+		$this->appendLine(" * @package " . $type->getPackage());
+		$this->appendLine(" * @subpackage api.filters.base");
 		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");
 		$this->appendLine("class $filterClassName extends $partnetClassName");
@@ -290,8 +290,8 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 			
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
-		$this->appendLine(" * @package api");
-		$this->appendLine(" * @subpackage enum");
+		$this->appendLine(" * @package " . $type->getPackage());
+		$this->appendLine(" * @subpackage api.filters.enum");
 		$this->appendLine(" */");
 		$this->appendLine("class $enumName extends $partnetClassName");
 		$this->appendLine("{");
