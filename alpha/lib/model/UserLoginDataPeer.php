@@ -286,14 +286,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			throw new Exception('Hash key not valid');
 		}
 		
-		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
-		if ($partner && $partnerPrefix = $partner->getPassResetUrlPrefix()) {
-			// partner has defined a custom reset password url (admin console for example)
-			return $partnerPrefix.$hashKey;
-		}		
+		$resetLinksArray = kConf::get('password_reset_links');
+		$resetLinkPrefix = $resetLinksArray['default'];		
 		
-		// default password reset url
-		return kConf::get('apphome_url').'/index.php/kmc/kmc/setpasshashkey/'.$hashKey;
+		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
+		if ($partner) {
+			// partner may define a custom reset password url (admin console for example)
+			$urlPrefixName = $partner->getPassResetUrlPrefixName();
+			if ($urlPrefixName && isset($resetLinksArray[$urlPrefixName]))
+			{
+				$resetLinkPrefix = $resetLinksArray[$urlPrefixName];
+			}
+		}	
+		
+		return $resetLinkPrefix.$hashKey;
 	}
 	
 	// user login by user_login_data record id

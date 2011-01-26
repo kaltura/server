@@ -593,14 +593,14 @@ class Partner extends BasePartner
 		return kuserPeer::doCount($c);
 	}
 	
-	public function setPassResetUrlPrefix($prefix)
+	public function setPassResetUrlPrefixName($name)
 	{
-		$this->putInCustomData('pass_reset_url_prefix', $prefix);
+		$this->putInCustomData('pass_reset_url_prefix_name', $name);
 	}
 	
-	public function getPassResetUrlPrefix()
+	public function getPassResetUrlPrefixName()
 	{
-		return $this->getFromCustomData('pass_reset_url_prefix');
+		return $this->getFromCustomData('pass_reset_url_prefix_name');
 	}
 	
 	public function setAdminSessionRoleId($roleId)
