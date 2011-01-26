@@ -7,6 +7,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	protected $kalturaClient = null;
 	
 	/**
+	 * @var int
+	 */
+	protected $partnerId;
+	
+	/**
 	 * @param string $interface
 	 * @param KalturaDistributionProviderType $providerType
 	 * @param KSchedularTaskConfig $taskConfig
@@ -40,26 +45,49 @@ abstract class DistributionEngine implements IDistributionEngine
 	public function setClient(KalturaClient $kalturaClient)
 	{
 		$this->kalturaClient = $kalturaClient;
+		
+		$config = $this->kalturaClient->getConfig();
+		$this->partnerId = $config->partnerId;
+	}
+	
+	public function unimpersonate()
+	{
+		$config = $this->kalturaClient->getConfig();
+		$config->partnerId = $this->partnerId;
+		$this->kalturaClient->setConfig($config);
+	}
+	
+	public function impersonate($partnerId)
+	{
+		$config = $this->kalturaClient->getConfig();
+		$config->partnerId = $partnerId;
+		$this->kalturaClient->setConfig($config);
 	}
 
 	/**
 	 * @param string $entryId
 	 * @return KalturaMediaEntry
 	 */
-	protected function getEntry($entryId)
+	protected function getEntry($partnerId, $entryId)
 	{
-		return $this->kalturaClient->baseEntry->get($entryId);
+		$this->impersonate($partnerId);
+		$entry = $this->kalturaClient->baseEntry->get($entryId);
+		$this->unimpersonate();
+		
+		return $entry;
 	}
 
 	/**
 	 * @param string $flavorAssetIds comma seperated
 	 * @return array<KalturaFlavorAsset>
 	 */
-	protected function getFlavorAssets($flavorAssetIds)
+	protected function getFlavorAssets($partnerId, $flavorAssetIds)
 	{
+		$this->impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $flavorAssetIds;
 		$flavorAssetsList = $this->kalturaClient->flavorAsset->listAction($filter);
+		$this->unimpersonate();
 		return $flavorAssetsList->objects;
 	}
 
@@ -67,11 +95,13 @@ abstract class DistributionEngine implements IDistributionEngine
 	 * @param string $thumbAssetIds comma seperated
 	 * @return array<KalturaThumbAsset>
 	 */
-	protected function getThumbAssets($thumbAssetIds)
+	protected function getThumbAssets($partnerId, $thumbAssetIds)
 	{
+		$this->impersonate($partnerId);
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $thumbAssetIds;
 		$thumbAssetsList = $this->kalturaClient->thumbAsset->listAction($filter);
+		$this->unimpersonate();
 		return $thumbAssetsList->objects;
 	}
 
@@ -130,11 +160,13 @@ abstract class DistributionEngine implements IDistributionEngine
 	 * @param KalturaMetadataObjectType $objectType
 	 * @return array<KalturaMetadata>
 	 */
-	protected function getMetadataObjects($objectId, $objectType = KalturaMetadataObjectType::ENTRY)
+	protected function getMetadataObjects($partnerId, $objectId, $objectType = KalturaMetadataObjectType::ENTRY)
 	{
 		if(!class_exists('KalturaMetadata'))
 			return null;
 			
+		$this->impersonate($partnerId);
+		
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->objectIdEqual = $objectId;
 		$metadataFilter->metadataObjectTypeEqual = $objectType;
@@ -142,6 +174,9 @@ abstract class DistributionEngine implements IDistributionEngine
 		$metadataPager = new KalturaFilterPager();
 		$metadataPager->pageSize = 1;
 		$metadataListResponse = $this->kalturaClient->metadata->listAction($metadataFilter, $metadataPager);
+		
+		$this->unimpersonate();
+		
 		if(!$metadataListResponse->totalCount)
 			throw new Exception("No metadata objects found");
 

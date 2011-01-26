@@ -104,8 +104,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	 */
 	public function getComcastMedia(KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
-		$entry = $this->getEntry($data->entryDistribution->entryId);
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->entryId);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		
 		$media = new ComcastMedia();
 		$media->contentType = ComcastContentType::_VIDEO;
@@ -147,7 +147,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	{	
 		$media = $this->getComcastMedia($data, $distributionProfile);
 	
-		$thumbAssets = $this->getThumbAssets($data->entryDistribution->thumbAssetIds);
+		$thumbAssets = $this->getThumbAssets($data->entryDistribution->partnerId, $data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
 		{
 			foreach($thumbAssets as $thumbAsset)
@@ -162,7 +162,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$mediaFiles = array();
 		
-		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->flavorAssetIds);
+		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->partnerId, $data->entryDistribution->flavorAssetIds);
+		
+		$this->impersonate($data->entryDistribution->partnerId);
 		foreach($flavorAssets as $flavorAsset)
 		{
 			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id);
@@ -179,6 +181,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFile->width = $flavorAsset->height;
 			$mediaFiles[] = $mediaFile;
 		}
+		$this->unimpersonate();
 		
 		$options = new ComcastAddContentOptions();
 		$options->generateThumbnail = false;
