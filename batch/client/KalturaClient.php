@@ -4,6 +4,28 @@ require_once("KalturaEnums.php");
 require_once("KalturaTypes.php");
 
 
+class KalturaBaseEntryService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function get($entryId, $version = -1)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->queueServiceActionCall("baseentry", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+}
+
 class KalturaBatchcontrolService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -1346,6 +1368,30 @@ class KalturaEmailIngestionProfileService extends KalturaServiceBase
 	}
 }
 
+class KalturaFlavorAssetService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("flavorasset", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFlavorAssetListResponse");
+		return $resultObject;
+	}
+}
+
 class KalturaJobsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client)
@@ -2404,6 +2450,30 @@ class KalturaSystemService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$resultObject = (bool) $resultObject;
+		return $resultObject;
+	}
+}
+
+class KalturaThumbAssetService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client)
+	{
+		parent::__construct($client);
+	}
+
+	function listAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("thumbasset", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAssetListResponse");
 		return $resultObject;
 	}
 }
@@ -7101,6 +7171,13 @@ class KalturaClient extends KalturaClientBase
 	protected $apiVersion = '3.1.1';
 
 	/**
+	 * Base Entry Service
+	 *
+	 * @var KalturaBaseEntryService
+	 */
+	public $baseEntry = null;
+
+	/**
 	 * batch service lets you handle different batch process from remote machines.
 	 * As oppesed to other ojects in the system, locking mechanism is critical in this case.
 	 * For this reason the GetExclusiveXX, UpdateExclusiveXX and FreeExclusiveXX actions are important for the system's intergity.
@@ -7132,6 +7209,13 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaEmailIngestionProfileService
 	 */
 	public $EmailIngestionProfile = null;
+
+	/**
+	 * Retrieve information and invoke actions on Flavor Asset
+	 *
+	 * @var KalturaFlavorAssetService
+	 */
+	public $flavorAsset = null;
 
 	/**
 	 * batch service lets you handle different batch process from remote machines.
@@ -7166,6 +7250,13 @@ class KalturaClient extends KalturaClientBase
 	 * @var KalturaSystemService
 	 */
 	public $system = null;
+
+	/**
+	 * Retrieve information and invoke actions on Thumb Asset
+	 *
+	 * @var KalturaThumbAssetService
+	 */
+	public $thumbAsset = null;
 
 	/**
 	 * Metadata service
@@ -7246,13 +7337,16 @@ class KalturaClient extends KalturaClientBase
 			}
 		}
 		
+		$this->baseEntry = new KalturaBaseEntryService($this);
 		$this->batchcontrol = new KalturaBatchcontrolService($this);
 		$this->batch = new KalturaBatchService($this);
 		$this->EmailIngestionProfile = new KalturaEmailIngestionProfileService($this);
+		$this->flavorAsset = new KalturaFlavorAssetService($this);
 		$this->jobs = new KalturaJobsService($this);
 		$this->media = new KalturaMediaService($this);
 		$this->session = new KalturaSessionService($this);
 		$this->system = new KalturaSystemService($this);
+		$this->thumbAsset = new KalturaThumbAssetService($this);
 		$this->metadata = new KalturaMetadataService($this);
 		$this->metadataBatch = new KalturaMetadataBatchService($this);
 		$this->fileSync = new KalturaFileSyncService($this);
