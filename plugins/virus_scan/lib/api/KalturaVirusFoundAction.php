@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage api.objects
+ */
 class KalturaVirusFoundAction extends KalturaEnum
 {
 	/**

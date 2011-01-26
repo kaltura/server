@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.virusScan
+ * @subpackage api.enum
+ */
 class KalturaVirusScanJobResult extends KalturaEnum
 {
 	const SCAN_ERROR        = 1;

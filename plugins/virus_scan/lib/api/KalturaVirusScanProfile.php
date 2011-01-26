@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage api.objects
+ */
 class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 {
 	/**

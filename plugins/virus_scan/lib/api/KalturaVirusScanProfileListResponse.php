@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage api.objects
+ */
 class KalturaVirusScanProfileListResponse extends KalturaObject
 {
 	/**

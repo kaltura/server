@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.virusScan
+ * @subpackage api.filters
  */
 class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
 {

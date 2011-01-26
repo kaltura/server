@@ -1,10 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage objects
- */
-
-/**
+ * @package plugins.virusScan
+ * @subpackage api.objects
  */
 class KalturaVirusScanJobData extends KalturaJobData
 {

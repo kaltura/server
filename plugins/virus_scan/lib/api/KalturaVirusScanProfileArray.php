@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage api.objects
+ */
 class KalturaVirusScanProfileArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
