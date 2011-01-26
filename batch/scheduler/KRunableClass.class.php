@@ -43,11 +43,6 @@ abstract class KRunableClass
 	protected $sessionKey;
 	
 	/**
-	 * @var string
-	 */
-	protected $partnerGroups;
-	
-	/**
 	 * @var int timestamp
 	 */
 	private $start;
@@ -92,8 +87,6 @@ abstract class KRunableClass
 		 
 		KalturaLog::debug("set_time_limit({$this->taskConfig->maximumExecutionTime})");
 		set_time_limit($this->taskConfig->maximumExecutionTime);
-		
-		$this->partnerGroups = $this->taskConfig->partnerGroups;
 	}
 	
 	protected function getParams ( $name  )
