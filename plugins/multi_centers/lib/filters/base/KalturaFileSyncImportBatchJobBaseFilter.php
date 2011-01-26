@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters.base
+ * @package plugins.multiCenters
+ * @subpackage api.filters.base
  * @abstract
  */
 class KalturaFileSyncImportBatchJobBaseFilter extends KalturaBatchJobFilter

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.multiCenters
+ * @subpackage api.enum
  */
 class KalturaFileSyncImportBatchJobOrderBy extends KalturaBatchJobOrderBy
 {

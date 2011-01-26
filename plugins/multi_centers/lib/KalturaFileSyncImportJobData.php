@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage objects
+ * @package plugins.multiCenters
+ * @subpackage api.objects
  */
 class KalturaFileSyncImportJobData extends KalturaJobData
 {
