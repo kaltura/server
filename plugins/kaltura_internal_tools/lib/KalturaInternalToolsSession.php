@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.KalturaInternalTools
+ * @subpackage api.objects
+ */
 class KalturaInternalToolsSession extends KalturaObject 
 {
 	
