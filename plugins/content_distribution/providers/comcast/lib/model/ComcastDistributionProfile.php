@@ -9,7 +9,7 @@ class ComcastDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_AUTHOR = 'author';
 	const CUSTOM_DATA_ALBUM = 'album';
 
-	const METADATA_FIELD_CATEGORY = 'comcastCategory';
+	const METADATA_FIELD_CATEGORY = 'ComcastCategory';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
