@@ -102,9 +102,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	 * @param KalturaComcastDistributionProfile $distributionProfile
 	 * @return ComcastMedia
 	 */
-	public function getComcastMedia(KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
+	public function getComcastMedia(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		
 		$media = new ComcastMedia();
@@ -145,7 +144,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
-		$media = $this->getComcastMedia($data, $distributionProfile);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$media = $this->getComcastMedia($entry, $data, $distributionProfile);
 	
 		$thumbAssets = $this->getThumbAssets($data->entryDistribution->partnerId, $data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
@@ -264,7 +264,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	
 	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{
-		$media = $this->getComcastMedia($data, $distributionProfile);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$media = $this->getComcastMedia($entry, $data, $distributionProfile);
 		$media->ID = $data->remoteId;
 	
 		$mediaFiles = array();
