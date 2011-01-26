@@ -25,6 +25,7 @@ class kConfLocal
 			
 				"apphome_url" => "@SERVICE_URL@",
 				"apphome_url_no_protocol" => "@KALTURA_VIRTUAL_HOST_NAME@",
+				"admin_console_url" => "@SERVICE_URL@/admin_console",
 				"contact_url" => "@CONTACT_URL@",
 				"contact_phone_number" => "@CONTACT_PHONE_NUMBER@",
 				"beginners_tutorial_url" => "@BEGINNERS_TUTORIAL_URL@",
@@ -104,6 +105,11 @@ class kConfLocal
 			)
 		);
 		
+		// password reset links
+		self::$map['password_reset_links']  = array (
+			'default' => self::$map['apphome_url'].'/index.php/kmc/kmc/setpasshashkey/',
+			'admin_console' => self::$map['admin_console_url'].'/index.php/user/reset-password-link/token/',
+		);		
 		
 		// additional plugins
 		// self::$map['default_plugins'][] = "FileSyncPlugin"; // Should be enabled only on servers that run admin console
