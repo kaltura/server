@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.systemPartner
+ * @subpackage api.objects
+ */
 class KalturaSystemPartnerPackage extends KalturaObject
 {
 	/**

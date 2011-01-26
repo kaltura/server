@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.systemPartner
+ * @subpackage api.objects
+ */
 class KalturaSystemPartnerUsageArray extends KalturaTypedArray
 {
 	public function __construct()
