@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.document
+ * @subpackage api.enum
  */
 class KalturaDocumentType extends KalturaEnum
 {

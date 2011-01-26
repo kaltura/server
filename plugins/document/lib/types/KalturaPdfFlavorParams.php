@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.document
+ * @subpackage api.objects
+ */
 class KalturaPdfFlavorParams extends KalturaFlavorParams 
 {
 	/**

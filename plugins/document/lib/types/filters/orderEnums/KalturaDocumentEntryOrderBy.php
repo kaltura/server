@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.document
+ * @subpackage api.filters.enum
  */
 class KalturaDocumentEntryOrderBy extends KalturaBaseEntryOrderBy
 {

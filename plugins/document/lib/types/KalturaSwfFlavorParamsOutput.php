@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.document
+ * @subpackage api.objects
+ */
 class KalturaSwfFlavorParamsOutput extends KalturaFlavorParamsOutput 
 {
 	private static $map_between_objects = array

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage objects
+ * @package plugins.document
+ * @subpackage api.objects
  */
 class KalturaDocumentListResponse extends KalturaObject
 {

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage api.objects
+ */
 class KalturaDocumentEntry extends KalturaBaseEntry
 {
 	/**

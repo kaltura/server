@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters.base
+ * @package plugins.document
+ * @subpackage api.filters.base
  * @abstract
  */
 class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter

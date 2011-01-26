@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage api.objects
+ */
 class KalturaDocumentEntryArray extends KalturaTypedArray
 {
 	public static function fromEntryArray ( $arr )
