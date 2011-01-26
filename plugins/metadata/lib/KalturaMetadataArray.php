@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.metadata
+ * @subpackage api.objects
+ */
 class KalturaMetadataArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

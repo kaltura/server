@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.metadata
+ * @subpackage api.filters
  */
 class KalturaMetadataProfileFilter extends KalturaMetadataProfileBaseFilter
 {

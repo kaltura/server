@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage api.objects
+ */
 class KalturaMetadataProfile extends KalturaObject implements IFilterable 
 {
 	/**

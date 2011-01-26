@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.metadata
+ * @subpackage api.objects
+ */
 class KalturaMetadataProfileArray extends KalturaTypedArray
 {
 	public static function fromMetadataProfileArray($arr)

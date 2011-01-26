@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage api.enum
+ */
 class KalturaMetadataProfileFieldStatus extends KalturaEnum 
 {
 	const ACTIVE = 1;

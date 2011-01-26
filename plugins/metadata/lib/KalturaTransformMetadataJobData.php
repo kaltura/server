@@ -1,10 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage objects
- */
-
-/**
+ * @package plugins.metadata
+ * @subpackage api.objects
  */
 class KalturaTransformMetadataJobData extends KalturaJobData
 {
