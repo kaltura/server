@@ -3,6 +3,8 @@
  * Annotation service - Video Annotation
  *
  * @service annotation
+ * @package plugins.annotation
+ * @subpackage api.services
  * @throws KalturaErrors::SERVICE_FORBIDDEN
  */
 class AnnotationService extends KalturaBaseService

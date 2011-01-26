@@ -3,6 +3,8 @@
  * Audit Trail service
  *
  * @service auditTrail
+ * @package plugins.audit
+ * @subpackage api.services
  */
 class AuditTrailService extends KalturaBaseService
 {

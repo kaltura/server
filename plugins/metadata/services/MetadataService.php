@@ -3,6 +3,8 @@
  * Metadata service
  *
  * @service metadata
+ * @package plugins.metadata
+ * @subpackage api.services
  */
 class MetadataService extends KalturaBaseService
 {

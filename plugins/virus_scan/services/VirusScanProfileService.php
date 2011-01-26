@@ -3,6 +3,8 @@
  * Virus scan profile service
  *
  * @service virusScanProfile
+ * @package plugins.virusScan
+ * @subpackage api.services
  */
 class VirusScanProfileService extends KalturaBaseService
 {

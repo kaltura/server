@@ -4,8 +4,8 @@
  * Document service lets you upload and manage document files
  *
  * @service documents
- * @package api
- * @subpackage services
+ * @package plugins.document
+ * @subpackage api.services
  */
 class DocumentsService extends KalturaEntryService
 {

@@ -3,6 +3,8 @@
  * System user service
  *
  * @service fileSync
+ * @package plugins.fileSync
+ * @subpackage api.services
  */
 class FileSyncService extends KalturaBaseService
 {

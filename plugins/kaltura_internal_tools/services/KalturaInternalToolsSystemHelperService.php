@@ -4,6 +4,8 @@
  * Internal Tools Service
  * 
  * @service kalturaInternalToolsSystemHelper
+ * @package plugins.KalturaInternalTools
+ * @subpackage api.services
  */
 class KalturaInternalToolsSystemHelperService extends KalturaBaseService
 {

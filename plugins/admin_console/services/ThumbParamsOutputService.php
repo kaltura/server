@@ -3,8 +3,8 @@
  * Thumb Params Output service
  *
  * @service thumbParamsOutput
- * @package api
- * @subpackage extServices
+ * @package plugins.adminConsole
+ * @subpackage api.services
  */
 class ThumbParamsOutputService extends KalturaBaseService
 {

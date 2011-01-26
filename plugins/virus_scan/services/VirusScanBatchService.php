@@ -3,6 +3,8 @@
  * @service virusScanBatch
  * @package api
  * @subpackage services
+ * @package plugins.virusScan
+ * @subpackage api.services
  */
 class VirusScanBatchService extends BatchService 
 {

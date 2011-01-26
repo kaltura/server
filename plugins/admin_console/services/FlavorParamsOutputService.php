@@ -3,8 +3,8 @@
  * Flavor Params Output service
  *
  * @service flavorParamsOutput
- * @package api
- * @subpackage extServices
+ * @package plugins.adminConsole
+ * @subpackage api.services
  */
 class FlavorParamsOutputService extends KalturaBaseService
 {

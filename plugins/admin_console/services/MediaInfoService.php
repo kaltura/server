@@ -3,8 +3,8 @@
  * Media Info service
  *
  * @service mediaInfo
- * @package api
- * @subpackage extServices
+ * @package plugins.adminConsole
+ * @subpackage api.services
  */
 class MediaInfoService extends KalturaBaseService
 {

@@ -3,8 +3,8 @@
  * Entry Admin service
  *
  * @service entryAdmin
- * @package api
- * @subpackage extServices
+ * @package plugins.adminConsole
+ * @subpackage api.services
  */
 class EntryAdminService extends KalturaBaseService
 {

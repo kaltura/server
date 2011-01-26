@@ -3,6 +3,8 @@
  * Storage Profiles service
  *
  * @service storageProfile
+ * @package plugins.storageProfile
+ * @subpackage api.services
  */
 class StorageProfileService extends KalturaBaseService
 {

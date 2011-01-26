@@ -3,6 +3,8 @@
  * System partner service
  *
  * @service systemPartner
+ * @package plugins.systemPartner
+ * @subpackage api.services
  */
 class SystemPartnerService extends KalturaBaseService
 {
