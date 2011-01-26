@@ -184,7 +184,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function setFlavorAssetIds($v)
 	{
 		if(is_array($v))
-			$v = implode(',', $v);
+			$v = implode(',', array_unique($v));
 			
 		return parent::setFlavorAssetIds($v);
 	}
@@ -192,7 +192,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function setThumbAssetIds($v)
 	{
 		if(is_array($v))
-			$v = implode(',', $v);
+			$v = implode(',', array_unique($v));
 			
 		return parent::setThumbAssetIds($v);
 	}
