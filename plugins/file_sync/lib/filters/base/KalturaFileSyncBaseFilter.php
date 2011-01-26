@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters.base
+ * @package plugins.fileSync
+ * @subpackage api.filters.base
  * @abstract
  */
 class KalturaFileSyncBaseFilter extends KalturaFilter

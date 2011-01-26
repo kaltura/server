@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.fileSync
+ * @subpackage api.filters.enum
  */
 class KalturaFileSyncOrderBy extends KalturaStringEnum
 {

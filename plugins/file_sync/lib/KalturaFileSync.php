@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.fileSync
+ * @subpackage api.objects
+ */
 class KalturaFileSync extends KalturaObject implements IFilterable 
 {
 	/**

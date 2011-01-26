@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.fileSync
+ * @subpackage api.enum
+ */
 class KalturaFileSyncStatus extends KalturaEnum 
 {
 	const ERROR = -1;

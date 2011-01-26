@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.fileSync
+ * @subpackage api.objects
+ */
 class KalturaFileSyncArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
