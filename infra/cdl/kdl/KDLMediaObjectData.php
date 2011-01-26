@@ -410,23 +410,23 @@ include_once("KDLCommon.php");
 			$rvStr=parent::ToString();
 
 			if($this->_flashVersion)
-				$rvStr=$rvStr.","."flashVersion:".$this->_channels;
+				$rvStr=$rvStr.","."flashVersion:".$this->_flashVersion;
 			if($this->_zoom)
-				$rvStr=$rvStr.","."zoom:".$this->_sampleRate;
+				$rvStr=$rvStr.","."zoom:".$this->_zoom;
 			if($this->_zlib)
-				$rvStr=$rvStr.","."zlib:".$this->_resolution;
+				$rvStr=$rvStr.","."zlib:".$this->_zlib;
 			if($this->_jpegQuality)
-				$rvStr=$rvStr.","."jpegQuality:".$this->_channels;
+				$rvStr=$rvStr.","."jpegQuality:".$this->_jpegQuality;
 			if($this->_sameWindow)
-				$rvStr=$rvStr.","."sameWindow:".$this->_sampleRate;
+				$rvStr=$rvStr.","."sameWindow:".$this->_sameWindow;
 			if($this->_insertStop)
-				$rvStr=$rvStr.","."insertStop:".$this->_resolution;
+				$rvStr=$rvStr.","."insertStop:".$this->_insertStop;
 			if($this->_useShapes)
-				$rvStr=$rvStr.","."useShapes:".$this->_sampleRate;
+				$rvStr=$rvStr.","."useShapes:".$this->_useShapes;
 			if($this->_storeFonts)
-				$rvStr=$rvStr.","."storeFonts:".$this->_resolution;
+				$rvStr=$rvStr.","."storeFonts:".$this->_storeFonts;
 			if($this->_flatten)
-				$rvStr=$rvStr.","."flatten:".$this->_resolution;
+				$rvStr=$rvStr.","."flatten:".$this->_flatten;
 				
 			if($rvStr)
 				$rvStr = "SWF(".$rvStr.")";
