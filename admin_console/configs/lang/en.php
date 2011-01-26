@@ -235,6 +235,7 @@ return array(
 	'password instructions emailed to %s' => 'Password instructions emailed to %s',
 	'new password was emailed' => 'New password was emailed',
 	'login' => 'Login',
+	'user reset password link' => 'Please enter a new password:',
 
 
 	// users

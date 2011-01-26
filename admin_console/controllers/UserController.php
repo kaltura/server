@@ -49,7 +49,7 @@ class UserController extends Zend_Controller_Action
 			$userEmail = $request->getPost('email');
 
 			$client->user->resetPassword($userEmail); // ask to reset password
-			//TODO: fix it so that reset password link will lead to admin console instead of kmc!
+			//TODO: check for exceptions!
 			
 			$tranlsate = $this->getFrontController()->getParam('bootstrap')->getResource('translate'); // TODO: add translate action helper
 			$form->setDescription(sprintf($tranlsate->_('password instructions emailed to %s'), $request->getPost('email')));
@@ -62,36 +62,16 @@ class UserController extends Zend_Controller_Action
 	
 	public function resetPasswordLinkAction()
 	{
-		die('Not yet implemented');
-		
 		$request = $this->getRequest();
-		$token = $request->get('token');
-		$config = Zend_Registry::get('config');
-		//$result = kString::crackString($token, $config->settings->secret);
-		//$array = unserialize($result);
-		if (!is_array($array) || !isset($array['email']) || !isset($array['expiry']) || ($array['expiry']) <= time())
-		{
-			$invalidToken = true;
-		}
-		
-		if ($invalidToken)
-			$this->_helper->redirector('reset-password-ok', 'user', null, array('invalid-token' => true));
-		
 		$form = new Form_ResetPasswordLink();
-		
+		$token = $request->get('token');
 		
 		if ($request->isPost())
-		{			
-			// redirect to display the message, and to hide the url with the token
-			$this->_helper->redirector('reset-password-ok', 'user');
-			$form->hideForm();
+		{
+			$this->proccessResetPasswordLinkForm($form, $token);
 		}
 		
-		//$this->view->form = $form;
-		
-		
-		//TODO: fix it so that reset password link will lead to admin console instead of kmc!
-				 
+		$this->view->form = $form;		 
 	}
 	
 	public function resetPasswordOkAction()
@@ -265,7 +245,8 @@ class UserController extends Zend_Controller_Action
 					throw new Exception('', 'LOGIN_DATA_NOT_FOUND');
 				}
 				
-				$auth->getStorage()->write($user); // new identity (email could be updated)
+				$identity = new Kaltura_UserIdentity($user, $ks);
+				$auth->getStorage()->write($identity); // new identity (email could be updated)
 				
 				$this->view->done = true;
 			}
@@ -337,6 +318,52 @@ class UserController extends Zend_Controller_Action
 					$form->setDescription($ex->getMessage());
 				else if ($ex->getCode() === 'ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE')
 					$form->setDescription($ex->getMessage());
+				else
+					throw $ex;
+			}
+		}
+		else
+		{
+			$form->populate($formData);
+		}
+	}
+	
+	
+	private function proccessResetPasswordLinkForm($form, $token)
+	{
+		$request = $this->getRequest();
+		$formData = $request->getPost();
+		
+		if (!$token)
+		{
+			$form->setDescription('no hash key given');
+			return;
+		}
+		
+		if ($form->isValid($formData))
+		{
+			try
+			{
+				$newPassword = $userId = $request->getParam('newPassword');
+				
+				$client = Kaltura_ClientHelper::getClient();
+				$client->setKs(null);
+				$client->user->setInitialPassword($token, $newPassword);
+				
+				$this->_helper->redirector('index');
+			}
+			catch(Exception $ex)
+			{
+				if ($ex->getCode() === 'LOGIN_DATA_NOT_FOUND' || $ex->getCode() === 'NEW_PASSWORD_HASH_KEY_INVALID')
+					$form->setDescription('reset link is no longer valid');
+				else if ($ex->getCode() === 'PASSWORD_STRUCTURE_INVALID')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'NEW_PASSWORD_HASH_KEY_EXPIRED')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'PASSWORD_ALREADY_USED')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'INTERNAL_SERVERL_ERROR')
+					$form->setDescription($ex->getMessage());	
 				else
 					throw $ex;
 			}
