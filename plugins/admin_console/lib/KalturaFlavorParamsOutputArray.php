@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.adminConsole
+ * @subpackage api.objects
+ */
 class KalturaFlavorParamsOutputArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

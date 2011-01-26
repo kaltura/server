@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.adminConsole
+ * @subpackage api.objects
+ */
 class KalturaThumbParamsOutputArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

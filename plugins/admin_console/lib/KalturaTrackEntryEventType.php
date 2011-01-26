@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.adminConsole
+ * @subpackage api.enums
+ */
 class KalturaTrackEntryEventType extends KalturaEnum
 {
 	const UPLOADED_FILE = 1;

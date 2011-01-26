@@ -1,5 +1,8 @@
 <?php
-	
+/**
+ * @package plugins.adminConsole
+ * @subpackage api.enums
+ */
 class KalturaAdminConsoleUserRole
 {
 	const ROLE_GUEST = 'guest';

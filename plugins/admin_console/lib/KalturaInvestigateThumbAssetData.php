@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.adminConsole
+ * @subpackage api.objects
+ */
 class KalturaInvestigateThumbAssetData extends KalturaObject
 {
 	/**
