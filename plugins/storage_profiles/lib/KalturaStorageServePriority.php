@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.storageProfile
+ * @subpackage api.enum
+ */
 class KalturaStorageServePriority extends KalturaEnum
 {	  				
 	const KALTURA_ONLY = 1;

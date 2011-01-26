@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.storageProfile
+ * @subpackage api.enum
+ */
 class KalturaStorageProfileProtocol extends KalturaEnum
 {
 	const KALTURA_DC = 0;
