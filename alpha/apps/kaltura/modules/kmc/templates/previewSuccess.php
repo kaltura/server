@@ -16,7 +16,7 @@ if( ! $sf_params->has('p') || $sf_params->has['e'] ) {
 
 		<div class="content">
 			<div class="title">
-				<h2>Kaltura HTML5 Player</h2>
+				<h2>Kaltura Player</h2>
 			</div>
 			<div class="contwrap">
 			
