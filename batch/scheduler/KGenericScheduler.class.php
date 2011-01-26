@@ -532,7 +532,10 @@ class KGenericScheduler
 			
 			if($size && $size != $oldSize)
 				KalturaLog::info("Worker $taskConfig->name, queue size: $size");
+				
+			return;
 		}
+		KalturaLog::err("Worker id not found [$workerId]");
 	}
 	
 	/***
