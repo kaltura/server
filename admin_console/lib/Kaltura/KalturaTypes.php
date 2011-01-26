@@ -3207,6 +3207,112 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
+
+}
+
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -3622,6 +3728,54 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $errorDescription = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteSentDataLog = null;
 
 
 }
@@ -7477,79 +7631,6 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 }
 
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -8491,6 +8572,67 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 
 }
 
+class KalturaInternalToolsSession extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partner_id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $valid_until = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partner_pattern = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaSessionType
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $error = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rand = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $user = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $privileges = null;
+
+
+}
+
 class KalturaExclusiveLockKey extends KalturaObjectBase
 {
 	/**
@@ -9069,67 +9211,6 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
-
-
-}
-
-class KalturaInternalToolsSession extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partner_id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $valid_until = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partner_pattern = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSessionType
-	 */
-	public $type = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $error = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $rand = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $user = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $privileges = null;
 
 
 }

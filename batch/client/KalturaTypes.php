@@ -1744,6 +1744,54 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	 */
 	public $errorDescription = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteSentDataLog = null;
+
 
 }
 

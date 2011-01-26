@@ -383,7 +383,8 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
+	const COMCAST = "comcastDistribution.COMCAST";
+	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 }
 
 class KalturaDurationType
