@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.audit
+ * @subpackage api.filters
  */
 class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 {

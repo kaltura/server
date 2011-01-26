@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage api.objects
+ */
 class KalturaAuditTrail extends KalturaObject implements IFilterable 
 {
 	/**

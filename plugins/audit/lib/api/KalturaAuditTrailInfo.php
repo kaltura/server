@@ -1,5 +1,7 @@
 <?php
 /**
+ * @package plugins.audit
+ * @subpackage api.objects
  * @abstract
  */
 class KalturaAuditTrailInfo extends KalturaObject 

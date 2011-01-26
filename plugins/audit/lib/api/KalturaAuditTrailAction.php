@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailAction extends KalturaStringEnum
 {
 	const CREATED = 'CREATED';

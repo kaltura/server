@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailChangeXmlNodeType extends KalturaEnum
 {
 	const CHANGED = 1;

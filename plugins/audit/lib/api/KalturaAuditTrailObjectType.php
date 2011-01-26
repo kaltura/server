@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailObjectType extends KalturaStringEnum
 {
 	const ACCESS_CONTROL = accessControlPeer::OM_CLASS;

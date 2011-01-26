@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage api.objects
+ */
 class KalturaAuditTrailFileSyncCreateInfo extends KalturaAuditTrailInfo
 {
 	/**

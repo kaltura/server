@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.audit
+ * @subpackage api.filters.enum
  */
 class KalturaAuditTrailOrderBy extends KalturaStringEnum
 {

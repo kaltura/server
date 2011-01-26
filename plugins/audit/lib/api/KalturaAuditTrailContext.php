@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailContext extends KalturaEnum
 {
 	const CLIENT = -1;

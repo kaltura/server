@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailFileSyncSubType extends KalturaEnum 
 {
 	const ENTRY_DATA = 11;

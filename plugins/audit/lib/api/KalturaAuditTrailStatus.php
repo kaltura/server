@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.audit
+ * @subpackage api.enums
+ */
 class KalturaAuditTrailStatus extends KalturaEnum
 {
 	const PENDING = 1;

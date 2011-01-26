@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage api.objects
+ */
 class KalturaAuditTrailArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)
