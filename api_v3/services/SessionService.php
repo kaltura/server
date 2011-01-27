@@ -9,6 +9,16 @@
  */
 class SessionService extends KalturaBaseService
 {
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'startWidgetSession') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
+	
+	
 	/**
 	 * Start a session with Kaltura's server.
 	 * The result KS is the session key that you should pass to all services that requires a ticket.
