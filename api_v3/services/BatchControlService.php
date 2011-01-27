@@ -115,7 +115,7 @@ class BatchControlService extends KalturaBaseService
 			$batchQueuesStatus = new KalturaBatchQueuesStatus();
 			$batchQueuesStatus->jobType = $workerQueueFilter->jobType;
 			$batchQueuesStatus->workerId = $workerQueueFilter->workerId;
-			$batchQueuesStatus->size = kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $workerQueueFilter->jobType, $filter);
+			$batchQueuesStatus->size = kBatchManager::getQueueSize($workerQueueFilter->schedulerId, $workerQueueFilter->workerId, $dbJobType, $filter);
 			
 			$schedulerStatusResponse->queuesStatus[] = $batchQueuesStatus;
 		}
