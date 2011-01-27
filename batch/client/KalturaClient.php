@@ -1391,10 +1391,11 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getDownloadUrl($id)
+	function getDownloadUrl($id, $useCdn = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "useCdn", $useCdn);
 		$this->client->queueServiceActionCall("flavorasset", "getDownloadUrl", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -7330,13 +7331,6 @@ class KalturaClient extends KalturaClientBase
 	public $contentDistributionBatch = null;
 
 	/**
-	 * Array of all plugin services
-	 *
-	 * @var array<KalturaServiceBase>
-	 */
-	protected $pluginServices = array();
-	
-	/**
 	 * Kaltura client constructor
 	 *
 	 * @param KalturaConfiguration $config
@@ -7344,27 +7338,6 @@ class KalturaClient extends KalturaClientBase
 	public function __construct(KalturaConfiguration $config)
 	{
 		parent::__construct($config);
-		
-		// load all plugins
-		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
-		if(is_dir($pluginsFolder))
-		{
-			$dir = dir($pluginsFolder);
-			while (false !== $fileName = $dir->read())
-			{
-				$matches = null;
-				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
-				{
-					require_once("$pluginsFolder/$fileName");
-					
-					$pluginClass = $matches[1];
-					$plugin = new $pluginClass();
-					$services = $plugin->getServices();
-					foreach($services as $service)
-						$this->pluginServices[$service->serviceName] = $service;
-				}
-			}
-		}
 		
 		$this->baseEntry = new KalturaBaseEntryService($this);
 		$this->batchcontrol = new KalturaBatchcontrolService($this);
@@ -7384,12 +7357,5 @@ class KalturaClient extends KalturaClientBase
 		$this->contentDistributionBatch = new KalturaContentDistributionBatchService($this);
 	}
 	
-	public function __get($serviceName)
-	{
-		if(isset($this->pluginServices[$serviceName]))
-			return $this->pluginServices[$serviceName];
-		
-		return null;
-	}
 }
 
