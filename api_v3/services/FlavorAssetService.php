@@ -227,9 +227,10 @@ class FlavorAssetService extends KalturaBaseService
 	 * 
 	 * @action getDownloadUrl
 	 * @param string $id
+	 * @param bool $useCdn
 	 * @return string
 	 */
-	public function getDownloadUrlAction($id)
+	public function getDownloadUrlAction($id, $useCdn = false)
 	{
 		$flavorAssetDb = flavorAssetPeer::retrieveById($id);
 		if (!$flavorAssetDb)
@@ -238,7 +239,7 @@ class FlavorAssetService extends KalturaBaseService
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
-		return $flavorAssetDb->getDownloadUrl();
+		return $flavorAssetDb->getDownloadUrl($useCdn);
 	}
 	
 	/**
