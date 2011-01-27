@@ -74,17 +74,32 @@
 			<videoFiles>
 				<xsl:if test="count(content[@flavorAssetId = $movFlavorAssetId])">
 					<videoFile formatCode="1001">
-						<uri><xsl:value-of select="content[@flavorAssetId = $movFlavorAssetId]/@url"/></uri>
+						<uri>
+							<xsl:value-of select="content[@flavorAssetId = $movFlavorAssetId]/@url"/>
+							<xsl:text>/name/</xsl:text>
+							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:text>.mov</xsl:text>
+						</uri>
 					</videoFile>
 				</xsl:if>
 				<xsl:if test="count(content[@flavorAssetId = $wmvFlavorAssetId])">
 					<videoFile formatCode="1002">
-						<uri><xsl:value-of select="content[@flavorAssetId = $wmvFlavorAssetId]/@url"/></uri>
+						<uri>
+							<xsl:value-of select="content[@flavorAssetId = $wmvFlavorAssetId]/@url"/>
+							<xsl:text>/name/</xsl:text>
+							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:text>.wmv</xsl:text>
+						</uri>
 					</videoFile>
 				</xsl:if>
 				<xsl:if test="count(content[@flavorAssetId = $flvFlavorAssetId])">
 					<videoFile formatCode="1003">
-						<uri><xsl:value-of select="content[@flavorAssetId = $flvFlavorAssetId]/@url"/></uri>
+						<uri>
+							<xsl:value-of select="content[@flavorAssetId = $flvFlavorAssetId]/@url"/>
+							<xsl:text>/name/</xsl:text>
+							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:text>.flv</xsl:text>
+						</uri>
 					</videoFile>
 				</xsl:if>
 			</videoFiles>
