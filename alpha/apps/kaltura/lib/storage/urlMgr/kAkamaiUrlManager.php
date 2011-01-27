@@ -201,7 +201,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		
-		if ($this->$protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
 			return $partnerPath.$fileSync->getFilePath()."/playlist.m3u8";
 		
 		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
