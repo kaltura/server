@@ -225,6 +225,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$query->parameterValues = array($ids);
 		
 		$sort = new ComcastMediaSort();
+		$sort->field = ComcastMediaField::_ID;
+		$sort->descending = true;
+		
 		$range = new ComcastRange();
 		
 		$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);

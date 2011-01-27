@@ -5,8 +5,18 @@ date_default_timezone_set('America/New_York');
 require_once 'C:\web\kaltura\infra\nusoap\nusoap.php';
 require_once 'C:\web\kaltura\infra\nusoap\SoapTypes.php';
 
+require_once 'ComcastBusinessObject.class.php';
+require_once 'ComcastStatusObject.class.php';
+require_once 'ComcastContent.class.php';
+require_once 'ComcastMedia.class.php';
+require_once 'ComcastMediaList.class.php';
+require_once 'ComcastMediaTemplate.class.php';
+require_once 'ComcastQuery.class.php';
+require_once 'ComcastMediaSort.class.php';
+require_once 'ComcastRange.class.php';
+require_once 'ComcastMediaField.class.php';
+
 require_once 'ComcastClient.php';
-require_once 'ComcastTypes.php';
 require_once 'ComcastMediaService.php';
 
 
@@ -29,7 +39,7 @@ $query = new ComcastQuery();
 $query->name = 'ByIDs';
 $query->parameterNames = array('IDs');
 
-$ids = new soapval('item', 'IDSet', array(1761382272), false, 'ns12');
+$ids = new soapval('item', 'IDSet', array(1768813088), false, 'ns12');
 $query->parameterValues = array($ids);
 
 $sort = new ComcastMediaSort();
