@@ -254,12 +254,12 @@ class asset extends Baseasset implements ISyncableFile
 			return null;
 	}
 	
-	public function getDownloadUrl()
+	public function getDownloadUrl($useCdn = false)
 	{
-		return $this->getDownloadUrlWithExpiry(86400);
+		return $this->getDownloadUrlWithExpiry(86400, $useCdn);
 	}
 	
-	public function getDownloadUrlWithExpiry($expiry)
+	public function getDownloadUrlWithExpiry($expiry, $useCdn = false)
 	{
 		$ksStr = "";
 		$partnerId = $this->getPartnerId();
@@ -280,7 +280,12 @@ class asset extends Baseasset implements ISyncableFile
 		// Gonen May 12 2010 - removing CDN URLs. see ticket 5135 in internal mantis
 		// in order to avoid conflicts with access_control (geo-location restriction), we always return the requestHost (www_host from kConf)
 		// and not the CDN host relevant for the partner.
-		$downloadUrl = requestUtils::getRequestHost().$finalPath;
+		
+		// Tan-Tan January 27 2011 - in some places we do need the cdn, I added a paramter useCdn to force it.
+		if($useCdn)
+			$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+		else
+			$downloadUrl = requestUtils::getRequestHost() . $finalPath;
 		
 		return $downloadUrl;
 	}
