@@ -97,7 +97,11 @@ function addActionPermissionItem($service, $action, $permissionNames)
 	{
 		KalturaLog::alert("Wrong parameters passed service [$service] action [$action] permissionNames [$permissionNames]");
 		return;
-	}	
+	}
+
+	// service and action are always kept in lowercase
+	$service = strtolower($service);
+	$action  = strtolower($action);
 	
 	// check if item already exists in db
 	$c = new Criteria();
@@ -124,9 +128,10 @@ function addActionPermissionItem($service, $action, $permissionNames)
 	// add item to each defined permission
 	foreach ($permissionNames as $permissionName)
 	{
+		$permissionName = trim($permissionName);
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL, PermissionType::PARTNER_GROUP), Criteria::IN);
 		$permission = PermissionPeer::doSelectOne($c);
 		
 		if (!$permission) {
@@ -182,9 +187,10 @@ function addParameterPermissionItem($actionType, $objectName, $paramName, $permi
 	// add item to each defined permission
 	foreach ($permissionNames as $permissionName)
 	{
+		$permissionName = trim($permissionName);
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL, PermissionType::PARTNER_GROUP), Criteria::IN);
 		$permission = PermissionPeer::doSelectOne($c);
 		
 		if (!$permission) {
