@@ -404,6 +404,14 @@ class kFlowHelper
 					if($flavorAsset->hasTag(flavorParams::TAG_SOURCE))
 						kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
 				
+					if($flavorAsset->getType() == assetType::FLAVOR)
+					{
+						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate());
+						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
+						$flavorAsset->setHeight($flavorParamsOutput->getHeight());
+						$flavorAsset->save();
+					}
+					
 					kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $flavorAsset);
 				}	
 			}
