@@ -194,15 +194,19 @@ class kAkamaiUrlManager extends kUrlManager
 	{
 		$fileSync = kFileSyncUtils::resolve($fileSync);
 		
-		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
-			return parent::getFileSyncUrl($fileSync);
-		
 		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		if(!$storage)
 			return parent::getFileSyncUrl($fileSync);
 		
 		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
+		
+		if ($this->$protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			return $partnerPath.$fileSync->getFilePath()."/playlist.m3u8";
+		
+		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+			return parent::getFileSyncUrl($fileSync);
+		
 		$path = $partnerPath.'/serveIsm/objectId/' . $fileSync->getObjectId() . '_' . $fileSync->getObjectSubType() . '_' . $fileSync->getVersion() . '.' . pathinfo(kFileSyncUtils::resolve($fileSync)->getFilePath(), PATHINFO_EXTENSION) . '/manifest';
 //		$path = $partnerPath.'/serveIsm/objectId/'.pathinfo(kFileSyncUtils::resolve($fileSync)->getFilePath(), PATHINFO_BASENAME).'/manifest';		
 		$matches = null;
