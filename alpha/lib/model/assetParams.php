@@ -33,7 +33,7 @@ class assetParams extends BaseassetParams
 	const TAG_EDIT = "edit";
 	const TAG_ISM = "ism";
 	const TAG_SLWEB = "slweb";
-	const TAG_APPLEWEB = "applembr";
+	const TAG_APPLEMBR = "applembr";
 	
 	public static $COLLECTION_TAGS = array(flavorParams::TAG_ISM); 
 	
