@@ -191,7 +191,7 @@ class KalturaFrontController
 	        		$cache->setKS(kCurrentContext::$ks);
 	        	}
 	        		
-				$cachedResult = $cache->checkCache();
+				$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
 				if ($cachedResult)
 				{
 					$currentResult = unserialize($cachedResult);

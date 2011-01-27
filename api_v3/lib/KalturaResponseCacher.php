@@ -90,8 +90,20 @@ class KalturaResponseCacher
 		self::$_useCache = false;
 	}
 	
-	
-	public function checkCache($cacheHeader = 'cached-dispatcher')
+	/**
+	 * This functions checks if a certain response resides in cache.
+	 * In case it dose, the response is returned from cache and a response header is added.
+	 * There are two possibilities on which this function is called:
+	 * 1)	The request is a single “stand alone” request (maybe this request is a multi request containing several sub-requests)
+	 * 2)	The request is a single request that is part of a multi request (sub-request in a multi request)
+	 * 
+	 * in case this function is called when handling a sub-request (single request as part of a multirequest) it
+	 * is preferable to change the default $cacheHeaderName
+	 * 
+	 * @param $cacheHeaderName - the header name to add
+	 * @param $cacheHeader - the header value to add
+	 */	
+	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
 		if (!self::$_useCache)
 			return false;
@@ -103,7 +115,7 @@ class KalturaResponseCacher
 			if ($response)
 			{
 				$processingTime = microtime(true) - $startTime;
-				header("X-Kaltura:$cacheHeader,$this->_cacheKey,$processingTime", false);
+				header("$cacheHeaderName:$cacheHeader,$this->_cacheKey,$processingTime", false);
 				return $response;
 			}
 		}
