@@ -877,7 +877,7 @@ class kuser extends Basekuser
 		}
 		
 		$loginDataExisted = null;
-		$loginData = UserLoginDataPeer::addlogindata($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure, $loginDataExisted);	
+		$loginData = UserLoginDataPeer::addLoginData($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure, $loginDataExisted);	
 		if (!$loginData)
 		{
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
