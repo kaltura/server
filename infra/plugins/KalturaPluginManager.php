@@ -170,6 +170,18 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * @param string $pluginClass
+	 */
+	public static function addPlugin($pluginClass)
+	{
+		self::getPluginInstances();
+		$plugin = new $pluginClass();
+		$pluginName = $plugin->getPluginName();
+		self::$plugins[$pluginName] = $pluginClass;
+		self::$pluginInstances[$pluginName] = $plugin;
+	}
+	
+	/**
 	 * @return array<string, string> in the form array[pluginName] = pluginClass
 	 */
 	public static function getPlugins()
