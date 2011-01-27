@@ -166,24 +166,28 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->partnerId, $data->entryDistribution->flavorAssetIds);
 		
-		$this->impersonate($data->entryDistribution->partnerId);
-		foreach($flavorAssets as $flavorAsset)
+		// TODO add support to update media files
+		if(!$data->entryDistribution->remoteId)
 		{
-			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
-			
-			$mediaFile = new ComcastMediaFile();
-			$mediaFile->allowRelease = true;
-			$mediaFile->bitrate = $flavorAsset->bitrate;
-			$mediaFile->contentType = ComcastContentType::_VIDEO;
-			$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
-			$mediaFile->length = $entry->duration;
-			$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-			$mediaFile->originalLocation = $url;
-			$mediaFile->height = $flavorAsset->width;
-			$mediaFile->width = $flavorAsset->height;
-			$mediaFiles[] = $mediaFile;
+			$this->impersonate($data->entryDistribution->partnerId);
+			foreach($flavorAssets as $flavorAsset)
+			{
+				$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
+				
+				$mediaFile = new ComcastMediaFile();
+				$mediaFile->allowRelease = true;
+				$mediaFile->bitrate = $flavorAsset->bitrate;
+				$mediaFile->contentType = ComcastContentType::_VIDEO;
+				$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
+				$mediaFile->length = $entry->duration;
+				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
+				$mediaFile->originalLocation = $url;
+				$mediaFile->height = $flavorAsset->width;
+				$mediaFile->width = $flavorAsset->height;
+				$mediaFiles[] = $mediaFile;
+			}
+			$this->unimpersonate();
 		}
-		$this->unimpersonate();
 		
 		$options = new ComcastAddContentOptions();
 		$options->generateThumbnail = false;
