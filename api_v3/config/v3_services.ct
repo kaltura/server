@@ -89,7 +89,7 @@ media.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 media.convert						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_RECONVERT
 media.addfromentry					|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
 media.addfromflavorasset			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
-media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
+media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 media.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 media.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 media.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
@@ -124,13 +124,13 @@ mixing.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 mixing.clone						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.appendmediaentry				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
 mixing.requestflattening			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,CONTENT_MANAGE_RECONVERT
-mixing.getmixesbymediaid			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,KMC_READ_ONLY
-mixing.getreadymediaentries			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX
+mixing.getmixesbymediaid			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,KMC_READ_ONLY,CONTENT_MANAGE_BASE
+mixing.getreadymediaentries			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_MIX,CONTENT_MANAGE_BASE
 mixing.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_METADATA
 
 data.add							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
-data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
+data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 data.serve							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
@@ -140,7 +140,7 @@ baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTE
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
 baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
-baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA
+baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL,LIVE_STREAM_UPDATE
 baseentry.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.getbyids					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 baseentry.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
@@ -324,7 +324,7 @@ flavorparams.add					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_ADD
 flavorparams.get					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE
 flavorparams.update					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_UPDATE
 flavorparams.delete					|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_DELETE
-flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY
+flavorparams.list					|			|2		|1	|1		|2		|1		|	|0,		|	|   |TRANSCODING_BASE,CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY,SYSTEM_ADMIN_STORAGE
 flavorparams.getbyconversionprofileid|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 flavorparams.getdefault				|			|2		|1	|1		|2		|1		|	|		|	|   |TRANSCODING_BASE
 
@@ -372,10 +372,10 @@ accesscontrol.update				|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_UPDATE
 accesscontrol.delete				|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_DELETE
 accesscontrol.list					|			|2		|1	|1		|2		|1		|	|		|	|   |ACCESS_CONTROL_BASE,KMC_READ_ONLY
 
-category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
-category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE
-category.update						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
-category.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES
+category.add						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_EDIT_CATEGORIES
+category.get						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_EDIT_CATEGORIES,CONTENT_MANAGE_BASE
+category.update						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_EDIT_CATEGORIES
+category.delete						|			|2		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_EDIT_CATEGORIES
 category.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_BASE,ANALYTICS_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY
 
 upload.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD

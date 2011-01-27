@@ -25,5 +25,5 @@ systempartner.getusage				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLI
 systempartner.updatestatus			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_BLOCK,SYSTEM_ADMIN_PUBLISHER_REMOVE
 systempartner.getadminsession		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_KMC_ACCESS
 systempartner.getconfiguration		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
-systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG
+systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG,SYSTEM_ADMIN_PUBLISHER_ADD
 systempartner.getpackages			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
