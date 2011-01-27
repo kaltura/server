@@ -19,6 +19,7 @@ class KExternalErrors
 	const IP_COUNTRY_BLOCKED = 16;
 	const IMAGE_RESIZE_FAILED = 17;
 	const DELIVERY_METHOD_NOT_ALLOWED = 18;
+	const INVALID_MAX_BITRATE= 19;
 	
 	private static $errorDescriptionMap = array(
 		self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -39,6 +40,7 @@ class KExternalErrors
 		self::IP_COUNTRY_BLOCKED => "", // we rather not explain this error code 
 		self::IMAGE_RESIZE_FAILED => "image resize failed",
 		self::DELIVERY_METHOD_NOT_ALLOWED => "Delivery method not allowed",
+		self::INVALID_MAX_BITRATE => "max bitrate is not valid",
 		);
 	
 	public static function dieError($errorCode)
