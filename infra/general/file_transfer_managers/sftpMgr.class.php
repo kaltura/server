@@ -158,6 +158,13 @@ class sftpMgr extends kFileTransferMgr
              $exec_output = $this->execCommand($deldir_cmd);
              return (trim($exec_output) == ''); // empty output means the command passed ok
         }
+
+	protected function doList ($remote_path)
+	{
+               $lsdir_cmd = 'ls ' . $remote_path;
+               $exec_output = $this->execCommand($lsdir_cmd);
+                return $exec_output;
+	}	
 	
 	// download a file from the server
 	public function fileGetContents ($remote_file)

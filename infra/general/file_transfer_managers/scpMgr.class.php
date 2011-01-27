@@ -110,6 +110,13 @@ class scpMgr extends kFileTransferMgr
                 return (trim($exec_output) == ''); // empty output means the command passed ok
         }
 	
+
+	protected function doList ($remote_path)
+	{
+               $lsdir_cmd = 'ls ' . $remote_path;
+               $exec_output = $this->execCommand($lsdir_cmd);
+                return $exec_output;
+	}	
 	
 	// execute the given command on the server
 	private function execCommand($command_str)

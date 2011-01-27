@@ -132,6 +132,11 @@ class ftpMgr extends kFileTransferMgr
 		return true;
 	}
 
+	protected function doList ($remoteDir)
+	{
+		return ftp_nlist($this->getConnection(), $remoteDir);
+	}
+
 
 	/*******************/
 	/* Other functions */

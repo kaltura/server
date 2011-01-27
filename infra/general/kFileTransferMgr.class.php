@@ -183,6 +183,14 @@ abstract class kFileTransferMgr
 	 */
 	abstract protected function doPwd();
 
+	/**
+	 * Should return an array of all elements
+	 *
+	 * @return an array of all elements
+	 */
+
+	abstract protected function doList ($remote_path);
+
 
 	/********************/
 	/* Public Functions */
@@ -603,6 +611,23 @@ abstract class kFileTransferMgr
 		}
 	}
 
+	public function listDir ($remote_path)
+	{
+		KalturaLog::debug("Listing directory [$remote_path]");
+		
+		// parameter checks
+		if (!$this->connection_id) {
+			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
+		}
+
+		$remote_path = $this->fixPathString($remote_path);
+
+		// try to delete directory
+		$res = @($this->doList($remote_path));
+
+		return $res;
+	}
+	
 
 	/***************************/
 	/* Other private functions */

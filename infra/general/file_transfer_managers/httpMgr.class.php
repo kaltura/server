@@ -228,6 +228,10 @@ class httpMgr extends kFileTransferMgr
 		return false;
 	}
 
+	protected function doList ($remoteDir)
+	{
+		return false;
+	}	
 
 	/*******************/
 	/* Other functions */
