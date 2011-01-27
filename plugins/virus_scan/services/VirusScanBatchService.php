@@ -1,8 +1,6 @@
 <?php
 /**
  * @service virusScanBatch
- * @package api
- * @subpackage services
  * @package plugins.virusScan
  * @subpackage api.services
  */

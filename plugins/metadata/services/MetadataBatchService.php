@@ -1,8 +1,6 @@
 <?php
 /**
  * @service metadataBatch
- * @package api
- * @subpackage services
  * @package plugins.metadata
  * @subpackage api.services
  */

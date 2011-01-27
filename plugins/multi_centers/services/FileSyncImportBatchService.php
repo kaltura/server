@@ -1,11 +1,6 @@
 <?php
-
-
-
 /**
  * @service filesyncImportBatch
- * @package api
- * @subpackage services
  * @package plugins.multiCenters
  * @subpackage api.services
  */
