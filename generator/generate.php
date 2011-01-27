@@ -25,9 +25,9 @@ foreach($config as $name => $item)
 	$pluginList = explode(',', $item->get("plugins"));
 	foreach($pluginList as $plugin)
 	{
-		$pluginName = ltrim(rtrim($plugin));
+		$pluginName = trim($plugin);
 		if(!$pluginName) continue;
-		KalturaPluginManager::addPluginByName($pluginName.'Plugin');
+		KalturaPluginManager::addPlugin($pluginName);
 	}
 	
 	$reflectionClass = new ReflectionClass($generator);
