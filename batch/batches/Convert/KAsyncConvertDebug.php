@@ -4,11 +4,6 @@
  * @package Scheduler
  * @subpackage Debug
  */
-if(strtoupper(PHP_SAPI) != 'CGI-FCGI')
-{
-	echo 'This script must be executed using CLI';
-	//exit;
-}
 
 chdir(dirname( __FILE__ ) . "/../../");
 

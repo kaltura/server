@@ -4,11 +4,6 @@
  * @package Scheduler
  * @subpackage Debug
  */
-if(strtoupper(PHP_SAPI) != 'CGI-FCGI' && strtoupper(PHP_SAPI) != 'CLI')
-{
-	echo 'This script must be executed using CLI';
-	exit;
-}
 
 // /opt/kaltura/app/batch
 chdir(dirname( __FILE__ ) . "/../../../../batch");
