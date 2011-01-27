@@ -262,6 +262,16 @@ class kPermissionManager
 		{
 			$item       = $lookup->getPermissionItem();
 			$permission = $lookup->getPermission();
+			
+			if (!$item)	{
+				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with PermissionItem id ['.$lookup->getPermissionItemId().'] which does not exist!');
+				continue;
+			}
+			
+			if (!$permission) {
+				KalturaLog::err('PermissionToPermissionItem id ['.$lookup->getId().'] is defined with Permission name ['.$lookup->getPermissionName().'] which does not exist!');
+				continue;
+			}
 				
 			// organize permission items in local arrays
 			$type = $item->getType();
