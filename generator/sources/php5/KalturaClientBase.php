@@ -34,6 +34,21 @@ class KalturaClientBase
 	 * @var unknown_type
 	 */
 	private $callsQueue = array();
+
+	/**
+	 * Array of all plugin services
+	 *
+	 * @var array<KalturaServiceBase>
+	 */
+	protected $pluginServices = array();
+	
+	public function __get($serviceName)
+	{
+		if(isset($this->pluginServices[$serviceName]))
+			return $this->pluginServices[$serviceName];
+		
+		return null;
+	}
 	
 	/**
 	 * Kaltura client constructor
@@ -48,6 +63,30 @@ class KalturaClientBase
 		if ($logger)
 		{
 			$this->shouldLog = true;	
+		}
+		
+		// load all plugins
+		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
+		if(is_dir($pluginsFolder))
+		{
+			$dir = dir($pluginsFolder);
+			while (false !== $fileName = $dir->read())
+			{
+				$matches = null;
+				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
+				{
+					require_once("$pluginsFolder/$fileName");
+					
+					$pluginClass = $matches[1];
+					$plugin = new $pluginClass();
+					$services = $plugin->getServices();
+					foreach($services as $service)
+					{
+						$service->setClient($this);
+						$this->pluginServices[$service->serviceName] = $service;
+					}
+				}
+			}
 		}
 	}
 
@@ -530,6 +569,14 @@ abstract class KalturaServiceBase
 	 * @param KalturaClient $client
 	 */
 	public function __construct(KalturaClient $client)
+	{
+		$this->client = $client;
+	}
+						
+	/**
+	 * @param KalturaClient $client
+	 */
+	public function setClient(KalturaClient $client)
 	{
 		$this->client = $client;
 	}
