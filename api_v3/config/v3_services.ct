@@ -140,7 +140,7 @@ baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTE
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
 baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
-baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA
+baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA
 baseentry.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.getbyids					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 baseentry.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE

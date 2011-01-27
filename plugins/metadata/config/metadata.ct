@@ -38,5 +38,5 @@ metadata.addfromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUST
 metadata.addfromurl					|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
 metadata.delete						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
 metadata.get						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_BASE
-metadata.update						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
+metadata.update						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
 metadata.updatefromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
