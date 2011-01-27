@@ -55,7 +55,7 @@ class playManifestAction extends kalturaAction
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
-	private function buildXml($streamType, array $flavors, $mimeType = 'video/x-flv', $duration = null, $baseUrl = null)
+	private function buildXml($streamType, array $flavors, $mimeType = 'video/x-flv', $duration = null, $baseUrl = null, $mediaUrl = null)
 	{
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
 		$baseUrlXml = ($baseUrl ? "<baseURL>$baseUrl</baseURL>" : '');
@@ -79,6 +79,7 @@ class playManifestAction extends kalturaAction
 					$durationXml
 					$baseUrlXml
 					$flvaorsXml
+					$mediaUrl
 				</manifest>";
 					
 		// <drmMetadata url=\"$metaDataUrl\"/>
@@ -121,6 +122,8 @@ class playManifestAction extends kalturaAction
 				$tag = flavorParams::TAG_WEB;
 				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
 					$tag = flavorParams::TAG_SLWEB;
+				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+					$tag = flavorParams::TAG_APPLEMBR;
 					
 				$webFlavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, $tag);
 				if(count($webFlavorAssets))
@@ -135,6 +138,8 @@ class playManifestAction extends kalturaAction
 			$tag = flavorParams::TAG_MBR;
 			if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
 				$tag = flavorParams::TAG_SLWEB;
+			elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+				$tag = flavorParams::TAG_APPLEMBR;
 				
 			$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, $tag);
 			
@@ -258,12 +263,19 @@ class playManifestAction extends kalturaAction
 		$partner = $this->entry->getPartner();
 		if($partner && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
-		
+
 		$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
 		$urlManager->setClipTo($this->clipTo);
 		$urlManager->setSeekFromTime($this->seekFrom);
 		$urlManager->setDomain($this->cdnHost);
-		$url = $urlManager->getFlavorAssetUrl($flavorAsset);
+		$urlManager->setProtocol($this->format);
+		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+		{
+			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+			$url = $urlManager->getFileSyncUrl($fileSync);
+		}
+		else
+	        $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
 		
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
@@ -534,6 +546,57 @@ class playManifestAction extends kalturaAction
 //		header("Location: $url/manifest");
 //		die;
 	}
+
+	private function serveAppleHttp()
+	{
+		
+		$content = "#EXTM3U\n";
+		$flavors = $this->buildFlavorsArray($duration);
+		foreach($flavors as $flavor)
+		{
+			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
+			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
+			$content .= "";
+			
+			
+			#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=301000,CODECS="mp4a.40.2,avc1.66.30"
+			///content/entry/data/....../entryId_falvorId/playlist.m3u8
+			
+		}
+		
+		return $content;
+	}
+	
+	private function serveHDNetwork()
+	{
+		$duration = $this->entry->getDurationInt();
+		$flavors = $this->buildFlavorsArray($duration);
+		
+		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
+		$flavorsXml = '';
+		foreach($flavors as $flavor)
+		{
+			$url = $flavor['url'];
+			$bitrate = isset($flavor['bitrate'])	? $flavor['bitrate']	: 0;
+			
+			$url = parse_url($url, PHP_URL_PATH);
+			
+			$url = htmlspecialchars($url);
+			$flavorsXml .= "<video src=\"$url\" system-bitrate=\"$bitrate\"/>"; 
+		}
+			
+		return '<?xml version="1.0"?>
+<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 2.0//EN" "http://www.w3.org/2001/SMIL20/SMIL20.dtd">
+<smil xmlns="http://www.w3.org/2001/SMIL20/Language">
+	<head>
+		<meta name="title" content="" />
+		<meta name="httpBase" content="" />
+		<meta name="rtmpAuthBase" content="" />
+	</head>
+	<body>
+		<switch id="video">'.$flavorsXml.'</switch>
+	</body></smil>';
+	}
 	
 	public function validateStorageId()
 	{
@@ -632,6 +695,21 @@ class playManifestAction extends kalturaAction
 				
 			case StorageProfile::PLAY_FORMAT_SILVER_LIGHT:
 				$xml = $this->serveSilverLight();
+				break;
+				
+			case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+				$xml = $this->serveAppleHttp();
+				break;
+				
+				case "hdnetworksmil":
+				$xml = $this->serveHDNetwork();
+				break;
+				
+			case "hdnetwork":
+				$duration = $this->entry->getDurationInt();
+				$mediaUrl = "<media url=\"".str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."/>"; 
+						
+				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, null, 'video/x-flv', $duration, null, $mediaUrl);
 				break;
 		}
 		
