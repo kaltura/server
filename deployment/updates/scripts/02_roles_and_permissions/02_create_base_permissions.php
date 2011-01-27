@@ -92,7 +92,6 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_BASE, 'Analytics access', PermissionName::FEATURE_ANALYTICS_TAB),
 	array (0, PermissionType::API_ACCESS,PermissionName::WIDGET_ADMIN, 'Widget admin', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_SEND_DATA, 'Send analytics data', null),
-	array (0, PermissionType::API_ACCESS,PermissionName::SYSTEM_BASE_ACTIONS, 'Basic system actions', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::WIDGET_ADMIN, 'Widget admin', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::SEARCH_SERVICE, 'Search service', null),
 	array (0, PermissionType::API_ACCESS,PermissionName::ANALYTICS_SEND_DATA, 'Send analytics data', null),
@@ -129,6 +128,7 @@ $permissionsData = array (
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY, 'Base system admin permission', null),
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_PERMISSIONS_MANAGE, 'Base system admin permission', null),
 	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_INTERNAL, 'System internal actions', null),
+	array (-2, PermissionType::API_ACCESS,PermissionName::SYSTEM_ADMIN_ENTRY_INVESTIGATION, 'Entry investigation', null),	
 	
 	// template partner
 	array (99, PermissionType::SPECIAL_FEATURE,PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION, 'PS2 permissions validation', null),

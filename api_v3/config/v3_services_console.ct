@@ -43,15 +43,15 @@ batchcontrol.listworkers			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BA
 batchcontrol.listcommands			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BATCH_CONTROL
 
 
-entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-entryadmin.gettracks				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-thumbasset.regenerate				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
+entryadmin.get						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+entryadmin.gettracks				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+flavorasset.getbyentryid			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+flavorparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+flavorasset.reconvert				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+thumbasset.regenerate				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
 
-thumbasset.getbyentryid				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
-thumbparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_BASE
+thumbasset.getbyentryid				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+thumbparams.list					|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
 
 emailingestionprofile.add				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_EMAIL_INGESTION
 emailingestionprofile.get				|		|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_EMAIL_INGESTION
@@ -75,7 +75,7 @@ virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_VIRU
 
 session.impersonate                 |			|0		|1	|0		|0		|1		|r	|*		|	|	|SYSTEM_ADMIN_BASE
 
-metadataprofile.list				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_BASE
+metadataprofile.list				|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|
 
 distributionprovider.list													|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE
 entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|*	|	|  		|SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE
