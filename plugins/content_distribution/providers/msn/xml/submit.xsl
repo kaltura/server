@@ -77,7 +77,7 @@
 						<uri>
 							<xsl:value-of select="content[@flavorAssetId = $movFlavorAssetId]/@url"/>
 							<xsl:text>/name/</xsl:text>
-							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:value-of select="content/@flavorAssetId"/>
 							<xsl:text>.mov</xsl:text>
 						</uri>
 					</videoFile>
@@ -87,7 +87,7 @@
 						<uri>
 							<xsl:value-of select="content[@flavorAssetId = $wmvFlavorAssetId]/@url"/>
 							<xsl:text>/name/</xsl:text>
-							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:value-of select="content/@flavorAssetId"/>
 							<xsl:text>.wmv</xsl:text>
 						</uri>
 					</videoFile>
@@ -97,7 +97,7 @@
 						<uri>
 							<xsl:value-of select="content[@flavorAssetId = $flvFlavorAssetId]/@url"/>
 							<xsl:text>/name/</xsl:text>
-							<xsl:value-of select="@flavorAssetId"/>
+							<xsl:value-of select="content/@flavorAssetId"/>
 							<xsl:text>.flv</xsl:text>
 						</uri>
 					</videoFile>
@@ -106,7 +106,12 @@
 			<files>
 				<xsl:if test="count(thumbnail[@thumbAssetId = $thumbAssetId])">
 					<file formatCode="2009">
-						<uri><xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/></uri>
+						<uri>
+							<xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/>
+							<xsl:text>/name/</xsl:text>
+							<xsl:value-of select="thumbnail/@thumbAssetId"/>
+							<xsl:text>.flv</xsl:text>
+						</uri>
 					</file>
 				</xsl:if>
 			</files>
