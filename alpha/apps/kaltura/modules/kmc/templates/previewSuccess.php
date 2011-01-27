@@ -9,7 +9,7 @@ if( ! $sf_params->has('p') || $sf_params->has['e'] ) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Kaltura HTML5 Player</title>
+	<title>Kaltura Player</title>
 </head>
 <body>
 	<div id="main">
@@ -60,6 +60,7 @@ mw.ready( function(){
 	});
 
 	$j('#showVideo').trigger('click');	
+	
 } );
 </script>
 </body>
