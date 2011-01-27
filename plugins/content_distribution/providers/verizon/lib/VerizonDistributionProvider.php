@@ -141,33 +141,14 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public static function generateUpdateXML($entryId, KalturaVerizonDistributionJobProviderData $providerData)
 	{
-		KalturaLog::debug(" verizon: entered here ");
 		$xml = self::generateXML($entryId, $providerData);
 		if(!$xml)
 		{
 			KalturaLog::err("No XML returned for entry [$entryId]");
 			return null;
 		}
-	
-		// change end time to 5 days from now (it's an VERIZON hack)
-		$fiveDaysFromNow = date('Y-m-d\TH:i:s\Z', time() + (5 * 24 * 60 * 60));
 		
-		$nodes = $xml->getElementsByTagName('activeEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-		
-		$nodes = $xml->getElementsByTagName('searchableEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-			
-		$nodes = $xml->getElementsByTagName('archiveEndDate');
-		foreach($nodes as $node)
-			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
-		
-		$myXml = $xml->saveXML();
-		
-		KalturaLog::debug($myXml);
-		return $myXml;
+		return $xml->saveXML();
 	}
 	
 	/**

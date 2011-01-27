@@ -45,7 +45,7 @@ class kVerizonDistributionReportHandler implements kBatchJobStatusEventConsumer
 		}
 		
 		$providerData = $data->getProviderData();
-		if($providerData instanceof kVerizonDistributionJobProviderData)
+/*		if($providerData instanceof kVerizonDistributionJobProviderData)
 		{
 			$entryDistribution->putInCustomData('emailed', $providerData->getEmailed());
 			$entryDistribution->putInCustomData('rated', $providerData->getRated());
@@ -58,7 +58,7 @@ class kVerizonDistributionReportHandler implements kBatchJobStatusEventConsumer
 			
 			$entryDistribution->save();
 		}
-		
+	*/	
 		return $dbBatchJob;
 	}
 }

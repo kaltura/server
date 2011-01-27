@@ -59,7 +59,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaVerizonDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaVerizonDistributionJobProviderData");
 		
-		$this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
+		$data->remoteId = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		
 		return true;
 	}
@@ -80,8 +80,16 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		KalturaLog::debug("verizon: send");
 		if(!$providerData->xml)
 			throw new Exception("XML data not supplied");
-		
-		$fileName = uniqid() . '.xml';
+
+		if (!isset($data->remoteId) || $data->remoteId == "")
+		{
+			$remoteId = uniqid();
+		}
+		else
+		{
+			$remoteId = $data->remoteId;
+		}
+		$fileName = $remoteId . '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$destFile = "{$path}/{$fileName}";
 			
@@ -90,12 +98,12 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
 		if(!$fileTransferMgr)
-			throw new Exception("SFTP manager not loaded");
+			throw new Exception("FTP manager not loaded");
 			
 		$fileTransferMgr->login($this->domain, $username, $password);
 		$fileTransferMgr->putFile($destFile, $srcFile, true);
 
-		return true;
+		return $remoteId;
 //		return $results;
 	}
 
@@ -105,7 +113,6 @@ class VerizonDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$publishState = $this->fetchStatus($data);
-		KalturaLog::err("publishState [$publishState]");
 		switch($publishState)
 		{
 			case 'Published':
@@ -114,18 +121,9 @@ class VerizonDistributionEngine extends DistributionEngine implements
 			case 'Pending':
 				return false;
 				
-			case 'Error':
-			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("VERIZON error: $errDescription");
-				}
-				throw new Exception('Unknows VERIZON error');
-				
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
+				throw new Exception("VERIZON error: $publishState");
 				return false;
 		}
 	}
@@ -139,13 +137,21 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaVerizonDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaVerizonDistributionProfile");
 	
-		$xml = $this->fetchXML($data, $data->distributionProfile);
-			
-		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
-		if($publishStateAttr)
-			return $publishStateAttr->value;
+		$fileArray = $this->fetchFilesList($data, $data->distributionProfile);
+		
+		for	($i=0; $i<count($fileArray) $i++)
+		{
+			if (preg_match ( "/{$data->remoteId}.rcvd/" , $fileArray[$i] , $matches))
+			{
+				return "Published";
+			}
+			else if (preg_match ( "/{$data->remoteId}.*.err/" , $fileArray[$i] , $matches))
+			{
+				return preg_split ("/\./", $matches[0])[1];
+			}
+		}
 				
-		return null;
+		return "Pending";
 	}
 
 	/**
@@ -153,46 +159,20 @@ class VerizonDistributionEngine extends DistributionEngine implements
 	 * @throws Exception
 	 * @return DOMDocument
 	 */
-	public function fetchXML(KalturaDistributionSubmitJobData $data, KalturaVerizonDistributionProfile $distributionProfile)
+	public function fetchFilesList(KalturaDistributionSubmitJobData $data, KalturaVerizonDistributionProfile $distributionProfile)
 	{
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
 		
-		$url = "https://{$domain}{$this->fetchReportPath}?uuid={$data->remoteId}";
+		KalturaLog::debug("Listing content for [$path]");
 		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_FORBID_REUSE, true); 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
-
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_POST, false);
-		
-		$results = curl_exec($ch);
-		if(!$results)
-		{
-			$errNumber = curl_errno($ch);
-			$errDescription = curl_error($ch);
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		if(!$fileTransferMgr)
+			throw new Exception("FTP manager not loaded");
 			
-			curl_close($ch);
-		
-			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
-		}
-		curl_close($ch);
-		
-		$xml = new DOMDocument();
-		if($xml->loadXML($results))
-			return $xml;
-			
-		return null;
+		$fileTransferMgr->login($this->domain, $username, $password);
+		return $fileTransferMgr->listDir($path);
 	}
 
 	/* (non-PHPdoc)
@@ -225,18 +205,9 @@ class VerizonDistributionEngine extends DistributionEngine implements
 			case 'Pending':
 				return false;
 				
-			case 'Error':
-			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("VERIZON error: $errDescription");
-				}
-				throw new Exception('Unknows VERIZON error');
-				
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
+				throw new Exception("VERIZON error: $publishState");
 				return false;
 		}
 	}
@@ -255,18 +226,9 @@ class VerizonDistributionEngine extends DistributionEngine implements
 			case 'Pending':
 				return false;
 				
-			case 'Error':
-			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
-					throw new Exception("VERIZON error: $errDescription");
-				}
-				throw new Exception('Unknows VERIZON error');
-				
 			default:
 				KalturaLog::err("Unknown publishState [$publishState]");
+				throw new Exception("VERIZON error: $publishState");
 				return false;
 		}
 	}
@@ -276,7 +238,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 	 */
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaVerizonDistributionProfile))
+/*		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaVerizonDistributionProfile))
 			KalturaLog::err("Distribution profile must be of type KalturaVerizonDistributionProfile");
 	
 		$xml = $this->fetchXML($data, $data->distributionProfile);
@@ -335,7 +297,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 					break;
 			}
 		}
-				
+	*?			
 		return true;
 	}
 
