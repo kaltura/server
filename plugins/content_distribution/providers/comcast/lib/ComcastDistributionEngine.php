@@ -146,8 +146,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	{	
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$media = $this->getComcastMedia($entry, $data, $distributionProfile);
-		if($data->remoteId)
-			$media->ID = $data->remoteId;
+		if($data->entryDistribution->remoteId)
+			$media->ID = $data->entryDistribution->remoteId;
 	
 		$thumbAssets = $this->getThumbAssets($data->entryDistribution->partnerId, $data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
@@ -192,7 +192,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		
-		if($data->remoteId)
+		if($data->entryDistribution->remoteId)
 			$comcastAddContentResults = $comcastMediaService->setContent($media, $mediaFiles, $options);
 		else
 			$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);
@@ -200,7 +200,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$data->sentData = $comcastMediaService->request;
 		$data->results = $comcastMediaService->response;
 		
-		if($comcastAddContentResults->mediaID)
+		if(!$data->entryDistribution->remoteId && $comcastAddContentResults->mediaID)
 		{
 			$data->remoteId = $comcastAddContentResults->mediaID;
 		}
