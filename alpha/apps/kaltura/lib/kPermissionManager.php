@@ -238,7 +238,7 @@ class kPermissionManager
 		if ($dbRole)
 		{
 			$permissionNames = $dbRole->getPermissionNames(true);
-			$permissionNames = explode(',', trim($permissionNames,','));
+			$permissionNames = array_map('trim', explode(',', $permissionNames));
 		}
 		else {
 			$permissionNames = array();
@@ -247,7 +247,7 @@ class kPermissionManager
 		// add always allowed permissions
 		if (self::$operatingPartner) {
 			$alwaysAllowed = self::$operatingPartner->getAlwaysAllowedPermissionNames();
-			$alwaysAllowed = explode(',', $alwaysAllowed);
+			$alwaysAllowed = array_map('trim', explode(',', $alwaysAllowed));
 		}
 		else {
 			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);

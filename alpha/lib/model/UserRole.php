@@ -33,6 +33,15 @@ class UserRole extends BaseUserRole
 		return $newRole;
 	}
 	
+	
+	public function setPermissionNames($permissionNames)
+	{
+		$permissionNames = array_map('trim', explode(',', $permissionNames));
+		$permissionNames = implode(',', $permissionNames);
+		parent::setPermissionNames($permissionNames);
+	}
+	
+	
 	/**
 	 * Get the [permission_names] column value.
 	 * If set to self::ALL_PARTNER_PERMISSIONS_WILDCARD (*), return all permisisons relevant for the partner.
@@ -43,6 +52,9 @@ class UserRole extends BaseUserRole
 	{
 		// get from DB
 		$permissionNames = parent::getPermissionNames();
+		$permissionNames = array_map('trim', explode(',', $permissionNames));
+		$permissionNames = implode(',', $permissionNames);
+		
 		// translate * to permission names of all permissions valid for partner
 		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD)
 		{
@@ -64,7 +76,6 @@ class UserRole extends BaseUserRole
 			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames, $this->getPartnerId());
 		}
 		return $permissionNames;
-		
 	}
 	
 	
