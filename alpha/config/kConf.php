@@ -100,7 +100,7 @@ class kConf extends kConfLocal
 				"kdp3_wrapper_version" => 'v32.0',
 				"kmc_secured_login" => false,
 				
-				"kmc_version" => 'v4.0.4',
+				"kmc_version" => 'v4.0.5',
 				
 				"paypal_data" => array (),
 				
