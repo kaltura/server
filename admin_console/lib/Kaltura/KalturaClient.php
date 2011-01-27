@@ -4471,13 +4471,6 @@ class KalturaClient extends KalturaClientBase
 	public $genericDistributionProviderAction = null;
 
 	/**
-	 * Array of all plugin services
-	 *
-	 * @var array<KalturaServiceBase>
-	 */
-	protected $pluginServices = array();
-	
-	/**
 	 * Kaltura client constructor
 	 *
 	 * @param KalturaConfiguration $config
@@ -4485,27 +4478,6 @@ class KalturaClient extends KalturaClientBase
 	public function __construct(KalturaConfiguration $config)
 	{
 		parent::__construct($config);
-		
-		// load all plugins
-		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
-		if(is_dir($pluginsFolder))
-		{
-			$dir = dir($pluginsFolder);
-			while (false !== $fileName = $dir->read())
-			{
-				$matches = null;
-				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
-				{
-					require_once("$pluginsFolder/$fileName");
-					
-					$pluginClass = $matches[1];
-					$plugin = new $pluginClass();
-					$services = $plugin->getServices();
-					foreach($services as $service)
-						$this->pluginServices[$service->serviceName] = $service;
-				}
-			}
-		}
 		
 		$this->batchcontrol = new KalturaBatchcontrolService($this);
 		$this->flavorAsset = new KalturaFlavorAssetService($this);
@@ -4538,12 +4510,5 @@ class KalturaClient extends KalturaClientBase
 		$this->genericDistributionProviderAction = new KalturaGenericDistributionProviderActionService($this);
 	}
 	
-	public function __get($serviceName)
-	{
-		if(isset($this->pluginServices[$serviceName]))
-			return $this->pluginServices[$serviceName];
-		
-		return null;
-	}
 }
 
