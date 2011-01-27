@@ -167,6 +167,9 @@ class kUrlManager
 		if($fileSync->getObjectSubType() == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
 			return $fileSync->getSmoothStreamUrl()."/manifest";
 			
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			return $fileSync->getFilePath()."/playlist.m3u8";
+		
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 	
