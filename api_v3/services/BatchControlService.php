@@ -109,7 +109,7 @@ class BatchControlService extends KalturaBaseService
 		$schedulerStatusResponse->queuesStatus = new KalturaBatchQueuesStatusArray();
 		foreach($workerQueueFilters as $workerQueueFilter)
 		{
-			$dbJobType = kPluginableEnumsManager::apiToCore('KalturaBatchJobType', $workerQueueFilter->jobType);
+			$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $workerQueueFilter->jobType);
 			$filter = $workerQueueFilter->filter->toFilter($dbJobType);
 			
 			$batchQueuesStatus = new KalturaBatchQueuesStatus();
