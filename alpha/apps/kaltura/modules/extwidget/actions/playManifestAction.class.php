@@ -274,7 +274,7 @@ class playManifestAction extends kalturaAction
 	{
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-		KalturaLog::debug("playmanifest: in remove");
+
 		switch($this->entry->getType())
 		{
 			case entryType::MEDIA_CLIP:
@@ -285,11 +285,10 @@ class playManifestAction extends kalturaAction
 						break;
 						
 					case entry::ENTRY_MEDIA_TYPE_VIDEO:
-					case entry::ENTRY_MEDIA_TYPE_AUDIO:
-						KalturaLog::debug("playmanifest: in mediaclip");	
+					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
 						$duration = $this->entry->getDurationInt();
 						$flavors = $this->buildFlavorsArray($duration, true);
-						KalturaLog::debug("playmanifest: in mediaclip flavor:".print_r($flavors,true));
+						
 						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration);
 				}
 				
