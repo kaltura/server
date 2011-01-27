@@ -128,7 +128,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
-		$publishState = $this->fetchStatus($data);
+		$errDescription = null;
+		$publishState = $this->fetchStatus($data, $errDescription);
 		KalturaLog::info("publishState [$publishState]");
 		switch($publishState)
 		{
@@ -140,12 +141,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 				
 			case 'Error':
 			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+				
+				if($errDescription)
 					throw new Exception("MSN error: $errDescription");
-				}
+					
 				throw new Exception('Unknows MSN error');
 				
 			default:
@@ -158,13 +157,17 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 * @param KalturaDistributionJobData $data
 	 * @return string status
 	 */
-	protected function fetchStatus(KalturaDistributionJobData $data)
+	protected function fetchStatus(KalturaDistributionJobData $data, &$errDescription)
 	{
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaMsnDistributionProfile))
 			throw new Exception("Distribution profile must be of type KalturaMsnDistributionProfile");
 	
 		$xml = $this->fetchXML($data, $data->distributionProfile);
-			
+	
+		$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
+		if($liveSiteErrorNodes->length)
+			$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+		
 		$publishStateAttr = $xml->documentElement->attributes->getNamedItem('publishState');
 		if($publishStateAttr)
 			return $publishStateAttr->value;
@@ -240,7 +243,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeDelete(KalturaDistributionDeleteJobData $data)
 	{
-		$publishState = $this->fetchStatus($data);
+		$errDescription = null;
+		$publishState = $this->fetchStatus($data, $errDescription);
 		switch($publishState)
 		{
 			case 'Published':
@@ -251,12 +255,9 @@ class MsnDistributionEngine extends DistributionEngine implements
 				
 			case 'Error':
 			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+				if($errDescription)
 					throw new Exception("MSN error: $errDescription");
-				}
+					
 				throw new Exception('Unknows MSN error');
 				
 			default:
@@ -270,7 +271,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	public function closeUpdate(KalturaDistributionUpdateJobData $data)
 	{
-		$publishState = $this->fetchStatus($data);
+		$errDescription = null;
+		$publishState = $this->fetchStatus($data, $errDescription);
 		switch($publishState)
 		{
 			case 'Published':
@@ -281,12 +283,9 @@ class MsnDistributionEngine extends DistributionEngine implements
 				
 			case 'Error':
 			case 'Update Error':
-				$liveSiteErrorNodes = $xml->documentElement->getElementsByTagName('liveSiteError');
-				if($liveSiteErrorNodes->length)
-				{
-					$errDescription = $liveSiteErrorNodes->item(0)->textContent;
+				if($errDescription)
 					throw new Exception("MSN error: $errDescription");
-				}
+					
 				throw new Exception('Unknows MSN error');
 				
 			default:
