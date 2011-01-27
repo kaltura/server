@@ -1484,7 +1484,17 @@ class kFlowHelper
 		
 	 	$jobData->setFromEmail(kConf::get("batch_download_video_sender_email"));
 	 	$jobData->setFromName(kConf::get("batch_download_video_sender_name"));
-		$jobData->setRecipientEmail($partner->getAdminEmail());
+	 	
+	 	$kuser = kuserPeer::getKuserByPartnerAndUid($dbBatchJob->getPartnerId(), $data->getPuserId());
+	 	if ($kuser) {
+	 		$recipientEmail = $kuser->getEmail();
+	 	}
+	 	else {
+	 		KalturaLog::err('Cannot find kuser with puserId ['.$dbBatchJob->getPartnerId().'] and partnerId ['.$data->getPuserId().']. Sending mail to admin user instead.');
+	 		$recipientEmail = $partner->getAdminEmail();
+	 	}
+	 	
+	 	$jobData->setRecipientEmail($recipientEmail);
 		$jobData->setSubjectParamsArray(array());
 		
 		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());

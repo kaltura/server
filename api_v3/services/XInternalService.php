@@ -37,7 +37,6 @@ class XInternalService extends KalturaBaseService
 		
 		kJobsManager::addBulkDownloadJob($this->getPartnerId(), $this->getKuser()->getPuserId(), $entryIds, $flavorParamsId);
 		
-		$partner = $this->getPartner();
-		return $partner->getAdminEmail();
+		return $this->getKuser->getEmail();
 	}
 }
