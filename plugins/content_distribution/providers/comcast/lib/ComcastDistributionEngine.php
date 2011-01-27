@@ -204,7 +204,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$data->sentData = $comcastMediaService->request;
 		$data->results = $comcastMediaService->response;
 		
-		if(!$data->entryDistribution->remoteId && $comcastAddContentResults->mediaID)
+		if($comcastAddContentResults->mediaID)
 		{
 			$data->remoteId = $comcastAddContentResults->mediaID;
 		}
