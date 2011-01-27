@@ -110,7 +110,7 @@
 							<xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/>
 							<xsl:text>/name/</xsl:text>
 							<xsl:value-of select="thumbnail/@thumbAssetId"/>
-							<xsl:text>.flv</xsl:text>
+							<xsl:text>.jpg</xsl:text>
 						</uri>
 					</file>
 				</xsl:if>
