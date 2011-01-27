@@ -75,7 +75,7 @@ class KalturaFrontController
 		$this->serializeResponse($result, $ignoreNull);
 	}
 	
-	public function handleMultiRequest()
+	public function handleMultiRequest() 
 	{
 	    $listOfRequests = array(); 
 	    $results = array();

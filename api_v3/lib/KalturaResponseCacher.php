@@ -102,7 +102,7 @@ class KalturaResponseCacher
 	 * 
 	 * @param $cacheHeaderName - the header name to add
 	 * @param $cacheHeader - the header value to add
-	 */	
+	 */	 
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
 		if (!self::$_useCache)
