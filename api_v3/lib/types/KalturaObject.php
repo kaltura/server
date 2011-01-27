@@ -128,7 +128,7 @@ class KalturaObject
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
-		$this->validateForUpdate(); // will check that not updatable properties are not set 
+		$this->validateForUpdate($object_to_fill); // will check that not updatable properties are not set 
 		
 		return $this->toObject($object_to_fill, $props_to_skip);
 	}
@@ -202,7 +202,7 @@ class KalturaObject
 		}
 	}
 	
-	public function validateForUpdate()
+	public function validateForUpdate($source_object)
 	{
 		$updatableProperties = array();
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
@@ -225,7 +225,17 @@ class KalturaObject
 				// property requires update permissions, verify that the current user has it
 				if ($property->requiresUpdatePermission())
 				{
-					if (!kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
+					$skip = false;
+					$objectPropertyName = $this->getObjectPropertyName($propertyName);
+					$getter_callback = array ( $source_object ,"get{$objectPropertyName}"  );
+					if (is_callable($getter_callback))
+            		{
+                		$value = call_user_func($getter_callback);
+                		if ($value === $this->$propertyName) {
+                			$skip = true;
+                		}
+            		}					
+					if (!skip && !kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
 						throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 					}
 				}
@@ -233,5 +243,18 @@ class KalturaObject
 		}
 		
 		return $updatableProperties;
+	}
+	
+	private function getObjectPropertyName($propertyName)
+	{
+		$objectPropertyName = null;
+		$mapBetweenObjects = $this->getMapBetweenObjects();
+		if (array_key_exists($propertyName, $mapBetweenObjects)) {
+			$objectPropertyName = $mapBetweenObjects[$propertyName];
+		}
+		else if (in_array($propertyName, $mapBetweenObjects)) {
+			$objectPropertyName = $propertyName;
+		}
+		return $objectPropertyName;
 	}
 }
