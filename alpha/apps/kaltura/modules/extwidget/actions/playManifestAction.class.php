@@ -142,8 +142,6 @@ class playManifestAction extends kalturaAction
 				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
 		}
 		
-		$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
-		
 		$flavors = array();
 		$durationSet = false;
 		foreach($flavorAssets as $flavorAsset)
