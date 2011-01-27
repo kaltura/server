@@ -167,7 +167,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$this->impersonate($data->entryDistribution->partnerId);
 		foreach($flavorAssets as $flavorAsset)
 		{
-			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id);
+			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
 			
 			$mediaFile = new ComcastMediaFile();
 			$mediaFile->allowRelease = true;
