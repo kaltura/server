@@ -276,20 +276,22 @@ class playManifestAction extends kalturaAction
 	{
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-		
+		KalturaLog::debug("playmanifest: in remove");
 		switch($this->entry->getType())
 		{
 			case entryType::MEDIA_CLIP:
 				switch($this->entry->getMediaType())
-				{
+				{					
 					case entry::ENTRY_MEDIA_TYPE_IMAGE:
 						// TODO - create sequence manifest
 						break;
 						
 					case entry::ENTRY_MEDIA_TYPE_VIDEO:
-					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
+					case entry::ENTRY_MEDIA_TYPE_AUDIO:
+						KalturaLog::debug("playmanifest: in mediaclip");	
 						$duration = $this->entry->getDurationInt();
 						$flavors = $this->buildFlavorsArray($duration, true);
+						KalturaLog::debug("playmanifest: in mediaclip flavor:".print_r($flavors,true));
 						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration);
 				}
 				
@@ -564,6 +566,7 @@ class playManifestAction extends kalturaAction
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
+	
 		
 		$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
 		if ( ! $this->entry )
@@ -586,6 +589,9 @@ class playManifestAction extends kalturaAction
 		if(!$this->cdnHost || $partner->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 		
+		if(($this->maxBitrate) && ((!is_numeric($this->maxBitrate)) || ($this->maxBitrate <= 0)))
+			KExternalErrors::dieError(KExternalErrors::INVALID_MAX_BITRATE);
+			
 		$ksStr = $this->getRequestParameter("ks");
 	
 		$base64Referrer = $this->getRequestParameter("referrer");
