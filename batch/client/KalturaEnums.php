@@ -264,9 +264,12 @@ class KalturaContainerFormat
 	const ISMV = "ismv";
 	const MKV = "mkv";
 	const WEBM = "webm";
+	const MPEG = "mpeg";
+	const MPEGTS = "mpegts";
 	const SWF = "swf";
 	const PDF = "pdf";
 	const JPG = "jpg";
+	const APPLEHTTP = "applehttp";
 }
 
 class KalturaControlPanelCommandOrderBy
@@ -318,6 +321,7 @@ class KalturaConversionEngineType
 	const FAST_START = "fastStart.FastStart";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const AVIDEMUX = "avidemux.Avidemux";
+	const SEGMENTER = "segmenter.Segmenter";
 }
 
 class KalturaConversionProfileOrderBy
