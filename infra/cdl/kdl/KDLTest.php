@@ -165,7 +165,7 @@ $exeStr = "FFMpeg ".$cmdLineGenerator->FFMpeg(null);
 			kLog::log( ".CMD-->".$exeStr);
 			$exeStr = "ffmpeg ".$cmdLineGenerator->Generate(new KDLOperationParams(KDLTranscoders::FFMPEG), 1000);
 			kLog::log( ".CMD-->".$exeStr);
-//			exec($exeStr, $output, $rv);
+			exec($exeStr, $output, $rv);
 			kLog::log( "..RV-->In".$inFile."==>");
 			if(!file_exists($outFile) || filesize($outFile)==0)
 				kLog::log( "Failed");
