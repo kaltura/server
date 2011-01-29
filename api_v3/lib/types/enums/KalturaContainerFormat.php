@@ -13,7 +13,10 @@ class KalturaContainerFormat extends KalturaStringEnum
 	const ISMV = "ismv";
 	const MKV = "mkv";
 	const WEBM = "webm";
-	
+	const MPEG = "mpeg";
+	const MPEGTS = "mpegts";
+	const APPLEHTTP = "applehttp";
+		
 	
 	const SWF = 'swf';
 	const PDF = 'pdf';
