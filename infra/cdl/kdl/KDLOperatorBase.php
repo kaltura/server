@@ -165,6 +165,8 @@ class KDLOperationParams {
 	public $_cmd=null;
 	public $_cfg=null;
 	public $_engine=null;
+	public $_extractmediaEnabled=null;
+	public $_thumbEnabled=null;
 	
 		/* ---------------------------
 		 * ToString
