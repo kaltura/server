@@ -449,6 +449,11 @@ $target->_video = null;
 				case KDLContainerTarget::WEBM:
 					$targetVid->_id = KDLVideoTarget::VP8;
 					break;
+				case KDLContainerTarget::MPEG:
+				case KDLContainerTarget::MPEGTS:
+				case KDLContainerTarget::APPLEHTTP:
+					$targetVid->_id = KDLVideoTarget::H264;
+					break;
 			}
 		}
 		/*
@@ -694,6 +699,8 @@ $target->_video = null;
 						$targetAud->_id=KDLAudioTarget::WMA;
 						break;
 					case KDLContainerTarget::WEBM:
+					case KDLContainerTarget::MPEGTS:
+					case KDLContainerTarget::APPLEHTTP:
 						$targetAud->_id=KDLAudioTarget::AAC;
 						break;
 				};
