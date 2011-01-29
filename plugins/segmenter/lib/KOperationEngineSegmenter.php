@@ -23,7 +23,7 @@ class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-$this->outFilePath = "k:".$this->outFilePath;
+//$this->outFilePath = "k:".$this->outFilePath;
 		KalturaLog::debug("creating directory:".$this->outFilePath);
 		if(mkdir($this->outFilePath))
 			KalturaLog::debug("SUCCESS");
