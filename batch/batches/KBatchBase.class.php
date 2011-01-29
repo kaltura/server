@@ -337,6 +337,16 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		return true;
 	}
 	
+	protected static function foldersize($path)
+	{
+	  if(!file_exists($path)) return 0;
+	  if(is_file($path)) return filesize($path);
+	  $ret = 0;
+	  foreach(glob($path."/*") as $fn)
+	    $ret += KBatchBase::foldersize($fn);
+	  return $ret;
+	}
+
 	/**
 	 * @param string $file
 	 * @param int $size
@@ -346,12 +356,19 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	{
 		if($this->isUnitTest)
 			return true;
-			
+
+			// If this is not a file but a directory, certain operations should be done diffrently:
+			// - size calcultions
+			// - the response from the client (to check the client size beaviour)
+		$directorySync = is_dir($file);
 		KalturaLog::info("Check File Exists[$file] size[$size]");
 		if(! $size)
 		{
 			clearstatcache();
-			$size = filesize($file);
+			if($directorySync)
+				$size=KBatchBase::foldersize($file);
+			else
+				$size = filesize($file);
 			if(! $size)
 				return false;
 		}
@@ -362,7 +379,8 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		while($retries > 0)
 		{
 			$check = $this->kClient->batch->checkFileExists($file, $size);
-			if($check->exists && $check->sizeOk)
+				// In case of directorySync - do not check client sizeOk - to be revised
+			if($check->exists && ($check->sizeOk || $directorySync))
 			{
 				$this->onFileEvent($file, $size, KBatchEvent::EVENT_FILE_EXISTS);
 				return true;
