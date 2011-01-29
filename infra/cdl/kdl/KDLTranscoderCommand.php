@@ -318,6 +318,13 @@ if($this->_inFileName){
 				case KDLContainerTarget::WEBM:
 					$format = "webm";
 					break;
+				case KDLContainerTarget::MPEGTS:
+				case KDLContainerTarget::APPLEHTTP:
+					$format = "mpegts";
+					break;
+				case KDLContainerTarget::MPEG:
+					$format = "mpeg";
+					break;
 			}
 			$cmdStr = $cmdStr." -f ".$format;
 		}
