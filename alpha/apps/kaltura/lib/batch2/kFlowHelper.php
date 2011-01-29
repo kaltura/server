@@ -277,7 +277,7 @@ class kFlowHelper
 			
 		return $dbBatchJob;
 	}
-	
+
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertJobData $data
@@ -363,6 +363,13 @@ class kFlowHelper
 				}
 			}
 		}
+				// For apple http flavors do not attempt to get thumbs and media info,
+				// It is up to the operator to provide that kind of data, rather than hardcoded check
+				// To-fix 
+		if($flavorParamsOutput->getFormat()==assetParams::CONTAINER_FORMAT_APPLEHTTP) {
+			$createThumb = false;
+			$extractMedia = false;
+		}
 		
 		if($createThumb)
 		{
@@ -394,7 +401,7 @@ class kFlowHelper
 				if($flavorAsset->getIsOriginal())
 					$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE;
 					
-				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+					kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 			}
 			else // no need to run post convert
 			{
@@ -409,6 +416,8 @@ class kFlowHelper
 						$flavorAsset->setBitrate($flavorParamsOutput->getVideoBitrate());
 						$flavorAsset->setWidth($flavorParamsOutput->getWidth());
 						$flavorAsset->setHeight($flavorParamsOutput->getHeight());
+						$flavorAsset->setFrameRate($flavorParamsOutput->getFrameRate());
+						$flavorAsset->setIsOriginal(0);
 						$flavorAsset->save();
 					}
 					
