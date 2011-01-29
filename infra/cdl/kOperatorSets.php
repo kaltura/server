@@ -62,12 +62,12 @@ class kOperatorSets
 			$set = array();
 			foreach($decodedSet as $decodedOperator)
 			{
-				$operator = new kOperator();
-				$operator->id = $decodedOperator->id;
+				$operator = new kOperator($decodedOperator);
+/*				$operator->id = $decodedOperator->id;
 				$operator->extra = isset($decodedOperator->extra) ? $decodedOperator->extra : null;
 				$operator->command = isset($decodedOperator->command) ? $decodedOperator->command : null;
 				$operator->config = isset($decodedOperator->config) ? $decodedOperator->config : null;
-				
+*/				
 				$set[] = $operator;
 			}
 			
