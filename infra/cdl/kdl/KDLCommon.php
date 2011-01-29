@@ -207,6 +207,9 @@
 		const ISMV = "ismv";
 		const MKV = "mkv";
 		const WEBM = "webm";
+		const MPEG = "mpeg";
+		const MPEGTS = "mpegts";
+		const APPLEHTTP = "applehttp";
 	};
 
 	class KDLVideoTarget {
