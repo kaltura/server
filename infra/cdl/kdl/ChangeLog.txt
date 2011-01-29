@@ -132,3 +132,24 @@ tr+tag - /opt/kaltura/app/admin_console/lib/Kaltura/KalturaClient.php - const AV
 tr+tag - /opt/kaltura/app/batch/client/KalturaClient.php: -  - const AVIDEMUX = "avidemux.Avidemux";
 tr - batch_config.template.ini - avidmux
 tr - kConfLocal.php - avidemux + ee
+
+
+/alpha/apps/kaltura/lib/batch2/kFlowHelper.php - 'handleConvertFinished' fixed to handle applehttp
+/alpha/lib/model/assetParams.php - 'mpeg','mpegts' and 'applehttp' format enums
+/admin_console/lib/Kaltura/KalturaEnums.php - 'mpeg','mpegts' and 'applehttp' format enums
+/api_v3/lib/types/enums/KalturaContainerFormat.php - 'mpeg','mpegts' and 'applehttp' format enums
+/batch/batches/KBatchBase.class.php - 'checkFileExists' to handle directories
+/batch/client/KalturaEnums.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kOperator.php - additional operator params
+/infra/cdl/kOperatorSets.php - to support additional params
+/infra/cdl/kdl/KDLCommon.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kdl/KDLFlavor.php - supports 'mpeg','mpegts' and 'applehttp' formats
+/infra/cdl/kdl/KDLOperatorBase.php - additional operator params
+/infra/cdl/kdl/KDLTranscoderCommand.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kdl/KDLWrap.php - additional operator params
+SaaS/alpha/config/kConfLocal.php - add SegmenterPlugin to  additional plugins
+plugins/segmenter - new operator
+batch_config.ini - addition to [KAsyncConvert] 
+   params.useSegmenter		= true;
+   params.segmenterCmd		= segmenter;
+
