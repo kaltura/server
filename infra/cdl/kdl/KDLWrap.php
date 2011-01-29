@@ -518,9 +518,26 @@ KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 		}
 		return $transObjArr;
 	}
+
+	/* ------------------------------
+	 * function convertOperatorKdl2Cdl
+	 */
+	public static function convertOperatorKdl2Cdl($kdlOperator, $id=null)
+	{
+		$opr = new kOperator();
+		if(!$id || $id===false)
+			$opr->id = $kdlOperator->_id;
+		else
+			$opr->id = $id;
+		
+		$opr->extra = $kdlOperator->_extra;
+		$opr->command = $kdlOperator->_cmd;
+		$opr->config = $kdlOperator->_cfg;
+		return $opr;
+	}
 	
 	/* ------------------------------
-	 * function convertOperatorsCdl2Kdl
+	 * function convertOperatorsKdl2Cdl
 	 */
 	public static function convertOperatorsKdl2Cdl($kdlOperators)
 	{
@@ -529,29 +546,31 @@ KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
 			$auxArr = array();
 			if(is_array($transObj)) {
 				foreach($transObj as $tr) {
-					$opr = new kOperator();
 					$key=array_search($tr->_id,self::$TranscodersCdl2Kdl);
-					if($key===false)
-						$opr->id = $tr->_id;
-					else
-						$opr->id = $key;
-					$opr->extra = $tr->_extra;
-					$opr->command = $tr->_cmd;
-					$opr->config = $tr->_cfg;
-					$auxArr[] = $opr;
+//					$opr = new kOperator();
+//					if($key===false)
+//						$opr->id = $tr->_id;
+//					else
+//						$opr->id = $key;
+//					$opr->extra = $tr->_extra;
+//					$opr->command = $tr->_cmd;
+//					$opr->config = $tr->_cfg;
+//					$auxArr[] = $opr;
+					$auxArr[] = KDLWrap::convertOperatorKdl2Cdl($tr, $key);
 				}
 			}
 			else {
-				$opr = new kOperator();
 				$key=array_search($transObj->_id,self::$TranscodersCdl2Kdl);
-				if($key===false)
-					$opr->id = $transObj->_id;
-				else
-					$opr->id = $key;
-				$opr->extra = $transObj->_extra;
-				$opr->command = $transObj->_cmd;
-				$opr->config = $transObj->_cfg;
-				$auxArr[] = $opr;
+//				$opr = new kOperator();
+//				if($key===false)
+//					$opr->id = $transObj->_id;
+//				else
+//					$opr->id = $key;
+//				$opr->extra = $transObj->_extra;
+//				$opr->command = $transObj->_cmd;
+//				$opr->config = $transObj->_cfg;
+//				$auxArr[] = $opr;
+				$auxArr[] = KDLWrap::convertOperatorKdl2Cdl($transObj, $key);
 			}
 			$cdlOprSets->addSet($auxArr);
 		}
