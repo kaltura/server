@@ -21,6 +21,9 @@ class assetParams extends BaseassetParams
 	const CONTAINER_FORMAT_ISMV = "ismv";
 	const CONTAINER_FORMAT_MKV = "mkv";
 	const CONTAINER_FORMAT_WEBM = "webm";
+	const CONTAINER_FORMAT_MPEG = "mpeg";
+	const CONTAINER_FORMAT_MPEGTS = "mpegts";
+	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
