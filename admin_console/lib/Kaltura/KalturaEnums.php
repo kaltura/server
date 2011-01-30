@@ -325,10 +325,9 @@ class KalturaConversionEngineType
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
-	const FAST_START = "fastStart.FastStart";
+	const SEGMENTER = "segmenter.Segmenter";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const AVIDEMUX = "avidemux.Avidemux";
-	const SEGMENTER = "segmenter.Segmenter";
 }
 
 class KalturaConversionProfileOrderBy
@@ -408,6 +407,7 @@ class KalturaDistributionProviderType
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const VERIZON = "verizonDistribution.VERIZON";
 }
 
 class KalturaDocumentType
@@ -993,7 +993,6 @@ class KalturaPermissionName
 	const FEATURE_PS2_PERMISSIONS_VALIDATION = "FEATURE_PS2_PERMISSIONS_VALIDATION";
 	const USER_SESSION_PERMISSION = "BASE_USER_SESSION_PERMISSION";
 	const ALWAYS_ALLOWED_ACTIONS = "ALWAYS_ALLOWED_ACTIONS";
-	const SYSTEM_BASE_ACTIONS = "SYSTEM_BASE_ACTIONS";
 	const SYSTEM_FILESYNC = "SYSTEM_FILESYNC";
 	const SYSTEM_INTERNAL = "SYSTEM_INTERNAL";
 	const KMC_ACCESS = "KMC_ACCESS";
@@ -1019,6 +1018,7 @@ class KalturaPermissionName
 	const SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE = "SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE";
 	const SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY = "SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY";
 	const SYSTEM_ADMIN_PERMISSIONS_MANAGE = "SYSTEM_ADMIN_PERMISSIONS_MANAGE";
+	const SYSTEM_ADMIN_ENTRY_INVESTIGATION = "SYSTEM_ADMIN_ENTRY_INVESTIGATION";
 	const BATCH_BASE = "BATCH_BASE";
 	const CONTENT_INGEST_UPLOAD = "CONTENT_INGEST_UPLOAD";
 	const CONTENT_INGEST_BULK_UPLOAD = "CONTENT_INGEST_BULK_UPLOAD";
