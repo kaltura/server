@@ -140,4 +140,15 @@ systempartner.getconfiguration		|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN
 systempartner.updateconfiguration	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_CONFIG
 systempartner.getpackages			|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 
+flavorparamsoutput.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+thumbparamsoutput.list				|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+mediainfo.list						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_ADMIN_ENTRY_INVESTIGATION
+
+filesync.list						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_FILESYNC,SYSTEM_ADMIN_ENTRY_INVESTIGATION
+filesync.sync						|			|N		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_FILESYNC
+
+kalturainternaltoolssystemhelper.fromsecurestring			|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_INTERNAL
+kalturainternaltoolssystemhelper.iptocountry				|			|2		|0	|0		|0		|1		|	|*		|	|   |SYSTEM_INTERNAL
+kalturainternaltoolssystemhelper.getremoteaddress			|			|2		|0	|0		|0		|1		|	|*		|	|   |SYSTEM_INTERNAL
+
 ---------------------------------------------------------------------------------------------------
