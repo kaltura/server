@@ -6,6 +6,11 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaSystemPartnerPlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaSystemPartnerService
 	 */
 	public $systemPartner = null;
@@ -32,7 +37,7 @@ class KalturaSystemPartnerPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->systemPartner,
+			'systemPartner' => $this->systemPartner,
 		);
 		return $services;
 	}

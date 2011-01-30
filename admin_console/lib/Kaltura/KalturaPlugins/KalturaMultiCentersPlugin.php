@@ -6,6 +6,11 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaMultiCentersPlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaFileSyncImportBatchService
 	 */
 	public $fileSyncImportBatch = null;
@@ -32,7 +37,7 @@ class KalturaMultiCentersPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->fileSyncImportBatch,
+			'fileSyncImportBatch' => $this->fileSyncImportBatch,
 		);
 		return $services;
 	}

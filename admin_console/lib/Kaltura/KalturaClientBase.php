@@ -86,10 +86,10 @@ class KalturaClientBase
 						continue;
 						
 					$services = $plugin->getServices();
-					foreach($services as $service)
+					foreach($services as $serviceName => $service)
 					{
 						$service->setClient($this);
-						$this->pluginServices[$service->serviceName] = $service;
+						$this->pluginServices[$serviceName] = $service;
 					}
 				}
 			}
@@ -494,11 +494,6 @@ interface IKalturaClientPlugin
 
 abstract class KalturaClientPlugin implements IKalturaClientPlugin
 {
-	/**
-	 * @var KalturaClientPlugin
-	 */
-	protected $instance;
-	
 	protected function __construct()
 	{
 		

@@ -6,6 +6,11 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaAdminConsolePlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaFlavorParamsOutputService
 	 */
 	public $flavorParamsOutput = null;
@@ -50,10 +55,10 @@ class KalturaAdminConsolePlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->flavorParamsOutput,
-			$this->thumbParamsOutput,
-			$this->mediaInfo,
-			$this->entryAdmin,
+			'flavorParamsOutput' => $this->flavorParamsOutput,
+			'thumbParamsOutput' => $this->thumbParamsOutput,
+			'mediaInfo' => $this->mediaInfo,
+			'entryAdmin' => $this->entryAdmin,
 		);
 		return $services;
 	}

@@ -6,9 +6,9 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaKalturaInternalToolsPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaKalturaInternalToolsService
+	 * @var KalturaClientPlugin
 	 */
-	public $KalturaInternalTools = null;
+	protected static $instance;
 
 	/**
 	 * @var KalturaKalturaInternalToolsSystemHelperService
@@ -18,7 +18,6 @@ class KalturaKalturaInternalToolsPlugin extends KalturaClientPlugin
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->KalturaInternalTools = new KalturaKalturaInternalToolsService();
 		$this->KalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService();
 	}
 
@@ -38,8 +37,7 @@ class KalturaKalturaInternalToolsPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->KalturaInternalTools,
-			$this->KalturaInternalToolsSystemHelper,
+			'KalturaInternalToolsSystemHelper' => $this->KalturaInternalToolsSystemHelper,
 		);
 		return $services;
 	}

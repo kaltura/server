@@ -6,6 +6,11 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaFileSyncPlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaFileSyncService
 	 */
 	public $fileSync = null;
@@ -32,7 +37,7 @@ class KalturaFileSyncPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->fileSync,
+			'fileSync' => $this->fileSync,
 		);
 		return $services;
 	}

@@ -6,6 +6,11 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaStorageProfilePlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaStorageProfileService
 	 */
 	public $storageProfile = null;
@@ -32,7 +37,7 @@ class KalturaStorageProfilePlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->storageProfile,
+			'storageProfile' => $this->storageProfile,
 		);
 		return $services;
 	}
