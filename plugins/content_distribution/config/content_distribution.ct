@@ -45,6 +45,6 @@ entrydistribution.submitupdate												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|C
 entrydistribution.submitdelete												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_REMOVE
 entrydistribution.submitfetchreport											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
 entrydistribution.retrysubmit												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
-entrydistribution.servereturneddata											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
-entrydistribution.servesentdata												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_SEND
+entrydistribution.servereturneddata											|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
+entrydistribution.servesentdata												|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
