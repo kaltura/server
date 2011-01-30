@@ -542,6 +542,7 @@ $(window).load(function(){
 			kmc.log(arguments);
 		
 			// default value for html5_compatible
+			alert(html5_compatible);
 			html5_compatible = (html5_compatible) ? html5_compatible : false;
 		
 			if(id != "multitab_playlist") {
