@@ -543,6 +543,7 @@ $(window).load(function(){
 		
 			// default value for html5_compatible
 			html5_compatible = (html5_compatible) ? html5_compatible : false;
+			html5_compatible = true;
 		
 			if(id != "multitab_playlist") {
 
