@@ -216,7 +216,7 @@ class myPartnerRegistration
 
 	// if the adminKuser already exists - use his password - it should always be the same one for a given email !!
 	private function createNewAdminKuser($newPartner , $existing_password )
-	{
+	{		
 		// generate a new password if not given
 		if ( $existing_password != null ) {
 			$password = $existing_password;
@@ -270,6 +270,26 @@ class myPartnerRegistration
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
 						
+		
+		$existingLoginData = UserLoginDataPeer::getByEmail($email);
+		if ($existingLoginData)
+		{
+			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
+			if (!$password)
+			{
+				throw new SignupException("User with email [$email] already exists in system.", SignupException::EMAIL_ALREADY_EXISTS );
+			}
+			else if ($existingLoginData->isPasswordValid($password))
+			{
+				KalturaLog::log('Login id ['.$email.'] already used, and given password is valid. Creating new partner with this same login id');
+			}
+			else
+			{
+				throw new SignupException("Invalid password for user with email [$email].", SignupException::EMAIL_ALREADY_EXISTS );
+			}
+		}
+			
+			
 		// TODO: log request
 		$newPartner = NULL;
 		$newSubPartner = NULL;
