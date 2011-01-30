@@ -129,6 +129,7 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "HuluDistributionPlugin";
 		// self::$map['default_plugins'][] = "ContentDistributionSphinxPlugin";
 		// self::$map['default_plugins'][] = "AnnotationPlugin"; 
+		// self::$map['default_plugins'][] = "SegmenterPlugin"; 
 		
 }
 
