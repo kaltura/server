@@ -34,20 +34,20 @@ class ShortLinkFilter extends baseObjectFilter
 	{
 		return 
 			array (
-				"display_name" => "VirusScanProfileFilter",
+				"display_name" => "ShortLinkFilter",
 				"desc" => ""
 			);
 	}
 	
 	public function getFieldNameFromPeer ( $field_name )
 	{
-		$res = VirusScanProfilePeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
+		$res = ShortLinkPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 		return $res;
 	}
 
 	public function getIdFromPeer (  )
 	{
-		return VirusScanProfilePeer::ID;
+		return ShortLinkPeer::ID;
 	}
 }
 
