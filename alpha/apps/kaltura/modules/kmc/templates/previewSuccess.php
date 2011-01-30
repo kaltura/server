@@ -34,7 +34,7 @@ if( ! $sf_params->has('p') || $sf_params->has['e'] ) {
 	</div><!-- end #main -->
 
 <!-- <script type="text/javascript" src="http://html5.kaltura.org/js"></script> -->
-<script src="/html5/html5lib/v1.0/mwEmbedLoader.php"></script> 
+<script src="/html5/html5lib/v1.1/mwEmbedLoader.php"></script>
 <script type="text/javascript">
 var partnerId = <?php echo $sf_params->get('p'); ?>;
 var uiConf = <?php echo $sf_params->get('u'); ?>;
@@ -59,7 +59,7 @@ mw.ready( function(){
 		} );
 	});
 
-	$j('#showVideo').trigger('click');	
+	$j('#showVideo').trigger('click');
 	
 } );
 </script>
