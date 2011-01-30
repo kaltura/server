@@ -96,6 +96,19 @@ class kPluginableEnumsManager
 		return null;
 	}
 	
+	public static function coreValues($type)
+	{
+		$reflect = new ReflectionClass($type);
+		$values = $reflect->getConstants();
+		
+		$typeMap = self::getApiMap($type);
+		foreach($typeMap as $apiValue => $coreValue)
+			if(!in_array($coreValue, $values))
+				$values[$apiValue] = $coreValue;
+				
+		return $values;
+	}
+	
 	public static function coreToApi($type, $value)
 	{
 		$typeMap = self::getCoreMap($type);
