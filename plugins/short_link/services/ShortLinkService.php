@@ -172,7 +172,10 @@ class ShortLinkService extends KalturaBaseService
 		{
 			$success = virtual($dbShortLink->getFullUrl());
 			if($success)
+			{
+				ob_end_flush();
 				die;
+			}
 				
 			throw new KalturaAPIException(ShortLinkErrors::VIRTUAL_PROXY_FAILED, $dbShortLink->getFullUrl());
 		}
