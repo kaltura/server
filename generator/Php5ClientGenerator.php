@@ -77,7 +77,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$xpath = new DOMXPath($this->_doc);
 		
 		$pluginName = $pluginNode->getAttribute("name");
-		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "Plugin";
+		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
