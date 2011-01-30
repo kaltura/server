@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="lib.model">
 	<table skipSql="false" abstract="false" name="short_link">
-		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar" size="20" />
+		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar" size="5" />
 		<column primaryKey="false" required="true"  lazyLoad="false" name="int_id" type="integer" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />

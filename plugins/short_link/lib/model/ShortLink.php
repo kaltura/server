@@ -69,5 +69,30 @@ class ShortLink extends BaseShortLink {
 			
 		return $ret;
 	}
+
+	protected function calculateId()
+	{
+		$dc = kDataCenterMgr::getCurrentDc();
+		for ($i = 0; $i < 10; $i++)
+		{
+			$id = $dc["id"] . kString::generateStringId(3);
+			$existingObject = ShortLinkPeer::retrieveByPK($id);
+			
+			if ($existingObject)
+				KalturaLog::log("id [$id] already exists");
+			else
+				return $id;
+		}
+		
+		throw new Exception("Could not find unique id for short link");
+	}
+
+	public function save(PropelPDO $con = null)
+	{
+		if ($this->isNew())
+			$this->setId($this->calculateId());
+			
+		parent::save($con);
+	}
 		
 } // ShortLink

@@ -288,9 +288,9 @@ class kString
 		return $key;
 	}
 	
-	public static function generateStringId()
+	public static function generateStringId($length = 8)
 	{
-		return substr(base_convert(md5(uniqid(rand(), true)), 16, 36), 1, 8);
+		return substr(base_convert(md5(uniqid(rand(), true)), 16, 36), 1, $length);
 	}
 	
 	
