@@ -38,7 +38,7 @@ $(window).load(function(){
 /* kmc and kmc.vars defined in script block in kmc2success.php */
 
 	// For debug enable to true
-	kmc.vars.debug = false;
+	kmc.vars.debug = true;
 	
 	// kmc.vars.quickstart_guide = "/content/docs/pdf/KMC_Quick_Start_Guide__Butterfly.pdf#";
 	kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
@@ -542,7 +542,6 @@ $(window).load(function(){
 			kmc.log(arguments);
 		
 			// default value for html5_compatible
-			alert(html5_compatible);
 			html5_compatible = (html5_compatible) ? html5_compatible : false;
 		
 			if(id != "multitab_playlist") {
