@@ -23,12 +23,12 @@ class ShortLinkService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaShortLinkListResponse
 	 */
-	function listAction(KalturaShortLinkFilter  $filter = null, KalturaFilterPager $pager = null)
+	function listAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaShortLinkFilter;
 			
-		$shortLinkFilter = $filter->toObject();
+		$shortLinkFilter = $filter->toFilter($this->getPartnerId());
 		
 		$c = new Criteria();
 		$shortLinkFilter->attachToCriteria($c);
