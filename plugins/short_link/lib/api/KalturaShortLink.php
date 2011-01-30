@@ -74,7 +74,6 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 		'id',
 		'createdAt',
 		'updatedAt',
-		'expiresAt',
 		'partnerId',
 		'userId' => 'puserId',
 		'name',
@@ -86,6 +85,12 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
+	public function fromObject($object)
+	{
+		parent::fromObject($object);
+		$this->expiresAt = $object->getExpiresAt(null);
 	}
 	
 	public function getExtraFilters()
