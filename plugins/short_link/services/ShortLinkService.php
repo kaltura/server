@@ -159,6 +159,7 @@ class ShortLinkService extends KalturaBaseService
 	 * @param bool $proxy proxy the response instead of redirect
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws ShortLinkErrors::VIRTUAL_PROXY_FAILED
 	 */		
 	function gotoAction($id, $proxy = false)
 	{
@@ -168,8 +169,14 @@ class ShortLinkService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 
 		if($proxy)
-			virtual($dbShortLink->getFullUrl());
-		else
-			header('Location: ' . $dbShortLink->getFullUrl());
+		{
+			$success = virtual($dbShortLink->getFullUrl());
+			if($success)
+				die;
+				
+			throw new KalturaAPIException(ShortLinkErrors::VIRTUAL_PROXY_FAILED, $dbShortLink->getFullUrl());
+		}
+		
+		header('Location: ' . $dbShortLink->getFullUrl());
 	}
 }
