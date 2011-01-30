@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `short_link`;
 
 CREATE TABLE `short_link`
 (
-	`id` VARCHAR(20)  NOT NULL,
+	`id` VARCHAR(5)  NOT NULL,
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
