@@ -13,6 +13,7 @@ class ShortLinkService extends KalturaBaseService
 		parent::initService($serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new ShortLinkPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new kuserPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 	}
 	
 	/**
