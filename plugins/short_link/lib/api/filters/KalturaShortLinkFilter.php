@@ -11,11 +11,11 @@ class KalturaShortLinkFilter extends KalturaShortLinkBaseFilter
 		
 		if(!is_null($this->userIdEqual))
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $filter->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->userIdEqual);
 			if ($kuser)
-				$filter->userIdEqual = $kuser->getId();
+				$this->userIdEqual = $kuser->getId();
 			else 
-				$filter->userIdEqual = -1; // no result will be returned when the user is missing
+				$this->userIdEqual = -1; // no result will be returned when the user is missing
 		}
 	
 		if(!is_null($this->userIdIn))
@@ -32,7 +32,7 @@ class KalturaShortLinkFilter extends KalturaShortLinkBaseFilter
 			}
 			else
 			{
-				$filter->userIdIn = -1; // no result will be returned when the user is missing
+				$this->userIdIn = -1; // no result will be returned when the user is missing
 			}
 		}
 
