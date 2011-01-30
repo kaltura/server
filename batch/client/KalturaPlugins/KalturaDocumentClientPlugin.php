@@ -3,7 +3,7 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-class KalturaSystemPartnerPlugin extends KalturaClientPlugin
+class KalturaDocumentClientPlugin extends KalturaClientPlugin
 {
 	/**
 	 * @var KalturaClientPlugin
@@ -21,7 +21,7 @@ class KalturaSystemPartnerPlugin extends KalturaClientPlugin
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new KalturaSystemPartnerPlugin();
+			self::$instance = new KalturaDocumentClientPlugin();
 		return self::$instance;
 	}
 

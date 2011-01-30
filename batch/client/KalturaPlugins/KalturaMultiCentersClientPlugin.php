@@ -3,16 +3,22 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-class KalturaStorageProfilePlugin extends KalturaClientPlugin
+class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 {
 	/**
 	 * @var KalturaClientPlugin
 	 */
 	protected static $instance;
 
+	/**
+	 * @var KalturaFileSyncImportBatchService
+	 */
+	public $fileSyncImportBatch = null;
+
 	protected function __construct()
 	{
 		parent::__construct();
+		$this->fileSyncImportBatch = new KalturaFileSyncImportBatchService();
 	}
 
 	/**
@@ -21,7 +27,7 @@ class KalturaStorageProfilePlugin extends KalturaClientPlugin
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new KalturaStorageProfilePlugin();
+			self::$instance = new KalturaMultiCentersClientPlugin();
 		return self::$instance;
 	}
 
@@ -31,6 +37,7 @@ class KalturaStorageProfilePlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
+			'fileSyncImportBatch' => $this->fileSyncImportBatch,
 		);
 		return $services;
 	}
