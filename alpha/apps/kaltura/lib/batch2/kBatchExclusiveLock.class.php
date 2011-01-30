@@ -300,25 +300,8 @@ class kBatchExclusiveLock
 
 	public static function getExpiredJobs()
 	{
-		$jobTypes = array(
-			BatchJobType::CONVERT,
-			BatchJobType::IMPORT,
-			BatchJobType::DELETE,
-			BatchJobType::FLATTEN,
-			BatchJobType::BULKUPLOAD,
-			BatchJobType::DVDCREATOR,
-			BatchJobType::DOWNLOAD,
-			BatchJobType::OOCONVERT,
-			BatchJobType::CONVERT_PROFILE,
-			BatchJobType::POSTCONVERT,
-			BatchJobType::PULL,
-			BatchJobType::REMOTE_CONVERT,
-			BatchJobType::EXTRACT_MEDIA,
-			BatchJobType::MAIL,
-			BatchJobType::NOTIFICATION,
-			BatchJobType::BULKDOWNLOAD,
-		);
-		
+		$jobTypes = kPluginableEnumsManager::coreValues('BatchJobType');
+				
 		$c = new Criteria();
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_FATAL, Criteria::NOT_EQUAL);
 		$c->add(BatchJobPeer::DC, kDataCenterMgr::getCurrentDcId()); // each DC should clean its own jobs
