@@ -6,14 +6,14 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaMetadataPlugin extends KalturaClientPlugin
 {
 	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected static $instance;
+
+	/**
 	 * @var KalturaMetadataService
 	 */
 	public $metadata = null;
-
-	/**
-	 * @var KalturaMetadataProfileService
-	 */
-	public $metadataProfile = null;
 
 	/**
 	 * @var KalturaMetadataBatchService
@@ -24,7 +24,6 @@ class KalturaMetadataPlugin extends KalturaClientPlugin
 	{
 		parent::__construct();
 		$this->metadata = new KalturaMetadataService();
-		$this->metadataProfile = new KalturaMetadataProfileService();
 		$this->metadataBatch = new KalturaMetadataBatchService();
 	}
 
@@ -44,9 +43,8 @@ class KalturaMetadataPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->metadata,
-			$this->metadataProfile,
-			$this->metadataBatch,
+			'metadata' => $this->metadata,
+			'metadataBatch' => $this->metadataBatch,
 		);
 		return $services;
 	}

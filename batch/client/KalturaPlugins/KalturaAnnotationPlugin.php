@@ -6,14 +6,13 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaAnnotationPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaAnnotationService
+	 * @var KalturaClientPlugin
 	 */
-	public $annotation = null;
+	protected static $instance;
 
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->annotation = new KalturaAnnotationService();
 	}
 
 	/**
@@ -32,7 +31,6 @@ class KalturaAnnotationPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->annotation,
 		);
 		return $services;
 	}

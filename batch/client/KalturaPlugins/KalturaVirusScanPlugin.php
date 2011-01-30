@@ -6,9 +6,9 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaVirusScanPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaVirusScanProfileService
+	 * @var KalturaClientPlugin
 	 */
-	public $virusScanProfile = null;
+	protected static $instance;
 
 	/**
 	 * @var KalturaVirusScanBatchService
@@ -18,7 +18,6 @@ class KalturaVirusScanPlugin extends KalturaClientPlugin
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->virusScanProfile = new KalturaVirusScanProfileService();
 		$this->virusScanBatch = new KalturaVirusScanBatchService();
 	}
 
@@ -38,8 +37,7 @@ class KalturaVirusScanPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->virusScanProfile,
-			$this->virusScanBatch,
+			'virusScanBatch' => $this->virusScanBatch,
 		);
 		return $services;
 	}

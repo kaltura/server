@@ -6,29 +6,9 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaContentDistributionPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaDistributionProfileService
+	 * @var KalturaClientPlugin
 	 */
-	public $distributionProfile = null;
-
-	/**
-	 * @var KalturaEntryDistributionService
-	 */
-	public $entryDistribution = null;
-
-	/**
-	 * @var KalturaDistributionProviderService
-	 */
-	public $distributionProvider = null;
-
-	/**
-	 * @var KalturaGenericDistributionProviderService
-	 */
-	public $genericDistributionProvider = null;
-
-	/**
-	 * @var KalturaGenericDistributionProviderActionService
-	 */
-	public $genericDistributionProviderAction = null;
+	protected static $instance;
 
 	/**
 	 * @var KalturaContentDistributionBatchService
@@ -38,11 +18,6 @@ class KalturaContentDistributionPlugin extends KalturaClientPlugin
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->distributionProfile = new KalturaDistributionProfileService();
-		$this->entryDistribution = new KalturaEntryDistributionService();
-		$this->distributionProvider = new KalturaDistributionProviderService();
-		$this->genericDistributionProvider = new KalturaGenericDistributionProviderService();
-		$this->genericDistributionProviderAction = new KalturaGenericDistributionProviderActionService();
 		$this->contentDistributionBatch = new KalturaContentDistributionBatchService();
 	}
 
@@ -62,12 +37,7 @@ class KalturaContentDistributionPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->distributionProfile,
-			$this->entryDistribution,
-			$this->distributionProvider,
-			$this->genericDistributionProvider,
-			$this->genericDistributionProviderAction,
-			$this->contentDistributionBatch,
+			'contentDistributionBatch' => $this->contentDistributionBatch,
 		);
 		return $services;
 	}

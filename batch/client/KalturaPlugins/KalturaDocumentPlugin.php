@@ -6,14 +6,13 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaDocumentPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaDocumentsService
+	 * @var KalturaClientPlugin
 	 */
-	public $documents = null;
+	protected static $instance;
 
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->documents = new KalturaDocumentsService();
 	}
 
 	/**
@@ -32,7 +31,6 @@ class KalturaDocumentPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->documents,
 		);
 		return $services;
 	}

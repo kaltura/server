@@ -6,14 +6,13 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaAuditPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaAuditTrailService
+	 * @var KalturaClientPlugin
 	 */
-	public $auditTrail = null;
+	protected static $instance;
 
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->auditTrail = new KalturaAuditTrailService();
 	}
 
 	/**
@@ -32,7 +31,6 @@ class KalturaAuditPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			$this->auditTrail,
 		);
 		return $services;
 	}
