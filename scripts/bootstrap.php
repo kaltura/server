@@ -1,11 +1,15 @@
 <?php
-chdir(dirname(__FILE__));
-require_once("..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."bootstrap_base.php");
-require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+set_time_limit(0);
 
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
-KAutoloader::setClassMapFilePath(KAutoloader::buildPath("cache", "KalturaClassMap.cache"));
+ini_set("memory_limit","700M");
+
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../'));
+require_once(ROOT_DIR . '/alpha/config/kConf.php');
+require_once(ROOT_DIR . '/infra/bootstrap_base.php');
+require_once(ROOT_DIR . '/infra/KAutoloader.php');
+
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
 KAutoloader::register();
 
 date_default_timezone_set(kConf::get("date_default_timezone"));
@@ -17,9 +21,6 @@ KalturaLog::setContext("SCRIPT");
 KalturaLog::info("Starting script");
 
 KalturaLog::info("Initializing database...");
-$dbManager = new DbManager();
-$configPath = KALTURA_API_PATH . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "database.ini";
-$dbManager->setConfig(new Zend_Config_Ini($configPath));
-$dbManager->initialize();
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
 KalturaLog::info("Database initialized successfully");
-?>
