@@ -93,6 +93,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
 		$this->appendLine('{');
+		$this->appendLine('	/**');
+		$this->appendLine('	 * @var KalturaClientPlugin');
+		$this->appendLine('	 */');
+		$this->appendLine('	protected static $instance;');
+		$this->appendLine('');
+	
 		foreach($services as $service)
 		{
 			$serviceName = ucfirst($service);
@@ -130,7 +136,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	{');
 		$this->appendLine('		$services = array(');
 		foreach($services as $service)
-			$this->appendLine("			\$this->$service,");
+			$this->appendLine("			'$service' => \$this->$service,");
 		$this->appendLine('		);');
 		$this->appendLine('		return $services;');
 		$this->appendLine('	}');

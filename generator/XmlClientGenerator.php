@@ -119,15 +119,21 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	{
     	$pluginElement = $this->_doc->createElement("plugin");
     	$pluginElement->setAttribute('name', $pluginInstance->getPluginName());
-    	$this->appendPluginServices($pluginElement, $pluginInstance);
+    	$this->appendPluginServices($pluginInstance->getPluginName(), $pluginElement, $pluginInstance);
     	$pluginsElement->appendChild($pluginElement);
 	}
 	
-	private function appendPluginServices(DOMElement &$pluginElement, IKalturaServices $pluginInstance)
+	private function appendPluginServices($pluginName, DOMElement &$pluginElement, IKalturaServices $pluginInstance)
 	{
     	$servicesMap = $pluginInstance->getServicesMap();
     	foreach($servicesMap as $service => $serviceClass)
     	{
+			if(!isset($this->_includeList[strtolower("{$pluginName}_{$service}")]))
+			{
+				KalturaLog::debug("Service [$service] exluded");
+				continue;
+			}
+			
     		$pluginServiceElement = $this->_doc->createElement("pluginService");
     		$pluginServiceElement->setAttribute('name', $service);
     		$pluginElement->appendChild($pluginServiceElement);
