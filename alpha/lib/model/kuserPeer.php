@@ -55,6 +55,19 @@ class kuserPeer extends BasekuserPeer
 		return $puser_kuser->getKuser();
 	}
 	
+	/**
+	 * @param int $partner_id
+	 * @param array $puser_ids
+	 * @return array<kuser>
+	 */
+	public static function getKuserByPartnerAndUids($partner_id , array $puser_ids)
+	{
+		$c = new Criteria();
+		$c->add(self::PARTNER_ID, $partner_id);
+		$c->add(self::PUSER_ID, $puser_ids, Criteria::IN);
+		return self::doSelect($c);			
+	}
+	
 	public static function getActiveKuserByPartnerAndUid($partner_id , $puser_id)
 	{
 		$c = new Criteria();
