@@ -537,30 +537,29 @@ $(window).load(function(){
 	kmc.preview_embed = {
 
 		// called from p&e dropdown, from content.swf and from appstudio.swf
-		doPreviewEmbed : function(id, name, description,previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors) {
-		kmc.log('doPreviewEmbed');
-		kmc.log(arguments);
-		// entry/playlist id, description, true/ false (or nothing or "" or null), uiconf id, live_bitrates obj or boolean, is_mix
-//			alert("doPreviewEmbed: id="+id+", name="+name+", description="+description+", is_playlist="+is_playlist+", uiconf_id="+uiconf_id);
-
+		doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors, html5_compatible) {
+			kmc.log('doPreviewEmbed');
+			kmc.log(arguments);
+		
+			// default value for html5_compatible
+			html5_compatible = (html5_compatible) ? html5_compatible : false;
+		
 			if(id != "multitab_playlist") {
 
 				name = kmc.utils.escapeQuotes(name);
 				description = kmc.utils.escapeQuotes(description); // @todo: move to "// JW" block
 
 				if(kmc.vars.current_uiconf) { // set by kmc.mediator.selectContent called from appstudio's "select content" action
-//					kmc.log(kmc.vars.current_uiconf); alert("kmc.vars.current_uiconf logged");
-//					cokmc.log(s_playlist=",is_playlist);
 					if((is_playlist && kmc.vars.current_uiconf.is_playlist) || (!is_playlist && !kmc.vars.current_uiconf.is_playlist)) { // @todo: minor optimization possible
 						var uiconf_id = kmc.vars.current_uiconf.uiconf_id;
-//						alert("doPreviewEmbed says:\nkmc.vars.current_uiconf true -> uiconf_id = "+uiconf_id);
+						//alert("doPreviewEmbed says:\nkmc.vars.current_uiconf true -> uiconf_id = "+uiconf_id);
 					}
 					kmc.vars.current_uiconf = null;
 				}
 
 				if(!uiconf_id) { // get default uiconf_id (first one in list)
 					var uiconf_id = is_playlist ? kmc.vars.playlists_list[0].id : kmc.vars.players_list[0].id;
-	//				alert(uiconf_id);
+					//alert(uiconf_id);
 				}
 
 				if(uiconf_id > 899 && uiconf_id < 1000) {
@@ -635,7 +634,7 @@ $(window).load(function(){
 							 (kmc.vars.jw ? jw_nomix_box_html : '') +							 
 							 (kmc.vars.jw ? jw_options_html : '') +
 							 ((kmc.vars.silverlight || live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-							 ((is_playlist) ? '' : kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, uiconf_id, has_mobile_flavors)) + 
+							 ((html5_compatible) ? kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, uiconf_id, has_mobile_flavors) : '') + 
 							 '<div class="embed_code_div"><div class="label">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 							 // style="width:' + (parseInt(uiconf_details.width)-10) + 'px;"
 							 'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
@@ -660,10 +659,10 @@ $(window).load(function(){
 			});
 			$("#delivery_type").change(function(){
 				kmc.vars.embed_code_delivery_type = this.value;
-				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors);
+				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors, html5_compatible);
 			});
 			$("#player_select").change(function(){
-				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, has_mobile_flavors);
+				kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, has_mobile_flavors, html5_compatible);
 			});
 			
 			$("#html5_support").change(function(){
@@ -715,9 +714,10 @@ $(window).load(function(){
 		buildRtmpOptions : function() {
 			var selected = ' selected="selected"';
 			var delivery_type = kmc.vars.embed_code_delivery_type || "http";
-			var html = '<div id="rtmp" class="label">Select Flash Delivery Type:</div> <div class="right"><select id="delivery_type">';
+			var html = '<div id="rtmp" class="label">Select Delivery Type:</div> <div class="right"><select id="delivery_type">';
 			var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
-						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
+						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>' + 
+						  '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
 			html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' + 
 					'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
 			return html;
@@ -825,6 +825,8 @@ $(window).load(function(){
 				if(kmc.vars.embed_code_delivery_type == "rtmp") {
 					// Ran: Removed streamerUrl & rtmpFlavors flashvars [not needed]
 					embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
+				} else if (kmc.vars.embed_code_delivery_type == "http_stream") {
+					embed_code = embed_code.replace("{FLASHVARS}", "mediaProtocol=http_stream&amp;{FLASHVARS}");
 				}
 			}
 			if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
@@ -882,18 +884,10 @@ $(window).load(function(){
 				selected = (this_uiconf.id == uiconf_id) ? ' selected="selected"' : '';
 				html_select += '<option ' + selected + ' value="' + this_uiconf.id + '">' + this_uiconf.name + '</option>';
 			}
-//			html_select = '<select onchange="kmc.preview_embed.doPreviewEmbed(\'' + id + '\',\'' + name + '\',\'' + description + '\',' + is_playlist + ', this.value)">'
 			html_select = '<div class="label">Select Player:</div><div class="right"><select id="player_select">' + html_select + '</select></div><br /><div class="note">Kaltura player includes both layout and functionality (advertising, subtitles, etc)</div><br />';
 			kmc.vars.current_uiconf = null;
 			return html_select;
 		},
-
-//		reload : function(id, name, description, is_playlist, uiconf_id) {
-//			var embed_code = kmc.preview_embed.buildEmbed(id, name, description, is_playlist, uiconf_id);
-//			$("#player_wrap").html(embed_code);
-//			$("#embed_code textarea").val(embed_code);
-//			kmc.preview_embed.doPreviewEmbed(id, name, description, is_playlist, uiconf_id);
-//		},
 
 		getUiconfDetails : function(uiconf_id,is_playlist) {
 //			alert("getUiconfDetails("+"uiconf_id="+uiconf_id+", +is_playlist="+is_playlist+")");
