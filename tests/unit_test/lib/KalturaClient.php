@@ -6,7 +6,7 @@ require_once("KalturaTypes.php");
 
 class KalturaAccessControlService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -83,7 +83,7 @@ class KalturaAccessControlService extends KalturaServiceBase
 
 class KalturaAdminUserService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -149,7 +149,7 @@ class KalturaAdminUserService extends KalturaServiceBase
 
 class KalturaBaseEntryService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -396,7 +396,7 @@ class KalturaBaseEntryService extends KalturaServiceBase
 
 class KalturaBatchcontrolService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -620,7 +620,7 @@ class KalturaBatchcontrolService extends KalturaServiceBase
 
 class KalturaBatchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -1647,7 +1647,7 @@ class KalturaBatchService extends KalturaServiceBase
 
 class KalturaBulkUploadService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -1697,7 +1697,7 @@ class KalturaBulkUploadService extends KalturaServiceBase
 
 class KalturaCategoryService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -1772,7 +1772,7 @@ class KalturaCategoryService extends KalturaServiceBase
 
 class KalturaConversionProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -1849,7 +1849,7 @@ class KalturaConversionProfileService extends KalturaServiceBase
 
 class KalturaDataService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -1927,7 +1927,7 @@ class KalturaDataService extends KalturaServiceBase
 
 class KalturaEmailIngestionProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -2018,7 +2018,7 @@ class KalturaEmailIngestionProfileService extends KalturaServiceBase
 
 class KalturaFlavorAssetService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -2118,10 +2118,11 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getDownloadUrl($id)
+	function getDownloadUrl($id, $useCdn = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "useCdn", $useCdn);
 		$this->client->queueServiceActionCall("flavorasset", "getDownloadUrl", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -2147,7 +2148,7 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 
 class KalturaFlavorParamsService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -2237,7 +2238,7 @@ class KalturaFlavorParamsService extends KalturaServiceBase
 
 class KalturaJobsService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3188,7 +3189,7 @@ class KalturaJobsService extends KalturaServiceBase
 
 class KalturaLiveStreamService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3296,7 +3297,7 @@ class KalturaLiveStreamService extends KalturaServiceBase
 
 class KalturaMediaService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3594,7 +3595,7 @@ class KalturaMediaService extends KalturaServiceBase
 
 class KalturaMixingService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3769,7 +3770,7 @@ class KalturaMixingService extends KalturaServiceBase
 
 class KalturaNotificationService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3791,7 +3792,7 @@ class KalturaNotificationService extends KalturaServiceBase
 
 class KalturaPartnerService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3869,7 +3870,7 @@ class KalturaPartnerService extends KalturaServiceBase
 
 class KalturaPermissionItemService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -3946,7 +3947,7 @@ class KalturaPermissionItemService extends KalturaServiceBase
 
 class KalturaPermissionService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4023,7 +4024,7 @@ class KalturaPermissionService extends KalturaServiceBase
 
 class KalturaPlaylistService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4179,7 +4180,7 @@ class KalturaPlaylistService extends KalturaServiceBase
 
 class KalturaReportService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4257,7 +4258,7 @@ class KalturaReportService extends KalturaServiceBase
 
 class KalturaSearchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4322,7 +4323,7 @@ class KalturaSearchService extends KalturaServiceBase
 
 class KalturaSessionService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4393,7 +4394,7 @@ class KalturaSessionService extends KalturaServiceBase
 
 class KalturaStatsService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4440,7 +4441,7 @@ class KalturaStatsService extends KalturaServiceBase
 
 class KalturaSyndicationFeedService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4543,7 +4544,7 @@ class KalturaSyndicationFeedService extends KalturaServiceBase
 
 class KalturaSystemService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4563,7 +4564,7 @@ class KalturaSystemService extends KalturaServiceBase
 
 class KalturaThumbAssetService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4710,7 +4711,7 @@ class KalturaThumbAssetService extends KalturaServiceBase
 
 class KalturaThumbParamsService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4800,7 +4801,7 @@ class KalturaThumbParamsService extends KalturaServiceBase
 
 class KalturaUiConfService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4906,7 +4907,7 @@ class KalturaUiConfService extends KalturaServiceBase
 
 class KalturaUploadService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -4941,7 +4942,7 @@ class KalturaUploadService extends KalturaServiceBase
 
 class KalturaUploadTokenService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5023,7 +5024,7 @@ class KalturaUploadTokenService extends KalturaServiceBase
 
 class KalturaUserRoleService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5113,7 +5114,7 @@ class KalturaUserRoleService extends KalturaServiceBase
 
 class KalturaUserService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5322,7 +5323,7 @@ class KalturaUserService extends KalturaServiceBase
 
 class KalturaWidgetService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5399,7 +5400,7 @@ class KalturaWidgetService extends KalturaServiceBase
 
 class KalturaXInternalService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5421,7 +5422,7 @@ class KalturaXInternalService extends KalturaServiceBase
 
 class KalturaMetadataService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5578,7 +5579,7 @@ class KalturaMetadataService extends KalturaServiceBase
 
 class KalturaMetadataProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -5732,7 +5733,7 @@ class KalturaMetadataProfileService extends KalturaServiceBase
 
 class KalturaMetadataBatchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -6887,7 +6888,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 
 class KalturaDocumentsService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7043,7 +7044,7 @@ class KalturaDocumentsService extends KalturaServiceBase
 
 class KalturaStorageProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7121,7 +7122,7 @@ class KalturaStorageProfileService extends KalturaServiceBase
 
 class KalturaFileSyncService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7160,7 +7161,7 @@ class KalturaFileSyncService extends KalturaServiceBase
 
 class KalturaSystemPartnerService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7282,7 +7283,7 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7306,7 +7307,7 @@ class KalturaFlavorParamsOutputService extends KalturaServiceBase
 
 class KalturaThumbParamsOutputService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7330,7 +7331,7 @@ class KalturaThumbParamsOutputService extends KalturaServiceBase
 
 class KalturaMediaInfoService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7354,7 +7355,7 @@ class KalturaMediaInfoService extends KalturaServiceBase
 
 class KalturaEntryAdminService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -7387,9 +7388,63 @@ class KalturaEntryAdminService extends KalturaServiceBase
 	}
 }
 
+class KalturaKalturaInternalToolsService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+}
+
+class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+
+	function fromSecureString($str)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "str", $str);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
+		return $resultObject;
+	}
+
+	function iptocountry($remote_addr)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "remote_addr", $remote_addr);
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
+	function getRemoteAddress()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+}
+
 class KalturaFilesyncImportBatchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -8480,7 +8535,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 
 class KalturaAuditTrailService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -8530,7 +8585,7 @@ class KalturaAuditTrailService extends KalturaServiceBase
 
 class KalturaVirusScanProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -8621,7 +8676,7 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 
 class KalturaVirusScanBatchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -9693,63 +9748,9 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 	}
 }
 
-class KalturaKalturaInternalToolsService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-}
-
-class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
-{
-	function __construct(KalturaClient $client)
-	{
-		parent::__construct($client);
-	}
-
-	function fromSecureString($str)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "str", $str);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "fromSecureString", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaInternalToolsSession");
-		return $resultObject;
-	}
-
-	function iptocountry($remote_addr)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "remote_addr", $remote_addr);
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "iptocountry", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-
-	function getRemoteAddress()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("kalturainternaltools_kalturainternaltoolssystemhelper", "getRemoteAddress", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
-		return $resultObject;
-	}
-}
-
 class KalturaDistributionProfileService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -9856,7 +9857,7 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 
 class KalturaEntryDistributionService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -10012,7 +10013,7 @@ class KalturaEntryDistributionService extends KalturaServiceBase
 
 class KalturaDistributionProviderService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -10036,7 +10037,7 @@ class KalturaDistributionProviderService extends KalturaServiceBase
 
 class KalturaGenericDistributionProviderService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -10113,7 +10114,7 @@ class KalturaGenericDistributionProviderService extends KalturaServiceBase
 
 class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -10320,7 +10321,7 @@ class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
 
 class KalturaContentDistributionBatchService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -11627,7 +11628,7 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 
 class KalturaAnnotationService extends KalturaServiceBase
 {
-	function __construct(KalturaClient $client)
+	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
 	}
@@ -11711,21 +11712,18 @@ class KalturaClient extends KalturaClientBase
 
 	/**
 	 * Add & Manage Access Controls
-	 *
 	 * @var KalturaAccessControlService
 	 */
 	public $accessControl = null;
 
 	/**
 	 * Manage details for the administrative user
-	 *
 	 * @var KalturaAdminUserService
 	 */
 	public $adminUser = null;
 
 	/**
 	 * Base Entry Service
-	 *
 	 * @var KalturaBaseEntryService
 	 */
 	public $baseEntry = null;
@@ -11738,7 +11736,6 @@ class KalturaClient extends KalturaClientBase
 	 * acuiring a batch objet properly (using  GetExclusiveXX).
 	 * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
 	 * 
-	 *
 	 * @var KalturaBatchcontrolService
 	 */
 	public $batchcontrol = null;
@@ -11751,56 +11748,48 @@ class KalturaClient extends KalturaClientBase
 	 * acuiring a batch objet properly (using  GetExclusiveXX).
 	 * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
 	 * 
-	 *
 	 * @var KalturaBatchService
 	 */
 	public $batch = null;
 
 	/**
 	 * Bulk upload service is used to upload & manage bulk uploads using CSV files
-	 *
 	 * @var KalturaBulkUploadService
 	 */
 	public $bulkUpload = null;
 
 	/**
 	 * Add & Manage Categories
-	 *
 	 * @var KalturaCategoryService
 	 */
 	public $category = null;
 
 	/**
 	 * Add & Manage Conversion Profiles
-	 *
 	 * @var KalturaConversionProfileService
 	 */
 	public $conversionProfile = null;
 
 	/**
 	 * Data service lets you manage data content (textual content)
-	 *
 	 * @var KalturaDataService
 	 */
 	public $data = null;
 
 	/**
 	 * EmailIngestionProfile service lets you manage email ingestion profile records
-	 *
 	 * @var KalturaEmailIngestionProfileService
 	 */
 	public $EmailIngestionProfile = null;
 
 	/**
 	 * Retrieve information and invoke actions on Flavor Asset
-	 *
 	 * @var KalturaFlavorAssetService
 	 */
 	public $flavorAsset = null;
 
 	/**
 	 * Add & Manage Flavor Params
-	 *
 	 * @var KalturaFlavorParamsService
 	 */
 	public $flavorParams = null;
@@ -11813,21 +11802,18 @@ class KalturaClient extends KalturaClientBase
 	 * acuiring a batch objet properly (using  GetExclusiveXX).
 	 * If an object was aquired and should be returned to the pool in it's initial state - use the FreeExclusiveXX action 
 	 * 
-	 *
 	 * @var KalturaJobsService
 	 */
 	public $jobs = null;
 
 	/**
 	 * Live Stream service lets you manage live stream channels
-	 *
 	 * @var KalturaLiveStreamService
 	 */
 	public $liveStream = null;
 
 	/**
 	 * Media service lets you upload and manage media files (images / videos & audio)
-	 *
 	 * @var KalturaMediaService
 	 */
 	public $media = null;
@@ -11835,35 +11821,30 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * A Mix is an XML unique format invented by Kaltura, it allows the user to create a mix of videos and images, in and out points, transitions, text overlays, soundtrack, effects and much more...
 	 * Mixing service lets you create a new mix, manage its metadata and make basic manipulations.   
-	 *
 	 * @var KalturaMixingService
 	 */
 	public $mixing = null;
 
 	/**
 	 * Notification Service
-	 *
 	 * @var KalturaNotificationService
 	 */
 	public $notification = null;
 
 	/**
 	 * partner service allows you to change/manage your partner personal details and settings as well
-	 *
 	 * @var KalturaPartnerService
 	 */
 	public $partner = null;
 
 	/**
 	 * PermissionItem service lets you create and manage permission items
-	 *
 	 * @var KalturaPermissionItemService
 	 */
 	public $permissionItem = null;
 
 	/**
 	 * Permission service lets you create and manage user permissions
-	 *
 	 * @var KalturaPermissionService
 	 */
 	public $permission = null;
@@ -11871,14 +11852,12 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * Playlist service lets you create,manage and play your playlists
 	 * Playlists could be static (containing a fixed list of entries) or dynamic (baseed on a filter)
-	 *
 	 * @var KalturaPlaylistService
 	 */
 	public $playlist = null;
 
 	/**
 	 * api for getting reports data by the report type and some inputFilter
-	 *
 	 * @var KalturaReportService
 	 */
 	public $report = null;
@@ -11886,49 +11865,42 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * Search service allows you to search for media in various media providers
 	 * This service is being used mostly by the CW component
-	 *
 	 * @var KalturaSearchService
 	 */
 	public $search = null;
 
 	/**
 	 * Session service
-	 *
 	 * @var KalturaSessionService
 	 */
 	public $session = null;
 
 	/**
 	 * Stats Service
-	 *
 	 * @var KalturaStatsService
 	 */
 	public $stats = null;
 
 	/**
 	 * Add & Manage Syndication Feeds
-	 *
 	 * @var KalturaSyndicationFeedService
 	 */
 	public $syndicationFeed = null;
 
 	/**
 	 * System service is used for internal system helpers & to retrieve system level information
-	 *
 	 * @var KalturaSystemService
 	 */
 	public $system = null;
 
 	/**
 	 * Retrieve information and invoke actions on Thumb Asset
-	 *
 	 * @var KalturaThumbAssetService
 	 */
 	public $thumbAsset = null;
 
 	/**
 	 * Add & Manage Thumb Params
-	 *
 	 * @var KalturaThumbParamsService
 	 */
 	public $thumbParams = null;
@@ -11936,28 +11908,24 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * UiConf service lets you create and manage your UIConfs for the various flash components
 	 * This service is used by the KMC-ApplicationStudio
-	 *
 	 * @var KalturaUiConfService
 	 */
 	public $uiConf = null;
 
 	/**
 	 * 
-	 *
 	 * @var KalturaUploadService
 	 */
 	public $upload = null;
 
 	/**
 	 * 
-	 *
 	 * @var KalturaUploadTokenService
 	 */
 	public $uploadToken = null;
 
 	/**
 	 * UserRole service lets you create and manage user permissions
-	 *
 	 * @var KalturaUserRoleService
 	 */
 	public $userRole = null;
@@ -11965,202 +11933,22 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * Manage partner users on Kaltura's side
 	 * The userId in kaltura is the unique Id in the partner's system, and the [partnerId,Id] couple are unique key in kaltura's DB
-	 *
 	 * @var KalturaUserService
 	 */
 	public $user = null;
 
 	/**
 	 * widget service for full widget management
-	 *
 	 * @var KalturaWidgetService
 	 */
 	public $widget = null;
 
 	/**
 	 * Internal Service is used for actions that are used internally in Kaltura applications and might be changed in the future without any notice.
-	 *
 	 * @var KalturaXInternalService
 	 */
 	public $xInternal = null;
 
-	/**
-	 * Metadata service
-	 *
-	 * @var KalturaMetadataService
-	 */
-	public $metadata = null;
-
-	/**
-	 * Metadata Profile service
-	 *
-	 * @var KalturaMetadataProfileService
-	 */
-	public $metadataProfile = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMetadataBatchService
-	 */
-	public $metadataBatch = null;
-
-	/**
-	 * Document service lets you upload and manage document files
-	 *
-	 * @var KalturaDocumentsService
-	 */
-	public $documents = null;
-
-	/**
-	 * Storage Profiles service
-	 *
-	 * @var KalturaStorageProfileService
-	 */
-	public $storageProfile = null;
-
-	/**
-	 * System user service
-	 *
-	 * @var KalturaFileSyncService
-	 */
-	public $fileSync = null;
-
-	/**
-	 * System partner service
-	 *
-	 * @var KalturaSystemPartnerService
-	 */
-	public $systemPartner = null;
-
-	/**
-	 * Flavor Params Output service
-	 *
-	 * @var KalturaFlavorParamsOutputService
-	 */
-	public $flavorParamsOutput = null;
-
-	/**
-	 * Thumb Params Output service
-	 *
-	 * @var KalturaThumbParamsOutputService
-	 */
-	public $thumbParamsOutput = null;
-
-	/**
-	 * Media Info service
-	 *
-	 * @var KalturaMediaInfoService
-	 */
-	public $mediaInfo = null;
-
-	/**
-	 * Entry Admin service
-	 *
-	 * @var KalturaEntryAdminService
-	 */
-	public $entryAdmin = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaFilesyncImportBatchService
-	 */
-	public $filesyncImportBatch = null;
-
-	/**
-	 * Audit Trail service
-	 *
-	 * @var KalturaAuditTrailService
-	 */
-	public $auditTrail = null;
-
-	/**
-	 * Virus scan profile service
-	 *
-	 * @var KalturaVirusScanProfileService
-	 */
-	public $virusScanProfile = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaVirusScanBatchService
-	 */
-	public $virusScanBatch = null;
-
-	/**
-	 * Internal Tools Service
-	 * 
-	 *
-	 * @var KalturaKalturaInternalToolsService
-	 */
-	public $KalturaInternalTools = null;
-
-	/**
-	 * Internal Tools Service
-	 * 
-	 *
-	 * @var KalturaKalturaInternalToolsSystemHelperService
-	 */
-	public $kalturaInternalToolsSystemHelper = null;
-
-	/**
-	 * Distribution Profile service
-	 *
-	 * @var KalturaDistributionProfileService
-	 */
-	public $distributionProfile = null;
-
-	/**
-	 * Entry Distribution service
-	 *
-	 * @var KalturaEntryDistributionService
-	 */
-	public $entryDistribution = null;
-
-	/**
-	 * Distribution Provider service
-	 *
-	 * @var KalturaDistributionProviderService
-	 */
-	public $distributionProvider = null;
-
-	/**
-	 * Generic Distribution Provider service
-	 *
-	 * @var KalturaGenericDistributionProviderService
-	 */
-	public $genericDistributionProvider = null;
-
-	/**
-	 * Generic Distribution Provider Actions service
-	 *
-	 * @var KalturaGenericDistributionProviderActionService
-	 */
-	public $genericDistributionProviderAction = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaContentDistributionBatchService
-	 */
-	public $contentDistributionBatch = null;
-
-	/**
-	 * Annotation service - Video Annotation
-	 *
-	 * @var KalturaAnnotationService
-	 */
-	public $annotation = null;
-
-	/**
-	 * Array of all plugin services
-	 *
-	 * @var array<KalturaServiceBase>
-	 */
-	protected $pluginServices = array();
-	
 	/**
 	 * Kaltura client constructor
 	 *
@@ -12169,27 +11957,6 @@ class KalturaClient extends KalturaClientBase
 	public function __construct(KalturaConfiguration $config)
 	{
 		parent::__construct($config);
-		
-		// load all plugins
-		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
-		if(is_dir($pluginsFolder))
-		{
-			$dir = dir($pluginsFolder);
-			while (false !== $fileName = $dir->read())
-			{
-				$matches = null;
-				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
-				{
-					require_once("$pluginsFolder/$fileName");
-					
-					$pluginClass = $matches[1];
-					$plugin = new $pluginClass();
-					$services = $plugin->getServices();
-					foreach($services as $service)
-						$this->pluginServices[$service->serviceName] = $service;
-				}
-			}
-		}
 		
 		$this->accessControl = new KalturaAccessControlService($this);
 		$this->adminUser = new KalturaAdminUserService($this);
@@ -12227,38 +11994,7 @@ class KalturaClient extends KalturaClientBase
 		$this->user = new KalturaUserService($this);
 		$this->widget = new KalturaWidgetService($this);
 		$this->xInternal = new KalturaXInternalService($this);
-		$this->metadata = new KalturaMetadataService($this);
-		$this->metadataProfile = new KalturaMetadataProfileService($this);
-		$this->metadataBatch = new KalturaMetadataBatchService($this);
-		$this->documents = new KalturaDocumentsService($this);
-		$this->storageProfile = new KalturaStorageProfileService($this);
-		$this->fileSync = new KalturaFileSyncService($this);
-		$this->systemPartner = new KalturaSystemPartnerService($this);
-		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($this);
-		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($this);
-		$this->mediaInfo = new KalturaMediaInfoService($this);
-		$this->entryAdmin = new KalturaEntryAdminService($this);
-		$this->filesyncImportBatch = new KalturaFilesyncImportBatchService($this);
-		$this->auditTrail = new KalturaAuditTrailService($this);
-		$this->virusScanProfile = new KalturaVirusScanProfileService($this);
-		$this->virusScanBatch = new KalturaVirusScanBatchService($this);
-		$this->KalturaInternalTools = new KalturaKalturaInternalToolsService($this);
-		$this->kalturaInternalToolsSystemHelper = new KalturaKalturaInternalToolsSystemHelperService($this);
-		$this->distributionProfile = new KalturaDistributionProfileService($this);
-		$this->entryDistribution = new KalturaEntryDistributionService($this);
-		$this->distributionProvider = new KalturaDistributionProviderService($this);
-		$this->genericDistributionProvider = new KalturaGenericDistributionProviderService($this);
-		$this->genericDistributionProviderAction = new KalturaGenericDistributionProviderActionService($this);
-		$this->contentDistributionBatch = new KalturaContentDistributionBatchService($this);
-		$this->annotation = new KalturaAnnotationService($this);
 	}
 	
-	public function __get($serviceName)
-	{
-		if(isset($this->pluginServices[$serviceName]))
-			return $this->pluginServices[$serviceName];
-		
-		return null;
-	}
 }
 

@@ -1834,6 +1834,54 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	 */
 	public $errorDescription = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasSubmitSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasUpdateSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $hasDeleteSentDataLog = null;
+
 
 }
 
@@ -2413,6 +2461,218 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $resultParserType = null;
 
+
+}
+
+class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $notificationEmail = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpHost = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpLogin = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpPublicKey = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpPrivateKey = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ownerName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $defaultCategory = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowComments = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowEmbedding = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowRatings = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $allowResponses = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $commercialPolicy = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ugcPolicy = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $target = null;
+
+
+}
+
+class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $domain = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+
+}
+
+class KalturaComcastDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $email = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $account = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $keywords = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $author = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $album = null;
+
+
+}
+
+class KalturaYouTubeDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaVerizonDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaComcastDistributionProvider extends KalturaDistributionProvider
+{
 
 }
 
@@ -12248,6 +12508,67 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 
 }
 
+class KalturaInternalToolsSession extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partner_id = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $valid_until = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partner_pattern = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaSessionType
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $error = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rand = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $user = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $privileges = null;
+
+
+}
+
 abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 {
 	/**
@@ -12913,67 +13234,6 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
-
-
-}
-
-class KalturaInternalToolsSession extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $partner_id = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $valid_until = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partner_pattern = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSessionType
-	 */
-	public $type = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $error = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $rand = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $user = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $privileges = null;
 
 
 }
@@ -13721,7 +13981,7 @@ abstract class KalturaAnnotationBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $idEqual = null;
 

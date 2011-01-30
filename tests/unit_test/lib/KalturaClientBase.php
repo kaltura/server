@@ -34,6 +34,21 @@ class KalturaClientBase
 	 * @var unknown_type
 	 */
 	private $callsQueue = array();
+
+	/**
+	 * Array of all plugin services
+	 *
+	 * @var array<KalturaServiceBase>
+	 */
+	protected $pluginServices = array();
+	
+	public function __get($serviceName)
+	{
+		if(isset($this->pluginServices[$serviceName]))
+			return $this->pluginServices[$serviceName];
+		
+		return null;
+	}
 	
 	/**
 	 * Kaltura client constructor
@@ -48,6 +63,36 @@ class KalturaClientBase
 		if ($logger)
 		{
 			$this->shouldLog = true;	
+		}
+		
+		// load all plugins
+		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
+		if(is_dir($pluginsFolder))
+		{
+			$dir = dir($pluginsFolder);
+			while (false !== $fileName = $dir->read())
+			{
+				$matches = null;
+				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
+				{
+					require_once("$pluginsFolder/$fileName");
+					
+					$pluginClass = $matches[1];
+					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', class_implements($pluginClass)))
+						continue;
+						
+					$plugin = call_user_func(array($pluginClass, 'get'));
+					if(!($plugin instanceof IKalturaClientPlugin))
+						continue;
+						
+					$services = $plugin->getServices();
+					foreach($services as $serviceName => $service)
+					{
+						$service->setClient($this);
+						$this->pluginServices[$serviceName] = $service;
+					}
+				}
+			}
 		}
 	}
 
@@ -434,6 +479,27 @@ class KalturaClientBase
 	}
 }
 
+interface IKalturaClientPlugin
+{
+	/**
+	 * @return KalturaClientPlugin
+	 */
+	public static function get();
+	
+	/**
+	 * @return array<KalturaServiceBase>
+	 */
+	public function getServices();
+}
+
+abstract class KalturaClientPlugin implements IKalturaClientPlugin
+{
+	protected function __construct()
+	{
+		
+	}
+}
+
 class KalturaServiceActionCall
 {
 	/**
@@ -529,7 +595,15 @@ abstract class KalturaServiceBase
 	 *
 	 * @param KalturaClient $client
 	 */
-	public function __construct(KalturaClient $client)
+	public function __construct(KalturaClient $client = null)
+	{
+		$this->client = $client;
+	}
+						
+	/**
+	 * @param KalturaClient $client
+	 */
+	public function setClient(KalturaClient $client)
 	{
 		$this->client = $client;
 	}
