@@ -2222,6 +2222,39 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 
 }
 
+class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $domain = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+
+}
+
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -2512,6 +2545,70 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $resultParserType = null;
 
+
+}
+
+class KalturaComcastDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $email = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $account = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $keywords = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $author = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $album = null;
+
+
+}
+
+class KalturaVerizonDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaComcastDistributionProvider extends KalturaDistributionProvider
+{
 
 }
 

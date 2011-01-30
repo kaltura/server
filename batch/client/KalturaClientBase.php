@@ -78,7 +78,13 @@ class KalturaClientBase
 					require_once("$pluginsFolder/$fileName");
 					
 					$pluginClass = $matches[1];
-					$plugin = new $pluginClass();
+					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', get_declared_interfaces($pluginClass)))
+						continue;
+						
+					$plugin = call_user_func(array($pluginClass, 'get'));
+					if(!($plugin instanceof IKalturaClientPlugin))
+						continue;
+						
 					$services = $plugin->getServices();
 					foreach($services as $service)
 					{
@@ -473,6 +479,32 @@ class KalturaClientBase
 	}
 }
 
+interface IKalturaClientPlugin
+{
+	/**
+	 * @return KalturaClientPlugin
+	 */
+	public static function get();
+	
+	/**
+	 * @return array<KalturaServiceBase>
+	 */
+	public function getServices();
+}
+
+abstract class KalturaClientPlugin implements IKalturaClientPlugin
+{
+	/**
+	 * @var KalturaClientPlugin
+	 */
+	protected $instance;
+	
+	protected function __construct()
+	{
+		
+	}
+}
+
 class KalturaServiceActionCall
 {
 	/**
@@ -568,7 +600,7 @@ abstract class KalturaServiceBase
 	 *
 	 * @param KalturaClient $client
 	 */
-	public function __construct(KalturaClient $client)
+	public function __construct(KalturaClient $client = null)
 	{
 		$this->client = $client;
 	}
