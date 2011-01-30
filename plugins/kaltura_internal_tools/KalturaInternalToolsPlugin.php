@@ -36,4 +36,12 @@ class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServic
 		$KalturaInternalTools = new KalturaInternalToolsPluginSystemHelperAction('System Helper', 'KalturaInternalToolsPluginSystemHelper', 'Developer');
 		return array($KalturaInternalTools);
 	}
+	
+	public static function isAllowedPartner($partnerId)
+	{
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			return true;
+		
+		return false;
+	}
 }
