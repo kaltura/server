@@ -26,4 +26,21 @@ class AnnotationPeer extends BaseAnnotationPeer {
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
+	public static function setDefaultCriteriaFilterByKuser()
+	{
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria();
+		$puserId = kCurrentContext::$ks_uid;
+		$partnerId = kCurrentContext::$partner_id;
+		if ($puserId && $partnerId)
+		{
+			$kuserId = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+			$c->addAnd(AnnotationPeer::KUSER_ID, $kuserId->getId());
+			KalturaLog::debug("myKuserId: " . $kuserId->getId());	
+		}
+		self::$s_criteria_filter->setFilter($c);
+	}
+		
 } // AnnotationPeer
