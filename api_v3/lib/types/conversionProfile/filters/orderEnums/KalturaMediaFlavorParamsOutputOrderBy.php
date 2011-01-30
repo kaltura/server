@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package 
+ * @subpackage api.filters.enum
  */
 class KalturaMediaFlavorParamsOutputOrderBy extends KalturaFlavorParamsOutputOrderBy
 {

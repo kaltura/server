@@ -1,7 +1,7 @@
 <?php
 /**
  * @package api
- * @subpackage enum
+ * @subpackage api.filters.enum
  */
 class KalturaLiveStreamAdminEntryOrderBy extends KalturaLiveStreamEntryOrderBy
 {

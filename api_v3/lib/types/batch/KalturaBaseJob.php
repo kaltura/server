@@ -1,11 +1,8 @@
 <?php
 /**
+ * Will be used as the base class for all the job objects.
  * @package api
  * @subpackage objects
- */
-
-/**
- * Will be used as the base class for all the job objects.
  */
 class KalturaBaseJob extends KalturaObject implements IFilterable 
 {

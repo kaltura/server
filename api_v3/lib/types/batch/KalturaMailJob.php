@@ -1,12 +1,7 @@
 <?php
-
 /**
  * @package api
  * @subpackage objects
- */
-
-/**
- *  
  */
 class KalturaMailJob extends KalturaBaseJob
 {
