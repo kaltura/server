@@ -78,7 +78,7 @@ class KalturaClientBase
 					require_once("$pluginsFolder/$fileName");
 					
 					$pluginClass = $matches[1];
-					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', get_declared_interfaces($pluginClass)))
+					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', class_implements($pluginClass)))
 						continue;
 						
 					$plugin = call_user_func(array($pluginClass, 'get'));
