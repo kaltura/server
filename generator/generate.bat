@@ -3,6 +3,6 @@ del /F /S /Q ..\cache\generator\*
 
 php generate.php
 
-copy /Y output\adminConsoleClient\* ..\admin_console\lib\Kaltura
-copy /Y output\batchClient\* ..\batch\client
-copy /Y output\php5full\* ..\tests\unit_test\lib
+xcopy /Y /S /R output\adminConsoleClient\* ..\admin_console\lib\Kaltura
+xcopy /Y /S /R output\batchClient\* ..\batch\client
+xcopy /Y /S /R output\php5full\* ..\tests\unit_test\lib
