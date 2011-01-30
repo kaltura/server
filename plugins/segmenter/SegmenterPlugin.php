@@ -1,6 +1,6 @@
 <?php
 
-class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
+class SegmenterPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'segmenter';
 	
