@@ -81,13 +81,13 @@ class ShortLinkService extends KalturaBaseService
 	 * Retrieve an short link object by id
 	 * 
 	 * @action get
-	 * @param int $id 
+	 * @param string $id 
 	 * @return KalturaShortLink
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
 	function getAction($id)
 	{
-		$dbShortLink = ShortLinkPeer::retrieveByPK( $id );
+		$dbShortLink = ShortLinkPeer::retrieveByPK($id);
 		
 		if(!$dbShortLink)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
@@ -103,7 +103,7 @@ class ShortLinkService extends KalturaBaseService
 	 * Update exisitng short link
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param string $id
 	 * @param KalturaShortLink $shortLink
 	 * @return KalturaShortLink
 	 *
@@ -128,7 +128,7 @@ class ShortLinkService extends KalturaBaseService
 	 * Mark the short link as deleted
 	 * 
 	 * @action delete
-	 * @param int $id 
+	 * @param string $id 
 	 * @return KalturaShortLink
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
@@ -154,7 +154,7 @@ class ShortLinkService extends KalturaBaseService
 	 * 
 	 * @action goto
 	 * @serverOnly
-	 * @param int $id
+	 * @param string $id
 	 * @param bool $proxy proxy the response instead of redirect
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
