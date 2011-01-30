@@ -10,9 +10,10 @@ class kPermissionManager
 	
 	private static $map = array(); // Local map of permission items allowed for the current role
 	
-	const API_ACTIONS_ARRAY_NAME    = 'api_actions';    // name of $map's api actions array
-	const API_PARAMETERS_ARRAY_NAME = 'api_parameters'; // name of $map's api parameters array
-	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';  // name of $map's partner group array
+	const API_ACTIONS_ARRAY_NAME    = 'api_actions';      // name of $map's api actions array
+	const API_PARAMETERS_ARRAY_NAME = 'api_parameters';   // name of $map's api parameters array
+	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';    // name of $map's partner group array
+	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
 			
 	private static $initialized = false; // map already initialized or not
 	private static $useCache = true;     // use cache or not
@@ -175,6 +176,7 @@ class kPermissionManager
 		$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::READ]   = array();
 		$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::UPDATE] = array();
 		$map[self::API_PARAMETERS_ARRAY_NAME][ApiParameterPermissionItemAction::INSERT] = array();
+		$map[self::PERMISSION_NAMES_ARRAY] = array();
 		return $map;
 	}
 	
@@ -226,6 +228,7 @@ class kPermissionManager
 		return $map;
 	}
 		
+		
 	/**
 	 * Init permission items map from DB for the given role
 	 * @param UserRole $dbRole
@@ -237,11 +240,11 @@ class kPermissionManager
 		// get all permission object names from role record
 		if ($dbRole)
 		{
-			$permissionNames = $dbRole->getPermissionNames(true);
-			$permissionNames = array_map('trim', explode(',', $permissionNames));
+			$tmpPermissionNames = $dbRole->getPermissionNames(true);
+			$tmpPermissionNames = array_map('trim', explode(',', $tmpPermissionNames));
 		}
 		else {
-			$permissionNames = array();
+			$tmpPermissionNames = array();
 		}
 		
 		// add always allowed permissions
@@ -252,8 +255,15 @@ class kPermissionManager
 		else {
 			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);
 		}
-		$permissionNames = array_merge($permissionNames, $alwaysAllowed);
-				
+		$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowed);
+		
+		$permissionNames = array();
+		foreach ($tmpPermissionNames as $name)
+		{
+			$permissionNames[$name] = $name;
+		}
+		$map[self::PERMISSION_NAMES_ARRAY] = $permissionNames;	
+		
 		// get mapping of permissions to permission items
 		$c = new Criteria();
 		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_NAME, $permissionNames, Criteria::IN);
@@ -727,6 +737,15 @@ class kPermissionManager
 		$partnerGroup = array_filter($partnerGroup);
 		$partnerGroup = implode(',', $partnerGroup);
 		return $partnerGroup;
+	}
+	
+	
+	/**
+	 * @return return current permission names
+	 */
+	public static function getCurrentPermissions()
+	{
+		return self::$map[self::PERMISSION_NAMES_ARRAY];
 	}
 		
 }

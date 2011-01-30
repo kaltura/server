@@ -25,6 +25,14 @@ class PermissionService extends KalturaBaseService
 		}
 		return parent::globalPartnerAllowed($actionName);
 	}
+	
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'getCurrentPermissions') {
+			return false;
+		}
+		return parent::partnerRequired($actionName);
+	}
 
 	
 	/**
@@ -174,6 +182,21 @@ class PermissionService extends KalturaBaseService
 		$response->totalCount = $count;
 		
 		return $response;
+	}
+	
+	/**
+	 * Return a list of current sessions's allowed permission names
+	 * 
+	 * @action getCurrentPermissions
+	 * 
+	 * @return string Comma seperated string of current permission names
+	 * 
+	 */	
+	public function getCurrentPermissions()
+	{	
+		$permissions = kPermissionManager::getCurrentPermissions();
+		$permissions = implode(',', $permissions);
+		return $permissions;
 	}
 	
 }
