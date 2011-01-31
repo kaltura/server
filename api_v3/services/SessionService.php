@@ -34,7 +34,7 @@ class SessionService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
-	function startAction($secret, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400 , $privileges = null )
+	function startAction($secret, $userId = "", $type = 0, $partnerId = null, $expiry = 86400 , $privileges = null )
 	{
 		KalturaResponseCacher::disableCache();
 		// make sure the secret fits the one in the partner's table
@@ -82,7 +82,7 @@ class SessionService extends KalturaBaseService
 	 *
 	 * @throws APIErrors::START_SESSION_ERROR
 	 */
-	function impersonateAction($secret, $impersonatedPartnerId, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400 , $privileges = null )
+	function impersonateAction($secret, $impersonatedPartnerId, $userId = "", $type = 0, $partnerId = null, $expiry = 86400 , $privileges = null )
 	{
 		KalturaResponseCacher::disableCache();
 		
