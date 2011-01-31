@@ -62,5 +62,13 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'adminConsole';
+	}
 }
 

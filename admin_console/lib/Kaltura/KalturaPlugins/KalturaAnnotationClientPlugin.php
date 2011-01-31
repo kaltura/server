@@ -34,5 +34,13 @@ class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'annotation';
+	}
 }
 

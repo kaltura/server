@@ -34,5 +34,13 @@ class KalturaDocumentClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'document';
+	}
 }
 

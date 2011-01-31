@@ -325,8 +325,10 @@ class KalturaConversionEngineType
 	const PDF2SWF = "201";
 	const PDF_CREATOR = "202";
 	const QUICK_TIME_PLAYER_TOOLS = "quickTimeTools.QuickTimeTools";
+	const FAST_START = "fastStart.FastStart";
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const AVIDEMUX = "avidemux.Avidemux";
+	const SEGMENTER = "segmenter.Segmenter";
 }
 
 class KalturaConversionProfileOrderBy

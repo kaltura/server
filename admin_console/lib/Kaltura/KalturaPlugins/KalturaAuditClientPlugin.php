@@ -34,5 +34,13 @@ class KalturaAuditClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'audit';
+	}
 }
 

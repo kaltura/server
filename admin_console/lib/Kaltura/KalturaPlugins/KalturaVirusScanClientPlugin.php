@@ -41,5 +41,13 @@ class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'virusScan';
+	}
 }
 
