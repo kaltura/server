@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MySpaceFeed xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Title>Kaltura Tests</Title>
+  <Description>Holds our media that we deliver to MySpace</Description>
+  <Contact>ofer.chesler@kaltura.com</Contact>
+  <LastUpdate>2010-12-28T07:23:51.7586741+02:00</LastUpdate>
+  <MediaItems>
+    <MediaItem>
+      <Name>Kaltura Promotion</Name>
+      <Title>My First Movie</Title>
+      <Description>Our first movie to myspace</Description>
+      <Location>ftp://myspace.upload.akamai.com/media/kaltura_final_4_CD.wmv</Location>
+      <ReleaseDate>2010-12-27T04:23:51.7586741+02:00</ReleaseDate>
+      <LastUpdate>2010-12-28T16:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge>ftp://myspace.upload.akamai.com/media/img_large.wmv</ThumbnailLarge>
+      <ThumbnailSmall>ftp://myspace.upload.akamai.com/media/img_small.wmv</ThumbnailSmall>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+      </Tags>
+    </MediaItem>
+  </MediaItems>
+</MySpaceFeed>
