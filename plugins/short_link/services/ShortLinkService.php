@@ -182,5 +182,6 @@ class ShortLinkService extends KalturaBaseService
 			kFile::dumpUrl($dbShortLink->getFullUrl());
 		
 		header('Location: ' . $dbShortLink->getFullUrl());
+		die;
 	}
 }
