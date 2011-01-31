@@ -8,12 +8,23 @@
  */
 class ShortLinkService extends KalturaBaseService
 {
+	protected function partnerRequired($actionName)
+	{
+		if ($actionName === 'goto')
+			return false;
+			
+		return parent::partnerRequired($actionName);
+	}
+	
 	public function initService($serviceName, $actionName)
 	{
 		parent::initService($serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria(new ShortLinkPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new kuserPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		if($actionName != 'goto')
+		{
+			myPartnerUtils::addPartnerToCriteria(new ShortLinkPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			myPartnerUtils::addPartnerToCriteria(new kuserPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		}
 	}
 	
 	/**
