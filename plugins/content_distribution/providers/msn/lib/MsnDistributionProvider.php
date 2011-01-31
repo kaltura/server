@@ -242,6 +242,7 @@ class MsnDistributionProvider implements IDistributionProvider
 		$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
+		KalturaLog::debug("xml[" . $xml->saveXML() . "]");
 		if(!$xml)
 		{
 			KalturaLog::err("XML Transformation failed");
