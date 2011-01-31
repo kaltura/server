@@ -173,6 +173,8 @@ class ShortLinkService extends KalturaBaseService
 	 */		
 	function gotoAction($id, $proxy = false)
 	{
+		KalturaResponseCacher::disableCache();
+		
 		$dbShortLink = ShortLinkPeer::retrieveByPK($id);
 	
 		if (!$dbShortLink)
