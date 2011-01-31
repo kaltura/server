@@ -490,6 +490,11 @@ interface IKalturaClientPlugin
 	 * @return array<KalturaServiceBase>
 	 */
 	public function getServices();
+	
+	/**
+	 * @return string
+	 */
+	public function getName();
 }
 
 abstract class KalturaClientPlugin implements IKalturaClientPlugin

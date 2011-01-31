@@ -140,6 +140,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('		);');
 		$this->appendLine('		return $services;');
 		$this->appendLine('	}');
+		$this->appendLine('');
+		$this->appendLine('	/**');
+		$this->appendLine('	 * @return string');
+		$this->appendLine('	 */');
+		$this->appendLine('	public function getName()');
+		$this->appendLine('	{');
+		$this->appendLine("		return '$pluginName';");
+		$this->appendLine('	}');
 		$this->appendLine('}');
 		$this->appendLine('');
 		
