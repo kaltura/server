@@ -80,7 +80,11 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		KalturaLog::debug("xml [$providerData->xml]");
+		$pattern = '/<([^\/]+)\/>/';
+		$replacement = '<$1></$1>';
+		
+		$xml = preg_replace($pattern, $replacement, $providerData->xml);
+		KalturaLog::debug("xml [$xml]");
 		
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
@@ -102,7 +106,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
 
-		$params = http_build_query(array($this->postFieldName => $providerData->xml));
+		$params = http_build_query(array($this->postFieldName => $xml));
 		
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -120,7 +124,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 		KalturaLog::debug("MSN HTTP response:\n$results\n");
-		$data->sentData = $providerData->xml;
+		$data->sentData = $xml;
 		$data->results = $results;
 		return $results;
 	}
