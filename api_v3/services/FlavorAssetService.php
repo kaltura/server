@@ -15,8 +15,20 @@ class FlavorAssetService extends KalturaBaseService
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
 		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
+		
+		$partnerGroup = null;
+		if(
+			$actionName == 'get' ||
+			$actionName == 'list' ||
+			$actionName == 'getByEntryId' ||
+			$actionName == 'getDownloadUrl' ||
+			$actionName == 'getWebPlayableByEntryId' ||
+			$actionName == 'getFlavorAssetsWithParams'
+			)
+			$partnerGroup = $this->partnerGroup . ',0';
+			
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
 	}
 	
 	protected function globalPartnerAllowed($actionName)

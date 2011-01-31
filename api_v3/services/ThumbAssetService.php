@@ -15,8 +15,20 @@ class ThumbAssetService extends KalturaBaseService
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(thumbParamsOutputPeer::getInstance());
-		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance());
 		parent::applyPartnerFilterForClass(thumbAssetPeer::getInstance());
+		
+		$partnerGroup = null;
+		if(
+			$actionName == 'get' ||
+			$actionName == 'list' ||
+			$actionName == 'getByEntryId' ||
+			$actionName == 'getDownloadUrl' ||
+			$actionName == 'getWebPlayableByEntryId' ||
+			$actionName == 'getFlavorAssetsWithParams'
+			)
+			$partnerGroup = $this->partnerGroup . ',0';
+			
+		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance(), $partnerGroup);
 	}
 	
 	/**

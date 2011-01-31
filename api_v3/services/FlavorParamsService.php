@@ -16,7 +16,15 @@ class FlavorParamsService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
 		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance()); // note that partner 0 is defined as partner group in service.ct
+		
+		$partnerGroup = null;
+		if(
+			$actionName == 'get' ||
+			$actionName == 'list'
+			)
+			$partnerGroup = $this->partnerGroup . ',0';
+			
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
 	}
 	
 	protected function globalPartnerAllowed($actionName)

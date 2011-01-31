@@ -147,14 +147,17 @@ abstract class KalturaBaseService
 		
 		
 	// can be used from derived classes to set additionl filter that don't automatically happen in applyPartnerFilters  
-	protected function applyPartnerFilterForClass ( $peer )//, $partner_id= null )
+	protected function applyPartnerFilterForClass ( $peer, $partnerGroup = null)//, $partner_id= null )
 	{
 		if ( $this->getPartner() )
 			$partner_id = $this->getPartner()->getId();
 		else
 			$partner_id = Partner::PARTNER_THAT_DOWS_NOT_EXIST;
 			
-		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($this->actionName)  );
+		if(is_null($partnerGroup))
+			$partnerGroup = $this->partnerGroup();
+			
+		myPartnerUtils::addPartnerToCriteria ( $peer , $partner_id , $this->private_partner_data , $partnerGroup , $this->kalturaNetworkAllowed($this->actionName)  );
 	}	
 	
 	

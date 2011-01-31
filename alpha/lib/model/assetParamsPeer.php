@@ -63,11 +63,6 @@ class assetParamsPeer extends BaseassetParamsPeer
 			
 		return self::$s_criteria_filter;
 	}
-
-	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null , $kalturaNetwork = null)
-	{
-		return parent::addPartnerToCriteria($partnerId, $privatePartnerData, "$partnerGroup,0", $kalturaNetwork);
-	}
 	
 	/**
 	 * The returned Class will contain objects of the default type or
