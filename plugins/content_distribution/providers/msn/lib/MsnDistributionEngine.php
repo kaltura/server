@@ -80,6 +80,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
+		KalturaLog::debug("xml [$providerData->xml]");
+		
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
