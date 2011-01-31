@@ -121,6 +121,8 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 			
 		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
 			$this->xml = MsnDistributionProvider::generateUpdateXML($distributionJobData->entryDistribution->entryId, $this);
+			
+		KalturaLog::debug("xml [$this->xml]");
 	}
 		
 	private static $map_between_objects = array
