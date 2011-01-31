@@ -2429,7 +2429,7 @@ class KalturaSessionService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function start($secret, $userId = "", $type = 0, $partnerId = -1, $expiry = 86400, $privileges = "")
+	function start($secret, $userId = "", $type = 0, $partnerId = "", $expiry = 86400, $privileges = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "secret", $secret);

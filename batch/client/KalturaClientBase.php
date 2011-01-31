@@ -90,7 +90,7 @@ class KalturaClientBase
 					foreach($services as $serviceName => $service)
 					{
 						$service->setClient($this);
-						$this->pluginServices["{$serviceName}_{$pluginName}"] = $service;
+						$this->pluginServices[$serviceName] = $service;
 					}
 				}
 			}
