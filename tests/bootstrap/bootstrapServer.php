@@ -1,6 +1,5 @@
 <?php
 
-//TODO:Fix this and the cache
 require_once (dirname ( __FILE__ ) . "/../../infra/bootstrap_base.php");
 require_once (KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 
