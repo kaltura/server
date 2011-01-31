@@ -155,7 +155,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function setRequiredThumbDimensionsObjects(array $v)
 	{
-		$requiredThumbDimensionsStr = serialize($v);
+		$requiredThumbDimensionsStr = serialize(array_unique($v));
 		return $this->setRequiredThumbDimensions($requiredThumbDimensionsStr);
 	}
 	
@@ -189,7 +189,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function setOptionalThumbDimensionsObjects(array $v)
 	{
-		$OptionalThumbDimensionsStr = serialize($v);
+		$OptionalThumbDimensionsStr = serialize(array_unique($v));
 		return $this->setOptionalThumbDimensions($OptionalThumbDimensionsStr);
 	}
 	
@@ -218,7 +218,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function setRequiredFlavorParamsIdsArray(array $v)
 	{
-		return $this->setRequiredFlavorParamsIds(implode(',', $v));
+		return $this->setRequiredFlavorParamsIds(implode(',', array_unique($v)));
 	}
 
 	public function getAutoCreateFlavorsArray()
