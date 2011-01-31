@@ -32,7 +32,7 @@ class KAsyncFileSyncImport extends KBatchBase
 		return $this->init();
 
 		if(is_null($jobs))
-		$jobs = $this->kClient->filesyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		$jobs = $this->kClient->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
 
 		KalturaLog::info(count($jobs) . " filesync import jobs to perform");
 
@@ -299,7 +299,7 @@ class KAsyncFileSyncImport extends KBatchBase
 	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{
-		return $this->kClient->filesyncImportBatch->updateExclusiveFileSyncImportJob($jobId, $this->getExclusiveLockKey(), $job);
+		return $this->kClient->fileSyncImportBatch->updateExclusiveFileSyncImportJob($jobId, $this->getExclusiveLockKey(), $job);
 	}
 
 	
@@ -310,7 +310,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			$resetExecutionAttempts = true;
 		}
 
-		$response = $this->kClient->filesyncImportBatch->freeExclusiveFileSyncImportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
+		$response = $this->kClient->fileSyncImportBatch->freeExclusiveFileSyncImportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
 
 		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
 		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
