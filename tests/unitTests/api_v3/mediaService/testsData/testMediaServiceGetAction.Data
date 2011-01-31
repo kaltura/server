@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Description>Test the get action for the media service on a specific id</Description>
+  <UnitTestsData>
+    <UnitTestData>
+      <Description>test data 1 - MBR</Description>
+      <Inputs>
+        <Input type="KalturaMediaEntry" key="1_4t1kingf" partnerId="407081" secret="021e6b694af8004ed2ef890e5664ae24" serviceUrl="www.kaltura.com" service="media">
+          <mediaType type="integer">1</mediaType>
+          <conversionQuality type="string">675181</conversionQuality>
+          <sourceType type="integer">1</sourceType>
+          <searchProviderType type="NULL"></searchProviderType>
+          <searchProviderId type="NULL"></searchProviderId>
+          <creditUserName type="NULL"></creditUserName>
+          <creditUrl type="NULL"></creditUrl>
+          <mediaDate type="NULL"></mediaDate>
+          <dataUrl type="string">http://cdnbakmi.kaltura.com/p/407081/sp/40708100/flvclipper/entry_id/1_4t1kingf/version/0</dataUrl>
+          <flavorParamsIds type="string">0,5,4,6,7,3,2</flavorParamsIds>
+          <plays type="integer">0</plays>
+          <views type="integer">2</views>
+          <width type="integer">1280</width>
+          <height type="integer">720</height>
+          <duration type="integer">30</duration>
+          <msDuration type="integer">30119</msDuration>
+          <durationType type="NULL"></durationType>
+          <id type="string">1_4t1kingf</id>
+          <name type="string">Wildlife.wmv</name>
+          <description type="string">Used by me for the unit tests</description>
+          <partnerId type="integer">407081</partnerId>
+          <userId type="string">__ADMIN__406541</userId>
+          <tags type="string">unit test material</tags>
+          <adminTags type="NULL"></adminTags>
+          <categories type="string">video</categories>
+          <categoriesIds type="string">1411891</categoriesIds>
+          <status type="integer">2</status>
+          <moderationStatus type="integer">6</moderationStatus>
+          <moderationCount type="integer">0</moderationCount>
+          <type type="integer">1</type>
+          <createdAt type="integer">1289486937</createdAt>
+          <rank type="double">0</rank>
+          <totalRank type="integer">0</totalRank>
+          <votes type="integer">0</votes>
+          <groupId type="NULL"></groupId>
+          <partnerData type="NULL"></partnerData>
+          <downloadUrl type="string">http://cdnbakmi.kaltura.com/p/407081/sp/40708100/raw/entry_id/1_4t1kingf/version/0</downloadUrl>
+          <searchText type="string">  Wildlife.wmv unit test material Used by me for the unit tests </searchText>
+          <licenseType type="integer">-1</licenseType>
+          <version type="integer">0</version>
+          <thumbnailUrl type="string">http://cdnbakmi.kaltura.com/p/407081/sp/40708100/thumbnail/entry_id/1_4t1kingf/version/100003</thumbnailUrl>
+          <accessControlId type="integer">294831</accessControlId>
+          <startDate type="NULL"></startDate>
+          <endDate type="NULL"></endDate>
+        </Input>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>
