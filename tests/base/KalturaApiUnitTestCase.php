@@ -135,20 +135,10 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 			{
 				$expectedValue = $property->getValue($outputReference);
 				$actualValue = $property->getValue($actualResult);
-				
+				$assertToPerform = "assertEquals";
+
+				$this->compareOnField($propertyName, $actualValue, $expectedValue, $assertToPerform);
 				//if this is an array we need to change it to a string
-				try {
-					$currentFailure = new unitTestFailure($propertyName, $actualValue, $expectedValue);
-					$this->assertEquals($expectedValue, $actualValue, $currentFailure);
-				}
-				catch (PHPUnit_Framework_AssertionFailedError $e) {
-					$this->hasFailures  = true;
-					$this->currentFailure = $currentFailure;
-					$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
-				}
-				catch (Exception $e) {
-					$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
-				}
 			}
 		}
 	
@@ -161,19 +151,26 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 	 * @param int $partnerId
 	 * @param string $secret
 	 * @param string $configServiceUrl
+	 * @param int $isAdmin - 0 = no admin
 	 * @return KalturaClient - a new api client 
 	 */
-	public function getClient($partnerId, $secret, $configServiceUrl)
+	public function getClient($partnerId, $secret, $configServiceUrl, $isAdmin, $userId = null)
 	{
 		$config = new KalturaConfiguration((int)$partnerId);
 
 		//Add the server url (into the test additional data)
 		$config->serviceUrl = $configServiceUrl;
 		$client = new KalturaClient($config);
-		$ks = $client->session->start($secret, null, KalturaSessionType::ADMIN, (int)$partnerId, null, null);
+		$sessionType = KalturaSessionType::USER;
+		
+		if($isAdmin != 0)
+		{
+			$sessionType =  KalturaSessionType::ADMIN;
+		} 
+		
+		$ks = $client->session->start($secret, (string)$userId, $sessionType, (int)$partnerId, null, null);
 		$client->setKs($ks);
 
 		return $client;
 	}
 }
-

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../bootstrap.php');
+require_once(dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
@@ -13,14 +13,14 @@ class KalturaUnitTestData
 	/**
 	 * 
 	 * The Test input
-	 * @var array<unitTestDataObject>
+	 * @var array<KalturaUnitTestDataObject>
 	 */
 	public $input = array();
 	
 	/**
 	 * 
 	 * The test output reference
-	 * @var array<unitTestDataObject>
+	 * @var array<KalturaUnitTestDataObject>
 	 */
 	public $outputReference = array();
 	
@@ -47,13 +47,13 @@ class KalturaUnitTestData
 	{
 		foreach ($simpleXMLElement->Inputs->Input as $input)
 		{
-			$unitTestDataObject = UnitTestDataObject::fromXml($input);
+			$unitTestDataObject = KalturaUnitTestDataObject::fromXml($input);
 			$this->input[] = $unitTestDataObject;
 		}
 		
 		foreach ($simpleXMLElement->OutputReferences->OutputReference as $outputReference)
 		{
-			$unitTestDataObject = UnitTestDataObject::fromXml($outputReference);
+			$unitTestDataObject = KalturaUnitTestDataObject::fromXml($outputReference);
 			$this->outputReference[] = $unitTestDataObject;
 		}
 	}

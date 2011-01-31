@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 //Command line usage 
 //TODO: check and add support
@@ -11,11 +11,11 @@ if(count($argv) == 2)
 }
 else
 {
-	$basePath = "C:/opt/kaltura/app/tests/unit_test/unitTests/KDL/testsData/";
+	$basePath = "C:/opt/kaltura/app/tests/unit_test/unitTests/kdl/testsData/";
 	$dataFilePath = $basePath."RealTest1.Data";
-	$failuresFilePath = $basePath. "KDLUnitTest.failures";
+	$failuresFilePath = $basePath. "testKDLWrapCDLGenerateTargetFlavors.failures";
 }
 
-unitTestResultUpdater::UpdateResults($dataFilePath, $failuresFilePath);
+KalturaUnitTestResultUpdater::UpdateResults($dataFilePath, $failuresFilePath);
 
 ?>

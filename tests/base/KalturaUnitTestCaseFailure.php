@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrap.php');
 
 /**
  * 
@@ -32,7 +32,7 @@ class KalturaUnitTestCaseFailure
 	/**
 	 * 
 	 * The unit test failures
-	 * @var array(unitTestFailure)
+	 * @var array(KalturaTestFailure)
 	 */
 	public $failures = null;
 	
@@ -82,7 +82,7 @@ class KalturaUnitTestCaseFailure
 		
 		foreach ($unitTestFailureXml->Failures->Failure as $failureXml)
 		{
-			$this->failures[] = unitTestFailure::generateFromXml($failureXml);
+			$this->failures[] = KalturaTestFailure::generateFromXml($failureXml);
 		}
 	}
 	
@@ -112,10 +112,12 @@ class KalturaUnitTestCaseFailure
 			$node = $xml->createElement("Input");
 			
 			$type = gettype($inputValue);
-			if(class_exists($inputValue))
+			
+			if(class_exists(get_class($inputValue)))
 			{
 				$type = get_class($inputValue);
-			} 
+			}
+			 
 			$node->setAttribute("type", $type);
 			
 			$id = $inputValue;
@@ -131,21 +133,34 @@ class KalturaUnitTestCaseFailure
 		
 		$failuresNode = $xml->createElement("Failures");
 		
-		foreach ($failure->failures as $unitTestFailure)
+		foreach ($failure->failures as $kalturaTestFailure)
 		{
 			$failureNode = $xml->createElement("Failure");
 			
-			$fieldNode = $xml->createElement("Field", $unitTestFailure->field);
+			$fieldNode = $xml->createElement("Field", $kalturaTestFailure->field);
 			$failureNode->appendChild($fieldNode);
 
 			$outputReferenceNode = $xml->createElement("OutputReference");
 			$failureNode->appendChild($outputReferenceNode);
-			KalturaUnitTestCaseFailure::setElementValue($xml, $outputReferenceNode, $unitTestFailure->outputReferenceValue, $unitTestFailure->field);
+			KalturaUnitTestCaseFailure::setElementValue($xml, $outputReferenceNode, $kalturaTestFailure->outputReferenceValue, $kalturaTestFailure->field);
 
 			$actualOutputNode = $xml->createElement("ActualOutput");
 			$failureNode->appendChild($actualOutputNode);
-			KalturaUnitTestCaseFailure::setElementValue($xml, $actualOutputNode, $unitTestFailure->actualValue, $unitTestFailure->field);
-
+			KalturaUnitTestCaseFailure::setElementValue($xml, $actualOutputNode, $kalturaTestFailure->actualValue, $kalturaTestFailure->field);
+			
+			if ($kalturaTestFailure->assert != null)
+			{
+				$assertNode = $xml->createElement("Assert");
+				$failureNode->appendChild($assertNode);
+				KalturaUnitTestCaseFailure::setElementValue($xml, $assertNode, $kalturaTestFailure->assert);
+			}
+			
+			if ($kalturaTestFailure->message != null)
+			{
+				$messageNode = $xml->createElement("Message");
+				$failureNode->appendChild($messageNode );
+				KalturaUnitTestCaseFailure::setElementValue($xml, $messageNode , $kalturaTestFailure->message);
+			}
 			
 			$failuresNode->appendChild($failureNode);
 		}
@@ -166,7 +181,7 @@ class KalturaUnitTestCaseFailure
 	 * @param string $fieldName
 	 * @param string $fieldType
 	 */
-	private static function setElementValue(DOMDocument &$xml, DomElement &$rootNode, $value, $fieldName, $fieldType = null)
+	private static function setElementValue(DOMDocument &$xml, DomElement &$rootNode, $value, $fieldName = null, $fieldType = null)
 	{
 		//If the value is not an array then we just create the element and sets it's value
 		if(!is_array($value ))

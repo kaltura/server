@@ -1,0 +1,52 @@
+<!--
+
+Admin console:
+partner id=-2
+secret= 35dc0d295d874788332a813066a77b88
+-----------------------------------------------------------------------------------
+partner=591
+admin secret= db73089260d7b34f03136050910914c7
+user_secret = d6bde1115dde81c0fcdd09772820c786
+server url = www.kaltura.co.cc
+-----------------------------------------------------------------------------------
+User5:
+Content moderator
+Is_admin=1
+puser_id=UserContentmoderator4@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+User6:
+Player Designer
+Is_admin=1
+puser_id=UserPlayerDesigner5@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+enduser7:
+Is_admin=0
+puser_id= enduser7
+With login data enduser7@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+enduser8:
+Is_admin=0
+puser_id= enduser8
+Without login data.
+-----------------------------------------------------------------------------------
+User1:
+Full permissions
+Is_admin=1
+puser_id=UserFullP1@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+User2:
+No permission
+Is_admin=1
+puser_id= UserNoP2@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+User3:
+Manager
+Is_admin=1
+puser_id=UserManager3@mailinator.com,pwd=moran%1234.
+-----------------------------------------------------------------------------------
+User4:
+Upload Only
+Is_admin=1
+puser_id=UserUploadOnly1@mailinator.com,pwd=moran%1234.
+
+-->

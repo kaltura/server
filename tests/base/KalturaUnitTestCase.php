@@ -1,5 +1,7 @@
 <?php
 
+require_once (dirname(__FILE__). '/../bootstrap/bootstrapServer.php');
+
 class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 {
 	/**
@@ -61,8 +63,6 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		parent::__construct($name, $data, $dataName);
 		
-		KalturaLog::debug(print_r($this->data, true));
-		
 		$class = get_class($this);
 		if($name)
 		{
@@ -104,8 +104,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		return $this->data;
 	}
-	
-	
+			
 	/**
 	 * @param Zend_Config $testConfig
 	 * @param ReflectionParameter $arg
@@ -271,6 +270,8 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 */
 	public function runTest()
 	{
+		print("In RunTest\n");
+		
 		//Do this section only once per test file and not for test... so we can initiate all the tests 
 		//TODO: HOW to do nice :) and also how to know if this is a new test class or a new test or just another input
 		$this->currentFailure = null;
@@ -280,7 +281,6 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			$class = get_class($this);
 
 			$classPath = KAutoloader::getClassFilePath($class);
-//			KalturaUnitTestCase::$failureFile = fopen(dirname($classPath) . "/testsData/{$this->name}.result", "w+");
 			KalturaUnitTestCase::$failureObjectsFile = fopen(dirname($classPath) . "/testsData/{$this->name}.failures", "w+");
 			$this->result->addListener(new KalturaUnitTestListener());
 		}
@@ -306,7 +306,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			
 			foreach ($unitTestData->Inputs->Input as $input)
 			{
-				$object = UnitTestDataObject::fromXml($input);
+				$object = KalturaUnitTestDataObject::fromXml($input);
 
 				//Go to the last and current input and add the variable
 				array_push($inputs, $object);
@@ -314,7 +314,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			
 			foreach ($unitTestData->OutputReferences->OutputReference as $output)
 			{
-				$object = UnitTestDataObject::fromXml($output);
+				$object = KalturaUnitTestDataObject::fromXml($output);
 
 				//Go to the last and current input and add the variable
 				array_push($inputs, $object);
@@ -362,18 +362,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 				$actualValue = $newResult->getByName($field);
 				
 				//if this is an array we need to change it to a string
-				$this->compareOnField($field, $actualValue, $expectedValue);
-//				try {
-//					$currentFailure = new unitTestFailure($field, $actualValue, $expectedValue);
-//					$this->assertEquals($expectedValue, $actualValue, $currentFailure);
-//				}
-//				catch (PHPUnit_Framework_AssertionFailedError $e) {
-//					$this->hasFailures  = true;
-//					$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
-//				}
-//				catch (Exception $e) {
-//					$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
-//				}
+				$this->compareOnField($field, $actualValue, $expectedValue, "assertEquals");
 			}
 		}
 
@@ -388,12 +377,12 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @param unknown_type $expectedResult
 	 * @throws no exception can be thrown (for mass compares)
 	 */
-	public function compareOnField($fieldName, $actualValue, $expectedValue)
+	public function compareOnField($fieldName, $actualValue, $expectedValue, $assertToPerform, $message = null)
 	{
 		try 
 		{
-			$this->currentFailure = new unitTestFailure($fieldName, $actualValue, $expectedValue);
-			$this->assertEquals($expectedValue, $actualValue, $this->currentFailure);
+			$this->currentFailure = new KalturaTestFailure($fieldName, $actualValue, $expectedValue, $assertToPerform, $message);
+			$this->$assertToPerform($expectedValue, $actualValue, $this->currentFailure);
 		}
 		catch (PHPUnit_Framework_AssertionFailedError $e) 
 		{

@@ -1,66 +1,45 @@
 <?php
 
-require_once (dirname(__FILE__). '/../unit_test/bootstrap.php');
+require_once (dirname(__FILE__). '/../bootstrap/bootstrapClient.php');
 
 class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 {
-	private $fullAccessClient;
-	private $minimalAccessClient;
-	
-	private $addedRoleIds = array();
-	private $isCleanClient = false; 
-	private $addedPermissionsId = array();
-	
-	const TEST_PARTNER_SECRET = '1af9794120591b09a1a5f65931e2dc4b';//'NjE3MjA4NjliYmQ4MWJlMjY0MmQwYWU4YWNkODA1ZjdjN2I2OTUyOHwxOTg7MTk4OzEyOTUyNjkwNzk7MjsxMjk1MTgyNjc5Ljg5MTM7Ozs7';
-	const TEST_PARTNER_ID = 193;
-	const TEST_SERVER = 'newkaldev.kaltura.dev'; 
-	const MAXIMAL_ACCESS_ROLE_ID = 0;
-	const MINIMAL_ACCESS_ROLE_ID = 0;
+	private static $adminClient;
+
+	const TEST_SERVER = 'www.kaltura.co.cc'; // //
+//	const TEST_SERVER = 'local.trunk';  
 	const ADMIN_PARTNER = -2;
 	const ADMIN_USER = 0;
-	const ADMIN_SECRET = 90210;
-		
+	const ADMIN_SECRET = "35dc0d295d874788332a813066a77b88"; //
+//	const ADMIN_SECRET = "adminconsoleadminsecret";
+
+	private $enumTypes = array(
+	'KalturaControlPanelCommandStatus',
+	'KalturaControlPanelCommandStatus',
+	'KalturaStorageProfileStatus',
+	'KalturaPartnerStatus',
+	'KalturaBatchJobType',
+	'KalturaEntryType',
+	'KalturaSourceType',
+	'KalturaNotificationType',
+	'KalturaPlaylistType',
+	'KalturaReportType',
+	'KalturaMetadataObjectType'
+	);
+	
 	/**
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
 		parent::setUp();
-		$this->client = $this->getClient(self::ADMIN_PARTNER, self::ADMIN_SECRET, self::TEST_SERVER);
+		
+		self::$adminClient = $this->getClient(self::ADMIN_PARTNER, self::ADMIN_SECRET, self::TEST_SERVER, 1);
+		
 		if(!$this->client)
 		{
 			//TODO: add a new client and get him from the DB
 			//TODO: add this new id to the config file
 		}
-		
-		$allPermissionsItems = array();
-		
-	//	$allPermissionsItems = $this->client->permissionItem->listAction();
-	//	var_dump($allPermissionsItems);
-		
-		$allPermissionsItemsIds  = array();
-		foreach ($allPermissionsItems as $permissionItem)
-		{
-			//TODO: create the ids list
-			$allPermissionsItemsIds[] = $permissionItem->id; 
-		}
-		
-//		$minimalPermission = $this->addPermission("MINIMAL", "MINIMAL", null);
-	//	$maximalPermission = $this->addPermission("MAXIMAL", "MAXIMAL", $allPermissionsItemsIds);
-		
-		
-		$this->client = $this->getClient(self::TEST_PARTNER_ID, self::TEST_PARTNER_SECRET, self::TEST_SERVER);
-		
-//		$minimalRole = $this->addRole("Minimal", "Minimal", null);
-///		$maximalRole = $this->addRole("Maximal", "Maximal", "MAXIMAL");
-		
-//		$this->addedRoleIds = array();
-//		$this->dummyPartner = PartnerPeer::retrieveByPK(self::TEST_PARTNER_ID);
-//		$this->assertEquals(self::TEST_PARTNER_ID, $this->dummyPartner->getId());
-//		UserRolePeer::clearInstancePool();
-//		PermissionPeer::clearInstancePool();
-//		PermissionItemPeer::clearInstancePool();
-//		kuserPeer::clearInstancePool();
-//		PartnerPeer::clearInstancePool();
 	}
 
 	/**
@@ -84,95 +63,64 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
-//		UserRolePeer::clearInstancePool();
-//		PermissionPeer::clearInstancePool();
-//		PermissionItemPeer::clearInstancePool();
-//		kuserPeer::clearInstancePool();
-//		PartnerPeer::clearInstancePool();
-		
-		$this->client = null;
-//		UserRolePeer::setUseCriteriaFilter(false);
-		
-		
-		//Clean role ids
-		foreach ($this->addedRoleIds as $id) {
-			try
-			{
-				$obj = UserRolePeer::retrieveByPK($id);
-				if ($obj) {
-					$obj->delete();
-				}
-			}
-			catch (PropelException $e) {
-				print("Unable to delete role id = {$id} \n" );
-			}
-		}
-		
-		//Clean added permissions ids
-		foreach ($this->addedPermissionsId as $id) {
-			try
-			{
-				
-				$obj = PermissionPeer::retrieveByPK($id);
-				if ($obj) {
-					$obj->delete();
-				}
-			}
-			catch (PropelException $e) {
-				print("Unable to delete role id = {$id} \n" );
-			}
-		}
-		
-//		UserRolePeer::setUseCriteriaFilter(true);
-		$this->addedRoleIds = array();
 		parent::tearDown ();
 	}
 
 	/**
 	 * Test accessibility for the given partner, secret and server
-	 * @dataProvider accessibilityProvider
+	 * @dataProvider accessibilitySuccessProvider
 	 */
-	public function testAccessibility($partnerId = '103', $secret = '1af9794120591b09a1a5f65931e2dc4b', $configServiceUrl = null)
+	public function testAccessibilitySuccess($partnerId, $secret, $configServiceUrl, $isAdmin, $userId)
 	{
-		print("Start test");
-		
-		$client = $this->getClient($partnerId, $secret, $configServiceUrl);
+		$testedClient = $this->getClient($partnerId, $secret, $configServiceUrl, $isAdmin, $userId);
+				
+		$permissions = $this->getPermissionsItems($testedClient, $userId, $partnerId, $isAdmin, $configServiceUrl);
+		$alwaysAllowedActions = $this->getAlwaysAllowedActions($partnerId);
 		
 		$serviceMap = KalturaServicesMap::getMap();
 		$services = array_keys($serviceMap);
+		
+//		$this->testSingleService("batchcontrol", $testedClient, $permissions, $alwaysAllowedActions);
+				
 		foreach($services as $service)
 		{
+			//We skip the session service
+			if($service == "session")
+			{
+				continue;
+			}
+			
 			$serviceReflector = new KalturaServiceReflector($service);
 			$actions = array_keys($serviceReflector->getActions());
-
-			$serviceAsArray = explode('_', $service);
-			$serviceName = end($serviceAsArray);
 			
+			$serviceName = $serviceReflector->getServiceName();
+
 			foreach($actions as $action)
 			{
-				// params
-				$actionParams = $serviceReflector->getActionParams($action);
-				$params = array();
-				foreach ($actionParams as $actionParam)
+				$params = $this->getActionParams($action, $serviceReflector);
+
+				if($action == "list")
 				{
-					$params[] = $actionParam->getDefaultValue();
+					$action .= "Action";
 				}
-
-				try 
+				
+				try
 				{
-					$actionName = $action;
-					if($action == 'list')
+					if(method_exists($testedClient->$serviceName, $action))
 					{
-						$actionName  = $action . "Action";
+						call_user_func_array(array($testedClient->$serviceName, $action), $params);				
+						//TODO: Handle non exception cases
+						$this->compareServiceAction($permissions, $alwaysAllowedActions, $serviceName, $action);
 					}
-
-					call_user_func_array(array($client->$serviceName, $actionName), $params);
-					
+					else
+					{
+						//TODO: handle method doesn't exists...						
+					}
 				}
 				catch(Exception $ex)
 				{
-					//TODO: add compare function to base
-					$this->compareOnField("{$serviceName}::{$actionName}", $ex->getCode(), 'SERVICE_FORBIDDEN');
+					//Check if the service / action is found in the user permissions
+					$this->compareServiceAction($permissions, $alwaysAllowedActions, $serviceName, $action, $ex);
 				}
 			}
 		}
@@ -180,17 +128,263 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 	
 	/**
 	 * 
-	 * Provides the data to the accessibility test
+	 * Gets all the needed parameters for the given action
+	 * @param unknown_type $action
 	 */
-	public function accessibilityProvider()
+	private function getActionParams($action, $serviceReflector)
 	{
-		//TODO: get func name
-		print("Test Name is: {$this->name}\n" );
+		$params = array();
+
+		//Get the action parameters
+		$actionParams = $serviceReflector->getActionParams($action);
 		
-		$rawInputs = $this->provider(dirname(__FILE__) . "/testsData/testAccessibility.data");
+		//for each action parameter
+		foreach ($actionParams as $actionParam)
+		{
+			$actionName = $actionParam->getName();
+			$typeName = $actionParam->getType();
+			$typeReflector = $actionParam->getTypeReflector();
+			
+			//Class is abstract 
+			if($typeName == "KalturaPermissionItem")
+			{
+				$params[] = new KalturaApiActionPermissionItem();
+				continue;
+			}
+			
+			//Checks if the parameter
+			if($actionParam->isComplexType())
+			{
+				//Is Array
+				if($actionParam->isArray())
+				{
+					$params[] = array();
+				}
+				else //it is a complex and not array type
+				{
+					if($typeReflector != null)
+					{
+						if($typeName == "fileData" || $typeName == "file")
+						{
+							$params[] = array( 	'name' => "",
+												'tmp_name' => "",
+												'filename' => "");
+						}
+						elseif($typeReflector->isStringEnum() || $typeReflector->isDynamicEnum())
+						{
+							$contants = $typeReflector->getConstants();
+							$enumValue = $contants[0]->getDefaultValue();
+							$params[] = (string)$enumValue;
+						}
+						elseif($typeReflector->isEnum())
+						{
+							$contants = $typeReflector->getConstants();
+							$params[] = (int)$contants[0]->getDefaultValue();
+						}
+						elseif(!$typeReflector->isAbstract())
+						{
+							//TODO: fix bug in the type reflector where those types aren't considered as ENUM
+							if(in_array($typeName, $this->enumTypes))
+							{
+								if($typeName == 'KalturaPlaylistType')
+								{
+									$params[] = 3;
+								}
+								else
+								{
+									$params[] = 1;
+								}
+							}
+							else 
+							{
+								$instance = $typeReflector->getInstance();
+								
+								if(!isset($instance->name))
+								{
+									$instance->name = "0";
+								}
+								
+								if(!isset($instance->id))
+								{
+									$instance->id = 0;
+								}
+								
+								$params[] = $instance;
+							}
+						}
+						else // handle all abstract classes and not just the permission item
+						{
+							//TODO: handle abstract classes
+							$params[] = new KalturaApiActionPermissionItem();								
+						}
+					}
+					else //type == null
+					{
+						$params[] = 0; 
+					}
+				}
+			}
+			else //For int, bool, string, float (SimpleType)
+			{
+				$params[] = 0;
+			}
+		}
+					
+		return $params;
+	}
+	
+	private function testSingleService($service, $testedClient, $permissions, $alwaysAllowedActions)
+	{
+		$serviceReflector = new KalturaServiceReflector($service);
+		$actions = array_keys($serviceReflector->getActions());
+		
+		$serviceName = $serviceReflector->getServiceName();
+
+		foreach($actions as $action)
+		{				
+			// Params
+			$actionParams = $serviceReflector->getActionParams($action);
+				 
+			$params = array();
+
+			foreach ($actionParams as $actionParam)
+			{
+				$actionName = $actionParam->getName();
+				$typeName = $actionParam->getType();
+				if($typeName == "KalturaPermissionItem")
+				{
+					$params[] = new KalturaApiActionPermissionItem();
+					continue;
+				}
+				
+				if($actionParam->isComplexType())
+				{
+					if($actionParam->isArray())
+					{
+						$params[] = array();
+					}
+					else //it is a complex not array type
+					{
+						$type = $actionParam->getTypeReflector();
+													
+						if($type != null)
+						{
+							if(!$type->isAbstract())
+							{
+								$params[] = $type->getInstance();
+							}
+							else // handle all abstract classes and not just the permission item
+							{
+								//TODO: handle abstract classes
+								$params[] = new KalturaApiActionPermissionItem();								
+							}
+						}
+						else //type == null
+						{
+							$params[] = null; 
+						}
+					}
+				}
+				else //For int, bool, string, float (SimpleType)
+				{
+					$params[] = 0;
+				}
+			}
+	
+			if($action == "list")
+			{
+				$action .= "Action";
+			}
+			
+			try
+			{
+				call_user_func_array(array($testedClient->$serviceName, $action), $params);				
+				//TODO: Handle non exception cases
+				$this->compareServiceAction($permissions, $alwaysAllowedActions, $serviceName, $action);
+			}
+			catch(Exception $ex)
+			{
+				//Check if the service / action is found in the user permissions
+				$this->compareServiceAction($permissions, $alwaysAllowedActions, $serviceName, $action, $ex);
+			}
+		}
+	}
+	
+	/**
+	 * Compares if the given exception   
+	 */
+	private function compareServiceAction($permissions, $alwaysAllowedActions, $serviceName, $actionName, $ex = null)
+	{
+		$isFound = $this->isFound($permissions, $serviceName, $actionName);
+		$isAlwaysAllowed =  $this->isFound($alwaysAllowedActions, $serviceName, $actionName);
+			
+		if($ex != null)
+		{
+			if($ex->getCode() == 4096)
+			{
+				print($ex->getMessage(). "\n");
+			}
+			
+			if($isFound || $isAlwaysAllowed)
+			{
+				$this->compareOnField("{$serviceName}::{$actionName}", $ex->getCode(), 'SERVICE_FORBIDDEN', "assertNotEquals", $ex->getMessage());
+			}
+			else
+			{
+				$this->compareOnField("{$serviceName}::{$actionName}", $ex->getCode(), 'SERVICE_FORBIDDEN', "assertEquals", $ex->getMessage());
+			}
+		}
+		else // No exception was raised in this service
+		{
+			if($isFound || $isAlwaysAllowed) // if is found
+			{}
+			else //the service is not open and we should have gotten an exception 
+			{
+				$this->compareOnField("{$serviceName}::{$actionName}", 'NO_EXCEPTION_WAS_RAISED', 'SERVICE_FORBIDDEN', "assertEquals");
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Checks if the service and action found in the given array of permissions items
+	 * @param array<KalturaPermissionItem> $permissions
+	 * @param string $serviceName
+	 * @param string $actionName
+	 */
+	private function isFound($permissions, $serviceName, $actionName)
+	{
+		$newActionName = $actionName;
+		
+		if($actionName == "listAction")
+		{
+			$newActionName = "list";
+		}
+		
+		if(count($permissions) > 0)
+		{
+			foreach ($permissions as $permission)
+			{
+				if(strtolower($permission->service) == strtolower($serviceName) && strtolower($permission->action) == strtolower($newActionName))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * Provides the data to the accessibility success test
+	 */
+	public function accessibilitySuccessProvider()
+	{
+		$rawInputs = $this->provider(dirname(__FILE__) . "/testsData/testAccessibilitySuccess.data");
 		
 		$inputs = array();
 		$index = -1;
+		
 		foreach ($rawInputs as $rawInput)
 		{
 			$index++;
@@ -198,6 +392,8 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 			$inputs[$index][] = $rawInputs[$index][0]->additionalData["partnerId"];	
 			$inputs[$index][] = $rawInputs[$index][0]->additionalData["secret"];
 			$inputs[$index][] = $rawInputs[$index][0]->additionalData["serviceUrl"];
+			$inputs[$index][] = $rawInputs[$index][0]->additionalData["isAdmin"];
+			$inputs[$index][] = $rawInputs[$index][0]->additionalData["userId"];
 		}
 		
 		return $inputs;
@@ -291,37 +487,174 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 		$this->addedPermissionsId[$permission->name] = $addedPermission->id;
 		return $addedPermission;
 	}
-	
+
 	/**
-	 * Scans the file system and loads the description of the services to an array
-	 *
+	 * 
+	 * Returns the given clients permission items
+	 * @param unknown_type $client
+	 * @return array<KalturaPermissionItem>
 	 */
-	protected function loadServicesInfo()
+	private function getPermissionsItems($client, $userId, $partnerId, $isAdmin, $configServiceUrl)
 	{
-		$serviceMap = KalturaServicesMap::getMap();
-		$services = array_keys($serviceMap);
-		foreach($services as $service)
+		$permissionItems = array();
+
+		$roleIds = "";
+		
+		$config = new KalturaConfiguration($partnerId);
+
+		//Add the server url (into the test additional data)
+		$config->serviceUrl = $configServiceUrl;
+		$impersonatedClient = new KalturaClient($config);
+		$sessionType = KalturaSessionType::ADMIN;
+				
+		$impersonateKS = self::$adminClient->session->impersonate(self::ADMIN_SECRET, $partnerId, $userId, KalturaSessionType::ADMIN, self::ADMIN_PARTNER);
+		$impersonatedClient->setKs($impersonateKS);
+				
+		$testedUser = $impersonatedClient->user->get($userId);
+		
+		self::$adminClient = $this->getClient(self::ADMIN_PARTNER, self::ADMIN_SECRET, self::TEST_SERVER, 1);
+		
+		//If the user has a role then
+		if(isset($testedUser->roleIds) && $testedUser->roleIds != "")
 		{
-			$serviceReflector = new KalturaServiceReflector($service);
-			$actions = array_keys($serviceReflector->getActions());
-
-			foreach($actions as $action)
+			$roleIds = explode(',', $testedUser->roleIds);
+		}
+		else // Else the user doesn't have a role
+		{
+			//Get role through the system partner default admin / user permissions 
+			$partnerConfig = self::$adminClient->systemPartner->getConfiguration($partnerId);
+			
+			if($isAdmin)
 			{
-				// params
-				$actionParams = $serviceReflector->getActionParams($action);
-				foreach ($actionParams as $actionParam)
-				{
-					$actionParam = null;
-				}
+				$roleIds = explode(",", $partnerConfig->adminSessionRoleId);
+			}
+			else
+			{
+				$roleIds = explode(",", $partnerConfig->userSessionRoleId);
+			}
+		}
+		
+		//For each user roles ids
+		foreach($roleIds as $roleId)
+		{
+			$this->addPermissionsFromRole($roleId, &$permissionItems, $client);
+		}
 
-				try {
-					call_user_func_array($service->$action, $actionParams);
+		return $permissionItems;
+	}
+
+	/**
+	 * 
+	 * Add to the given collection the permissions items assoiated with the given role id
+	 * @param unknown_type $roleId
+	 * @param unknown_type $permissionItems
+	 * @param unknown_type $client
+	 */
+	private function addPermissionsFromRole($roleId, $permissionItems, $client)
+	{
+		//We get all the role's permission names
+		$role = $client->userRole->get($roleId);
+		$permissionNames = explode(',', $role->permissionNames);
+
+		//And for each permission name
+		foreach ($permissionNames as $permissionName)
+		{
+			if($permissionName != "")
+			{
+				try 
+				{
+					//We get the permission items ids
+					$permission = self::$adminClient->permission->get($permissionName);
+					$permissionItemIds = explode(',', $permission->permissionItemsIds);
 				}
 				catch(Exception $e)
 				{
-					var_dump($e);
+					$this->compareOnField("Role::PermissionNames", $permissionName, "", "assertEquals", $e->getMessage());
+					$permissionItemIds = array();
+				}
+				
+				//And for each permission item id
+				foreach ($permissionItemIds as $permissionItemId)
+				{
+					$this->addPermissionItem(&$permissionItems, $permissionItemId);
 				}
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * Gets the permission item by its id and adds it into the given $permissionItem array
+	 * @param array<KalturaApiActionPermissionItem> $permissionItems
+	 * @param unknown_type $permissionItemId
+	 */
+	private function addPermissionItem($permissionItems, $permissionItemId)
+	{
+		//We insert only action permissions and only once
+		if($permissionItemId != "")
+		{
+			if(!isset($permissionItems[$permissionItemId]))
+			{
+				$permissionItem = self::$adminClient->permissionItem->get($permissionItemId);
+
+				//We add only the action related permission items
+				if($permissionItem instanceof KalturaApiActionPermissionItem)
+				{
+					$permissionItems[$permissionItemId] = $permissionItem;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Gets the always allowed
+	 */
+	private function getAlwaysAllowedActions($partnerId)
+	{
+		$permissionItems = array();
+				
+		$partnerConfig = self::$adminClient->systemPartner->getConfiguration($partnerId);
+		
+		//TODO: change to explode and shit
+//		$permissionNames = explode(",", $partnerConfig->alwaysAllowedPermissionNames);
+		$permissionNames = $partnerConfig->alwaysAllowedPermissionNames;
+	
+		foreach ($permissionNames as $permissionName)
+		{
+			//Skip empty permissions names
+			if($permissionName == ''){continue;}
+			
+			$permission = self::$adminClient->permission->get($permissionName);
+			
+			$permissionItemIds = explode(',', $permission->permissionItemsIds);
+					
+			foreach ($permissionItemIds as $permissionItemId)
+			{
+				$this->addPermissionItem(&$permissionItems, $permissionItemId); 
+			}
+		}
+		
+		return $permissionItems; 
+	}
+	
+	/**
+	 * 
+	 * Wraps the call_user_func_array for faster use.
+	 * @param unknown_type $c
+	 * @param unknown_type $a
+	 * @param unknown_type $p
+	 */
+	private function wrap_call_user_func_array($c, $a, $p) {
+    switch(count($p)) {
+        case 0: $c->{$a}(); break;
+        case 1: $c->{$a}($p[0]); break;
+        case 2: $c->{$a}($p[0], $p[1]); break;
+        case 3: $c->{$a}($p[0], $p[1], $p[2]); break;
+        case 4: $c->{$a}($p[0], $p[1], $p[2], $p[3]); break;
+        case 5: $c->{$a}($p[0], $p[1], $p[2], $p[3], $p[4]); break;
+        default: call_user_func_array(array($c, $a), $p);  break;
+    	}
+	}
 }
+?>

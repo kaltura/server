@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../bootstrap.php');
+require_once(dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 	/**
 	 * 
@@ -19,7 +19,7 @@ class KalturaUnitTestDataFile
 	/**
 	 * 
 	 * All the file unit tests data
-	 * @var array<UnitTestData>
+	 * @var array<KalturaUnitTestData>
 	 */
 	public $unitTestsData = array();
 	
@@ -49,16 +49,16 @@ class KalturaUnitTestDataFile
 								
 		foreach ($simpleXMLElement->UnitTestsData->UnitTestData as $xmlUnitTestData)
 		{
-			$unitTestData = new unitTestData();
+			$unitTestData = new KalturaUnitTestData();
 				foreach ($xmlUnitTestData->Inputs->Input as $input)
 				{
-					$unitTestObjectIdentifier = new UnitTestDataObject(((string)$input["type"]), ((string)$input["key"]));
+					$unitTestObjectIdentifier = new KalturaUnitTestDataObject(((string)$input["type"]), ((string)$input["key"]));
 					$unitTestData->input[] = $unitTestObjectIdentifier;
 				}
 				
 				foreach ($xmlUnitTestData->OutputReferences->OutputReference as $outputReference)
 				{
-					$unitTestObjectIdentifier = new UnitTestDataObject(((string)$outputReference["type"]), ((string)$outputReference["key"]));
+					$unitTestObjectIdentifier = new KalturaUnitTestDataObject(((string)$outputReference["type"]), ((string)$outputReference["key"]));
 					$unitTestData->outputReference[] = $unitTestObjectIdentifier;		
 				}
 											
@@ -101,7 +101,7 @@ class KalturaUnitTestDataFile
 			foreach ($unitTestData->input as $input)
 			{
 				//Create the xml from the object
-				$objectAsDOM = UnitTestDataObject::toXml($input, "Input");
+				$objectAsDOM = KalturaUnitTestDataObject::toXml($input, "Input");
 		 
 				if($objectAsDOM->documentElement != NULL)
 				{
@@ -121,7 +121,7 @@ class KalturaUnitTestDataFile
 			foreach ($unitTestData->outputReference as $outputReference)
 			{
 				//Create the xml from the object
-				$objectAsDOM = UnitTestDataObject::toXml($outputReference, "OutputReference");
+				$objectAsDOM = KalturaUnitTestDataObject::toXml($outputReference, "OutputReference");
 		 
 				if($objectAsDOM->documentElement != NULL)
 				{
@@ -171,7 +171,7 @@ class KalturaUnitTestDataFile
 		
 		foreach ($simpleXmlElement->UnitTestsData->UnitTestData as $unitTestDataXml)
 		{
-			$unitTestData = unitTestData::generateFromDataXml($unitTestDataXml);
+			$unitTestData = KalturaUnitTestData::generateFromDataXml($unitTestDataXml);
 			$this->unitTestsData[] = $unitTestData;
 		}
 	}

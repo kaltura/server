@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
@@ -27,11 +27,11 @@ class KalturaDataGeneratorConfigFile
 	
 	/**
 	 * 
-	 * Generates a new dataGeneratorConfigFile object from simpleXMLElement (the config file itself)
+	 * Generates a new KalturaDataGeneratorConfigFile object from simpleXMLElement (the config file itself)
 	 * @param SimpleXMLElement $simpleXMLElement
 	 * 
-	 * @return dataGeneratorConfigFile 
-	 * 		   A new dataGeneratorConfigFile object  
+	 * @return KalturaDataGeneratorConfigFile 
+	 * 		   A new KalturaDataGeneratorConfigFile object  
 	 */
 	public static function generateFromXML(SimpleXMLElement $simpleXMLElement)
 	{
@@ -41,7 +41,7 @@ class KalturaDataGeneratorConfigFile
 	}
 	
 	/**
-	 * sets the dataGeneratorConfigFile object from simpleXMLElement (the source xml of the data)
+	 * sets the KalturaDataGeneratorConfigFile object from simpleXMLElement (the source xml of the data)
 	 * @param SimpleXMLElement $simpleXMLElement
 	 * 
 	 * @return None, sets the given object
@@ -52,19 +52,19 @@ class KalturaDataGeneratorConfigFile
 		foreach ($simpleXMLElement->TestDataFile as $xmlTestDataFile)
 		{
 			//Create new test file obejct
-			$testDataFile = new unitTestDataFile();
+			$testDataFile = new KalturaUnitTestDataFile();
 			
 			//For each UnitTest data (in this file)
 			foreach ($xmlTestDataFile->UnitTestsData->UnitTestData as $xmlUnitTestData)
 			{
 				//Create new unit test data
-				$unitTestData = new unitTestData();
+				$unitTestData = new KalturaUnitTestData();
 
 				//For each input create the needed Kaltura object identifier
 				foreach ($xmlUnitTestData->Inputs->Input as $input)
 				{
 					$additionalData = kXml::getAttributesAsArray($input);
-					$unitTestDataObjectIdentifier = new UnitTestDataObject(((string)$input["type"]), $additionalData);
+					$unitTestDataObjectIdentifier = new KalturaUnitTestDataObject(((string)$input["type"]), $additionalData);
 					$unitTestData->input[] = $unitTestDataObjectIdentifier;
 				}
 				
@@ -72,7 +72,7 @@ class KalturaDataGeneratorConfigFile
 				foreach ($xmlUnitTestData->OutputReferences->OutputReference as $outputReference)
 				{
 					$additionalData = kXml::getAttributesAsArray($outputReference);
-					$unitTestDataObjectIdentifier = new UnitTestDataObject(((string)$outputReference["type"]), $additionalData);
+					$unitTestDataObjectIdentifier = new KalturaUnitTestDataObject(((string)$outputReference["type"]), $additionalData);
 					$unitTestData->outputReference[] = $unitTestDataObjectIdentifier;		
 				}
 				

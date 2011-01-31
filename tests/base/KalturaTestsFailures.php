@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
@@ -8,7 +8,7 @@ require_once (dirname(__FILE__) . '/../bootstrap.php');
  * @author Roni
  *
  */
-class testsFailures
+class KalturaTestsFailures
 {
 	/**
 	 * 
@@ -78,19 +78,19 @@ class testsFailures
 	
 	/**
 	 * 
-	 * Generates a new testsFailures object from a given failure file path 
+	 * Generates a new KalturaTestsFailures object from a given failure file path 
 	 * @param string $failureFilePath
 	 */
 	public static function generateFromXml($failureFilePath)
 	{
-		$testsFailures = new testsFailures();
+		$testsFailures = new KalturaTestsFailures();
 		$testsFailures->fromXml($failureFilePath);
 		return $testsFailures;		
 	}
 	
 	/**	
 	 * 
-	 * Generates a new testsFailures object from a given failure file path 
+	 * Generates a new KalturaTestsFailures object from a given failure file path 
 	 * @param string $failureFilePath
 	 */
 	public function fromXml($failureFilePath)

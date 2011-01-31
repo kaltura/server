@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrap.php');
 
 class KalturaUnitTestResultUpdater
 {
@@ -15,9 +15,9 @@ class KalturaUnitTestResultUpdater
 	public static function UpdateResults($dataFilePath, $failuresFilePath)
 	{
 		//Returns the inputs for the unit tests
-		$unitTestDataFile = unitTestDataFile::generateFromDataXml($dataFilePath);
+		$unitTestDataFile = KalturaUnitTestDataFile::generateFromDataXml($dataFilePath);
 				
-		$testsFailures = testsFailures::generateFromXml($failuresFilePath);
+		$testsFailures = KalturaTestsFailures::generateFromXml($failuresFilePath);
 			
 		$newUnitTestData = KalturaUnitTestResultUpdater::update($unitTestDataFile, $testsFailures);
 		
@@ -30,10 +30,10 @@ class KalturaUnitTestResultUpdater
 	 * 
 	 * Update the data with the given failure
 	 * @param unitTestDataFile $unitTestData
-	 * @param testsFailures $testsFailures
+	 * @param KalturaTestsFailures $testsFailures
 	 * @return unitTestDataFile - The new unitTestDataFile with the changes
 	 */
-	private static function update(unitTestDataFile $unitTestDataFile, testsFailures $testsFailures)
+	private static function update(KalturaUnitTestDataFile $unitTestDataFile, KalturaTestsFailures $testsFailures)
 	{
 		//Maybe a bug because of shallow copy, but currently we don't need the old object after the copy
 		//So bug can't be checked
@@ -54,6 +54,7 @@ class KalturaUnitTestResultUpdater
 				$actualValue = $failure->actualValue;
 				
 				$outputReferenceObject = $newUnitTestDataFile->unitTestsData[$unitTestDataKey]->outputReference[0];
+				
 				//We update only the first output reference which is propel
 				$outputReferenceObject->setByName($field, $actualValue);
 				
@@ -71,11 +72,11 @@ class KalturaUnitTestResultUpdater
 	/**
 	 * 
 	 *  Finds the right test data by its inputs (id and type)
-	 * @param array $unitTestDataFile
+	 * @param KalturaUnitTestDataFile $unitTestDataFile
 	 * @param array $failuresInputs
-	 * @return int - the unitTestData key or null for if non found
+	 * @return int - the KalturaUnitTestDataFile key or null for if non found
 	 */
-	private static function getTestKeyByInputs(unitTestDataFile $unitTestDataFile, array $failuresInputs)
+	private static function getTestKeyByInputs(KalturaUnitTestDataFile $unitTestDataFile, array $failuresInputs)
 	{
 		$testKey = null;
 		 

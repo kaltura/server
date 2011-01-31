@@ -1,0 +1,764 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Failures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserFullP1@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>FEATURE_PS2_PERMISSIONS_VALIDATION</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [FEATURE_PS2_PERMISSIONS_VALIDATION]</Message>
+        </Failure>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>FEATURE_VAST</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [FEATURE_VAST]</Message>
+        </Failure>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>FEATURE_LIVE_STREAM</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [FEATURE_LIVE_STREAM]</Message>
+        </Failure>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>CONTENTDISTRIBUTION_PLUGIN_PERMISSION</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [CONTENTDISTRIBUTION_PLUGIN_PERMISSION]</Message>
+        </Failure>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>FEATURE_ANALYTICS_TAB</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [FEATURE_ANALYTICS_TAB]</Message>
+        </Failure>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>AUDIT_PLUGIN_PERMISSION</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [AUDIT_PLUGIN_PERMISSION]</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;add] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromurl</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;addFromUrl] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listfields</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;listFields] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;add] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::revert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;revert] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [fileSync-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserNoP2@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>baseEntry::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>baseEntry::updatethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>bulkUpload::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>liveStream::updateofflinethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>media::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>thumbAsset::addfromimage</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>upload::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>uploadToken::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updatedefinitionfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updateviewsfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserManager3@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>Role::PermissionNames</Field>
+          <OutputReference></OutputReference>
+          <ActualOutput>CONTENT_MANAGE_DISTRIBUTION_MODIFY</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid object id [CONTENT_MANAGE_DISTRIBUTION_MODIFY]</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;add] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromurl</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;addFromUrl] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listfields</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;listFields] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;add] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::revert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;revert] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserUploadOnly1@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>baseEntry::updatethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>liveStream::updateofflinethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>thumbAsset::addfromimage</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updatedefinitionfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updateviewsfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserContentmoderator4@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>baseEntry::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>baseEntry::updatethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>bulkUpload::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>liveStream::updateofflinethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>media::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>thumbAsset::addfromimage</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>upload::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>uploadToken::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updatedefinitionfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updateviewsfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="591"/>
+        <Input type="string" stringId="db73089260d7b34f03136050910914c7"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="UserPlayerDesigner5@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>baseEntry::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>baseEntry::updatethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>bulkUpload::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>liveStream::updateofflinethumbnailjpeg</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>media::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>thumbAsset::addfromimage</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>upload::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>uploadToken::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updatedefinitionfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updateviewsfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+  </Failures>
+</UnitTests>

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../bootstrap.php');
+require_once(dirname(__FILE__) . '/../bootstrap/bootstrap.php');
 
 class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 {
@@ -26,7 +26,7 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 			{
 				if(KalturaUnitTestListener::$failures == null)
 				{
-					KalturaUnitTestListener::$failures = new testsFailures();
+					KalturaUnitTestListener::$failures = new KalturaTestsFailures();
 					KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure($test->getInputs());
 				}
 				
@@ -39,7 +39,7 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addIncompleteTest()
 	 */
 	public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		// TODO Auto-generated method stub
+		print("In addIncompleteTest\n");
 		
 	}
 
@@ -47,7 +47,7 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addSkippedTest()
 	 */
 	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		// TODO Auto-generated method stub
+		print("In addSkippedTest\n");
 		
 	}
 
@@ -55,25 +55,33 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::startTestSuite()
 	 */
 	public function startTestSuite(PHPUnit_Framework_TestSuite $suite) {
-		// TODO Auto-generated method stub
+		print("In startTestSuite\n");
 		//unset the failures for the suite back to null
-		KalturaUnitTestListener::$failures = new testsFailures();
+		KalturaUnitTestListener::$failures = new KalturaTestsFailures();
 		KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure();
-
 	}
 
 	/* (non-PHPdoc)
 	 * @see PHPUnit_Framework_TestListener::endTestSuite()
 	 */
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) {
-		// TODO Auto-generated method stub
-		//1. create the failure file for that suite and output there all the failures for the suite
+		print("In endTestSuite\n");
 		
+		//1. create the failure file for that suite and output there all the failures for the suite
 		$this->cleanEmptyFailures();
 				
 		if(KalturaUnitTestListener::$failures != null)
 		{
 			fwrite(KalturaUnitTestCase::$failureObjectsFile, KalturaUnitTestListener::$failures->toXml());
+		}
+		
+		//Zero the failures
+		KalturaUnitTestListener::$failures = null;
+		
+		if(KalturaUnitTestCase::$failureObjectsFile)
+		{
+			fclose(KalturaUnitTestCase::$failureObjectsFile);
+			KalturaUnitTestCase::$failureObjectsFile = null;
 		}
 	}
 
@@ -81,29 +89,50 @@ class KalturaUnitTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::startTest()
 	 */
 	public function startTest(PHPUnit_Framework_Test $test) {
-		// TODO Auto-generated method stub
-		//Add another test case failure for this test
-		KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure($test->getInputs());
+		print("In startTest\n");
+
+		if($test instanceof KalturaUnitTestCase)
+		{
+			//Add another test case failure for this test
+			KalturaUnitTestListener::$failures->failures[] = new KalturaUnitTestCaseFailure($test->getInputs());
+	
+			if(KalturaUnitTestCase::$failureObjectsFile == null)
+			{
+				//Opens the new file for the new test
+				$class = get_class($test);
+				$classPath = KAutoloader::getClassFilePath($class);
+				KalturaUnitTestCase::$failureObjectsFile = fopen(dirname($classPath) . "/testsData/{$test->getName(false)}.failures", "w+");
+			}
+		}
 	}
 
 	/* (non-PHPdoc)
 	 * @see PHPUnit_Framework_TestListener::endTest()
 	 */
 	public function endTest(PHPUnit_Framework_Test $test, $time) {
-		// when we finish a test we need to see if there were no errors in the test we need to clean him from the failure object
-		if(!$test->hasFailures)
+		print("In endTest\n");
+
+		if($test instanceof KalturaUnitTestCase)
 		{
-			if(KalturaUnitTestListener::$failures != null)
+			// When we finish a test we need to see if there were no errors in the test we need to clean him from the failure object
+			if(!$test->hasFailures)
 			{
-				if(KalturaUnitTestListener::$failures->failures != null)
+				if(KalturaUnitTestListener::$failures != null)
 				{
-					//remove from result object
-					array_pop(KalturaUnitTestListener::$failures->failures);
+					if(KalturaUnitTestListener::$failures->failures != null)
+					{
+						//Remove from result object
+						array_pop(KalturaUnitTestListener::$failures->failures);
+					}
 				}
 			}
 		}
 	}
 	
+	/**
+	 * 
+	 * Cleans all empty failures that were accidently inserted
+	 */
 	private function cleanEmptyFailures()
 	{
 		//for each failure:
