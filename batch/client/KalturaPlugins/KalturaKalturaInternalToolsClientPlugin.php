@@ -34,5 +34,13 @@ class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin
 		);
 		return $services;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'KalturaInternalTools';
+	}
 }
 

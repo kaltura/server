@@ -3,22 +3,16 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-class KalturaFileSyncClientPlugin extends KalturaClientPlugin
+class KalturaShortLinkClientPlugin extends KalturaClientPlugin
 {
 	/**
 	 * @var KalturaClientPlugin
 	 */
 	protected static $instance;
 
-	/**
-	 * @var KalturaFileSyncService
-	 */
-	public $fileSync = null;
-
 	protected function __construct()
 	{
 		parent::__construct();
-		$this->fileSync = new KalturaFileSyncService();
 	}
 
 	/**
@@ -27,7 +21,7 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new KalturaFileSyncClientPlugin();
+			self::$instance = new KalturaShortLinkClientPlugin();
 		return self::$instance;
 	}
 
@@ -37,7 +31,6 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 	public function getServices()
 	{
 		$services = array(
-			'fileSync' => $this->fileSync,
 		);
 		return $services;
 	}
@@ -47,7 +40,7 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 	 */
 	public function getName()
 	{
-		return 'fileSync';
+		return 'shortLink';
 	}
 }
 

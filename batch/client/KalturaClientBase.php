@@ -85,11 +85,12 @@ class KalturaClientBase
 					if(!($plugin instanceof IKalturaClientPlugin))
 						continue;
 						
+					$pluginName = $plugin->getName();
 					$services = $plugin->getServices();
 					foreach($services as $serviceName => $service)
 					{
 						$service->setClient($this);
-						$this->pluginServices[$serviceName] = $service;
+						$this->pluginServices["{$serviceName}_{$pluginName}"] = $service;
 					}
 				}
 			}
@@ -490,6 +491,11 @@ interface IKalturaClientPlugin
 	 * @return array<KalturaServiceBase>
 	 */
 	public function getServices();
+	
+	/**
+	 * @return string
+	 */
+	public function getName();
 }
 
 abstract class KalturaClientPlugin implements IKalturaClientPlugin
