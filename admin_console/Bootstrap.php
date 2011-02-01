@@ -181,7 +181,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
       				$requiredPermissions = array_map('trim', explode(',', $requiredPermissions));
 	      			
 	      			foreach ($requiredPermissions as $required) {
-	      				if (!in_array($required, $currentPermissions)) {
+	      				if (!in_array($required, $currentPermissions, true)) {
 	      					$allow = false;
 	      					break;
 	      				}
@@ -218,7 +218,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		      			$requiredPermissions = array_map('trim', explode(',', $requiredPermissions));
 	      			
 		      			foreach ($requiredPermissions as $required) {
-		      				if (!in_array($required, $currentPermissions)) {
+		      				if (!in_array($required, $currentPermissions, true)) {
 		      					$allow = false;
 		      					break;
 		      				}

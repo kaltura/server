@@ -325,7 +325,7 @@ class kPermissionManager
 			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()] = array();
 			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()][$item->getAction()] = array();		
 		}
-		else if (!in_array($item->getAction(), $map[self::API_ACTIONS_ARRAY_NAME][$item->getService()])) {
+		else if (!in_array($item->getAction(), $map[self::API_ACTIONS_ARRAY_NAME][$item->getService()], true)) {
 			$map[self::API_ACTIONS_ARRAY_NAME][$item->getService()][$item->getAction()] = array();
 		}
 	}
@@ -667,10 +667,10 @@ class kPermissionManager
 		if ($param_name === kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER) {
 			return true;
 		}
-		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name])) {
+		if (in_array(kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name], true)) {
 			return true;
 		}
-		return in_array($param_name, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name]);
+		return in_array($param_name, self::$map[self::API_PARAMETERS_ARRAY_NAME][$array_name][$object_name], true);
 		
 	}
 	
@@ -731,7 +731,7 @@ class kPermissionManager
 		$partnerGroup =  self::$map[self::PARTNER_GROUP_ARRAY_NAME][$service][$action];
 		$partnerGroup[] = self::$operatingPartnerId;
 		
-		if (in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $partnerGroup))
+		if (in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $partnerGroup, true))
 		{
 			return myPartnerUtils::ALL_PARTNERS_WILD_CHAR;
 		}

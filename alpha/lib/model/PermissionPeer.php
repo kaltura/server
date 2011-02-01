@@ -159,7 +159,7 @@ class PermissionPeer extends BasePermissionPeer
 	public static function getByNameAndPartner($permissionName, $partnerIdsArray)
 	{
 		$c = new Criteria();
-		if (!in_array('*', $partnerIdsArray)) {
+		if (!in_array('*', $partnerIdsArray, true)) {
 			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerIdsArray, Criteria::IN);
 		}
 		$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
@@ -262,7 +262,7 @@ class PermissionPeer extends BasePermissionPeer
 							// invalid text
 							continue;
 						}
-						if (!in_array($dependPermission, $permissionNames) && !in_array($dependPermission, $additionalPartnerPermissionNames)) {
+						if (!in_array($dependPermission, $permissionNames, true) && !in_array($dependPermission, $additionalPartnerPermissionNames, true)) {
 							// current permission depends on a non existing permission
 							unset($permissions[$key]);
 							$checkDependency = true; // need to recheck because we have delete a permission
