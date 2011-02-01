@@ -3207,6 +3207,112 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 
 }
 
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
+
+}
+
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -3626,7 +3732,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitResultsLog = null;
@@ -3634,7 +3740,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitSentDataLog = null;
@@ -3642,7 +3748,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateResultsLog = null;
@@ -3650,7 +3756,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateSentDataLog = null;
@@ -3658,7 +3764,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteResultsLog = null;
@@ -3666,7 +3772,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteSentDataLog = null;
@@ -7619,79 +7725,6 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
-
-}
-
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
 
 }
 

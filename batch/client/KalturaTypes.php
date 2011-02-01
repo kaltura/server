@@ -1747,7 +1747,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitResultsLog = null;
@@ -1755,7 +1755,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitSentDataLog = null;
@@ -1763,7 +1763,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateResultsLog = null;
@@ -1771,7 +1771,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateSentDataLog = null;
@@ -1779,7 +1779,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteResultsLog = null;
@@ -1787,7 +1787,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteSentDataLog = null;
@@ -2318,6 +2318,296 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 }
 
 class KalturaMsnDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaHuluDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaYouTubeDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $csId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $source = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $movFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $wmvFlavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $emailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $rated = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $blogged = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $reviewed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $bookmarked = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $playbackFailed = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $timeSpent = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $recommended = null;
+
+
+}
+
+class KalturaHuluDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xmlFileName = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $aspectRatio = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $frameRate = null;
+
+
+}
+
+class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $videoAssetFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpDirectory = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sftpMetadataFilename = null;
+
+
+}
+
+class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xml = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $resultParseData = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderParser
+	 */
+	public $resultParserType = null;
+
+
+}
+
+class KalturaComcastDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $email = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $account = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $keywords = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $author = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $album = null;
+
+
+}
+
+class KalturaVerizonDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
+class KalturaComcastDistributionProvider extends KalturaDistributionProvider
 {
 
 }
