@@ -34,7 +34,7 @@ distributionprofile.delete													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONT
 
 
 entrydistribution.get														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
-entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,KMC_READ_ONLY
+entrydistribution.list														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE,KMC_READ_ONLY,SYSTEM_ADMIN_ENTRY_INVESTIGATION
 entrydistribution.validate													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
 
 entrydistribution.add														|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_WHERE
