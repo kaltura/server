@@ -331,6 +331,7 @@ class KAsyncConvert extends KBatchBase
 		if  ( $this->taskConfig->params->useAvidemux ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::AVIDEMUX . "] avidemux";
 		if  ( $this->taskConfig->params->usePdfCreator ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::PDF_CREATOR . "] pdf creator";
 		if  ( $this->taskConfig->params->usePdf2Swf ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::PDF2SWF . "] pdf2swf";
+		if  ( $this->taskConfig->params->useSegmenter ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::SEGMENTER . "] segmenter";
 		
 		return implode ( ", " , $supported_engines_arr );
 	}
@@ -362,6 +363,7 @@ class KAsyncConvert extends KBatchBase
 		if  ( $this->taskConfig->params->useAvidemux ) $supported_engines_arr[] = KalturaConversionEngineType::AVIDEMUX;
 		if  ( $this->taskConfig->params->usePdfCreator ) $supported_engines_arr[] = KalturaConversionEngineType::PDF_CREATOR;
 		if  ( $this->taskConfig->params->usePdf2Swf ) $supported_engines_arr[] = KalturaConversionEngineType::PDF2SWF;
+		if  ( $this->taskConfig->params->useSegmenter ) $supported_engines_arr[] = KalturaConversionEngineType::SEGMENTER;
 		
 		return join(',', $supported_engines_arr);
 	}
