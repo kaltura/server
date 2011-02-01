@@ -518,7 +518,9 @@ class kPermissionManager
 		
 		// init current kuser
 		if (self::$ksUserId) { // will never be null because ks::uid is never null
+			kuserPeer::setUseCriteriaFilter(false);
 			self::$kuser = kuserPeer::getKuserByPartnerAndUid(self::$ksPartnerId, self::$ksUserId);
+			kuserPeer::setUseCriteriaFilter(true);
 			if (!self::$kuser)
 			{
 				self::$kuser = null;
