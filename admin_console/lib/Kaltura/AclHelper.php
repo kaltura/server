@@ -2,23 +2,28 @@
 class Kaltura_AclHelper
 {
 	const ROLE_GUEST = 'guest';
-	const ROLE_PROFESIONAL_SERVICES = 'ps';
-	const ROLE_ADMINISTRATOR = 'admin';
-	
+		
 	/**
 	 * @return string
 	 */
 	public static function getCurrentRole()
 	{
-		if (Zend_Auth::getInstance()->hasIdentity()) {
-			$roleId = unserialize(Zend_Auth::getInstance()->getIdentity()->getUser()->partnerData)->role;
-			if ($roleId)
-				return $roleId;
-			else
-				return self::ROLE_GUEST;
+		if (Zend_Auth::getInstance()->hasIdentity())
+		{
+			$roleIds = Zend_Auth::getInstance()->getIdentity()->getUser()->roleIds;
+			return $roleIds;
 		}
-		else
-			return self::ROLE_GUEST;
+		return self::ROLE_GUEST;
+	}
+	
+	public static function getCurrentPermissions()
+	{
+		if (Zend_Auth::getInstance()->hasIdentity())
+		{
+			$permissions = Zend_Auth::getInstance()->getIdentity()->getPermissions();
+			return $permissions;
+		}
+		return array();
 	}
 	
 	/**
@@ -30,7 +35,8 @@ class Kaltura_AclHelper
 	public static function isAllowed($resource, $privilege)
 	{
 		$acl = Zend_Registry::get('acl');
-		return $acl->isAllowed(self::getCurrentRole(), $resource, $privilege);
+		$allowed = $acl->isAllowed(self::getCurrentRole(), $resource, $privilege);
+		return $allowed;
 	}
 	
 	/**
@@ -39,11 +45,11 @@ class Kaltura_AclHelper
      * @param  string                             $privilege
      * @return boolean
      */
-	public static function validateAccess($resouce, $privilege)
+	public static function validateAccess($resource, $privilege)
 	{
-		if (!self::isAllowed($resouce, $privilege))
+		if (!self::isAllowed($resource, $privilege))
 		{
-			throw new Exception('Access denied');
+			throw new Exception('Access denied '.$resource.'-'.$privilege);
 		}
 	}
 }

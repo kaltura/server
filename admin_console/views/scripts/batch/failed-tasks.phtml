@@ -95,8 +95,9 @@
 		</tbody>
 	</table>
 	<div id="buttons">
-		<button name="retry" onclick="doAction(this.name);"><span><?php echo $this->translate('jobs failed action retry'); ?></span></button>
-		<button name="delete" onclick="doAction(this.name)"><span><?php echo $this->translate('jobs failed action delete'); ?></span></button>
+		<?php $disabled = Kaltura_AclHelper::isAllowed('batch', 'failed-retry-delete') ? '' : 'disabled="disabled"'; ?>
+		<button <?php echo $disabled; ?> name="retry" onclick="doAction(this.name);"><span><?php echo $this->translate('jobs failed action retry'); ?></span></button>
+		<button <?php echo $disabled; ?> name="delete" onclick="doAction(this.name)"><span><?php echo $this->translate('jobs failed action delete'); ?></span></button>
 	</div>
 
 </div>
@@ -127,7 +128,6 @@
 					alert("<?php echo $this->translate('jobs failed action retry alert'); ?>");
 					break;
 			case "delete" :
-//					return false;
 					var do_delete = confirm("<?php echo $this->translate('jobs failed action delete confirm'); ?>");
 					if(!do_delete) {
 						return false;

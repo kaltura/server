@@ -1411,6 +1411,18 @@ class KalturaPermissionService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaPermissionListResponse");
 		return $resultObject;
 	}
+
+	function getCurrentPermissions()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("permission", "getCurrentPermissions", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
 }
 
 class KalturaSessionService extends KalturaServiceBase

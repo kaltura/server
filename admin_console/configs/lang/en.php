@@ -108,8 +108,6 @@ return array(
 	'KalturaSystemPartnerPackage::PACKAGE_500' => 'Package 500',
 
 	'KalturaAdminConsoleUserRole::ROLE_GUEST' => 'Guest',
-	'KalturaAdminConsoleUserRole::ROLE_PROFESIONAL_SERVICES' => 'Profesional Services',
-	'KalturaAdminConsoleUserRole::ROLE_ADMINISTRATOR' => 'Administrator',	
 
 	'KalturaBitRateMode::CBR' => 'CBR',
 	'KalturaBitRateMode::VBR' => 'VBR',

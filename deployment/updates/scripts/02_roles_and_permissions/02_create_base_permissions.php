@@ -99,9 +99,9 @@ $permissionsData = array (
 	array (0, PermissionType::API_ACCESS,PermissionName::AUDIT_TRAIL_ADD, 'Audit trail add', PermissionPeer::getPermissionNameFromPluginName(AuditPlugin::getPluginName())),
 	array (0, PermissionType::EXTERNAL,PermissionName::KMC_ACCESS, 'KMC access', null),
 	array (0, PermissionType::EXTERNAL,PermissionName::KMC_READ_ONLY, 'KMC access', PermissionName::KMC_ACCESS),	
-	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_ADD, 'Add custom data field', PermissionName::CUSTOM_DATA_PROFILE_UPDATE),	
-	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_UPDATE, 'Update custom data field', PermissionName::CUSTOM_DATA_PROFILE_UPDATE),	
-	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_DELETE, 'Delete custom data field', PermissionName::CUSTOM_DATA_PROFILE_UPDATE),	
+	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_ADD, 'Add custom data field', null),	
+	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_UPDATE, 'Update custom data field', null),	
+	array (0, PermissionType::API_ACCESS,PermissionName::CUSTOM_DATA_FIELD_DELETE, 'Delete custom data field', null),	
 
 	
 	// system admin and admin console permissions

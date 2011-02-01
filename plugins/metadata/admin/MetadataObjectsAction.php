@@ -17,9 +17,9 @@ class MetadataObjectsAction extends KalturaAdminConsolePlugin
 		return realpath(dirname(__FILE__));
 	}
 	
-	public function getRole()
+	public function getRequiredPermissions()
 	{
-		return Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES;
+		return array(KalturaPermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)

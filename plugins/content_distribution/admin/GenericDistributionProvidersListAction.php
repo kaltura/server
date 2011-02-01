@@ -16,9 +16,9 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 		return realpath(dirname(__FILE__));
 	}
 	
-	public function getRole()
+	public function getRequiredPermissions()
 	{
-		return Kaltura_AclHelper::ROLE_ADMINISTRATOR;
+		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1296381026">
-  <!-- Generated on date 30/01/11 09:50:26 -->
+<xml apiVersion="3.1.1" generatedDate="1296549901">
+  <!-- Generated on date 01/02/11 10:45:01 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -321,6 +321,7 @@
       <const name="PDF2SWF" value="201"/>
       <const name="PDF_CREATOR" value="202"/>
       <const name="QUICK_TIME_PLAYER_TOOLS" value="quickTimeTools.QuickTimeTools"/>
+      <const name="FAST_START" value="fastStart.FastStart"/>
       <const name="EXPRESSION_ENCODER" value="expressionEncoder.ExpressionEncoder"/>
       <const name="AVIDEMUX" value="avidemux.Avidemux"/>
       <const name="SEGMENTER" value="segmenter.Segmenter"/>
@@ -388,9 +389,10 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
+      <const name="HULU" value="huluDistribution.HULU"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -1107,6 +1109,19 @@
     <enum name="KalturaSessionType" enumType="int">
       <const name="USER" value="0"/>
       <const name="ADMIN" value="2"/>
+    </enum>
+    <enum name="KalturaShortLinkOrderBy" enumType="string" plugin="shortLink">
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+      <const name="UPDATED_AT_ASC" value="+updatedAt"/>
+      <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+      <const name="EXPIRES_AT_ASC" value="+expiresAt"/>
+      <const name="EXPIRES_AT_DESC" value="-expiresAt"/>
+    </enum>
+    <enum name="KalturaShortLinkStatus" enumType="int" plugin="shortLink">
+      <const name="DISABLED" value="1"/>
+      <const name="ENABLED" value="2"/>
+      <const name="DELETED" value="3"/>
     </enum>
     <enum name="KalturaSiteRestrictionType" enumType="int">
       <const name="RESTRICT_SITE_LIST" value="0"/>
@@ -3125,6 +3140,41 @@
       <property name="objects" type="array" arrayType="KalturaAnnotation" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaShortLinkBaseFilter" abstract="1" base="KalturaFilter" plugin="shortLink">
+      <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="expiresAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="expiresAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="int" enumType="KalturaShortLinkStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaShortLinkFilter" base="KalturaShortLinkBaseFilter" plugin="shortLink"/>
+    <class name="KalturaShortLink" plugin="shortLink">
+      <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="expiresAt" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="userId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="fullUrl" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="status" type="int" enumType="KalturaShortLinkStatus" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaShortLinkListResponse" plugin="shortLink">
+      <property name="objects" type="array" arrayType="KalturaShortLink" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaSearchCondition" base="KalturaSearchItem">
       <property name="field" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="value" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3916,6 +3966,9 @@
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
         <result type="KalturaPermissionListResponse"/>
       </action>
+      <action name="getCurrentPermissions" description="Return a list of current sessions's allowed permission names&#10;">
+        <result type="string"/>
+      </action>
     </service>
     <service id="playlist" name="playlist" description="Playlist service lets you create,manage and play your playlists&#10;Playlists could be static (containing a fixed list of entries) or dynamic (baseed on a filter)&#13;">
       <action name="add" description="Add new playlist&#10;Note that all entries used in a playlist will become public and may appear in KalturaNetwork&#10;">
@@ -4033,7 +4086,7 @@
         <param name="secret" type="string" optional="0" description="Remember to provide the correct secret according to the sessionType you want&#13;"/>
         <param name="userId" type="string" optional="1" default="" description="&#13;"/>
         <param name="type" type="int" enumType="KalturaSessionType" optional="1" default="0" description="Regular session or Admin session&#13;"/>
-        <param name="partnerId" type="int" optional="1" default="-1" description="&#13;"/>
+        <param name="partnerId" type="int" optional="1" default="" description="&#13;"/>
         <param name="expiry" type="int" optional="1" default="86400" description="KS expiry time in seconds&#13;"/>
         <param name="privileges" type="string" optional="1" default="" description="&#13;"/>
         <result type="string"/>
@@ -4046,7 +4099,7 @@
         <param name="impersonatedPartnerId" type="int" optional="0" description="&#13;"/>
         <param name="userId" type="string" optional="1" default="" description="&#13;"/>
         <param name="type" type="int" enumType="KalturaSessionType" optional="1" default="0" description="Regular session or Admin session&#13;"/>
-        <param name="partnerId" type="int" optional="1" default="-1" description="&#13;"/>
+        <param name="partnerId" type="int" optional="1" default="" description="&#13;"/>
         <param name="expiry" type="int" optional="1" default="86400" description="KS expiry time in seconds&#13;"/>
         <param name="privileges" type="string" optional="1" default="" description="&#13;"/>
         <result type="string"/>
@@ -4911,6 +4964,30 @@
         <result type="KalturaAnnotation"/>
       </action>
     </service>
+    <service id="shortlink_shortlink" name="shortLink" description="Short link service&#13;" plugin="shortLink">
+      <action name="list" description="List short link objects by filter and pager&#10;">
+        <param name="filter" type="KalturaShortLinkFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaShortLinkListResponse"/>
+      </action>
+      <action name="add" description="Allows you to add a short link object&#10;">
+        <param name="shortLink" type="KalturaShortLink" optional="0" description="&#13;"/>
+        <result type="KalturaShortLink"/>
+      </action>
+      <action name="get" description="Retrieve an short link object by id&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaShortLink"/>
+      </action>
+      <action name="update" description="Update exisitng short link&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <param name="shortLink" type="KalturaShortLink" optional="0" description="&#13;"/>
+        <result type="KalturaShortLink"/>
+      </action>
+      <action name="delete" description="Mark the short link as deleted&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaShortLink"/>
+      </action>
+    </service>
   </services>
   <plugins>
     <plugin name="metadata">
@@ -4953,6 +5030,9 @@
     </plugin>
     <plugin name="annotation">
       <pluginService name="annotation"/>
+    </plugin>
+    <plugin name="shortLink">
+      <pluginService name="shortLink"/>
     </plugin>
   </plugins>
 </xml>

@@ -17,9 +17,9 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 		return realpath(dirname(__FILE__));
 	}
 	
-	public function getRole()
+	public function getRequiredPermissions()
 	{
-		return Kaltura_AclHelper::ROLE_ADMINISTRATOR;
+		return array(KalturaPermissionName::SYSTEM_INTERNAL);
 	}
 
 	

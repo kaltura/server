@@ -37,17 +37,27 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
-						<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
+						<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+							<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
+						<?php endif; ?>	
+						<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-users')): ?>
+							<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
+						<?php endif; ?>	
 						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
-							<?php if (Kaltura_AclHelper::getCurrentRole() == Kaltura_AclHelper::ROLE_ADMINISTRATOR): ?>
+							<?php if (Kaltura_AclHelper::isAllowed('partner','configure')): ?>
 								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+							<?php endif; ?>								
+							<?php if (Kaltura_AclHelper::isAllowed('partner','configure-storage')): ?>	
 								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+							<?php endif; ?>	
+							<?php if (Kaltura_AclHelper::isAllowed('partner','block')): ?>		
 								<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
 									<option value="block"><?php echo $this->translate('Block'); ?></option>
 								<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
 									<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
 								<?php endif; ?>
+							<?php endif; ?>
+							<?php if (Kaltura_AclHelper::isAllowed('partner','remove')): ?>
 								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 							<?php endif; ?>
 						<?php endif; ?>

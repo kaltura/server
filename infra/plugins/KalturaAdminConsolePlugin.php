@@ -29,31 +29,23 @@ abstract class KalturaAdminConsolePlugin
 	
 	abstract public function doAction(Zend_Controller_Action $action);
 	
-	abstract public function getRole();
+	abstract public function getRequiredPermissions();
 	
-	public function accessCheck($currentRole)
+	public function accessCheck($currentPermissions)
 	{
-		$legalAccess = false;
+		$requiredPermissions = $this->getRequiredPermissions();
+
+		$legalAccess = true;
 		
-		if ($currentRole == Kaltura_AclHelper::ROLE_ADMINISTRATOR)
+		foreach ($requiredPermissions as $permission)
 		{
-			$legalAccess = true;	
-		}
-		else if ($currentRole == Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES)
-		{
-			if (($this->getRole() == Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES) ||
-				($this->getRole() == Kaltura_AclHelper::ROLE_GUEST))
-				{
-					$legalAccess = true;	
-				}
-		}
-		else if ($currentRole == Kaltura_AclHelper::ROLE_GUEST)
-		{
-			if($this->getRole() == Kaltura_AclHelper::ROLE_GUEST)
+			if (!in_array($permission, $currentPermissions))
 			{
-				$legalAccess = true;
+				$legalAccess = false;
+				break;
 			}
 		}
+		
 		return $legalAccess;
 	}
 	

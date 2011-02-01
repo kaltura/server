@@ -187,7 +187,7 @@
 			<td><?php echo $enabledStr; ?></td>
 			<td><?php echo $maxInstances; ?></td>
 			<td>
-				<?php $disabled = (!Kaltura_AclHelper::isAllowed('batch', 'stop-start')) ? ' disabled="disabled"' : ''; ?>
+				<?php $disabled = (!Kaltura_AclHelper::isAllowed('batch', 'setup-stop-start')) ? ' disabled="disabled"' : ''; ?>
 				<select onchange="callAction(<?php echo $worker->id; ?>, this.value)"<?php echo $disabled;?>>
 					<option><?php echo $this->translate('batch setup worker action select'); ?></option>
 					<?php foreach($actions as $action => $text): ?>
@@ -277,7 +277,6 @@
 
 	function callAction(workerId, action) {
 		var confirmText = "";
-		
 		switch(action) {
 			case "stop":
 				confirmText = "<?php echo $this->translate('batch setup worker confirm stop'); ?>";

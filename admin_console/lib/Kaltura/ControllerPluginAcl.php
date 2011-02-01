@@ -23,7 +23,7 @@ class Kaltura_ControllerPluginAcl extends Zend_Controller_Plugin_Abstract
      * @param $roleName
      * @return void
      **/
-    public function __construct(Zend_Acl $aclData, $roleName = 'defaultRole')
+    public function __construct(Zend_Acl $aclData, $roleName)
     {
         $this->_errorPage = array('module' => 'default', 
                                   'controller' => 'error', 

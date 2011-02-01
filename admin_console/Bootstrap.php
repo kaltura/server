@@ -64,7 +64,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		{
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
 				continue;
-			if(!($pluginAdminConsolePage->accessCheck(Kaltura_AclHelper::getCurrentRole())))
+			if(!($pluginAdminConsolePage->accessCheck(Kaltura_AclHelper::getCurrentPermissions())))
 				continue;				
 				
 			$navigation->addPage(array(
@@ -143,117 +143,114 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function _initAcl()
 	{
-		// roles
 		$acl = new Zend_Acl();
-		$acl->addRole(Kaltura_AclHelper::ROLE_GUEST)
-			->addRole(Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES, Kaltura_AclHelper::ROLE_GUEST)
-      		->addRole(Kaltura_AclHelper::ROLE_ADMINISTRATOR, Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES);
-      		
+		
+		$acl->addRole(Kaltura_AclHelper::ROLE_GUEST);
+				
+		$currentRole = Kaltura_AclHelper::getCurrentRole();
+		$currentPermissions = Kaltura_AclHelper::getCurrentPermissions();
+		
+		if (!$acl->hasRole($currentRole)) {
+			$acl->addRole($currentRole);
+		}
+		
       	$accessItems = Zend_Registry::get('config')->access;
+      	$allAccess = array();
+      	
       	foreach($accessItems as $resource => $accessConfig)
       	{
-      		$acl->add(new Zend_Acl_Resource($resource));
-      		
-      		$role = Kaltura_AclHelper::ROLE_GUEST;
-      		
-      		if(!($accessConfig instanceof Zend_Config))
-      			$role = $accessConfig;
-      		elseif(isset($accessConfig->all))
-      			$role = $accessConfig->all;
-      			
-      		switch($role)
-      		{
-      			case Kaltura_AclHelper::ROLE_GUEST:
-					$acl->allow(null, $resource);
-					break;
-					
-      			case Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES:
-					$acl->allow(Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES, $resource);
-					$acl->allow(Kaltura_AclHelper::ROLE_ADMINISTRATOR, $resource);
-					break;
-					
-      			case Kaltura_AclHelper::ROLE_ADMINISTRATOR:
-					$acl->deny(Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES, $resource);
-					$acl->allow(Kaltura_AclHelper::ROLE_ADMINISTRATOR, $resource);
-					break;
+      		if (!($accessConfig instanceof Zend_Config)) {
+      			$requiredPermissions = $accessConfig;
+      		}
+      		else if (isset($accessConfig->all)) {
+      			$requiredPermissions = $accessConfig->all;
+      		}
+      		else {
+      			continue;
       		}
       		
-      		if($accessConfig instanceof Zend_Config)
+      		$acl->addResource(new Zend_Acl_Resource($resource));
+      		
+      		if ($requiredPermissions)
       		{
-	      		foreach($accessConfig as $action => $role)
+      			$allow = true;
+      			if ($requiredPermissions != '*')
+      			{
+	      			$allAccess[$resource] = $requiredPermissions;
+      				
+      				$requiredPermissions = array_map('trim', explode(',', $requiredPermissions));
+	      			
+	      			foreach ($requiredPermissions as $required) {
+	      				if (!in_array($required, $currentPermissions)) {
+	      					$allow = false;
+	      					break;
+	      				}
+	      			}
+      			}
+      			
+      			if ($allow) {
+      				$acl->allow($currentRole, $resource);
+      			}
+      			else {
+      				$acl->deny($currentRole, $resource);
+      			}
+      		}
+      	}
+      	
+      	foreach($accessItems as $resource => $accessConfig)
+      	{      		
+      		if ($accessConfig instanceof Zend_Config)
+      		{
+	      		foreach($accessConfig as $action => $requiredPermissions)
 	      		{
 	      			if($action == 'all')
 	      				continue;
 	      		
-	      			switch($role)
-	      			{
-	      				case Kaltura_AclHelper::ROLE_GUEST:
-							$acl->allow(null, $resource, $action);
-							break;
-							
-	      				case Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES:
-							$acl->allow(Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES, $resource, $action);
-							break;
-							
-	      				case Kaltura_AclHelper::ROLE_ADMINISTRATOR:
-							$acl->deny(Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES, $resource, $action);
-							$acl->allow(Kaltura_AclHelper::ROLE_ADMINISTRATOR, $resource, $action);
-							break;
+		      		$acl->addResource(new Zend_Acl_Resource($resource.$action), $resource);
+	      				
+	      			$allow = true;
+	      			if ($requiredPermissions != '*')
+		      		{	
+		      			if (isset($allAccess[$resource])) {
+	      					$requiredPermissions .= ','.$allAccess[$resource];
+		      			}
+		      			
+		      			$requiredPermissions = array_map('trim', explode(',', $requiredPermissions));
+	      			
+		      			foreach ($requiredPermissions as $required) {
+		      				if (!in_array($required, $currentPermissions)) {
+		      					$allow = false;
+		      					break;
+		      				}
+		      			}
+		      		}
+	      			
+	      			if ($allow) {
+	      				$acl->allow($currentRole, $resource, $action);
+	      			}
+	      			else {
+	      				$acl->deny($currentRole, $resource, $action);
 	      			}
 	      		}
       		}
       	}
+      	
+      	
       	Zend_Registry::set('acl', $acl);
 	}
+		
 	
 	protected function checkAclForNavigation(Zend_Navigation_Container $navigation)
 	{
-		$acl = Zend_Registry::get('acl');
-   		$accessConfig = Zend_Registry::get('config')->access;
-		$currentRole = Kaltura_AclHelper::getCurrentRole();
+		$accessConfig = Zend_Registry::get('config')->access;
 		$pages = $navigation->getPages();
 		foreach($pages as $page)
 		{
 			$controller = $page->get('controller');
-			if(!isset($accessConfig->$controller))
-				continue;
-				
-			$controllerAccess = $accessConfig->$controller;
-			$remove = false;
-			
-			if($controllerAccess instanceof Zend_Config)
-			{
-				if(isset($controllerAccess->all))
-				{
-					if($currentRole == Kaltura_AclHelper::ROLE_GUEST && $controllerAccess->all != Kaltura_AclHelper::ROLE_GUEST)
-						$remove = true;
-						
-					if($currentRole == Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES && $controllerAccess->all == Kaltura_AclHelper::ROLE_ADMINISTRATOR)
-						$remove = true;
-				}
-				
-				$action = $page->get('action');
-				if(!$remove && isset($controllerAccess->$action))
-				{
-					$actionAccess = $controllerAccess->$action;
-					
-					if($currentRole == Kaltura_AclHelper::ROLE_GUEST && $actionAccess != Kaltura_AclHelper::ROLE_GUEST)
-						$remove = true;
-						
-					if($currentRole == Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES && $actionAccess == Kaltura_AclHelper::ROLE_ADMINISTRATOR)
-						$remove = true;
-				}
-			}
-			else
-			{
-				if($currentRole == Kaltura_AclHelper::ROLE_GUEST && $controllerAccess != Kaltura_AclHelper::ROLE_GUEST)
-					$remove = true;
-					
-				if($currentRole == Kaltura_AclHelper::ROLE_PROFESIONAL_SERVICES && $controllerAccess == Kaltura_AclHelper::ROLE_ADMINISTRATOR)
-					$remove = true;
-			}
-			
-			if($remove)
+			$action = $page->get('action');
+			$allowed = Kaltura_AclHelper::isAllowed($controller, $action);
+
+			if(!$allowed)
 			{
 				$navigation->removePage($page);
 			}

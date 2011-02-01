@@ -123,7 +123,7 @@ class BatchController extends Zend_Controller_Action
 		$abortJob = $request->getParam('abort', false);
 		if ($abortJob)
 		{
-			Kaltura_AclHelper::validateAccess('batch', 'abort-tasks');
+			Kaltura_AclHelper::validateAccess('batch', 'in-progress-abort-tasks');
 			$abortJobType = $request->getParam('abortType', false);
 			try{
 				$client->jobs->abortJob($abortJob, $abortJobType);
@@ -274,10 +274,15 @@ class BatchController extends Zend_Controller_Action
 			$client->startMultiRequest();
 			foreach($jobs as $jobId => $jobType)
 			{
-				if($submitAction == 'retry')
+				if($submitAction == 'retry') {
+					Kaltura_AclHelper::validateAccess('batch', 'failed-retry-delete');
 					$client->jobs->retryJob($jobId, $jobType);
-				elseif($submitAction == 'delete')
+				}
+					
+				elseif($submitAction == 'delete') {
+					Kaltura_AclHelper::validateAccess('batch', 'failed-retry-delete');
 					$client->jobs->deleteJob($jobId, $jobType);
+				}
 			}
 			$results = $client->doMultiRequest();
 		}
@@ -433,10 +438,10 @@ class BatchController extends Zend_Controller_Action
 		$action = $request->getParam('hdnAction', false);
 		if($action)
 		{
-			Kaltura_AclHelper::validateAccess('batch', 'stop-start');
+			Kaltura_AclHelper::validateAccess('batch', 'setup-stop-start');
 			$workerId = $request->getParam('hdnWorkerId', false);
 			$cause = $request->getParam('hdnCause', false);
-			
+
 			try{
 				switch($action)
 				{
