@@ -130,7 +130,6 @@ userrole.update				    	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISS
 userrole.clone				    	|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PERMISSIONS_MANAGE
 
 
-
 systempartner.get					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 systempartner.list					|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_BASE
 systempartner.getusage				|			|2		|1	|0		|0		|1		|	|*		|	|   |SYSTEM_ADMIN_PUBLISHER_USAGE
