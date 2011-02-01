@@ -20,5 +20,9 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-virusscanprofile.scan				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_VIRUS_SCAN
-
+virusscanprofile.scan				|			|N		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_VIRUS_SCAN
+virusscanprofile.add				|			|N		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.delete				|			|N		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.get				|			|N		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.list				|			|N		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
+virusscanprofile.update				|			|N		|1	|0		|0		|1		|rw	|*		|	|   |admin-console
