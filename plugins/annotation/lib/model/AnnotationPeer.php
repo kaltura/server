@@ -38,7 +38,6 @@ class AnnotationPeer extends BaseAnnotationPeer {
 		{
 			$kuserId = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 			$c->addAnd(AnnotationPeer::KUSER_ID, $kuserId->getId());
-			KalturaLog::debug("myKuserId: " . $kuserId->getId());	
 		}
 		self::$s_criteria_filter->setFilter($c);
 	}
