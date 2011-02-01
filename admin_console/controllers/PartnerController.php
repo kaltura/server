@@ -343,7 +343,7 @@ class PartnerController extends Zend_Controller_Action
 	
 	public function kmcUsersAction()
 	{
-		$this->_helper->layout->disableLayout();
+//		$this->_helper->layout->disableLayout();
 
 		$partnerId = $this->_getParam('partner_id');
 		if (!$partnerId) {
