@@ -43,7 +43,7 @@ class Kaltura_AuthAdapter implements Zend_Auth_Adapter_Interface
 			$client->setKs($ks);
 			$user = $client->user->getByLoginId($this->username, $partnerId);
 			$identity = new Kaltura_UserIdentity($user, $ks);
-			if (!$user->partnerId != $partnerId) {
+			if ($user->partnerId != $partnerId) {
 				throw new Exception('SYSTEM_USER_INVALID_CREDENTIALS');
 			}
 			return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
