@@ -53,7 +53,7 @@ foreach ($permissionItems as $cur)
 		if (!$permissionName) {
 			continue;
 		}
-		$permission = PermissionPeer::getByNameAndPartner(trim($permissionName), PartnerPeer::GLOBAL_PARTNER);
+		$permission = PermissionPeer::getByNameAndPartner(trim($permissionName), array(PartnerPeer::GLOBAL_PARTNER));
 		if (!$permission)
 		{
 			$msg = '***** ERROR - Permission ['.$cur['permission'].'] not found for item ['.$cur['object'].'->'.$cur['parameter'].']';
