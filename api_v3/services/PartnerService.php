@@ -176,7 +176,6 @@ class PartnerService extends KalturaBaseService
 		$c->add ( kuserPeer::PARTNER_ID , $partnerId );
 		$c->add ( kuserPeer::LOGIN_DATA_ID , $loginData->getId() );
 		$c->add ( kuserPeer::IS_ADMIN, true);
-		$c->setLimit ( 20 ); // just to limit the number of partners returned
 		$adminKuser = kuserPeer::doSelectOne( $c );
 		
 		// be sure to return the same error if there are no admins in the list and when there are none matched -
