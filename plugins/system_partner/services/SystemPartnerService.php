@@ -215,6 +215,8 @@ class SystemPartnerService extends KalturaBaseService
 	 */
 	public function updateConfigurationAction($partnerId, KalturaSystemPartnerConfiguration $configuration)
 	{
+		$configuration->validatePropertyMinValue('adminLoginUsersQuota', 1, true);
+		
 		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
