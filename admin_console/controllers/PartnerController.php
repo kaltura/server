@@ -132,7 +132,7 @@ class PartnerController extends Zend_Controller_Action
 			$url .= '/index.php/kmc/extlogin';
 		}
 		
-		$url .= '?ks='.$ks;
+		$url .= '?ks='.$ks.'&partner_id='.$partnerId;
 		$this->getResponse()->setRedirect($url);
 	}
 	
