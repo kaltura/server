@@ -24,7 +24,9 @@ class ThumbAssetService extends KalturaBaseService
 			$actionName == 'getByEntryId' ||
 			$actionName == 'getDownloadUrl' ||
 			$actionName == 'getWebPlayableByEntryId' ||
-			$actionName == 'getFlavorAssetsWithParams'
+			$actionName == 'getFlavorAssetsWithParams' ||
+			$actionName == 'generateByEntryId' ||
+			$actionName == 'regenerate'
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
