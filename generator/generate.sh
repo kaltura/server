@@ -7,4 +7,3 @@ php generate.php
 
 cp output/adminConsoleClient/* ../admin_console/lib/Kaltura
 cp output/batchClient/* ../batch/client
-cp output/php5full/* ../tests/unit_test/lib
