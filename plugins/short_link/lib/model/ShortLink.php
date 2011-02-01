@@ -72,10 +72,17 @@ class ShortLink extends BaseShortLink {
 
 	protected function calculateId()
 	{
+		$allChars = '0123456789abcdefghijklmnopqrstuvwxyz';
+		$dcChars = str_split($allChars, strlen($allChars) / count(kDataCenterMgr::getAllDcs()));
+		
 		$dc = kDataCenterMgr::getCurrentDc();
+		$dcId = $dc["id"];
+		$currentDcChars = $dcChars[$dcId];
+		
 		for ($i = 0; $i < 10; $i++)
 		{
-			$id = $dc["id"] . kString::generateStringId(3);
+			$dcChar = substr($currentDcChars, rand(0, strlen($currentDcChars) - 1), 1);
+			$id = $dcChar . kString::generateStringId(3);
 			$existingObject = ShortLinkPeer::retrieveByPK($id);
 			
 			if ($existingObject)
