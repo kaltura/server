@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1296549901">
-  <!-- Generated on date 01/02/11 10:45:01 -->
+<xml apiVersion="3.1.1" generatedDate="1296562478">
+  <!-- Generated on date 01/02/11 12:14:38 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -389,10 +389,9 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
-      <const name="HULU" value="huluDistribution.HULU"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -2997,12 +2996,12 @@
       <property name="errorType" type="int" enumType="KalturaBatchJobErrorTypes" readOnly="1" insertOnly="0" description=""/>
       <property name="errorNumber" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="errorDescription" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasSubmitResultsLog" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasSubmitSentDataLog" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasUpdateResultsLog" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasUpdateSentDataLog" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasDeleteResultsLog" type="bool" readOnly="1" insertOnly="0" description=""/>
-      <property name="hasDeleteSentDataLog" type="bool" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasSubmitResultsLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasSubmitSentDataLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasUpdateResultsLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasUpdateSentDataLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasDeleteResultsLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
+      <property name="hasDeleteSentDataLog" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaEntryDistributionBaseFilter" abstract="1" base="KalturaFilter" plugin="contentDistribution">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
