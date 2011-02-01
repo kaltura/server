@@ -149,37 +149,37 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 	public $errorDescription;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitResultsLog;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasSubmitSentDataLog;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateResultsLog;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasUpdateSentDataLog;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteResultsLog;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 * @readonly
 	 */
 	public $hasDeleteSentDataLog;
