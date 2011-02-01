@@ -48,6 +48,12 @@ class KalturaErrors extends APIErrors
 	
 	const PROPERTY_VALIDATION_MAX_LENGTH = "PROPERTY_VALIDATION_MAX_LENGTH,The property \"%s\" cannot have more than %s characters";
 	
+	const PROPERTY_VALIDATION_NUMERIC_VALUE = "PROPERTY_VALIDATION_NUMERIC_VALUE,The property \"%s\" must be numeric";
+	
+	const PROPERTY_VALIDATION_MIN_VALUE = "PROPERTY_VALIDATION_MIN_VALUE,The property \"%s\" must have a min value of %s";
+	
+	const PROPERTY_VALIDATION_MAX_VALUE = "PROPERTY_VALIDATION_MAX_VALUE,The property \"%s\" must have a max value of %s";
+	
 	const PROPERTY_VALIDATION_NOT_UPDATABLE = "PROPERTY_VALIDATION_NOT_UPDATABLE,The property \"%s\" cannot be updated";
 	
 	const PROPERTY_VALIDATION_ADMIN_PROPERTY = "PROPERTY_VALIDATION_ADMIN_PROPERTY,The property \"%s\" is updatable with admin session only";

@@ -155,6 +155,42 @@ class KalturaObject
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	}
 	
+	public function validatePropertyNumeric($propertyName, $allowNull = false)
+	{
+		if($allowNull && is_null($this->$propertyName))
+			return;
+			
+		$this->validatePropertyNotNull($propertyName);
+		if (!is_numeric($this->$propertyName))
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NUMERIC_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName));
+	}
+	
+	public function validatePropertyMinValue($propertyName, $minValue, $allowNull = false)
+	{
+		if($allowNull && is_null($this->$propertyName))
+			return;
+			
+		$this->validatePropertyNumeric($propertyName, $allowNull);
+		if ($this->$propertyName < $minValue)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName), $minValue);
+	}
+	
+	public function validatePropertyMaxValue($propertyName, $maxValue, $allowNull = false)
+	{
+		if($allowNull && is_null($this->$propertyName))
+			return;
+			
+		$this->validatePropertyNumeric($propertyName, $allowNull);
+		if ($this->$propertyName > $maxValue)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName), $maxValue);
+	}
+	
+	public function validatePropertyMinMaxValue($propertyName, $minValue, $maxValue, $allowNull = false)
+	{
+		$this->validatePropertyMinValue($propertyName, $minValue, $allowNull);
+		$this->validatePropertyMaxValue($propertyName, $maxValue, $allowNull);
+	}
+	
 	public function validatePropertyMaxLength($propertyName, $maxLength)
 	{
 		$this->validatePropertyNotNull($propertyName);
