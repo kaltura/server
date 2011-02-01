@@ -28,6 +28,11 @@ class Kaltura_Paginator extends Zend_Paginator
     	$this->action = $action;
     }
     
+    public static function setIndex($index)
+    {
+    	self::$index = $index;
+    }
+    
     /**
      * Renders the paginator.
      *
