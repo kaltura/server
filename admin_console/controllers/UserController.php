@@ -241,7 +241,7 @@ class UserController extends Zend_Controller_Action
 				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Kaltura_ClientHelper::getPartnerId());				
 				$client->setKs($ks);
 				$user = $client->user->getByLoginId($request->getPost('email_address'), Kaltura_ClientHelper::getPartnerId());
-				if (!$user->isAdmin || $user->partnerId != Kaltura_ClientHelper::getPartnerId()) {
+				if ($user->partnerId != Kaltura_ClientHelper::getPartnerId()) {
 					throw new Exception('', 'LOGIN_DATA_NOT_FOUND');
 				}
 				
