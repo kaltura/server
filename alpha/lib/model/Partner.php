@@ -807,11 +807,13 @@ class Partner extends BasePartner
 	
 	public function setAdminName($name)
 	{
+		parent::setAdminName(null);
 		$this->tempAdminName = $name;
 	}
 	
 	public function setAdminEmail($email)
 	{
+		parent::setAdminEmail(null);
 		$this->tempAdminEmail = $email;	
 	}
 	
@@ -824,6 +826,7 @@ class Partner extends BasePartner
 		
 		$ownerKuserId = $this->getAccountOwnerKuserId();
 		if (!$ownerKuserId) {
+			// should only happen for new partner objects
 			return parent::getAdminName();
 		}
 		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
@@ -831,7 +834,19 @@ class Partner extends BasePartner
 			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
 			return null;
 		}
-		return $ownerKuser->getFullName();		
+		
+		$kuserName = $ownerKuser->getFullName();
+		$oldPartnerAdminName = parent::getAdminName();
+
+		// Partner admin_name is deprecated and is now taken from the account owner kuser object.
+		// For backward compatibility, if an old partner still has an admin_name which is different than the owner kuser name, the old name is returned.
+		if ($oldPartnerAdminName && $oldPartnerAdminName != $kuserName) {
+			KalturaLog::notice('Partner ['.$this->getId().'] admin_name ['.$oldPartnerAdminName.'] is different than account owner kuser ['.$ownerKuserId.'] with name ['.$kuserName.']. Returning old partner admin_name for backward compatibility.');
+			return $oldPartnerAdminName;
+		}
+		else {
+			return $kuserName;
+		}
 	}
 	
 	public function getAdminEmail()
@@ -842,6 +857,7 @@ class Partner extends BasePartner
 		
 		$ownerKuserId = $this->getAccountOwnerKuserId();
 		if (!$ownerKuserId) {
+			// should only happen for new partner objects
 			return parent::getAdminEmail();
 		}
 		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
@@ -849,7 +865,18 @@ class Partner extends BasePartner
 			KalturaLog::err('Cannot retrieve kuser with id ['.$ownerKuserId.'] set as account owner for partner ['.$this->getId().']');
 			return null;
 		}
-		return $ownerKuser->getEmail();	
+		$kuserEmail = $ownerKuser->getEmail();	
+		$oldPartnerAdminEmail = parent::getAdminEmail();
+
+		// Partner admin_email is deprecated and is now taken from the account owner kuser object.
+		// For backward compatibility, if an old partner still has an admin_email which is different than the owner kuser email, the old email is returned.
+		if ($oldPartnerAdminEmail && $oldPartnerAdminEmail != $kuserEmail) {
+			KalturaLog::notice('Partner ['.$this->getId().'] admin_email ['.$oldPartnerAdminEmail.'] is different than account owner kuser ['.$ownerKuserId.'] with email ['.$kuserEmail.']. Returning old partner admin_email for backward compatibility.');
+			return $oldPartnerAdminEmail;
+		}
+		else {
+			return $kuserEmail;
+		}
 	}
 		
 	// -----------------------------------------------
