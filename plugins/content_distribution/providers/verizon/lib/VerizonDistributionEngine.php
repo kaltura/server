@@ -139,7 +139,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 	
 		$fileArray = $this->fetchFilesList($data, $data->distributionProfile);
 		
-		for	($i=0; $i<count($fileArray) $i++)
+		for	($i=0; $i<count($fileArray); $i++)
 		{
 			if (preg_match ( "/{$data->remoteId}.rcvd/" , $fileArray[$i] , $matches))
 			{
