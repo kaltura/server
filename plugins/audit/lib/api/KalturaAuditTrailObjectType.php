@@ -23,7 +23,6 @@ class KalturaAuditTrailObjectType extends KalturaStringEnum
 	const MEDIA_INFO = mediaInfoPeer::OM_CLASS;
 	const MODERATION = moderationPeer::OM_CLASS;
 	const PARTNER = PartnerPeer::OM_CLASS;
-	const PUSER_KUSER = PuserKuserPeer::OM_CLASS;
 	const ROUGHCUT = roughcutEntryPeer::OM_CLASS;
 	const SYNDICATION = syndicationFeedPeer::OM_CLASS;
 	const UI_CONF = uiConfPeer::OM_CLASS;

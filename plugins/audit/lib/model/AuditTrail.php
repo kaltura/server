@@ -34,7 +34,6 @@ class AuditTrail extends BaseAuditTrail
 	const AUDIT_TRAIL_OBJECT_TYPE_MEDIA_INFO = mediaInfoPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_MODERATION = moderationPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_PARTNER = PartnerPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_PUSER_KUSER = PuserKuserPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_ROUGHCUT = roughcutEntryPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_SYNDICATION = syndicationFeedPeer::OM_CLASS;
 	const AUDIT_TRAIL_OBJECT_TYPE_UI_CONF = uiConfPeer::OM_CLASS;
@@ -81,7 +80,6 @@ class AuditTrail extends BaseAuditTrail
 		self::AUDIT_TRAIL_OBJECT_TYPE_MEDIA_INFO,
 		self::AUDIT_TRAIL_OBJECT_TYPE_MODERATION,
 		self::AUDIT_TRAIL_OBJECT_TYPE_PARTNER,
-		self::AUDIT_TRAIL_OBJECT_TYPE_PUSER_KUSER,
 		self::AUDIT_TRAIL_OBJECT_TYPE_ROUGHCUT,
 		self::AUDIT_TRAIL_OBJECT_TYPE_SYNDICATION,
 		self::AUDIT_TRAIL_OBJECT_TYPE_UI_CONF,
@@ -201,7 +199,11 @@ class AuditTrail extends BaseAuditTrail
 	public function getPuserId()
 	{
 		if(!$this->puserId)
-			$this->puserId = PuserKuserPeer::getPuserIdFromKuserId($this->getPartnerId(), $this->getKuserId());
+		{
+			$kuser = KuserPeer::retrieveByPK($this->getKuserId());
+			if($kuser)
+				$this->puserId = $kuser->getPuserId(); 
+		}
 			
 		return $this->puserId;
 	}
@@ -209,7 +211,9 @@ class AuditTrail extends BaseAuditTrail
 	public function setPuserId($v)
 	{
 		$this->puserId = $v;
-		return $this->setKuserId(PuserKuserPeer::getKuserIdFromPuserId($this->getPartnerId(), $this->puserId));
+		$kuser = KuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $this->puserId, true);
+		if($kuser)
+			return $this->setKuserId($kuser->getId());
 	}
 	
 	/* (non-PHPdoc)
@@ -225,8 +229,7 @@ class AuditTrail extends BaseAuditTrail
 
 		if(is_null($this->getKuserId()))
 		{
-			$kuserId = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, kCurrentContext::$uid);
-			$this->setKuserId($kuserId);
+			$this->setPuserId(kCurrentContext::$uid);
 		}
 	
 		if(is_null($this->getClientTag()))
