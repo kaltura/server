@@ -83,8 +83,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 //		$pattern = '/<([^\/]+)\/>/';
 //		$replacement = '<$1></$1>';
 //		$xml = preg_replace($pattern, $replacement, $providerData->xml);
-		$xml = $providerData->xml;
-		KalturaLog::debug("xml [$xml]");
+		KalturaLog::debug("xml [$providerData->xml]");
 		
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
@@ -106,7 +105,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
 
-		$params = http_build_query(array($this->postFieldName => $xml));
+		$params = http_build_query(array($this->postFieldName => $providerData->xml));
 		
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -124,7 +123,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		}
 		curl_close($ch);
 		KalturaLog::debug("MSN HTTP response:\n$results\n");
-		$data->sentData = $xml;
+		$data->sentData = $providerData->xml;
 		$data->results = $results;
 		return $results;
 	}
