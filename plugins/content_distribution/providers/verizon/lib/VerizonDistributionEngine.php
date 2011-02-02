@@ -300,7 +300,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		}
 	*?			
 		return true;
-	}
+	*/}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineUpdate::update()
