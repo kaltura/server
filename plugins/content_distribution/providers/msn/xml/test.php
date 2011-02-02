@@ -1,19 +1,20 @@
 <?php
 
-define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../'));
-require_once(KALTURA_ROOT_PATH . '/infra/bootstrap_base.php');
-require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
+define('KALTURA_ROOT', realpath(dirname(__FILE__) . '/../../../../../'));
+require_once(KALTURA_ROOT . '/alpha/config/kConf.php');
+require_once(KALTURA_ROOT . '/infra/bootstrap_base.php');
+require_once(KALTURA_ROOT . '/infra/KAutoloader.php');
 
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH . "/api_v3");
+define("KALTURA_API_PATH", KALTURA_ROOT . "/api_v3");
 
 // Autoloader
 require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT, "vendor", "propel", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*")); // needed for testmeDoc
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator")); // needed for testmeDoc
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT, "alpha", "plugins", "*")); // needed for testmeDoc
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT, "plugins", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT, "generator")); // needed for testmeDoc
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/plugins/classMap.cache');
 //KAutoloader::dumpExtra();
 KAutoloader::register();
@@ -52,17 +53,18 @@ foreach($argv as $arg)
 	}
 }
 
-$data = new KalturaDistributionSubmitJobData();
-$data->providerData = $providerData; 
-$data->distributionProfile = new KalturaMsnDistributionProfile();
-//$data->distributionProfile->domain = 'tools.catalog.video.msn-int.com';
-$data->distributionProfile->domain = 'catalog.video.msn.com';
-$data->distributionProfile->username = 'Jonathan.Kanariek@kaltura.com';
-$data->distributionProfile->password = 'aMdlW2Cf';
-
-$entry = entryPeer::retrieveByPKNoFilter($entryId);
-$mrss = kMrssManager::getEntryMrss($entry);
-file_put_contents('mrss.xml', $mrss);
+//$data = new KalturaDistributionSubmitJobData();
+//$data->providerData = $providerData; 
+//$data->distributionProfile = new KalturaMsnDistributionProfile();
+////$data->distributionProfile->domain = 'tools.catalog.video.msn-int.com';
+//$data->distributionProfile->domain = 'catalog.video.msn.com';
+//$data->distributionProfile->username = 'Jonathan.Kanariek@kaltura.com';
+//$data->distributionProfile->password = 'aMdlW2Cf';
+//
+//$entry = entryPeer::retrieveByPKNoFilter($entryId);
+//$mrss = kMrssManager::getEntryMrss($entry);
+//file_put_contents('mrss.xml', $mrss);
+$mrss = file_get_contents('mrss.xml');
 KalturaLog::debug("MRSS [$mrss]");
 		
 $xml = MsnDistributionProvider::generateSubmitXML($entryId, $providerData);
@@ -70,14 +72,14 @@ $providerData->xml = $xml;
 file_put_contents('out.xml', $xml);
 KalturaLog::debug("XML [$xml]");
 
-//$xml = file_get_contents('example.xml');
-$providerData->xml = $xml;
-
-$engine = new MsnDistributionEngine();
-$engine->submit($data);
-
-var_dump($data->remoteId);
-KalturaLog::debug("remoteId [$data->remoteId]");
-
-//$data->remoteId = '56ee9481-6463-42fa-b9b7-e784d73bd514';
-$engine->closeSubmit($data);
+////$xml = file_get_contents('example.xml');
+//$providerData->xml = $xml;
+//
+//$engine = new MsnDistributionEngine();
+//$engine->submit($data);
+//
+//var_dump($data->remoteId);
+//KalturaLog::debug("remoteId [$data->remoteId]");
+//
+////$data->remoteId = '56ee9481-6463-42fa-b9b7-e784d73bd514';
+//$engine->closeSubmit($data);
