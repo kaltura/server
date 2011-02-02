@@ -36,10 +36,21 @@ class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 			$auditTrailFilter = new AuditTrailFilter();
 			
 		if(isset($this->userIdEqual))
-			$this->userIdEqual = PuserKuserPeer::getKuserIdFromPuserId(kCurrentContext::$ks_partner_id, $this->userIdEqual);
+		{
+			$kuser = KuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual, true);
+			if($kuser)
+				$this->userIdEqual = $kuser->getId();
+		}
 		
 		if(isset($this->userIdIn))
-			$this->userIdIn = PuserKuserPeer::getKuserIdFromPuserIds(kCurrentContext::$ks_partner_id, explode(',', $this->userIdIn));
+		{
+			$kusers = KuserPeer::getKuserByPartnerAndUids(kCurrentContext::$ks_partner_id, $this->userIdIn);
+			$kuserIds = array();
+			foreach($kusers as $kuser)
+				$kuserIds[] = $kuser->getId();
+				
+			$this->userIdIn = implode(',', $kuserIds);
+		}
 			
 		return parent::toObject($auditTrailFilter, $propsToSkip);
 	}
