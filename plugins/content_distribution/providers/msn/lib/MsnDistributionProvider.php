@@ -145,7 +145,7 @@ class MsnDistributionProvider implements IDistributionProvider
 		foreach($nodes as $node)
 			$node->replaceChild($xml->createTextNode($fiveDaysFromNow), $node->firstChild);
 			
-		return $xml->saveXML(null, LIBXML_NOEMPTYTAG);
+		return $xml->saveXML();
 	}
 	
 	/**
@@ -162,7 +162,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		return $xml->saveXML(null, LIBXML_NOEMPTYTAG);
+		return $xml->saveXML();
 	}
 	
 	/**
@@ -179,7 +179,7 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		return $xml->saveXML(null, LIBXML_NOEMPTYTAG);
+		return $xml->saveXML();
 	}
 	
 	/**
@@ -235,14 +235,17 @@ class MsnDistributionProvider implements IDistributionProvider
 				KalturaLog::debug("Set variable [$name] to [{$providerData->$name}]");
 			}
 		}
-		KalturaLog::debug("xsl[" . $xsl->saveXML(null, LIBXML_NOEMPTYTAG) . "]");
+		KalturaLog::debug("xsl[" . $xsl->saveXML() . "]");
 
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
 		$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
-		KalturaLog::debug("xml[" . $xml->saveXML(null, LIBXML_NOEMPTYTAG) . "]");
+		$xml->encoding = 'UTF-8';
+		$xml->documentElement->removeAttribute('xmlns:php');
+		
+		KalturaLog::debug("xml[" . $xml->saveXML() . "]");
 		if(!$xml)
 		{
 			KalturaLog::err("XML Transformation failed");
