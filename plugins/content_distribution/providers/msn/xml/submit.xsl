@@ -34,31 +34,31 @@
 			<description>
 				<xsl:value-of select="description" />
 			</description>
-			<!--  
+			<!-- 
 			<durationSecs>
 				<xsl:value-of select="floor(sum(media/duration) div 1000)" />
 			</durationSecs>
-			-->
-			<xsl:if test="sum(distribution[@provider='MSN']/sunrise) > 0">
-				<startDate>
+			 -->
+			<startDate>
+				<xsl:if test="sum(distribution[@provider='MSN']/sunrise) > 0">
 					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='MSN']/sunrise))" />
-				</startDate>
-			</xsl:if>
-			<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
-				<activeEndDate>
+				</xsl:if>
+			</startDate>
+			<activeEndDate>
+				<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
 					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='MSN']/sunset))" />
-				</activeEndDate>
-			</xsl:if>
-			<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
-				<searchableEndDate>
+				</xsl:if>
+			</activeEndDate>
+			<searchableEndDate>
+				<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
 					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='MSN']/sunset))" />
-				</searchableEndDate>
-			</xsl:if>
-			<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
-				<archiveEndDate>
+				</xsl:if>
+			</searchableEndDate>
+			<archiveEndDate>
+				<xsl:if test="sum(distribution[@provider='MSN']/sunset) > 0">
 					<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@provider='MSN']/sunset))" />
-				</archiveEndDate>
-			</xsl:if>
+				</xsl:if>
+			</archiveEndDate>
 			<tags>
 				<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/MSNVideoCat) > 0">
 					<tag market="us" namespace="MSNVideo_Cat"><xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/MSNVideoCat"/></tag>
