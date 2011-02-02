@@ -12,6 +12,7 @@
 				<media:keywords><![CDATA[]]></media:keywords>
 				<media:category></media:category>
             </media:content>
+            <media:thumbnail url="file://" />
             <yt:start_time></yt:start_time>
             <yt:end_time></yt:end_time>
             <yt:target></yt:target>

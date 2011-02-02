@@ -189,6 +189,11 @@ class YouTubeDistributionFeedHelper
 	{
 		$this->setNodeValue('/rss/channel/item/media:content/@url', $value);
 	}
+	
+	public function setThumbnailUrl($value)
+	{
+		$this->setNodeValue('/rss/channel/item/media:thumbnail/@url', $value);
+	}
 
 	public function setWebCustomId($value)
 	{

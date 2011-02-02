@@ -164,22 +164,36 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->kalturaClient->media->get($entryId);
 		
-		$videoFileFile = $providerData->videoAssetFilePath;
-		if (!file_exists($videoFileFile))
-			throw new KalturaDistributionException('The file ['.$videoFileFile.'] was not found (probably not synced yet), the job will retry');
+		$videoFilePath = $providerData->videoAssetFilePath;
+		if (!$videoFilePath)
+			throw new KalturaException('No video asset to distribute, the job will fail');
+			
+		if (!file_exists($videoFilePath))
+			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
+			
+		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 		
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry($entry);
-		$feed->setContentUrl('file://' . pathinfo($videoFileFile, PATHINFO_BASENAME));
+		$feed->setContentUrl('file://' . pathinfo($videoFilePath, PATHINFO_BASENAME));
+		if (file_exists($thumbnailFilePath))
+			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
 		$feed->sendFeed($sftpManager);
 		
 		// upload the video
-		$videoSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($videoFileFile, PATHINFO_BASENAME);
-		$sftpManager->putFile($videoSFTPPath, $videoFileFile);
+		$videoSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($videoFilePath, PATHINFO_BASENAME);
+		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
+		
+		// upload the thumbnail if exists
+		if (file_exists($thumbnailFilePath))
+		{
+			$thumbnailSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
+		}
 		
 		$feed->setDeliveryComplete($sftpManager);
 		

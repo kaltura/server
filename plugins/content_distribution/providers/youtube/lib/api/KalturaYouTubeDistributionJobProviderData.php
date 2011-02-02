@@ -13,6 +13,11 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 	/**
 	 * @var string
 	 */
+	public $thumbAssetFilePath;
+	
+	/**
+	 * @var string
+	 */
 	public $sftpDirectory;
 	
 	/**
@@ -28,17 +33,30 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 		if(!($distributionJobData->distributionProfile instanceof KalturaYouTubeDistributionProfile))
 			return;
 			
-		$sourceAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
-		if($sourceAsset) 
+		$flavorAssets = flavorAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
+		if(count($flavorAssets)) // if we have specific flavor assets for this distribution, grab the first one
+			$flavorAsset = reset($flavorAssets);
+		else // take the source asset
+			$flavorAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
+		
+		if($flavorAsset) 
 		{
-			$syncKey = $sourceAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+		}
+		
+		$thumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
+		if(count($thumbAssets))
+		{
+			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
 	}
 		
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
+		"thumbAssetFilePath",
 		"sftpDirectory",
 		"sftpMetadataFilename",
 	);
