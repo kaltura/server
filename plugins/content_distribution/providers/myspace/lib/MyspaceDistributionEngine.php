@@ -81,29 +81,37 @@ class MyspaceDistributionEngine extends DistributionEngine implements
 		if(!$providerData->xml)
 			throw new Exception("XML data not supplied");
 
-		if (!isset($data->remoteId) || $data->remoteId == "")
-		{
-			$remoteId = uniqid();
-		}
-		else
-		{
-			$remoteId = $data->remoteId;
-		}
-		$fileName = $remoteId . '.xml';
-		$srcFile = $this->tempXmlPath . '/' . $fileName;
-		$destFile = "{$path}/{$fileName}";
-			
-		file_put_contents($srcFile, $providerData->xml);
-		KalturaLog::debug("XML written to file [$srcFile]");
-		
 		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
 		if(!$fileTransferMgr)
 			throw new Exception("FTP manager not loaded");
 			
-		$fileTransferMgr->login($this->domain, $username, $password);
-		$fileTransferMgr->putFile($destFile, $srcFile, true);
+		$fileNameOld = uniqid() . 'Old.xml';
+		$fileNameNew = uniqid() . 'Fin.xml';
+		$srcFileFileUp = $this->tempXmlPath . '/' . $fileNameNew;
+		$srcFileFileDn = $this->tempXmlPath . '/' . $fileNameOld;
+		$destFile = "{$path}/feed.xml";
 
-		return $remoteId;
+		$fileTransferMgr->login($this->domain, $username, $password);
+		if ($fileTransferMgr->fileExists("feed.xml"))
+		{
+			$res = $fileTransferMgr->getFile ( "feed.xml", $srcFileFileDn);	
+			if ($res = kFileTransferMgr::FILETRANSFERMGR_RES_ERR)
+			{
+				$srcFileFileDn = '';
+			}
+		}
+		else
+		{
+				$srcFileFileDn = '';
+		}
+		$newXml = MyspaceDistributionProvider::generateCombinedXML($srcFileFileDn, $providerData);
+	
+		file_put_contents($srcFileFileUp, $newXml);
+		KalturaLog::debug("XML written to file [$srcFileFileUp]");
+		
+		$fileTransferMgr->putFile($destFile, $srcFileFileUp, true);
+
+		return true;
 //		return $results;
 	}
 
@@ -139,7 +147,7 @@ class MyspaceDistributionEngine extends DistributionEngine implements
 	
 		$fileArray = $this->fetchFilesList($data, $data->distributionProfile);
 		
-		for	($i=0; $i<count($fileArray) $i++)
+		for	($i=0; $i<count($fileArray); $i++)
 		{
 			if (preg_match ( "/{$data->remoteId}.rcvd/" , $fileArray[$i] , $matches))
 			{
@@ -147,7 +155,8 @@ class MyspaceDistributionEngine extends DistributionEngine implements
 			}
 			else if (preg_match ( "/{$data->remoteId}.*.err/" , $fileArray[$i] , $matches))
 			{
-				return preg_split ("/\./", $matches[0])[1];
+				$res = preg_split ("/\./", $matches[0]);
+				return $res[1];
 			}
 		}
 				
@@ -299,7 +308,7 @@ class MyspaceDistributionEngine extends DistributionEngine implements
 		}
 	*?			
 		return true;
-	}
+*/	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionEngineUpdate::update()

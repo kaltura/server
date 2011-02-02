@@ -74,8 +74,8 @@ $distributionJobData->providerData = $providerData;
 file_put_contents('out.xml', $providerData->xml);
 KalturaLog::debug("XML [$providerData->xml]");
 
-return;
-$engine = new GenericDistributionEngine();
+
+$engine = new MyspaceDistributionEngine();
 $engine->submit($distributionJobData);
 
 

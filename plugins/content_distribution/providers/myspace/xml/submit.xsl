@@ -5,6 +5,7 @@
 	<xsl:output omit-xml-declaration="no" method="xml" />
 	<xsl:variable name="distributionProfileId" />
 	<xsl:variable name="metadataProfileId" />	
+	<xsl:variable name="existingFile" />	
 
 	<xsl:template match="@*|node()">
 		<xsl:copy>
@@ -89,9 +90,11 @@
 				</xsl:for-each>			
 			</Tags>
 		</MediaItem>
-      <xsl:apply-templates select="document('C:/kaltura/opt/kaltura/app/plugins/content_distribution/providers/myspace/xml/feed.xml')">
-		<xsl:with-param name="title" select="customData[@metadataProfileId = $metadataProfileId]/metadata/Slug"/>
-	  </xsl:apply-templates>
+	  <xsl:if test="string-length($existingFile) > 0">
+		<xsl:apply-templates select="document($existingFile)">
+			<xsl:with-param name="title" select="customData[@metadataProfileId = $metadataProfileId]/metadata/Slug"/>
+		</xsl:apply-templates>
+	  </xsl:if>
 	</MediaItems>	
 	</MySpaceFeed>
 	</xsl:template>

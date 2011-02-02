@@ -189,7 +189,24 @@ class MyspaceDistributionProvider implements IDistributionProvider
 			KalturaLog::err("Could not load MRSS as XML for entry [$entryId]");
 			return null;
 		}
+		return $xml;
 		
+	}
+	
+		/**
+	 * @param string $previousFile
+	 * @param KalturaMyspaceDistributionJobProviderData $providerData
+	 * @return String
+	 */
+	public static function generateCombinedXML($previousFile, KalturaMyspaceDistributionJobProviderData $providerData)
+	{
+		$xml = new DOMDocument();
+		if(!$xml->loadXML($providerData->xml))
+		{
+			KalturaLog::err("Could not load MRSS as XML for entry [$entryId]");
+			return null;
+		}
+
 		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsl';
 		if(!file_exists($xslPath))
 		{
@@ -208,7 +225,17 @@ class MyspaceDistributionProvider implements IDistributionProvider
 				continue;
 				
 			$name = $nameAttr->value;
-			if($name && $providerData->$name)
+			if ($name == "flavourId")
+			{
+				continue; //local variable in the xsl
+			}
+			else if ($name == "existingFile")
+			{
+				$varNode->textContent = $previousFile;
+				$varNode->appendChild($xsl->createTextNode($previousFile));
+				KalturaLog::debug("Set variable [existingFile] to [{$previousFile}]");
+			}
+			else if($name && $providerData->$name)
 			{
 				$varNode->textContent = $providerData->$name;
 				$varNode->appendChild($xsl->createTextNode($providerData->$name));
@@ -235,6 +262,8 @@ class MyspaceDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		return $xml;
+		return $xml->saveXML();
+	
 	}
+
 }
