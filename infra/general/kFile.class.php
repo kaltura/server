@@ -499,6 +499,10 @@ class kFile
 		
 		$ch = curl_init();
 		
+		// set URL and other appropriate options
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		
 		if($passHeaders)
 		{
 			$sentHeaders = self::getRequestHeaders();
@@ -508,16 +512,13 @@ class kFile
 			
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
 		}
-		
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-		if($allowRange && isset($_SERVER['HTTP_RANGE']) && $_SERVER['HTTP_RANGE'])
+		elseif($allowRange && isset($_SERVER['HTTP_RANGE']) && $_SERVER['HTTP_RANGE'])
 		{
 			// get range parameters from HTTP range requst headers
 			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 			curl_setopt($ch, CURLOPT_RANGE, $range);
 		}
+		
 		if($_SERVER['REQUEST_METHOD'] == 'HEAD')
 		{
 			// request was HEAD, proxy only HEAD response
