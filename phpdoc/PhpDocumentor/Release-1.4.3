@@ -1,0 +1,98 @@
+$Id: Release-1.4.3 256385 2008-03-31 00:45:57Z ashnazg $
+
+PhpDocumentor Version 1.4.3
+################################################################################
+http://www.phpdoc.org
+Gregory Beaver cellog@php.net
+Joshua Eichorn jeichorn@phpdoc.org
+Chuck Burgess  ashnazg@php.net
+################################################################################
+################################################################################
+
+The phpDocumentor team would like to announce the release of phpDocumentor
+1.4.3.  This is a general bugfix release, which includes a few documentation
+clarifications in the phpDocumentor manual.
+
+------
+IMPORTANT:  phpDocumentor 1.4.3 requires PHP version 4.2.0 or greater.
+phpDocumentor will function best with PHP version 4.3.0 or greater, as it will
+use of the tokenizer extension if php 4.3.0 is installed for a tremendous
+increase in parsing speed.  PHP version 5.1.0 or newer is recommended to take
+advantage of PHP5-only features.
+
+WARNING:  A bug in PHP v5.2.1 can cause PhpDocumentor v1.3.1 and older to
+spiral into an infinite loop when parsing tutorial documents.  PhpDocumentor 
+v1.3.2 and newer will abort at the beginning of the tutorial parsing 
+stage if it detects PHP v5.2.1 being used to parse tutorials.
+
+NOTE:  Beware of using the PDF converter with "--sourcecode on" for any medium
+to large code projects.  The design of the PDF generation library is very
+inefficient... the doc generation could take a very long time (e.g. days),
+and if it hits your memory_limit ceiling, you may be waiting a long time
+just for it to abort.  If there are any users out there with the
+time and expertise to look into the algorithms used by CPdf, by all means
+please send us some patches.
+------
+
+A full listing of all closed bugs and feature requests can be found in the 
+next section of the notes.
+
+phpDocumentor 1.4.3 is ready for production use documenting any PHP project... 
+download it and try it out.
+
+################################################################################
+
+The following PEAR items are included in version 1.4.3:
+ * Bug #11654: @static in DocBlock Template can cause PHP Notice
+ * Bug #11813: @link URL short description does&apos;nt work
+ * Bug #13800: Invalid tutorials tree generation
+ * Bug #14191: earthli template contains bad HTML
+ * Bug #14472: Incorrect line numbers with heredoc
+ * Bug #15517: Wrong table of contents in tutorials
+ * Bug #16431: Warning: get_class() expects parameter 1 to be object, string given
+ * Bug #16441: Parse error when parsing &lt;&lt;foo&gt;&gt;
+ * Bug #16446: Use of split() causes E_DEPRECATED warnings
+ * Feature #13599: Third Gotcha on Bare Minimum Tutorial example
+ * Feature #14312: @param tag with additional arguments doesn&apos;t work as expected
+ * Feature #14461: Data Type Confusion for Some Tags
+
+The following Sourceforge items are included in version 1.4.3:
+* [2692032] use of templatebase - missing information
+* [2669256] get_class() expects parameter 1 to be object, string given
+* [2669110] ereg / split is deprecated
+* [1940914] Tutorials tree is added to tutorials which have no children
+* [1929926] Default version number not updated
+* [1918851] @toc render is wrong in earthli tutorial_toc.tpl
+* [1903136] Constant Link not worked
+* [1771553] @link URL short description does\'nt work
+
+You can view the bug details or reopen one if
+you think it's not totally fixed at:
+http://pear.php.net/bugs/search.php?cmd=display&package_name%5B%5D=PhpDocumentor
+http://sourceforge.net/tracker/?group_id=11194&atid=111194
+
+################################################################################
+
+The documentation has been updated for this release you can view it at
+http://www.phpdoc.org/docs
+or in the distribution in the spec directory
+
+The changelog is available in the tarball, or online at 
+http://pear.php.net/package/PhpDocumentor/download/
+
+You can download the newest version from 
+http://pear.php.net/package/PhpDocumentor/download/ 
+and http://phpdocu.sourceforge.net/downloads.php
+
+And of course you can reach the webpage at
+http://pear.php.net/package/PhpDocumentor/ or
+http://phpdocu.sourceforge.net/ or
+http://phpdoc.org/
+
+Enjoy!
+* Gregory Beaver <cellog@php.net>
+* Joshua Eichorn <jeichorn@phpdoc.org>
+* Chuck Burgess  <ashnazg@php.net>
+
+
+vim: set expandtab :
