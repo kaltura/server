@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface UserRoleId extends BaseEnum
 {
 	const PARTNER_ADMIN_ROLE     = 'PARTNER_ADMIN_ROLE';

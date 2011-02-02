@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package core
+ * @subpackage managers
+ */ 
 class kPluginableEnumsManager
 {
 	/**

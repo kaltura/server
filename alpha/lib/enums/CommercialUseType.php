@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface CommercialUseType extends BaseEnum
 {
 	const COMMERCIAL_USE = 1;

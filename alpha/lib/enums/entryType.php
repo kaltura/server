@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface entryType extends BaseEnum
 {
 	const AUTOMATIC = -1;

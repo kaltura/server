@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface BatchJobType extends BaseEnum
 {
 	const CONVERT = 0;

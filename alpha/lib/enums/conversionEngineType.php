@@ -1,8 +1,8 @@
 <?php
 /**
- * @package api
+ * @package lib.model
  * @subpackage enum
- */
+ */ 
 interface conversionEngineType extends BaseEnum
 {
 	const KALTURA_COM = 0;

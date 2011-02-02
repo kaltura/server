@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface PermissionType extends BaseEnum
 {
 	const API_ACCESS       = '1';

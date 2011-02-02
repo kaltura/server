@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface KuserStatus extends BaseEnum
 {
 	const BLOCKED = 0;

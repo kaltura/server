@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage interfaces
+ */ 
 interface ISyncableFile extends IBaseObject
 {
 	public function getSyncKey( $sub_type , $version=null);

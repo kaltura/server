@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage interfaces
+ */ 
 interface IIndexable extends IBaseObject
 {
 	const FIELD_TYPE_STRING = 'string';

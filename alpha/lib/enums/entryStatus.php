@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface entryStatus extends BaseEnum
 {
 	const ERROR_IMPORTING = -2;

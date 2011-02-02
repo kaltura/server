@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface UserRoleStatus extends BaseEnum
 {
 	const ACTIVE  = 1;

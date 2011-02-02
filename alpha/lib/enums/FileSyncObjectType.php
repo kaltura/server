@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage enum
+ */ 
 interface FileSyncObjectType extends BaseEnum
 {
 	const ENTRY = 1;

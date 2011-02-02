@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package lib.model
+ * @subpackage interfaces
+ */ 
 interface IBaseObject
 {
 	/**
