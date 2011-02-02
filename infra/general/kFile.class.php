@@ -564,7 +564,7 @@ class kFile
 		}
 	}
 	
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null)
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0)
 	{
 		self::closeDbConnections();
 		
@@ -591,7 +591,7 @@ class kFile
 			die();
 		
 		$ext = pathinfo($file_name, PATHINFO_EXTENSION);
-		$total_length = filesize($file_name);
+		$total_length = $limit_file_size ? $limit_file_size : filesize($file_name);
 		
 		// get range parameters from HTTP range requst headers
 		list($range_from, $range_to, $range_length) = infraRequestUtils::handleRangeRequest($total_length);
