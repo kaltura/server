@@ -232,9 +232,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 		
 		if($filter->get('_free_text'))
 		{
-			KalturaLog::debug('No advanced filter defined');
-		
 			$freeTexts = $filter->get('_free_text');
+			KalturaLog::debug("Attach free text [$freeTexts]");
 			
 			$additionalConditions = array();
 			$advancedSearch = $filter->getAdvancedSearch();
