@@ -44,14 +44,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @filter order
-	 * @insertonly
 	 */
 	public $adminName;
 	
 	/**
 	 * @var string
 	 * @filter order
-	 * @insertonly
 	 */
 	public $adminEmail;
 	

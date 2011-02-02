@@ -123,7 +123,8 @@ class PartnerService extends KalturaBaseService
 		
 		try {
 			$partner->id = $this->getPartnerId();
-			$partnerUpdate = $partner->toPartner();
+			$partnerUpdate = new Partner();
+			$partnerUpdate = $partner->toUpdatableObject($partnerUpdate);
 			$partnerUpdate->setId($dbPartner->getId());
 		}
 		catch(kUserException $e) {
