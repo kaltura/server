@@ -96,7 +96,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 		{			
 			//$ks = ks::fromSecureString ( $str ); // to do ->api Extension
 			$client = Kaltura_ClientHelper::getClient();
-			$ks = $client->kalturaInternalToolsSystemHelper->fromSecureString($str); 
+			$ks = $client->KalturaInternalToolsSystemHelper->fromSecureString($str); 
 			$res = print_r ( $ks , true );
 			if ( $ks != null )
 			{
@@ -136,10 +136,10 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 			else
 			{
 				//$remote_addr = requestUtils::getRemoteAddress();// to do ->api Extension
-				$remote_addr = $client->kalturaInternalToolsSystemHelper->getRemoteAddress();
+				$remote_addr = $client->KalturaInternalToolsSystemHelper->getRemoteAddress();
 			} 
 			//$res = $ip_geo->iptocountry( $remote_addr );
-			$res = $client->kalturaInternalToolsSystemHelper->iptocountry($remote_addr);
+			$res = $client->KalturaInternalToolsSystemHelper->iptocountry($remote_addr);
 		}
 		
 				
