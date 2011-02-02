@@ -556,8 +556,7 @@ class playManifestAction extends kalturaAction
 		{
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
-			$content .= "";
-			
+			$content .= $flavor['url']."\n";
 			
 			#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=301000,CODECS="mp4a.40.2,avc1.66.30"
 			///content/entry/data/....../entryId_falvorId/playlist.m3u8
@@ -590,7 +589,7 @@ class playManifestAction extends kalturaAction
 <smil xmlns="http://www.w3.org/2001/SMIL20/Language">
 	<head>
 		<meta name="title" content="" />
-		<meta name="httpBase" content="" />
+		<meta name="httpBase" content="http://kalturavod-f.akamaihd.net/" />
 		<meta name="rtmpAuthBase" content="" />
 	</head>
 	<body>
