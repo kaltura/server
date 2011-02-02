@@ -62,6 +62,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 				if($item instanceof AdvancedSearchFilterItem)
 				{
 					$condition = $item->getCondition();
+					KalturaLog::debug("Append item [" . get_class($item) . "] condition [$condition]");
 					if($condition)
 						$conditions[] = "($condition)";
 				}
@@ -75,6 +76,27 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		$this->condition = implode($glue, $conditions);
 		
 		return $this->condition;
+	}
+	
+	public function getFreeTextConditions($freeTexts)
+	{
+		$additionalConditions = array();
+		if(count($this->items))
+		{
+			foreach($this->items as $item)
+			{
+				if($item instanceof AdvancedSearchFilterItem)
+				{
+					$itemAdditionalConditions = $item->getFreeTextConditions($freeTexts);
+					foreach($itemAdditionalConditions as $itemAdditionalCondition)
+					{
+						KalturaLog::debug("Append free text item [" . get_class($item) . "] condition [$itemAdditionalCondition]");
+						$additionalConditions[] = "$itemAdditionalCondition";
+					}
+				}
+			}
+		}
+		return $additionalConditions;
 	}
 	
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)

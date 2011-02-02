@@ -12,6 +12,11 @@ class AdvancedSearchFilterItem
 		$matchClause[] = $this->getCondition();
 	}
 	
+	public function getFreeTextConditions($freeTexts)
+	{
+		return array();	
+	}
+	
 	public function getCondition()
 	{
 		return null;

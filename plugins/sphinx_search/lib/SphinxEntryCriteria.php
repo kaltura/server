@@ -237,6 +237,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$freeTexts = $filter->get('_free_text');
 			
 			$additionalConditions = array();
+			$advancedSearch = $filter->getAdvancedSearch();
+			if($advancedSearch)
+			{
+				$additionalConditions = $advancedSearch->getFreeTextConditions($freeTexts);
+			}
+			
 			if(preg_match('/^"[^"]+"$/', $freeTexts))
 			{
 				$freeText = str_replace('"', '', $freeTexts);

@@ -72,6 +72,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				{
 					$condition = $item->doGetCondition($xPaths);
 				}
+					
+				KalturaLog::debug("Append item [" . get_class($item) . "] condition [$condition]");
 				
 				if($condition)
 					$conditions[] = "($condition)";
@@ -87,15 +89,17 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $this->condition;
 	}
 	
-	protected function getFreeTextConditions($freeTexts)
+	public function getFreeTextConditions($freeTexts)
 	{
+		$additionalConditions = array();
+		
 		if(preg_match('/^"[^"]+"$/', $freeTexts))
 		{
 			$freeText = str_replace('"', '', $freeTexts);
 			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
-			$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
+//			$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
 			$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts";
 			
 			return $additionalConditions;
@@ -112,7 +116,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					
 			foreach($freeTextsArr as $freeText)
 			{
-				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
+//				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
 				$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText";
 			}
 			return $additionalConditions;
@@ -124,32 +128,18 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				unset($freeTextsArr[$valIndex]);
 				
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
+//		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
 		$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
 		return $additionalConditions;
 	}
 	
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
 	{
-		KalturaLog::debug("apply MetadataSearchFilter from [" . get_class($filter) . "] with free text [" . $filter->get('_free_text') . "]");
-		if($filter->get('_free_text'))
-		{
-			$additionalConditions = $this->getFreeTextConditions($filter->get('_free_text'));
-			$additionalCondition = '(' . implode(') | (', $additionalConditions) . ')';
-				
-			KalturaLog::debug("Additional Condition [$additionalCondition]");
-			$matchClause[] = $additionalCondition;
-		}
-		else
-		{
-			KalturaLog::debug('No free text filter found');
-		}
-		
 		$condition = $this->getCondition();
 		if($condition && strlen($condition))
 			$matchClause[] = "@plugins_data $condition";
 			
-		$filter->unsetByName('_free_text');
+//		$filter->unsetByName('_free_text');
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
