@@ -33,6 +33,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
 			return self::onAssetReady($object);
+			
+		return true;
 	}
 	
 	/**

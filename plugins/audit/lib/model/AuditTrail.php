@@ -16,32 +16,6 @@ class AuditTrail extends BaseAuditTrail
 {	
 	protected $puserId = null;
 	
-	const AUDIT_TRAIL_OBJECT_TYPE_ACCESS_CONTROL = accessControlPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_ADMIN_KUSER = adminKuserPeer::OM_CLASS; // deprecated
-	const AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB = BatchJobPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_CATEGORY = categoryPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_CONVERSION_PROFILE_2 = conversionProfile2Peer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_EMAIL_INGESTION_PROFILE = EmailIngestionProfilePeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_ENTRY = entryPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_FILE_SYNC = FileSyncPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_ASSET = flavorAssetPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS = flavorParamsPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS_CONVERSION_PROFILE = flavorParamsConversionProfilePeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS_OUTPUT = flavorParamsOutputPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_KSHOW = kshowPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_KSHOW_KUSER = KshowKuserPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_KUSER = kuserPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_MEDIA_INFO = mediaInfoPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_MODERATION = moderationPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_PARTNER = PartnerPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_ROUGHCUT = roughcutEntryPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_SYNDICATION = syndicationFeedPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_UI_CONF = uiConfPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_UPLOAD_TOKEN = UploadTokenPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_WIDGET = widgetPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_METADATA = MetadataPeer::OM_CLASS;
-	const AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE = MetadataProfilePeer::OM_CLASS;
-	
 	const AUDIT_TRAIL_CONTEXT_CLIENT = -1;
 	const AUDIT_TRAIL_CONTEXT_SCRIPT = 0;
 	const AUDIT_TRAIL_CONTEXT_PS2 = 1;
@@ -61,33 +35,18 @@ class AuditTrail extends BaseAuditTrail
 	const AUDIT_TRAIL_ACTION_RELATION_ADDED = 'RELATION_ADDED';
 	const AUDIT_TRAIL_ACTION_RELATION_REMOVED = 'RELATION_REMOVED';
 	
-	private static $allwodObjectTypes = array(
-		self::AUDIT_TRAIL_OBJECT_TYPE_ACCESS_CONTROL,
-		self::AUDIT_TRAIL_OBJECT_TYPE_ADMIN_KUSER,
-		self::AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB,
-		self::AUDIT_TRAIL_OBJECT_TYPE_CATEGORY,
-		self::AUDIT_TRAIL_OBJECT_TYPE_CONVERSION_PROFILE_2,
-		self::AUDIT_TRAIL_OBJECT_TYPE_EMAIL_INGESTION_PROFILE,
-		self::AUDIT_TRAIL_OBJECT_TYPE_ENTRY,
-		self::AUDIT_TRAIL_OBJECT_TYPE_FILE_SYNC,
-		self::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_ASSET,
-		self::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS,
-		self::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS_CONVERSION_PROFILE,
-		self::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_PARAMS_OUTPUT,
-		self::AUDIT_TRAIL_OBJECT_TYPE_KSHOW,
-		self::AUDIT_TRAIL_OBJECT_TYPE_KSHOW_KUSER,
-		self::AUDIT_TRAIL_OBJECT_TYPE_KUSER,
-		self::AUDIT_TRAIL_OBJECT_TYPE_MEDIA_INFO,
-		self::AUDIT_TRAIL_OBJECT_TYPE_MODERATION,
-		self::AUDIT_TRAIL_OBJECT_TYPE_PARTNER,
-		self::AUDIT_TRAIL_OBJECT_TYPE_ROUGHCUT,
-		self::AUDIT_TRAIL_OBJECT_TYPE_SYNDICATION,
-		self::AUDIT_TRAIL_OBJECT_TYPE_UI_CONF,
-		self::AUDIT_TRAIL_OBJECT_TYPE_UPLOAD_TOKEN,
-		self::AUDIT_TRAIL_OBJECT_TYPE_WIDGET,
-		self::AUDIT_TRAIL_OBJECT_TYPE_METADATA,
-		self::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE,
-	);
+	private static $allwodObjectTypes;
+	
+	public static function getAllwodObjectTypes()
+	{
+		if(!self::$allwodObjectTypes)
+		{
+			$reflect = new ReflectionClass('AuditTrailObjectType');
+			self::$allwodObjectTypes = $reflect->getConstants();
+		}
+		
+		return self::$allwodObjectTypes;
+	}
 	
 	private static $uniqueRequestId = null;
 	
@@ -145,7 +104,7 @@ class AuditTrail extends BaseAuditTrail
 	 */
 	public function setObjectType($v)
 	{
-		if(!in_array($v, self::$allwodObjectTypes))
+		if(!in_array($v, self::getAllwodObjectTypes()))
 			throw new kAuditTrailException("Object type [$v] not allowed", kAuditTrailException::OBJECT_TYPE_NOT_ALLOWED);
 		
 		return parent::setObjectType($v);
@@ -156,7 +115,7 @@ class AuditTrail extends BaseAuditTrail
 	 */
 	public function setRelatedObjectType($v)
 	{
-		if(!in_array($v, self::$allwodObjectTypes))
+		if(!in_array($v, self::getAllwodObjectTypes()))
 			throw new kAuditTrailException("Object type [$v] not allowed", kAuditTrailException::OBJECT_TYPE_NOT_ALLOWED);
 		
 		return parent::setRelatedObjectType($v);

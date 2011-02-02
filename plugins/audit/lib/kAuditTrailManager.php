@@ -99,7 +99,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	{
 		if(class_exists('Metadata') && $object instanceof Metadata)
 		{
-			$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE);
+			$auditTrail->setRelatedObjectType(AuditTrailObjectType::METADATA_PROFILE);
 			$auditTrail->setRelatedObjectId($object->getMetadataProfileId());
 		}
 		
@@ -117,18 +117,18 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			switch($object->getObjectType())
 			{
 				case FileSyncObjectType::ENTRY:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_ENTRY);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::ENTRY);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					$auditTrail->setEntryId($object->getObjectId());
 					break;
 					
 				case FileSyncObjectType::UICONF:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_UI_CONF);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::UI_CONF);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					break;
 					
 				case FileSyncObjectType::BATCHJOB:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_BATCH_JOB);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::BATCH_JOB);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
 					$batchJob = BatchJobPeer::retrieveByPK($object->getObjectId());
@@ -138,7 +138,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					break;
 					
 				case FileSyncObjectType::FLAVOR_ASSET:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_FLAVOR_ASSET);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::FLAVOR_ASSET);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
 					$flavorAsset = flavorAssetPeer::retrieveById($object->getObjectId());
@@ -148,7 +148,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					break;
 					
 				case FileSyncObjectType::METADATA:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::METADATA);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
 					if(class_exists('Metadata'))
@@ -160,7 +160,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					break;
 					
 				case FileSyncObjectType::METADATA_PROFILE:
-					$auditTrail->setRelatedObjectType(AuditTrail::AUDIT_TRAIL_OBJECT_TYPE_METADATA_PROFILE);
+					$auditTrail->setRelatedObjectType(AuditTrailObjectType::METADATA_PROFILE);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					break;
 			}
