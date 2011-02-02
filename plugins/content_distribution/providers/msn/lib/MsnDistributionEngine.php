@@ -80,10 +80,10 @@ class MsnDistributionEngine extends DistributionEngine implements
 	 */
 	protected function handleSend($path, KalturaDistributionJobData $data, KalturaMsnDistributionProfile $distributionProfile, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		$pattern = '/<([^\/]+)\/>/';
-		$replacement = '<$1></$1>';
-		
-		$xml = preg_replace($pattern, $replacement, $providerData->xml);
+//		$pattern = '/<([^\/]+)\/>/';
+//		$replacement = '<$1></$1>';
+//		$xml = preg_replace($pattern, $replacement, $providerData->xml);
+		$xml = $providerData->xml;
 		KalturaLog::debug("xml [$xml]");
 		
 		$domain = $distributionProfile->domain;
