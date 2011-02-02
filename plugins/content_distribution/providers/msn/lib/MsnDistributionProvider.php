@@ -243,7 +243,6 @@ class MsnDistributionProvider implements IDistributionProvider
 		
 		$xml = $proc->transformToDoc($xml);
 		$xml->encoding = 'UTF-8';
-		$xml->documentElement->removeAttribute('xmlns:php');
 		
 		KalturaLog::debug("xml[" . $xml->saveXML() . "]");
 		if(!$xml)
