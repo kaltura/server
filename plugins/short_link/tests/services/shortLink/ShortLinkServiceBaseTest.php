@@ -51,63 +51,60 @@ abstract class ShortLinkServiceBaseTest extends KalturaApiUnitTestCase
 
 	/**
 	 * Tests shortLink->get action
+	 * @param string $id 
 	 * @param KalturaShortLink $reference 
-	 * @param int id - returned from testAdd
 	 * @return int
-	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testGet(KalturaShortLink $reference, $id)
+	public function testGet($id, KalturaShortLink $reference)
 	{
 		$resultObject = $this->client->shortLink->get($id);
 		$this->assertType('KalturaShortLink', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateGet($reference);
+		$this->validateGet($id, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testGet results
 	 */
-	protected function validateGet(KalturaShortLink $reference, $id)
+	protected function validateGet($id, KalturaShortLink $reference)
 	{
 	}
 
 	/**
 	 * Tests shortLink->update action
+	 * @param string $id 
 	 * @param KalturaShortLink $shortLink 
 	 * @param KalturaShortLink $reference 
-	 * @param int id - returned from testAdd
 	 * @return int
-	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testUpdate(KalturaShortLink $shortLink, KalturaShortLink $reference, $id)
+	public function testUpdate($id, KalturaShortLink $shortLink, KalturaShortLink $reference)
 	{
 		$resultObject = $this->client->shortLink->update($id, $shortLink);
 		$this->assertType('KalturaShortLink', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateUpdate($shortLink, $reference);
+		$this->validateUpdate($id, $shortLink, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate(KalturaShortLink $shortLink, KalturaShortLink $reference, $id)
+	protected function validateUpdate($id, KalturaShortLink $shortLink, KalturaShortLink $reference)
 	{
 	}
 
 	/**
 	 * Tests shortLink->delete action
-	 * @param int id - returned from testAdd
-	 * @depends testFinished
+	 * @param string $id 
 	 * @dataProvider provideData
 	 */
 	public function testDelete($id)
 	{
 		$resultObject = $this->client->shortLink->delete($id);
-		$this->validateDelete();
+		$this->validateDelete($id);
 	}
 
 	/**
