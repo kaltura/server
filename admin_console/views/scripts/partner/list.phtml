@@ -108,7 +108,7 @@ function kmcUsers(partnerId) {
 	dialogDiv.dialog({
 		bgiframe: true,
 		modal: true,
-		resizable: false,
+		resizable: true,
 		width: 1133,
 		height: 600,
 		title: "<?php echo $this->translate('Publisher\'s Users list'); ?>",
@@ -116,20 +116,12 @@ function kmcUsers(partnerId) {
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
-		},
-		close: function() {
-			jQuery('#frmPaginator1').submit();
-		}	
+		}
 	});
 	
 	dialogDiv.load(
 		url, 
-		null, 
-		function() {
-			jQuery(this).find('form').ajaxForm(function() { 
-				dialogDiv.dialog('close');
-			}); 
-		}
+		null
 	);
 }
 

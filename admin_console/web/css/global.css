@@ -458,6 +458,3 @@ table table td.commandLines { width }
 
 #list_kmc_users_panel button { position: static; }
 #list_kmc_users_panel table { width: auto; min-width: 0px; }
-
-#partner-kmc-users #kmcHeader { display: none; }
-#partner-kmc-users #sub-header { display: none; }

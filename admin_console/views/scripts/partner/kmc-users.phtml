@@ -46,4 +46,18 @@ function kmcLogin(partnerId, userId) {
 	window.open(url);
 }
 
+$( function() {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-users', 'partner_id' => $this->partnerId)); ?>';
+	form = jQuery('#list_kmc_users_panel').find('form');
+	form.attr('action', url);
+	var theForm = form.get(0);
+	theForm.submit = function() {
+		jQuery('#partner-kmc-users-dialog').html('Loading...');
+		jQuery.post(url, form.serialize(), function(data) {
+			jQuery('#partner-kmc-users-dialog').html(data);
+		});
+		return false;
+	};
+});
+
 </script>
