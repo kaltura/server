@@ -3,50 +3,83 @@
   <xsd:element name="metadata">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="MSNVideoCat" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="FeedTitle" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
-              <label>MSNVideo_Cat</label>
-              <key>MSNVideo_Cat</key>
+              <label>Feed Title</label>
+              <key>FeedTitle</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>	
+        <xsd:element name="FeedDescription" minOccurs="0" maxOccurs="1" type="textType">		
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>Feed Description</label>
+              <key>FeedDescription</key>
               <searchable>true</searchable>
               <description/>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="MSNVideoTop" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="FeedContact" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
-              <label>MSNVideo_Top</label>
-              <key>MSNVideo_Top</key>
+              <label>Feed Contact</label>
+              <key>FeedContact</key>
               <searchable>true</searchable>
               <description/>
             </xsd:appinfo>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="MSNVideoTopCat" minOccurs="0" maxOccurs="1" type="textType">
+        <xsd:element name="LongTitle" minOccurs="0" maxOccurs="1" type="textType">
           <xsd:annotation>
             <xsd:documentation/>
             <xsd:appinfo>
-              <label>MSNVideo_Top_Cat</label>
-              <key>MSNVideo_Top_Cat</key>
+              <label>Long Title</label>
+              <key>LongTitle</key>
               <searchable>true</searchable>
               <description/>
             </xsd:appinfo>
           </xsd:annotation>
-        </xsd:element>
-        <xsd:element name="MSNPublic" minOccurs="0" maxOccurs="1" type="textType">
-          <xsd:annotation>
-            <xsd:documentation></xsd:documentation>
+        </xsd:element>	
+        <xsd:element name="LongDescription" minOccurs="0" maxOccurs="1" type="textType">
+		<xsd:annotation>
+            <xsd:documentation/>
             <xsd:appinfo>
-              <label>MSNPublic</label>
-              <key>MSNPublic</key>
+              <label>Long Description</label>
+              <key>LongDescription</key>
               <searchable>true</searchable>
-              <description></description>
+              <description/>
             </xsd:appinfo>
           </xsd:annotation>
-        </xsd:element>
+        </xsd:element>		
+        <xsd:element name="Slug" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>Slug</label>
+              <key>Slug</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>		
+        <xsd:element name="Keywords" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>Keywords</label>
+              <key>Keywords</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>			
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>

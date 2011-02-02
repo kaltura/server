@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<MSNVideoCat>FOX_big12</MSNVideoCat>
-	<MSNVideoTop>Fox Sports</MSNVideoTop>
-	<MSNVideoTopCat>Fox Sports_FOX_big12</MSNVideoTopCat>
-	<MSNPublic>Fox Sports</MSNPublic>
+  <FeedTitle>Fox Sports Videos</FeedTitle>
+  <FeedDescription>Fox Sports Videos</FeedDescription>
+  <FeedContact>ofer.chesler@kaltura.com</FeedContact>
+  <LongTitle>Item long title</LongTitle>
+  <LongDescription>Item long description</LongDescription>
+  <Slug>who</Slug>   
+  <Keywords>Fox, Kaltura, Test</Keywords>
 </metadata>

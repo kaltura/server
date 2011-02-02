@@ -1,2 +1,86 @@
 <?xml version="1.0"?>
-<MySpaceFeed xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:php="http://php.net/xsl"><Title>Fox feed</Title><Description>Fox feed</Description><Contact/><LastUpdate>2011-01-04T11:17:42Z</LastUpdate><MediaItems><MediaItem><Name>myname</Name><Title>myname</Title><Description/></MediaItem></MediaItems></MySpaceFeed>
+<MySpaceFeed xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:php="http://php.net/xsl" xmlns:str="http://exslt.org/strings"><Title>Fox Sports Videos</Title><Description>Fox Sports Videos</Description><Contact>ofer.chesler@kaltura.com</Contact><LastUpdate>2011-02-02T14:49:55Z</LastUpdate><MediaItems><MediaItem><Name>who</Name><Title>Item long title</Title><Description>Item long description</Description><ReleaseDate>2011-01-12T09:45:24Z</ReleaseDate><TerminationDate>2012-05-31T09:44:46Z</TerminationDate><LastUpdate>2011-02-02T14:49:55Z</LastUpdate><Location>http://local.trunk:9000/p/100/sp/10000/serveFlavor/flavorId/0_tknd3g6e</Location><Tags><Tag>Fox</Tag><Tag> Kaltura</Tag><Tag> Test</Tag></Tags></MediaItem><MediaItem>
+      <Name>Kaltura Promotion</Name>
+      <Title>My First Movie</Title>
+      <Description>Our first movie to myspace</Description>
+      <Location>ftp://myspace.upload.akamai.com/media/kaltura_final_4_CD.wmv</Location>
+      <ReleaseDate>2010-12-27T04:23:51.7586741+02:00</ReleaseDate>
+      <LastUpdate>2010-12-28T16:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge/>
+      <ThumbnailSmall/>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+        <Tag/>
+      </Tags>
+	  <OfferingTerms>
+		<Territory Code="WW" StartDate="2010-02-01T02:23:51.7586741Z" EndDate="2011-12-31T23:59:58.001Z"/>
+      </OfferingTerms>
+    </MediaItem><MediaItem>
+      <Name>Kaltura 2nd Promotion</Name>
+      <Title>My second Movie</Title>
+      <Description>Our second movie to myspace</Description>
+      <Location>ftp://myspace.upload.akamai.com/media/k2.wmv</Location>
+      <ReleaseDate>2010-12-27T04:23:51.7586741+02:00</ReleaseDate>
+      <LastUpdate>2010-12-28T17:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge/>
+      <ThumbnailSmall/>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+        <Tag>Test</Tag>
+      </Tags>
+	  <OfferingTerms>
+		<Territory Code="WW" StartDate="2010-02-01T02:23:51.7586741Z" EndDate="2011-12-31T23:59:58.001Z"/>
+      </OfferingTerms>
+    </MediaItem><MediaItem>
+      <Name>Kaltura 3rd Promotion</Name>
+      <Title>My third Movie</Title>
+      <Description>Our third movie to myspace</Description>
+      <Location>http://www.homsys.co.il/kaltura/fox/k2.wmv</Location>
+      <ReleaseDate>2010-12-27T04:23:51.7586741+02:00</ReleaseDate>
+      <LastUpdate>2010-12-28T17:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge/>
+      <ThumbnailSmall/>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+        <Tag>HTTP</Tag>
+      </Tags>
+	<TerminationDate>2011-12-31T23:59:58.001Z</TerminationDate>  
+    </MediaItem><MediaItem>
+      <Name>Kaltura 4th Promotion</Name>
+      <Title>AMovie</Title>
+      <Description>Our fourth movie to myspace</Description>
+      <Location>http://www.homsys.co.il/kaltura/fox/k2.wmv</Location>
+      <ReleaseDate>2010-01-07T04:23:51.7586741+02:00</ReleaseDate>
+	  <TerminationDate>2011-12-31T23:59:58.001Z</TerminationDate>  
+      <LastUpdate>2010-12-28T17:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge/>
+      <ThumbnailSmall/>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+        <Tag>HTTP</Tag>
+      </Tags>
+    </MediaItem><MediaItem>
+      <Name>AMovie</Name>
+      <Title>Kaltura 5th Promotion</Title>
+      <Description>Our fifth movie to myspace</Description>
+      <Location>http://www.homsys.co.il/kaltura/fox/k2.wmv</Location>
+      <ReleaseDate>2010-01-07T04:23:51.7586741+02:00</ReleaseDate>
+	  <TerminationDate>2011-12-31T23:59:58.001Z</TerminationDate>  
+      <LastUpdate>2010-12-28T17:46:33.609375+02:00</LastUpdate>
+      <Private>true</Private>
+      <ThumbnailLarge/>
+      <ThumbnailSmall/>
+      <Tags>
+        <Tag>Humor</Tag>
+        <Tag>Promotional</Tag>
+        <Tag>HTTP</Tag>
+      </Tags>
+    </MediaItem></MediaItems></MySpaceFeed>

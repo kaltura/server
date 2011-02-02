@@ -1,8 +1,7 @@
 <?php
 
-
-define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../'));
-var_dump(KALTURA_ROOT_PATH);
+define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__) . '/../../../../..'));
+echo KALTURA_ROOT_PATH;
 require_once(KALTURA_ROOT_PATH . '/infra/bootstrap_base.php');
 require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
@@ -33,19 +32,10 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_20enb9ht';
+$entryId = '0_ola7u9py';
 
 if(isset($argv[1]))
 	$entryId = $argv[1];
-
-$providerData = new KalturaMySpaceDistributionJobProviderData();
-$providerData->csId = 'Fox Sports';
-$providerData->source = 'FOX_big12';
-$providerData->metadataProfileId = 1;
-$providerData->movFlavorAssetId = '0_xm5eh03p';
-$providerData->flvFlavorAssetId = '0_xm5eh03p';
-$providerData->wmvFlavorAssetId = '0_xm5eh03p';
-$providerData->thumbAssetId = '0_1e6adevn';
 
 foreach($argv as $arg)
 {
@@ -53,37 +43,82 @@ foreach($argv as $arg)
 	if(preg_match('/(.*)=(.*)/', $arg, $matches))
 	{
 		$field = $matches[1];
-		$providerData->$field = $matches[2];
+//		$providerData->$field = $matches[2];
 	}
 }
-
-$data = new KalturaDistributionSubmitJobData();
-$data->providerData = $providerData; 
-$data->distributionProfile = new KalturaMySpaceDistributionProfile();
-//$data->distributionProfile->domain = 'tools.catalog.video.msn-int.com';
-$data->distributionProfile->domain = 'catalog.video.msn.com';
-$data->distributionProfile->username = 'Jonathan.Kanariek@kaltura.com';
-$data->distributionProfile->password = 'aMdlW2Cf';
 
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 file_put_contents('mrss.xml', $mrss);
 KalturaLog::debug("MRSS [$mrss]");
-		
-$xml = MySpaceDistributionProvider::generateSubmitXML($entryId, $providerData);
-$providerData->xml = $xml;
-file_put_contents('out.xml', $xml);
-KalturaLog::debug("XML [$xml]");
+
+$distributionJobData = new KalturaDistributionSubmitJobData();
+
+$dbDistributionProfile = DistributionProfilePeer::retrieveByPK(1);
+$distributionProfile = new KalturaMyspaceDistributionProfile();
+$distributionProfile->fromObject($dbDistributionProfile);
+$distributionJobData->distributionProfileId = $distributionProfile->id;
+
+
+$distributionJobData->distributionProfile = $distributionProfile;
+
+$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(1);
+$entryDistribution = new KalturaEntryDistribution();
+$entryDistribution->fromObject($dbEntryDistribution);
+$distributionJobData->entryDistributionId = $entryDistribution->id;
+$distributionJobData->entryDistribution = $entryDistribution;
+
+$providerData = new KalturaMyspaceDistributionJobProviderData($distributionJobData);
+$distributionJobData->providerData = $providerData;
+
+file_put_contents('out.xml', $providerData->xml);
+KalturaLog::debug("XML [$providerData->xml]");
 
 return;
-//$xml = file_get_contents('example.xml');
-$providerData->xml = $xml;
+$engine = new GenericDistributionEngine();
+$engine->submit($distributionJobData);
 
-$engine = new MySpaceDistributionEngine();
-$engine->submit($data);
 
-var_dump($data->remoteId);
-KalturaLog::debug("remoteId [$data->remoteId]");
-
-//$data->remoteId = '56ee9481-6463-42fa-b9b7-e784d73bd514';
-$engine->closeSubmit($data);
+//$xml = new DOMDocument();
+//if(!$xml->loadXML($mrss))
+//{
+//	KalturaLog::err("MRSS not is not valid XML:\n$mrss\n");
+//	exit;
+//}
+//
+//$xslPath = 'submit.xsl';
+//$xsl = new DOMDocument();
+//$xsl->load($xslPath);
+//			
+//// set variables in the xsl
+//$varNodes = $xsl->getElementsByTagName('variable');
+//foreach($varNodes as $varNode)
+//{
+//	$nameAttr = $varNode->attributes->getNamedItem('name');
+//	if(!$nameAttr)
+//		continue;
+//		
+//	$name = $nameAttr->value;
+//	if($name && $distributionJobData->$name)
+//	{
+//		$varNode->textContent = $distributionJobData->$name;
+//		$varNode->appendChild($xsl->createTextNode($distributionJobData->$name));
+//		KalturaLog::debug("Set variable [$name] to [{$distributionJobData->$name}]");
+//	}
+//}
+//
+//$proc = new XSLTProcessor;
+//$proc->registerPHPFunctions();
+//$proc->importStyleSheet($xsl);
+//
+//$xml = $proc->transformToDoc($xml);
+//if(!$xml)
+//{
+//	KalturaLog::err("Transform returned false");
+//	exit;
+//}
+//
+//$xml = $xml->saveXML();
+//
+//file_put_contents('out.xml', $xml);
+//KalturaLog::debug("XML [$xml]");
