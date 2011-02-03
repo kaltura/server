@@ -138,6 +138,26 @@ class rawAction extends sfAction
 			}
 			kFile::dumpFile($file_sync->getFullPath());
 		}
+		elseif ($entry->getType() == entryType::DATA)
+		{
+			$version = $this->getRequestParameter("version");
+			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version);
+			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+			if($local)
+				$path = $fileSync->getFullPath();
+			else
+			{
+				$path = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+				KalturaLog::info("Redirecting to [$path]");
+			}
+			if (!$path)
+			{
+				header('KalturaRaw: no data was found available for download');
+				header("HTTP/1.0 404 Not Found");
+			}
+			else
+				kFile::dumpFile($path);
+		}
 		
 		//$archive_file = $entry->getArchiveFile();
 		$media_type =  $entry->getMediaType();
