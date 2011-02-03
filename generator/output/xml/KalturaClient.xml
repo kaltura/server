@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1296562478">
-  <!-- Generated on date 01/02/11 12:14:38 -->
+<xml apiVersion="3.1.1" generatedDate="1296727067">
+  <!-- Generated on date 03/02/11 11:57:47 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -104,7 +104,6 @@
       <const name="MEDIA_INFO" value="mediaInfo"/>
       <const name="MODERATION" value="moderation"/>
       <const name="PARTNER" value="Partner"/>
-      <const name="PUSER_KUSER" value="PuserKuser"/>
       <const name="ROUGHCUT" value="roughcutEntry"/>
       <const name="SYNDICATION" value="syndicationFeed"/>
       <const name="UI_CONF" value="uiConf"/>
@@ -389,9 +388,10 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
+      <const name="HULU" value="huluDistribution.HULU"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -2148,8 +2148,8 @@
       <property name="notificationUrl" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="appearInSearch" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="adminName" type="string" readOnly="0" insertOnly="1" description=""/>
-      <property name="adminEmail" type="string" readOnly="0" insertOnly="1" description=""/>
+      <property name="adminName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="adminEmail" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="commercialUse" type="int" enumType="KalturaCommercialUseType" readOnly="0" insertOnly="0" description=""/>
       <property name="landingPage" type="string" readOnly="0" insertOnly="0" description=""/>

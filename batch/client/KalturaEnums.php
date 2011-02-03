@@ -387,9 +387,10 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
+	const HULU = "huluDistribution.HULU";
+	const VERIZON = "verizonDistribution.VERIZON";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
-	const VERIZON = "verizonDistribution.VERIZON";
 }
 
 class KalturaDurationType

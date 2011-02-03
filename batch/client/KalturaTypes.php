@@ -2510,6 +2510,13 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 	 *
 	 * @var string
 	 */
+	public $thumbAssetFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $sftpDirectory = null;
 
 	/**
@@ -5180,7 +5187,6 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
-	 * @insertonly
 	 */
 	public $adminName = null;
 
@@ -5188,7 +5194,6 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
-	 * @insertonly
 	 */
 	public $adminEmail = null;
 
