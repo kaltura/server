@@ -202,6 +202,7 @@ class kConf extends kConfLocal
 					'uploadjpegaction',
 					'getentryaction',
 					'getkshowaction',
+					'registerpartneraction',
 				),
 			)
 		);
