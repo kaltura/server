@@ -282,6 +282,38 @@ class playManifestAction extends kalturaAction
 		return $this->protocol . '://' . $url;
 	}
 	
+	private function serveUrl()
+	{
+		if($this->entry->getType() != entryType::MEDIA_CLIP)
+			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+
+		switch($this->entry->getType())
+		{
+			case entryType::MEDIA_CLIP:
+				switch($this->entry->getMediaType())
+				{					
+					case entry::ENTRY_MEDIA_TYPE_IMAGE:
+						// TODO - create sequence manifest
+						break;
+						
+					case entry::ENTRY_MEDIA_TYPE_VIDEO:
+					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
+						$flavors = $this->buildFlavorsArray($duration, true);
+						
+						if (count($flavors))
+						{
+							header('location:'.$flavors[0]['url']);
+							die;
+						}
+				}
+				
+			default:
+				break;
+		}
+		
+		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+	}
+	
 	private function serveHttp()
 	{
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
@@ -700,7 +732,11 @@ class playManifestAction extends kalturaAction
 				$xml = $this->serveAppleHttp();
 				break;
 				
-				case "hdnetworksmil":
+			case "url":
+				return $this->serveUrl();
+				break;
+				
+			case "hdnetworksmil":
 				$xml = $this->serveHDNetwork();
 				break;
 				
