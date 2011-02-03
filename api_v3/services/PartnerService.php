@@ -114,7 +114,6 @@ class PartnerService extends KalturaBaseService
 			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
 		
 		try {
-			$partner->id = $this->getPartnerId();
 			$partnerUpdate = new Partner();
 			$partnerUpdate = $partner->toUpdatableObject($partnerUpdate);
 			$partnerUpdate->setId($dbPartner->getId());
