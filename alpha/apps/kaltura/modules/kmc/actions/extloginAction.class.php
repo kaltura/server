@@ -36,6 +36,10 @@ class extloginAction extends kalturaAction
 		$ksObj = kSessionUtils::crackKs($ks);
 		$ksPartnerId = $ksObj->partner_id;
 		
+		if (!$requestedPartnerId) {
+			$requestedPartnerId = $ksPartnerId; 
+		}
+		
 		try {
 			$adminKuser = UserLoginDataPeer::userLoginByKs($ks, $requestedPartnerId, true);
 		}
