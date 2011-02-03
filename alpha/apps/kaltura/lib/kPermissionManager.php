@@ -519,7 +519,7 @@ class kPermissionManager
 		// init current kuser
 		if (self::$ksUserId) { // will never be null because ks::uid is never null
 			kuserPeer::setUseCriteriaFilter(false);
-			self::$kuser = kuserPeer::getKuserByPartnerAndUid(self::$ksPartnerId, self::$ksUserId);
+			self::$kuser = kuserPeer::getKuserByPartnerAndUid(self::$ksPartnerId, self::$ksUserId, true);
 			kuserPeer::setUseCriteriaFilter(true);
 			if (!self::$kuser)
 			{
@@ -647,8 +647,8 @@ class kPermissionManager
 	{
 		self::errorIfNotInitialized();
 		
-		$service = strtolower($service); //TODO: save service with normal case ?
-		$action = strtolower($action); //TODO: save actions with normal case ?	
+		$service = strtolower($service);
+		$action = strtolower($action);	
 		$partnerAccessPermitted = self::isPartnerAccessAllowed($service, $action);
 		$servicePermitted  = $partnerAccessPermitted && isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
 		$actionPermitted   = $servicePermitted && isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$action]);
