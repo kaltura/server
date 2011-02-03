@@ -95,9 +95,10 @@
 		</tbody>
 	</table>
 	<div id="buttons">
-		<?php $disabled = Kaltura_AclHelper::isAllowed('batch', 'failed-retry-delete') ? '' : 'disabled="disabled"'; ?>
-		<button <?php echo $disabled; ?> name="retry" onclick="doAction(this.name);"><span><?php echo $this->translate('jobs failed action retry'); ?></span></button>
-		<button <?php echo $disabled; ?> name="delete" onclick="doAction(this.name)"><span><?php echo $this->translate('jobs failed action delete'); ?></span></button>
+		<?php if (Kaltura_AclHelper::isAllowed('batch', 'failed-retry-delete')): ?>
+			<button name="retry" onclick="doAction(this.name);"><span><?php echo $this->translate('jobs failed action retry'); ?></span></button>
+			<button name="delete" onclick="doAction(this.name)"><span><?php echo $this->translate('jobs failed action delete'); ?></span></button>
+		<?php endif; ?>
 	</div>
 
 </div>
