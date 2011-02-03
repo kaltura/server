@@ -191,6 +191,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_TYPE_KMC_DASHBOARD => true,
 				self::UI_CONF_TYPE_KMC_LOGIN => true,
 				self::UI_CONF_TYPE_SLP => true,
+				self::UI_CONF_CLIENTSIDE_ENCODER => false,
+				self::UI_CONF_KMC_GENERAL => false,
+				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => true,
 			);
 		}		
 	}
