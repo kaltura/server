@@ -324,12 +324,22 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	}
 	
 	// user login by ks
-	public static function userLoginByKs($ks, $requestedPartnerId)
+	public static function userLoginByKs($ks, $requestedPartnerId, $useOwnerIfNoUser = false)
 	{
 		$ksObj = kSessionUtils::crackKs($ks);
 		
 		$ksUserId = $ksObj->user;
 		$ksPartnerId = $ksObj->partner_id;
+		
+		if (!$ksUserId && $useOwnerIfNoUser)
+		{
+			KalturaLog::log('No user id on KS, trying to login as the account owner');
+			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
+			if (!$partner) {
+				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
+			}
+			$ksUserId = $partner->getAccountOwnerKuserId();
+		}
 		
 		$kuser = kuserPeer::getKuserByPartnerAndUid($ksPartnerId, $ksUserId, true);
 		if (!$kuser)
