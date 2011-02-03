@@ -161,7 +161,7 @@ class playManifestAction extends kalturaAction
 					$durationSet = true;
 				}
 			}
-			
+
 			$flavors[] = array(
 				'url' => $this->getFlavorHttpUrl($flavorAsset),
 				'bitrate' => $flavorAsset->getBitrate(),
@@ -287,8 +287,8 @@ class playManifestAction extends kalturaAction
 		if($this->entry->getType() != entryType::MEDIA_CLIP)
 			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 
-		switch($this->entry->getType())
-		{
+			switch($this->entry->getType())
+			{
 			case entryType::MEDIA_CLIP:
 				switch($this->entry->getMediaType())
 				{					
@@ -298,13 +298,13 @@ class playManifestAction extends kalturaAction
 						
 					case entry::ENTRY_MEDIA_TYPE_VIDEO:
 					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
-						$flavors = $this->buildFlavorsArray($duration, true);
-						
-						if (count($flavors))
+						if($this->flavorId && ($flavorAsset = flavorAssetPeer::retrieveById($this->flavorId)) != null)
 						{
-							header('location:'.$flavors[0]['url']);
+							$url = $this->getFlavorHttpUrl($flavorAsset);
+							header("location:$url");
 							die;
 						}
+						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				}
 				
 			default:
