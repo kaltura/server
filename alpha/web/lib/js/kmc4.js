@@ -409,7 +409,7 @@ $(window).load(function(){
 			
 			$("#do_change_partner").click(function() {
 				var pid = $('input[name=pid]:radio:checked').val();
-				var url = '/index.php/kmc/extloginbyks?ks=' + kmc.vars.ks + '&partner_id=' + pid;
+				var url = '/index.php/kmc/extlogin?ks=' + kmc.vars.ks + '&partner_id=' + pid;
 				//kmc.log(url);
 				window.location.href = url;
 			});
