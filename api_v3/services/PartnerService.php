@@ -106,17 +106,14 @@ class PartnerService extends KalturaBaseService
 	 */	
 	function updateAction( KalturaPartner $partner, $allowEmpty = false)
 	{
-		// TODO: decide - why we need 2 different services for update ? ? ?
-
 		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
 		
 		if ( ! $dbPartner )
 			throw new KalturaAPIException ( APIErrors::UNKNOWN_PARTNER_ID , $this->getPartnerId() );
 		
 		try {
-			$partnerUpdate = new Partner();
-			$partnerUpdate = $partner->toUpdatableObject($partnerUpdate);
-			$partnerUpdate->setId($dbPartner->getId());
+			$dbPartner = $partner->toUpdatableObject($dbPartner);
+			$dbPartner->save();
 		}
 		catch(kUserException $e) {
 			if ($e->getCode() === kUserException::USER_NOT_FOUND) {
@@ -131,10 +128,7 @@ class PartnerService extends KalturaBaseService
 			throw $e;			
 		}		
 		
-		// TODO - what is the $allowEmpty policy  ?
-		baseObjectUtils::autoFillObjectFromObject ( $partnerUpdate , $dbPartner , $allowEmpty );
-		
-		$dbPartner->save();
+		$partner = new KalturaPartner();
 		$partner->fromPartner( $dbPartner );
 		
 		return $partner;
