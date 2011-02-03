@@ -140,7 +140,7 @@ baseentry.list						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTE
 baseentry.count						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE
 baseentry.get						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
 baseentry.getcontextdata			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE,KMC_READ_ONLY
-baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL,LIVE_STREAM_UPDATE
+baseentry.update					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL,LIVE_STREAM_UPDATE
 baseentry.upload					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 baseentry.getbyids					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
 baseentry.delete					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
@@ -399,5 +399,15 @@ userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
 permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_READ_ONLY
 permission.getcurrentpermissions    |			|0		|1	|0		|0		|1		|	|		|	|   |
+
+document.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+document.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |CONTENT_MANAGE_BASE
+document.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
+document.delete						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_DELETE
+document.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+document.upload						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
+document.convertppttoswf			|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_RECONVERT
+document.serve						|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
+document.servebyflavorparamsid		|			|0		|0	|0		|0		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
 
 ---------------------------------------------------------------------------------------------------
