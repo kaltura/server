@@ -8,9 +8,9 @@
  */
 class VirusScanProfileService extends KalturaBaseService
 {
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new VirusScanProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		myPartnerUtils::addPartnerToCriteria(new flavorAssetPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());

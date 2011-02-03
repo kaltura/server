@@ -7,15 +7,6 @@
  */
 class ReportService extends KalturaBaseService
 {
-	// use initService to add a peer to the partner filter
-	/**
-	 * @ignore
-	 */
-	public function initService($serviceName, $actionName)
-	{
-		parent::initService($serviceName, $actionName);
-	}
-
 	
 	/**
 	 * report getGraphs action allows to get a graph data for a specific report. 

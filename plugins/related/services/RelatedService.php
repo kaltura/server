@@ -19,7 +19,7 @@ class RelatedService extends KalturaBaseService
 	public function listRelatedMedieEntriesAction($entryId, KalturaRelatedScope $scope = null, KalturaFilterPager $pager = null)
 	{
 		$mediaService = new MediaService();
-		$mediaService->initService('media', 'get');
+		$mediaService->initService('media', 'media', 'get');
 		$entry = $mediaService->getAction($entryId);
 
 		if (!$scope)
@@ -37,7 +37,7 @@ class RelatedService extends KalturaBaseService
 		$mediaEntryFilter->advancedSearch = $this->getAdvancedSearch($entry, $scope);
 		
 		kCurrentContext::initKsPartnerUser($adminKs);
-		$mediaService->initService('media', 'list');
+		$mediaService->initService('media', 'media', 'list');
 		$response = $mediaService->listAction($mediaEntryFilter, $pager);
 		kCurrentContext::initKsPartnerUser($originalKs);
 
@@ -51,7 +51,7 @@ class RelatedService extends KalturaBaseService
 			throw new Exception('Partner not found when trying to start session');
 		
 		$sessionService = new SessionService();
-		$sessionService->initService('session', 'start');
+		$sessionService->initService('session', 'session', 'start');
 		return $sessionService->startAction($partner->getAdminSecret(), "", KalturaSessionType::ADMIN, $partnerId);
 	}
 	

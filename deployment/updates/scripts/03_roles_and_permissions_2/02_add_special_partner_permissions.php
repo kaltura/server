@@ -64,80 +64,106 @@ foreach ($serviceConfigFiles as $file)
 	}
 	
 	$serviceConfig = new KalturaServiceConfig($file, null, false, false);
-	$services = $serviceConfig->getServices();
+	$servicesTable = $serviceConfig->getAllServicesByCt();
 	
-	foreach ($services as $serviceActionName)
-	{
-		// get permission item object for the current service/action
-		$serviceConfig->setServiceName($serviceActionName);
-		$serviceSplit = explode('.', $serviceActionName);
-		$serviceName = $serviceSplit[0];
-		$actionName  = $serviceSplit[1];
-		$ticketTypes = explode(',', $serviceConfig->getTicketType());		
-		
-		// skip action if set with ticket type N (blocked)
-		if (in_array(BLOCKED_TICKET_TYPE, $ticketTypes))
+	// for each defined service.action
+	foreach ($servicesTable as $ctPath => $services)
+	{	
+		foreach ($services as $serviceActionName)
 		{
-			$msg = '***** NOTICE - Action ['.$serviceActionName.'] is set with ticket type N (blocked) -> skipping!';
-			KalturaLog::notice($msg);
-			echo $msg.PHP_EOL;
-			continue;
-		}	
-		
-		$c = new Criteria();
-		$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceName);
-		$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName);
-		$permissionItem = PermissionItemPeer::doSelectOne($c);
-		
-		if (!$permissionItem)
-		{
-			$msg = '***** ERROR - Permission item for service ['.$serviceName.'] action ['.$actionName.'] not found in DB!';
-			KalturaLog::alert($msg);
-			echo $msg.PHP_EOL;
-			continue;
-		}
-		
-		// check if a special ticket type was set for the action which is different from the basic system ticket types
-
-		if (in_array(USER_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $userSessionPermissionItemIds))
-		{
-			// ticket type 1 set - add a special user KS permission to all relevant partners and add current permission item to it
-			foreach ($partners as $partner)
-			{
-				$userKsRole = getOrCreateUserSessionRole($partner->getId());				
-				$userKsPermission = getOrCreateSessionPermission($partner->getId(), 'user');
-				$userKsPermission->addPermissionItem($permissionItem->getId(), true);
-				$userKsRole->setPermissionNames(PermissionName::USER_SESSION_PERMISSION.','.$userKsPermission->getName());
-				$partner->setUserSessionRoleId($userKsRole->getId());
-				$partner->save();
+			// get permission item object for the current service/action
+			$serviceConfig->setServiceName($serviceActionName);
+			$serviceSplit = explode('.', $serviceActionName);
+			$serviceName = $serviceSplit[0];
+			$actionName  = $serviceSplit[1];
+			$ticketTypes = explode(',', $serviceConfig->getTicketType());		
+			
+			$serviceId = $serviceName;
+			$pluginName = getPluginNameFromServicesCtPath($ctPath);
+			if ($pluginName) {
+				$serviceId = strtolower($pluginName).'_'.$serviceId;
 			}
-		}
-		
-		if (in_array(NO_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $noKsPermissionItemIds))
-		{
-			// ticket type 0 set - add a special no KS permission to all relevant partners and add current permission item to it
-			foreach ($partners as $partner)
-			{
-				$noKsPermission = getOrCreateSessionPermission($partner->getId(), 'no');
-				$noKsPermission->addPermissionItem($permissionItem->getId(), true);
-				$currentPerms = $partner->getAlwaysAllowedPermissionNames();
-				$currentPerms = explode(',', $currentPerms);
-				$currentPerms[] = $noKsPermission->getName();
-				$currentPerms = implode(',', $currentPerms);
-				$partner->setAlwaysAllowedPermissionNames($currentPerms);
-				$partner->save();
+			
+			$serviceClass = KalturaServicesMap::getService($serviceId);
+			if (!$serviceClass) {
+				$tmpServiceIds = KalturaServicesMap::getServiceIdsFromName($serviceName);
+				if ($tmpServiceIds && count($tmpServiceIds) == 1)
+				{
+					$serviceId = reset($tmpServiceIds);
+					$serviceClass = KalturaServicesMap::getService($serviceId);
+				}
 			}
-		}
-		
-		// check if partner group is set for the action
-		$partnerGroup = $serviceConfig->getPartnerGroup();
-		if ($partnerGroup)
-		{
-			// partner group is set - add a special partner group permission to all relevant partners and add current permission item to it
-			foreach ($partners as $partner)
+			if (!$serviceClass) {
+				$msg = '***** ERROR - service id ['.$serviceId.'] not found in services map!';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
+				continue;
+			}
+			
+			// skip action if set with ticket type N (blocked)
+			if (in_array(BLOCKED_TICKET_TYPE, $ticketTypes))
 			{
-				$partnerGroupPermission = getOrCreatePartnerGroupPermission($partner->getId(), $partnerGroup);
-				$partnerGroupPermission->addPermissionItem($permissionItem->getId(), true);				
+				$msg = '***** NOTICE - Action ['.$serviceActionName.'] is set with ticket type N (blocked) -> skipping!';
+				KalturaLog::notice($msg);
+				echo $msg.PHP_EOL;
+				continue;
+			}	
+			
+			$c = new Criteria();
+			$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceId);
+			$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName);
+			$permissionItem = PermissionItemPeer::doSelectOne($c);
+			
+			if (!$permissionItem)
+			{
+				$msg = '***** ERROR - Permission item for service ['.$serviceId.'] action ['.$actionName.'] not found in DB!';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
+				continue;
+			}
+			
+			// check if a special ticket type was set for the action which is different from the basic system ticket types
+	
+			if (in_array(USER_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $userSessionPermissionItemIds))
+			{
+				// ticket type 1 set - add a special user KS permission to all relevant partners and add current permission item to it
+				foreach ($partners as $partner)
+				{
+					$userKsRole = getOrCreateUserSessionRole($partner->getId());				
+					$userKsPermission = getOrCreateSessionPermission($partner->getId(), 'user');
+					$userKsPermission->addPermissionItem($permissionItem->getId(), true);
+					$userKsRole->setPermissionNames(PermissionName::USER_SESSION_PERMISSION.','.$userKsPermission->getName());
+					$partner->setUserSessionRoleId($userKsRole->getId());
+					$partner->save();
+				}
+			}
+			
+			if (in_array(NO_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $noKsPermissionItemIds))
+			{
+				// ticket type 0 set - add a special no KS permission to all relevant partners and add current permission item to it
+				foreach ($partners as $partner)
+				{
+					$noKsPermission = getOrCreateSessionPermission($partner->getId(), 'no');
+					$noKsPermission->addPermissionItem($permissionItem->getId(), true);
+					$currentPerms = $partner->getAlwaysAllowedPermissionNames();
+					$currentPerms = explode(',', $currentPerms);
+					$currentPerms[] = $noKsPermission->getName();
+					$currentPerms = implode(',', $currentPerms);
+					$partner->setAlwaysAllowedPermissionNames($currentPerms);
+					$partner->save();
+				}
+			}
+			
+			// check if partner group is set for the action
+			$partnerGroup = $serviceConfig->getPartnerGroup();
+			if ($partnerGroup)
+			{
+				// partner group is set - add a special partner group permission to all relevant partners and add current permission item to it
+				foreach ($partners as $partner)
+				{
+					$partnerGroupPermission = getOrCreatePartnerGroupPermission($partner->getId(), $partnerGroup);
+					$partnerGroupPermission->addPermissionItem($permissionItem->getId(), true);				
+				}
 			}
 		}
 	}
@@ -271,4 +297,22 @@ function resetServiceConfig()
 	myServiceConfig::$path = null;
 	myServiceConfig::$strict_mode = null;
 	myServiceConfig::$default_config_table = null;
+}
+
+
+function getPluginNameFromServicesCtPath($ctPath)
+{
+	$pluginClasses = KalturaPluginManager::getPlugins();
+	foreach ($pluginClasses as $pluginClass)
+	{
+		$ct_callback = array ( $pluginClass ,"getServiceConfig"  );
+		if (!is_callable($ct_callback)) {
+			continue;
+		}
+		$pluginCtPath = call_user_func($ct_callback);
+		if (realpath($pluginCtPath) === realpath($ctPath)) {
+			return call_user_func(array($pluginClass, 'getPluginName'));
+		}
+	}
+	return null;
 }

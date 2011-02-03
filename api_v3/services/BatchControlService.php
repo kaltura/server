@@ -22,9 +22,9 @@ class BatchControlService extends KalturaBaseService
 	/**
 	 * @ignore
 	 */
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 //		parent::applyPartnerFilterForClass ( new BatchJobPeer() ); 	
 //		parent::applyPartnerFilterForClass ( new notificationPeer() );
 	}

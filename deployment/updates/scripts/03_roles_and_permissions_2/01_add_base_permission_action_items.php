@@ -57,100 +57,143 @@ KalturaLog::notice($msg);
 echo $msg.PHP_EOL;
 
 
+function getPluginNameFromServicesCtPath($ctPath)
+{
+	$pluginClasses = KalturaPluginManager::getPlugins();
+	foreach ($pluginClasses as $pluginClass)
+	{
+		$ct_callback = array ( $pluginClass ,"getServiceConfig"  );
+		if (!is_callable($ct_callback)) {
+			continue;
+		}
+		$pluginCtPath = call_user_func($ct_callback);
+		if (realpath($pluginCtPath) === realpath($ctPath)) {
+			return call_user_func(array($pluginClass, 'getPluginName'));
+		}
+	}
+	return null;
+}
+
+
 function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionPermission, $noKsPermission)
 {
 	// get list of services defined in the services.ct files
-	$services = $serviceConfig->getAllServices();
+	$servicesTable = $serviceConfig->getAllServicesByCt();
 	
 	// for each defined service.action
-	foreach ($services as $serviceActionName)
+	foreach ($servicesTable as $ctPath => $services)
 	{
-		$serviceConfig->setServiceName($serviceActionName);
-		$serviceSplit = explode('.', $serviceActionName);
-		$serviceName = $serviceSplit[0];
-		$actionName  = $serviceSplit[1];
-		$ticketTypes = explode(',', $serviceConfig->getTicketType());
+		foreach ($services as $serviceActionName)
+		{
+			$serviceConfig->setServiceName($serviceActionName);
+			$serviceSplit = explode('.', $serviceActionName);
+			$serviceName = $serviceSplit[0];
+			$actionName  = $serviceSplit[1];
+			$ticketTypes = explode(',', $serviceConfig->getTicketType());
 	
-		// skip action if set with ticket type N (blocked)
-		if (in_array(BLOCKED_TICKET_TYPE, $ticketTypes))
-		{
-			$msg = '***** NOTICE - Action ['.$serviceActionName.'] is set with ticket type N (blocked) -> skipping!';
-			KalturaLog::notice($msg);
-			echo $msg.PHP_EOL;
-			continue;
-		}	
-		
-		// check if a permission item for the current action already exists
-		$c = new Criteria();
-		$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceName, Criteria::EQUAL);
-		$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName, Criteria::EQUAL);
-		$permissionItem = PermissionItemPeer::doSelectOne($c);
-		if ($permissionItem) {
-			$msg = '***** NOTICE - Permission item for ['.$serviceActionName.'] already exists with id ['.$permissionItem->getId().']';
-			KalturaLog::alert($msg);
-			echo $msg.PHP_EOL;
-		}
-		else {
-			// create a new api action permission item and save it
-			$permissionItem = new kApiActionPermissionItem();
-			$permissionItem->setService($serviceName);
-			$permissionItem->setAction($actionName);
-			$permissionItem->save();
-		}		
-		
-		// get the defined permission names from the tags section of the services.ct file
-		$permissionNames = $serviceConfig->getTags();
-		$permissionNames = explode(',', $permissionNames);
-		
-		$anyPermissionSet = false; // was any permission set to include the current permission item or not
-		foreach ($permissionNames as $permissionName)
-		{
-			if (!$permissionName) {
-				continue;
+			$serviceId = $serviceName;
+			$pluginName = getPluginNameFromServicesCtPath($ctPath);
+			if ($pluginName) {
+				$serviceId = strtolower($pluginName).'_'.$serviceId;
 			}
 			
-			// add the permission item to all its defined permission objects
-			$c = new Criteria();
-			$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-			$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
-			$permission = PermissionPeer::doSelectOne($c);
-			
-			if (!$permission) {
-				$msg = '***** ERROR - Permission ['.$permissionName.'] not found in DB although set for ['.$serviceActionName.']';
+			$serviceClass = KalturaServicesMap::getService($serviceId);
+			if (!$serviceClass) {
+				$tmpServiceIds = KalturaServicesMap::getServiceIdsFromName($serviceName);
+				if ($tmpServiceIds && count($tmpServiceIds) == 1)
+				{
+					$serviceId = reset($tmpServiceIds);
+					$serviceClass = KalturaServicesMap::getService($serviceId);
+				}
+			}
+			if (!$serviceClass) {
+				$msg = '***** ERROR - service id ['.$serviceId.'] not found in services map!';
 				KalturaLog::alert($msg);
 				echo $msg.PHP_EOL;
 				continue;
 			}
 			
-			$permission->addPermissionItem($permissionItem->getId(), true);
-			$anyPermissionSet = true;
-		}
-		
-	
-		// add permission item to the basic NO_KS and USER_KS permissions according to its ticket type
-		// (partner admin role already contains all other permissions)
-	
-		if ($setBaseSystemPermissions)
-		{
-			if (in_array(NO_KS_TICKET_TYPE, $ticketTypes))
+			// skip action if set with ticket type N (blocked)
+			if (in_array(BLOCKED_TICKET_TYPE, $ticketTypes))
 			{
-				$noKsPermission->addPermissionItem($permissionItem->getId(), true);
-				$userSessionPermission->addPermissionItem($permissionItem->getId(), true);
+				$msg = '***** NOTICE - Action ['.$serviceActionName.'] is set with ticket type N (blocked) -> skipping!';
+				KalturaLog::notice($msg);
+				echo $msg.PHP_EOL;
+				continue;
+			}	
+			
+			// check if a permission item for the current action already exists
+			$c = new Criteria();
+			$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceId, Criteria::EQUAL);
+			$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName, Criteria::EQUAL);
+			$permissionItem = PermissionItemPeer::doSelectOne($c);
+			if ($permissionItem) {
+				$msg = '***** NOTICE - Permission item for ['.$serviceActionName.'] already exists with id ['.$permissionItem->getId().']';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
+			}
+			else {
+				// create a new api action permission item and save it
+				$permissionItem = new kApiActionPermissionItem();
+				$permissionItem->setService($serviceId);
+				$permissionItem->setAction($actionName);
+				$permissionItem->save();
+			}		
+			
+			// get the defined permission names from the tags section of the services.ct file
+			$permissionNames = $serviceConfig->getTags();
+			$permissionNames = explode(',', $permissionNames);
+			
+			$anyPermissionSet = false; // was any permission set to include the current permission item or not
+			foreach ($permissionNames as $permissionName)
+			{
+				if (!$permissionName) {
+					continue;
+				}
+				
+				// add the permission item to all its defined permission objects
+				$c = new Criteria();
+				$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
+				$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+				$permission = PermissionPeer::doSelectOne($c);
+				
+				if (!$permission) {
+					$msg = '***** ERROR - Permission ['.$permissionName.'] not found in DB although set for ['.$serviceActionName.']';
+					KalturaLog::alert($msg);
+					echo $msg.PHP_EOL;
+					continue;
+				}
+				
+				$permission->addPermissionItem($permissionItem->getId(), true);
 				$anyPermissionSet = true;
 			}
-			else if (in_array(USER_KS_TICKET_TYPE, $ticketTypes))
+			
+		
+			// add permission item to the basic NO_KS and USER_KS permissions according to its ticket type
+			// (partner admin role already contains all other permissions)
+		
+			if ($setBaseSystemPermissions)
 			{
-				$userSessionPermission->addPermissionItem($permissionItem->getId(), true);
-				$anyPermissionSet = true;
+				if (in_array(NO_KS_TICKET_TYPE, $ticketTypes))
+				{
+					$noKsPermission->addPermissionItem($permissionItem->getId(), true);
+					$userSessionPermission->addPermissionItem($permissionItem->getId(), true);
+					$anyPermissionSet = true;
+				}
+				else if (in_array(USER_KS_TICKET_TYPE, $ticketTypes))
+				{
+					$userSessionPermission->addPermissionItem($permissionItem->getId(), true);
+					$anyPermissionSet = true;
+				}
+			}
+			
+			if (!$anyPermissionSet) {
+				$msg = '***** ERROR - No permission was set for ['.$serviceActionName.']';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
 			}
 		}
-		
-		if (!$anyPermissionSet) {
-			$msg = '***** ERROR - No permission was set for ['.$serviceActionName.']';
-			KalturaLog::alert($msg);
-			echo $msg.PHP_EOL;
-		}
-	}	
+	}
 }
 
 

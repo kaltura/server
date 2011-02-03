@@ -175,12 +175,12 @@ class myServiceConfig
 		return self::$default_config_table->listPks();	
 	}
 	
-	public function getAllServices ( )
+	public function getAllServicesByCt ( )
 	{
 		$services = array();	
 		foreach ($this->all_config_tables as $cur)
 		{
-			$services = array_merge($services, $cur->listPks());
+			$services[$cur->getId()] = $cur->listPks();
 		}
 		return $services;
 	}

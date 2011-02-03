@@ -251,4 +251,6 @@ class KalturaErrors extends APIErrors
 	
 	const USER_NOT_ADMIN = "USER_NOT_ADMIN,User [%s] is not admin";
 	
+	const ROLE_NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS,A role with the same name already exists";
+	
 }

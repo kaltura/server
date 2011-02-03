@@ -18,15 +18,7 @@
  */
 class BatchService extends KalturaBaseService 
 {
-	// use initService to add a peer to the partner filter
-	/**
-	 * @ignore
-	 */
-	public function initService($serviceName, $actionName)
-	{
-		parent::initService($serviceName, $actionName);
-	}
-	
+
 	
 // --------------------------------- ImportJob functions 	--------------------------------- //
 	

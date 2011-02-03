@@ -31,6 +31,8 @@ abstract class KalturaBaseService
 	
 	protected $impersonatedPartnerId = null;
 	
+	protected $serviceId = null;
+	
 	protected $serviceName = null;
 	
 	protected $actionName = null;
@@ -53,7 +55,7 @@ abstract class KalturaBaseService
 	
 	/**
 	 * Should return true or false for allowing/disallowing kaltura network filter for the given action.
-	 * Can be extended to to partner specific checks etc...
+	 * Can be extended to partner specific checks etc...
 	 * @return true if "kaltura network" is enabled for the given action or false otherwise
 	 * @param string $actionName action name
 	 */
@@ -62,19 +64,30 @@ abstract class KalturaBaseService
 		return false;
 	}
 	
+	/**
+	 * Should return 'false' if no partner is required for that action, to make it usable with no KS or partner_id variable.
+	 * Return 'true' otherwise (most actions).
+	 * @param string $actionName
+	 */
 	protected function partnerRequired($actionName)
 	{
 		return true;
 	}
 	
+	/**
+	 * Should return 'true' if global partner (partner 0) should be added to the partner group filter for the given action, or 'false' otherwise.
+	 * Enter description here ...
+	 * @param string $actionName action name
+	 */
 	protected function globalPartnerAllowed($actionName)
 	{
 		return false;
 	} 
 		
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{	
 		// init service and action name
+		$this->serviceId = $serviceId;
 		$this->serviceName = $serviceName;
 		$this->actionName  = $actionName;
 		
@@ -94,12 +107,12 @@ abstract class KalturaBaseService
 		
 		// action not permitted at all, not even kaltura network
 		if (!$actionPermitted) {
-			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
+			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
 		}
 		
 		// init partner filter parameters
 		$this->private_partner_data = $allowPrivatePartnerData;
-		$this->partnerGroup = kPermissionManager::getPartnerGroup($this->serviceName, $this->actionName);
+		$this->partnerGroup = kPermissionManager::getPartnerGroup($this->serviceId, $this->actionName);
 		if ($this->globalPartnerAllowed($this->actionName)) {
 			$this->partnerGroup = PartnerPeer::GLOBAL_PARTNER.','.trim($this->partnerGroup,',');
 		}
@@ -125,7 +138,7 @@ abstract class KalturaBaseService
 		}
 		
 		// check if actions is permitted for current context
-		$isActionPermitted = kPermissionManager::isActionPermitted($this->serviceName, $this->actionName);
+		$isActionPermitted = kPermissionManager::isActionPermitted($this->serviceId, $this->actionName);
 		
 		// if action permitted - no problem to access action and the private partner data
 		if ($isActionPermitted) {

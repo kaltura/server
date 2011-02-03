@@ -8,9 +8,9 @@
  */
 class StorageProfileService extends KalturaBaseService
 {
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 
 		// since plugin might be using KS impersonation, we need to validate the requesting
 		// partnerId from the KS and not with the $_POST one

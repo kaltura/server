@@ -8,11 +8,6 @@
  */
 class PermissionItemService extends KalturaBaseService
 {
-	public function initService($serviceName, $actionName)
-	{
-		parent::initService($serviceName, $actionName);
-	}	
-
 	
 	/**
 	 * Allows you to add a new KalturaPermissionItem object

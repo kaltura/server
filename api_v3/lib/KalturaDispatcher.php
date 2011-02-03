@@ -111,7 +111,7 @@ class KalturaDispatcher
 		kPermissionManager::init(kConf::get('enable_cache'));
 				
 		// initialize the service before invoking the action on it
-		$serviceInstance->initService ($reflector->getServiceName(), $action);
+		$serviceInstance->initService ($reflector->getServiceId(), $reflector->getServiceName(), $action);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");

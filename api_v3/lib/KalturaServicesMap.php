@@ -41,6 +41,20 @@ class KalturaServicesMap
 		return null;
 	}
 	
+	static function getServiceIdsFromName($serviceName)
+	{
+		$serviceIds = array();
+		$allServices = self::getMap();
+		foreach ($allServices as $currentServiceId => $currentService)
+		{
+			$currentServiceName = end(explode('_', $currentServiceId));
+			if (strtolower($currentServiceName) === strtolower($serviceName)) {
+				$serviceIds[] = $currentServiceId;
+			}
+		}
+		return $serviceIds;
+	}
+	
 	static function cacheMap($servicePath, $cacheFilePath)
 	{
 		if (!is_dir($servicePath))

@@ -9,9 +9,9 @@
  */
 class AnnotationService extends KalturaBaseService
 {	
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 		myPartnerUtils::addPartnerToCriteria ( new AnnotationPeer() , $this->getPartnerId() , $this->private_partner_data , $this->partnerGroup() , $this->kalturaNetworkAllowed($action) );
 
 		// when session is not admin, allow access to user entries only

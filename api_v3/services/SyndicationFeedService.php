@@ -9,9 +9,9 @@
 class SyndicationFeedService extends KalturaBaseService 
 {
 	
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
 		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
 		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());

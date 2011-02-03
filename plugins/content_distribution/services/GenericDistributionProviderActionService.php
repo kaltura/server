@@ -8,9 +8,9 @@
  */
 class GenericDistributionProviderActionService extends KalturaBaseService
 {
-	public function initService($serviceName, $actionName)
+	public function initService($serviceId, $serviceName, $actionName)
 	{
-		parent::initService($serviceName, $actionName);
+		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new GenericDistributionProviderActionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
