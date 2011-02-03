@@ -254,24 +254,25 @@ class KalturaObject
 			
 			if ($this->$propertyName !== null)
 			{
+				// check if property value is being changed - if not, just continue to the next
+				$objectPropertyName = $this->getObjectPropertyName($propertyName);
+				$getter_callback = array ( $source_object ,"get{$objectPropertyName}"  );
+				if (is_callable($getter_callback))
+            	{
+                	$value = call_user_func($getter_callback);
+                	if ($value === $this->$propertyName) {
+                		continue;
+                	}
+            	}
+				
 				if ($property->isReadOnly() || $property->isInsertOnly())
 				{
 					throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE, $this->getFormattedPropertyNameWithClassName($propertyName));
 				}
 				// property requires update permissions, verify that the current user has it
 				if ($property->requiresUpdatePermission())
-				{
-					$skip = false;
-					$objectPropertyName = $this->getObjectPropertyName($propertyName);
-					$getter_callback = array ( $source_object ,"get{$objectPropertyName}"  );
-					if (is_callable($getter_callback))
-            		{
-                		$value = call_user_func($getter_callback);
-                		if ($value === $this->$propertyName) {
-                			$skip = true;
-                		}
-            		}					
-					if (!skip && !kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
+				{				
+					if (!kPermissionManager::getUpdatePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
 						throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 					}
 				}
