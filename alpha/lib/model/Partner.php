@@ -775,6 +775,10 @@ class Partner extends BasePartner
 			return null;
 		}
 		$ownerKuser = kuserPeer::retrieveByPK($ownerKuserId);
+		if (!$ownerKuser) {
+			KalturaLog::err('Cannot find kuser with id ['.$ownerKuserId.'] set as account of partner id ['.$this->getId().']');
+			return null;
+		}
 		return $ownerKuser->getPuserId();
 	}
 	
