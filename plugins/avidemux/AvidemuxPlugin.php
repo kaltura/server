@@ -42,10 +42,10 @@ class AvidemuxPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(AvidemuxConversionEngineType::AVIDEMUX))
-			return 'KOperationEngineFastStart';
+			return 'KOperationEngineAvidemux';
 	
 		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(AvidemuxConversionEngineType::AVIDEMUX))
-			return 'KDLOperatorQTFastStart';
+			return 'KDLOperatorAvidemux';
 		
 		return null;
 	}
