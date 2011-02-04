@@ -253,6 +253,18 @@ class KAsyncConvert extends KBatchBase
 		return $operatorsSet->getOperator($data->currentOperationSet, $data->currentOperationIndex);
 	}
 	
+	private function rename_wrap($src, $trg)
+	{
+		$rv=0;
+		if(!rename($src, $trg)) {
+	//		echo "failed reanme\n";
+			$out_arr = array();
+			exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
+	//		echo "RV($rv)\n";
+		}
+		return $rv;
+	}
+	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
 		KalturaLog::debug("moveFile($job->id, $data->destFileSyncLocalPath)");
@@ -263,7 +275,7 @@ class KAsyncConvert extends KBatchBase
 		clearstatcache();
 		$fileSize = filesize($data->destFileSyncLocalPath);
 		@rename($data->destFileSyncLocalPath . '.log', "$sharedFile.log");
-		rename($data->destFileSyncLocalPath, $sharedFile); 
+		KAsyncConvert::rename_wrap($data->destFileSyncLocalPath, $sharedFile);
 		
 		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
 		{
