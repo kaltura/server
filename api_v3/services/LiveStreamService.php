@@ -189,15 +189,8 @@ class LiveStreamService extends KalturaEntryService
 		if (!$liveStreamEntry->name)
 			$liveStreamEntry->name = $this->getPartnerId().'_'.time();
 		
-		try
-		{
-			// first copy all the properties to the db entry, then we'll check for security stuff
-			$dbEntry = $liveStreamEntry->toObject(new entry());
-		}
-		catch(kCoreException $ex)
-		{
-			$this->handleCoreException($ex, $dbEntry);
-		}
+		// first copy all the properties to the db entry, then we'll check for security stuff
+		$dbEntry = $liveStreamEntry->toObject(new entry());
 
 		$this->checkAndSetValidUser($liveStreamEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($liveStreamEntry);

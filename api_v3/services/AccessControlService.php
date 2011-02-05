@@ -25,19 +25,9 @@ class AccessControlService extends KalturaBaseService
 		$accessControl->validatePropertyMinLength("name", 1);
 		$accessControl->partnerId = $this->getPartnerId();
 		
-		try
-		{
-			$dbAccessControl = new accessControl();
-			$accessControl->toObject($dbAccessControl);
-			$dbAccessControl->save();
-		}
-		catch(Exception $ex)
-		{
-			if ($ex instanceof kCoreException)
-				$this->handleCoreException($ex, $dbAccessControl, $accessControl);
-			else
-				throw $ex;
-		}
+		$dbAccessControl = new accessControl();
+		$accessControl->toObject($dbAccessControl);
+		$dbAccessControl->save();
 		
 		$accessControl = new KalturaAccessControl();
 		$accessControl->fromObject($dbAccessControl);
@@ -149,17 +139,5 @@ class AccessControlService extends KalturaBaseService
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
 		return $response;    
-	}
-	
-	private function handleCoreException(kCoreException $ex, accessControl $accessControlDb, KalturaAccessControl $accessControl)
-	{
-		switch($ex->getCode())
-		{
-			case kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED:
-				throw new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, Partner::MAX_ACCESS_CONTROLS);
-				
-			default:
-				throw $ex;
-		}
 	}
 }

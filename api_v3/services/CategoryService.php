@@ -169,12 +169,6 @@ class CategoryService extends KalturaBaseService
 			case kCoreException::DUPLICATE_CATEGORY:
 				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
 				
-			case kCoreException::MAX_CATEGORY_DEPTH_REACHED:
-				throw new KalturaAPIException(KalturaErrors::MAX_CATEGORY_DEPTH_REACHED, categoryPeer::MAX_CATEGORY_DEPTH);
-				
-			case kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED:
-				throw new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_CATEGORIES_REACHED, Partner::MAX_NUMBER_OF_CATEGORIES);
-				
 			case kCoreException::PARENT_ID_IS_CHILD:
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
 				

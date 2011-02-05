@@ -181,15 +181,8 @@ class EmailIngestionProfileService extends KalturaEntryService
 			if (!$mediaEntry->name)
 			$mediaEntry->name = $this->getPartnerId().'_'.time();
 	
-			try
-			{
-				// first copy all the properties to the db entry, then we'll check for security stuff
-				$dbEntry = $mediaEntry->toObject(new entry());
-			}
-			catch(kCoreException $ex)
-			{
-				$this->handleCoreException($ex, $dbEntry);
-			}
+			// first copy all the properties to the db entry, then we'll check for security stuff
+			$dbEntry = $mediaEntry->toObject(new entry());
 	
 			if($emailIP->moderationStatus == KalturaEntryModerationStatus::PENDING_MODERATION)
 			{

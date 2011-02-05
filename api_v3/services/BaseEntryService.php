@@ -72,15 +72,8 @@ class BaseEntryService extends KalturaEntryService
 	    if (!$entry->name)
 		    $entry->name = $this->getPartnerId().'_'.time();
 			
-	    try
-	    {
-		    // first copy all the properties to the db entry, then we'll check for security stuff
-		    $dbEntry = $entry->toInsertableObject(new entry());
-	    }
-	    catch(kCoreException $ex)
-	    {
-		    $this->handleCoreException($ex, $dbEntry);
-	    }
+	    // first copy all the properties to the db entry, then we'll check for security stuff
+	    $dbEntry = $entry->toInsertableObject(new entry());
 			
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);

@@ -12,15 +12,8 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$entry->name)
 			$entry->name = $this->getPartnerId().'_'.time();
 		
-		try
-		{
-			// first copy all the properties to the db entry, then we'll check for security stuff
-			$dbEntry = $entry->toInsertableObject(new entry());
-		}
-		catch(kCoreException $ex)
-		{
-			$this->handleCoreException($ex, $dbEntry);
-		}
+		// first copy all the properties to the db entry, then we'll check for security stuff
+		$dbEntry = $entry->toInsertableObject(new entry());
 
 		$this->checkAndSetValidUser($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
@@ -487,14 +480,7 @@ class KalturaEntryService extends KalturaBaseService
 		$this->validateAccessControlId($entry);
 		$this->validateEntryScheduleDates($entry);
 		
-		try
-		{
-			$dbEntry = $entry->toUpdatableObject($dbEntry);
-		}
-		catch(kCoreException $ex)
-		{
-			$this->handleCoreException($ex, $dbEntry);
-		}
+		$dbEntry = $entry->toUpdatableObject($dbEntry);
 		
 		$dbEntry->save();
 		$entry->fromObject($dbEntry);
@@ -814,17 +800,6 @@ class KalturaEntryService extends KalturaBaseService
 				
 			if ($filter->durationLessThanOrEqual !== null)
 				$filter->durationLessThanOrEqual = $filter->durationLessThanOrEqual * 1000;
-		}
-	}
-	
-	private function handleCoreException(kCoreException $ex, entry $entry)
-	{
-		switch($ex->getCode())
-		{
-			case kCoreException::MAX_CATEGORIES_PER_ENTRY:
-				throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
-			default:
-				throw $ex;
 		}
 	}
 }
