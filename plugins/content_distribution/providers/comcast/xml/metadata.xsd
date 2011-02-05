@@ -24,7 +24,7 @@
 						<xsd:documentation />
 						<xsd:appinfo>
 							<label>Long Title</label>
-							<key>longTitle</key>
+							<key>LongTitle</key>
 							<searchable>true</searchable>
 							<description />
 						</xsd:appinfo>
@@ -40,7 +40,7 @@
 						<xsd:documentation />
 						<xsd:appinfo>
 							<label>Short Description</label>
-							<key>shortDescription</key>
+							<key>ShortDescription</key>
 							<searchable>true</searchable>
 							<description />
 						</xsd:appinfo>
@@ -56,7 +56,7 @@
 						<xsd:documentation />
 						<xsd:appinfo>
 							<label>Comcast Category</label>
-							<key>comcastCategory</key>
+							<key>ComcastCategory</key>
 							<searchable>true</searchable>
 							<description />
 						</xsd:appinfo>
@@ -83,7 +83,7 @@
 						<xsd:documentation />
 						<xsd:appinfo>
 							<label>Comcast Rating</label>
-							<key>comcastRating</key>
+							<key>ComcastRating</key>
 							<searchable>true</searchable>
 							<description />
 						</xsd:appinfo>
