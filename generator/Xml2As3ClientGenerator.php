@@ -484,7 +484,6 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "		// Event Handlers\n";
 				$str .= "		override protected function onDataComplete(event:Event):void {\n";
 				$str .= "			try{\n";
-			
 				$str .= "				if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
 				$str .= "					handleResult( XML(event[\"data\"]) );\n";
 				$str .= "				}\n";
