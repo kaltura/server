@@ -6,7 +6,7 @@ SELECT
 	COUNT(IF(entry_media_type_id = 6, 1,NULL)) count_mix,
 	COUNT(IF(is_admin_content = 0, 1,NULL)) count_ugc,
 	COUNT(IF(is_admin_content = 1, 1,NULL)) count_admin
-FROM dwh_dim_entries
+FROM dwh_dim_entries ev
 WHERE
 {OBJ_ID_CLAUSE}
 AND entry_media_type_id IN (1,2,5,6)
