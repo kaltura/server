@@ -16,8 +16,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				return self::onEntryChanged($object, $modifiedColumns);
 		}
 		
-		if($object instanceof asset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-			return self::onAssetReady($object);
+		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+		{
+			if(in_array(assetPeer::STATUS, $modifiedColumns))
+				return self::onAssetReady($object);
+				
+			if(in_array(assetPeer::VERSION, $modifiedColumns))
+				return self::onAssetVersionChanged($object);
+		}
 		
 		if($object instanceof EntryDistribution)
 			return self::onEntryDistributionChanged($object, $modifiedColumns);
@@ -720,14 +726,24 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	
 	/**
 	 * @param EntryDistribution $entryDistribution
-	 * @param array $modifiedColumns
 	 */
-	public static function onEntryDistributionChanged(EntryDistribution $entryDistribution, array $modifiedColumns)
+	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
-		if(!in_array(EntryDistributionPeer::SUNRISE, $modifiedColumns) && !in_array(EntryDistributionPeer::SUNSET, $modifiedColumns))
+		KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] of entry [" . $entryDistribution->getEntryId() . "] changed");
+		
+		$ignoreStatuses = array(
+			EntryDistributionStatus::PENDING,
+			EntryDistributionStatus::DELETED,
+			EntryDistributionStatus::DELETING,
+			EntryDistributionStatus::QUEUED,
+			EntryDistributionStatus::REMOVED,
+		);
+		
+		if(in_array($entryDistribution->getStatus(), $ignoreStatuses))
+		{			
+			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] does not require update");
 			return true;
-			
-		KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] of entry [" . $entryDistribution->getEntryId() . "] schedule changed");
+		}
 		
 		if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 		{			
@@ -752,6 +768,26 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+		return true;
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param array $modifiedColumns
+	 */
+	public static function onEntryDistributionChanged(EntryDistribution $entryDistribution, array $modifiedColumns)
+	{
+		$updateRequiredFields = array(
+			EntryDistributionPeer::SUNRISE,
+			EntryDistributionPeer::SUNSET,
+			EntryDistributionPeer::FLAVOR_ASSET_IDS,
+			EntryDistributionPeer::THUMB_ASSET_IDS,
+		);
+		
+		foreach($updateRequiredFields as $updateRequiredField)
+			if(in_array($updateRequiredField, $modifiedColumns))
+				return self::onEntryDistributionUpdateRequired($entryDistribution);
+				
 		return true;
 	}
 	
@@ -889,6 +925,26 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 
+	/**
+	 * @param asset $asset
+	 */
+	public static function onAssetVersionChanged(asset $asset)
+	{
+		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
+			return true;
+			
+		$entry = $asset->getentry();
+		if(!$entry)
+			return true;
+			
+		KalturaLog::debug("Asset [" . $asset->getId() . "] of entry [" . $asset->getEntryId() . "] version changed");
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
+		foreach($entryDistributions as $entryDistribution)
+			self::onEntryDistributionUpdateRequired($entryDistribution);
+		
+		return true;
+	}
+	
 	/**
 	 * @param asset $asset
 	 */
