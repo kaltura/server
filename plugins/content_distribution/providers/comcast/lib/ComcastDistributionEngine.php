@@ -181,7 +181,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
 				$mediaFile->length = $entry->duration;
 				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-				$mediaFile->originalLocation = $url;
+				$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}";
 				$mediaFile->height = $flavorAsset->width;
 				$mediaFile->width = $flavorAsset->height;
 				$mediaFiles[] = $mediaFile;
