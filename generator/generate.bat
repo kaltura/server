@@ -1,5 +1,5 @@
-#del /F /S /Q ..\cache\api_v3\*
-#del /F /S /Q ..\cache\generator\*
+del /F /S /Q ..\cache\api_v3\*
+del /F /S /Q ..\cache\generator\*
 
 php generate.php
 
