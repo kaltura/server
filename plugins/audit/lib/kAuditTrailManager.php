@@ -199,7 +199,13 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return $object->getPartnerId();
 			
 		KalturaLog::info("Can't get partner id for object type [" . get_class($object) . "]");
-		return kCurrentContext::$partner_id;
+		
+		if(kCurrentContext::$partner_id)
+			return kCurrentContext::$partner_id;
+		if(kCurrentContext::$ks_partner_id)
+			return kCurrentContext::$ks_partner_id;
+			
+		return null;
 	}
 
 	/**
