@@ -6,9 +6,23 @@ require_once 'C:\web\kaltura\infra\nusoap\nusoap.php';
 require_once 'C:\web\kaltura\infra\nusoap\SoapTypes.php';
 
 require_once 'ComcastClient.php';
-require_once 'ComcastTypes.php';
 require_once 'ComcastMediaService.php';
 
+require_once 'ComcastBusinessObject.class.php';
+require_once 'ComcastStatusObject.class.php';
+require_once 'ComcastContent.class.php';
+require_once 'ComcastMedia.class.php';
+require_once 'ComcastContentType.class.php';
+require_once 'ComcastArrayOfFormat.class.php';
+require_once 'ComcastFormat.class.php';
+require_once 'ComcastLanguage.class.php';
+require_once 'ComcastCustomDataElement.class.php';
+require_once 'ComcastFieldValue.class.php';
+require_once 'ComcastTextValue.class.php';
+require_once 'ComcastMediaFile.class.php';
+require_once 'ComcastMediaFileType.class.php';
+require_once 'ComcastAddContentOptions.class.php';
+require_once 'ComcastAddContentResults.class.php';
 
 $userName = 'roman.kreichman@kaltura.com'; 
 $password = 'Roman1234';
@@ -298,7 +312,10 @@ $options->generateThumbnail = false;
 $options->publish = false;
 $options->deleteSource = false;
 
+try{
 $results = $mediaService->addContent($media, $mediaFiles, $options);
+}
+catch(Exception $e){}
 file_put_contents('err.log', $mediaService->getError());
 file_put_contents('request.xml', $mediaService->request);
 file_put_contents('response.xml', $mediaService->responseData);
