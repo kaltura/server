@@ -36,15 +36,25 @@ while(count($users))
 		$lastUser = $user->getId();
 		KalturaLog::log('-- kuser id ' . $lastUser);
 		
-		$userRole = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
-		$user->setRoleIds($userRole->getId());
+		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
+		
+		if ($partner->getId() == -2)
+		{
+			KalturaLog::log('Skipping partner -2 users... will be migrated in a later script');
+			continue;
+		}
+		
+		
+		
+		$adminRoleId = $partner->getAdminSessionRoleId();
+		$user->setRoleIds($adminRoleId);
 
 		if (!$dryRun) {
-			KalturaLog::log('Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$userRole->getId().']');		
+			KalturaLog::log('Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$adminRoleId.']');		
 			$user->save(); // save
 		}
 		else {
-			KalturaLog::log('DRY RUN ONLY - Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$userRole->getId().']');
+			KalturaLog::log('DRY RUN ONLY - Setting kuser id ['.$user->getId().'] admin ['.$user->getIsAdmin().'] with role id ['.$adminRoleId.']');
 		}		
 				
 		file_put_contents($lastUserFile, $lastUser);
