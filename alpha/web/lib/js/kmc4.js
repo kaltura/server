@@ -72,7 +72,7 @@ $(window).load(function(){
 			conversion_profile = conversion_profile || "";
 
 			// use wrap = 0 to indicate se should be open withou the html & form wrapper ????
-			$("#flash_wrap").css("visibility","hidden");
+			kmc.utils.hideFlash(true);
 			modal = kalturaInitModalBox ( null , { width: 700, height: 360 } );
 			modal.innerHTML = '<div id="kcw"></div>';
 			var flashvars = {
@@ -106,14 +106,14 @@ $(window).load(function(){
 			setObjectToRemove("kaltura_cw"); // ???
 		},
 		onCloseKcw : function() {
-			$("#flash_wrap").css("visibility","visible");
+			kmc.utils.hideFlash();
 			kalturaCloseModalBox();
 			modal = null;
 			kmc.vars.kcw_open = false;
 			// nullify flash object inside div kcw
 		},
-		openChangePwd : function() {
-			kmc.utils.secureIframe('password');
+		openChangePwd : function(email) {
+			kmc.utils.secureIframe('password', { email: email } );
 		},
 		openChangeEmail : function(email) {
 			kmc.utils.secureIframe('email', { email: email } );
@@ -156,7 +156,7 @@ $(window).load(function(){
 			kalturaCloseModalBox();
 			var modal_width = $.browser.msie ? 543 : 519;
 			var iframe_height = $.browser.msie ? 751 : ($.browser.safari ? 697 : 732);
-			$("#flash_wrap").css("visibility","hidden");
+			kmc.utils.hideFlash(true);
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: 450 } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							  '<b>Support Request</b></div> <div id="modal_content"><iframe id="support" src="' + href + '" scrolling="no" frameborder="0"' +
@@ -253,9 +253,29 @@ $(window).load(function(){
 			kill	: function(){}
 		}*/
 //};
+		
+		hideFlash : function(hide) {
+
+			if(hide) {
+				if( $.browser.msie ) {
+					// For IE only we're positioning outside of the screen
+					$("#flash_wrap").css("margin-right","3333px");
+				} else {
+					// For other browsers we're just make it
+					$("#flash_wrap").css("visibility","hidden");
+				}				
+			} else {
+				if( $.browser.msie ) {
+					$("#flash_wrap").css("margin-right","0");			
+				} else {
+					$("#flash_wrap").css("visibility","visible");
+				}				
+			}
+		},
+		
 		closeModal : function() {
 			kalturaCloseModalBox();
-			$("#flash_wrap").css("visibility","visible");
+			kmc.utils.hideFlash();
 			return false;
 		},
 	
@@ -285,7 +305,7 @@ $(window).load(function(){
 					var subtab = (e.target.tagName == "A") ? $(e.target).attr("rel") : $(e.target).parent().attr("rel");
 					
 					var go_to = { moduleName : tab, subtab : subtab };
-					
+					//alert($("#kcms")[0].id);
 					$("#kcms")[0].gotoPage(go_to); 
 					return false;					
 					
@@ -339,19 +359,22 @@ $(window).load(function(){
 			// change http to https
 			url = url.replace("http", "https");
 			
+			// Pass the parent url for the postMessage to work
+			url = url + '&parent=' + encodeURIComponent(document.location.href);
+			
 			var modal_width = 370;
 			var modal_height = 160;
-			$("#flash_wrap").css("visibility","hidden");
+			var iframe_width = modal_width;
+			if( $.browser.msie ) {
+				modal_width = modal_width + 24;
+			}
+			kmc.utils.hideFlash(true);
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
 							  '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
-							  ' height="' + modal_height + '" width="' + modal_width + '"></iframe></div></div>';
+							  ' height="' + modal_height + '" width="' + iframe_width + '"></iframe></div></div>';
 			$("#mbContent").addClass("new");
-			
-		    // pass the URL of the current parent page to the iframe using location.hash
-		    var src = url + '#' + encodeURIComponent(document.location.href);
-		    document.getElementById("sec_iframe").src = src;
 		 
 		    // setup a callback to handle the dispatched MessageEvent. if window.postMessage is supported the passed
 		    // event will have .data, .origin and .source properties. otherwise, it will only have the .data property.
@@ -396,7 +419,7 @@ $(window).load(function(){
 			}
 			content += '<br /><div class="center"><input id="do_change_partner" type="button" value=" Go " style="width: 100px;" /></div>';
 			
-			$("#flash_wrap").css("visibility","hidden");
+			kmc.utils.hideFlash(true);
 			kalturaCloseModalBox();
 			modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
 			modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
@@ -485,7 +508,7 @@ $(window).load(function(){
 //	alert("swfobject.createSWF("+attributes+", "+params+", "+kcms+")");
 			window.kmc_module = swfobject.createSWF(attributes, params, "kcms");
 			if(kmc.vars.kcw_open) {
-				$("#flash_wrap").css("visibility","hidden");
+				kmc.utils.hideFlash(true);
 				kmc.functions.openKcw();
 				kmc.vars.kcw_open = false;
 			}
@@ -645,7 +668,9 @@ $(window).load(function(){
 			kmc.vars.silverlight = false;
 
 			kalturaCloseModalBox();
-			$("#flash_wrap").css("visibility","hidden");
+
+			kmc.utils.hideFlash(true);
+			
 			modal = kalturaInitModalBox ( null , { width : parseInt(uiconf_details.width) + 140 , height: parseInt(uiconf_details.height) + 200 } );
 			modal.innerHTML = modal_html;
 			$("#mbContent").addClass("new");
@@ -716,24 +741,27 @@ $(window).load(function(){
 			var delivery_type = kmc.vars.embed_code_delivery_type || "http";
 			var html = '<div id="rtmp" class="label">Select Delivery Type:</div> <div class="right"><select id="delivery_type">';
 			var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
-						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>' + 
-						  '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
+						  '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
+			if(!kmc.vars.hide_akamai_hd_network) {
+				options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
+			}
 			html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' + 
 					'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
 			return html;
 		},
 		
 		buildHTML5Option : function(entry_id, partner_id, uiconf_id, has_mobile_flavors) {
-			//kmc.log('buildHTML5Option');
-			//kmc.log(arguments);
-			var url = kmc.vars.service_url + '/preview/' + partner_id + ':' + entry_id + ':' + uiconf_id;
-			var url_text = url.replace(/http:\/\/|www./ig, '');
+			kmc.log('buildHTML5Option');
+			kmc.log(arguments);
+			
+			var long_url = kmc.vars.service_url + '/index.php/kmc/preview/p/' + partner_id + '/e/' + entry_id + '/u/' + uiconf_id;
+			kmc.client.getShortURL(long_url);
+			
 			var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
 			if(has_mobile_flavors) {
 				description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
 							  ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' + 
-							  '<br class"clear" />View player outside KMC: <a target="_blank" href="' + url + '">' + 
-							  '<span class="preview_url">' + url_text + '</span></a></div>';
+							  '<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Creating Short URL...</span></div>';
 			}
 			var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' + 
 					   ' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
@@ -748,7 +776,7 @@ $(window).load(function(){
 			entry_name = kmc.utils.escapeQuotes(entry_name);
 //			var flavor_asset_name = kmc.utils.escapeQuotes(flavor_details.flavor_name) || "unknown";
 			kalturaCloseModalBox();
-			$("#flash_wrap").css("visibility","hidden");
+			kmc.utils.hideFlash(true);
 			modal = kalturaInitModalBox ( null , { width : parseInt(kmc.vars.default_kdp.width) + 20 , height: parseInt(kmc.vars.default_kdp.height) + 10 } );
 			$("#mbContent").addClass("new");
 			var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp);
@@ -846,8 +874,8 @@ $(window).load(function(){
 				embed_code = embed_code.replace("{FLASHVARS}", "");
 			}
 			
-			var iframe_url = kmc.vars.service_url + '/html5/html5lib/v1.0/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
-			var script_url = kmc.vars.service_url + '/html5/html5lib/v1.0/mwEmbedLoader.php';
+			var iframe_url = kmc.vars.service_url + '/html5/html5lib/v1.2/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
+			var script_url = kmc.vars.service_url + '/html5/html5lib/v1.2/mwEmbedLoader.php';
 			
 			embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
 			embed_code = embed_code.replace(/{HEIGHT}/gi,uiconf_details.height);
@@ -932,6 +960,15 @@ $(window).load(function(){
 				}
 			});
 		},
+		
+		setShortURL : function(id) {
+			var url = kmc.vars.service_url + '/tiny/' + id;
+			var url_text = url.replace(/http:\/\/|www./ig, '');
+			
+			var html = '<a href="' + url + '" target="_blank">' + url_text + '</a>';
+			$(".preview_url").html(html);
+		},
+		
 		// JW
 		jw : {
 			// @todo: chg function name to ?
@@ -1108,7 +1145,7 @@ $(window).load(function(){
 			}
 			kmc.editors.flashvars.entry_id = entry_id;
 			width = $.browser.msie ? parseInt(width) + 32 : parseInt(width) + 22;
-			$("#flash_wrap").css("visibility","hidden");
+			kmc.utils.hideFlash(true);
 			modal = kalturaInitModalBox( null, { width: width, height: height } );
 			modal.innerHTML = '<div id="keditor"></div>';
 			swfobject.embedSWF(	kmc.vars.service_url + "/kse/ui_conf_id/" + editor_uiconf,
@@ -1191,6 +1228,83 @@ $(window).load(function(){
 			showVersionsWindowHandler				: kmc.functions.doNothing,
 			sortMediaClipsHandler					: kmc.functions.doNothing,
 			filterMediaClipsHandler					: kmc.functions.doNothing
+		}
+	};
+	
+	kmc.client = {
+			
+		buildClientURL : function(service, action) {
+			return kmc.vars.service_url + '/api_v3/index.php?service='+service+'&action='+action;
+		},
+		
+		// Get the Short URL code
+		getShortURL : function(url) {
+			kmc.log('getShortURL');
+			
+			// First do short_url :: list action to see if it already exists
+			var service_url = kmc.client.buildClientURL("shortlink_shortlink", "list");
+			
+			var data = {
+				"ks"					: kmc.vars.ks,
+				"format"				: 1,
+				"filter:objectType"		: "KalturaShortLinkFilter",
+				"filter:userIdEqual"	: kmc.vars.user_id,
+				"filter:systemNameEqual": "KMC-PREVIEW"
+			};
+			
+			$.getJSON( service_url, data, function(res) {
+				if(res.totalCount == 0) {
+					// if no url were found, create a new one
+					return kmc.client.createShortURL(url);
+				} else {
+					// update the url
+					var id = res.objects[0].id;
+                                        var res_url = res.objects[0].fullUrl;
+                                        if(url == res_url) {
+                                            kmc.preview_embed.setShortURL(id);
+                                        } else {
+                                            return kmc.client.updateShortURL(url, id);
+                                        }
+				}
+			} );
+		},
+		
+		createShortURL : function(url) {
+			kmc.log('createShortURL');
+			
+			var service_url = kmc.client.buildClientURL("shortlink_shortlink", "add");
+			
+			var data = {
+				"ks"					: kmc.vars.ks, // Set KS
+				"format"				: 1, //format JSON
+				"shortLink:objectType"	: "KalturaShortLink", 
+				"shortLink:userId"		: kmc.vars.user_id,
+				"shortLink:systemName"	: "KMC-PREVIEW", // Unique name for filtering
+				"shortLink:fullUrl"		: url 
+			};	
+			
+			$.getJSON( service_url, data, function(res) {
+				kmc.preview_embed.setShortURL(res.id);
+			});
+		},
+		
+		updateShortURL : function(url, id) {
+			kmc.log('updateShortURL');
+			
+			var service_url = kmc.client.buildClientURL("shortlink_shortlink", "update");
+			
+			var data = {
+				"ks"					: kmc.vars.ks, // Set KS
+				"format"				: 1, //format JSON
+				"id"					: id,
+				"shortLink:objectType"	: "KalturaShortLink", 
+				"shortLink:fullUrl"		: url 
+			};	
+			
+			$.getJSON( service_url, data, function(res) {
+				kmc.preview_embed.setShortURL(id);
+			});
+			
 		}
 	};
 
@@ -1292,7 +1406,8 @@ kmc.mediator.loadKmc = function() {
 			height : "100%",
 			width : "100%",
 			data : kmc.vars.kmc_swf.url,
-			id : "kcms"
+			id : "kcms",
+			name : "kcms"
 	};
 	var flashvars = kmc.vars.kmc_swf.flashvars; 
 	var params = {
