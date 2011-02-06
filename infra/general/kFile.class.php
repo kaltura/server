@@ -270,6 +270,19 @@ class kFile
 	//			}
 	//		}
 	}
+
+	private static function rename_wrap($src, $trg)
+	{
+//	KalturaLog::log("before rename");
+		if(!rename($src, $trg)) {
+//	KalturaLog::log("failed rename");
+			$out_arr = array();
+			exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
+			return false;
+	//		echo "RV($rv)\n";
+		}
+		return true;
+	}
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
@@ -289,7 +302,7 @@ class kFile
 		if($copy)
 			return copy($from, $to);
 		else
-			return rename($from, $to);
+			return self::rename_wrap($from, $to);
 	}
 	
 	// make sure the file is closed , then remove it
