@@ -16,8 +16,8 @@ FROM (
 		dwh_dim_entries en JOIN dwh_dim_kusers ku ON en.kuser_id = ku.kuser_id  
 	WHERE entry_media_type_id IN (1,2,5,6)
 		AND en.partner_id = {PARTNER_ID} /* PARTNER_ID*/
-		AND en.created_at BETWEEN '{FROM_TIME}' /*FROM_TIME*/ 
-			AND '{TO_TIME}' /*TO_TIME*/
+		AND en.created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
+			AND '{TO_TIME}' - interval {TIME_SHIFT} hour /*TO_TIME*/
 	 
 	GROUP BY en.kuser_id,ku.screen_name,en.entry_id,en.entry_media_type_id
 ) a

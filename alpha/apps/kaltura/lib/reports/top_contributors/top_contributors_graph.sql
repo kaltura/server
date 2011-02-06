@@ -9,7 +9,7 @@ FROM dwh_dim_entries ev
 WHERE
 {OBJ_ID_CLAUSE}
 AND entry_media_type_id IN (1,2,5,6)
-	AND partner_id = {PARTNER_ID}
-	AND created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
+AND partner_id = {PARTNER_ID}
+		AND created_at BETWEEN '{FROM_TIME}' - interval {TIME_SHIFT} hour /*FROM_TIME*/ 
 		AND '{TO_TIME}' - interval {TIME_SHIFT} hour /*TO_TIME*/
 GROUP BY DATE(created_at - interval {TIME_SHIFT} hour) *1
