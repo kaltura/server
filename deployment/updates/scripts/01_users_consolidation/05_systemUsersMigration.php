@@ -72,8 +72,8 @@ while(count($users))
 				$new_kuser->setLoginDataId($existing_login_data->getId());
 			}
 			else {
-				KalturaLog::alert('!!! Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']');
-				echo '!!! Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']';
+				KalturaLog::alert('!!! ERROR - Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']');
+				echo '!!! ERROR - Existing user_login_data record with different password found with id ['.$existing_login_data->getId().'] skipping user id ['.$lastUser.']';
 				continue;
 			}
 		}

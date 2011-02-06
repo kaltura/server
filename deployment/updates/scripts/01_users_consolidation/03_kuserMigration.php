@@ -62,13 +62,13 @@ while(count($users))
 			}
 			else {
 				if ($existingLoginData->getSalt() != $user->getSalt() || $existingLoginData->getSha1Password() != $user->getSha1Password()) {
-					KalturaLog::alert('login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!');
-					echo 'login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!';
+					KalturaLog::alert('ERROR - login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!');
+					echo 'ERROR - login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!';
 					continue;
 				}
 				if (kuserPeer::getByLoginDataAndPartner($existingLoginData->getId(), $user->getPartnerId())) {
-					KalturaLog::alert('another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']');
-					echo 'another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']';
+					KalturaLog::alert('ERROR - another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']');
+					echo 'ERROR - another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']';
 					continue;
 				}
 				KalturaLog::log('Kuser ['.$user->getId().'] is set with existing login data id ['.$existingLoginData->getId().']');

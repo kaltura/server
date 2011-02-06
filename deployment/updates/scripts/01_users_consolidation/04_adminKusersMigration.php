@@ -38,8 +38,8 @@ while(count($users))
 		$new_login_data = new UserLoginData();
 		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
 		if (!$partner) {
-			KalturaLog::alert('!!! Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!');
-			echo '!!! Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!';
+			KalturaLog::alert('!!! ERROR - Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!');
+			echo '!!! ERROR - Partner ID ['.$user->getPartnerId().'] not found on DB but set for admin user id ['.$lastUser.'] !!!';
 			continue;
 		}
 		
@@ -51,8 +51,8 @@ while(count($users))
 		
 		if ($existing_login_data)
 		{
-			KalturaLog::alert('!!! Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!');
-			echo '!!! Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!';
+			KalturaLog::alert('!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!');
+			echo '!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!';
 			continue;
 		}
 		

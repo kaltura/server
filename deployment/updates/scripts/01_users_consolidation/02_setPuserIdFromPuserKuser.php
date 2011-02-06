@@ -47,13 +47,17 @@ while(count($puserKusers))
 		
 		if (!$kuser)
 		{
-			KalturaLog::alert('ERROR - Kuser id ['.$kuserId.'] not found but pointed from puserKuser ['.$lastPuserKuser.']');
+			$msg = 'ERROR - Kuser id ['.$kuserId.'] not found but pointed from puserKuser ['.$lastPuserKuser.']';
+			KalturaLog::alert($msg);
+			echo $msg.PHP_EOL;
 			continue;
 		}
 		
 		if ($kuser->getPartnerId() != $partnerId)
 		{
-			KalturaLog::alert('ERROR - Partner IDs are not the same for puserKuser ['.$lastPuserKuser.'] with partnerId ['.$partnerId.'] and kuser ['.$kuser->getId().'] with partnerId ['.$kuser->getPartnerId().']');
+			$msg = 'ERROR - Partner IDs are not the same for puserKuser ['.$lastPuserKuser.'] with partnerId ['.$partnerId.'] and kuser ['.$kuser->getId().'] with partnerId ['.$kuser->getPartnerId().']';
+			KalturaLog::alert($msg);
+			echo $msg.PHP_EOL;
 			continue;
 		}
 				
@@ -67,7 +71,9 @@ while(count($puserKusers))
 				$otherKusers = kuserPeer::doSelect($c);
 				if (count($otherKusers) > 0)
 				{
-					KalturaLog::alert('ERROR - Partner ['.$partnerId.'] already has a different kuser with puserId ['.$puserId.'] but puserKuser ['.$lastPuserKuser.'] is pointing to kuser ['.$kuserId.']');
+					$msg = 'ERROR - Partner ['.$partnerId.'] already has a different kuser with puserId ['.$puserId.'] but puserKuser ['.$lastPuserKuser.'] is pointing to kuser ['.$kuserId.']';
+					KalturaLog::alert($msg);
+					echo $msg.PHP_EOL;
 					continue;
 				}
 				else
@@ -77,7 +83,9 @@ while(count($puserKusers))
 			}
 			else
 			{
-				KalturaLog::alert('ERROR - No puserId is set for puserKuser ['.$lastPuserKuser.'] or kuser ['.$kuserId.']');
+				$msg = 'ERROR - No puserId is set for puserKuser ['.$lastPuserKuser.'] or kuser ['.$kuserId.']';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
 				continue;
 			}
 		}
@@ -85,7 +93,9 @@ while(count($puserKusers))
 		{
 			if ($kuser->getPuserId() != $puserId)
 			{
-				KalturaLog::alert('ERROR - Puser ids are not the same for puserKuser ['.$lastPuserKuser.'] with puserId ['.$puserId.'] and kuser ['.$kuserId.'] with puserId ['.$kuser->getPuserId().']');
+				$msg = 'ERROR - Puser ids are not the same for puserKuser ['.$lastPuserKuser.'] with puserId ['.$puserId.'] and kuser ['.$kuserId.'] with puserId ['.$kuser->getPuserId().']';
+				KalturaLog::alert($msg);
+				echo $msg.PHP_EOL;
 				continue;
 			}	
 		}
