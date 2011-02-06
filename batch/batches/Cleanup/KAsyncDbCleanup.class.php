@@ -1,5 +1,10 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Cleanup
+ */
 require_once("bootstrap.php");
+
 /**
  * Will clean from the DB all locked jobs and will mark them as fatal if exeeded max retries
  *

@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Will run KAsyncStorageExport.class.php 
  * 
@@ -7,9 +6,8 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Storage
  */
-
+require_once("bootstrap.php");
 
 $instance = new KAsyncStorageExport();
 $instance->run(); 
 $instance->done();
-?>

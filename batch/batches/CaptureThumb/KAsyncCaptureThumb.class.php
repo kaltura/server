@@ -1,5 +1,11 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Capture-Thumbnail
+ */
 require_once ("bootstrap.php");
+
+
 /**
  * Will convert a single flavor and store it in the file system.
  * The state machine of the job is as follows:

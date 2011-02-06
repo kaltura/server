@@ -1,5 +1,11 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Bulk-Download
+ */
 require_once("bootstrap.php");
+
+
 /**
  * Will close almost done bulk downloads.
  * The state machine of the job is as follows:

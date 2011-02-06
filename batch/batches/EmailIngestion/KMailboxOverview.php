@@ -1,14 +1,16 @@
 <?php
-
-/*
-Usage -  php <FILE_NAME> <host> <port> <user> <pass>
-
-Output for each folder :
-<user>@<host>: <folder>: <total messages>
-
-If the INBOX folder contains READ messages, this line will also appear at the end :
-<user>@<host>: READ messages in INBOX: <number of read messages in INBOX>
-*/
+/**
+ * Usage -  php <FILE_NAME> <host> <port> <user> <pass>
+ * 
+ * Output for each folder :
+ * <user>@<host>: <folder>: <total messages>
+ * 
+ * If the INBOX folder contains READ messages, this line will also appear at the end :
+ * <user>@<host>: READ messages in INBOX: <number of read messages in INBOX>
+ * 
+ * @package Scheduler
+ * @subpackage Email-Ingestion
+ */
 
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'KMailChecker.class.php');
 

@@ -1,6 +1,4 @@
 <?php
-require_once("bootstrap.php");
-
 /**
  * Will run KAsyncNotifier 
  * 
@@ -8,8 +6,8 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Notifier
  */
+require_once("bootstrap.php");
 
 $instance = new KAsyncNotifier ( );
 $instance->run(); 
 $instance->done();
-?>

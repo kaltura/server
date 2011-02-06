@@ -1,8 +1,11 @@
 <?php
+/**
+ * @package Scheduler
+ */
 require_once ("bootstrap.php");
+
 /**
  * Will be used as the base class for all the batch classes.
- * 
  * 
  * @package Scheduler
  */

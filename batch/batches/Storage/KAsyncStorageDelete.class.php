@@ -1,5 +1,10 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Storage
+ */
 require_once("bootstrap.php");
+
 /**
  * Will delete a single file to ftp or scp server 
  *

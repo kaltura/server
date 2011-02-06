@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Will run KAsyncPostConvert
  *
@@ -7,8 +6,8 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Post-Convert
  */
+require_once("bootstrap.php");
 
 $instance = new KAsyncPostConvert();
 $instance->run(); 
 $instance->done();
-?>

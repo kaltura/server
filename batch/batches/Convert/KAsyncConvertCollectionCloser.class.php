@@ -1,5 +1,10 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Conversion
+ */
 require_once("bootstrap.php");
+
 /**
  * Will close almost done conversions that sent to remote systems and store the files in the file system.
  * The state machine of the job is as follows:

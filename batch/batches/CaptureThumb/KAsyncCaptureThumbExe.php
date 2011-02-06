@@ -1,6 +1,4 @@
 <?php
-chdir(dirname(__FILE__) . '/../../');
-require_once("bootstrap.php");
 /**
  * Will run KAsyncCaptureThumb
  *
@@ -8,6 +6,8 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Capture-Thumbnail
  */
+chdir(dirname(__FILE__) . '/../../');
+require_once("bootstrap.php");
 
 $instance = new KAsyncCaptureThumb();
 $instance->run(); 

@@ -1,5 +1,10 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Cleanup
+ */
 require_once("bootstrap.php");
+
 /**
  * Will run periodically and cleanup directories from old files that have a specific pattern (older than x days) 
  *
@@ -70,4 +75,3 @@ class KAsyncDirectoryCleanup extends KBatchBase
 		KalturaLog::debug("Deleted $deletedCount files");
 	}
 }
-?>
