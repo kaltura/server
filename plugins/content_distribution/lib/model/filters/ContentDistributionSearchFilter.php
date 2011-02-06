@@ -204,13 +204,13 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		parent::fillObjectFromXml($xmlElement);
 		
 		$attr = $xmlElement->attributes();
-		if(isset($attr['distributionProfileId']))
+		if(isset($attr['distributionProfileId']) && strlen($attr['distributionProfileId']))
 			$this->distributionProfileId = (int) $attr['distributionProfileId'];
-		if(isset($attr['entryDistributionFlag']))
+		if(isset($attr['entryDistributionFlag']) && strlen($attr['entryDistributionFlag']))
 			$this->entryDistributionFlag = (int) $attr['entryDistributionFlag'];
-		if(isset($attr['entryDistributionStatus']))
+		if(isset($attr['entryDistributionStatus']) && strlen($attr['entryDistributionStatus']))
 			$this->entryDistributionStatus = (int) $attr['entryDistributionStatus'];
-		if(isset($attr['distributionSunStatus']))
+		if(isset($attr['distributionSunStatus']) && strlen($attr['distributionSunStatus']))
 			$this->distributionSunStatus = (int) $attr['distributionSunStatus'];
 	}
 }
