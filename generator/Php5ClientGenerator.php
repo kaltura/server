@@ -19,6 +19,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		// enumes
 		$this->appendLine('<?php');
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
+		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('');
 	    
@@ -34,6 +39,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		// classes
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
+		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('');
 		
@@ -49,6 +59,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		// services
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
+		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('require_once("KalturaEnums.php");');
 		$this->appendLine('require_once("KalturaTypes.php");');
@@ -84,6 +99,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
+		
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaClientBase.php");');
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaEnums.php");');
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaTypes.php");');

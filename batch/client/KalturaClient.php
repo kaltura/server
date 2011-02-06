@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 require_once("KalturaClientBase.php");
 require_once("KalturaEnums.php");
 require_once("KalturaTypes.php");

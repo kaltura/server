@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 require_once("KalturaClientBase.php");
 
 /**

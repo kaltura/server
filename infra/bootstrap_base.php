@@ -1,5 +1,8 @@
 <?php 
-// Define
+/**
+ * @package infra
+ * @subpackage autoloader
+ */
 define("KALTURA_ROOT_PATH", realpath(dirname(__FILE__).DIRECTORY_SEPARATOR."../"));
 define("KALTURA_INFRA_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."infra");
 

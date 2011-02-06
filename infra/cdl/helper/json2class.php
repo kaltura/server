@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Conversion
+ */
 
 require_once '../kOperator.php';
 require_once '../kOperatorSets.php';
