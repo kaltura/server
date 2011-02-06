@@ -5,13 +5,13 @@ error_reporting(E_ALL);
 require_once(dirname(__FILE__).'/../alpha/config/kConf.php');
 
 // clear kConf defined cache directories
-system('rm -rf '.kConf::get('cache_root_path').'/*');
-system('rm -rf '.kConf::get('general_cache_dir').'/*');
-system('rm -rf '.kConf::get('response_cache_dir').'/*');
+system('rm -rf '.realpath(kConf::get('cache_root_path')).DIRECTORY_SEPARATOR.'*');
+system('rm -rf '.realpath(kConf::get('general_cache_dir')).DIRECTORY_SEPARATOR.'*');
+system('rm -rf '.realpath(kConf::get('response_cache_dir')).DIRECTORY_SEPARATOR.'*');
 
 // clear symfony (alpha) cache
-system(kConf::get('sf_root_dir').'/symfony cc');
-system(kConf::get('sf_root_dir').'/symfony cc');
+system('php '.realpath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
+system('php '.realpath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
 
 // clear APC cache
 if (function_exists('apc_clear_cache'))
