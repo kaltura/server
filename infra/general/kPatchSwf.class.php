@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class kPatchSwf
 {
 	const SWF_TAG_DefineBinaryData = 87;
@@ -180,4 +183,3 @@ class kPatchSwf
 	}
 };
 
-?>

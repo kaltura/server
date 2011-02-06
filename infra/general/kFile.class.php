@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Storage
+ */
 class kFile
 {
 	// TODO - implement recursion
@@ -659,6 +663,10 @@ class kFile
 
 }
 
+/**
+ * @package infra
+ * @subpackage Storage
+ */
 class kFileData
 {
 	public $exists;

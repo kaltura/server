@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage Storage
+ * @deprecated
+ */
 class mySyncFile
 {
 	static public function lock ($filename) {

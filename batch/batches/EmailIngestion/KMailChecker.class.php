@@ -3,6 +3,9 @@
 /**
  * IMAP mail checker.
  * Can connect to an IMAP mail server and retrive mail information and contents. *
+ * 
+ * @package Scheduler
+ * @subpackage Email-Ingestion
  */
 class KMailChecker {
 
@@ -487,6 +490,9 @@ class KMailChecker {
 
 /**
  * Class holding all mail's data - header, body, attachments
+ *  
+ * @package Scheduler
+ * @subpackage Email-Ingestion
  */
 class MailMsg {
 	/**
@@ -508,6 +514,9 @@ class MailMsg {
 
 /**
  * Class holding a mail's header data
+ *  
+ * @package Scheduler
+ * @subpackage Email-Ingestion
  */
 class MailHeader {
 	/**
@@ -534,7 +543,10 @@ class MailHeader {
 
 
 /**
- * Class holding a mail's attachments data
+ * Class holding a mail's attachments data 
+ * 
+ * @package Scheduler
+ * @subpackage Email-Ingestion
  */
 class MailAttachment {
 	/**

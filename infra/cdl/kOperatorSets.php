@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Conversion
+ */
 class kOperatorSets
 {
 	/**

@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @package Scheduler
  * @subpackage Conversion
  */
