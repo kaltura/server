@@ -8,6 +8,24 @@
  */
 class PermissionItemService extends KalturaBaseService
 {
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+
+		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new PermissionItemPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+	}
+	
+	protected function globalPartnerAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+		if ($actionName === 'list') {
+			return true;
+		}
+		return parent::globalPartnerAllowed($actionName);
+	}
 	
 	/**
 	 * Allows you to add a new KalturaPermissionItem object
