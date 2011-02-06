@@ -381,6 +381,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	import com.kaltura.delegates.WebDelegateBase;\n";
 			if(count($fileAttributesNames))
 			{
+				$str .= "	import com.kaltura.core.KClassFactory;\n";
 				$str .= "	import com.kaltura.errors.KalturaError;\n";
 				$str .= "	import com.kaltura.commands." . $xml->attributes()->name . "." . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ";\n\n";
 				
@@ -468,11 +469,28 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "				mrloader.load(req);\n";
 				$str .= "			}\n";
 				$str .= "		}\n\n";
-				
+			
+				$str .= "		override public function parse(result:XML):* {\n";
+				$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
+				$str .= "				return super.parse(result);\n";
+				$str .= "			}\n";
+				$str .= "			else {\n";
+				$str .= "				var cls : Class = getDefinitionByName('com.kaltura.vo.'+ result.result.objectType) as Class;\n";
+				$str .= "				var obj : * = (new KClassFactory( cls )).newInstanceFromXML( result.result );\n";
+				$str .= "				return obj;\n";
+				$str .= "			}\n";
+				$str .= "		}\n\n";
+		
 				$str .= "		// Event Handlers\n";
 				$str .= "		override protected function onDataComplete(event:Event):void {\n";
 				$str .= "			try{\n";
-				$str .= "				handleResult( XML(event[\"data\"]) );\n";
+			
+				$str .= "				if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
+				$str .= "					handleResult( XML(event[\"data\"]) );\n";
+				$str .= "				}\n";
+				$str .= "				else {\n";
+				$str .= "					handleResult( XML(event.target.loader.data) );\n";
+				$str .= "				}\n";
 				$str .= "			}\n";
 				$str .= "			catch( e:Error ){\n";
 				$str .= "				var kErr : KalturaError = new KalturaError();\n";
