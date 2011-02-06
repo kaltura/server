@@ -92,6 +92,8 @@ class secForm {
 	
 	function clean($str) { 
 		$str = str_replace("javascript:", "", $str);
+		$str = str_replace("eval", "", $str);
+		$str = str_replace("document", "", $str);
 		$str = htmlspecialchars($str);
 		
 		return $str;
@@ -211,7 +213,6 @@ HTML;
 				break;
 			}
 		}
-		$this->email = 'ran.yefet@kaltura.com';
 		$client = $this->getClient();
 		try {
 			$client->user->updateLoginData($this->email, $_POST['password'], $_POST['email'], $_POST['password']);
@@ -294,6 +295,7 @@ HTML;
 	
 	// Show Success Message
 	function showSuccess() {
+		$parent_url = $this->clean($_GET['parent']);
 		$this->pageTitle = 'Changes were saved!'; 
 		$this->showHead();
 		
@@ -309,8 +311,13 @@ HTML;
 		echo <<<HTML
 <script type="text/javascript" src="/lib/js/postmessage.js"></script>
 <script type="text/javascript">
-var parent_url = decodeURIComponent(document.location.hash.replace(/^#/, ''));
-XD.postMessage("{$msg}", parent_url, parent);
+var parent_url = decodeURIComponent("{$parent_url}");
+
+function send() {
+	XD.postMessage("{$msg}", parent_url, parent);
+}
+
+window.onload = send; 
 </script>
 HTML;
 		$this->showFoot();
@@ -335,7 +342,7 @@ HTML;
 		.center { text-align: center; }
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
-		input { font-size: 13px; width: 160px; height: 25px; }
+		input { font-size: 13px; width: 160px; }
 		#submit {  } 
 		</style>
 	</head>

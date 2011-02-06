@@ -87,6 +87,9 @@ class kmc4Action extends kalturaAction
 	$this->cdn_host = str_replace ( "http://" , "" , $this->cdn_url );
 	$this->rtmp_host = myPartnerUtils::getRtmpUrl($this->partner_id);
 	$this->flash_dir = $this->cdn_url . myContentStorage::getFSFlashRootPath ();
+	
+	// Decide if to hide akamai delivery type
+	$this->hideAkamaiHDNetwork = $partner->getDisableAkamaiHDNetwork();
 		
 	/** set embed_code value **/
 		if ( $this->partner_id !== null )

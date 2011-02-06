@@ -86,7 +86,8 @@ else
 			kmc_version		: "<?php echo $kmc_swf_version; ?>",
 			kmc_general_uiconf	: "<?php echo $kmc_general->getId(); ?>", 
 			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
-			allowed_partners 		: <?php echo json_encode($allowedPartners); ?>,
+			allowed_partners	: <?php echo json_encode($allowedPartners); ?>,
+			hide_akamai_hd_network	: "<?php echo $hideAkamaiHDNetwork; ?>",
 		  /* END new vars KMC4 */
 		
 			service_url		: "<?php echo $service_url; ?>",
@@ -141,7 +142,7 @@ else
 	<div id="kmcHeader"	<?php if($templatePartnerId) echo 'class="whiteLabel"'; ?>>
 	 <div id="logo"></div>
      <ul id="hTabs">
-     	<li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> Loading...</li>
+     	<li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
 <?php 
 if( count($allowedPartners) > 1 ) { 
