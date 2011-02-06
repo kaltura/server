@@ -237,7 +237,7 @@ class kFileSyncUtils
 		}
 		else
 		{
-			$success = rename($temp_file_path, $targetFullPath);
+			$success = kFile::moveFile($temp_file_path, $targetFullPath);
 		}
 		
 		if($success)
