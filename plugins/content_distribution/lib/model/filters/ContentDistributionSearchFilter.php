@@ -197,15 +197,6 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		$xmlElement->addAttribute('entryDistributionFlag', $this->entryDistributionFlag);
 		$xmlElement->addAttribute('entryDistributionStatus', $this->entryDistributionStatus);
 		$xmlElement->addAttribute('distributionSunStatus', $this->distributionSunStatus);
-		$xmlElement->addAttribute('operatorType', $this->type);
-		
-		foreach($this->items as $item)
-		{
-			$itemXmlElement = $xmlElement->addChild('item');
-			$itemXmlElement->addAttribute('type', get_class($item));
-			
-			$item->addToXml($itemXmlElement);
-		}
 	}
 	
 	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
@@ -221,20 +212,5 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 			$this->entryDistributionStatus = (int) $attr['entryDistributionStatus'];
 		if(isset($attr['distributionSunStatus']))
 			$this->distributionSunStatus = (int) $attr['distributionSunStatus'];
-			
-		if(isset($attr['operatorType']))
-			$this->type = (int) $attr['operatorType'];
-			
-		foreach($xmlElement->item as $child)
-		{
-			$attr = $child->attributes();
-			if(!isset($attr['type']))
-				continue;
-				
-			$type = (string) $attr['type'];
-			$item = new $type();
-			$item->fillObjectFromXml($child);
-			$this->items[] = $item;
-		}
 	}
 }
