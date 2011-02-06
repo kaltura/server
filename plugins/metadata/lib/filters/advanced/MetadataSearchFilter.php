@@ -147,16 +147,6 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		parent::addToXml($xmlElement);
 		
 		$xmlElement->addAttribute('metadataProfileId', $this->metadataProfileId);
-		$xmlElement->addAttribute('operatorType', $this->type);
-		
-		foreach($this->items as $item)
-		{
-			$itemXmlElement = $xmlElement->addChild('item');
-			$itemXmlElement->addAttribute('type', get_class($item));
-			
-			$item->addToXml($itemXmlElement);
-		}
-//		KalturaLog::debug('Add to XML [' . $xmlElement->asXML() . ']');
 	}
 	
 	public function fillObjectFromXml(SimpleXMLElement $xmlElement)
