@@ -114,12 +114,15 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		
 		$xmlElement->addAttribute('operatorType', $this->type);
 		
-		foreach($this->items as $item)
+		if($this->items && is_array($this->items))
 		{
-			$itemXmlElement = $xmlElement->addChild('item');
-			$itemXmlElement->addAttribute('type', get_class($item));
-			
-			$item->addToXml($itemXmlElement);
+			foreach($this->items as $item)
+			{
+				$itemXmlElement = $xmlElement->addChild('item');
+				$itemXmlElement->addAttribute('type', get_class($item));
+				
+				$item->addToXml($itemXmlElement);
+			}
 		}
 	}
 	
