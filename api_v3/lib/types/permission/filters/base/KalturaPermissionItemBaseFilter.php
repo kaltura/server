@@ -12,6 +12,8 @@ class KalturaPermissionItemBaseFilter extends KalturaFilter
 		"idIn" => "_in_id",
 		"typeEqual" => "_eq_type",
 		"typeIn" => "_in_type",
+		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -67,6 +69,20 @@ class KalturaPermissionItemBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $typeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $partnerIdIn;
 
 	/**
 	 * 

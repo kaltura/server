@@ -6372,6 +6372,14 @@ abstract class KalturaPermissionItem extends KalturaObjectBase
 	/**
 	 * 
 	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
 	 * @var string
 	 */
 	public $tags = null;

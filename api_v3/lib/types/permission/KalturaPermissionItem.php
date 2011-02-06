@@ -22,6 +22,13 @@ class KalturaPermissionItem extends KalturaObject implements IFilterable
 	 */
 	public $type;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 * @filter eq,in
+	 */
+	public $partnerId;
+	
 	
 	/**
 	 * @var string
@@ -60,6 +67,7 @@ class KalturaPermissionItem extends KalturaObject implements IFilterable
 	private static $map_between_objects = array(
 		'id',
 		'permissionNames',
+		'partnerId',
 		'tags',
 		'value',
 		'createdAt',

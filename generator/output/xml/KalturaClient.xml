@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1296727067">
-  <!-- Generated on date 03/02/11 11:57:47 -->
+<xml apiVersion="3.1.1" generatedDate="1296979876">
+  <!-- Generated on date 06/02/11 10:11:16 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -2185,6 +2185,7 @@
     <class name="KalturaPermissionItem" abstract="1">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="type" type="string" enumType="KalturaPermissionItemType" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
