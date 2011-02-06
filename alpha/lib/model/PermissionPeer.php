@@ -49,7 +49,7 @@ class PermissionPeer extends BasePermissionPeer
 	{
 		$permission->setPartnerId($partnerId);
 		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 		$c->addAnd(PermissionPeer::NAME, $permission->getName(), Criteria::EQUAL);
 		$existingPermission = PermissionPeer::doSelectOne($c);
 		if (!$existingPermission) {
