@@ -1,6 +1,6 @@
 <?php
 
-class kPermissionManager
+class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedEventConsumer
 {
 	// -------------------
 	// -- Class members --
@@ -749,5 +749,74 @@ class kPermissionManager
 	{
 		return self::$map[self::PERMISSION_NAMES_ARRAY];
 	}
+	
+	
+	/**
+	 * Will delete all partner roles from cache so they will be re-generated next time.
+	 * @param int $partnerId Partner id
+	 */
+	private function delPartnerCache($partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$roles = UserRolePeer::doSelect($c);
+		
+		foreach ($roles as $role)
+		{
+			self::delFromCache($role->getId(), $partnerId);
+		}
+	}
+	
+	private function delFromCache($roleId, $partnerId)
+	{
+		if (!self::useCache())
+		{
+			return null;
+		}
+		
+		$cacheKey = self::getRoleIdKey($roleId, $partnerId);
+		return self::deleteFromCache($cacheKey);
+	}
+	
+
+	public function objectChanged(BaseObject $object, array $modifiedColumns) {
+		if($object instanceof Permission)
+		{
+			if ($object->getPartnerId() !== PartnerPeer::GLOBAL_PARTNER)
+			{
+				self::delPartnerCache($object->getPartnerId());
+				return true;
+			}
+		}
+		
+		if ($object instanceof UserRole)
+		{
+			if (in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
+			{
+				self::delFromCache($object->getId(), $object->getPartnerId());
+				return true;
+			}
+		}
+		
+		return true;
+	}
+
+	public function objectCreated(BaseObject $object) {
+		if($object instanceof Permission)
+		{
+			// changes in permissions for partner, may require new cache generation
+			if ( $object->getType() == PermissionType::PLUGIN ||
+				 $object->getType() == PermissionType::SPECIAL_FEATURE ||
+				 $object->getType() == PermissionType::PARTNER_GROUP      )
+			{
+				self::delPartnerCache($object->getPartnerId());
+				return true;
+			}
+		}
+		
+		return true;
+		
+	}
+
 		
 }

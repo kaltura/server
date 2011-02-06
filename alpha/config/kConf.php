@@ -136,6 +136,7 @@ class kConf extends kConfLocal
                 	"kStorageExporter",
                     "kObjectCopyHandler",
                     "kObjectDeleteHandler",
+					"kPermissionManager",
                 ),
                 "event_consumers_default_priority" => 5,
 				"event_consumers_priorities" => array(
