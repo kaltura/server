@@ -13,6 +13,7 @@ class PermissionService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new PermissionPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(new PermissionItemPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 	}
 	
 	protected function globalPartnerAllowed($actionName)
@@ -116,6 +117,15 @@ class PermissionService extends KalturaBaseService
 		
 		if (!$dbPermission) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
+		}
+		
+		if ($permission->name && $permission->name != $permissionName)
+		{
+			$existingPermission = PermissionPeer::getByNameAndPartner($permission->name, array($dbPermission->getPartnerId(), PartnerPeer::GLOBAL_PARTNER));
+			if ($existingPermission)
+			{
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_ALREADY_EXISTS, $permission->name, $this->getPartnerId());
+			}
 		}
 		
 		$dbPermission = $permission->toUpdatableObject($dbPermission);
