@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage autoloader
+ */
 class KAutoloader 
 {
 	static private $_oldIncludePath = "";
