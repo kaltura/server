@@ -351,74 +351,6 @@ class KalturaDataEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
-class KalturaDistributionAction
-{
-	const SUBMIT = 1;
-	const UPDATE = 2;
-	const DELETE = 3;
-	const FETCH_REPORT = 4;
-}
-
-class KalturaDistributionErrorType
-{
-	const MISSING_FLAVOR = 1;
-	const MISSING_THUMBNAIL = 2;
-	const MISSING_METADATA = 3;
-	const INVALID_DATA = 4;
-}
-
-class KalturaDistributionProfileActionStatus
-{
-	const DISABLED = 1;
-	const AUTOMATIC = 2;
-	const MANUAL = 3;
-}
-
-class KalturaDistributionProfileOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaDistributionProfileStatus
-{
-	const DISABLED = 1;
-	const ENABLED = 2;
-	const DELETED = 3;
-}
-
-class KalturaDistributionProtocol
-{
-	const FTP = 1;
-	const SCP = 2;
-	const SFTP = 3;
-	const HTTP = 4;
-	const HTTPS = 5;
-}
-
-class KalturaDistributionProviderOrderBy
-{
-}
-
-class KalturaDistributionProviderType
-{
-	const GENERIC = "1";
-	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
-	const VERIZON = "verizonDistribution.VERIZON";
-	const COMCAST = "comcastDistribution.COMCAST";
-	const YOUTUBE = "youTubeDistribution.YOUTUBE";
-}
-
-class KalturaDocumentType
-{
-	const DOCUMENT = 11;
-	const SWF = 12;
-	const PDF = 13;
-}
-
 class KalturaDurationType
 {
 	const NOT_AVAILABLE = "notavailable";
@@ -431,43 +363,6 @@ class KalturaEditorType
 {
 	const SIMPLE = 1;
 	const ADVANCED = 2;
-}
-
-class KalturaEntryDistributionFlag
-{
-	const NONE = 0;
-	const SUBMIT_REQUIRED = 1;
-	const DELETE_REQUIRED = 2;
-	const UPDATE_REQUIRED = 3;
-}
-
-class KalturaEntryDistributionOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-	const SUBMITTED_AT_ASC = "+submittedAt";
-	const SUBMITTED_AT_DESC = "-submittedAt";
-	const SUNRISE_ASC = "+sunrise";
-	const SUNRISE_DESC = "-sunrise";
-	const SUNSET_ASC = "+sunset";
-	const SUNSET_DESC = "-sunset";
-}
-
-class KalturaEntryDistributionStatus
-{
-	const PENDING = 0;
-	const QUEUED = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const SUBMITTING = 4;
-	const UPDATING = 5;
-	const DELETING = 6;
-	const ERROR_SUBMITTING = 7;
-	const ERROR_UPDATING = 8;
-	const ERROR_DELETING = 9;
-	const REMOVED = 10;
 }
 
 class KalturaEntryModerationStatus
@@ -517,36 +412,6 @@ class KalturaFileSyncObjectType
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";
 }
 
-class KalturaFileSyncOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-	const READY_AT_ASC = "+readyAt";
-	const READY_AT_DESC = "-readyAt";
-	const SYNC_TIME_ASC = "+syncTime";
-	const SYNC_TIME_DESC = "-syncTime";
-	const FILE_SIZE_ASC = "+fileSize";
-	const FILE_SIZE_DESC = "-fileSize";
-}
-
-class KalturaFileSyncStatus
-{
-	const ERROR = -1;
-	const PENDING = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const PURGED = 4;
-}
-
-class KalturaFileSyncType
-{
-	const FILE = 1;
-	const LINK = 2;
-	const URL = 3;
-}
-
 class KalturaFlavorAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -583,35 +448,6 @@ class KalturaGender
 	const UNKNOWN = 0;
 	const MALE = 1;
 	const FEMALE = 2;
-}
-
-class KalturaGenericDistributionProviderActionOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaGenericDistributionProviderOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaGenericDistributionProviderParser
-{
-	const XSL = 1;
-	const XPATH = 2;
-	const REGEX = 3;
-}
-
-class KalturaGenericDistributionProviderStatus
-{
-	const ACTIVE = 2;
-	const DELETED = 3;
 }
 
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -814,45 +650,6 @@ class KalturaMediaType
 	const LIVE_STREAM_WINDOWS_MEDIA = 202;
 	const LIVE_STREAM_REAL_MEDIA = 203;
 	const LIVE_STREAM_QUICKTIME = 204;
-}
-
-class KalturaMetadataObjectType
-{
-	const ENTRY = 1;
-}
-
-class KalturaMetadataOrderBy
-{
-	const METADATA_PROFILE_VERSION_ASC = "+metadataProfileVersion";
-	const METADATA_PROFILE_VERSION_DESC = "-metadataProfileVersion";
-	const VERSION_ASC = "+version";
-	const VERSION_DESC = "-version";
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaMetadataProfileOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaMetadataProfileStatus
-{
-	const ACTIVE = 1;
-	const DEPRECATED = 2;
-	const TRANSFORMING = 3;
-}
-
-class KalturaMetadataStatus
-{
-	const VALID = 1;
-	const INVALID = 2;
-	const DELETED = 3;
 }
 
 class KalturaMixEntryOrderBy
@@ -1237,29 +1034,6 @@ class KalturaSourceType
 	const AKAMAI_LIVE = 29;
 }
 
-class KalturaStorageProfileProtocol
-{
-	const KALTURA_DC = 0;
-	const FTP = 1;
-	const SCP = 2;
-	const SFTP = 3;
-}
-
-class KalturaStorageProfileStatus
-{
-	const DISABLED = 1;
-	const AUTOMATIC = 2;
-	const MANUAL = 3;
-}
-
-class KalturaStorageServePriority
-{
-	const KALTURA_ONLY = 1;
-	const KALTURA_FIRST = 2;
-	const EXTERNAL_FIRST = 3;
-	const EXTERNAL_ONLY = 4;
-}
-
 class KalturaThumbAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -1286,16 +1060,6 @@ class KalturaThumbParamsOrderBy
 
 class KalturaThumbParamsOutputOrderBy
 {
-}
-
-class KalturaTrackEntryEventType
-{
-	const UPLOADED_FILE = 1;
-	const WEBCAM_COMPLETED = 2;
-	const IMPORT_STARTED = 3;
-	const ADD_ENTRY = 4;
-	const UPDATE_ENTRY = 5;
-	const DELETED_ENTRY = 6;
 }
 
 class KalturaTubeMogulSyndicationFeedOrderBy
@@ -1412,33 +1176,6 @@ class KalturaVideoCodec
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
 	const COPY = "copy";
-}
-
-class KalturaVirusFoundAction
-{
-	const NONE = 0;
-	const DELETE = 1;
-	const CLEAN_NONE = 2;
-	const CLEAN_DELETE = 3;
-}
-
-class KalturaVirusScanEngineType
-{
-	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
-}
-
-class KalturaVirusScanProfileOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaVirusScanProfileStatus
-{
-	const DISABLED = 1;
-	const ENABLED = 2;
 }
 
 class KalturaWidgetOrderBy

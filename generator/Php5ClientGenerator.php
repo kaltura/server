@@ -25,7 +25,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$enumNodes = $xpath->query("/xml/enums/enum");
 		foreach($enumNodes as $enumNode)
 		{
-			$this->writeEnum($enumNode);
+			if(!$enumNode->hasAttribute('plugin'))
+				$this->writeEnum($enumNode);
 		}
     	$this->addFile("KalturaEnums.php", $this->getTextBlock());
     	
@@ -39,7 +40,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$classNodes = $xpath->query("/xml/classes/class");
 		foreach($classNodes as $classNode)
 		{
-			$this->writeClass($classNode);
+			if(!$classNode->hasAttribute('plugin'))
+				$this->writeClass($classNode);
 		}
     	$this->addFile("KalturaTypes.php", $this->getTextBlock());
 		
@@ -55,7 +57,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$serviceNodes = $xpath->query("/xml/services/service");
 		foreach($serviceNodes as $serviceNode)
 		{
-		    $this->writeService($serviceNode);
+			if(!$classNode->hasAttribute('plugin'))
+		    	$this->writeService($serviceNode);
 		}
 		$this->appendLine();
 	    $this->writeMainClient($serviceNodes);
@@ -86,6 +89,24 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaTypes.php");');
 		$this->appendLine('');
 		
+		$enumNodes = $xpath->query("/xml/enums/enum[@plugin = '$pluginName']");
+		foreach($enumNodes as $enumNode)
+		{
+			$this->writeEnum($enumNode);
+		}
+	
+		$classNodes = $xpath->query("/xml/classes/class[@plugin = '$pluginName']");
+		foreach($classNodes as $classNode)
+		{
+			$this->writeClass($classNode);
+		}
+	
+		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
+		foreach($serviceNodes as $serviceNode)
+		{
+		    $this->writeService($serviceNode);
+		}
+		
 		$serviceNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
@@ -109,23 +130,23 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine('');
 		}
 		
-		$this->appendLine('	protected function __construct()');
+		$this->appendLine('	protected function __construct(KalturaClient $client)');
 		$this->appendLine('	{');
 		$this->appendLine('		parent::__construct();');
 		foreach($services as $service)
 		{
 			$serviceName = ucfirst($service);
-			$this->appendLine("		\$this->$service = new Kaltura{$serviceName}Service();");
+			$this->appendLine("		\$this->$service = new Kaltura{$serviceName}Service(\$client);");
 		}
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
 		$this->appendLine('	 * @return KalturaClientPlugin');
 		$this->appendLine('	 */');
-		$this->appendLine('	public static function get()');
+		$this->appendLine('	public static function get(KalturaClient $client)');
 		$this->appendLine('	{');
 		$this->appendLine('		if(!self::$instance)');
-		$this->appendLine("			self::\$instance = new $pluginClassName();");
+		$this->appendLine("			self::\$instance = new $pluginClassName(\$client);");
 		$this->appendLine('		return self::$instance;');
 		$this->appendLine('	}');
 		$this->appendLine('');

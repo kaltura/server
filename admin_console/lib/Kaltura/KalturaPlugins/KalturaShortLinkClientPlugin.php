@@ -10,7 +10,7 @@ class KalturaShortLinkClientPlugin extends KalturaClientPlugin
 	 */
 	protected static $instance;
 
-	protected function __construct()
+	protected function __construct(KalturaClient $client)
 	{
 		parent::__construct();
 	}
@@ -18,10 +18,10 @@ class KalturaShortLinkClientPlugin extends KalturaClientPlugin
 	/**
 	 * @return KalturaClientPlugin
 	 */
-	public static function get()
+	public static function get(KalturaClient $client)
 	{
 		if(!self::$instance)
-			self::$instance = new KalturaShortLinkClientPlugin();
+			self::$instance = new KalturaShortLinkClientPlugin($client);
 		return self::$instance;
 	}
 

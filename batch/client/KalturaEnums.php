@@ -344,55 +344,6 @@ class KalturaDataEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
-class KalturaDistributionAction
-{
-	const SUBMIT = 1;
-	const UPDATE = 2;
-	const DELETE = 3;
-	const FETCH_REPORT = 4;
-}
-
-class KalturaDistributionErrorType
-{
-	const MISSING_FLAVOR = 1;
-	const MISSING_THUMBNAIL = 2;
-	const MISSING_METADATA = 3;
-	const INVALID_DATA = 4;
-}
-
-class KalturaDistributionProfileActionStatus
-{
-	const DISABLED = 1;
-	const AUTOMATIC = 2;
-	const MANUAL = 3;
-}
-
-class KalturaDistributionProfileStatus
-{
-	const DISABLED = 1;
-	const ENABLED = 2;
-	const DELETED = 3;
-}
-
-class KalturaDistributionProtocol
-{
-	const FTP = 1;
-	const SCP = 2;
-	const SFTP = 3;
-	const HTTP = 4;
-	const HTTPS = 5;
-}
-
-class KalturaDistributionProviderType
-{
-	const GENERIC = "1";
-	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
-	const VERIZON = "verizonDistribution.VERIZON";
-	const COMCAST = "comcastDistribution.COMCAST";
-	const YOUTUBE = "youTubeDistribution.YOUTUBE";
-}
-
 class KalturaDurationType
 {
 	const NOT_AVAILABLE = "notavailable";
@@ -411,29 +362,6 @@ class KalturaEmailIngestionProfileStatus
 {
 	const INACTIVE = 0;
 	const ACTIVE = 1;
-}
-
-class KalturaEntryDistributionFlag
-{
-	const NONE = 0;
-	const SUBMIT_REQUIRED = 1;
-	const DELETE_REQUIRED = 2;
-	const UPDATE_REQUIRED = 3;
-}
-
-class KalturaEntryDistributionStatus
-{
-	const PENDING = 0;
-	const QUEUED = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const SUBMITTING = 4;
-	const UPDATING = 5;
-	const DELETING = 6;
-	const ERROR_SUBMITTING = 7;
-	const ERROR_UPDATING = 8;
-	const ERROR_DELETING = 9;
-	const REMOVED = 10;
 }
 
 class KalturaEntryModerationStatus
@@ -491,22 +419,6 @@ class KalturaFileSyncObjectType
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";
 }
 
-class KalturaFileSyncStatus
-{
-	const ERROR = -1;
-	const PENDING = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const PURGED = 4;
-}
-
-class KalturaFileSyncType
-{
-	const FILE = 1;
-	const LINK = 2;
-	const URL = 3;
-}
-
 class KalturaFlavorAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -536,13 +448,6 @@ class KalturaFlavorParamsOrderBy
 
 class KalturaFlavorParamsOutputOrderBy
 {
-}
-
-class KalturaGenericDistributionProviderParser
-{
-	const XSL = 1;
-	const XPATH = 2;
-	const REGEX = 3;
 }
 
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -745,30 +650,6 @@ class KalturaMediaType
 	const LIVE_STREAM_WINDOWS_MEDIA = 202;
 	const LIVE_STREAM_REAL_MEDIA = 203;
 	const LIVE_STREAM_QUICKTIME = 204;
-}
-
-class KalturaMetadataObjectType
-{
-	const ENTRY = 1;
-}
-
-class KalturaMetadataOrderBy
-{
-	const METADATA_PROFILE_VERSION_ASC = "+metadataProfileVersion";
-	const METADATA_PROFILE_VERSION_DESC = "-metadataProfileVersion";
-	const VERSION_ASC = "+version";
-	const VERSION_DESC = "-version";
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaMetadataStatus
-{
-	const VALID = 1;
-	const INVALID = 2;
-	const DELETED = 3;
 }
 
 class KalturaMixEntryOrderBy
@@ -1288,27 +1169,6 @@ class KalturaVideoCodec
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
 	const COPY = "copy";
-}
-
-class KalturaVirusFoundAction
-{
-	const NONE = 0;
-	const DELETE = 1;
-	const CLEAN_NONE = 2;
-	const CLEAN_DELETE = 3;
-}
-
-class KalturaVirusScanEngineType
-{
-	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
-}
-
-class KalturaVirusScanJobResult
-{
-	const SCAN_ERROR = 1;
-	const FILE_IS_CLEAN = 2;
-	const FILE_WAS_CLEANED = 3;
-	const FILE_INFECTED = 4;
 }
 
 class KalturaWidgetOrderBy

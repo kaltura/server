@@ -81,7 +81,7 @@ class KalturaClientBase
 					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', class_implements($pluginClass)))
 						continue;
 						
-					$plugin = call_user_func(array($pluginClass, 'get'));
+					$plugin = call_user_func(array($pluginClass, 'get'), $this);
 					if(!($plugin instanceof IKalturaClientPlugin))
 						continue;
 						
