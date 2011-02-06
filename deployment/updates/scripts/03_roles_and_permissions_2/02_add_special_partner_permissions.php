@@ -236,7 +236,8 @@ function getOrCreateUserSessionRole($partnerId)
 	if ($id) {
 		$role = UserRolePeer::retrieveByPK($id);
 	}
-	else {
+	if (!$role)
+	{
 		$role = new UserRole();
 		$role->setPartnerId($partnerId);
 		$role->setStatus(UserRoleStatus::ACTIVE);
