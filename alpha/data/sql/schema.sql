@@ -1926,6 +1926,7 @@ CREATE TABLE `permission_item`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`type` VARCHAR(100)  NOT NULL,
+	`partner_id` INTEGER  NOT NULL,
 	`param_1` VARCHAR(100)  NOT NULL,
 	`param_2` VARCHAR(100)  NOT NULL,
 	`param_3` VARCHAR(100)  NOT NULL,

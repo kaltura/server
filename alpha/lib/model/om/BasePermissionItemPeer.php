@@ -25,7 +25,7 @@ abstract class BasePermissionItemPeer {
 	const TM_CLASS = 'PermissionItemTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 12;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -35,6 +35,9 @@ abstract class BasePermissionItemPeer {
 
 	/** the column name for the TYPE field */
 	const TYPE = 'permission_item.TYPE';
+
+	/** the column name for the PARTNER_ID field */
+	const PARTNER_ID = 'permission_item.PARTNER_ID';
 
 	/** the column name for the PARAM_1 field */
 	const PARAM_1 = 'permission_item.PARAM_1';
@@ -79,11 +82,11 @@ abstract class BasePermissionItemPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'Param1', 'Param2', 'Param3', 'Param4', 'Param5', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'param1', 'param2', 'param3', 'param4', 'param5', 'tags', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::PARAM_1, self::PARAM_2, self::PARAM_3, self::PARAM_4, self::PARAM_5, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'param_1', 'param_2', 'param_3', 'param_4', 'param_5', 'tags', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'PartnerId', 'Param1', 'Param2', 'Param3', 'Param4', 'Param5', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'partnerId', 'param1', 'param2', 'param3', 'param4', 'param5', 'tags', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::TYPE, self::PARTNER_ID, self::PARAM_1, self::PARAM_2, self::PARAM_3, self::PARAM_4, self::PARAM_5, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'partner_id', 'param_1', 'param_2', 'param_3', 'param_4', 'param_5', 'tags', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -93,11 +96,11 @@ abstract class BasePermissionItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'Param1' => 2, 'Param2' => 3, 'Param3' => 4, 'Param4' => 5, 'Param5' => 6, 'Tags' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'CustomData' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'param1' => 2, 'param2' => 3, 'param3' => 4, 'param4' => 5, 'param5' => 6, 'tags' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'customData' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::PARAM_1 => 2, self::PARAM_2 => 3, self::PARAM_3 => 4, self::PARAM_4 => 5, self::PARAM_5 => 6, self::TAGS => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::CUSTOM_DATA => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'param_1' => 2, 'param_2' => 3, 'param_3' => 4, 'param_4' => 5, 'param_5' => 6, 'tags' => 7, 'created_at' => 8, 'updated_at' => 9, 'custom_data' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'PartnerId' => 2, 'Param1' => 3, 'Param2' => 4, 'Param3' => 5, 'Param4' => 6, 'Param5' => 7, 'Tags' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, 'CustomData' => 11, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'partnerId' => 2, 'param1' => 3, 'param2' => 4, 'param3' => 5, 'param4' => 6, 'param5' => 7, 'tags' => 8, 'createdAt' => 9, 'updatedAt' => 10, 'customData' => 11, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::TYPE => 1, self::PARTNER_ID => 2, self::PARAM_1 => 3, self::PARAM_2 => 4, self::PARAM_3 => 5, self::PARAM_4 => 6, self::PARAM_5 => 7, self::TAGS => 8, self::CREATED_AT => 9, self::UPDATED_AT => 10, self::CUSTOM_DATA => 11, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'partner_id' => 2, 'param_1' => 3, 'param_2' => 4, 'param_3' => 5, 'param_4' => 6, 'param_5' => 7, 'tags' => 8, 'created_at' => 9, 'updated_at' => 10, 'custom_data' => 11, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -169,6 +172,7 @@ abstract class BasePermissionItemPeer {
 	{
 		$criteria->addSelectColumn(PermissionItemPeer::ID);
 		$criteria->addSelectColumn(PermissionItemPeer::TYPE);
+		$criteria->addSelectColumn(PermissionItemPeer::PARTNER_ID);
 		$criteria->addSelectColumn(PermissionItemPeer::PARAM_1);
 		$criteria->addSelectColumn(PermissionItemPeer::PARAM_2);
 		$criteria->addSelectColumn(PermissionItemPeer::PARAM_3);
@@ -317,6 +321,66 @@ abstract class BasePermissionItemPeer {
 	
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		
+		if(!$privatePartnerData)
+		{
+			// the private partner data is not allowed - 
+			if($kalturaNetwork)
+			{
+				// allow only the kaltura netword stuff
+				if($partnerId)
+				{
+					$orderBy = "(" . self::PARTNER_ID . "<>{$partnerId})";  // first take the pattner_id and then the rest
+					myCriteria::addComment($criteria , "Only Kaltura Network");
+					$criteria->addAscendingOrderByColumn($orderBy);//, Criteria::CUSTOM );
+				}
+			}
+			else
+			{
+				// no private data and no kaltura_network - 
+				// add a criteria that will return nothing
+				$criteria->addAnd(self::PARTNER_ID, Partner::PARTNER_THAT_DOWS_NOT_EXIST);
+			}
+		}
+		else
+		{
+			// private data is allowed
+			if(empty($partnerGroup) && empty($kalturaNetwork))
+			{
+				// the default case
+				$criteria->addAnd(self::PARTNER_ID, $partnerId);
+			}
+			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			{
+				// all is allowed - don't add anything to the criteria
+			}
+			else 
+			{
+				$criterion = null;
+				if($partnerGroup)
+				{
+					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+					$partners = explode(',', trim($partnerGroup));
+					foreach($partners as &$p)
+						trim($p); // make sure there are not leading or trailing spaces
+	
+					// add the partner_id to the partner_group
+					$partners[] = $partnerId;
+					
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+				}
+				else 
+				{
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
+				}	
+				
+				$criteria->addAnd($criterion);
+			}
+		}
+			
+		$criteriaFilter->enable();
 	}
 	
 	/**

@@ -31,6 +31,12 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 	protected $type;
 
 	/**
+	 * The value for the partner_id field.
+	 * @var        int
+	 */
+	protected $partner_id;
+
+	/**
 	 * The value for the param_1 field.
 	 * @var        string
 	 */
@@ -140,6 +146,16 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 	public function getType()
 	{
 		return $this->type;
+	}
+
+	/**
+	 * Get the [partner_id] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPartnerId()
+	{
+		return $this->partner_id;
 	}
 
 	/**
@@ -337,6 +353,29 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setType()
+
+	/**
+	 * Set the value of [partner_id] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     PermissionItem The current object (for fluent API support)
+	 */
+	public function setPartnerId($v)
+	{
+		if(!isset($this->oldColumnsValues[PermissionItemPeer::PARTNER_ID]))
+			$this->oldColumnsValues[PermissionItemPeer::PARTNER_ID] = $this->partner_id;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->partner_id !== $v) {
+			$this->partner_id = $v;
+			$this->modifiedColumns[] = PermissionItemPeer::PARTNER_ID;
+		}
+
+		return $this;
+	} // setPartnerId()
 
 	/**
 	 * Set the value of [param_1] column.
@@ -628,15 +667,16 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->type = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-			$this->param_1 = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->param_2 = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->param_3 = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->param_4 = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->param_5 = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->tags = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+			$this->param_1 = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->param_2 = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->param_3 = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->param_4 = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->param_5 = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->tags = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -646,7 +686,7 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = PermissionItemPeer::NUM_COLUMNS - PermissionItemPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = PermissionItemPeer::NUM_COLUMNS - PermissionItemPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating PermissionItem object", $e);
@@ -1079,30 +1119,33 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 				return $this->getType();
 				break;
 			case 2:
-				return $this->getParam1();
+				return $this->getPartnerId();
 				break;
 			case 3:
-				return $this->getParam2();
+				return $this->getParam1();
 				break;
 			case 4:
-				return $this->getParam3();
+				return $this->getParam2();
 				break;
 			case 5:
-				return $this->getParam4();
+				return $this->getParam3();
 				break;
 			case 6:
-				return $this->getParam5();
+				return $this->getParam4();
 				break;
 			case 7:
-				return $this->getTags();
+				return $this->getParam5();
 				break;
 			case 8:
-				return $this->getCreatedAt();
+				return $this->getTags();
 				break;
 			case 9:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 10:
+				return $this->getUpdatedAt();
+				break;
+			case 11:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1128,15 +1171,16 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 		$result = array(
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getType(),
-			$keys[2] => $this->getParam1(),
-			$keys[3] => $this->getParam2(),
-			$keys[4] => $this->getParam3(),
-			$keys[5] => $this->getParam4(),
-			$keys[6] => $this->getParam5(),
-			$keys[7] => $this->getTags(),
-			$keys[8] => $this->getCreatedAt(),
-			$keys[9] => $this->getUpdatedAt(),
-			$keys[10] => $this->getCustomData(),
+			$keys[2] => $this->getPartnerId(),
+			$keys[3] => $this->getParam1(),
+			$keys[4] => $this->getParam2(),
+			$keys[5] => $this->getParam3(),
+			$keys[6] => $this->getParam4(),
+			$keys[7] => $this->getParam5(),
+			$keys[8] => $this->getTags(),
+			$keys[9] => $this->getCreatedAt(),
+			$keys[10] => $this->getUpdatedAt(),
+			$keys[11] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1175,30 +1219,33 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 				$this->setType($value);
 				break;
 			case 2:
-				$this->setParam1($value);
+				$this->setPartnerId($value);
 				break;
 			case 3:
-				$this->setParam2($value);
+				$this->setParam1($value);
 				break;
 			case 4:
-				$this->setParam3($value);
+				$this->setParam2($value);
 				break;
 			case 5:
-				$this->setParam4($value);
+				$this->setParam3($value);
 				break;
 			case 6:
-				$this->setParam5($value);
+				$this->setParam4($value);
 				break;
 			case 7:
-				$this->setTags($value);
+				$this->setParam5($value);
 				break;
 			case 8:
-				$this->setCreatedAt($value);
+				$this->setTags($value);
 				break;
 			case 9:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 10:
+				$this->setUpdatedAt($value);
+				break;
+			case 11:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1227,15 +1274,16 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
-		if (array_key_exists($keys[2], $arr)) $this->setParam1($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setParam2($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setParam3($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setParam4($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setParam5($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setTags($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
+		if (array_key_exists($keys[3], $arr)) $this->setParam1($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setParam2($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setParam3($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setParam4($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setParam5($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setTags($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
 	}
 
 	/**
@@ -1249,6 +1297,7 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 
 		if ($this->isColumnModified(PermissionItemPeer::ID)) $criteria->add(PermissionItemPeer::ID, $this->id);
 		if ($this->isColumnModified(PermissionItemPeer::TYPE)) $criteria->add(PermissionItemPeer::TYPE, $this->type);
+		if ($this->isColumnModified(PermissionItemPeer::PARTNER_ID)) $criteria->add(PermissionItemPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(PermissionItemPeer::PARAM_1)) $criteria->add(PermissionItemPeer::PARAM_1, $this->param_1);
 		if ($this->isColumnModified(PermissionItemPeer::PARAM_2)) $criteria->add(PermissionItemPeer::PARAM_2, $this->param_2);
 		if ($this->isColumnModified(PermissionItemPeer::PARAM_3)) $criteria->add(PermissionItemPeer::PARAM_3, $this->param_3);
@@ -1313,6 +1362,8 @@ abstract class BasePermissionItem extends BaseObject  implements Persistent {
 	{
 
 		$copyObj->setType($this->type);
+
+		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setParam1($this->param_1);
 
