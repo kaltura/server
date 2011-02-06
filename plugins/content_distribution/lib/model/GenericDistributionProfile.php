@@ -52,6 +52,54 @@ class GenericDistributionProfile extends DistributionProfile
     	
 		return parent::preSave($con);
 	}
+
+	/* (non-PHPdoc)
+	 * @see BaseDistributionProfile::getSubmitEnabled()
+	 */
+	public function getSubmitEnabled()
+	{
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::SUBMIT);
+		if(!$action)
+			return DistributionProfileActionStatus::DISABLED;
+		
+		return parent::getSubmitEnabled();
+	}
+
+	/* (non-PHPdoc)
+	 * @see BaseDistributionProfile::getUpdateEnabled()
+	 */
+	public function getUpdateEnabled()
+	{
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::UPDATE);
+		if(!$action)
+			return DistributionProfileActionStatus::DISABLED;
+		
+		return parent::getUpdateEnabled();
+	}
+
+	/* (non-PHPdoc)
+	 * @see BaseDistributionProfile::getDeleteEnabled()
+	 */
+	public function getDeleteEnabled()
+	{
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::DELETE);
+		if(!$action)
+			return DistributionProfileActionStatus::DISABLED;
+		
+		return parent::getDeleteEnabled();
+	}
+
+	/* (non-PHPdoc)
+	 * @see BaseDistributionProfile::getReportEnabled()
+	 */
+	public function getReportEnabled()
+	{
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::FETCH_REPORT);
+		if(!$action)
+			return DistributionProfileActionStatus::DISABLED;
+		
+		return parent::getReportEnabled();
+	}
 	
 	public function getGenericProviderId()			{return $this->getFromCustomData(self::CUSTOM_DATA_GENERIC_PROVIDER_ID);}
 		
