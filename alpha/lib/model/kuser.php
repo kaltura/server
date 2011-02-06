@@ -525,9 +525,8 @@ class kuser extends Basekuser
 	public function getPuserId()
 	{
 		$puserId = parent::getPuserId();
-		if (!$puserId) {
+		if (is_null($puserId) && !defined("KALTURA_API_V3"))
 			$puserId = PuserKuserPeer::getPuserIdFromKuserId ( $this->getPartnerId(), $this->getId() );
-		}
 		
 		return $puserId;
 	}
