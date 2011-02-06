@@ -1,4 +1,8 @@
 <?php
+/**
+ *  @package infra
+ *  @subpackage DB
+ */
 class KalturaStatement extends PDOStatement
 {
 	protected $values = array();

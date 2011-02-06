@@ -1,6 +1,8 @@
 <?php
-
-	
+/**
+ * @package External
+ * @subpackage Akamai
+ */
 class AkamaiRichMediaAcceleratorReportServiceClient extends AkamaiClient
 {
 	const WSDL_URL = 'https://control.akamai.com/nmrws/services/RichMediaAcceleratorReportService?wsdl';

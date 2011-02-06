@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTrackEntryEventType
 {
 	const UPLOADED_FILE = 1;
@@ -13,6 +17,10 @@ class KalturaTrackEntryEventType
 	const DELETED_ENTRY = 6;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaInfoListResponse extends KalturaObjectBase
 {
 	/**
@@ -34,6 +42,10 @@ class KalturaMediaInfoListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -55,6 +67,10 @@ class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaInvestigateFlavorAssetData extends KalturaObjectBase
 {
 	/**
@@ -100,6 +116,10 @@ class KalturaInvestigateFlavorAssetData extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -121,6 +141,10 @@ class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaInvestigateThumbAssetData extends KalturaObjectBase
 {
 	/**
@@ -158,6 +182,10 @@ class KalturaInvestigateThumbAssetData extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTrackEntry extends KalturaObjectBase
 {
 	/**
@@ -282,6 +310,10 @@ class KalturaTrackEntry extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaInvestigateEntryData extends KalturaObjectBase
 {
 	/**
@@ -335,6 +367,10 @@ class KalturaInvestigateEntryData extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTrackEntryListResponse extends KalturaObjectBase
 {
 	/**
@@ -357,6 +393,10 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -381,6 +421,10 @@ class KalturaFlavorParamsOutputService extends KalturaServiceBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOutputService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -405,6 +449,10 @@ class KalturaThumbParamsOutputService extends KalturaServiceBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaInfoService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -429,6 +477,10 @@ class KalturaMediaInfoService extends KalturaServiceBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEntryAdminService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -463,6 +515,10 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 {
 	/**

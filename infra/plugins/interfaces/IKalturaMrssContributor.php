@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Plugins
+ */
 interface IKalturaMrssContributor extends IKalturaBase
 {
 	/**

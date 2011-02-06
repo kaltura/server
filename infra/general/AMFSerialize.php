@@ -22,6 +22,8 @@
 /**
  * Serializes a PHP variable as an AMF stream
  *
+ * @package infra
+ * @subpackage Media
  */
 class FLV_Util_AMFSerialize {
 

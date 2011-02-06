@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaClientBase 
 {
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
@@ -480,6 +484,10 @@ class KalturaClientBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 interface IKalturaClientPlugin
 {
 	/**
@@ -498,6 +506,10 @@ interface IKalturaClientPlugin
 	public function getName();
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaClientPlugin implements IKalturaClientPlugin
 {
 	protected function __construct()
@@ -506,6 +518,10 @@ abstract class KalturaClientPlugin implements IKalturaClientPlugin
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaServiceActionCall
 {
 	/**
@@ -586,8 +602,10 @@ class KalturaServiceActionCall
 }
 
 /**
- * Abstract base class for all client services 
- *
+ * Abstract base class for all client services
+ *  
+ * @package Kaltura
+ * @subpackage Client
  */
 abstract class KalturaServiceBase
 {
@@ -616,8 +634,10 @@ abstract class KalturaServiceBase
 }
 
 /**
- * Abstract base class for all client objects 
- *
+ * Abstract base class for all client objects
+ * 
+ * @package Kaltura
+ * @subpackage Client
  */
 abstract class KalturaObjectBase
 {
@@ -648,6 +668,10 @@ abstract class KalturaObjectBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaException extends Exception 
 {
     public function __construct($message, $code) 
@@ -657,6 +681,10 @@ class KalturaException extends Exception
     }
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaClientException extends Exception 
 {
 	const ERROR_GENERIC = -1;
@@ -669,6 +697,10 @@ class KalturaClientException extends Exception
 	const ERROR_INVALID_OBJECT_TYPE = -8;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConfiguration
 {
 	private $logger;
@@ -715,7 +747,9 @@ class KalturaConfiguration
 
 /**
  * Implement to get Kaltura Client logs
- *
+ * 
+ * @package Kaltura
+ * @subpackage Client
  */
 interface IKalturaLogger 
 {

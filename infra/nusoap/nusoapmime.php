@@ -50,6 +50,8 @@ require_once('Mail/mimePart.php');
 * @author	Thanks to Guillaume and Henning Reich for posting great attachment code to the mail list
 * @version  $Id: nusoapmime.php,v 1.13 2010/04/26 20:15:08 snichol Exp $
 * @access   public
+* @package External
+* @subpackage soap
 */
 class nusoap_client_mime extends nusoap_client {
 	/**

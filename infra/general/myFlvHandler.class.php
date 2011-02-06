@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class myFlvHandler
 {
 	const FLV_HEADER_SIZE = 13;
@@ -877,6 +881,10 @@ class myFlvHandler
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class myFlvStaticHandler
 {
 	public static function isMultiFlavor ( $file_name )
@@ -956,7 +964,10 @@ class myFlvStaticHandler
 	}
 		
 }
-
+/**
+ * @package infra
+ * @subpackage Media
+ */
 abstract class FlvInfo
 {
 	protected $flv_file_name;
@@ -1023,6 +1034,10 @@ abstract class FlvInfo
 	
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvInfoVideo extends FlvInfo
 {
 	protected $FILE_SUFFIX = ".vinfo";
@@ -1161,6 +1176,10 @@ class FlvInfoVideo extends FlvInfo
     }
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvInfoAudio extends FlvInfoVideo
 {
 	protected $FILE_SUFFIX = ".ainfo";
@@ -1187,6 +1206,10 @@ class FlvInfoAudio extends FlvInfoVideo
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvMetadataVideo extends FlvInfo
 {
 	protected $FILE_SUFFIX = ".vmetadata";
@@ -1285,6 +1308,10 @@ class FlvMetadataVideo extends FlvInfo
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvMetadataAudio extends FlvMetadataVideo
 {
 	protected $FILE_SUFFIX = ".ametadata";

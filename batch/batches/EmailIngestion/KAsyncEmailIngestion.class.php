@@ -519,7 +519,10 @@ class KAsyncEmailIngestion extends KBatchBase {
 
 
 
-//TODO: add comments
+/**
+ * @package Scheduler
+ * @subpackage Email-Ingestion
+ */
 class AddEntriesFailures {
 
 	public $attachment_invalid     = false;

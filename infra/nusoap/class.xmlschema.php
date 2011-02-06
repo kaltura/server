@@ -11,6 +11,8 @@
 * @author   Scott Nichol <snichol@users.sourceforge.net>
 * @version  $Id: class.xmlschema.php,v 1.53 2010/04/26 20:15:08 snichol Exp $
 * @access   public
+* @package External
+* @subpackage soap
 */
 class nusoap_xmlschema extends nusoap_base  {
 	

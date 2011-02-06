@@ -1,6 +1,8 @@
 <?php
-
-	
+/**
+ * @package External
+ * @subpackage Akamai
+ */
 class AkamaiBillingReportsClient extends AkamaiClient
 {
 	const WSDL_URL = 'https://control.akamai.com/nmrws/services/BillingReports?wsdl';

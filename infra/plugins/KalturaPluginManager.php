@@ -2,7 +2,10 @@
 // TODO - remove after config moved to DB or external file
 require_once realpath(dirname(__FILE__) . '/../../') . '/alpha/config/kConf.php';
 
-
+/**
+ * @package infra
+ * @subpackage Plugins
+ */
 class KalturaPluginManager
 {
 	/**

@@ -1,12 +1,20 @@
 <?php
 require_once("KalturaClientBase.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAccessControlOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAdminUserOrderBy
 {
 	const ID_ASC = "+id";
@@ -15,6 +23,10 @@ class KalturaAdminUserOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaApiActionPermissionItemOrderBy
 {
 	const ID_ASC = "+id";
@@ -25,6 +37,10 @@ class KalturaApiActionPermissionItemOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaApiParameterPermissionItemAction
 {
 	const READ = "read";
@@ -32,6 +48,10 @@ class KalturaApiParameterPermissionItemAction
 	const INSERT = "insert";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaApiParameterPermissionItemOrderBy
 {
 	const ID_ASC = "+id";
@@ -42,6 +62,10 @@ class KalturaApiParameterPermissionItemOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -54,20 +78,36 @@ class KalturaAssetOrderBy
 	const DELETED_AT_DESC = "-deletedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParamsOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParamsOutputOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetType
 {
 	const FLAVOR = "1";
 	const THUMBNAIL = "2";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAudioCodec
 {
 	const NONE = "";
@@ -78,6 +118,10 @@ class KalturaAudioCodec
 	const COPY = "copy";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -92,6 +136,10 @@ class KalturaBaseEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseJobOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -106,6 +154,10 @@ class KalturaBaseJobOrderBy
 	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";
@@ -118,6 +170,10 @@ class KalturaBaseSyndicationFeedOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobAppErrors
 {
 	const OUTPUT_FILE_DOESNT_EXIST = 11;
@@ -133,6 +189,10 @@ class KalturaBatchJobAppErrors
 	const THUMBNAIL_NOT_CREATED = 91;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobErrorTypes
 {
 	const APP = 0;
@@ -143,6 +203,10 @@ class KalturaBatchJobErrorTypes
 	const KALTURA_CLIENT = 5;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobOrderBy
 {
 	const STATUS_ASC = "+status";
@@ -173,6 +237,10 @@ class KalturaBatchJobOrderBy
 	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobStatus
 {
 	const PENDING = 0;
@@ -189,6 +257,10 @@ class KalturaBatchJobStatus
 	const DONT_PROCESS = 11;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobType
 {
 	const CONVERT = "0";
@@ -228,12 +300,20 @@ class KalturaBatchJobType
 	const DISTRIBUTION_SYNC = "contentDistribution.DistributionSync";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBitRateMode
 {
 	const CBR = 1;
 	const VBR = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBulkUploadCsvVersion
 {
 	const V1 = "1";
@@ -241,6 +321,10 @@ class KalturaBulkUploadCsvVersion
 	const V3 = "3";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaCategoryOrderBy
 {
 	const DEPTH_ASC = "+depth";
@@ -251,12 +335,20 @@ class KalturaCategoryOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaCommercialUseType
 {
 	const COMMERCIAL_USE = 1;
 	const NON_COMMERCIAL_USE = 0;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaContainerFormat
 {
 	const FLV = "flv";
@@ -279,6 +371,10 @@ class KalturaContainerFormat
 	const JPG = "jpg";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -287,6 +383,10 @@ class KalturaControlPanelCommandOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandStatus
 {
 	const PENDING = 1;
@@ -295,6 +395,10 @@ class KalturaControlPanelCommandStatus
 	const FAILED = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandTargetType
 {
 	const DATA_CENTER = 1;
@@ -304,6 +408,10 @@ class KalturaControlPanelCommandTargetType
 	const BATCH = 5;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandType
 {
 	const STOP = 1;
@@ -312,6 +420,10 @@ class KalturaControlPanelCommandType
 	const KILL = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConversionEngineType
 {
 	const KALTURA_COM = "0";
@@ -331,12 +443,20 @@ class KalturaConversionEngineType
 	const SEGMENTER = "segmenter.Segmenter";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConversionProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDataEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -351,6 +471,10 @@ class KalturaDataEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDurationType
 {
 	const NOT_AVAILABLE = "notavailable";
@@ -359,12 +483,20 @@ class KalturaDurationType
 	const LONG = "long";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEditorType
 {
 	const SIMPLE = 1;
 	const ADVANCED = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEntryModerationStatus
 {
 	const PENDING_MODERATION = 1;
@@ -374,6 +506,10 @@ class KalturaEntryModerationStatus
 	const AUTO_APPROVED = 6;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEntryStatus
 {
 	const ERROR_IMPORTING = "-2";
@@ -388,6 +524,10 @@ class KalturaEntryStatus
 	const INFECTED = "virusScan.Infected";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEntryType
 {
 	const AUTOMATIC = "-1";
@@ -399,6 +539,10 @@ class KalturaEntryType
 	const DOCUMENT = "10";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncObjectType
 {
 	const ENTRY = "1";
@@ -412,6 +556,10 @@ class KalturaFileSyncObjectType
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -424,6 +572,10 @@ class KalturaFlavorAssetOrderBy
 	const DELETED_AT_DESC = "-deletedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorAssetStatus
 {
 	const ERROR = -1;
@@ -435,14 +587,26 @@ class KalturaFlavorAssetStatus
 	const TEMP = 5;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutputOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaGender
 {
 	const UNKNOWN = 0;
@@ -450,6 +614,10 @@ class KalturaGender
 	const FEMALE = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaGoogleVideoSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";
@@ -462,6 +630,10 @@ class KalturaGoogleVideoSyndicationFeedOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaITunesSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";
@@ -474,6 +646,10 @@ class KalturaITunesSyndicationFeedOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLicenseType
 {
 	const UNKNOWN = -1;
@@ -495,6 +671,10 @@ class KalturaLicenseType
 	const MOZILLA = 15;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamAdminEntryOrderBy
 {
 	const MEDIA_TYPE_ASC = "+mediaType";
@@ -519,6 +699,10 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamEntryOrderBy
 {
 	const MEDIA_TYPE_ASC = "+mediaType";
@@ -543,6 +727,10 @@ class KalturaLiveStreamEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailJobOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -557,6 +745,10 @@ class KalturaMailJobOrderBy
 	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailJobStatus
 {
 	const PENDING = 1;
@@ -565,6 +757,10 @@ class KalturaMailJobStatus
 	const QUEUED = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailType
 {
 	const MAIL_TYPE_KALTURA_NEWSLETTER = 10;
@@ -605,6 +801,10 @@ class KalturaMailType
 	const MAIL_TYPE_SYSTEM_USER_CREDENTIALS_SAVED = 113;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaEntryOrderBy
 {
 	const MEDIA_TYPE_ASC = "+mediaType";
@@ -629,18 +829,34 @@ class KalturaMediaEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParamsOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParamsOutputOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaInfoOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaType
 {
 	const VIDEO = 1;
@@ -652,6 +868,10 @@ class KalturaMediaType
 	const LIVE_STREAM_QUICKTIME = 204;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMixEntryOrderBy
 {
 	const PLAYS_ASC = "+plays";
@@ -674,6 +894,10 @@ class KalturaMixEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationObjectType
 {
 	const ENTRY = 1;
@@ -682,6 +906,10 @@ class KalturaNotificationObjectType
 	const BATCH_JOB = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -696,6 +924,10 @@ class KalturaNotificationOrderBy
 	const LOCK_VERSION_DESC = "-lockVersion";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationStatus
 {
 	const PENDING = 1;
@@ -707,6 +939,10 @@ class KalturaNotificationStatus
 	const QUEUED = 7;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationType
 {
 	const ENTRY_ADD = 1;
@@ -720,6 +956,10 @@ class KalturaNotificationType
 	const USER_BANNED = 26;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNullableBoolean
 {
 	const NULL_VALUE = -1;
@@ -727,6 +967,10 @@ class KalturaNullableBoolean
 	const TRUE_VALUE = 1;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPartnerOrderBy
 {
 	const ID_ASC = "+id";
@@ -745,6 +989,10 @@ class KalturaPartnerOrderBy
 	const STATUS_DESC = "-status";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPartnerStatus
 {
 	const ACTIVE = 1;
@@ -752,6 +1000,10 @@ class KalturaPartnerStatus
 	const FULL_BLOCK = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPartnerType
 {
 	const KMC = 1;
@@ -766,6 +1018,10 @@ class KalturaPartnerType
 	const SAKAI = 108;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionItemOrderBy
 {
 	const ID_ASC = "+id";
@@ -776,12 +1032,20 @@ class KalturaPermissionItemOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionItemType
 {
 	const API_ACTION_ITEM = "kApiActionPermissionItem";
 	const API_PARAMETER_ITEM = "kApiParameterPermissionItem";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionName
 {
 	const FEATURE_ANALYTICS_TAB = "FEATURE_ANALYTICS_TAB";
@@ -902,6 +1166,10 @@ class KalturaPermissionName
 	const ADMIN_WHITE_BRANDING = "ADMIN_WHITE_BRANDING";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionOrderBy
 {
 	const ID_ASC = "+id";
@@ -914,6 +1182,10 @@ class KalturaPermissionOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionStatus
 {
 	const ACTIVE = 1;
@@ -921,6 +1193,10 @@ class KalturaPermissionStatus
 	const DELETED = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionType
 {
 	const API_ACCESS = 1;
@@ -930,6 +1206,10 @@ class KalturaPermissionType
 	const EXTERNAL = 99;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlayableEntryOrderBy
 {
 	const PLAYS_ASC = "+plays";
@@ -952,6 +1232,10 @@ class KalturaPlayableEntryOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlaylistOrderBy
 {
 	const NAME_ASC = "+name";
@@ -966,6 +1250,10 @@ class KalturaPlaylistOrderBy
 	const RANK_DESC = "-rank";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlaylistType
 {
 	const DYNAMIC = 10;
@@ -973,6 +1261,10 @@ class KalturaPlaylistType
 	const EXTERNAL = 101;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerStatusType
 {
 	const RUNNING_BATCHES_COUNT = 1;
@@ -984,6 +1276,10 @@ class KalturaSchedulerStatusType
 	const RUNNING_BATCHES_IS_RUNNING = 7;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchConditionComparison
 {
 	const EQUEL = 1;
@@ -993,12 +1289,20 @@ class KalturaSearchConditionComparison
 	const LESS_THAN_OR_EQUEL = 5;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchOperatorType
 {
 	const SEARCH_AND = 1;
 	const SEARCH_OR = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchProviderType
 {
 	const FLICKR = 3;
@@ -1019,12 +1323,20 @@ class KalturaSearchProviderType
 	const PARTNER_SPECIFIC = 100;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSessionType
 {
 	const USER = 0;
 	const ADMIN = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSourceType
 {
 	const FILE = 1;
@@ -1034,6 +1346,10 @@ class KalturaSourceType
 	const AKAMAI_LIVE = 29;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbAssetOrderBy
 {
 	const SIZE_ASC = "+size";
@@ -1046,6 +1362,10 @@ class KalturaThumbAssetOrderBy
 	const DELETED_AT_DESC = "-deletedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbCropType
 {
 	const RESIZE = 1;
@@ -1054,14 +1374,26 @@ class KalturaThumbCropType
 	const CROP_FROM_TOP = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOutputOrderBy
 {
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTubeMogulSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";
@@ -1074,12 +1406,20 @@ class KalturaTubeMogulSyndicationFeedOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUiConfCreationMode
 {
 	const WIZARD = 2;
 	const ADVANCED = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUiConfObjType
 {
 	const PLAYER = 1;
@@ -1101,6 +1441,10 @@ class KalturaUiConfObjType
 	const KMC_ROLES_AND_PERMISSIONS = 17;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUiConfOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -1109,12 +1453,20 @@ class KalturaUiConfOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUploadTokenOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUploadTokenStatus
 {
 	const PENDING = 0;
@@ -1125,6 +1477,10 @@ class KalturaUploadTokenStatus
 	const DELETED = 5;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserOrderBy
 {
 	const ID_ASC = "+id";
@@ -1133,6 +1489,10 @@ class KalturaUserOrderBy
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserRoleOrderBy
 {
 	const ID_ASC = "+id";
@@ -1145,6 +1505,10 @@ class KalturaUserRoleOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserRoleStatus
 {
 	const ACTIVE = 1;
@@ -1152,6 +1516,10 @@ class KalturaUserRoleStatus
 	const DELETED = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserStatus
 {
 	const BLOCKED = 0;
@@ -1159,6 +1527,10 @@ class KalturaUserStatus
 	const DELETED = 2;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVideoCodec
 {
 	const NONE = "";
@@ -1178,12 +1550,20 @@ class KalturaVideoCodec
 	const COPY = "copy";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaWidgetOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaYahooSyndicationFeedOrderBy
 {
 	const PLAYLIST_ID_ASC = "+playlistId";

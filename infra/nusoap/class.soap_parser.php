@@ -11,6 +11,8 @@
 * @author   Scott Nichol <snichol@users.sourceforge.net>
 * @version  $Id: class.soap_parser.php,v 1.42 2010/04/26 20:15:08 snichol Exp $
 * @access   public
+* @package External
+* @subpackage soap
 */
 class nusoap_parser extends nusoap_base {
 

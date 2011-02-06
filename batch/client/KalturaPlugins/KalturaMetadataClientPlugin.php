@@ -3,11 +3,19 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataObjectType
 {
 	const ENTRY = 1;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataOrderBy
 {
 	const METADATA_PROFILE_VERSION_ASC = "+metadataProfileVersion";
@@ -20,6 +28,10 @@ class KalturaMetadataOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataStatus
 {
 	const VALID = 1;
@@ -27,6 +39,10 @@ class KalturaMetadataStatus
 	const DELETED = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTransformMetadataJobData extends KalturaJobData
 {
 	/**
@@ -67,6 +83,10 @@ class KalturaTransformMetadataJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaImportMetadataJobData extends KalturaJobData
 {
 	/**
@@ -93,6 +113,10 @@ class KalturaImportMetadataJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMetadataBaseFilter extends KalturaFilter
 {
 	/**
@@ -217,11 +241,19 @@ abstract class KalturaMetadataBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadata extends KalturaObjectBase
 {
 	/**
@@ -315,6 +347,10 @@ class KalturaMetadata extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataListResponse extends KalturaObjectBase
 {
 	/**
@@ -336,6 +372,10 @@ class KalturaMetadataListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTransformMetadataResponse extends KalturaObjectBase
 {
 	/**
@@ -365,6 +405,10 @@ class KalturaTransformMetadataResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUpgradeMetadataResponse extends KalturaObjectBase
 {
 	/**
@@ -387,6 +431,10 @@ class KalturaUpgradeMetadataResponse extends KalturaObjectBase
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -438,6 +486,10 @@ class KalturaMetadataService extends KalturaServiceBase
 	}
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1592,6 +1644,10 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMetadataClientPlugin extends KalturaClientPlugin
 {
 	/**

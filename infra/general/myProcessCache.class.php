@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage cache
+ */
 class myProcessCache
 {
 	private $m_namespace;

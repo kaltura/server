@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package infra
+ * @subpackage soap
+ */
 class SoapObject
 {
 	protected function getAttributeType($attributeName)

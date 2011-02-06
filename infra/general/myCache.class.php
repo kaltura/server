@@ -5,9 +5,11 @@
  * 	1. in the php.ini - uncomment the extension=php_memcache.dll entry (windows)
  * 	2. run the daemon memcached
  * 
- * The memcahe object is sttic and will be used for all of the cache requests of a single request. 
+ * The memcahe object is sttic and will be used for all of the cache requests of a single request.
+ * 
+ * @package infra
+ * @subpackage cache
  */
-
 class myCache
 {
 	const STATS = "_stats_";

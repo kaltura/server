@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfileProtocol
 {
 	const KALTURA_DC = 0;
@@ -11,6 +15,10 @@ class KalturaStorageProfileProtocol
 	const SFTP = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfileStatus
 {
 	const DISABLED = 1;
@@ -18,6 +26,10 @@ class KalturaStorageProfileStatus
 	const MANUAL = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageServePriority
 {
 	const KALTURA_ONLY = 1;
@@ -26,6 +38,10 @@ class KalturaStorageServePriority
 	const EXTERNAL_ONLY = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -198,6 +214,10 @@ class KalturaStorageProfile extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfileListResponse extends KalturaObjectBase
 {
 	/**
@@ -220,6 +240,10 @@ class KalturaStorageProfileListResponse extends KalturaObjectBase
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -297,6 +321,10 @@ class KalturaStorageProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 {
 	/**

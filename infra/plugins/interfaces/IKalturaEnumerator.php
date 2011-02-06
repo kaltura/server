@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Plugins
+ */
 interface IKalturaEnumerator extends IKalturaBase
 {
 	const PLUGIN_VALUE_DELIMITER = '.';

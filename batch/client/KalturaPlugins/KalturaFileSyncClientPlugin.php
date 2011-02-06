@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncStatus
 {
 	const ERROR = -1;
@@ -12,6 +16,10 @@ class KalturaFileSyncStatus
 	const PURGED = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncType
 {
 	const FILE = 1;
@@ -19,6 +27,10 @@ class KalturaFileSyncType
 	const URL = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSync extends KalturaObjectBase
 {
 	/**
@@ -209,6 +221,10 @@ class KalturaFileSync extends KalturaObjectBase
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -231,6 +247,10 @@ class KalturaFileSyncService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 {
 	/**

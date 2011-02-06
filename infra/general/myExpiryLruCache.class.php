@@ -3,8 +3,10 @@
  * implementation of LRU cache where the cached objects can expire.
  * when using the 'get' function - if an object exists but expires, it will not appear (as if not in cache).
  * if you want to know if an object is expires but still is held in the cache - use 'exists ( $obj_name )'
+ * 
+ * @package infra
+ * @subpackage cache
  */
-
 class myExpiryLruCache 
 {
 	private $m_cache ;

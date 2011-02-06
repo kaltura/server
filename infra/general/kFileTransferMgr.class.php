@@ -1,10 +1,13 @@
 <?php
 
 
-/*************************************************************************************
+/**
  * List of classes that extend 'kFileTransferMgr'.
  * Instances of these classes can be created using the 'getInstance($type)' function.
- *************************************************************************************/
+ * 
+ * @package infra
+ * @subpackage Storage
+ */
 class kFileTransferMgrType
 {
 	const FTP  = 1; // FTP Protocol
@@ -19,10 +22,13 @@ define ("PATH_TO_MANAGERS", "file_transfer_managers");
 
 
 
-/**********************************************************************************************************
+/**
  * List of exception types relevant to 'kFileTransferMgr'.
  * Should be used as the exception code (getCode()) when creating a 'kFileTransferMgrException' exception.
- **********************************************************************************************************/
+ * 
+ * @package infra
+ * @subpackage Storage
+ */
 class kFileTransferMgrException extends Exception
 {
 	const notYetConnected    = 1; // connection not yet established
@@ -36,9 +42,12 @@ class kFileTransferMgrException extends Exception
 
 
 
-/*************************************************************
+/**
  * An abstract class that implements a file transfer manager.
- *************************************************************/
+ * 
+ * @package infra
+ * @subpackage Storage
+ */
 abstract class kFileTransferMgr
 {
 	/********************/

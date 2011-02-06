@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class myFlvWrapper
 {
 	/*FLV File Format
@@ -961,6 +965,10 @@ class myFlvWrapper
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvTag
 {
 	public $index = 0;
@@ -1144,6 +1152,10 @@ class FlvTag
 
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class PrevTagSize
 {
 	public $size_raw = null;
@@ -1176,6 +1188,10 @@ class PrevTagSize
 }
 
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvInfo
 {
 	const NUMBER_OF_FIELDS = 6;
@@ -1530,6 +1546,10 @@ class FlvInfo
 }
 
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvInfoAudio extends FlvInfo
 {
 	protected $FILE_SUFFIX = ".info-audio";
@@ -1572,8 +1592,13 @@ class FlvInfoAudio extends FlvInfo
 
 }
 
-// this class helps create the metadata for an flv file
-// using a cached version of the serialized FLV_Util_AMFSerialize as a basic template
+/**
+ * this class helps create the metadata for an flv file
+ * using a cached version of the serialized FLV_Util_AMFSerialize as a basic template
+ * 
+ * @package infra
+ * @subpackage Media
+ */
 class FlvMetaData
 {
 	protected $FILE_SUFFIX = ".metadata";
@@ -1731,6 +1756,10 @@ class FlvMetaData
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class FlvMetaDataAudio extends FlvMetaData
 {
 	protected $FILE_SUFFIX = ".metadata-audio";

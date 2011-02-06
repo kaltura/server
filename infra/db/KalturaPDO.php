@@ -1,5 +1,8 @@
 <?php
-
+/**
+ *  @package infra
+ *  @subpackage DB
+ */
 class KalturaPDO extends PropelPDO
 {
 	public function __construct($dsn, $username = null, $password = null, $driver_options = array())

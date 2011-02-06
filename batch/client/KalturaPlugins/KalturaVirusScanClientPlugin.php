@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusFoundAction
 {
 	const NONE = 0;
@@ -11,11 +15,19 @@ class KalturaVirusFoundAction
 	const CLEAN_DELETE = 3;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusScanEngineType
 {
 	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusScanJobResult
 {
 	const SCAN_ERROR = 1;
@@ -24,6 +36,10 @@ class KalturaVirusScanJobResult
 	const FILE_INFECTED = 4;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusScanJobData extends KalturaJobData
 {
 	/**
@@ -58,6 +74,10 @@ class KalturaVirusScanJobData extends KalturaJobData
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusScanBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1131,6 +1151,10 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 {
 	/**

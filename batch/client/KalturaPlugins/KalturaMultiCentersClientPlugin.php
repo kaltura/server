@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileSyncImportJobData extends KalturaJobData
 {
 	/**
@@ -37,6 +41,10 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 }
 
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFilesyncImportBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1127,6 +1135,10 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 {
 	/**

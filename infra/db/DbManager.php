@@ -1,7 +1,7 @@
 <?php
 /**
- * Our version of sfDatabaseManager - taken from the generated version from config_core_compile.yml.php
- *
+ *  @package infra
+ *  @subpackage DB
  */
 class DbManager 
 {

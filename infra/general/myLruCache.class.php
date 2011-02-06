@@ -1,10 +1,10 @@
 <?php
 /**
- * implementation of a cache that uses the LRU algorithm when number of cached objects exceed the 
- * allowed size.
+ * implementation of a cache that uses the LRU algorithm when number of cached objects exceed the allowed size.
+ *  
+ * @package infra
+ * @subpackage cache
  */
-
-// TODO - implement the LRU algorithm !!
 class myLruCache
 {
 	private $m_max_size = 100; // SOME defaulat value

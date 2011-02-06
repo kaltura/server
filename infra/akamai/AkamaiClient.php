@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package External
+ * @subpackage Akamai
+ */
 class AkamaiClient extends nusoap_client
 {
 	const PARAM_TYPE_TIMESTAMP = 'xsd:dateTime';

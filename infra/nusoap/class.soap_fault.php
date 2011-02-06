@@ -10,6 +10,8 @@
 * @author   Dietrich Ayala <dietrich@ganx4.com>
 * @version  $Id: class.soap_fault.php,v 1.14 2007/04/11 15:49:47 snichol Exp $
 * @access public
+* @package External
+* @subpackage soap
 */
 class nusoap_fault extends nusoap_base {
 	/**

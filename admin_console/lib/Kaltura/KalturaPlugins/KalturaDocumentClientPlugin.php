@@ -3,6 +3,10 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDocumentType
 {
 	const DOCUMENT = 11;
@@ -10,6 +14,10 @@ class KalturaDocumentType
 	const PDF = 13;
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDocumentEntry extends KalturaBaseEntry
 {
 	/**
@@ -32,6 +40,10 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPdfFlavorParams extends KalturaFlavorParams
 {
 	/**
@@ -44,11 +56,19 @@ class KalturaPdfFlavorParams extends KalturaFlavorParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSwfFlavorParams extends KalturaFlavorParams
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDocumentClientPlugin extends KalturaClientPlugin
 {
 	/**

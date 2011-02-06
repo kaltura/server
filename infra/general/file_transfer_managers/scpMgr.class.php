@@ -1,12 +1,11 @@
 <?php
-
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'kFileTransferMgr.class.php');
-
-/*
+/**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the SCP protocol.
  * For additional comments please look at the 'kFileTransferMgr' class.
+ * 
+ * @package infra
+ * @subpackage Storage
  */
-
 class scpMgr extends kFileTransferMgr
 {
 	

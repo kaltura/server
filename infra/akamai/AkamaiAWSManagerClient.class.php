@@ -1,6 +1,8 @@
 <?php
-
-	
+/**
+ * @package External
+ * @subpackage Akamai
+ */
 class AkamaiAWSManagerClient extends AkamaiClient
 {
 	const WSDL_URL = 'https://control.akamai.com/webservices/services/AWSManager?wsdl';

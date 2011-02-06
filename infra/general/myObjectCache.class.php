@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage cache
+ */
 class myObjectCache
 {
 	private static $s_cache ;

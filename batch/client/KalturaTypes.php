@@ -1,16 +1,28 @@
 <?php
 require_once("KalturaClientBase.php");
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDynamicEnum extends KalturaObjectBase
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaJobData extends KalturaObjectBase
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBulkUploadJobData extends KalturaJobData
 {
 	/**
@@ -79,6 +91,10 @@ class KalturaBulkUploadJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParams extends KalturaObjectBase
 {
 	/**
@@ -151,6 +167,10 @@ class KalturaAssetParams extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParams extends KalturaAssetParams
 {
 	/**
@@ -287,6 +307,10 @@ class KalturaFlavorParams extends KalturaAssetParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutput extends KalturaFlavorParams
 {
 	/**
@@ -334,6 +358,10 @@ class KalturaFlavorParamsOutput extends KalturaFlavorParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConvartableJobData extends KalturaJobData
 {
 	/**
@@ -402,6 +430,10 @@ class KalturaConvartableJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConvertJobData extends KalturaConvartableJobData
 {
 	/**
@@ -442,6 +474,10 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConvertProfileJobData extends KalturaJobData
 {
 	/**
@@ -470,6 +506,10 @@ class KalturaConvertProfileJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaExtractMediaJobData extends KalturaConvartableJobData
 {
 	/**
@@ -482,6 +522,10 @@ class KalturaExtractMediaJobData extends KalturaConvartableJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaImportJobData extends KalturaJobData
 {
 	/**
@@ -508,6 +552,10 @@ class KalturaImportJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPostConvertJobData extends KalturaConvartableJobData
 {
 	/**
@@ -560,6 +608,10 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaRemoteConvertJobData extends KalturaConvartableJobData
 {
 	/**
@@ -580,6 +632,10 @@ class KalturaRemoteConvertJobData extends KalturaConvartableJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailJobData extends KalturaJobData
 {
 	/**
@@ -690,6 +746,10 @@ class KalturaMailJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationJobData extends KalturaJobData
 {
 	/**
@@ -758,6 +818,10 @@ class KalturaNotificationJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBulkDownloadJobData extends KalturaJobData
 {
 	/**
@@ -787,11 +851,19 @@ class KalturaBulkDownloadJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlattenJobData extends KalturaJobData
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaProvisionJobData extends KalturaJobData
 {
 	/**
@@ -888,6 +960,10 @@ class KalturaProvisionJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConvertCollectionFlavorData extends KalturaObjectBase
 {
 	/**
@@ -942,6 +1018,10 @@ class KalturaConvertCollectionFlavorData extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 {
 	/**
@@ -996,6 +1076,10 @@ class KalturaConvertCollectionJobData extends KalturaConvartableJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageJobData extends KalturaJobData
 {
 	/**
@@ -1043,6 +1127,10 @@ class KalturaStorageJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageExportJobData extends KalturaStorageJobData
 {
 	/**
@@ -1062,11 +1150,19 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaStorageDeleteJobData extends KalturaStorageJobData
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParams extends KalturaAssetParams
 {
 	/**
@@ -1163,6 +1259,10 @@ class KalturaThumbParams extends KalturaAssetParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOutput extends KalturaThumbParams
 {
 	/**
@@ -1196,6 +1296,10 @@ class KalturaThumbParamsOutput extends KalturaThumbParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -1257,6 +1361,10 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseEntry extends KalturaObjectBase
 {
 	/**
@@ -1493,6 +1601,10 @@ class KalturaBaseEntry extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerStatus extends KalturaObjectBase
 {
 	/**
@@ -1566,6 +1678,10 @@ class KalturaSchedulerStatus extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerConfig extends KalturaObjectBase
 {
 	/**
@@ -1684,6 +1800,10 @@ class KalturaSchedulerConfig extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseJob extends KalturaObjectBase
 {
 	/**
@@ -1753,6 +1873,10 @@ class KalturaBaseJob extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJob extends KalturaBaseJob
 {
 	/**
@@ -1969,6 +2093,10 @@ class KalturaBatchJob extends KalturaBaseJob
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerWorker extends KalturaObjectBase
 {
 	/**
@@ -2087,6 +2215,10 @@ class KalturaSchedulerWorker extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaScheduler extends KalturaObjectBase
 {
 	/**
@@ -2179,11 +2311,19 @@ class KalturaScheduler extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaSearchItem extends KalturaObjectBase
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFilter extends KalturaObjectBase
 {
 	/**
@@ -2203,6 +2343,10 @@ class KalturaFilter extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 {
 	/**
@@ -2313,11 +2457,19 @@ abstract class KalturaBaseJobBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseJobFilter extends KalturaBaseJobBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 {
 	/**
@@ -2799,11 +2951,19 @@ abstract class KalturaBatchJobBaseFilter extends KalturaBaseJobFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaWorkerQueueFilter extends KalturaObjectBase
 {
 	/**
@@ -2837,6 +2997,10 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchQueuesStatus extends KalturaObjectBase
 {
 	/**
@@ -2882,6 +3046,10 @@ class KalturaBatchQueuesStatus extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommand extends KalturaObjectBase
 {
 	/**
@@ -3026,6 +3194,10 @@ class KalturaControlPanelCommand extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerStatusResponse extends KalturaObjectBase
 {
 	/**
@@ -3055,6 +3227,10 @@ class KalturaSchedulerStatusResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaControlPanelCommandBaseFilter extends KalturaFilter
 {
 	/**
@@ -3137,11 +3313,19 @@ abstract class KalturaControlPanelCommandBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandFilter extends KalturaControlPanelCommandBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFilterPager extends KalturaObjectBase
 {
 	/**
@@ -3163,6 +3347,10 @@ class KalturaFilterPager extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaControlPanelCommandListResponse extends KalturaObjectBase
 {
 	/**
@@ -3184,6 +3372,10 @@ class KalturaControlPanelCommandListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerListResponse extends KalturaObjectBase
 {
 	/**
@@ -3205,6 +3397,10 @@ class KalturaSchedulerListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSchedulerWorkerListResponse extends KalturaObjectBase
 {
 	/**
@@ -3226,6 +3422,10 @@ class KalturaSchedulerWorkerListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaExclusiveLockKey extends KalturaObjectBase
 {
 	/**
@@ -3252,6 +3452,10 @@ class KalturaExclusiveLockKey extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFreeJobResponse extends KalturaObjectBase
 {
 	/**
@@ -3281,6 +3485,10 @@ class KalturaFreeJobResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBulkUploadPluginData extends KalturaObjectBase
 {
 	/**
@@ -3300,6 +3508,10 @@ class KalturaBulkUploadPluginData extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBulkUploadResult extends KalturaObjectBase
 {
 	/**
@@ -3464,6 +3676,10 @@ class KalturaBulkUploadResult extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaInfo extends KalturaObjectBase
 {
 	/**
@@ -3714,6 +3930,10 @@ class KalturaMediaInfo extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotification extends KalturaBaseJob
 {
 	/**
@@ -3775,6 +3995,10 @@ class KalturaNotification extends KalturaBaseJob
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPartner extends KalturaObjectBase
 {
 	/**
@@ -4006,6 +4230,10 @@ class KalturaPartner extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchGetExclusiveNotificationJobsResponse extends KalturaObjectBase
 {
 	/**
@@ -4027,6 +4255,10 @@ class KalturaBatchGetExclusiveNotificationJobsResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFileExistsResponse extends KalturaObjectBase
 {
 	/**
@@ -4048,6 +4280,10 @@ class KalturaFileExistsResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaEmailIngestionProfile extends KalturaObjectBase
 {
 	/**
@@ -4169,6 +4405,10 @@ class KalturaEmailIngestionProfile extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlayableEntry extends KalturaBaseEntry
 {
 	/**
@@ -4237,6 +4477,10 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaEntry extends KalturaPlayableEntry
 {
 	/**
@@ -4323,6 +4567,10 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaAssetBaseFilter extends KalturaFilter
 {
 	/**
@@ -4447,11 +4695,19 @@ abstract class KalturaAssetBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetFilter extends KalturaAssetBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAsset extends KalturaObjectBase
 {
 	/**
@@ -4554,6 +4810,10 @@ class KalturaAsset extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorAsset extends KalturaAsset
 {
 	/**
@@ -4636,6 +4896,10 @@ class KalturaFlavorAsset extends KalturaAsset
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorAssetListResponse extends KalturaObjectBase
 {
 	/**
@@ -4657,6 +4921,10 @@ class KalturaFlavorAssetListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobResponse extends KalturaObjectBase
 {
 	/**
@@ -4678,6 +4946,10 @@ class KalturaBatchJobResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobFilterExt extends KalturaBatchJobFilter
 {
 	/**
@@ -4690,6 +4962,10 @@ class KalturaBatchJobFilterExt extends KalturaBatchJobFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBatchJobListResponse extends KalturaObjectBase
 {
 	/**
@@ -4711,6 +4987,10 @@ class KalturaBatchJobListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbAsset extends KalturaAsset
 {
 	/**
@@ -4743,6 +5023,10 @@ class KalturaThumbAsset extends KalturaAsset
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbAssetListResponse extends KalturaObjectBase
 {
 	/**
@@ -4764,6 +5048,10 @@ class KalturaThumbAssetListResponse extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPullJobData extends KalturaJobData
 {
 	/**
@@ -4783,6 +5071,10 @@ class KalturaPullJobData extends KalturaJobData
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParamsOutput extends KalturaAssetParams
 {
 	/**
@@ -4823,16 +5115,28 @@ class KalturaAssetParamsOutput extends KalturaAssetParams
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParams extends KalturaFlavorParams
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParamsOutput extends KalturaFlavorParamsOutput
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDataEntry extends KalturaBaseEntry
 {
 	/**
@@ -4853,6 +5157,10 @@ class KalturaDataEntry extends KalturaBaseEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamBitrate extends KalturaObjectBase
 {
 	/**
@@ -4879,6 +5187,10 @@ class KalturaLiveStreamBitrate extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamEntry extends KalturaMediaEntry
 {
 	/**
@@ -4939,6 +5251,10 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
 {
 	/**
@@ -4977,6 +5293,10 @@ class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMixEntry extends KalturaPlayableEntry
 {
 	/**
@@ -5006,6 +5326,10 @@ class KalturaMixEntry extends KalturaPlayableEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 {
 	/**
@@ -5399,6 +5723,10 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 {
 	/**
@@ -5411,6 +5739,10 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	/**
@@ -5479,11 +5811,19 @@ abstract class KalturaPlayableEntryBaseFilter extends KalturaBaseEntryFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlayableEntryFilter extends KalturaPlayableEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 	/**
@@ -5531,11 +5871,19 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 {
 	/**
@@ -5548,6 +5896,10 @@ class KalturaMediaEntryFilterForPlaylist extends KalturaMediaEntryFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlaylist extends KalturaBaseEntry
 {
 	/**
@@ -5608,6 +5960,10 @@ class KalturaPlaylist extends KalturaBaseEntry
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailJob extends KalturaBaseJob
 {
 	/**
@@ -5711,6 +6067,10 @@ class KalturaMailJob extends KalturaBaseJob
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchCondition extends KalturaSearchItem
 {
 	/**
@@ -5730,6 +6090,10 @@ class KalturaSearchCondition extends KalturaSearchItem
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchComparableCondition extends KalturaSearchCondition
 {
 	/**
@@ -5742,6 +6106,10 @@ class KalturaSearchComparableCondition extends KalturaSearchCondition
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaSearchOperator extends KalturaSearchItem
 {
 	/**
@@ -5761,6 +6129,10 @@ class KalturaSearchOperator extends KalturaSearchItem
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 {
 	/**
@@ -5794,31 +6166,55 @@ abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAccessControlFilter extends KalturaAccessControlBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMailJobBaseFilter extends KalturaBaseJobFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMailJobFilter extends KalturaMailJobBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaNotificationBaseFilter extends KalturaBaseJobFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaNotificationFilter extends KalturaNotificationBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 {
 	/**
@@ -5838,11 +6234,19 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParamsFilter extends KalturaAssetParamsBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilter
 {
 	/**
@@ -5876,11 +6280,19 @@ abstract class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilt
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAssetParamsOutputFilter extends KalturaAssetParamsOutputBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	/**
@@ -5900,31 +6312,55 @@ abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaConversionProfileFilter extends KalturaConversionProfileBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaFlavorAssetBaseFilter extends KalturaAssetFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorAssetFilter extends KalturaFlavorAssetBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsFilter extends KalturaFlavorParamsBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFilter
 {
 	/**
@@ -5958,31 +6394,55 @@ abstract class KalturaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsFi
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutputFilter extends KalturaFlavorParamsOutputBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMediaFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParamsFilter extends KalturaMediaFlavorParamsBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMediaFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaFlavorParamsOutputFilter extends KalturaMediaFlavorParamsOutputBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 {
 	/**
@@ -5995,31 +6455,55 @@ abstract class KalturaMediaInfoBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMediaInfoFilter extends KalturaMediaInfoBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaThumbAssetBaseFilter extends KalturaAssetFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbAssetFilter extends KalturaThumbAssetBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaThumbParamsBaseFilter extends KalturaAssetParamsFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsFilter extends KalturaThumbParamsBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilter
 {
 	/**
@@ -6053,61 +6537,109 @@ abstract class KalturaThumbParamsOutputBaseFilter extends KalturaThumbParamsFilt
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaThumbParamsOutputFilter extends KalturaThumbParamsOutputBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaDataEntryBaseFilter extends KalturaBaseEntryFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaDataEntryFilter extends KalturaDataEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaLiveStreamEntryBaseFilter extends KalturaMediaEntryFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamEntryFilter extends KalturaLiveStreamEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaLiveStreamAdminEntryBaseFilter extends KalturaLiveStreamEntryFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaLiveStreamAdminEntryFilter extends KalturaLiveStreamAdminEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaMixEntryBaseFilter extends KalturaPlayableEntryFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaMixEntryFilter extends KalturaMixEntryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaPlaylistBaseFilter extends KalturaBaseEntryFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaUserBaseFilter extends KalturaFilter
 {
 	/**
@@ -6197,6 +6729,10 @@ abstract class KalturaUserBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserFilter extends KalturaUserBaseFilter
 {
 	/**
@@ -6223,26 +6759,46 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaAdminUserBaseFilter extends KalturaUserFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaAdminUserFilter extends KalturaAdminUserBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaBaseSyndicationFeedFilter extends KalturaBaseSyndicationFeedBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaCategoryBaseFilter extends KalturaFilter
 {
 	/**
@@ -6297,31 +6853,55 @@ abstract class KalturaCategoryBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaCategoryFilter extends KalturaCategoryBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaGoogleVideoSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaGoogleVideoSyndicationFeedFilter extends KalturaGoogleVideoSyndicationFeedBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaITunesSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaITunesSyndicationFeedFilter extends KalturaITunesSyndicationFeedBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaPartnerBaseFilter extends KalturaFilter
 {
 	/**
@@ -6390,21 +6970,37 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPartnerFilter extends KalturaPartnerBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaTubeMogulSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaTubeMogulSyndicationFeedFilter extends KalturaTubeMogulSyndicationFeedBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaUiConfBaseFilter extends KalturaFilter
 {
 	/**
@@ -6494,11 +7090,19 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUiConfFilter extends KalturaUiConfBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 {
 	/**
@@ -6539,11 +7143,19 @@ abstract class KalturaUploadTokenBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUploadTokenFilter extends KalturaUploadTokenBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaWidgetBaseFilter extends KalturaFilter
 {
 	/**
@@ -6633,21 +7245,37 @@ abstract class KalturaWidgetBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaWidgetFilter extends KalturaWidgetBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaYahooSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaYahooSyndicationFeedFilter extends KalturaYahooSyndicationFeedBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaPermissionItemBaseFilter extends KalturaFilter
 {
 	/**
@@ -6737,31 +7365,55 @@ abstract class KalturaPermissionItemBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaApiActionPermissionItemBaseFilter extends KalturaPermissionItemFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaApiActionPermissionItemFilter extends KalturaApiActionPermissionItemBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaApiParameterPermissionItemBaseFilter extends KalturaPermissionItemFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaApiParameterPermissionItemFilter extends KalturaApiParameterPermissionItemBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaPermissionBaseFilter extends KalturaFilter
 {
 	/**
@@ -6907,11 +7559,19 @@ abstract class KalturaPermissionBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaPermissionFilter extends KalturaPermissionBaseFilter
 {
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 abstract class KalturaUserRoleBaseFilter extends KalturaFilter
 {
 	/**
@@ -7022,6 +7682,10 @@ abstract class KalturaUserRoleBaseFilter extends KalturaFilter
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
 class KalturaUserRoleFilter extends KalturaUserRoleBaseFilter
 {
 

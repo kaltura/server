@@ -57,7 +57,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$serviceNodes = $xpath->query("/xml/services/service");
 		foreach($serviceNodes as $serviceNode)
 		{
-			if(!$classNode->hasAttribute('plugin'))
+			if(!$serviceNode->hasAttribute('plugin'))
 		    	$this->writeService($serviceNode);
 		}
 		$this->appendLine();
@@ -111,6 +111,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
 			$services[] = $serviceNode->getAttribute("name");
+		
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
 		
 		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
 		$this->appendLine('{');
@@ -178,6 +183,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	function writeEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute("name");
+		
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
+		
 	 	$this->appendLine("class $enumName");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
@@ -203,6 +214,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$abstract = '';
 		if ($classNode->hasAttribute("abstract"))
 			$abstract = 'abstract ';
+		
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
 		
 		// class definition
 		if ($classNode->hasAttribute("base"))
@@ -264,7 +280,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$serviceId = $serviceNode->getAttribute("id");
 		
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
-		$this->appendLine();		
+		$this->appendLine();
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
 		$this->appendLine("class $serviceClassName extends KalturaServiceBase");
 		$this->appendLine("{");
 		$this->appendLine("	function __construct(KalturaClient \$client = null)");
@@ -434,6 +454,11 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	function writeMainClient(DOMNodeList $serviceNodes)
 	{
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
+		
+		$this->appendLine('/**');
+		$this->appendLine(' * @package Kaltura');
+		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(' */');
 		
 		$this->appendLine("class KalturaClient extends KalturaClientBase");
 		$this->appendLine("{");

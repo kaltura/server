@@ -1,6 +1,8 @@
 <?php
-
-	
+/**
+ * @package External
+ * @subpackage Akamai
+ */
 class AkamaiStreamsClient extends AkamaiClient
 {
 	const WSDL_URL = 'https://control.akamai.com/webservices/services/Streams?wsdl';
