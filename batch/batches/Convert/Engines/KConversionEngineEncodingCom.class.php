@@ -1,12 +1,10 @@
 <?php
-
-/*
+/**
  * Encoding.com API: http://www.encoding.com/wdocs/ApiDoc
  * 
  * @package Scheduler
  * @subpackage Conversion
  */
-
 class KConversionEngineEncodingCom  extends KJobConversionEngine
 {
 	const ENCODING_COM = "encoding_com";

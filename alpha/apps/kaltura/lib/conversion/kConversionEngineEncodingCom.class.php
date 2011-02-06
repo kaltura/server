@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage Conversion
+ */
 class kConversionEngineEncodingCom  extends kConversionEngineFlix
 {
 	const ENCODING_COM = "encoding_com";

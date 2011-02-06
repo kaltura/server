@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage mantis
+ */
 class MantisClient extends nusoap_client
 {
 	var $soapClient = null;
@@ -72,4 +75,3 @@ class MantisClient extends nusoap_client
 		return $result;
 	}
 }
-?>
