@@ -19,6 +19,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand,eq,order
+	 * @requiresPermission update
 	 */
 	public $name;
 	
@@ -26,6 +27,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Entry description
 	 * 
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $description;
 	
@@ -51,6 +53,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
+	 * @requiresPermission update
 	 */
 	public $tags;
 	
