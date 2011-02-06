@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class KImageMagickCropper extends KBaseCropper
 {
 	const RESIZE = 1;

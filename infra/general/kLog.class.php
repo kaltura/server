@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage log
+ */
 class kLog
 {
 	private static $s_context;
@@ -40,4 +44,3 @@ class kLog
 		return self::$logger;
 	}
 }
-?>

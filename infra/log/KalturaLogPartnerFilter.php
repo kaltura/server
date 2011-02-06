@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage log
+ */
 class KalturaLogPartnerFilter implements Zend_Log_Filter_Interface
 {
 	/**
@@ -30,4 +34,3 @@ class KalturaLogPartnerFilter implements Zend_Log_Filter_Interface
         return ($GLOBALS["partnerId"] === $this->_partnerId);
     }
 }
-?>

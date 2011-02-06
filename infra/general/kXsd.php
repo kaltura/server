@@ -1,5 +1,8 @@
 <?php
-
+/** 
+ * @package infra
+ * @subpackage utils
+ */
 class kXsd
 {
 	/**

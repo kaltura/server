@@ -28,9 +28,11 @@
  * The forth part holds the rows of the table.
  * Each row in a separate line.
  * Each line separated into columns by the table-delimiter.
- * In the column defined as the pk there should be no duplicates.
+ * In the column defined as the pk there should be no duplicates. 
+ * 
+ * @package infra
+ * @subpackage utils
  */
-
 class kConfigTable 
 {
 	const LINE_SEPARATOR = "\r\n";

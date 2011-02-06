@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 {
 	protected $cmdPath;

@@ -1,5 +1,8 @@
 <?php
-
+/** 
+ * @package infra
+ * @subpackage utils
+ */
 class kXml
 {
 	public static function getLibXmlErrorDescription($xml)
@@ -226,5 +229,3 @@ class kXml
 		return $simpleXML;
 	}
 }
-
-?>

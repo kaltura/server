@@ -1,5 +1,8 @@
 <?php
-
+/** 
+ * @package infra
+ * @subpackage utils
+ */
 class myDebug
 {
 	private $m_str ;
@@ -32,4 +35,3 @@ class myDebug
 		return strftime( "%d/%m %H:%M:%S." , time() ) . $milliseconds ;
 	}
 }
-?>

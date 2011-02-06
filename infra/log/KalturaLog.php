@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage log
+ */
 class KalturaLog
 {
 	private static $_logger;
@@ -92,6 +96,10 @@ class KalturaLog
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class KalturaStdoutLogger
 {
 	public function log($message, $priority = KalturaLog::NOTICE)
@@ -100,6 +108,10 @@ class KalturaStdoutLogger
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class LogTime 
 {
 	public function __toString()
@@ -108,6 +120,10 @@ class LogTime
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class UniqueId
 {
 	static $_uniqueId = null;
@@ -128,6 +144,10 @@ class UniqueId
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class LogMethod
 {
 	public function __toString()
@@ -148,6 +168,10 @@ class LogMethod
 	}
 }
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class LogIp
 {
 	static $_ip = null;
@@ -161,4 +185,3 @@ class LogIp
 		return self::$_ip;
 	}
 }
-?>

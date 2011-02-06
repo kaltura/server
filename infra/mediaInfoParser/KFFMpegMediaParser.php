@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Media
+ */
 class KFFMpegMediaParser extends KBaseMediaParser
 {
 	protected $cmdPath;

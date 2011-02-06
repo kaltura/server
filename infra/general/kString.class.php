@@ -2,10 +2,11 @@
 /**
  * kString -
  * a bundle of helpful functions for manipulating strings
+ *  
+ * @package infra
+ * @subpackage utils
+ * @todo think if kClass is a good convention for helper classes ?
  */
-
-// TODO - think if kClass is a good convention for helper classes ?
-
 class kString
 {
 	/**

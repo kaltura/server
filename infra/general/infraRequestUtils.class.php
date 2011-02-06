@@ -3,6 +3,8 @@
 /**
  * Will hold helper functions and conventions for working with the HttpRequest object
  *
+ * @package infra
+ * @subpackage http
  */
 class infraRequestUtils
 {

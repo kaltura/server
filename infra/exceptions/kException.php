@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage Exceptions
+ */
 class kException extends Exception
 {
 	public $kaltura_code = null;

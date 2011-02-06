@@ -1,4 +1,8 @@
 <?php
+/** 
+ * @package infra
+ * @subpackage utils
+ */
 class myGenericContainer
 {
 	private $map = null;
@@ -16,4 +20,3 @@ class myGenericContainer
 		return $val;
 	}
 }
-?>

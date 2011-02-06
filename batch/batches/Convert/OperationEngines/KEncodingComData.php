@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * Encoding.com API: http://www.encoding.com/wdocs/ApiDoc
  * 
  * @package Scheduler
  * @subpackage Conversion
  */
-
 class KEncodingComData
 {
 	const ACTION_ADD_MEDIA = 'AddMedia';

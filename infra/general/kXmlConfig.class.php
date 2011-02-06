@@ -3,8 +3,10 @@
  * This class will merge 2 xml configurztion files to reduce code duplication.
  * This will lbe done by referencing elements from one xml to another.
  * The result can be stored on the disk so the relatively heavy merge will be done only when really required.
+ * 
+ * @package infra
+ * @subpackage utils
  */
-
 class kXmlConfig
 {
 	const ATTR_EXTENDS = "extends";
@@ -358,4 +360,3 @@ class kXmlConfig
 
 	}
 }
-?>

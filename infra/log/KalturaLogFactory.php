@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package infra
+ * @subpackage log
+ */
 class KalturaLogFactory
 {
 	public static function getLogger(Zend_Config $config = null)

@@ -1,10 +1,10 @@
 <?php
-
 /**
- * kUTF8 -
  * manipulate UTF8 strings
+ *  
+ * @package infra
+ * @subpackage utils
  */
-
 class kUTF8
 {
 	/* 

@@ -1,7 +1,9 @@
 <?php
 /**
- * kArray -
- * a bundle of helpful functions for manipulating arrays
+ * A bundle of helpful functions for manipulating arrays
+ * 
+ * @package infra
+ * @subpackage utils
  */
 class kArray
 {

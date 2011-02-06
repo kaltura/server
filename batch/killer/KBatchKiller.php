@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Scheduler
+ * @subpackage Killer
+ */
 class KBatchKiller
 {
 	/**

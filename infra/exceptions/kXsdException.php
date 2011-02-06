@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package infra
+ * @subpackage Exceptions
+ */
 class kXsdException extends kException
 {
 	const CAN_NOT_CHANGE_ELEMENT_ID = "CAN_NOT_CHANGE_ELEMENT_ID,Different ids [%s != %s] in path [%s]";
