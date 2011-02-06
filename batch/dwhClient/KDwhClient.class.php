@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage DWH
+ */
 require_once("bootstrap.php");
 
 /**
@@ -102,4 +106,3 @@ class KDwhClient
 		$this->shutdown();
 	}
 }
-?>

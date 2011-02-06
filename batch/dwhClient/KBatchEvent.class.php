@@ -1,29 +1,33 @@
 <?php
+/**
+ * @package Scheduler
+ * @subpackage DWH
+ */
 require_once("bootstrap.php");
 
-/*
+/**
  * 
  *   --------- This is strongly coupled with the ETL op_mon/load_batch_events. 
  * 	Hopefully will be genrated together with the ds_events table events table, and ETL CSV file structure ,--------- 
-	,batch_client_version	varchar(20)
-	,batch_event_type_id	smallint
-	,batch_name	varchar(50)
-	,batch_event_time	datetime
-	,batch_session_id	varchar(50)
-	,batch_type smallint
-	,host_name	varchar(20)
-	,location_id	int
-	,section_id	int
-	,batch_id	int
-	,partner_id	int
-	,entry_id varchar(20)
-	,bulk_upload_id int
-	,batch_parant_id int
-	,batch_root_id int
-	,batch_status smallint
-	,batch_progress int
-	,value_1 int
-	,value_2 string
+ * 	,batch_client_version	varchar(20)
+ * 	,batch_event_type_id	smallint
+ * 	,batch_name	varchar(50)
+ * 	,batch_event_time	datetime
+ * 	,batch_session_id	varchar(50)
+ * 	,batch_type smallint
+ * 	,host_name	varchar(20)
+ * 	,location_id	int
+ * 	,section_id	int
+ * 	,batch_id	int
+ * 	,partner_id	int
+ * 	,entry_id varchar(20)
+ * 	,bulk_upload_id int
+ * 	,batch_parant_id int
+ * 	,batch_root_id int
+ * 	,batch_status smallint
+ * 	,batch_progress int
+ * 	,value_1 int
+ * 	,value_2 string
  * 
  * @package Scheduler
  * @subpackage DWH

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package infra
+ * @subpackage propel
+ */
 require_once 'propel/engine/builder/om/php5/PHP5ObjectBuilder.php';
 
 /**
