@@ -40,15 +40,17 @@ class KalturaDataEntry extends KalturaBaseEntry
 		if ($this->retrieveDataContentByGet === null)
 			$this->retrieveDataContentByGet = 1;
 			
-		$dbDataEntry->putInCustomData('retrieveDataContentByGet',$this->retrieveDataContentByGet);
-			
+		//$dbDataEntry->putInCustomData('retrieveDataContentByGet',$this->retrieveDataContentByGet);
+		$dbDataEntry->setRetrieveDataContentByGet($this->retrieveDataContentByGet);
+		
 		return parent::toObject($dbDataEntry, $propsToSkip);
 	}
 	
 	public function fromObject($dbDataEntry)
 	{
 		parent::fromObject($dbDataEntry);
-		$retrieveDataContentByGet = $dbDataEntry->getFromCustomData('retrieveDataContentByGet');
+		//$retrieveDataContentByGet = $dbDataEntry->getFromCustomData('retrieveDataContentByGet');
+		$retrieveDataContentByGet = $dbDataEntry->getRetrieveDataContentByGet();
 		$this->retrieveDataContentByGet = $retrieveDataContentByGet;
 		
 		if($retrieveDataContentByGet != true)
