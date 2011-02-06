@@ -13,9 +13,17 @@ class ConversionProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
 		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+		
+		$partnerGroup = null;
+		if(
+			$actionName == 'add' ||
+			$actionName == 'update'
+			)
+			$partnerGroup = $this->partnerGroup . ',0';
+			
+		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
 	}
 	
 	/**
