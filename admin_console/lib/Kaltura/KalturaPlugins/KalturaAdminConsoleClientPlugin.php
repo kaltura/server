@@ -552,7 +552,7 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 		$this->flavorParamsOutput = new KalturaFlavorParamsOutputService($client);
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($client);
 		$this->mediaInfo = new KalturaMediaInfoService($client);

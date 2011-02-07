@@ -2401,7 +2401,7 @@ class KalturaContentDistributionClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 		$this->distributionProfile = new KalturaDistributionProfileService($client);
 		$this->entryDistribution = new KalturaEntryDistributionService($client);
 		$this->distributionProvider = new KalturaDistributionProviderService($client);

@@ -1671,7 +1671,7 @@ class KalturaMetadataClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 		$this->metadata = new KalturaMetadataService($client);
 		$this->metadataBatch = new KalturaMetadataBatchService($client);
 	}

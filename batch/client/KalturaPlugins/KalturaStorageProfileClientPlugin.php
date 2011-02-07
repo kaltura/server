@@ -20,7 +20,7 @@ class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 	}
 
 	/**

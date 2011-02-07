@@ -366,7 +366,7 @@ class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 		$this->virusScanProfile = new KalturaVirusScanProfileService($client);
 	}
 

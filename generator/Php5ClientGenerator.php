@@ -157,7 +157,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		$this->appendLine('	protected function __construct(KalturaClient $client)');
 		$this->appendLine('	{');
-		$this->appendLine('		parent::__construct();');
+		$this->appendLine('		parent::__construct($client);');
 		foreach($services as $service)
 		{
 			$serviceName = ucfirst($service);

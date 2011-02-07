@@ -549,7 +549,7 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 
 	protected function __construct(KalturaClient $client)
 	{
-		parent::__construct();
+		parent::__construct($client);
 		$this->fileSync = new KalturaFileSyncService($client);
 	}
 
