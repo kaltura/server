@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaTrackEntryEventType
@@ -22,7 +22,7 @@ class KalturaTrackEntryEventType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaInfoListResponse extends KalturaObjectBase
@@ -47,7 +47,7 @@ class KalturaMediaInfoListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
@@ -72,7 +72,7 @@ class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaInvestigateFlavorAssetData extends KalturaObjectBase
@@ -121,7 +121,7 @@ class KalturaInvestigateFlavorAssetData extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
@@ -146,7 +146,7 @@ class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaInvestigateThumbAssetData extends KalturaObjectBase
@@ -187,7 +187,7 @@ class KalturaInvestigateThumbAssetData extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaTrackEntry extends KalturaObjectBase
@@ -315,7 +315,7 @@ class KalturaTrackEntry extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaInvestigateEntryData extends KalturaObjectBase
@@ -372,7 +372,7 @@ class KalturaInvestigateEntryData extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaTrackEntryListResponse extends KalturaObjectBase
@@ -398,7 +398,7 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
@@ -426,7 +426,7 @@ class KalturaFlavorParamsOutputService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbParamsOutputService extends KalturaServiceBase
@@ -454,7 +454,7 @@ class KalturaThumbParamsOutputService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaInfoService extends KalturaServiceBase
@@ -482,7 +482,7 @@ class KalturaMediaInfoService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryAdminService extends KalturaServiceBase
@@ -520,7 +520,7 @@ class KalturaEntryAdminService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin

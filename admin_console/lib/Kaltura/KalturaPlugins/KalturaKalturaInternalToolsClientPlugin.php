@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaInternalToolsSession extends KalturaObjectBase
@@ -74,7 +74,7 @@ class KalturaInternalToolsSession extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
@@ -123,7 +123,7 @@ class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin

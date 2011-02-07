@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once("KalturaClientBase.php");
@@ -9,7 +9,7 @@ require_once("KalturaTypes.php");
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchcontrolService extends KalturaServiceBase
@@ -237,7 +237,7 @@ class KalturaBatchcontrolService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorAssetService extends KalturaServiceBase
@@ -275,7 +275,7 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorParamsService extends KalturaServiceBase
@@ -303,7 +303,7 @@ class KalturaFlavorParamsService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaJobsService extends KalturaServiceBase
@@ -1258,7 +1258,7 @@ class KalturaJobsService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPartnerService extends KalturaServiceBase
@@ -1284,7 +1284,7 @@ class KalturaPartnerService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionItemService extends KalturaServiceBase
@@ -1365,7 +1365,7 @@ class KalturaPermissionItemService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionService extends KalturaServiceBase
@@ -1458,7 +1458,7 @@ class KalturaPermissionService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSessionService extends KalturaServiceBase
@@ -1482,7 +1482,7 @@ class KalturaSessionService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbAssetService extends KalturaServiceBase
@@ -1520,7 +1520,7 @@ class KalturaThumbAssetService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbParamsService extends KalturaServiceBase
@@ -1548,7 +1548,7 @@ class KalturaThumbParamsService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserRoleService extends KalturaServiceBase
@@ -1642,7 +1642,7 @@ class KalturaUserRoleService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserService extends KalturaServiceBase
@@ -1855,7 +1855,7 @@ class KalturaUserService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaClient extends KalturaClientBase

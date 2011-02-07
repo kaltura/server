@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfileProtocol
@@ -20,7 +20,7 @@ class KalturaStorageProfileProtocol
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfileStatus
@@ -31,7 +31,7 @@ class KalturaStorageProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageServePriority
@@ -43,7 +43,7 @@ class KalturaStorageServePriority
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfile extends KalturaObjectBase
@@ -219,7 +219,7 @@ class KalturaStorageProfile extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfileListResponse extends KalturaObjectBase
@@ -245,7 +245,7 @@ class KalturaStorageProfileListResponse extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfileService extends KalturaServiceBase
@@ -326,7 +326,7 @@ class KalturaStorageProfileService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaStorageProfileClientPlugin extends KalturaClientPlugin

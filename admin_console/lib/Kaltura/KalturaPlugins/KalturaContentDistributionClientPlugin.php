@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionAction
@@ -20,7 +20,7 @@ class KalturaDistributionAction
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionErrorType
@@ -32,7 +32,7 @@ class KalturaDistributionErrorType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileActionStatus
@@ -43,7 +43,7 @@ class KalturaDistributionProfileActionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileOrderBy
@@ -55,7 +55,7 @@ class KalturaDistributionProfileOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileStatus
@@ -66,7 +66,7 @@ class KalturaDistributionProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProtocol
@@ -79,7 +79,7 @@ class KalturaDistributionProtocol
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProviderOrderBy
@@ -87,7 +87,7 @@ class KalturaDistributionProviderOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProviderType
@@ -100,7 +100,7 @@ class KalturaDistributionProviderType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionFlag
@@ -112,7 +112,7 @@ class KalturaEntryDistributionFlag
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionOrderBy
@@ -130,7 +130,7 @@ class KalturaEntryDistributionOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionStatus
@@ -149,7 +149,7 @@ class KalturaEntryDistributionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderActionOrderBy
@@ -161,7 +161,7 @@ class KalturaGenericDistributionProviderActionOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderOrderBy
@@ -173,7 +173,7 @@ class KalturaGenericDistributionProviderOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderParser
@@ -184,7 +184,7 @@ class KalturaGenericDistributionProviderParser
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderStatus
@@ -194,7 +194,7 @@ class KalturaGenericDistributionProviderStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionThumbDimensions extends KalturaObjectBase
@@ -217,7 +217,7 @@ class KalturaDistributionThumbDimensions extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionProfile extends KalturaObjectBase
@@ -367,7 +367,7 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionValidationError extends KalturaObjectBase
@@ -397,7 +397,7 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistribution extends KalturaObjectBase
@@ -616,7 +616,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
@@ -625,7 +625,7 @@ abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionJobData extends KalturaJobData
@@ -697,7 +697,7 @@ class KalturaDistributionJobData extends KalturaJobData
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
@@ -720,7 +720,7 @@ class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
@@ -729,7 +729,7 @@ class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
@@ -738,7 +738,7 @@ class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
@@ -747,7 +747,7 @@ class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProfileAction extends KalturaObjectBase
@@ -812,7 +812,7 @@ class KalturaGenericDistributionProfileAction extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
@@ -871,7 +871,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionProvider extends KalturaObjectBase
@@ -937,7 +937,7 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
@@ -967,7 +967,7 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
@@ -1018,7 +1018,7 @@ abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
@@ -1027,7 +1027,7 @@ class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFil
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileListResponse extends KalturaObjectBase
@@ -1052,7 +1052,7 @@ class KalturaDistributionProfileListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
@@ -1201,7 +1201,7 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
@@ -1210,7 +1210,7 @@ class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionListResponse extends KalturaObjectBase
@@ -1235,7 +1235,7 @@ class KalturaEntryDistributionListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
@@ -1258,7 +1258,7 @@ abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
@@ -1267,7 +1267,7 @@ class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseF
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProviderListResponse extends KalturaObjectBase
@@ -1292,7 +1292,7 @@ class KalturaDistributionProviderListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProvider extends KalturaDistributionProvider
@@ -1393,7 +1393,7 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
@@ -1486,7 +1486,7 @@ abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistr
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributionProviderBaseFilter
@@ -1495,7 +1495,7 @@ class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributio
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderListResponse extends KalturaObjectBase
@@ -1520,7 +1520,7 @@ class KalturaGenericDistributionProviderListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderAction extends KalturaObjectBase
@@ -1660,7 +1660,7 @@ class KalturaGenericDistributionProviderAction extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
@@ -1739,7 +1739,7 @@ abstract class KalturaGenericDistributionProviderActionBaseFilter extends Kaltur
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistributionProviderActionBaseFilter
@@ -1748,7 +1748,7 @@ class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistr
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderActionListResponse extends KalturaObjectBase
@@ -1774,7 +1774,7 @@ class KalturaGenericDistributionProviderActionListResponse extends KalturaObject
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProfileService extends KalturaServiceBase
@@ -1885,7 +1885,7 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryDistributionService extends KalturaServiceBase
@@ -2045,7 +2045,7 @@ class KalturaEntryDistributionService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDistributionProviderService extends KalturaServiceBase
@@ -2073,7 +2073,7 @@ class KalturaDistributionProviderService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderService extends KalturaServiceBase
@@ -2154,7 +2154,7 @@ class KalturaGenericDistributionProviderService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
@@ -2364,7 +2364,7 @@ class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaContentDistributionClientPlugin extends KalturaClientPlugin

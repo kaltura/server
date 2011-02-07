@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncOrderBy
@@ -26,7 +26,7 @@ class KalturaFileSyncOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncStatus
@@ -39,7 +39,7 @@ class KalturaFileSyncStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncType
@@ -50,7 +50,7 @@ class KalturaFileSyncType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSync extends KalturaObjectBase
@@ -243,7 +243,7 @@ class KalturaFileSync extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncListResponse extends KalturaObjectBase
@@ -268,7 +268,7 @@ class KalturaFileSyncListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaFileSyncBaseFilter extends KalturaFilter
@@ -480,7 +480,7 @@ abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
@@ -490,7 +490,7 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncService extends KalturaServiceBase
@@ -532,7 +532,7 @@ class KalturaFileSyncService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncClientPlugin extends KalturaClientPlugin

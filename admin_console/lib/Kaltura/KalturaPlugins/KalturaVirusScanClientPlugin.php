@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusFoundAction
@@ -20,7 +20,7 @@ class KalturaVirusFoundAction
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanEngineType
@@ -29,7 +29,7 @@ class KalturaVirusScanEngineType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfileOrderBy
@@ -41,7 +41,7 @@ class KalturaVirusScanProfileOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfileStatus
@@ -51,7 +51,7 @@ class KalturaVirusScanProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
@@ -144,7 +144,7 @@ abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
@@ -153,7 +153,7 @@ class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfile extends KalturaObjectBase
@@ -229,7 +229,7 @@ class KalturaVirusScanProfile extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfileListResponse extends KalturaObjectBase
@@ -255,7 +255,7 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanProfileService extends KalturaServiceBase
@@ -349,7 +349,7 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVirusScanClientPlugin extends KalturaClientPlugin

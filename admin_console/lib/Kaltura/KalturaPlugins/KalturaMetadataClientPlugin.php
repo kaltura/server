@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataObjectType
@@ -17,7 +17,7 @@ class KalturaMetadataObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataOrderBy
@@ -33,7 +33,7 @@ class KalturaMetadataOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileOrderBy
@@ -45,7 +45,7 @@ class KalturaMetadataProfileOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileStatus
@@ -56,7 +56,7 @@ class KalturaMetadataProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataStatus
@@ -67,7 +67,7 @@ class KalturaMetadataStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaMetadataBaseFilter extends KalturaFilter
@@ -195,7 +195,7 @@ abstract class KalturaMetadataBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataFilter extends KalturaMetadataBaseFilter
@@ -204,7 +204,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadata extends KalturaObjectBase
@@ -301,7 +301,7 @@ class KalturaMetadata extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataListResponse extends KalturaObjectBase
@@ -326,7 +326,7 @@ class KalturaMetadataListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 abstract class KalturaMetadataProfileBaseFilter extends KalturaFilter
@@ -405,7 +405,7 @@ abstract class KalturaMetadataProfileBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileFilter extends KalturaMetadataProfileBaseFilter
@@ -414,7 +414,7 @@ class KalturaMetadataProfileFilter extends KalturaMetadataProfileBaseFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfile extends KalturaObjectBase
@@ -501,7 +501,7 @@ class KalturaMetadataProfile extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileListResponse extends KalturaObjectBase
@@ -526,7 +526,7 @@ class KalturaMetadataProfileListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileField extends KalturaObjectBase
@@ -567,7 +567,7 @@ class KalturaMetadataProfileField extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
@@ -593,7 +593,7 @@ class KalturaMetadataProfileFieldListResponse extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataService extends KalturaServiceBase
@@ -754,7 +754,7 @@ class KalturaMetadataService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataProfileService extends KalturaServiceBase
@@ -911,7 +911,7 @@ class KalturaMetadataProfileService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMetadataClientPlugin extends KalturaClientPlugin

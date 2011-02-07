@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerUsageFilter extends KalturaFilter
@@ -33,7 +33,7 @@ class KalturaSystemPartnerUsageFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerUsageItem extends KalturaObjectBase
@@ -170,7 +170,7 @@ class KalturaSystemPartnerUsageItem extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerUsageListResponse extends KalturaObjectBase
@@ -193,7 +193,7 @@ class KalturaSystemPartnerUsageListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerConfiguration extends KalturaObjectBase
@@ -405,7 +405,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerPackage extends KalturaObjectBase
@@ -429,7 +429,7 @@ class KalturaSystemPartnerPackage extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerService extends KalturaServiceBase
@@ -554,7 +554,7 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSystemPartnerClientPlugin extends KalturaClientPlugin

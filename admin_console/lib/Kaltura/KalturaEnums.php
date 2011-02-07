@@ -1,12 +1,12 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once("KalturaClientBase.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAccessControlOrderBy
@@ -16,7 +16,7 @@ class KalturaAccessControlOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAdminUserOrderBy
@@ -28,7 +28,7 @@ class KalturaAdminUserOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaApiActionPermissionItemOrderBy
@@ -42,7 +42,7 @@ class KalturaApiActionPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaApiParameterPermissionItemAction
@@ -53,7 +53,7 @@ class KalturaApiParameterPermissionItemAction
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaApiParameterPermissionItemOrderBy
@@ -67,7 +67,7 @@ class KalturaApiParameterPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAssetOrderBy
@@ -83,7 +83,7 @@ class KalturaAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAssetParamsOrderBy
@@ -91,7 +91,7 @@ class KalturaAssetParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAssetParamsOutputOrderBy
@@ -99,7 +99,7 @@ class KalturaAssetParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAssetType
@@ -109,7 +109,7 @@ class KalturaAssetType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaAudioCodec
@@ -123,7 +123,7 @@ class KalturaAudioCodec
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBaseEntryOrderBy
@@ -141,7 +141,7 @@ class KalturaBaseEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBaseJobOrderBy
@@ -159,7 +159,7 @@ class KalturaBaseJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBaseSyndicationFeedOrderBy
@@ -175,7 +175,7 @@ class KalturaBaseSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchJobAppErrors
@@ -194,7 +194,7 @@ class KalturaBatchJobAppErrors
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchJobErrorTypes
@@ -208,7 +208,7 @@ class KalturaBatchJobErrorTypes
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchJobOrderBy
@@ -242,7 +242,7 @@ class KalturaBatchJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchJobStatus
@@ -262,7 +262,7 @@ class KalturaBatchJobStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBatchJobType
@@ -305,7 +305,7 @@ class KalturaBatchJobType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBitRateMode
@@ -315,7 +315,7 @@ class KalturaBitRateMode
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaBulkUploadCsvVersion
@@ -326,7 +326,7 @@ class KalturaBulkUploadCsvVersion
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaCategoryOrderBy
@@ -340,7 +340,7 @@ class KalturaCategoryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaCommercialUseType
@@ -350,7 +350,7 @@ class KalturaCommercialUseType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaContainerFormat
@@ -376,7 +376,7 @@ class KalturaContainerFormat
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaControlPanelCommandOrderBy
@@ -388,7 +388,7 @@ class KalturaControlPanelCommandOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaControlPanelCommandStatus
@@ -400,7 +400,7 @@ class KalturaControlPanelCommandStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaControlPanelCommandTargetType
@@ -413,7 +413,7 @@ class KalturaControlPanelCommandTargetType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaControlPanelCommandType
@@ -425,7 +425,7 @@ class KalturaControlPanelCommandType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaConversionEngineType
@@ -448,7 +448,7 @@ class KalturaConversionEngineType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaConversionProfileOrderBy
@@ -458,7 +458,7 @@ class KalturaConversionProfileOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDataEntryOrderBy
@@ -476,7 +476,7 @@ class KalturaDataEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDurationType
@@ -488,7 +488,7 @@ class KalturaDurationType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEditorType
@@ -498,7 +498,7 @@ class KalturaEditorType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryModerationStatus
@@ -511,7 +511,7 @@ class KalturaEntryModerationStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryStatus
@@ -529,7 +529,7 @@ class KalturaEntryStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaEntryType
@@ -544,7 +544,7 @@ class KalturaEntryType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFileSyncObjectType
@@ -561,7 +561,7 @@ class KalturaFileSyncObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorAssetOrderBy
@@ -577,7 +577,7 @@ class KalturaFlavorAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorAssetStatus
@@ -592,7 +592,7 @@ class KalturaFlavorAssetStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorParamsOrderBy
@@ -600,7 +600,7 @@ class KalturaFlavorParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaFlavorParamsOutputOrderBy
@@ -608,7 +608,7 @@ class KalturaFlavorParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGender
@@ -619,7 +619,7 @@ class KalturaGender
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -635,7 +635,7 @@ class KalturaGoogleVideoSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaITunesSyndicationFeedOrderBy
@@ -651,7 +651,7 @@ class KalturaITunesSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaLicenseType
@@ -676,7 +676,7 @@ class KalturaLicenseType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaLiveStreamAdminEntryOrderBy
@@ -704,7 +704,7 @@ class KalturaLiveStreamAdminEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaLiveStreamEntryOrderBy
@@ -732,7 +732,7 @@ class KalturaLiveStreamEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMailJobOrderBy
@@ -750,7 +750,7 @@ class KalturaMailJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMailJobStatus
@@ -762,7 +762,7 @@ class KalturaMailJobStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMailType
@@ -806,7 +806,7 @@ class KalturaMailType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaEntryOrderBy
@@ -834,7 +834,7 @@ class KalturaMediaEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaFlavorParamsOrderBy
@@ -842,7 +842,7 @@ class KalturaMediaFlavorParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaFlavorParamsOutputOrderBy
@@ -850,7 +850,7 @@ class KalturaMediaFlavorParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaInfoOrderBy
@@ -858,7 +858,7 @@ class KalturaMediaInfoOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMediaType
@@ -873,7 +873,7 @@ class KalturaMediaType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaMixEntryOrderBy
@@ -899,7 +899,7 @@ class KalturaMixEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaNotificationObjectType
@@ -911,7 +911,7 @@ class KalturaNotificationObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaNotificationOrderBy
@@ -929,7 +929,7 @@ class KalturaNotificationOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaNotificationStatus
@@ -944,7 +944,7 @@ class KalturaNotificationStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaNotificationType
@@ -961,7 +961,7 @@ class KalturaNotificationType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaNullableBoolean
@@ -972,7 +972,7 @@ class KalturaNullableBoolean
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPartnerOrderBy
@@ -994,7 +994,7 @@ class KalturaPartnerOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPartnerStatus
@@ -1005,7 +1005,7 @@ class KalturaPartnerStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPartnerType
@@ -1023,7 +1023,7 @@ class KalturaPartnerType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionItemOrderBy
@@ -1037,7 +1037,7 @@ class KalturaPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionItemType
@@ -1047,7 +1047,7 @@ class KalturaPermissionItemType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionName
@@ -1171,7 +1171,7 @@ class KalturaPermissionName
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionOrderBy
@@ -1187,7 +1187,7 @@ class KalturaPermissionOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionStatus
@@ -1198,7 +1198,7 @@ class KalturaPermissionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPermissionType
@@ -1211,7 +1211,7 @@ class KalturaPermissionType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPlayableEntryOrderBy
@@ -1237,7 +1237,7 @@ class KalturaPlayableEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPlaylistOrderBy
@@ -1255,7 +1255,7 @@ class KalturaPlaylistOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPlaylistType
@@ -1266,7 +1266,7 @@ class KalturaPlaylistType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSchedulerStatusType
@@ -1281,7 +1281,7 @@ class KalturaSchedulerStatusType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSearchConditionComparison
@@ -1294,7 +1294,7 @@ class KalturaSearchConditionComparison
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSearchOperatorType
@@ -1304,7 +1304,7 @@ class KalturaSearchOperatorType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSearchProviderType
@@ -1328,7 +1328,7 @@ class KalturaSearchProviderType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSessionType
@@ -1338,7 +1338,7 @@ class KalturaSessionType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSourceType
@@ -1351,7 +1351,7 @@ class KalturaSourceType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbAssetOrderBy
@@ -1367,7 +1367,7 @@ class KalturaThumbAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbCropType
@@ -1379,7 +1379,7 @@ class KalturaThumbCropType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbParamsOrderBy
@@ -1387,7 +1387,7 @@ class KalturaThumbParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaThumbParamsOutputOrderBy
@@ -1395,7 +1395,7 @@ class KalturaThumbParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaTubeMogulSyndicationFeedOrderBy
@@ -1411,7 +1411,7 @@ class KalturaTubeMogulSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUiConfCreationMode
@@ -1421,7 +1421,7 @@ class KalturaUiConfCreationMode
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUiConfObjType
@@ -1446,7 +1446,7 @@ class KalturaUiConfObjType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUiConfOrderBy
@@ -1458,7 +1458,7 @@ class KalturaUiConfOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUploadTokenOrderBy
@@ -1468,7 +1468,7 @@ class KalturaUploadTokenOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUploadTokenStatus
@@ -1482,7 +1482,7 @@ class KalturaUploadTokenStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserOrderBy
@@ -1494,7 +1494,7 @@ class KalturaUserOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserRoleOrderBy
@@ -1510,7 +1510,7 @@ class KalturaUserRoleOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserRoleStatus
@@ -1521,7 +1521,7 @@ class KalturaUserRoleStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaUserStatus
@@ -1532,7 +1532,7 @@ class KalturaUserStatus
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaVideoCodec
@@ -1555,7 +1555,7 @@ class KalturaVideoCodec
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaWidgetOrderBy
@@ -1565,7 +1565,7 @@ class KalturaWidgetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaYahooSyndicationFeedOrderBy

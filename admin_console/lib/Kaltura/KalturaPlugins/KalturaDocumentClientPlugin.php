@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDocumentType
@@ -19,7 +19,7 @@ class KalturaDocumentType
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDocumentEntry extends KalturaBaseEntry
@@ -45,7 +45,7 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaPdfFlavorParams extends KalturaFlavorParams
@@ -61,7 +61,7 @@ class KalturaPdfFlavorParams extends KalturaFlavorParams
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaSwfFlavorParams extends KalturaFlavorParams
@@ -70,7 +70,7 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 }
 
 /**
- * @package Kaltura
+ * @package Admin
  * @subpackage Client
  */
 class KalturaDocumentClientPlugin extends KalturaClientPlugin
