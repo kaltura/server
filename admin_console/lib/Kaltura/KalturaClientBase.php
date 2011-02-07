@@ -493,7 +493,7 @@ interface IKalturaClientPlugin
 	/**
 	 * @return KalturaClientPlugin
 	 */
-	public static function get();
+	public static function get(KalturaClient $client);
 	
 	/**
 	 * @return array<KalturaServiceBase>
