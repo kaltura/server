@@ -420,7 +420,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$str .= "		{\n";
 					$str .= "			return result.result.toString();\n"; 
 					$str .= "		}\n\n";
-				break;
+					break;
+					
 				case "array":
 					$str .= "		override public function parse(result:XML) : *\n";
 					$str .= "		{\n";
@@ -439,6 +440,20 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$str .= "		}\n\n";
 				break;
 				default:
+					if(count($fileAttributesNames))
+					{
+						$str .= "		override public function parse(result:XML):* {\n";
+						$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
+						$str .= "				return super.parse(result);\n";
+						$str .= "			}\n";
+						$str .= "			else {\n";
+						$str .= "				var cls : Class = getDefinitionByName('com.kaltura.vo.'+ result.result.objectType) as Class;\n";
+						$str .= "				var obj : * = (new KClassFactory( cls )).newInstanceFromXML( result.result );\n";
+						$str .= "				return obj;\n";
+						$str .= "			}\n";
+						$str .= "		}\n\n";
+					}
+					
 					//this code moved to the delegate class so it's not needed
 					/*$str = $this->addImport2String( "	import com.kaltura.core.KClassFactory" , $str );
 					$str .= "			var cls : Class = getDefinitionByName('com.kaltura.vo.'+ result.result.objectType) as Class;\n";
@@ -470,17 +485,6 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "			}\n";
 				$str .= "		}\n\n";
 			
-				$str .= "		override public function parse(result:XML):* {\n";
-				$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
-				$str .= "				return super.parse(result);\n";
-				$str .= "			}\n";
-				$str .= "			else {\n";
-				$str .= "				var cls : Class = getDefinitionByName('com.kaltura.vo.'+ result.result.objectType) as Class;\n";
-				$str .= "				var obj : * = (new KClassFactory( cls )).newInstanceFromXML( result.result );\n";
-				$str .= "				return obj;\n";
-				$str .= "			}\n";
-				$str .= "		}\n\n";
-		
 				$str .= "		// Event Handlers\n";
 				$str .= "		override protected function onDataComplete(event:Event):void {\n";
 				$str .= "			try{\n";
