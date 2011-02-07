@@ -83,7 +83,7 @@ class kuser extends Basekuser
 				}
 			}
 		}
-		return parent::preSave();
+		return parent::preSave($con);
 	}
 	
 	
