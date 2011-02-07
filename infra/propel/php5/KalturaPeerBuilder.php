@@ -11,7 +11,8 @@ require_once 'propel/engine/builder/om/php5/PHP5PeerBuilder.php';
  * This class produces the base peer class (e.g. BaseMyPeer) which contains all
  * the custom-built query and manipulator methods.
  *
- * @package    infra.propel.php5
+ * @package infra
+ * @subpackage propel
  */
 class KalturaPeerBuilder extends PHP5PeerBuilder 
 {	
