@@ -504,7 +504,7 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 			else
 			{
 				// already exists but not a directory 
-				KalutraLog::err("Cannot create temp directory [$path] due to an error. Please fix and restart");
+				KalturaLog::err("Cannot create temp directory [$path] due to an error. Please fix and restart");
 				return null;
 			}
 		}
