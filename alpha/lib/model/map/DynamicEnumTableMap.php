@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package Core
+ * @subpackage model.map
  */
 class DynamicEnumTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.DynamicEnumTableMap';
+	const CLASS_NAME = 'Core.DynamicEnumTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class DynamicEnumTableMap extends TableMap {
 		$this->setName('dynamic_enum');
 		$this->setPhpName('DynamicEnum');
 		$this->setClassname('DynamicEnum');
-		$this->setPackage('lib.model');
+		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

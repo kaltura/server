@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasePartnerStats extends BaseObject  implements Persistent {
 

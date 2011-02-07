@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseblockedEmailPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseblockedEmailPeer {
 	const OM_CLASS = 'blockedEmail';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.blockedEmail';
+	const CLASS_DEFAULT = 'Core.blockedEmail';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'blockedEmailTableMap';

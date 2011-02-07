@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false"
-	name="propel" defaultIdMethod="native" package="lib.model">
+	name="propel" defaultIdMethod="native" package="Core">
 	<table skipSql="false" abstract="false" name="kuser" phpName="kuser">
 		<column lazyLoad="false" name="id" type="integer"
 			required="true" primaryKey="true" autoIncrement="true" />

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class Basecomment extends BaseObject  implements Persistent {
 

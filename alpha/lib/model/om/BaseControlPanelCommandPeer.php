@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseControlPanelCommandPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseControlPanelCommandPeer {
 	const OM_CLASS = 'ControlPanelCommand';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.ControlPanelCommand';
+	const CLASS_DEFAULT = 'Core.ControlPanelCommand';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'ControlPanelCommandTableMap';

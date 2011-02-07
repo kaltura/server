@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseKceInstallationErrorPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseKceInstallationErrorPeer {
 	const OM_CLASS = 'KceInstallationError';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.KceInstallationError';
+	const CLASS_DEFAULT = 'Core.KceInstallationError';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'KceInstallationErrorTableMap';

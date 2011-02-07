@@ -6,7 +6,8 @@ require_once( 'myFileIndicator.class.php');
  *
  * 
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */ 
 class BatchJob extends BaseBatchJob implements ISyncableFile
 {

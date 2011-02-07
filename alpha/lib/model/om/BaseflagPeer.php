@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseflagPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseflagPeer {
 	const OM_CLASS = 'flag';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.flag';
+	const CLASS_DEFAULT = 'Core.flag';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'flagTableMap';

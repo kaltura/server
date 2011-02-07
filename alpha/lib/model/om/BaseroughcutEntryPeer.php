@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseroughcutEntryPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseroughcutEntryPeer {
 	const OM_CLASS = 'roughcutEntry';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.roughcutEntry';
+	const CLASS_DEFAULT = 'Core.roughcutEntry';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'roughcutEntryTableMap';

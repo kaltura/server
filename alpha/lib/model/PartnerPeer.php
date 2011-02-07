@@ -6,7 +6,8 @@
  * we'll use the obejct cache mechanism to hit the DB as little as possible
  *
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */
 class PartnerPeer extends BasePartnerPeer
 {

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasePermissionToPermissionItem extends BaseObject  implements Persistent {
 

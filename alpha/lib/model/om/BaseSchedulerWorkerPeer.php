@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseSchedulerWorkerPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSchedulerWorkerPeer {
 	const OM_CLASS = 'SchedulerWorker';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SchedulerWorker';
+	const CLASS_DEFAULT = 'Core.SchedulerWorker';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SchedulerWorkerTableMap';

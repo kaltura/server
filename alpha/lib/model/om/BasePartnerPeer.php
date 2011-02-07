@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasePartnerPeer {
 
@@ -19,7 +20,7 @@ abstract class BasePartnerPeer {
 	const OM_CLASS = 'Partner';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.Partner';
+	const CLASS_DEFAULT = 'Core.Partner';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'PartnerTableMap';

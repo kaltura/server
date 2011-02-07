@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package Core
+ * @subpackage model.map
  */
 class PartnerStatsTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.PartnerStatsTableMap';
+	const CLASS_NAME = 'Core.PartnerStatsTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class PartnerStatsTableMap extends TableMap {
 		$this->setName('partner_stats');
 		$this->setPhpName('PartnerStats');
 		$this->setClassname('PartnerStats');
-		$this->setPackage('lib.model');
+		$this->setPackage('Core');
 		$this->setUseIdGenerator(false);
 		// columns
 		$this->addPrimaryKey('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);

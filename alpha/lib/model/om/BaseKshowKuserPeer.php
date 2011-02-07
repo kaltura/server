@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseKshowKuserPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseKshowKuserPeer {
 	const OM_CLASS = 'KshowKuser';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.KshowKuser';
+	const CLASS_DEFAULT = 'Core.KshowKuser';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'KshowKuserTableMap';

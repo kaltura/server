@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasecategoryPeer {
 
@@ -19,7 +20,7 @@ abstract class BasecategoryPeer {
 	const OM_CLASS = 'category';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.category';
+	const CLASS_DEFAULT = 'Core.category';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'categoryTableMap';

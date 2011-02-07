@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasekvotePeer {
 
@@ -19,7 +20,7 @@ abstract class BasekvotePeer {
 	const OM_CLASS = 'kvote';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.kvote';
+	const CLASS_DEFAULT = 'Core.kvote';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'kvoteTableMap';

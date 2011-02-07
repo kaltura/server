@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */ 
 class widgetPeer extends BasewidgetPeer
 {

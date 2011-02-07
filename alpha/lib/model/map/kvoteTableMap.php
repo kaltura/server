@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package Core
+ * @subpackage model.map
  */
 class kvoteTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.kvoteTableMap';
+	const CLASS_NAME = 'Core.kvoteTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class kvoteTableMap extends TableMap {
 		$this->setName('kvote');
 		$this->setPhpName('kvote');
 		$this->setClassname('kvote');
-		$this->setPackage('lib.model');
+		$this->setPackage('Core');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

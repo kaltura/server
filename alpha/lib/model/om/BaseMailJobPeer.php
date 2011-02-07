@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseMailJobPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseMailJobPeer {
 	const OM_CLASS = 'MailJob';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.MailJob';
+	const CLASS_DEFAULT = 'Core.MailJob';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'MailJobTableMap';

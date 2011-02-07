@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseflavorParamsConversionProfilePeer {
 
@@ -19,7 +20,7 @@ abstract class BaseflavorParamsConversionProfilePeer {
 	const OM_CLASS = 'flavorParamsConversionProfile';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.flavorParamsConversionProfile';
+	const CLASS_DEFAULT = 'Core.flavorParamsConversionProfile';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'flavorParamsConversionProfileTableMap';

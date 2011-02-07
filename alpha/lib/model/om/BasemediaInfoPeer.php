@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasemediaInfoPeer {
 
@@ -19,7 +20,7 @@ abstract class BasemediaInfoPeer {
 	const OM_CLASS = 'mediaInfo';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.mediaInfo';
+	const CLASS_DEFAULT = 'Core.mediaInfo';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'mediaInfoTableMap';

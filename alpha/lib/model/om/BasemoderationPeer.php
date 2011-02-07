@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasemoderationPeer {
 
@@ -19,7 +20,7 @@ abstract class BasemoderationPeer {
 	const OM_CLASS = 'moderation';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.moderation';
+	const CLASS_DEFAULT = 'Core.moderation';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'moderationTableMap';

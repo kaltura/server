@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasePuserRolePeer {
 
@@ -19,7 +20,7 @@ abstract class BasePuserRolePeer {
 	const OM_CLASS = 'PuserRole';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.PuserRole';
+	const CLASS_DEFAULT = 'Core.PuserRole';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'PuserRoleTableMap';

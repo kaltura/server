@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseSystemUserPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSystemUserPeer {
 	const OM_CLASS = 'SystemUser';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SystemUser';
+	const CLASS_DEFAULT = 'Core.SystemUser';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SystemUserTableMap';

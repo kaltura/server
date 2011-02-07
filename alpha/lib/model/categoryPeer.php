@@ -1,11 +1,13 @@
-<?php
+@package Core
+ * @subpackage model<?php
 
 /**
  * Subclass for performing query and update operations on the 'category' table.
  *
  * 
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */ 
 class categoryPeer extends BasecategoryPeer
 {

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseDynamicEnumPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseDynamicEnumPeer {
 	const OM_CLASS = 'DynamicEnum';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.DynamicEnum';
+	const CLASS_DEFAULT = 'Core.DynamicEnum';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'DynamicEnumTableMap';

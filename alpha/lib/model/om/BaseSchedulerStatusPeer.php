@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseSchedulerStatusPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSchedulerStatusPeer {
 	const OM_CLASS = 'SchedulerStatus';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SchedulerStatus';
+	const CLASS_DEFAULT = 'Core.SchedulerStatus';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SchedulerStatusTableMap';

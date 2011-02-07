@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseUserLoginDataPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseUserLoginDataPeer {
 	const OM_CLASS = 'UserLoginData';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.UserLoginData';
+	const CLASS_DEFAULT = 'Core.UserLoginData';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'UserLoginDataTableMap';

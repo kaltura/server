@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasenotificationPeer {
 
@@ -19,7 +20,7 @@ abstract class BasenotificationPeer {
 	const OM_CLASS = 'notification';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.notification';
+	const CLASS_DEFAULT = 'Core.notification';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'notificationTableMap';

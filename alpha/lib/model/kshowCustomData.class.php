@@ -2,7 +2,9 @@
 
 /**
  * TODO - think of how's best to work with these classes - $attach_policy and stuff !
- *
+ * 
+ * @package Core
+ * @subpackage model
  */
 abstract class kshowCustomData extends myBaseObject
 {

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseuiConfPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseuiConfPeer {
 	const OM_CLASS = 'uiConf';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.uiConf';
+	const CLASS_DEFAULT = 'Core.uiConf';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'uiConfTableMap';

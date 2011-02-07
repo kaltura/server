@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasewidgetPeer {
 
@@ -19,7 +20,7 @@ abstract class BasewidgetPeer {
 	const OM_CLASS = 'widget';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.widget';
+	const CLASS_DEFAULT = 'Core.widget';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'widgetTableMap';

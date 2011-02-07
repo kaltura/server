@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseSchedulerConfigPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSchedulerConfigPeer {
 	const OM_CLASS = 'SchedulerConfig';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SchedulerConfig';
+	const CLASS_DEFAULT = 'Core.SchedulerConfig';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SchedulerConfigTableMap';

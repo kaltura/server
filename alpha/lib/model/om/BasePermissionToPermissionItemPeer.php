@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasePermissionToPermissionItemPeer {
 
@@ -19,7 +20,7 @@ abstract class BasePermissionToPermissionItemPeer {
 	const OM_CLASS = 'PermissionToPermissionItem';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.PermissionToPermissionItem';
+	const CLASS_DEFAULT = 'Core.PermissionToPermissionItem';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'PermissionToPermissionItemTableMap';

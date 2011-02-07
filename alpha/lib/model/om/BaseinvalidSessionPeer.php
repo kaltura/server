@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseinvalidSessionPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseinvalidSessionPeer {
 	const OM_CLASS = 'invalidSession';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.invalidSession';
+	const CLASS_DEFAULT = 'Core.invalidSession';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'invalidSessionTableMap';

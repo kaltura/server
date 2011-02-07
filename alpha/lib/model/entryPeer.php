@@ -4,7 +4,8 @@
  *
  * 
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */ 
 class entryPeer extends BaseentryPeer 
 {

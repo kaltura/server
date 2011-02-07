@@ -10,7 +10,8 @@ require_once ( "myStatisticsMgr.class.php");
  *
  * 
  *
- * @package lib.model
+ * @package Core
+ * @subpackage model
  */ 
 class kuser extends Basekuser
 {

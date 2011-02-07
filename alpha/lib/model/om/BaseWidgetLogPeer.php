@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseWidgetLogPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseWidgetLogPeer {
 	const OM_CLASS = 'WidgetLog';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.WidgetLog';
+	const CLASS_DEFAULT = 'Core.WidgetLog';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'WidgetLogTableMap';

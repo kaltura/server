@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseassetParamsOutputPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseassetParamsOutputPeer {
 	const OM_CLASS = 'assetParamsOutput';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.assetParamsOutput';
+	const CLASS_DEFAULT = 'Core.assetParamsOutput';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'assetParamsOutputTableMap';

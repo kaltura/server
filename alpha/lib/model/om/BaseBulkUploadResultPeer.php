@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseBulkUploadResultPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseBulkUploadResultPeer {
 	const OM_CLASS = 'BulkUploadResult';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.BulkUploadResult';
+	const CLASS_DEFAULT = 'Core.BulkUploadResult';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'BulkUploadResultTableMap';

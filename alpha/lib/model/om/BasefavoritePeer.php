@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BasefavoritePeer {
 
@@ -19,7 +20,7 @@ abstract class BasefavoritePeer {
 	const OM_CLASS = 'favorite';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.favorite';
+	const CLASS_DEFAULT = 'Core.favorite';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'favoriteTableMap';

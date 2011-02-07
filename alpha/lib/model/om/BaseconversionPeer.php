@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseconversionPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseconversionPeer {
 	const OM_CLASS = 'conversion';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.conversion';
+	const CLASS_DEFAULT = 'Core.conversion';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'conversionTableMap';

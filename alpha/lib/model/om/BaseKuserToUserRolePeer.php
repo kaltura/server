@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseKuserToUserRolePeer {
 
@@ -19,7 +20,7 @@ abstract class BaseKuserToUserRolePeer {
 	const OM_CLASS = 'KuserToUserRole';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.KuserToUserRole';
+	const CLASS_DEFAULT = 'Core.KuserToUserRole';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'KuserToUserRoleTableMap';

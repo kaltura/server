@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseassetPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseassetPeer {
 	const OM_CLASS = 'asset';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.asset';
+	const CLASS_DEFAULT = 'Core.asset';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'assetTableMap';

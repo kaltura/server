@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package Core
+ * @subpackage model.om
  */
 abstract class BaseUploadTokenPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseUploadTokenPeer {
 	const OM_CLASS = 'UploadToken';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.UploadToken';
+	const CLASS_DEFAULT = 'Core.UploadToken';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'UploadTokenTableMap';
