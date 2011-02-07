@@ -145,10 +145,10 @@ tr - kConfLocal.php - avidemux + ee
 /infra/cdl/kdl/KDLCommon.php - 'mpeg','mpegts' and 'applehttp' format enums
 /infra/cdl/kdl/KDLFlavor.php - supports 'mpeg','mpegts' and 'applehttp' formats
 /infra/cdl/kdl/KDLOperatorBase.php - additional operator params
-/infra/cdl/kdl/KDLTranscoderCommand.php - 'mpeg','mpegts' and 'applehttp' format enums
+/infra/cdl/kdl/KDLTranscoderCommand.php - supports 'mpeg','mpegts' and 'applehttp' formats
 /infra/cdl/kdl/KDLWrap.php - additional operator params
-SaaS/alpha/config/kConfLocal.php - add SegmenterPlugin to  additional plugins
 plugins/segmenter - new operator
+SaaS/alpha/config/kConfLocal.php - add SegmenterPlugin to  additional plugins
 batch_config.ini - addition to [KAsyncConvert] 
    params.useSegmenter		= true;
    params.segmenterCmd		= segmenter;
