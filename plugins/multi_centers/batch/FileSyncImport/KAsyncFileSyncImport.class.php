@@ -28,12 +28,14 @@ class KAsyncFileSyncImport extends KBatchBase
 	{
 		KalturaLog::info("FileSyncImport batch is running");
 
-		if($this->taskConfig->isInitOnly())
-		return $this->init();
+		if($this->taskConfig->isInitOnly()) {
+			return $this->init();
+		}
 
-		if(is_null($jobs))
-		$jobs = $this->kClient->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-
+		if(is_null($jobs)) {
+			$jobs = $this->kClient->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		}
+			
 		KalturaLog::info(count($jobs) . " filesync import jobs to perform");
 
 		if(!count($jobs) > 0)
@@ -45,20 +47,28 @@ class KAsyncFileSyncImport extends KBatchBase
 
 		$useCloser = $this->taskConfig->params->useCloser;
 
-		foreach($jobs as &$job) {
+		foreach($jobs as &$job)
+		{
 			
-			if ($useCloser) {
-				// set tmp file path
-				if (!$job->data->tmpFilePath) {
+			if ($useCloser)
+			{
+				// if closer is used, the file will be download to a temporary directory, and then moved to its final destination by the KAsyncFileSyncImportCloser batch
+				if (!$job->data->tmpFilePath)
+				{
+					// adding temp path to the job data, so that the closer will be able to use it later
 					$job->data->tmpFilePath = $this->getTmpPath($job->data->sourceUrl);
 					$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, 2, $job->data);
 				}
+				// destination = temporary path
 				$fileDestination = $job->data->tmpFilePath;
 			}
-			else {
+			else
+			{
+				// destination = final path
 				$fileDestination = $job->data->destFilePath;
 			}
 			
+			// start downoading the file to its destination (temp or final)
 			$job = $this->fetchFile($job, $job->data->sourceUrl, $fileDestination);
 		}
 			
@@ -68,20 +78,22 @@ class KAsyncFileSyncImport extends KBatchBase
 	
 	private function getTmpPath($sourceUrl)
 	{
-		// creates a temp file path 
+		// create a temporary file path 
 		$rootPath = $this->taskConfig->params->localTempPath;
 		
 		$res = self::createDir( $rootPath );
 		if ( !$res ) 
 		{
-			KalturaLog::err( "Cannot continue filesync import without temp directory");
+			KalturaLog::err( "Cannot continue filesync import without a temp directory");
 			die(); 
 		}
 		
+		// add a unique id to the temporary file path
 		$uniqid = uniqid('filesync_import_');
 		$destFile = realpath($rootPath) . "/$uniqid";
 		KalturaLog::debug("destFile [$destFile]");
 		
+		// add file extension if any
 		$ext = pathinfo($sourceUrl, PATHINFO_EXTENSION);
 		$extArr = explode('?', $ext); // remove query string
 		$ext = reset($extArr);
@@ -102,21 +114,24 @@ class KAsyncFileSyncImport extends KBatchBase
 				
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED, 1);
 				
-			// fetches the http headers
+			// fetch the http headers
 			$curlWrapper = new KCurlWrapper($sourceUrl);
 			$curlHeaderResponse = $curlWrapper->getHeader();
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
+				// error fetching headers
 				$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
 				
 			if(!$curlHeaderResponse->isGoodCode())
 			{
+				// some error exists in the response
 				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
 				return $job;
 			}
-				
+			
+			// try to get file size from headers
 			$fileSize = null;
 			if (isset($curlHeaderResponse->headers['content-length'])) {
 				$fileSize = $curlHeaderResponse->headers['content-length'];
@@ -124,7 +139,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			$curlWrapper->close();
 
 
-			// check if we can start from specific offset on exising partial content
+			// if file already exists - check if we can start from specific offset on exising partial content
 			$resumeOffset = 0;
 			if($fileSize && $fileDestination && file_exists($fileDestination))
 			{
@@ -132,11 +147,13 @@ class KAsyncFileSyncImport extends KBatchBase
 				$actualFileSize = filesize($fileDestination);
 				if($actualFileSize >= $fileSize)
 				{
+					// file download finished ?
 					$job = $this->checkFile($job, $fileDestination, $fileSize);
 					return $job;
 				}
 				else
 				{
+					// will resume from the current offset
 					$resumeOffset = $actualFileSize;
 				}
 			}
@@ -148,39 +165,46 @@ class KAsyncFileSyncImport extends KBatchBase
 
 			if($resumeOffset)
 			{
+				// will resume from the current offset
 				$curlWrapper->setResumeOffset($resumeOffset);
 			}
 			else
 			{
+				// create destination directory if doesn't already exist
 				$res = self::createDir(dirname($fileDestination));
 				if ( !$res )
 				{
 					KalturaLog::err( "Cannot continue filesync import without destination directory");
 					die();
 				}
-
+				
+				// about to start downloading
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2);
 			}
 				
 			KalturaLog::debug("Executing curl");
-			$res = $curlWrapper->exec($fileDestination);
+			$res = $curlWrapper->exec($fileDestination); // download file
 			KalturaLog::debug("Curl results: $res");
 
+			// handle errors
 			if (!$res || $curlWrapper->getError())
 			{
 				$errNumber = $curlWrapper->getErrorNumber();
 				if($errNumber != CURLE_OPERATION_TIMEOUTED)
 				{
+					// an error other than timeout occured  - cannot continue (timeout is handled with resuming)
 					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
 					$curlWrapper->close();
 					return $job;
 				}
 				else
 				{
+					// timeout error occured
 					clearstatcache();
 					$actualFileSize = filesize($fileDestination);
 					if($actualFileSize == $resumeOffset)
 					{
+						// no downloading was done at all - error
 						$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Error: " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
 						$curlWrapper->close();
 						return $job;
@@ -192,6 +216,7 @@ class KAsyncFileSyncImport extends KBatchBase
 				
 			if(!file_exists($fileDestination))
 			{
+				// destination file does not exist for an unknown reason
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
 				return $job;
 			}
@@ -203,6 +228,7 @@ class KAsyncFileSyncImport extends KBatchBase
 				$actualFileSize = filesize($fileDestination);
 				if ($actualFileSize < $fileSize)
 				{
+					// part of file was downloaded - will resume in next run
 					$percent = floor($actualFileSize * 100 / $fileSize);
 					$this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $percent);
 					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
@@ -211,11 +237,13 @@ class KAsyncFileSyncImport extends KBatchBase
 			}
 						
 			$this->updateJob($job, 'File downloaded', KalturaBatchJobStatus::PROCESSED, 90);
-				
+			
+			// file downloaded completely - check it
 			$job = $this->checkFile($job, $fileDestination, $fileSize);
 		}
 		catch(Exception $ex)
 		{
+			// run time error occured
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		
@@ -224,6 +252,9 @@ class KAsyncFileSyncImport extends KBatchBase
 
 	
 	/**
+	 * Checks downloaded file.
+	 * Changes the file mode and owner if required.
+	 * 
 	 * @param KalturaBatchJob $job
 	 * @param string $destFile
 	 * @param int $fileSize
@@ -237,6 +268,7 @@ class KAsyncFileSyncImport extends KBatchBase
 		{
 			if(!file_exists($destFile))
 			{
+				// destination file does not exist
 				KalturaLog::err("Error: file [$destFile] doesn't exist");
 				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: file [$destFile] doesn't exist", KalturaBatchJobStatus::FAILED);
 				return $job;
@@ -247,6 +279,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			{
 				if(filesize($destFile) != $fileSize)
 				{
+					// destination file size is wrong
 					KalturaLog::err("Error: file [$destFile] has a wrong size");
 					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE, "Error: file [$destFile] has a wrong size", KalturaBatchJobStatus::FAILED);
 					return $job;
@@ -257,13 +290,14 @@ class KAsyncFileSyncImport extends KBatchBase
 				$fileSize = filesize($destFile);
 			}
 				
-			
+			// set file owner
 			$chown_name = $this->taskConfig->params->fileOwner;
 			if ($chown_name) {
 				KalturaLog::debug("Changing owner of file [$destFile] to [$chown_name]");
 				@chown($destFile, $chown_name);
 			}
 			
+			// set file mode
 			$chmod_perm = octdec($this->taskConfig->params->fileChmod);
 			if (!$chmod_perm) {
 				$chmod_perm = 0644;
@@ -290,6 +324,7 @@ class KAsyncFileSyncImport extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
+			// run time error occured
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		

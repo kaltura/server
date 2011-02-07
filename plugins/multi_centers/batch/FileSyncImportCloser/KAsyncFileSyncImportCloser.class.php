@@ -28,12 +28,14 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 	{
 		KalturaLog::info("FileSyncImportCloser batch is running");
 
-		if($this->taskConfig->isInitOnly())
-		return $this->init();
+		if($this->taskConfig->isInitOnly()) {
+			return $this->init();
+		}
 
-		if(is_null($jobs))
-		$jobs = $this->kClient->fileSyncImportBatch->getExclusiveAlmostDoneFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
+		if(is_null($jobs)) {
+			$jobs = $this->kClient->fileSyncImportBatch->getExclusiveAlmostDoneFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
+		}
+			
 		KalturaLog::info(count($jobs) . " filesync import closer jobs to perform");
 
 		if(!count($jobs) > 0)
@@ -48,6 +50,7 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 			}
 			else {
+				// move file from temp location to final destination
 				$job = $this->moveFile($job, $job->data->tmpFilePath, $job->data->destFilePath);
 			}
 		}
@@ -61,12 +64,14 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 		
 		@rename($fromPath, $toPath);
 		
+		// change file owner
 		$chown_name = $this->taskConfig->params->fileOwner;
 		if ($chown_name) {
 			KalturaLog::debug("Changing owner of file [$toPath] to [$chown_name]");
 			@chown($toPath, $chown_name);
 		}
 		
+		// change file mode
 		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
 		if (!$chmod_perm) {
 			$chmod_perm = 0644;
@@ -74,6 +79,7 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 		KalturaLog::debug("Changing mode of file [$toPath] to [$chmod_perm]");
 		@chmod($toPath, $chmod_perm);
 				
+		// check file
 		if($this->checkFileExists($toPath))
 		{
 			$job->status = KalturaBatchJobStatus::FINISHED;
