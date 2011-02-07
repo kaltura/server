@@ -1,5 +1,5 @@
 SELECT
-	calc_time_shift(date_id, hour_id, time_shift) date_id, # time shifted date
+	DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 date_id, # time shifted date
 	SUM(count_plays) count_plays,
 #	AVG(distinct_plays) distinct_plays, /* Because we don't know the real number, we use avarage instead*/
 	SUM(sum_time_viewed) sum_time_viewed,
@@ -21,6 +21,6 @@ WHERE
 		( count_time_viewed > 0 OR
 		  count_plays > 0 OR
 		  count_loads > 0 )
-GROUP BY calc_time_shift(date_id, hour_id, time_shift)
-ORDER BY calc_time_shift(date_id, hour_id, time_shift)
+GROUP BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1
+ORDER BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1
 LIMIT 0,365  /* pagination  */

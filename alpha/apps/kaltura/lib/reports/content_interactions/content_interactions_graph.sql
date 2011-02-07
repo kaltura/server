@@ -1,5 +1,5 @@
 SELECT 
-	calc_time_shift(date_id, hour_id, time_shift) date_id, # time shifted date
+	DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 date_id, # time shifted date
 	SUM(count_plays) count_plays,
 	SUM(count_edit) count_edit,
 	SUM(count_viral) count_viral,
@@ -23,6 +23,6 @@ WHERE
 		  count_viral > 0 OR
 		  count_download > 0 OR
 		  count_report > 0 )
-GROUP BY calc_time_shift(date_id, hour_id, time_shift) 
-ORDER BY calc_time_shift(date_id, hour_id, time_shift) 
+GROUP BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 
+ORDER BY DATE(DATE(date_id) + INTERVAL hour_id HOUR + INTERVAL {TIME_SHIFT} HOUR)*1 
 LIMIT 0,365 /* pagination  */	
