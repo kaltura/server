@@ -278,14 +278,18 @@ class kFile
 	private static function rename_wrap($src, $trg)
 	{
 //	KalturaLog::log("before rename");
-		if(!rename($src, $trg)) {
+		if(rename($src, $trg)) 
+			return true;
+		
 //	KalturaLog::log("failed rename");
-			$out_arr = array();
-			exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
+		$out_arr = array();
+		$rv = 0;
+		exec("mv \"$src\" \"$trg\"", $out_arr, $rv);
+//			echo "RV($rv)\n";
+		if($rv==0)
+			return true;
+		else
 			return false;
-	//		echo "RV($rv)\n";
-		}
-		return true;
 	}
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
