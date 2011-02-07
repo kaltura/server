@@ -1,7 +1,7 @@
 <?php
 /**
- * @package Security
- * @subpackage act
+ * @package infra
+ * @subpackage Security
  */
 class ActKeyUtils
 {
