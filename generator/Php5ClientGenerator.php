@@ -20,8 +20,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		// enumes
 		$this->appendLine('<?php');
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
@@ -40,8 +40,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
@@ -60,8 +60,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
@@ -100,8 +100,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaClientBase.php");');
@@ -133,8 +133,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$services[] = $serviceNode->getAttribute("name");
 		
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
@@ -205,8 +205,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$enumName = $enumNode->getAttribute("name");
 		
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 	 	$this->appendLine("class $enumName");		
@@ -236,8 +236,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			$abstract = 'abstract ';
 		
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		// class definition
@@ -302,8 +302,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$this->appendLine();
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		$this->appendLine("class $serviceClassName extends KalturaServiceBase");
 		$this->appendLine("{");
@@ -476,8 +476,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		
 		$this->appendLine('/**');
-		$this->appendLine(' * @package Kaltura');
-		$this->appendLine(' * @subpackage Client');
+		$this->appendLine(" * @package $this->package");
+		$this->appendLine(" * @subpackage $this->subpackage");
 		$this->appendLine(' */');
 		
 		$this->appendLine("class KalturaClient extends KalturaClientBase");

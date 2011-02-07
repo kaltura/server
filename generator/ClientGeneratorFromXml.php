@@ -7,6 +7,19 @@ abstract class ClientGeneratorFromXml
 	protected $_sourcePath = "";
 	protected $_params = array();
 	
+	protected $package = 'Kaltura';
+	protected $subpackage = 'Client';
+	
+	public function setPackage($package)
+	{
+		$this->package = $package;
+	}
+
+	public function setSubpackage($subpackage)
+	{
+		$this->subpackage = $subpackage;
+	}
+
 	public function ClientGeneratorFromXml($xmlFile, $sourcePath = null)
 	{
 		$this->_xmlFile = realpath($xmlFile);

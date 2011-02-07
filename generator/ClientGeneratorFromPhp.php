@@ -7,6 +7,19 @@ abstract class ClientGeneratorFromPhp
 	protected $_types = array();
 	protected $_includeList = array();
 	protected $_sourcePath = "";
+	
+	protected $package = 'Kaltura';
+	protected $subpackage = 'Client';
+	
+	public function setPackage($package)
+	{
+		$this->package = $package;
+	}
+
+	public function setSubpackage($subpackage)
+	{
+		$this->subpackage = $subpackage;
+	}
 
 	/**
 	 * @return the $_services

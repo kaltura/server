@@ -46,6 +46,12 @@ foreach($config as $name => $item)
 		
 		$instance = $reflectionClass->newInstance("temp.xml");
 		
+		if($item->get("package"))
+			$instance->setPackage($item->get("package"));
+			
+		if($item->get("subpackage"))
+			$instance->setSubpackage($item->get("subpackage"));
+		
 		if (isset($item->params))
 		{
 			foreach($item->params as $key => $val)
@@ -59,6 +65,12 @@ foreach($config as $name => $item)
 		$instance = $reflectionClass->newInstance();
 		$instance->setIncludeOrExcludeList($include, $exclude);
 		$instance->setAdditionalList($additional);
+		
+		if($item->get("package"))
+			$instance->setPackage($item->get("package"));
+			
+		if($item->get("subpackage"))
+			$instance->setSubpackage($item->get("subpackage"));
 	}
 	else
 	{
