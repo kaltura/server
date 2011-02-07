@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncImportJobData extends KalturaJobData
@@ -46,7 +46,7 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFilesyncImportBatchService extends KalturaServiceBase
@@ -1140,7 +1140,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMultiCentersClientPlugin extends KalturaClientPlugin

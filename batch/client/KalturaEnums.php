@@ -1,12 +1,12 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once("KalturaClientBase.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAccessControlOrderBy
@@ -16,7 +16,7 @@ class KalturaAccessControlOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAdminUserOrderBy
@@ -28,7 +28,7 @@ class KalturaAdminUserOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaApiActionPermissionItemOrderBy
@@ -42,7 +42,7 @@ class KalturaApiActionPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaApiParameterPermissionItemOrderBy
@@ -56,7 +56,7 @@ class KalturaApiParameterPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAssetOrderBy
@@ -72,7 +72,7 @@ class KalturaAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAssetParamsOrderBy
@@ -80,7 +80,7 @@ class KalturaAssetParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAssetParamsOutputOrderBy
@@ -88,7 +88,7 @@ class KalturaAssetParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAssetType
@@ -98,7 +98,7 @@ class KalturaAssetType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaAudioCodec
@@ -112,7 +112,7 @@ class KalturaAudioCodec
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBaseEntryOrderBy
@@ -130,7 +130,7 @@ class KalturaBaseEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBaseJobOrderBy
@@ -148,7 +148,7 @@ class KalturaBaseJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBaseSyndicationFeedOrderBy
@@ -164,7 +164,7 @@ class KalturaBaseSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchJobAppErrors
@@ -183,7 +183,7 @@ class KalturaBatchJobAppErrors
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchJobErrorTypes
@@ -197,7 +197,7 @@ class KalturaBatchJobErrorTypes
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchJobOrderBy
@@ -231,7 +231,7 @@ class KalturaBatchJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchJobStatus
@@ -251,7 +251,7 @@ class KalturaBatchJobStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchJobType
@@ -294,7 +294,7 @@ class KalturaBatchJobType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBitRateMode
@@ -304,7 +304,7 @@ class KalturaBitRateMode
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBulkUploadCsvVersion
@@ -315,7 +315,7 @@ class KalturaBulkUploadCsvVersion
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaCategoryOrderBy
@@ -329,7 +329,7 @@ class KalturaCategoryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaCommercialUseType
@@ -339,7 +339,7 @@ class KalturaCommercialUseType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaContainerFormat
@@ -365,7 +365,7 @@ class KalturaContainerFormat
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaControlPanelCommandOrderBy
@@ -377,7 +377,7 @@ class KalturaControlPanelCommandOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaControlPanelCommandStatus
@@ -389,7 +389,7 @@ class KalturaControlPanelCommandStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaControlPanelCommandTargetType
@@ -402,7 +402,7 @@ class KalturaControlPanelCommandTargetType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaControlPanelCommandType
@@ -414,7 +414,7 @@ class KalturaControlPanelCommandType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaConversionEngineType
@@ -437,7 +437,7 @@ class KalturaConversionEngineType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaConversionProfileOrderBy
@@ -447,7 +447,7 @@ class KalturaConversionProfileOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDataEntryOrderBy
@@ -465,7 +465,7 @@ class KalturaDataEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDurationType
@@ -477,7 +477,7 @@ class KalturaDurationType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEditorType
@@ -487,7 +487,7 @@ class KalturaEditorType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEmailIngestionProfileStatus
@@ -497,7 +497,7 @@ class KalturaEmailIngestionProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryModerationStatus
@@ -510,7 +510,7 @@ class KalturaEntryModerationStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryStatus
@@ -528,7 +528,7 @@ class KalturaEntryStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryType
@@ -543,7 +543,7 @@ class KalturaEntryType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaExportProtocol
@@ -555,7 +555,7 @@ class KalturaExportProtocol
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncObjectType
@@ -572,7 +572,7 @@ class KalturaFileSyncObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFlavorAssetOrderBy
@@ -588,7 +588,7 @@ class KalturaFlavorAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFlavorAssetStatus
@@ -603,7 +603,7 @@ class KalturaFlavorAssetStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFlavorParamsOrderBy
@@ -611,7 +611,7 @@ class KalturaFlavorParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFlavorParamsOutputOrderBy
@@ -619,7 +619,7 @@ class KalturaFlavorParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaGoogleVideoSyndicationFeedOrderBy
@@ -635,7 +635,7 @@ class KalturaGoogleVideoSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaITunesSyndicationFeedOrderBy
@@ -651,7 +651,7 @@ class KalturaITunesSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaLicenseType
@@ -676,7 +676,7 @@ class KalturaLicenseType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaLiveStreamAdminEntryOrderBy
@@ -704,7 +704,7 @@ class KalturaLiveStreamAdminEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaLiveStreamEntryOrderBy
@@ -732,7 +732,7 @@ class KalturaLiveStreamEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMailJobOrderBy
@@ -750,7 +750,7 @@ class KalturaMailJobOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMailJobStatus
@@ -762,7 +762,7 @@ class KalturaMailJobStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMailType
@@ -806,7 +806,7 @@ class KalturaMailType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaEntryOrderBy
@@ -834,7 +834,7 @@ class KalturaMediaEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaFlavorParamsOrderBy
@@ -842,7 +842,7 @@ class KalturaMediaFlavorParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaFlavorParamsOutputOrderBy
@@ -850,7 +850,7 @@ class KalturaMediaFlavorParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaInfoOrderBy
@@ -858,7 +858,7 @@ class KalturaMediaInfoOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaType
@@ -873,7 +873,7 @@ class KalturaMediaType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMixEntryOrderBy
@@ -899,7 +899,7 @@ class KalturaMixEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaNotificationObjectType
@@ -911,7 +911,7 @@ class KalturaNotificationObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaNotificationOrderBy
@@ -929,7 +929,7 @@ class KalturaNotificationOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaNotificationStatus
@@ -944,7 +944,7 @@ class KalturaNotificationStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaNotificationType
@@ -961,7 +961,7 @@ class KalturaNotificationType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaNullableBoolean
@@ -972,7 +972,7 @@ class KalturaNullableBoolean
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPartnerOrderBy
@@ -994,7 +994,7 @@ class KalturaPartnerOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPartnerType
@@ -1012,7 +1012,7 @@ class KalturaPartnerType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionItemOrderBy
@@ -1026,7 +1026,7 @@ class KalturaPermissionItemOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionItemType
@@ -1036,7 +1036,7 @@ class KalturaPermissionItemType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionName
@@ -1160,7 +1160,7 @@ class KalturaPermissionName
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionOrderBy
@@ -1176,7 +1176,7 @@ class KalturaPermissionOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionStatus
@@ -1187,7 +1187,7 @@ class KalturaPermissionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPermissionType
@@ -1200,7 +1200,7 @@ class KalturaPermissionType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPlayableEntryOrderBy
@@ -1226,7 +1226,7 @@ class KalturaPlayableEntryOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPlaylistOrderBy
@@ -1244,7 +1244,7 @@ class KalturaPlaylistOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaPlaylistType
@@ -1255,7 +1255,7 @@ class KalturaPlaylistType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSchedulerStatusType
@@ -1270,7 +1270,7 @@ class KalturaSchedulerStatusType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSearchConditionComparison
@@ -1283,7 +1283,7 @@ class KalturaSearchConditionComparison
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSearchOperatorType
@@ -1293,7 +1293,7 @@ class KalturaSearchOperatorType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSearchProviderType
@@ -1317,7 +1317,7 @@ class KalturaSearchProviderType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSessionType
@@ -1327,7 +1327,7 @@ class KalturaSessionType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSourceType
@@ -1340,7 +1340,7 @@ class KalturaSourceType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaThumbAssetOrderBy
@@ -1356,7 +1356,7 @@ class KalturaThumbAssetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaThumbCropType
@@ -1368,7 +1368,7 @@ class KalturaThumbCropType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaThumbParamsOrderBy
@@ -1376,7 +1376,7 @@ class KalturaThumbParamsOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaThumbParamsOutputOrderBy
@@ -1384,7 +1384,7 @@ class KalturaThumbParamsOutputOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaTubeMogulSyndicationFeedOrderBy
@@ -1400,7 +1400,7 @@ class KalturaTubeMogulSyndicationFeedOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUiConfCreationMode
@@ -1410,7 +1410,7 @@ class KalturaUiConfCreationMode
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUiConfObjType
@@ -1435,7 +1435,7 @@ class KalturaUiConfObjType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUiConfOrderBy
@@ -1447,7 +1447,7 @@ class KalturaUiConfOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUploadTokenOrderBy
@@ -1457,7 +1457,7 @@ class KalturaUploadTokenOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUploadTokenStatus
@@ -1471,7 +1471,7 @@ class KalturaUploadTokenStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUserOrderBy
@@ -1483,7 +1483,7 @@ class KalturaUserOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUserRoleOrderBy
@@ -1499,7 +1499,7 @@ class KalturaUserRoleOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUserRoleStatus
@@ -1510,7 +1510,7 @@ class KalturaUserRoleStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUserStatus
@@ -1521,7 +1521,7 @@ class KalturaUserStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVideoCodec
@@ -1544,7 +1544,7 @@ class KalturaVideoCodec
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaWidgetOrderBy
@@ -1554,7 +1554,7 @@ class KalturaWidgetOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaYahooSyndicationFeedOrderBy

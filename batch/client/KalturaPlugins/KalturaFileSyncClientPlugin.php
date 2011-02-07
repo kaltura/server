@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncStatus
@@ -21,7 +21,7 @@ class KalturaFileSyncStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncType
@@ -32,7 +32,7 @@ class KalturaFileSyncType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSync extends KalturaObjectBase
@@ -226,7 +226,7 @@ class KalturaFileSync extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncService extends KalturaServiceBase
@@ -252,7 +252,7 @@ class KalturaFileSyncService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFileSyncClientPlugin extends KalturaClientPlugin

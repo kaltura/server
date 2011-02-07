@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionAction
@@ -20,7 +20,7 @@ class KalturaDistributionAction
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionErrorType
@@ -32,7 +32,7 @@ class KalturaDistributionErrorType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionProfileActionStatus
@@ -43,7 +43,7 @@ class KalturaDistributionProfileActionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionProfileStatus
@@ -54,7 +54,7 @@ class KalturaDistributionProfileStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionProtocol
@@ -67,7 +67,7 @@ class KalturaDistributionProtocol
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionProviderType
@@ -80,7 +80,7 @@ class KalturaDistributionProviderType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryDistributionFlag
@@ -92,7 +92,7 @@ class KalturaEntryDistributionFlag
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryDistributionStatus
@@ -111,7 +111,7 @@ class KalturaEntryDistributionStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderParser
@@ -122,7 +122,7 @@ class KalturaGenericDistributionProviderParser
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionThumbDimensions extends KalturaObjectBase
@@ -145,7 +145,7 @@ class KalturaDistributionThumbDimensions extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaDistributionProfile extends KalturaObjectBase
@@ -295,7 +295,7 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaDistributionValidationError extends KalturaObjectBase
@@ -325,7 +325,7 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEntryDistribution extends KalturaObjectBase
@@ -544,7 +544,7 @@ class KalturaEntryDistribution extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
@@ -553,7 +553,7 @@ abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionJobData extends KalturaJobData
@@ -625,7 +625,7 @@ class KalturaDistributionJobData extends KalturaJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
@@ -648,7 +648,7 @@ class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
@@ -657,7 +657,7 @@ class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
@@ -666,7 +666,7 @@ class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
@@ -675,7 +675,7 @@ class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaGenericDistributionProfileAction extends KalturaObjectBase
@@ -740,7 +740,7 @@ class KalturaGenericDistributionProfileAction extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
@@ -799,7 +799,7 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaDistributionProvider extends KalturaObjectBase
@@ -865,7 +865,7 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
@@ -896,7 +896,7 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaContentDistributionBatchService extends KalturaServiceBase
@@ -2206,7 +2206,7 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaContentDistributionClientPlugin extends KalturaClientPlugin

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once("KalturaClientBase.php");
@@ -9,7 +9,7 @@ require_once("KalturaTypes.php");
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBaseEntryService extends KalturaServiceBase
@@ -35,7 +35,7 @@ class KalturaBaseEntryService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchcontrolService extends KalturaServiceBase
@@ -263,7 +263,7 @@ class KalturaBatchcontrolService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaBatchService extends KalturaServiceBase
@@ -1294,7 +1294,7 @@ class KalturaBatchService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaEmailIngestionProfileService extends KalturaServiceBase
@@ -1389,7 +1389,7 @@ class KalturaEmailIngestionProfileService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaFlavorAssetService extends KalturaServiceBase
@@ -1431,7 +1431,7 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaJobsService extends KalturaServiceBase
@@ -2386,7 +2386,7 @@ class KalturaJobsService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMediaService extends KalturaServiceBase
@@ -2455,7 +2455,7 @@ class KalturaMediaService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSessionService extends KalturaServiceBase
@@ -2485,7 +2485,7 @@ class KalturaSessionService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaSystemService extends KalturaServiceBase
@@ -2509,7 +2509,7 @@ class KalturaSystemService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaThumbAssetService extends KalturaServiceBase
@@ -2537,7 +2537,7 @@ class KalturaThumbAssetService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaClient extends KalturaClientBase

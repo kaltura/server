@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataObjectType
@@ -17,7 +17,7 @@ class KalturaMetadataObjectType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataOrderBy
@@ -33,7 +33,7 @@ class KalturaMetadataOrderBy
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataStatus
@@ -44,7 +44,7 @@ class KalturaMetadataStatus
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaTransformMetadataJobData extends KalturaJobData
@@ -88,7 +88,7 @@ class KalturaTransformMetadataJobData extends KalturaJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaImportMetadataJobData extends KalturaJobData
@@ -118,7 +118,7 @@ class KalturaImportMetadataJobData extends KalturaJobData
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaMetadataBaseFilter extends KalturaFilter
@@ -246,7 +246,7 @@ abstract class KalturaMetadataBaseFilter extends KalturaFilter
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataFilter extends KalturaMetadataBaseFilter
@@ -255,7 +255,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadata extends KalturaObjectBase
@@ -352,7 +352,7 @@ class KalturaMetadata extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataListResponse extends KalturaObjectBase
@@ -377,7 +377,7 @@ class KalturaMetadataListResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaTransformMetadataResponse extends KalturaObjectBase
@@ -410,7 +410,7 @@ class KalturaTransformMetadataResponse extends KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaUpgradeMetadataResponse extends KalturaObjectBase
@@ -436,7 +436,7 @@ class KalturaUpgradeMetadataResponse extends KalturaObjectBase
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataService extends KalturaServiceBase
@@ -491,7 +491,7 @@ class KalturaMetadataService extends KalturaServiceBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataBatchService extends KalturaServiceBase
@@ -1649,7 +1649,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaMetadataClientPlugin extends KalturaClientPlugin

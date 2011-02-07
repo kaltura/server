@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusFoundAction
@@ -20,7 +20,7 @@ class KalturaVirusFoundAction
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusScanEngineType
@@ -29,7 +29,7 @@ class KalturaVirusScanEngineType
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusScanJobResult
@@ -41,7 +41,7 @@ class KalturaVirusScanJobResult
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusScanJobData extends KalturaJobData
@@ -79,7 +79,7 @@ class KalturaVirusScanJobData extends KalturaJobData
 
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusScanBatchService extends KalturaServiceBase
@@ -1156,7 +1156,7 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 	}
 }
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaVirusScanClientPlugin extends KalturaClientPlugin
