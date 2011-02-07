@@ -7,8 +7,8 @@ abstract class ClientGeneratorFromXml
 	protected $_sourcePath = "";
 	protected $_params = array();
 	
-	protected $package = 'Kaltura';
-	protected $subpackage = 'Client';
+	protected $package = 'External';
+	protected $subpackage = 'Kaltura';
 	
 	public function setPackage($package)
 	{
