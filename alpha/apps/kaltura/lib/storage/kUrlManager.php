@@ -231,7 +231,7 @@ class kUrlManager
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";
 		
-                if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		{
 			$url .= '/forceproxy/true';
 			if ($this->extention && strtolower($this->extention) != 'flv' ||
