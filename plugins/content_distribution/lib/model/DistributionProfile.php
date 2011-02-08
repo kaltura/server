@@ -155,7 +155,17 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function setRequiredThumbDimensionsObjects(array $v)
 	{
-		$requiredThumbDimensionsStr = serialize(array_unique($v));
+		$existsKeys = array();
+		foreach($v as $index => $dimension)
+		{
+			$key = $dimension->getKey();
+			if(in_array($key, $existsKeys))
+				unset($v[$index]);
+			else
+				$existsKeys[] = $key;
+		}
+		
+		$requiredThumbDimensionsStr = serialize($v);
 		return $this->setRequiredThumbDimensions($requiredThumbDimensionsStr);
 	}
 	
@@ -189,7 +199,17 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function setOptionalThumbDimensionsObjects(array $v)
 	{
-		$OptionalThumbDimensionsStr = serialize(array_unique($v));
+		$existsKeys = array();
+		foreach($v as $index => $dimension)
+		{
+			$key = $dimension->getKey();
+			if(in_array($key, $existsKeys))
+				unset($v[$index]);
+			else
+				$existsKeys[] = $key;
+		}
+		
+		$OptionalThumbDimensionsStr = serialize($v);
 		return $this->setOptionalThumbDimensions($OptionalThumbDimensionsStr);
 	}
 	
