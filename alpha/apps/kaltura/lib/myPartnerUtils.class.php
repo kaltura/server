@@ -286,13 +286,26 @@ class myPartnerUtils
 	}
 	
 	
-	public static function getCdnHost ( $partner_id, $protocol = 'http' )
+	public static function getCdnHost ( $partner_id, $protocol = null )
 	{
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ( !$partner || (! $partner->getCdnHost() ) ) return requestUtils::getCdnHost($protocol);
-		
+
 		$cdnHost = $partner->getCdnHost();
-		$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
+
+		// in case the request came through https, force https url
+		if (@$_SERVER['HTTPS'] == 'on')
+			$protocol = 'https';
+
+		// temporary default is http since the system is not aligned to use https in all of its components (e.g. kmc)
+		// right now, if a partner cdnHost is set to https:// the kmc wont work well if we reply with https prefix to its requests
+		if ($protocol === null)
+			$protocol='http';
+
+		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
+		if ($protocol !== null)
+			$cdnHost = preg_replace('/^https?/', $protocol, $cdnHost);
+			
 		return $cdnHost;
 	}
 	
