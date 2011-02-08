@@ -269,13 +269,8 @@ class playManifestAction extends kalturaAction
 		$urlManager->setSeekFromTime($this->seekFrom);
 		$urlManager->setDomain($this->cdnHost);
 		$urlManager->setProtocol($this->format);
-		if ($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-		{
-			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-			$url = $urlManager->getFileSyncUrl($fileSync);
-		}
-		else
-	        $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
+
+	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
 		
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
