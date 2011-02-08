@@ -289,7 +289,7 @@ class KalturaFrontController
 			{
 				case kCoreException::MAX_CATEGORY_DEPTH_REACHED:
 		    		KalturaLog::err($ex);
-					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORY_DEPTH_REACHED, categoryPeer::MAX_CATEGORY_DEPTH);
+					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORY_DEPTH_REACHED, category::MAX_CATEGORY_DEPTH);
 					break;
 					
 				case kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED:
