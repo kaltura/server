@@ -372,7 +372,7 @@ class ContentDistributionBatchService extends BatchService
 		}
 		
 		
-		// serach all records that atrrived their sunrise time and requires submittion
+		// serach all records that arrived their sunrise time and requires submittion
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::SUBMIT_REQUIRED);
 		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::GREATER_EQUAL);
@@ -387,7 +387,7 @@ class ContentDistributionBatchService extends BatchService
 		}
 		
 		
-		// serach all records that atrrived their sunset time and requires deletion
+		// serach all records that arrived their sunset time and requires deletion
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::DELETE_REQUIRED);
 		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::GREATER_EQUAL);
