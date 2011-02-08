@@ -443,7 +443,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					if(count($fileAttributesNames))
 					{
 						$str .= "		override public function parse(result:XML):* {\n";
-						$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
+						$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributesNames is FileReference) {\n";
 						$str .= "				return super.parse(result);\n";
 						$str .= "			}\n";
 						$str .= "			else {\n";
