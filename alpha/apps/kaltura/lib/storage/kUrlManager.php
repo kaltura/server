@@ -224,25 +224,29 @@ class kUrlManager
 		$this->setContainerFormat($flavorAsset->getContainerFormat());
 	
 		$url = "$partnerPath/serveFlavor/flavorId/$flavorAssetId";
-		
 		if($this->seekFromTime)
 			$url .= "/seekFrom/$this->seekFromTime";
 			
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";
-		
-		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
-		{
+			
+		switch($this->protocol){
+		case StorageProfile::PLAY_FORMAT_RTMP:
 			$url .= '/forceproxy/true';
 			if ($this->extention && strtolower($this->extention) != 'flv' ||
                         	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')	
 			{
 				$url = "mp4:$url/name/$flavorAssetId.mp4";
+				$urlService = "";
 			}
 			else
 			{
 				$url .= "/name/$flavorAssetId.flv";
 			}
+			break;
+		case StorageProfile::PLAY_FORMAT_APPLE_HTTP:
+			$url .= "/file/playlist.m3u8";
+			break;
 		}
 		
 		$url = str_replace('\\', '/', $url);
