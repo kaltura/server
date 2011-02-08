@@ -237,7 +237,6 @@ class kUrlManager
                         	$this->containerFormat && strtolower($this->containerFormat) != 'flash video')	
 			{
 				$url = "mp4:$url/name/$flavorAssetId.mp4";
-				$urlService = "";
 			}
 			else
 			{
