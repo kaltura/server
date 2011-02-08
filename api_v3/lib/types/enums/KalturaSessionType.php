@@ -3,8 +3,6 @@
  * @package api
  * @subpackage enum
  */
-class KalturaSessionType extends KalturaEnum
+class KalturaSessionType extends KalturaEnum implements SessionType
 {
-	const USER = 0;
-	const ADMIN = 2;
 }

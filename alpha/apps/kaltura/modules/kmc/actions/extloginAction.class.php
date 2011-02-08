@@ -98,7 +98,7 @@ class extloginAction extends kalturaAction
 		if ($ksPartnerId != $partner_id)
 		{
 			$ks = null;	
-			$sessionType = $adminKuser->getIsAdmin() ? KalturaSessionType::ADMIN : KalturaSessionType::USER;
+			$sessionType = $adminKuser->getIsAdmin() ? SessionType::ADMIN : SessionType::USER;
 			kSessionUtils::createKSessionNoValidations ( $partner_id ,  $admin_puser_id , $ks , 30 * 86400 , $sessionType , "" , "*" );
 		}
 					
@@ -114,4 +114,3 @@ class extloginAction extends kalturaAction
 	}
 	
 }
-?>
