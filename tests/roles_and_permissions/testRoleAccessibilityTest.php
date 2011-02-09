@@ -429,7 +429,7 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 		$permission->description = $desc;
 		$permission->permissionItemsIds = $permissionsItemsIds;
 		$permission->status = KalturaPermissionStatus::ACTIVE;
-		$permission->type = KalturaPermissionType::API_ACCESS;
+		$permission->type = KalturaPermissionType::NORMAL;
 		
 		return $permission;
 	}
