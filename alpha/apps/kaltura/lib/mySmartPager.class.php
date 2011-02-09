@@ -1,6 +1,4 @@
 <?php
-
-require_once ( "mySmartPagerRenderer.class.php" );
 /**
  * what makes this so smart ?
  * this pager basicaly has 4 parts:
@@ -11,8 +9,10 @@ require_once ( "mySmartPagerRenderer.class.php" );
  * 	these PKs are stored in a fast cache and for each page (which is a fragment of the bulk that was initially fetched) the access uses
  *  the in [PK1 , PK2, PK3.. ] to optimize the next page onwards.
  * TODO - the smart part - caching results by PK
+ * 
+ * @package Core
+ * @subpackage lib.paging
  */
-
 class mySmartPager 
 {
 	const NONE = "_NONE_";

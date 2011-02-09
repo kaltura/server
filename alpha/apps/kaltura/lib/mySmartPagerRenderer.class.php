@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage lib.paging
+ */
 class mySmartPagerRenderer
 {
 	const PAGES_TO_DISPLAY = 5;			// the number of pages to display between prev & next
