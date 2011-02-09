@@ -191,7 +191,7 @@ $acodec = "libmp3lam";
 			$cmdStr = $cmdStr." -t ".$this->_clipDur/1000;
 		}
 		
-if($this->_inFileName){
+		if($this->_inFileName){
 			$cmdStr .= " -i ".$this->_inFileName;
 		}
 		if($this->_vidId!="none"){
