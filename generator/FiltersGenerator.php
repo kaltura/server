@@ -81,10 +81,11 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : "KalturaFilter");
 		
+		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters';
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
 		$this->appendLine(" * @package " . $type->getPackage());
-		$this->appendLine(" * @subpackage api.filters");
+		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" */");
 		$this->appendLine("class $filterClassName extends $filterBaseClassName");
 		$this->appendLine("{");
@@ -115,10 +116,11 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		
 		$partnetClassName = ($parentType ? $parentType->getType() . "Filter" : "KalturaFilter");
 		
+		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.base';
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
 		$this->appendLine(" * @package " . $type->getPackage());
-		$this->appendLine(" * @subpackage api.filters.base");
+		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" * @abstract");
 		$this->appendLine(" */");
 		$this->appendLine("class $filterClassName extends $partnetClassName");
@@ -288,10 +290,11 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 		$enumName = $type->getType() . "OrderBy";
 		$enumPath = dirname($map[$type->getType()]) . "/filters/orderEnums/$enumName.php";
 			
+		$subpackage = ($type->getPackage() == 'api' ? '' : 'api.') . 'filters.enum';
 		$this->appendLine("<?php");
 		$this->appendLine("/**");
 		$this->appendLine(" * @package " . $type->getPackage());
-		$this->appendLine(" * @subpackage api.filters.enum");
+		$this->appendLine(" * @subpackage $subpackage");
 		$this->appendLine(" */");
 		$this->appendLine("class $enumName extends $partnetClassName");
 		$this->appendLine("{");
