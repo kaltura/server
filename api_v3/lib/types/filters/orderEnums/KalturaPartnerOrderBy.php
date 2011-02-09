@@ -1,7 +1,7 @@
 <?php
 /**
  * @package api
- * @subpackage api.filters.enum
+ * @subpackage filters.enum
  */
 class KalturaPartnerOrderBy extends KalturaStringEnum
 {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @package api
- * @subpackage api.filters.base
+ * @subpackage filters.base
  * @abstract
  */
 class KalturaMailJobBaseFilter extends KalturaBaseJobFilter
