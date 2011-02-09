@@ -1,9 +1,9 @@
 <?php
 /**
  * Marker interface
- * 
- * @package lib.model
- * @subpackage interfaces
+ *
+ * @package Core
+ * @subpackage enum
  */ 
 interface IKalturaPluginEnum 
 {

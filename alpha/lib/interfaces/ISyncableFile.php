@@ -1,7 +1,7 @@
 <?php
 /**
- * @package lib.model
- * @subpackage interfaces
+ * @package Core
+ * @subpackage model.interfaces
  */ 
 interface ISyncableFile extends IBaseObject
 {
