@@ -75,8 +75,10 @@ class KalturaResponseCacher
 		$this->_params["___cache___partnerId"] = $ksData["partnerId"];
 		$this->_params["___cache___userId"] = $ksData["userId"];
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
+		$this->_params['___cache___protocol'] = @$_SERVER['HTTPS'];
 		ksort($this->_params);
-		
+
+		$protocol = (@$_SERVER['HTTPS'] == 'on') ? "https|" : "";
 		$this->_cacheKey = md5( http_build_query($this->_params) );
 
 		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
