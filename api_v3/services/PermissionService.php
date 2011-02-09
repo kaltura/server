@@ -58,6 +58,9 @@ class PermissionService extends KalturaBaseService
 		if (!$permission->status) {
 			$permission->status = KalturaPermissionStatus::ACTIVE;
 		}
+		
+		// only normal permission types are added through this services
+		$permission->type = KalturaPermissionType::NORMAL;
 											
 		$dbPermission = $permission->toInsertableObject();
 		$dbPermission->setPartnerId($this->getPartnerId());
@@ -68,6 +71,9 @@ class PermissionService extends KalturaBaseService
 			if ($code === kPermissionException::PERMISSION_ALREADY_EXISTS) {
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_ALREADY_EXISTS, $permission->getName(), $this->getPartnerId());
 			}
+			if ($code === kPermissionException::PERMISSION_ITEM_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_ITEM_NOT_FOUND);
+			}			
 			throw $e;
 		}
 		
@@ -119,6 +125,12 @@ class PermissionService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
 		}
 		
+		// only normal permission types are allowed for updating through this service
+		if ($dbPermission->getType() !== PermissionType::NORMAL)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionName);
+		}
+		
 		if ($permission->name && $permission->name != $permissionName)
 		{
 			$existingPermission = PermissionPeer::getByNameAndPartner($permission->name, array($dbPermission->getPartnerId(), PartnerPeer::GLOBAL_PARTNER));
@@ -129,8 +141,18 @@ class PermissionService extends KalturaBaseService
 		}
 		
 		$dbPermission = $permission->toUpdatableObject($dbPermission);
-		$dbPermission->save();
-	
+		try
+		{
+			$dbPermission->save();
+		}
+		catch (kPermissionException $e)
+		{
+			$code = $e->getCode();
+			if ($code === kPermissionException::PERMISSION_ITEM_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_ITEM_NOT_FOUND);
+			}
+		}			
+		
 		$permission = new KalturaPermission();
 		$permission->fromObject($dbPermission);
 		

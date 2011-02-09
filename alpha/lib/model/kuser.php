@@ -15,6 +15,13 @@ require_once ( "myStatisticsMgr.class.php");
  */ 
 class kuser extends Basekuser
 {
+	public function __construct()
+	{
+		$this->roleIds = null;
+		$this->roleIdsChanged = false;
+	}
+	
+	
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;

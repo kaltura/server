@@ -38,7 +38,7 @@ class PermissionToPermissionItemTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-		$this->addForeignKey('PERMISSION_NAME', 'PermissionName', 'VARCHAR', 'permission', 'NAME', true, 100, null);
+		$this->addForeignKey('PERMISSION_ID', 'PermissionId', 'INTEGER', 'permission', 'ID', true, null, null);
 		$this->addForeignKey('PERMISSION_ITEM_ID', 'PermissionItemId', 'INTEGER', 'permission_item', 'ID', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -50,7 +50,7 @@ class PermissionToPermissionItemTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('Permission', 'Permission', RelationMap::MANY_TO_ONE, array('permission_name' => 'name', ), null, null);
+    $this->addRelation('Permission', 'Permission', RelationMap::MANY_TO_ONE, array('permission_id' => 'id', ), null, null);
     $this->addRelation('PermissionItem', 'PermissionItem', RelationMap::MANY_TO_ONE, array('permission_item_id' => 'id', ), null, null);
 	} // buildRelations()
 

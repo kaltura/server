@@ -34,8 +34,8 @@ abstract class BasePermissionToPermissionItemPeer {
 	/** the column name for the ID field */
 	const ID = 'permission_to_permission_item.ID';
 
-	/** the column name for the PERMISSION_NAME field */
-	const PERMISSION_NAME = 'permission_to_permission_item.PERMISSION_NAME';
+	/** the column name for the PERMISSION_ID field */
+	const PERMISSION_ID = 'permission_to_permission_item.PERMISSION_ID';
 
 	/** the column name for the PERMISSION_ITEM_ID field */
 	const PERMISSION_ITEM_ID = 'permission_to_permission_item.PERMISSION_ITEM_ID';
@@ -62,10 +62,10 @@ abstract class BasePermissionToPermissionItemPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PermissionName', 'PermissionItemId', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'permissionName', 'permissionItemId', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PERMISSION_NAME, self::PERMISSION_ITEM_ID, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'permission_name', 'permission_item_id', 'created_at', 'updated_at', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PermissionId', 'PermissionItemId', 'CreatedAt', 'UpdatedAt', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'permissionId', 'permissionItemId', 'createdAt', 'updatedAt', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PERMISSION_ID, self::PERMISSION_ITEM_ID, self::CREATED_AT, self::UPDATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'permission_id', 'permission_item_id', 'created_at', 'updated_at', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
@@ -76,10 +76,10 @@ abstract class BasePermissionToPermissionItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PermissionName' => 1, 'PermissionItemId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'permissionName' => 1, 'permissionItemId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PERMISSION_NAME => 1, self::PERMISSION_ITEM_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'permission_name' => 1, 'permission_item_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PermissionId' => 1, 'PermissionItemId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'permissionId' => 1, 'permissionItemId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PERMISSION_ID => 1, self::PERMISSION_ITEM_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'permission_id' => 1, 'permission_item_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
@@ -151,7 +151,7 @@ abstract class BasePermissionToPermissionItemPeer {
 	public static function addSelectColumns(Criteria $criteria)
 	{
 		$criteria->addSelectColumn(PermissionToPermissionItemPeer::ID);
-		$criteria->addSelectColumn(PermissionToPermissionItemPeer::PERMISSION_NAME);
+		$criteria->addSelectColumn(PermissionToPermissionItemPeer::PERMISSION_ID);
 		$criteria->addSelectColumn(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID);
 		$criteria->addSelectColumn(PermissionToPermissionItemPeer::CREATED_AT);
 		$criteria->addSelectColumn(PermissionToPermissionItemPeer::UPDATED_AT);
@@ -534,7 +534,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 		$stmt = PermissionToPermissionItemPeer::doCountStmt($criteria, $con);
 
@@ -617,7 +617,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		$startcol = (PermissionToPermissionItemPeer::NUM_COLUMNS - PermissionToPermissionItemPeer::NUM_LAZY_LOAD_COLUMNS);
 		PermissionPeer::addSelectColumns($criteria);
 
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 		$stmt = PermissionToPermissionItemPeer::doSelectStmt($criteria, $con);
 		$results = array();
@@ -761,7 +761,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, PermissionItemPeer::ID, $join_behavior);
 
@@ -804,7 +804,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		PermissionItemPeer::addSelectColumns($criteria);
 		$startcol4 = $startcol3 + (PermissionItemPeer::NUM_COLUMNS - PermissionItemPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, PermissionItemPeer::ID, $join_behavior);
 
@@ -949,7 +949,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		$criteria->setDbName(self::DATABASE_NAME);
 		
 		
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 		$stmt = PermissionToPermissionItemPeer::doCountStmt($criteria, $con);
 
@@ -1064,7 +1064,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		PermissionPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (PermissionPeer::NUM_COLUMNS - PermissionPeer::NUM_LAZY_LOAD_COLUMNS);
 
-		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_NAME, PermissionPeer::NAME, $join_behavior);
+		$criteria->addJoin(PermissionToPermissionItemPeer::PERMISSION_ID, PermissionPeer::ID, $join_behavior);
 
 
 		$stmt = BasePeer::doSelect($criteria, $con);

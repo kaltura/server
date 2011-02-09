@@ -34,7 +34,7 @@ KalturaLog::notice($msg);
 echo $msg.PHP_EOL;
 resetServiceConfig();
 $serviceConfig = new KalturaServiceConfig('v3_services.ct', null, true);
-setPermissions($serviceConfig, true, $userSessionPermission, $noKsPermission);
+setPermissions($serviceConfig, true, $userSessionPermission, $noKsPermission, PartnerPeer::GLOBAL_PARTNER);
 
 // add batch partner special permissions
 $msg = '***** NOTICE - Starting v3_services_batch.ct';
@@ -42,7 +42,7 @@ KalturaLog::notice($msg);
 echo $msg.PHP_EOL;
 resetServiceConfig();
 $serviceConfig = new KalturaServiceConfig('v3_services_batch.ct', null, false, false);
-setPermissions($serviceConfig, false, null, null);
+setPermissions($serviceConfig, false, null, null, Partner::BATCH_PARTNER_ID);
 
 // add admin console partner special permissions
 $msg = '***** NOTICE - Starting v3_services_console.ct';
@@ -50,7 +50,7 @@ KalturaLog::notice($msg);
 echo $msg.PHP_EOL;
 resetServiceConfig();
 $serviceConfig = new KalturaServiceConfig('v3_services_console.ct', null, false, false);
-setPermissions($serviceConfig, false, null, null);
+setPermissions($serviceConfig, false, null, null, Partner::ADMIN_CONSOLE_PARTNER_ID);
 
 $msg = 'Done!';
 KalturaLog::notice($msg);
@@ -75,7 +75,7 @@ function getPluginNameFromServicesCtPath($ctPath)
 }
 
 
-function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionPermission, $noKsPermission)
+function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionPermission, $noKsPermission, $partnerId)
 {
 	// get list of services defined in the services.ct files
 	$servicesTable = $serviceConfig->getAllServicesByCt();
@@ -126,6 +126,7 @@ function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionP
 			$c = new Criteria();
 			$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceId, Criteria::EQUAL);
 			$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName, Criteria::EQUAL);
+			$c->addAnd(PermissionItemPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partnerId), Criteria::IN);
 			$permissionItem = PermissionItemPeer::doSelectOne($c);
 			if ($permissionItem) {
 				$msg = '***** NOTICE - Permission item for ['.$serviceActionName.'] already exists with id ['.$permissionItem->getId().']';
@@ -137,6 +138,7 @@ function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionP
 				$permissionItem = new kApiActionPermissionItem();
 				$permissionItem->setService($serviceId);
 				$permissionItem->setAction($actionName);
+				$permissionItem->setPartnerId($partnerId);
 				$permissionItem->save();
 			}		
 			
@@ -154,7 +156,8 @@ function setPermissions($serviceConfig, $setBaseSystemPermissions, $userSessionP
 				// add the permission item to all its defined permission objects
 				$c = new Criteria();
 				$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-				$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+				$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
+				//$c->addAnd(PermissionPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partnerId), Criteria::IN);
 				$permission = PermissionPeer::doSelectOne($c);
 				
 				if (!$permission) {

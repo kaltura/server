@@ -1517,7 +1517,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 			   $this->collPermissionToPermissionItems = array();
 			} else {
 
-				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 				PermissionToPermissionItemPeer::addSelectColumns($criteria);
 				$this->collPermissionToPermissionItems = PermissionToPermissionItemPeer::doSelect($criteria, $con);
@@ -1530,7 +1530,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 				// one, just return the collection.
 
 
-				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 				PermissionToPermissionItemPeer::addSelectColumns($criteria);
 				if (!isset($this->lastPermissionToPermissionItemCriteria) || !$this->lastPermissionToPermissionItemCriteria->equals($criteria)) {
@@ -1570,7 +1570,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 				$count = 0;
 			} else {
 
-				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 				$count = PermissionToPermissionItemPeer::doCount($criteria, false, $con);
 			}
@@ -1582,7 +1582,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 				// one, just return count of the collection.
 
 
-				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 				if (!isset($this->lastPermissionToPermissionItemCriteria) || !$this->lastPermissionToPermissionItemCriteria->equals($criteria)) {
 					$count = PermissionToPermissionItemPeer::doCount($criteria, false, $con);
@@ -1642,7 +1642,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 				$this->collPermissionToPermissionItems = array();
 			} else {
 
-				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+				$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 				$this->collPermissionToPermissionItems = PermissionToPermissionItemPeer::doSelectJoinPermissionItem($criteria, $con, $join_behavior);
 			}
@@ -1651,7 +1651,7 @@ abstract class BasePermission extends BaseObject  implements Persistent {
 			// called for.  If the criteria is the same as the last
 			// one, just return the collection.
 
-			$criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->name);
+			$criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->id);
 
 			if (!isset($this->lastPermissionToPermissionItemCriteria) || !$this->lastPermissionToPermissionItemCriteria->equals($criteria)) {
 				$this->collPermissionToPermissionItems = PermissionToPermissionItemPeer::doSelectJoinPermissionItem($criteria, $con, $join_behavior);

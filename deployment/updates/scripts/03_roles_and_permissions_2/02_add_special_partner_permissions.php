@@ -109,26 +109,27 @@ foreach ($serviceConfigFiles as $file)
 				continue;
 			}	
 			
-			$c = new Criteria();
-			$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceId);
-			$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName);
-			$permissionItem = PermissionItemPeer::doSelectOne($c);
 			
-			if (!$permissionItem)
+			foreach ($partners as $partner)
 			{
-				$msg = '***** ERROR - Permission item for service ['.$serviceId.'] action ['.$actionName.'] not found in DB!';
-				KalturaLog::alert($msg);
-				echo $msg.PHP_EOL;
-				continue;
-			}
-			
-			// check if a special ticket type was set for the action which is different from the basic system ticket types
-	
-			if (in_array(USER_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $userSessionPermissionItemIds))
-			{
-				// ticket type 1 set - add a special user KS permission to all relevant partners and add current permission item to it
-				foreach ($partners as $partner)
+				$c = new Criteria();
+				$c->addAnd(kApiActionPermissionItem::SERVICE_COLUMN_NAME, $serviceId, Criteria::EQUAL);
+				$c->addAnd(kApiActionPermissionItem::ACTION_COLUMN_NAME, $actionName, Criteria::EQUAL);
+				$c->addAnd(PermissionItemPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $partner->getId()), Criteria::IN);
+				$permissionItem = PermissionItemPeer::doSelectOne($c);
+				
+				if (!$permissionItem)
 				{
+					$msg = '***** ERROR - Permission item for service ['.$serviceId.'] action ['.$actionName.'] not found in DB!';
+					KalturaLog::alert($msg);
+					echo $msg.PHP_EOL;
+					continue;
+				}
+				
+				// check if a special ticket type was set for the action which is different from the basic system ticket types
+				if (in_array(USER_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $userSessionPermissionItemIds))
+				{
+					// ticket type 1 set - add a special user KS permission to all relevant partners and add current permission item to it
 					$userKsRole = getOrCreateUserSessionRole($partner->getId());				
 					$userKsPermission = getOrCreateSessionPermission($partner->getId(), 'user');
 					$userKsPermission->addPermissionItem($permissionItem->getId(), true);
@@ -136,13 +137,10 @@ foreach ($serviceConfigFiles as $file)
 					$partner->setUserSessionRoleId($userKsRole->getId());
 					$partner->save();
 				}
-			}
-			
-			if (in_array(NO_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $noKsPermissionItemIds))
-			{
-				// ticket type 0 set - add a special no KS permission to all relevant partners and add current permission item to it
-				foreach ($partners as $partner)
+				
+				if (in_array(NO_KS_TICKET_TYPE, $ticketTypes) && !in_array($permissionItem->getId(), $noKsPermissionItemIds))
 				{
+					// ticket type 0 set - add a special no KS permission to all relevant partners and add current permission item to it
 					$noKsPermission = getOrCreateSessionPermission($partner->getId(), 'no');
 					$noKsPermission->addPermissionItem($permissionItem->getId(), true);
 					$currentPerms = $partner->getAlwaysAllowedPermissionNames();
@@ -152,19 +150,21 @@ foreach ($serviceConfigFiles as $file)
 					$partner->setAlwaysAllowedPermissionNames($currentPerms);
 					$partner->save();
 				}
+				
+				// check if partner group is set for the action
+				$partnerGroup = $serviceConfig->getPartnerGroup();
+				if ($partnerGroup)
+				{
+					// partner group is set - add a special partner group permission to all relevant partners and add current permission item to it
+					$partnerGroupPermission = getOrCreatePartnerGroupPermission($partner->getId(), $partnerGroup);
+					$partnerGroupPermission->addPermissionItem($permissionItem->getId(), true);
+				}
+				
+				
 			}
 			
-			// check if partner group is set for the action
-			$partnerGroup = $serviceConfig->getPartnerGroup();
-			if ($partnerGroup)
-			{
-				// partner group is set - add a special partner group permission to all relevant partners and add current permission item to it
-				foreach ($partners as $partner)
-				{
-					$partnerGroupPermission = getOrCreatePartnerGroupPermission($partner->getId(), $partnerGroup);
-					$partnerGroupPermission->addPermissionItem($permissionItem->getId(), true);				
-				}
-			}
+			
+			
 		}
 	}
 	
@@ -207,7 +207,7 @@ function getOrCreateSessionPermission($partnerId, $type)
 	$c = new Criteria();
 	$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$c->addAnd(PermissionPeer::NAME, $permissionName, Criteria::EQUAL);
-	$c->addAnd(PermissionPeer::TYPE, PermissionType::API_ACCESS, Criteria::EQUAL);
+	$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
 	
 	$permission = PermissionPeer::doSelectOne($c);
 	
@@ -218,7 +218,7 @@ function getOrCreateSessionPermission($partnerId, $type)
 		$permission->setName($permissionName);
 		$permission->setFriendlyName('Special '.strtolower($type).' session permission');
 		$permission->setDescription('Partner '.$partnerId.' special '.strtolower($type).' session permission');
-		$permission->setType(PermissionType::API_ACCESS);
+		$permission->setType(PermissionType::NORMAL);
 		$permission->setStatus(PermissionStatus::ACTIVE);
 		$permission->save();
 	}

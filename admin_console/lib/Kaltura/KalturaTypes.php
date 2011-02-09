@@ -2743,87 +2743,6 @@ class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
  * @package Admin
  * @subpackage Client
  */
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -5047,6 +4966,7 @@ class KalturaPermission extends KalturaObjectBase
 	 * 
 	 *
 	 * @var KalturaPermissionType
+	 * @readonly
 	 */
 	public $type = null;
 
@@ -5728,6 +5648,87 @@ class KalturaUserListResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
 
 }
 

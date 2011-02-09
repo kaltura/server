@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1296979876">
-  <!-- Generated on date 06/02/11 10:11:16 -->
+<xml apiVersion="3.1.1" generatedDate="1297175853">
+  <!-- Generated on date 08/02/11 16:37:33 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -992,6 +992,9 @@
       <const name="ADMIN_ROLE_ADD" value="ADMIN_ROLE_ADD"/>
       <const name="ADMIN_ROLE_UPDATE" value="ADMIN_ROLE_UPDATE"/>
       <const name="ADMIN_ROLE_DELETE" value="ADMIN_ROLE_DELETE"/>
+      <const name="ADMIN_PERMISSION_ADD" value="ADMIN_PERMISSION_ADD"/>
+      <const name="ADMIN_PERMISSION_UPDATE" value="ADMIN_PERMISSION_UPDATE"/>
+      <const name="ADMIN_PERMISSION_DELETE" value="ADMIN_PERMISSION_DELETE"/>
       <const name="ADMIN_PUBLISHER_MANAGE" value="ADMIN_PUBLISHER_MANAGE"/>
       <const name="ANALYTICS_BASE" value="ANALYTICS_BASE"/>
       <const name="WIDGET_ADMIN" value="WIDGET_ADMIN"/>
@@ -1023,11 +1026,10 @@
       <const name="DELETED" value="3"/>
     </enum>
     <enum name="KalturaPermissionType" enumType="int">
-      <const name="API_ACCESS" value="1"/>
+      <const name="NORMAL" value="1"/>
       <const name="SPECIAL_FEATURE" value="2"/>
       <const name="PLUGIN" value="3"/>
       <const name="PARTNER_GROUP" value="4"/>
-      <const name="EXTERNAL" value="99"/>
     </enum>
     <enum name="KalturaPlayableEntryOrderBy" enumType="string">
       <const name="PLAYS_ASC" value="+plays"/>
@@ -2195,6 +2197,8 @@
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="typeEqual" type="string" enumType="KalturaPermissionItemType" readOnly="0" insertOnly="0" description=""/>
       <property name="typeIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2209,7 +2213,7 @@
     </class>
     <class name="KalturaPermission">
       <property name="id" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="type" type="int" enumType="KalturaPermissionType" readOnly="0" insertOnly="0" description=""/>
+      <property name="type" type="int" enumType="KalturaPermissionType" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="friendlyName" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>

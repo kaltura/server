@@ -16,6 +16,51 @@
 class Permission extends BasePermission
 {
 	
+	private $permissionItemIds = null;
+	private $permissionItemIdsChanged = false;
+	
+	
+	public function __construct()
+	{
+		$this->permissionItemIds = null;
+		$this->permissionItemIdsChanged = false;	
+	}
+	
+	public function preSave(PropelPDO $con = null)
+	{
+		if ($this->permissionItemIdsChanged)
+		{
+			PermissionItemPeer::checkValidForParther(implode(',',$this->permissionItemIds), $this->getPartnerId());
+		}
+		
+		return parent::preSave($con);
+	}
+	
+	
+	public function postSave(PropelPDO $con = null) 
+	{
+		if ($this->permissionItemIdsChanged)
+		{
+			$this->deleteAllPermissionItems();
+						
+			foreach ($this->permissionItemIds as $itemId)
+			{
+				if (!is_null($itemId) && $itemId !== '')
+				{
+					$permissionToPermissionItem = new PermissionToPermissionItem();
+					$permissionToPermissionItem->setPermissionItemId($itemId);
+					$permissionToPermissionItem->setPermissionId($this->getId());
+					$permissionToPermissionItem->save();
+				}
+			}
+		}
+		
+		$this->permissionItemIds = null;
+		$this->permissionItemIdsChanged = false;
+		return parent::postSave($con);
+		
+	}
+		
 	/**
 	 * Add a permission item to the current permission
 	 * @param int $permissionItemId
@@ -29,37 +74,42 @@ class Permission extends BasePermission
 			throw new kPermissionException('', kPermissionException::PERMISSION_ITEM_NOT_FOUND);
 		}
 		
-		// check if item is already associated to the permission
-		$permissionToItem = PermissionToPermissionItemPeer::getByPermissionNameAndItemId($this->getName(), $permissionItemId);
-		if ($permissionToItem) {
+		$itemIds = $this->getPermissionItemIds(); // init $this->permissionItemIds
+		
+		// check if item is already associated with the permission
+		if ($itemIds && in_array($permissionItemId, $itemIds)) {
 			KalturaLog::notice('Permission with name ['.$this->getName().'] already contains permission item with id ['.$permissionItemId.']');
 			return true;
 		}
 		
-		// add item to permission
-		$permissionToItem = new PermissionToPermissionItem();
-		$permissionToItem->setPermissionItem($permissionItem);
-		$this->addPermissionToPermissionItem($permissionToItem);
+		$this->permissionItemIds[$permissionItemId] = $permissionItemId;
+		$this->permissionItemIdsChanged = true;
+
 		if ($save) {
 			$this->save();
 		}
 		return true;
 	}
+
 	
 	/**
 	 * @return array Array of permission item ids associated with the current permission
 	 */
 	public function getPermissionItemIds()
 	{
-		$ids = array();
-		$lookups = $this->getPermissionToPermissionItems();
-		if (!$lookups) {
-			return null;
+		if (is_null($this->permissionItemIds))
+		{
+			$c = new Criteria();
+			$c->addSelectColumn(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID);
+			$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ID, $this->getId(), Criteria::EQUAL);
+			$stmt = PermissionToPermissionItemPeer::doSelectStmt($c);
+			$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+			if (!$ids) {
+				return null;
+			}
+			$this->permissionItemIds = $ids;
 		}		
-		foreach ($lookups as $lookup) {
-			$ids[] = $lookup->getPermissionItemId();
-		}
-		return $ids;
+		return $this->permissionItemIds;
 	}
 	
 	/**
@@ -83,14 +133,14 @@ class Permission extends BasePermission
 	public function removePermissionItem($permissionItemId)
 	{		
 		// check if item is already associated to the permission
-		$permissionToItem = PermissionToPermissionItemPeer::getByPermissionNameAndItemId($this->getName(), $permissionItemId);
-		if (!$permissionToItem) {
+		$itemIds = $this->getPermissionItemIds();
+		if (!in_array($permissionItemId, $itemIds)) {
 			KalturaLog::notice('Permission with name ['.$this->getName().'] does not contain permission item with id ['.$permissionItemId.']');
 			return true;
 		}
 		
-		// delete association between item and permission
-		$permissionToItem->delete();
+		unset($this->permissionItemIds[$permissionItemId]);
+		$this->permissionItemIdsChanged = true;
 	}
 	
 
@@ -100,17 +150,8 @@ class Permission extends BasePermission
 	 */
 	public function setPermissionItems($idsString)
 	{
-		$this->deleteAllPermissionItems();
-		$ids = explode(',', trim($idsString));
-		
-		foreach ($ids as $id)
-		{
-			if (!is_null($id) && $id != '') {
-				$this->addPermissionItem($id, false);
-			}
-		}
-		
-		$this->save();
+		$this->permissionItemIds = explode(',', trim($idsString));
+		$this->permissionItemIdsChanged = true;
 	}
 	
 	
@@ -120,7 +161,7 @@ class Permission extends BasePermission
 	private function deleteAllPermissionItems()
 	{
 		$c = new Criteria();
-		$c->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->getName(), Criteria::EQUAL);
+		$c->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->getId(), Criteria::EQUAL);
 		PermissionToPermissionItemPeer::doDelete($c);
 	}
 	

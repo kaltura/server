@@ -26,10 +26,10 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	protected $id;
 
 	/**
-	 * The value for the permission_name field.
-	 * @var        string
+	 * The value for the permission_id field.
+	 * @var        int
 	 */
-	protected $permission_name;
+	protected $permission_id;
 
 	/**
 	 * The value for the permission_item_id field.
@@ -98,13 +98,13 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	}
 
 	/**
-	 * Get the [permission_name] column value.
+	 * Get the [permission_id] column value.
 	 * 
-	 * @return     string
+	 * @return     int
 	 */
-	public function getPermissionName()
+	public function getPermissionId()
 	{
-		return $this->permission_name;
+		return $this->permission_id;
 	}
 
 	/**
@@ -221,31 +221,31 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	} // setId()
 
 	/**
-	 * Set the value of [permission_name] column.
+	 * Set the value of [permission_id] column.
 	 * 
-	 * @param      string $v new value
+	 * @param      int $v new value
 	 * @return     PermissionToPermissionItem The current object (for fluent API support)
 	 */
-	public function setPermissionName($v)
+	public function setPermissionId($v)
 	{
-		if(!isset($this->oldColumnsValues[PermissionToPermissionItemPeer::PERMISSION_NAME]))
-			$this->oldColumnsValues[PermissionToPermissionItemPeer::PERMISSION_NAME] = $this->permission_name;
+		if(!isset($this->oldColumnsValues[PermissionToPermissionItemPeer::PERMISSION_ID]))
+			$this->oldColumnsValues[PermissionToPermissionItemPeer::PERMISSION_ID] = $this->permission_id;
 
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (int) $v;
 		}
 
-		if ($this->permission_name !== $v) {
-			$this->permission_name = $v;
-			$this->modifiedColumns[] = PermissionToPermissionItemPeer::PERMISSION_NAME;
+		if ($this->permission_id !== $v) {
+			$this->permission_id = $v;
+			$this->modifiedColumns[] = PermissionToPermissionItemPeer::PERMISSION_ID;
 		}
 
-		if ($this->aPermission !== null && $this->aPermission->getName() !== $v) {
+		if ($this->aPermission !== null && $this->aPermission->getId() !== $v) {
 			$this->aPermission = null;
 		}
 
 		return $this;
-	} // setPermissionName()
+	} // setPermissionId()
 
 	/**
 	 * Set the value of [permission_item_id] column.
@@ -405,7 +405,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-			$this->permission_name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+			$this->permission_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->permission_item_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
@@ -441,7 +441,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	public function ensureConsistency()
 	{
 
-		if ($this->aPermission !== null && $this->permission_name !== $this->aPermission->getName()) {
+		if ($this->aPermission !== null && $this->permission_id !== $this->aPermission->getId()) {
 			$this->aPermission = null;
 		}
 		if ($this->aPermissionItem !== null && $this->permission_item_id !== $this->aPermissionItem->getId()) {
@@ -870,7 +870,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 				return $this->getId();
 				break;
 			case 1:
-				return $this->getPermissionName();
+				return $this->getPermissionId();
 				break;
 			case 2:
 				return $this->getPermissionItemId();
@@ -903,7 +903,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		$keys = PermissionToPermissionItemPeer::getFieldNames($keyType);
 		$result = array(
 			$keys[0] => $this->getId(),
-			$keys[1] => $this->getPermissionName(),
+			$keys[1] => $this->getPermissionId(),
 			$keys[2] => $this->getPermissionItemId(),
 			$keys[3] => $this->getCreatedAt(),
 			$keys[4] => $this->getUpdatedAt(),
@@ -942,7 +942,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 				$this->setId($value);
 				break;
 			case 1:
-				$this->setPermissionName($value);
+				$this->setPermissionId($value);
 				break;
 			case 2:
 				$this->setPermissionItemId($value);
@@ -978,7 +978,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		$keys = PermissionToPermissionItemPeer::getFieldNames($keyType);
 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-		if (array_key_exists($keys[1], $arr)) $this->setPermissionName($arr[$keys[1]]);
+		if (array_key_exists($keys[1], $arr)) $this->setPermissionId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setPermissionItemId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
@@ -994,7 +994,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		$criteria = new Criteria(PermissionToPermissionItemPeer::DATABASE_NAME);
 
 		if ($this->isColumnModified(PermissionToPermissionItemPeer::ID)) $criteria->add(PermissionToPermissionItemPeer::ID, $this->id);
-		if ($this->isColumnModified(PermissionToPermissionItemPeer::PERMISSION_NAME)) $criteria->add(PermissionToPermissionItemPeer::PERMISSION_NAME, $this->permission_name);
+		if ($this->isColumnModified(PermissionToPermissionItemPeer::PERMISSION_ID)) $criteria->add(PermissionToPermissionItemPeer::PERMISSION_ID, $this->permission_id);
 		if ($this->isColumnModified(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID)) $criteria->add(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, $this->permission_item_id);
 		if ($this->isColumnModified(PermissionToPermissionItemPeer::CREATED_AT)) $criteria->add(PermissionToPermissionItemPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(PermissionToPermissionItemPeer::UPDATED_AT)) $criteria->add(PermissionToPermissionItemPeer::UPDATED_AT, $this->updated_at);
@@ -1052,7 +1052,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	public function copyInto($copyObj, $deepCopy = false)
 	{
 
-		$copyObj->setPermissionName($this->permission_name);
+		$copyObj->setPermissionId($this->permission_id);
 
 		$copyObj->setPermissionItemId($this->permission_item_id);
 
@@ -1133,9 +1133,9 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	public function setPermission(Permission $v = null)
 	{
 		if ($v === null) {
-			$this->setPermissionName(NULL);
+			$this->setPermissionId(NULL);
 		} else {
-			$this->setPermissionName($v->getName());
+			$this->setPermissionId($v->getId());
 		}
 
 		$this->aPermission = $v;
@@ -1159,10 +1159,8 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	 */
 	public function getPermission(PropelPDO $con = null)
 	{
-		if ($this->aPermission === null && (($this->permission_name !== "" && $this->permission_name !== null))) {
-			$c = new Criteria(PermissionPeer::DATABASE_NAME);
-			$c->add(PermissionPeer::NAME, $this->permission_name);
-			$this->aPermission = PermissionPeer::doSelectOne($c, $con);
+		if ($this->aPermission === null && ($this->permission_id !== null)) {
+			$this->aPermission = PermissionPeer::retrieveByPk($this->permission_id);
 			/* The following can be used additionally to
 			   guarantee the related object contains a reference
 			   to this object.  This level of coupling may, however, be

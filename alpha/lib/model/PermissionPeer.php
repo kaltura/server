@@ -22,7 +22,7 @@ class PermissionPeer extends BasePermissionPeer
 			return true;
 		}
 		
-		$permissions = explode(',', $permissionsStr);
+		$permissions = array_map('trim', explode(',', $permissionsStr));
 		
 		foreach ($permissions as $permission)
 		{
@@ -32,8 +32,8 @@ class PermissionPeer extends BasePermissionPeer
 			$c = new Criteria();
 			$c->addAnd(PermissionPeer::NAME, $permission, Criteria::EQUAL);
 			$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
-			// a user role can only contain API_ACCESS and EXTERNAL permission types - TODO should be changed to perPartner / perUser permissions
-			$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+			// a user role can only contain NORMAL permission types - TODO should be changed to perPartner / perUser permissions
+			$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
 			$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 			
 			PermissionPeer::setUseCriteriaFilter(false);

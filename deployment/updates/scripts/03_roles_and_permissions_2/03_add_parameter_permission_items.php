@@ -46,6 +46,7 @@ foreach ($permissionItems as $cur)
 	$item->setObject($cur['object']);
 	$item->setParameter($cur['parameter']);
 	$item->setAction($cur['action']);
+	$item->setPartnerId(PartnerPeer::GLOBAL_PARTNER);
 	$item->save();
 	
 	$permissions = $cur['permission'];

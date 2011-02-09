@@ -262,11 +262,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			$permissionNames[$name] = $name;
 		}
-		$map[self::PERMISSION_NAMES_ARRAY] = $permissionNames;	
+		$map[self::PERMISSION_NAMES_ARRAY] = $permissionNames;
 		
 		// get mapping of permissions to permission items
 		$c = new Criteria();
-		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_NAME, $permissionNames, Criteria::IN);
+		$c->addAnd(PermissionPeer::NAME, $permissionNames, Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, self::$operatingPartnerId), Criteria::IN);
+		$c->addAnd(PermissionItemPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, self::$operatingPartnerId), Criteria::IN);
 		$lookups = PermissionToPermissionItemPeer::doSelectJoinAll($c);
 		foreach ($lookups as $lookup)
 		{

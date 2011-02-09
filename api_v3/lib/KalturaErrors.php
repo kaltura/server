@@ -253,4 +253,6 @@ class KalturaErrors extends APIErrors
 	
 	const ROLE_NAME_ALREADY_EXISTS = "ROLE_NAME_ALREADY_EXISTS,A role with the same name already exists";
 	
+	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exist";
+	
 }

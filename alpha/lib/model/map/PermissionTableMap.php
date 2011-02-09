@@ -57,7 +57,7 @@ class PermissionTableMap extends TableMap {
 	 */
 	public function buildRelations()
 	{
-    $this->addRelation('PermissionToPermissionItem', 'PermissionToPermissionItem', RelationMap::ONE_TO_MANY, array('name' => 'permission_name', ), null, null);
+    $this->addRelation('PermissionToPermissionItem', 'PermissionToPermissionItem', RelationMap::ONE_TO_MANY, array('id' => 'permission_id', ), null, null);
 	} // buildRelations()
 
 } // PermissionTableMap
