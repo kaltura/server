@@ -44,7 +44,8 @@ class kwidgetAction extends sfAction
 		if (!$nowrapper)
 			$noncached_params =	$externalInterfaceDisabled."&referer=".urlencode($referer);
 
-		$requestKey = $_SERVER["REQUEST_URI"];
+		$protocol = (@$_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		$requestKey = $protocol.$_SERVER["REQUEST_URI"];
 		
 		// check if we cached the redirect url
 		$cache = new myCache("kwidget", 10 * 60); // 10 minutes
