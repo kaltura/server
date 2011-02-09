@@ -137,6 +137,10 @@ class KDLMediaDataSet  {
 						$tagsOut[] = $tag;
 					break;
 				case "web":
+							// MP3 sources are flash-web-playable as well
+					if($this->_container->IsFormatOf(array("mpeg audio"))) {
+						$tagsOut[] = $tag;
+					}
 				case "mbr":
 					if($this->_video && $this->_video->_rotation>0) {
 						break;
