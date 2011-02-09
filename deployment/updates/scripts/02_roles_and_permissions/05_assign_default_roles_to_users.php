@@ -38,6 +38,12 @@ while(count($users))
 		
 		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
 		
+		if (!$partner)
+		{
+			KalturaLog::alert('ERROR - cannot find partner id ['.$user->getPartnerId().'] defined for kuser id ['.$lastUser.'] - skipping user');
+			continue;
+		}
+		
 		if ($partner->getId() == -2)
 		{
 			KalturaLog::log('Skipping partner -2 users... will be migrated in a later script');
