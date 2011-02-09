@@ -102,6 +102,7 @@ class kConf extends kConfLocal
 				"kmc_secured_login" => false,
 				
 				"kmc_version" => 'v4.0.6',
+				"new_partner_kmc_version" => 4,
 				
 				"paypal_data" => array (),
 				

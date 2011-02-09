@@ -198,7 +198,7 @@ class myPartnerRegistration
  		else
 	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner, true);
 		
-		$newPartner->setKmcVersion('3');
+		$newPartner->setKmcVersion(kConf::get('new_partner_kmc_version'));
 		$newPartner->save();
 		
 		return $newPartner;
