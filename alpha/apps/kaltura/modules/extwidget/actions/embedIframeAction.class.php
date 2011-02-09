@@ -121,27 +121,22 @@ class embedIframeAction extends sfAction
 			
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
-		$host = $partner_host;
 
 		$uiConf = uiConfPeer::retrieveByPK($uiconf_id);
 		if(!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 			
-		$url = null;
-		$ui_conf_swf_url = $uiConf->getSwfUrl();
-		if(kString::beginsWith($ui_conf_swf_url, "http"))
-		{
-			$url = 	$ui_conf_swf_url; // absolute URL
-		}
-		else
-		{
-			$use_cdn = $uiConf->getUseCdn();
-			$host = $use_cdn ?  $partner_cdnHost : $partner_host;
-			$url =  $host;
-			$url .=  myPartnerUtils::getUrlForPartner($partner_id, $subp_id);
-			$url .=  $ui_conf_swf_url;
-			$url .= "/entry_id/$entry_id/widget_id/$widget_id/uiconf_id/$uiconf_id";
-		}
+		$partner_host = myPartnerUtils::getHost($partner_id);
+		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
+		
+		$html5_version = kConf::get('html5_version');
+
+		$use_cdn = $uiConf->getUseCdn();
+		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
+		
+		$url =  $host;
+		$url .=  "/html5/html5lib/v{$html5_version}/mwEmbedFrame.php";
+		$url .=  "/entry_id/{$entry_id}/widget_id/_{$widget_id}/uiconf_id/{$uiconf_id}";
 		
 		if ($allowCache)
 			$cache->put($requestKey, $url);

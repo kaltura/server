@@ -30,22 +30,14 @@ class embedIframeJsAction extends sfAction
 		
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
-		$host = $partner_host;
+		
+		$html5_version = kConf::get('html5_version');
 
-		$url = null;
-		$ui_conf_swf_url = $uiConf->getSwfUrl();
-		if(kString::beginsWith($ui_conf_swf_url, "http"))
-		{
-			$url = 	$ui_conf_swf_url; // absolute URL
-		}
-		else
-		{
-			$use_cdn = $uiConf->getUseCdn();
-			$host = $use_cdn ?  $partner_cdnHost : $partner_host;
-			$url =  $host;
-			$url .=  myPartnerUtils::getUrlForPartner($partner_id, $subp_id);
-			$url .=  $ui_conf_swf_url;
-		}
+		$use_cdn = $uiConf->getUseCdn();
+		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
+		
+		$url =  $host;
+		$url .=  "/html5/html5lib/v{$html5_version}/mwEmbedLoader.php";
 		
 		$this->redirect($url);
 	}
