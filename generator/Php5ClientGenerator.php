@@ -15,6 +15,8 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	
 	function generate() 
 	{
+		parent::generate();
+	
 		$xpath = new DOMXPath($this->_doc);
 		
 		// enumes
@@ -528,5 +530,19 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	");
 	
 		$this->appendLine("}");
+	}
+	
+	protected function addFile($fileName, $fileContents)
+	{
+		$patterns = array(
+			'/@package\s+.+/',
+			'/@subpackage\s+.+/',
+		);
+		$replacements = array(
+			'@package ' . $this->package,
+			'@subpackage ' . $this->subpackage,
+		);
+		$fileContents = preg_replace($patterns, $replacements, $fileContents);
+		parent::addFile($fileName, $fileContents);
 	}
 }

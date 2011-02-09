@@ -15,6 +15,8 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 	
 	function generate() 
 	{
+		parent::generate();
+		
 		$this->removeFilesFromSource();
 		
 		$xpath = new DOMXPath($this->_doc);

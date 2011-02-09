@@ -23,6 +23,8 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 	
 	public function generate() 
 	{
+		parent::generate();
+	
 		$xpath = new DOMXPath ( $this->_doc );
 		$enumNodes = $xpath->query ( "/xml/enums/enum" );
 		foreach ( $enumNodes as $enumNode ) 

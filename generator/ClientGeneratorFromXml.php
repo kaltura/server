@@ -30,12 +30,13 @@ abstract class ClientGeneratorFromXml
 			
 		if (($sourcePath !== null) && !(file_exists($sourcePath)))
 			throw new Exception("Source path was not found [$sourcePath]");
-			
+	}
+	
+	public function generate()
+	{
 		if (is_dir($this->_sourcePath))
 			$this->addSourceFiles($this->_sourcePath);
 	}
-	
-	public abstract function generate();
 	
 	public function getOutputFiles()
 	{

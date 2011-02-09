@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaClientBase 
@@ -485,7 +485,7 @@ class KalturaClientBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 interface IKalturaClientPlugin
@@ -507,7 +507,7 @@ interface IKalturaClientPlugin
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaClientPlugin implements IKalturaClientPlugin
@@ -519,7 +519,7 @@ abstract class KalturaClientPlugin implements IKalturaClientPlugin
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaServiceActionCall
@@ -604,7 +604,7 @@ class KalturaServiceActionCall
 /**
  * Abstract base class for all client services
  *  
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaServiceBase
@@ -636,7 +636,7 @@ abstract class KalturaServiceBase
 /**
  * Abstract base class for all client objects
  * 
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 abstract class KalturaObjectBase
@@ -669,7 +669,7 @@ abstract class KalturaObjectBase
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaException extends Exception 
@@ -682,7 +682,7 @@ class KalturaException extends Exception
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaClientException extends Exception 
@@ -698,7 +698,7 @@ class KalturaClientException extends Exception
 }
 
 /**
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 class KalturaConfiguration
@@ -748,7 +748,7 @@ class KalturaConfiguration
 /**
  * Implement to get Kaltura Client logs
  * 
- * @package Kaltura
+ * @package Scheduler
  * @subpackage Client
  */
 interface IKalturaLogger 

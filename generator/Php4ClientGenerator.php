@@ -15,6 +15,8 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 	
 	function generate() 
 	{
+		parent::generate();
+	
 		$xpath = new DOMXPath($this->_doc);
 		
 		$this->appendLine('<?php');

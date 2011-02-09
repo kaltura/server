@@ -12,6 +12,8 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	
 	function generate() 
 	{
+		parent::generate();
+	
 		$xpath = new DOMXPath($this->_doc);
 		
 	    $this->appendLine("require 'kaltura_client_base.rb'");
