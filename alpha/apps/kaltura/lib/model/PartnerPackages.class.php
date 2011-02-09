@@ -1,11 +1,8 @@
 <?php
 
 /**
- * 
- *
- * 
- *
- * @package lib.model
+ * @package Core
+ * @subpackage config
  */ 
 class PartnerPackages
 {

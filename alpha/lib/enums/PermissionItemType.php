@@ -1,7 +1,7 @@
 <?php
 /**
- * @package lib.model
- * @subpackage enum
+ * @package Core
+ * @subpackage model.enum
  */ 
 interface PermissionItemType extends BaseEnum
 {
