@@ -62,7 +62,10 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
 			}
 			else if ($code == kUserException::WRONG_PASSWORD) {
-				throw new KalturaAPIException(KalturaErrors::WRONG_OLD_PASSWORD);
+				if($password == $newPassword)
+					throw new KalturaAPIException(KalturaErrors::USER_WRONG_PASSWORD);
+				else
+					throw new KalturaAPIException(KalturaErrors::WRONG_OLD_PASSWORD);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
