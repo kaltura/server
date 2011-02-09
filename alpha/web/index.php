@@ -7,6 +7,7 @@ function checkCache()
 	$start_time = microtime(true);
 
 	$uri = $_SERVER["REQUEST_URI"];
+	$protocol = (@$_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
 	if (strpos($uri, "/partnerservices2") !== false)
 	{
@@ -59,6 +60,7 @@ function checkCache()
 		if ( $res )
 		{
 			// check if we cached the patched swf with flashvars
+			$uri = $protocol.$uri;
 			$cachedResponse = $cache->get("kwidgetswf$uri");
 			if ($cachedResponse) // dont use cache if we want to force no caching
 			{
