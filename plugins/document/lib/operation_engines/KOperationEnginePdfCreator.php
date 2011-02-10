@@ -15,8 +15,8 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		parent::configure($taskConfig, $data);
-		if(!($data->flavorParamsOutput instanceof KalturaPdfFlavorParamsOutput))
-			throw new Exception("KOperationEnginePdfCreator must work on KalturaPdfFlavorParamsOutput object, " . get_class($data->flavorParamsOutput) . " received");
+//		if(!($data->flavorParamsOutput instanceof KalturaPdfFlavorParamsOutput))
+//			throw new Exception("KOperationEnginePdfCreator must work on KalturaPdfFlavorParamsOutput object, " . get_class($data->flavorParamsOutput) . " received");
 
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
 	}
