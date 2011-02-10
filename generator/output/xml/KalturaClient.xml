@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1297175853">
-  <!-- Generated on date 08/02/11 16:37:33 -->
+<xml apiVersion="3.1.1" generatedDate="1297356734">
+  <!-- Generated on date 10/02/11 16:52:14 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -388,10 +388,9 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
-      <const name="HULU" value="huluDistribution.HULU"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -1973,21 +1972,21 @@
       <property name="size" type="int" readOnly="1" insertOnly="0" description="The size (in KBytes) of the Flavor Asset&#10;"/>
       <property name="tags" type="string" readOnly="0" insertOnly="0" description="Tags used to identify the Flavor Asset in various scenarios&#10;"/>
       <property name="fileExt" type="string" readOnly="0" insertOnly="0" description="The file extension&#10;"/>
-      <property name="createdAt" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="updatedAt" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="deletedAt" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="deletedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaFlavorAsset" base="KalturaAsset">
-      <property name="flavorParamsId" type="int" readOnly="1" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
+      <property name="flavorParamsId" type="int" readOnly="0" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
       <property name="width" type="int" readOnly="1" insertOnly="0" description="The width of the Flavor Asset &#10;"/>
       <property name="height" type="int" readOnly="1" insertOnly="0" description="The height of the Flavor Asset&#10;"/>
       <property name="bitrate" type="int" readOnly="1" insertOnly="0" description="The overall bitrate (in KBits) of the Flavor Asset &#10;"/>
       <property name="frameRate" type="int" readOnly="1" insertOnly="0" description="The frame rate (in FPS) of the Flavor Asset&#10;"/>
       <property name="isOriginal" type="bool" readOnly="0" insertOnly="0" description="True if this Flavor Asset is the original source&#10;"/>
-      <property name="isWeb" type="bool" readOnly="0" insertOnly="0" description="True if this Flavor Asset is playable in KDP&#10;"/>
-      <property name="containerFormat" type="string" readOnly="0" insertOnly="0" description="The container format&#10;"/>
-      <property name="videoCodecId" type="string" readOnly="0" insertOnly="0" description="The video codec&#10;"/>
+      <property name="isWeb" type="bool" readOnly="1" insertOnly="0" description="True if this Flavor Asset is playable in KDP&#10;"/>
+      <property name="containerFormat" type="string" readOnly="1" insertOnly="0" description="The container format&#10;"/>
+      <property name="videoCodecId" type="string" readOnly="1" insertOnly="0" description="The video codec&#10;"/>
     </class>
     <class name="KalturaAssetBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -2382,7 +2381,7 @@
       <property name="requireTranscodingCount" type="int" readOnly="0" insertOnly="0" description="count of entries that requires transcoding in order to be included in feed&#13;"/>
     </class>
     <class name="KalturaThumbAsset" base="KalturaAsset">
-      <property name="thumbParamsId" type="int" readOnly="1" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
+      <property name="thumbParamsId" type="int" readOnly="0" insertOnly="0" description="The Flavor Params used to create this Flavor Asset&#10;"/>
       <property name="width" type="int" readOnly="1" insertOnly="0" description="The width of the Flavor Asset &#10;"/>
       <property name="height" type="int" readOnly="1" insertOnly="0" description="The height of the Flavor Asset&#10;"/>
     </class>

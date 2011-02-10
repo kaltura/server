@@ -4787,6 +4787,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
 	public $createdAt = null;
 
@@ -4794,6 +4795,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
 	public $updatedAt = null;
 
@@ -4801,6 +4803,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
+	 * @readonly
 	 */
 	public $deletedAt = null;
 
@@ -4808,6 +4811,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @readonly
 	 */
 	public $description = null;
 
@@ -4825,7 +4829,6 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
-	 * @readonly
 	 */
 	public $flavorParamsId = null;
 
@@ -4878,6 +4881,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var bool
+	 * @readonly
 	 */
 	public $isWeb = null;
 
@@ -4886,6 +4890,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var string
+	 * @readonly
 	 */
 	public $containerFormat = null;
 
@@ -4894,6 +4899,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var string
+	 * @readonly
 	 */
 	public $videoCodecId = null;
 
@@ -5002,7 +5008,6 @@ class KalturaThumbAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
-	 * @readonly
 	 */
 	public $thumbParamsId = null;
 
