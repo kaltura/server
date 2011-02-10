@@ -49,6 +49,11 @@ class UserRoleService extends KalturaBaseService
 			$userRole->status = KalturaUserRoleStatus::ACTIVE;
 		}
 		
+		// cannot add a role with a name that already exists
+		if (UserRolePeer::getByNameAndPartnerId($userRole->name, $this->getPartnerId())) {
+			throw new KalturaAPIException(KalturaErrors::ROLE_NAME_ALREADY_EXISTS);
+		}
+		
 		try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
 		catch (kPermissionException $e) {
 			$code = $e->getCode();
@@ -114,6 +119,13 @@ class UserRoleService extends KalturaBaseService
 	
 		if (!$dbUserRole) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $userRoleId);
+		}
+		
+		// cannot update name to a name that already exists
+		if ($userRole->name && $userRole->name != $dbUserRole->getName()) {
+			if (UserRolePeer::getByNameAndPartnerId($userRole->name, $this->getPartnerId())) {
+				throw new KalturaAPIException(KalturaErrors::ROLE_NAME_ALREADY_EXISTS);
+			}
 		}
 		
 		try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
@@ -219,6 +231,8 @@ class UserRoleService extends KalturaBaseService
 		}
 		
 		$newDbRole = $dbUserRole->copyToPartner($this->getPartnerId());
+		$newName = $newDbRole->getName(). ' copy ('.date("D j M o, H:i:s").')';
+		$newDbRole->setName($newName);
 		$newDbRole->save();
 		
 		$userRole = new KalturaUserRole();

@@ -59,5 +59,23 @@ class UserRolePeer extends BaseUserRolePeer
 		UserRolePeer::setUseCriteriaFilter(true);
 		return $userRole;
 	}
+	
+	
+	/**
+	 * Will return a UserRole object with the given $roleName and given $partnerId (or partner 0)
+	 * @param string $roleName
+	 * @param int $partnerId
+	 * @return UserRole
+	 */
+	public static function getByNameAndPartnerId($roleName, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
+		UserRolePeer::setUseCriteriaFilter(false);
+		$userRole = UserRolePeer::doSelectOne($c);
+		UserRolePeer::setUseCriteriaFilter(true);
+		return $userRole;
+	}
 		
 } // UserRolePeer
