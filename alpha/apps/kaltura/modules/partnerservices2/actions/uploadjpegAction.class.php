@@ -1,6 +1,8 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class uploadjpegAction extends defPartnerservices2Action
 {
 	public function describe()
@@ -51,4 +53,3 @@ class uploadjpegAction extends defPartnerservices2Action
 		$this->addMsg( "result_ok" , $res );
 	}
 }
-?>

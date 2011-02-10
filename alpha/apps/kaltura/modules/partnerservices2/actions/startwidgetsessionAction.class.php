@@ -1,8 +1,8 @@
 <?php
-require_once ( "startsessionAction.class.php");
-require_once ( "myPartnerUtils.class.php");
-require_once ( "webservices/kSessionUtils.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class startwidgetsessionAction extends startsessionAction
 {
 	public function describe()

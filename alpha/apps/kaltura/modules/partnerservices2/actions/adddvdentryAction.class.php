@@ -1,7 +1,8 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class adddvdentryAction extends defPartnerservices2Action
 {
 	public function describe()

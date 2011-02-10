@@ -1,6 +1,8 @@
 <?php
-require_once ( "addmoderationAction.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class reportkshowAction extends addmoderationAction
 {
 	public function describe()

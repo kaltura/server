@@ -1,11 +1,9 @@
 <?php
-require_once ( "myInsertEntryHelper.class.php");
-require_once ( "myKshowUtils.class.php");
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-
 /**
  * This is a utility service that helps describes the fields of our objects - not the data itself
+ * 
+ * @package api
+ * @subpackage ps2
  */
 class objdetailsAction extends defPartnerservices2Action
 {

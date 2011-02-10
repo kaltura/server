@@ -1,9 +1,8 @@
 <?php
-require_once ( "myInsertEntryHelper.class.php");
-require_once ( "myKshowUtils.class.php");
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class getallentriesAction extends defPartnerservices2Action
 {
 	const LIST_TYPE_KSHOW = 1 ;

@@ -1,20 +1,11 @@
 <?php
-
-require_once ( "webservices/kalturaBaseWebserviceAction.class.php");
-require_once ( "webservices/APIErrors.class.php");
-require_once ( "webservices/APIException.class.php");
-require_once ( "myPartnerUtils.class.php");
-require_once ( "webservices/kSessionUtils.class.php");
-
 /**
  * This class is NOT a symfony action any more.
  * It is the base class for all the kaltura servies.
  * When used from an action, the action can pass itself to the ctor  so that at the end the response type will
  *
- * @package    kaltura
- * @subpackage emailImport
- * @author     Your name here
- * @version    SVN: $Id: actions.class.php 2692 2006-11-15 21:03:55Z fabien $
+ * @package api
+ * @subpackage ps2
  */
 abstract class defPartnerservices2Action //extends kalturaBaseWebserviceAction
 {

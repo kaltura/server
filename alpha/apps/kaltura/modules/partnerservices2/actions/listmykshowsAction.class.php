@@ -1,7 +1,8 @@
 <?php
-require_once ( "listkshowsAction.class.php");
-
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class listmykshowsAction extends listkshowsAction
 {
 	public function describe()

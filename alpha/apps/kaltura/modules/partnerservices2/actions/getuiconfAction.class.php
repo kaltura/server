@@ -1,14 +1,10 @@
 <?php
-require_once ( "myInsertEntryHelper.class.php");
-require_once ( "myKshowUtils.class.php");
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "addkshowAction.class.php");
-
-
-
 /**
  * 1. Will create a kshow with name and summary for a specific partner.
- * 2. Will generate widget-html for this kshow.  
+ * 2. Will generate widget-html for this kshow.
+ * 
+ * @package api
+ * @subpackage ps2
  */
 class getuiconfAction extends defPartnerservices2Action
 {

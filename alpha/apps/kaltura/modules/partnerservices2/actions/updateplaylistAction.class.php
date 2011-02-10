@@ -1,6 +1,8 @@
 <?php
-require_once ( "updateentryAction.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class updateplaylistAction extends updateentryAction
 {
 	public function describe()

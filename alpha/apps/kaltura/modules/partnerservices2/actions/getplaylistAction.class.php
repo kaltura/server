@@ -1,6 +1,8 @@
 <?php
-require_once ( "getentryAction.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class getplaylistAction extends getentryAction
 {
 	public function describe()

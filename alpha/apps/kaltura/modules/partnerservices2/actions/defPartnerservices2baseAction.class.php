@@ -1,5 +1,8 @@
 <?php
-require_once ( "myMultiRequest.class.php");
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class defPartnerservices2baseAction extends kalturaAction
 {
 	protected static $_useCache = true;	

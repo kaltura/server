@@ -1,8 +1,8 @@
 <?php
-require_once ( "myKshowUtils.class.php");
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class getlastversionsinfoAction extends defPartnerservices2Action
 {
 	public function describe()

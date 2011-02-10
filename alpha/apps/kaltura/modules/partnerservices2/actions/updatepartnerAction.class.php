@@ -1,8 +1,8 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-require_once ( "myPartnerRegistration.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class updatepartnerAction extends defPartnerservices2Action
 {
 	public function describe()

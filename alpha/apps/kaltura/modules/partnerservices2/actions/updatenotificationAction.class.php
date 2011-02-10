@@ -1,6 +1,8 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class updatenotificationAction extends defPartnerservices2Action
 {
 	public function describe()

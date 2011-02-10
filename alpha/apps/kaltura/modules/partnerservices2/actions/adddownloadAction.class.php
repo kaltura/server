@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class adddownloadAction extends defPartnerservices2Action
 {
 	public function describe()

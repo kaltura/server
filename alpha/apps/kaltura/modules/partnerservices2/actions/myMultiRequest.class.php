@@ -1,7 +1,10 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-
-// this clas does not really  extend defPartnerservices2Action. Its only for now - to use the debug data
+/**
+ * this clas does not really  extend defPartnerservices2Action. Its only for now - to use the debug data
+ * 
+ * @package api
+ * @subpackage ps2
+ */
 class myMultiRequest extends defPartnerservices2Action
 {
 	public function describe()

@@ -1,7 +1,8 @@
 <?php
-require_once ( "listentriesAction.class.php");
-
-
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class listplaylistsAction extends listentriesAction
 {
 	public function describe()

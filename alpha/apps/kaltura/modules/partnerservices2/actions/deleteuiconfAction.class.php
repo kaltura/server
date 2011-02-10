@@ -1,9 +1,9 @@
 <?php
-require_once ( "defPartnerservices2Action.class.php");
-require_once ( "myPartnerUtils.class.php");
-
 /**
  * After making sure the ticket is a valid admin ticket - the setrvice is allowed and no other validations should be done
+ * 
+ * @package api
+ * @subpackage ps2
  */
 class deleteuiconfAction extends defPartnerservices2Action
 {
