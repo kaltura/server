@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="lib.model">
+<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.sphinxSearch">
 	<table skipSql="false" abstract="false" name="sphinx_log">
 		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
 			required="true" primaryKey="true" />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="lib.model">
+<database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.contentDistribution">
 	<table skipSql="false" abstract="false" name="distribution_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
