@@ -3,9 +3,6 @@
  * @package api
  * @subpackage objects
  */
-
-/**
- */
 class KalturaStorageDeleteJobData extends KalturaStorageJobData
 {
 	private static $map_between_objects = array

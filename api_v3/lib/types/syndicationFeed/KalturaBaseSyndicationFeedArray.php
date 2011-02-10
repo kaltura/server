@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaBaseSyndicationFeedArray extends KalturaTypedArray
 {
 	public static function fromSyndicationFeedArray ( $arr )

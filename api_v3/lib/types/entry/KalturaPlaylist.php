@@ -1,5 +1,8 @@
 <?php 
-
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaPlaylist extends KalturaBaseEntry
 {
 	/**

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaBatchQueuesStatusArray extends KalturaTypedArray 
 {
 	public static function fromBatchQueuesStatusArray($arr)

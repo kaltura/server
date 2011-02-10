@@ -3,9 +3,6 @@
  * @package api
  * @subpackage objects
  */
-
-/**
- */
 class KalturaWorkerQueueFilter extends KalturaObject
 {
 	/**

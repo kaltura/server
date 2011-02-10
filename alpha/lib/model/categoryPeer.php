@@ -1,6 +1,4 @@
-@package Core
- * @subpackage model<?php
-
+<?php
 /**
  * Subclass for performing query and update operations on the 'category' table.
  *

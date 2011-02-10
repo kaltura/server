@@ -1,10 +1,7 @@
 <?php
 /**
  * @package api
- * @subpackage filters
- */
-
-/**
+ * @subpackage objects
  */
 class KalturaBatchJobFilterExt extends KalturaBatchJobFilter
 {

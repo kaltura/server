@@ -1,7 +1,7 @@
 <?php
 /**
- * @package 
- * @subpackage api.filters.enum
+ * @package api
+ * @subpackage filters.enum
  */
 class KalturaThumbAssetOrderBy extends KalturaAssetOrderBy
 {

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="metadata">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MSNVideoCat" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>MSNVideo_Cat</label>
+							<key>MSNVideo_Cat</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="MSNVideoTop" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>MSNVideo_Top</label>
+							<key>MSNVideo_Top</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="MSNVideoTopCat" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>MSNVideo_Top_Cat</label>
+							<key>MSNVideo_Top_Cat</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="MSNPublic" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation></xsd:documentation>
+						<xsd:appinfo>
+							<label>MSNPublic</label>
+							<key>MSNPublic</key>
+							<searchable>true</searchable>
+							<description></description>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="copyright" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Copyright</label>
+							<key>copyright</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="LongTitle" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Long Title</label>
+							<key>LongTitle</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="128" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ShortDescription" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Short Description</label>
+							<key>ShortDescription</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ComcastCategory" minOccurs="1" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Comcast Category</label>
+							<key>ComcastCategory</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="TV Preview" />
+							<xsd:enumeration value="TV Interview" />
+							<xsd:enumeration value="TV News" />
+							<xsd:enumeration value="TV Featurette" />
+							<xsd:enumeration value="TV Sneak Peek" />
+							<xsd:enumeration value="TV Full Episode" />
+							<xsd:enumeration value="MOVIE Trailer" />
+							<xsd:enumeration value="MOVIE Interview" />
+							<xsd:enumeration value="MOVIE News" />
+							<xsd:enumeration value="MOVIE Featurette" />
+							<xsd:enumeration value="MOVIE Sneak Peek" />
+							<xsd:enumeration value="MOVIE Full Feature" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ComcastRating" minOccurs="1" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Comcast Rating</label>
+							<key>ComcastRating</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="G" />
+							<xsd:enumeration value="PG" />
+							<xsd:enumeration value="PG-13" />
+							<xsd:enumeration value="R" />
+							<xsd:enumeration value="NC-17" />
+							<xsd:enumeration value="NR" />
+							<xsd:enumeration value="TV-Y" />
+							<xsd:enumeration value="TV-Y7" />
+							<xsd:enumeration value="TV-Y7-FV" />
+							<xsd:enumeration value="TV-G" />
+							<xsd:enumeration value="TV-PG" />
+							<xsd:enumeration value="TV-14" />
+							<xsd:enumeration value="TV-MA" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="textType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+	<xsd:complexType name="dateType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:long" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="objectType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="listType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+</xsd:schema>

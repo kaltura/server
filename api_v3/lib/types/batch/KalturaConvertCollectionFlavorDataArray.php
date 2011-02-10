@@ -3,9 +3,6 @@
  * @package api
  * @subpackage objects
  */
-
-/**
- */
 class KalturaConvertCollectionFlavorDataArray extends KalturaTypedArray
 {
 	public static function fromConvertCollectionFlavorDataArray( $arr )

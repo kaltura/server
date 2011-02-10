@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaSchedulerStatusResponse extends KalturaObject 
 {
 	/**

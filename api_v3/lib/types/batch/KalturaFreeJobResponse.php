@@ -3,9 +3,6 @@
  * @package api
  * @subpackage objects
  */
-
-/**
- */
 class KalturaFreeJobResponse extends KalturaObject
 {
 	/**

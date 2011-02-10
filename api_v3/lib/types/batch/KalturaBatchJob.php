@@ -3,9 +3,6 @@
  * @package api
  * @subpackage objects
  */
-
-/**
- */
 class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 {
 	/**

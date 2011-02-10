@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 {
 	/**

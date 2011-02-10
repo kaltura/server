@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaUploadTokenListResponse extends KalturaObject
 {
 	/**
