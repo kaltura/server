@@ -20,5 +20,4 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------
 
-filesync.list						|			|2		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_FILESYNC,SYSTEM_ADMIN_ENTRY_INVESTIGATION
 filesync.sync						|			|N		|1	|0		|0		|1		|rw	|*		|	|   |SYSTEM_FILESYNC

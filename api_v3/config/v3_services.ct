@@ -396,6 +396,9 @@ userrole.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,ACCOUNT_BASE
 userrole.update				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_UPDATE
 userrole.clone				    	|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_ROLE_ADD
 
+permission.add						|			|2		|1	|0		|0		|1		|	|		|	|   |
+permission.delete					|			|2		|1	|0		|0		|1		|	|		|	|   |
+permission.update					|			|2		|1	|0		|0		|1		|	|		|	|   |
 permission.get						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE
 permission.list						|			|2		|1	|0		|0		|1		|	|		|	|   |ADMIN_BASE,KMC_READ_ONLY
 permission.getcurrentpermissions    |			|0		|1	|0		|0		|1		|	|		|	|   |
