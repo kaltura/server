@@ -73,6 +73,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $createdAt;
@@ -80,6 +81,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
@@ -87,6 +89,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
+	 * @readonly
 	 * @filter gte,lte,order
 	 */
 	public $deletedAt;
@@ -94,6 +97,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $description;
 	

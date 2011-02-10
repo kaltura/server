@@ -9,7 +9,6 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * The Flavor Params used to create this Flavor Asset
 	 * 
 	 * @var int
-	 * @readonly
 	 */
 	public $flavorParamsId;
 	
@@ -56,6 +55,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * True if this Flavor Asset is playable in KDP
 	 * 
 	 * @var bool
+	 * @readonly
 	 */
 	public $isWeb;
 	
@@ -63,6 +63,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * The container format
 	 * 
 	 * @var string
+	 * @readonly
 	 */
 	public $containerFormat;
 	
@@ -70,6 +71,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * The video codec
 	 * 
 	 * @var string
+	 * @readonly
 	 */
 	public $videoCodecId;
 	

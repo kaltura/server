@@ -9,7 +9,6 @@ class KalturaThumbAsset extends KalturaAsset
 	 * The Flavor Params used to create this Flavor Asset
 	 * 
 	 * @var int
-	 * @readonly
 	 */
 	public $thumbParamsId;
 	
