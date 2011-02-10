@@ -237,8 +237,11 @@ class PartnerService extends KalturaBaseService
 		
 		$partnerUsage->hostingGB = round($totalStorage/1024 , 2); // from MB to GB
 		$totalUsageGB = round($totalUsage/1024/1024 , 2); // from KB to GB
-		$partnerUsage->Percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
-		$partnerUsage->packageBW = $partnerPackage['cycle_bw'];
+		if($partnerPackage)
+		{
+			$partnerUsage->Percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
+			$partnerUsage->packageBW = $partnerPackage['cycle_bw'];
+		}
 		$partnerUsage->usageGB = $totalUsageGB;
 		$partnerUsage->reachedLimitDate = $dbPartner->getUsageLimitWarning();
 		
