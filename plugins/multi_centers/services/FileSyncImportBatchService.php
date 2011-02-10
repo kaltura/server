@@ -57,9 +57,11 @@ class FileSyncImportBatchService extends BatchService
 				}
 				
 				// update job data with destination path if needed
-				if ($data->destFilePath != $dest_path) {	
+				if (!$data->destFilePath) {	
 					$data->destFilePath = $dest_path;
 					$job->data = $data;
+					KalturaLog::log('Updating destination path for job id [$job->id]');
+					$this->updateJob($job);
 				}
 				
 				if (!is_dir(dirname($dest_path)) && !@mkdir(dirname($dest_path), 0755, true)) {
@@ -69,6 +71,13 @@ class FileSyncImportBatchService extends BatchService
 		}
 				
 		return $jobs;
+	}
+	
+	private function updateJob(KalturaBatchJob $job)
+	{
+		$dbJob = BatchJobPeer::retrieveByPK($job->id);
+		$dbJob = $job->toObject($dbJob);
+		$dbJob->save();
 	}
 	
 	

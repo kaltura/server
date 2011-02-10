@@ -161,9 +161,9 @@ class kDataCenterMgr
 	/*
 	 * will handle the serving of the file assuming a remote DC (other than the current) requested it
 	 */
-	public static function serveFileToRemoteDataCenter ( $file_sync_id , $file_hash )
+	public static function serveFileToRemoteDataCenter ( $file_sync_id , $file_hash, $file_name )
 	{
-		KalturaLog::log(__METHOD__." - file_sync_id [$file_sync_id], file_hash [$file_hash]");
+		KalturaLog::log(__METHOD__." - file_sync_id [$file_sync_id], file_hash [$file_hash], file_name [$file_name]");
 		// TODO - verify security
 		
 		$current_dc = self::getCurrentDc();
@@ -184,7 +184,29 @@ class kDataCenterMgr
 			throw new Exception ( $error );
 		}
 		
-		// validate the hash 
+		// resolve if file_sync is link
+		$file_sync_resolved = $file_sync;
+		if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
+		{
+			$file_sync_resolved = kFileSyncUtils::resolve($file_sync);
+		}
+		
+		// check if file sync path leads to a file or a directory
+		$resolvedPath = $file_sync_resolved->getFullPath();
+		$fileSyncIsDir = is_dir($resolvedPath);
+		if ($fileSyncIsDir && $file_name) {
+			$resolvedPath .= '/'.$file_name;
+		}
+		
+		if (!file_exists($resolvedPath))
+		{
+			$file_name_msg = $file_name ? "file name [$file_name] " : '';
+			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist";
+			KalturaLog::log(__METHOD__." - $error"); 
+			throw new Exception ( $error );	
+		}
+		
+		// validate the hash
 		$expected_file_hash = md5( $current_dc["secret" ] .  $file_sync_id );	// will be verified on the other side to make sure not some attack or external invalid request
 		if ( $file_hash != $expected_file_hash )  
 		{
@@ -193,13 +215,22 @@ class kDataCenterMgr
 			throw new Exception ( $error );			
 		}
 				
-		if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
+		if ($fileSyncIsDir && is_dir($resolvedPath))
 		{
-			$file_sync = kFileSyncUtils::resolve($file_sync);
+			KalturaLog::log(__METHOD__." - serving directory content from [".$resolvedPath."]");
+			$contents = kFile::listDir($resolvedPath);
+			sort($contents, SORT_STRING);
+			$contents = serialize($contents);
+			header("file-sync-type: dir");
+			echo $contents;
+			die();
+		}
+		else
+		{
+			KalturaLog::log(__METHOD__." - serving file from [".$resolvedPath."]");
+			kFile::dumpFile( $resolvedPath );
 		}
 		
-		KalturaLog::log(__METHOD__." - serving file from [".$file_sync->getFullPath()."]");
-		kFile::dumpFile( $file_sync->getFullPath() );
 	}
 }
 ?>

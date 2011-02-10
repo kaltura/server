@@ -62,25 +62,28 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 	{
 		KalturaLog::debug("moveFile from[$fromPath] to[$toPath]");
 		
-		@rename($fromPath, $toPath);
+		// move file/dir to the new location
+		$res = @rename($fromPath, $toPath);
 		
-		// change file owner
-		$chown_name = $this->taskConfig->params->fileOwner;
-		if ($chown_name) {
-			KalturaLog::debug("Changing owner of file [$toPath] to [$chown_name]");
-			@chown($toPath, $chown_name);
+		// chmod + chown + check file seen by apache - for each moved file/directory
+		if ($res)
+		{
+			if (is_dir($toPath))
+			{
+				$contents = kFile::listDir($toPath);
+				sort($contents, SORT_STRING);
+				foreach ($contents as $current)
+				{
+					$res = $res && $this->setAndCheck($toPath.'/'.$current);				
+				}
+			}
+			else
+			{
+				$res = $this->setAndCheck($toPath);	
+			}
 		}
-		
-		// change file mode
-		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
-		if (!$chmod_perm) {
-			$chmod_perm = 0644;
-		}
-		KalturaLog::debug("Changing mode of file [$toPath] to [$chmod_perm]");
-		@chmod($toPath, $chmod_perm);
-				
-		// check file
-		if($this->checkFileExists($toPath))
+
+		if($res)
 		{
 			$job->status = KalturaBatchJobStatus::FINISHED;
 			$job->message = "File moved to final destination";
@@ -90,10 +93,36 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 			$job->status = KalturaBatchJobStatus::FAILED;
 			$job->message = "File not moved correctly";
 		}
+		
 		return $this->closeJob($job, null, null, $job->message, $job->status, null, $job->data);
 	}
 	
 	
+	private function setAndCheck($path)
+	{
+		// change path owner
+		$chown_name = $this->taskConfig->params->fileOwner;
+		if ($chown_name) {
+			KalturaLog::debug("Changing owner of file [$path] to [$chown_name]");
+			@chown($path, $chown_name);
+		}
+		
+		// change path mode
+		$chmod_perm = octdec($this->taskConfig->params->fileChmod);
+		if (!$chmod_perm) {
+			$chmod_perm = 0644;
+		}
+		KalturaLog::debug("Changing mode of file [$path] to [$chmod_perm]");
+		@chmod($path, $chmod_perm);
+		
+		if (is_dir($path)) {
+			return true;
+		}
+		else {
+			// check that file is seen by apache
+			return $this->checkFileExists($path);
+		}		
+	}
 	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{

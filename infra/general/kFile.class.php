@@ -5,6 +5,40 @@
  */
 class kFile
 {
+	
+	public static function listDir($path, $pathPrefix = '')
+	{
+		$fileList = array();
+		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
+		$handle = opendir($path);
+		if ($handle)
+		{
+		    while (false !== ($file = readdir($handle)))
+		    {
+		    	if ($file != '.' && $file != '..')
+		    	{
+		    		$fullPath = $path.'/'.$file;
+		    		$tmpPrefix = $pathPrefix.$file;
+		    		
+			    	if (is_dir($fullPath))
+			    	{
+			    		$tmpPrefix = $tmpPrefix.'/';
+			    		$fileList[] = $tmpPrefix;
+			    		$fileList = array_merge($fileList, kFile::listDir($fullPath, $tmpPrefix));
+			    	}	
+			    	else
+			    	{
+			    		$fileList[] = $tmpPrefix;
+			    	}	    	
+		    	}
+		    }
+		    closedir($handle);
+		}
+		return $fileList;
+	}	
+	
+	
+	
 	// TODO - implement recursion
 	static public function dirList($directory, $return_directory_as_prefix = true, $should_recurse = false)
 	{

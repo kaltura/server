@@ -7,6 +7,7 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 {
 	const OUTPUT_FILE_DOESNT_EXIST = 11;
 	const OUTPUT_FILE_WRONG_SIZE = 12;
+	const CANNOT_CREATE_DIRECTORY = 13;
 	
 	const NFS_FILE_DOESNT_EXIST = 21;
 	
