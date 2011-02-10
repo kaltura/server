@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface EntryDistributionDirtyStatus extends BaseEnum
 {
 	const NONE = 0;

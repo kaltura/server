@@ -1,9 +1,8 @@
 <?php
-
-
-	/* ===========================
-	 * KDLOperatorSegmenter
-	 */
+/**
+ * @package plugins.segmenter
+ * @subpackage lib
+ */
 class KDLOperatorSegmenter extends KDLOperatorBase {
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);

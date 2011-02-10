@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface EntryDistributionStatus extends BaseEnum
 {
 	const PENDING = 0;

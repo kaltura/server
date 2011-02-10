@@ -10,7 +10,8 @@
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    lib.model
+ * @package plugins.contentDistribution
+ * @subpackage model
  */
 class GenericDistributionProvider extends BaseGenericDistributionProvider implements IDistributionProvider 
 {

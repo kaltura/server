@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage model
+ */
 class DocumentEntry extends entry
 {
 	/**

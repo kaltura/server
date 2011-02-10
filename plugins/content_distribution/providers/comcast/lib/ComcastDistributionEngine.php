@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.comcastDistribution
+ * @subpackage lib
+ */
 class ComcastDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit,
 	IDistributionEngineCloseSubmit, 

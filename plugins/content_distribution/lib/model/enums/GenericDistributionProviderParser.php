@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface GenericDistributionProviderParser extends BaseEnum
 {
 	const XSL = 1;

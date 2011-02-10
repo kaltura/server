@@ -1,7 +1,7 @@
 <?php
 /**
- * @package lib.model
- * @subpackage filters
+ * @package plugins.contentDistribution
+ * @subpackage model.filters.advanced
  */
 class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 {

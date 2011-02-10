@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.expressionEncoder
+ * @subpackage lib
  */
 class ExpressionEncoderConversionEngineType implements IKalturaPluginEnum, conversionEngineType
 {

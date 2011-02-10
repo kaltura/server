@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage model
+ */
 class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParamsInterface
 {
 	/**

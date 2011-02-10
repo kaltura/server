@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage lib
+ */
 class kContentDistributionMrssManager implements IKalturaMrssContributor
 {
 	/**

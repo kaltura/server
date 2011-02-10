@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.comcastDistribution
+ * @subpackage lib
+ */
 class ComcastDistributionProvider implements IDistributionProvider
 {
 	/**

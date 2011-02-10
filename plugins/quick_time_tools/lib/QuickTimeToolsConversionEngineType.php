@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.quickTimeTools
+ * @subpackage lib
  */
 class QuickTimeToolsConversionEngineType implements IKalturaPluginEnum, conversionEngineType
 {

@@ -1,9 +1,7 @@
 <?php
 /**
- * 
- * @package Scheduler
- * @subpackage Conversion
- *
+ * @package plugins.segmenter
+ * @subpackage lib
  */
 class KOperationEngineSegmenter  extends KSingleOutputOperationEngine
 {

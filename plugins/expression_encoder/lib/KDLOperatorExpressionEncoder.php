@@ -1,8 +1,8 @@
 <?php
- 
-	/* ===========================
-	 * KDLOperatorExpressionEncoder
-	 */
+/**
+ * @package plugins.expressionEncoder
+ * @subpackage lib
+ */
 class KDLOperatorExpressionEncoder extends KDLOperatorBase {
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);

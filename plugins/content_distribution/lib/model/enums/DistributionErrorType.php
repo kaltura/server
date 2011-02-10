@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface DistributionErrorType extends BaseEnum
 {
 	const MISSING_FLAVOR = 1;

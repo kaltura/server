@@ -1,9 +1,8 @@
 <?php
-
-
-	/* ===========================
-	 * KDLOperatorQTFastStart
-	 */
+/**
+ * @package plugins.fastStart
+ * @subpackage lib
+ */
 class KDLOperatorQTFastStart extends KDLOperatorBase {
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);

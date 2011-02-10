@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage model
+ */
 class SwfFlavorParamsOutput extends flavorParamsOutput implements SwfFlavorParamsInterface
 {
 	/**

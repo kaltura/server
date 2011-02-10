@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface DistributionProfileStatus extends BaseEnum
 {
 	const DISABLED = 1;

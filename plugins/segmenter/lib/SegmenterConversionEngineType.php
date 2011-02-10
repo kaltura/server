@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.segmenter
+ * @subpackage lib
  */
 class SegmenterConversionEngineType implements IKalturaPluginEnum, conversionEngineType
 {

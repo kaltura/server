@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.fastStart
+ * @subpackage lib
  */
 class FastStartConversionEngineType implements IKalturaPluginEnum, conversionEngineType
 {

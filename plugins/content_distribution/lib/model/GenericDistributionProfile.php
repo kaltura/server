@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model
+ */
 class GenericDistributionProfile extends DistributionProfile
 {
 	// TODO - force provider and provider action editable and required fields

@@ -1,9 +1,7 @@
 <?php
 /**
- * 
- * @package Scheduler
- * @subpackage Conversion
- *
+ * @package plugins.expressionEncoder
+ * @subpackage lib
  */
 class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 {

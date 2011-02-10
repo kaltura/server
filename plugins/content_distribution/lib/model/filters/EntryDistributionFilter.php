@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.filters
+ */
 class EntryDistributionFilter extends baseObjectFilter
 {
 	public function init ()

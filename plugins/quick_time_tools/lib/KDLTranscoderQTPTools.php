@@ -1,8 +1,8 @@
 <?php
- 
-	/* ===========================
-	 * KDLTranscoderQTPTools
-	 */
+/**
+ * @package plugins.quickTimeTools
+ * @subpackage lib
+ */
 class KDLTranscoderQTPTools extends KDLOperatorBase {
     public function __construct($id, $name=null, $sourceBlacklist=null, $targetBlacklist=null) {
     	if(is_null($targetBlacklist)){

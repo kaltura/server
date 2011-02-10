@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.document
+ * @subpackage model
+ */
 class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 {
 	const CUSTOM_DATA_NAMESPACE = 'PDF';

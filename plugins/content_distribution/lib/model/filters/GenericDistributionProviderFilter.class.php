@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.filters
+ */
 class GenericDistributionProviderFilter extends baseObjectFilter
 {
 	public function init ()

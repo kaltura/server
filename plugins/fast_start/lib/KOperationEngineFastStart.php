@@ -1,9 +1,7 @@
 <?php
 /**
- * 
- * @package Scheduler
- * @subpackage Conversion
- *
+ * @package plugins.fastStart
+ * @subpackage lib
  */
 class KOperationEngineFastStart  extends KSingleOutputOperationEngine
 {

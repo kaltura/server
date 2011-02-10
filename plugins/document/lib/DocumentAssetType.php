@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.document
+ * @subpackage model.enum
  */
 class DocumentAssetType implements IKalturaPluginEnum, assetType
 {

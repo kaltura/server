@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage lib
+ */
 interface IKalturaContentDistributionProvider extends IKalturaBase
 {
 	/**

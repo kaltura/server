@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface EntryDistributionSunStatus extends BaseEnum
 {
 	const BEFORE_SUNRISE = 1;

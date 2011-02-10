@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.contentDistribution
+ * @subpackage lib.enum
  */
 class ContentDistributionBatchJobType implements IKalturaPluginEnum, BatchJobType
 {

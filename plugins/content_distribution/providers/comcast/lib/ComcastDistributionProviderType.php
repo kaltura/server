@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.comcastDistribution
+ * @subpackage lib
  */
 class ComcastDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {

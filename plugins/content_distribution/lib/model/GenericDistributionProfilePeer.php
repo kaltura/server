@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model
+ */
 class GenericDistributionProfilePeer extends DistributionProfilePeer
 {
 	const OM_CLASS = 'GenericDistributionProfile';

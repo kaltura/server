@@ -1,9 +1,7 @@
 <?php
 /**
- * 
- * @package Scheduler
- * @subpackage Conversion
- *
+ * @package plugins.quickTimeTools
+ * @subpackage lib
  */
 class KOperationEngineQtTools  extends KSingleOutputOperationEngine
 {

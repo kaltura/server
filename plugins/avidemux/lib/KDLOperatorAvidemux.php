@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.avidemux
- * @subpackage kdl
+ * @subpackage lib
  */
 class KDLOperatorAvidemux extends KDLOperatorBase {
 

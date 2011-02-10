@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.enum
+ */
 interface DistributionAction extends BaseEnum
 {
 	const SUBMIT = 1;
