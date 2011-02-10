@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaBulkUploads extends KalturaTypedArray
 {
 	public static function fromBatchJobArray ($arr)

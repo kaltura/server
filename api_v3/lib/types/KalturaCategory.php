@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaCategory extends KalturaObject implements IFilterable 
 {
 	/**

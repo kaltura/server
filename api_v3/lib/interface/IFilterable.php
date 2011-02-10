@@ -1,7 +1,9 @@
 <?php 
 /**
  * Implement to add filtering support for API objects
- *
+ * 
+ * @package api
+ * @subpackage interfaces
  */
 interface IFilterable
 {
