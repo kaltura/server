@@ -1,9 +1,7 @@
 <?php
-
 /**
  * @package Core
- * @subpackage Batch
- *
+ * @subpackage model.data
  */
 class kJobData
 {

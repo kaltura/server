@@ -1,8 +1,7 @@
 <?php
-
-/** 
+/**
  * @package Core
- * @subpackage Batch
+ * @subpackage model.data
  */
 class kConvertCollectionFlavorData extends kJobData
 {

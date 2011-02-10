@@ -1,8 +1,7 @@
 <?php
-
-/** 
- * @package Core
- * @subpackage Batch
+/**
+ * @package plugins.metadata
+ * @subpackage model.data
  */
 class kImportMetadataJobData extends kJobData
 {

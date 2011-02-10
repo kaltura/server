@@ -1,8 +1,7 @@
 <?php
-
-/** 
- * @package Core
- * @subpackage Batch
+/**
+ * @package plugins.multiCenters
+ * @subpackage model.data
  */
 class kFileSyncImportJobData extends kJobData
 {

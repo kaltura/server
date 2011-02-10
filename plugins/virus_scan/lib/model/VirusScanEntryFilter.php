@@ -1,5 +1,8 @@
 <?php
-
+/**
+ *   * @package plugins.virusScan
+ * @subpackage model.filters
+ */
 class VirusScanEntryFilter extends entryFilter
 {
 	

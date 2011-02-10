@@ -1,8 +1,7 @@
 <?php
-
-/** 
- * @package Core
- * @subpackage Batch
+/**
+ * @package plugins.virusScan
+ * @subpackage model.data
  */
 class kVirusScanJobData extends kJobData
 {
