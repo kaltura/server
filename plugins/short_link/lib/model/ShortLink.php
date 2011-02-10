@@ -76,12 +76,15 @@ class ShortLink extends BaseShortLink {
 		$dcChars = str_split($allChars, strlen($allChars) / count(kDataCenterMgr::getAllDcs()));
 		
 		$dc = kDataCenterMgr::getCurrentDc();
-		$dcId = $dc["id"];
+		$dcId = (int) $dc["id"];
 		$currentDcChars = $dcChars[$dcId];
 		
 		for ($i = 0; $i < 10; $i++)
 		{
 			$dcChar = substr($currentDcChars, rand(0, strlen($currentDcChars) - 1), 1);
+			if(!$dcChar)
+				$dcChar = '0';
+				
 			$id = $dcChar . kString::generateStringId(3);
 			$existingObject = ShortLinkPeer::retrieveByPK($id);
 			
