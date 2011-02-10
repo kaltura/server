@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class partnerFilter extends baseObjectFilter
 {
 	public function init ()

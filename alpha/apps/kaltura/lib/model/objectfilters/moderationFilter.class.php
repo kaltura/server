@@ -1,7 +1,8 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
-require_once( 'model/moderationPeer.php');
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class moderationFilter extends baseObjectFilter
 {
 	public function init ()

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class BatchJobFilter extends baseObjectFilter
 {
 	const JOB_TYPE_AND_SUB_TYPE_MAIN_DELIMITER = ';';

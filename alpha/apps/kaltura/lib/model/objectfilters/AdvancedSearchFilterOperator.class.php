@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.filters.advanced
+ */ 
 class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 {
 	const SEARCH_AND = 1;

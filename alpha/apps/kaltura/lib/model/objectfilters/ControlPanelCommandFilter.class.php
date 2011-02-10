@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class ControlPanelCommandFilter extends baseObjectFilter
 {
 	public function init ()

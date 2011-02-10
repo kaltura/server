@@ -1,6 +1,8 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class syndicationFeedFilter extends baseObjectFilter
 {
 	public function init ()

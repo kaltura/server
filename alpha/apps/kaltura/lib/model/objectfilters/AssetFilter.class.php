@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class AssetFilter extends baseObjectFilter
 {
 	public function init ()

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.filters.advanced
+ */ 
 class AdvancedSearchFilterItem
 {
 	/**

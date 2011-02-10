@@ -1,15 +1,12 @@
 <?php
-
-include_once( 'allUtils.class.php');
-
 /**
  * This base class will help filter the BaseObject class by using the Criteria object.
  * Each filter is coupled with a concrete class derived from BaseObject (and maybe to its Peer object ??).
  * It hold the fields of the original object that can be filtered by.
- *
- */
-
-// TODO - should go global -> go into lib !
+ * 
+ * @package Core
+ * @subpackage model.filters
+ */ 
 abstract class baseObjectFilter extends myBaseObject
 {
 	public $fields;

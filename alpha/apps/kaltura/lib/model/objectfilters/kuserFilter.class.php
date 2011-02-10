@@ -1,7 +1,8 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
-require_once( 'model/kuserPeer.php');
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class kuserFilter extends baseObjectFilter
 {
 	public function init ()

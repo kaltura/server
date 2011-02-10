@@ -1,7 +1,8 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
-require_once( 'model/kshowPeer.php');
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class kshowFilter extends baseObjectFilter
 {
 	public function init ()

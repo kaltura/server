@@ -1,7 +1,8 @@
 <?php
-require_once( 'model/objectfilters/filters.class.php');
-require_once( 'model/notificationPeer.php');
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class ConversionProfileFilter extends baseObjectFilter
 {
 	public function init ()

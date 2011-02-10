@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class entryFilter extends baseObjectFilter
 {
 	const FREE_TEXT_FIELDS = 'name,tags,description,entry_id';

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Core
+ * @subpackage model.filters
+ */ 
 class FileSyncFilter extends baseObjectFilter
 {
 	public function init ()
