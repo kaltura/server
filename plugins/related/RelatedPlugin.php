@@ -2,7 +2,7 @@
 /**
  * Related plugin exposes specific functionality to retreive related entries
  * 
- * @author Roman
+ * @package plugins.related
  */
 class RelatedPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {

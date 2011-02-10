@@ -1,8 +1,8 @@
 <?php
- 
-	/* ===========================
-	 * KDLOperatorAvidemux
-	 */
+/**
+ * @package plugins.avidemux
+ * @subpackage kdl
+ */
 class KDLOperatorAvidemux extends KDLOperatorBase {
 
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)

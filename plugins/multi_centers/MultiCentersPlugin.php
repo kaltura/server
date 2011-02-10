@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.multiCenters
+ */
 class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'multiCenters';

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.shortLink
+ */
 class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'shortLink';

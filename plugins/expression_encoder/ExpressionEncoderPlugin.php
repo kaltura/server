@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.expressionEncoder
+ */
 class ExpressionEncoderPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'expressionEncoder';

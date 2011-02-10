@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ */
 class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'verizonDistribution';

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.storageProfile
+ */
 class StorageProfilePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'storageProfile';

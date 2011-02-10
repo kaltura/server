@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ */
 class MyspaceDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'myspaceDistribution';

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.virusScan
+ */
 class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'virusScan';

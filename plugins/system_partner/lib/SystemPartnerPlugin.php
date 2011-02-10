@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.systemPartner
+ */
 class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'systemPartner';

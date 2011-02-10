@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.fastStart
+ */
 class FastStartPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'fastStart';

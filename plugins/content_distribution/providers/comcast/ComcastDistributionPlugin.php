@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.comcastDistribution
+ */
 class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
 	const PLUGIN_NAME = 'comcastDistribution';

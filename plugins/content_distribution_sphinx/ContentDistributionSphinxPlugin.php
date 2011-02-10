@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.contentDistributionSphinx
+ */
 class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {
 	const PLUGIN_NAME = 'contentDistributionSphinx';

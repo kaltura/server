@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.symantecScanEngine
+ */
 class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'symantecScanEngine';

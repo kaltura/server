@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.segmenter
+ */
 class SegmenterPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'segmenter';

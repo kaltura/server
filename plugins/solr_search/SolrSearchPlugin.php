@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.solr_search
+ */
 class SolrSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
 {
 	const PLUGIN_NAME = 'solr_search';

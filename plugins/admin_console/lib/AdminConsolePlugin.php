@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.adminConsole
+ */
 class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'adminConsole';

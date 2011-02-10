@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.document
+ */
 class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'document';

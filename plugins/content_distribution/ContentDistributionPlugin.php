@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.contentDistribution
+ */
 class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending
 {
 	const PLUGIN_NAME = 'contentDistribution';

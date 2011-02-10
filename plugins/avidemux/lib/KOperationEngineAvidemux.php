@@ -1,9 +1,7 @@
 <?php
 /**
- * 
- * @package Scheduler
- * @subpackage Conversion
- *
+ * @package plugins.avidemux
+ * @subpackage batch.conversion
  */
 class KOperationEngineAvidemux  extends KSingleOutputOperationEngine
 {

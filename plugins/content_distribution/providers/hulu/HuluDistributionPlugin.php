@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ */
 class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'huluDistribution';

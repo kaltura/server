@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.audit
+ */
 class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'audit';

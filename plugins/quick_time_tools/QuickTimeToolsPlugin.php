@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.quickTimeTools
+ */
 class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'quickTimeTools';

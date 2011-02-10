@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.metadata
+ */
 class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor
 {
 	const PLUGIN_NAME = 'metadata';

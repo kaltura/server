@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.avidemux
+ * @subpackage batch.conversion
  */
 class AvidemuxConversionEngineType implements conversionEngineType, IKalturaPluginEnum
 {

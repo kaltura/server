@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.KalturaInternalTools
+ */
 class KalturaInternalToolsPlugin extends KalturaPlugin implements IKalturaServices, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'KalturaInternalTools';

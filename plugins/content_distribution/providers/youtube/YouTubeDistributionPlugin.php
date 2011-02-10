@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.youTubeDistribution
+ */
 class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
 {
 	const PLUGIN_NAME = 'youTubeDistribution';

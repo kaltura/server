@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.mySqlSearch
+ */
 class MySqlSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
 {
 	const PLUGIN_NAME = 'mySqlSearch';

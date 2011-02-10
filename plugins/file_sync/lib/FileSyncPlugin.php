@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package plugins.fileSync
+ */
 class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
 {
 	const PLUGIN_NAME = 'fileSync';

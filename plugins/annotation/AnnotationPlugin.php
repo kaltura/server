@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package plugins.annotation
+ */
 class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'annotation';
