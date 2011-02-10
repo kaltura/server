@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.youTubeDistribution
+ * @subpackage admin
+ */
 class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

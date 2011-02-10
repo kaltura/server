@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage model.data
+ */
 class kMyspaceDistributionJobProviderData extends kDistributionJobProviderData
 {
 	/**
@@ -51,15 +55,6 @@ class kMyspaceDistributionJobProviderData extends kDistributionJobProviderData
 	public function getXml()
 	{
 		return $this->xml;
-	}
-
-
-	/**
-	 * @return the $metadataProfileId
-	 */
-	public function getMetadataProfileId()
-	{
-		return $this->metadataProfileId;
 	}
 
 

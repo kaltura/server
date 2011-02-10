@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.youTubeDistribution
+ * @subpackage lib
+ */
 class YouTubeDistributionFeedHelper
 {
 	/**

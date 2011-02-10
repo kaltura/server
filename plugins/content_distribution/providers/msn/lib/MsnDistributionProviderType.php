@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.msnDistribution
+ * @subpackage lib
  */
 class MsnDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {

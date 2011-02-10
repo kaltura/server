@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage model
+ */
 class VerizonDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';

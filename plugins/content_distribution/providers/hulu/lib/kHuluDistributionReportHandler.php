@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage lib
+ */
 class kHuluDistributionReportHandler implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)

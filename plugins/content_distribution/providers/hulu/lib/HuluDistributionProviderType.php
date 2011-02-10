@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.huluDistribution
+ * @subpackage lib
  */
 class HuluDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage lib
+ */
 class HuluDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,

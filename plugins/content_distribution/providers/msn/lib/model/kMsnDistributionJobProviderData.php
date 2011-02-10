@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage model.data
+ */
 class kMsnDistributionJobProviderData extends kDistributionJobProviderData
 {
 	/**

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage lib
+ */
 class kVerizonDistributionReportHandler implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)

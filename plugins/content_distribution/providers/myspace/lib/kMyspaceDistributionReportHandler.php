@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage lib
+ */
 class kMyspaceDistributionReportHandler implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.youTubeDistribution
+ * @subpackage model
+ */
 class YouTubeDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage model.data
+ */
 class kHuluDistributionJobProviderData extends kDistributionJobProviderData
 {
 	/**

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage lib
+ */
 class MsnDistributionProvider implements IDistributionProvider
 {
 	/**

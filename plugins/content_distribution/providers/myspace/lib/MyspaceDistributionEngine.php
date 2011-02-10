@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage lib
+ */
 class MyspaceDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,

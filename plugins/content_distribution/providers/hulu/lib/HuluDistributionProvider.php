@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage lib
+ */
 class HuluDistributionProvider implements IDistributionProvider
 {
 	/**

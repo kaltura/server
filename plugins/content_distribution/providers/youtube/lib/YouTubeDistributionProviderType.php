@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.youTubeDistribution
+ * @subpackage lib
  */
 class YouTubeDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {

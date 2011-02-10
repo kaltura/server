@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage admin
+ */
 class Form_MyspaceProfileConfiguration extends Form_ProviderProfileConfiguration
 {	
 	protected function addProviderElements()

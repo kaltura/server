@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage model.data
+ */
 class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 {
 	/**
@@ -51,15 +55,6 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	public function getXml()
 	{
 		return $this->xml;
-	}
-
-
-	/**
-	 * @return the $metadataProfileId
-	 */
-	public function getMetadataProfileId()
-	{
-		return $this->metadataProfileId;
 	}
 
 

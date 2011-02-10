@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.huluDistribution
+ * @subpackage admin
+ */
 class Form_HuluProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	protected function addProviderElements()

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.myspaceDistribution
+ * @subpackage lib
  */
 class MyspaceDistributionProviderType extends KalturaDistributionProviderType
 {

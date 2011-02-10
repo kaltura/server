@@ -1,7 +1,7 @@
 <?php
 /**
- * @package api
- * @subpackage enum
+ * @package plugins.verizonDistribution
+ * @subpackage lib
  */
 class VerizonDistributionProviderType extends KalturaDistributionProviderType
 {

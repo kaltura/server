@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.comcastDistribution
+ * @subpackage model
+ */
 class ComcastDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_EMAIL = 'email';

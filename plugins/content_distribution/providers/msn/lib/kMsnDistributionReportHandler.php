@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage lib
+ */
 class kMsnDistributionReportHandler implements kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)

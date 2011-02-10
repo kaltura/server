@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage model
+ */
 class VerizonDistributionProfilePeer extends DistributionProfilePeer
 {
 	const OM_CLASS = 'VerizonDistributionProfile';

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage lib
+ */
 class VerizonDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineUpdate,
 	IDistributionEngineSubmit,

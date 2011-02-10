@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage model
+ */
 class MyspaceDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';

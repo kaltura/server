@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.huluDistribution
+ * @subpackage model.data
+ */
 class HuluDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';

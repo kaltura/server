@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.myspaceDistribution
+ * @subpackage model
+ */
 class MyspaceDistributionProfilePeer extends DistributionProfilePeer
 {
 	const OM_CLASS = 'MyspaceDistributionProfile';

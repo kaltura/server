@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.comcastDistribution
+ * @subpackage admin
+ */
 class Form_ComcastProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

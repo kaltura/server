@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage admin
+ */
 class Form_VerizonProfileConfiguration extends Form_ProviderProfileConfiguration
 {	
 	protected function addProviderElements()

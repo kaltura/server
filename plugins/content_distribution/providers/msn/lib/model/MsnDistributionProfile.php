@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.msnDistribution
+ * @subpackage model
+ */
 class MsnDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';

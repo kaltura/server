@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.youTubeDistribution
+ * @subpackage model.data
+ */
 class kYouTubeDistributionJobProviderData extends kDistributionJobProviderData
 {
 	/**
