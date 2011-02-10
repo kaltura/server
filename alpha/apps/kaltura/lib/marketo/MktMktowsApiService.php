@@ -1,57 +1,69 @@
 <?php
+/**
+ * @package External
+ * @subpackage Marketo
+ */
 
 if (!class_exists("LeadKeyRef")) {
 /**
- * LeadKeyRef
+ * @package External
+ * @subpackage Marketo
  */
 class LeadKeyRef {
 }}
 
 if (!class_exists("LeadSyncStatus")) {
 /**
- * LeadSyncStatus
+ * @package External
+ * @subpackage Marketo
  */
 class LeadSyncStatus {
 }}
 
 if (!class_exists("ActivityType")) {
 /**
- * ActivityType
+ * @package External
+ * @subpackage Marketo
  */
 class ActivityType {
 }}
 
 if (!class_exists("ForeignSysType")) {
 /**
- * ForeignSysType
+ * @package External
+ * @subpackage Marketo
  */
 class ForeignSysType {
 }}
 
 if (!class_exists("ReqCampSourceType")) {
 /**
- * ReqCampSourceType
+ * @package External
+ * @subpackage Marketo
  */
 class ReqCampSourceType {
 }}
 
 if (!class_exists("ListKeyType")) {
 /**
- * ListKeyType
+ * @package External
+ * @subpackage Marketo
  */
 class ListKeyType {
 }}
 
 if (!class_exists("ListOperationType")) {
 /**
- * ListOperationType
+ * @package External
+ * @subpackage Marketo
  */
 class ListOperationType {
 }}
 
 if (!class_exists("ActivityTypeFilter")) {
 /**
- * ActivityTypeFilter
+ * @package External
+ * @subpackage Marketo
  */
 class ActivityTypeFilter {
 	/**
@@ -68,7 +80,8 @@ class ActivityTypeFilter {
 
 if (!class_exists("Attribute")) {
 /**
- * Attribute
+ * @package External
+ * @subpackage Marketo
  */
 class Attribute {
 	/**
@@ -90,7 +103,8 @@ class Attribute {
 
 if (!class_exists("LeadRecord")) {
 /**
- * LeadRecord
+ * @package External
+ * @subpackage Marketo
  */
 class LeadRecord {
 	/**
@@ -122,7 +136,8 @@ class LeadRecord {
 
 if (!class_exists("ActivityRecord")) {
 /**
- * ActivityRecord
+ * @package External
+ * @subpackage Marketo
  */
 class ActivityRecord {
 	/**
@@ -184,7 +199,8 @@ class ActivityRecord {
 
 if (!class_exists("CampaignRecord")) {
 /**
- * CampaignRecord
+ * @package External
+ * @subpackage Marketo
  */
 class CampaignRecord {
 	/**
@@ -206,7 +222,8 @@ class CampaignRecord {
 
 if (!class_exists("LeadChangeRecord")) {
 /**
- * LeadChangeRecord
+ * @package External
+ * @subpackage Marketo
  */
 class LeadChangeRecord {
 	/**
@@ -248,7 +265,8 @@ class LeadChangeRecord {
 
 if (!class_exists("LeadKey")) {
 /**
- * LeadKey
+ * @package External
+ * @subpackage Marketo
  */
 class LeadKey {
 	/**
@@ -265,7 +283,8 @@ class LeadKey {
 
 if (!class_exists("LeadStatus")) {
 /**
- * LeadStatus
+ * @package External
+ * @subpackage Marketo
  */
 class LeadStatus {
 	/**
@@ -282,7 +301,8 @@ class LeadStatus {
 
 if (!class_exists("ListKey")) {
 /**
- * ListKey
+ * @package External
+ * @subpackage Marketo
  */
 class ListKey {
 	/**
@@ -299,7 +319,8 @@ class ListKey {
 
 if (!class_exists("MObjectMetadata")) {
 /**
- * MObjectMetadata
+ * @package External
+ * @subpackage Marketo
  */
 class MObjectMetadata {
 	/**
@@ -336,7 +357,8 @@ class MObjectMetadata {
 
 if (!class_exists("MObjFieldMetadata")) {
 /**
- * MObjFieldMetadata
+ * @package External
+ * @subpackage Marketo
  */
 class MObjFieldMetadata {
 	/**
@@ -413,7 +435,8 @@ class MObjFieldMetadata {
 
 if (!class_exists("StreamPosition")) {
 /**
- * StreamPosition
+ * @package External
+ * @subpackage Marketo
  */
 class StreamPosition {
 	/**
@@ -440,7 +463,8 @@ class StreamPosition {
 
 if (!class_exists("SyncStatus")) {
 /**
- * SyncStatus
+ * @package External
+ * @subpackage Marketo
  */
 class SyncStatus {
 	/**
@@ -462,7 +486,8 @@ class SyncStatus {
 
 if (!class_exists("VersionedItem")) {
 /**
- * VersionedItem
+ * @package External
+ * @subpackage Marketo
  */
 class VersionedItem {
 	/**
@@ -494,7 +519,8 @@ class VersionedItem {
 
 if (!class_exists("ParamsDescribeMObject")) {
 /**
- * ParamsDescribeMObject
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsDescribeMObject {
 	/**
@@ -506,7 +532,8 @@ class ParamsDescribeMObject {
 
 if (!class_exists("ParamsGetCampaignsForSource")) {
 /**
- * ParamsGetCampaignsForSource
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsGetCampaignsForSource {
 	/**
@@ -528,7 +555,8 @@ class ParamsGetCampaignsForSource {
 
 if (!class_exists("ParamsGetLead")) {
 /**
- * ParamsGetLead
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsGetLead {
 	/**
@@ -540,7 +568,8 @@ class ParamsGetLead {
 
 if (!class_exists("ParamsGetLeadActivity")) {
 /**
- * ParamsGetLeadActivity
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsGetLeadActivity {
 	/**
@@ -567,7 +596,8 @@ class ParamsGetLeadActivity {
 
 if (!class_exists("ParamsGetLeadChanges")) {
 /**
- * ParamsGetLeadChanges
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsGetLeadChanges {
 	/**
@@ -589,7 +619,8 @@ class ParamsGetLeadChanges {
 
 if (!class_exists("ParamsGetMultipleLeads")) {
 /**
- * ParamsGetMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsGetMultipleLeads {
 	/**
@@ -616,14 +647,16 @@ class ParamsGetMultipleLeads {
 
 if (!class_exists("ParamsListMObjects")) {
 /**
- * ParamsListMObjects
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsListMObjects {
 }}
 
 if (!class_exists("ParamsListOperation")) {
 /**
- * ParamsListOperation
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsListOperation {
 	/**
@@ -650,7 +683,8 @@ class ParamsListOperation {
 
 if (!class_exists("ParamsRequestCampaign")) {
 /**
- * ParamsRequestCampaign
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsRequestCampaign {
 	/**
@@ -672,7 +706,8 @@ class ParamsRequestCampaign {
 
 if (!class_exists("ParamsSyncLead")) {
 /**
- * ParamsSyncLead
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsSyncLead {
 	/**
@@ -694,7 +729,8 @@ class ParamsSyncLead {
 
 if (!class_exists("ParamsSyncMultipleLeads")) {
 /**
- * ParamsSyncMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class ParamsSyncMultipleLeads {
 	/**
@@ -711,7 +747,8 @@ class ParamsSyncMultipleLeads {
 
 if (!class_exists("LeadActivityList")) {
 /**
- * LeadActivityList
+ * @package External
+ * @subpackage Marketo
  */
 class LeadActivityList {
 	/**
@@ -738,7 +775,8 @@ class LeadActivityList {
 
 if (!class_exists("ResultDescribeMObject")) {
 /**
- * ResultDescribeMObject
+ * @package External
+ * @subpackage Marketo
  */
 class ResultDescribeMObject {
 	/**
@@ -750,7 +788,8 @@ class ResultDescribeMObject {
 
 if (!class_exists("ResultGetCampaignsForSource")) {
 /**
- * ResultGetCampaignsForSource
+ * @package External
+ * @subpackage Marketo
  */
 class ResultGetCampaignsForSource {
 	/**
@@ -767,7 +806,8 @@ class ResultGetCampaignsForSource {
 
 if (!class_exists("ResultGetLeadChanges")) {
 /**
- * ResultGetLeadChanges
+ * @package External
+ * @subpackage Marketo
  */
 class ResultGetLeadChanges {
 	/**
@@ -794,7 +834,8 @@ class ResultGetLeadChanges {
 
 if (!class_exists("ResultGetLead")) {
 /**
- * ResultGetLead
+ * @package External
+ * @subpackage Marketo
  */
 class ResultGetLead {
 	/**
@@ -811,7 +852,8 @@ class ResultGetLead {
 
 if (!class_exists("ResultListMObjects")) {
 /**
- * ResultListMObjects
+ * @package External
+ * @subpackage Marketo
  */
 class ResultListMObjects {
 	/**
@@ -823,7 +865,8 @@ class ResultListMObjects {
 
 if (!class_exists("ResultListOperation")) {
 /**
- * ResultListOperation
+ * @package External
+ * @subpackage Marketo
  */
 class ResultListOperation {
 	/**
@@ -840,7 +883,8 @@ class ResultListOperation {
 
 if (!class_exists("ResultGetMultipleLeads")) {
 /**
- * ResultGetMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class ResultGetMultipleLeads {
 	/**
@@ -867,7 +911,8 @@ class ResultGetMultipleLeads {
 
 if (!class_exists("ResultRequestCampaign")) {
 /**
- * ResultRequestCampaign
+ * @package External
+ * @subpackage Marketo
  */
 class ResultRequestCampaign {
 	/**
@@ -879,7 +924,8 @@ class ResultRequestCampaign {
 
 if (!class_exists("ResultSyncLead")) {
 /**
- * ResultSyncLead
+ * @package External
+ * @subpackage Marketo
  */
 class ResultSyncLead {
 	/**
@@ -901,7 +947,8 @@ class ResultSyncLead {
 
 if (!class_exists("ResultSyncMultipleLeads")) {
 /**
- * ResultSyncMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class ResultSyncMultipleLeads {
 	/**
@@ -913,7 +960,8 @@ class ResultSyncMultipleLeads {
 
 if (!class_exists("SuccessDescribeMObject")) {
 /**
- * SuccessDescribeMObject
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessDescribeMObject {
 	/**
@@ -925,7 +973,8 @@ class SuccessDescribeMObject {
 
 if (!class_exists("SuccessGetCampaignsForSource")) {
 /**
- * SuccessGetCampaignsForSource
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessGetCampaignsForSource {
 	/**
@@ -937,7 +986,8 @@ class SuccessGetCampaignsForSource {
 
 if (!class_exists("SuccessGetLead")) {
 /**
- * SuccessGetLead
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessGetLead {
 	/**
@@ -949,7 +999,8 @@ class SuccessGetLead {
 
 if (!class_exists("SuccessGetLeadActivity")) {
 /**
- * SuccessGetLeadActivity
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessGetLeadActivity {
 	/**
@@ -961,7 +1012,8 @@ class SuccessGetLeadActivity {
 
 if (!class_exists("SuccessGetLeadChanges")) {
 /**
- * SuccessGetLeadChanges
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessGetLeadChanges {
 	/**
@@ -973,7 +1025,8 @@ class SuccessGetLeadChanges {
 
 if (!class_exists("SuccessGetMultipleLeads")) {
 /**
- * SuccessGetMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessGetMultipleLeads {
 	/**
@@ -985,7 +1038,8 @@ class SuccessGetMultipleLeads {
 
 if (!class_exists("SuccessListMObjects")) {
 /**
- * SuccessListMObjects
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessListMObjects {
 	/**
@@ -997,7 +1051,8 @@ class SuccessListMObjects {
 
 if (!class_exists("SuccessListOperation")) {
 /**
- * SuccessListOperation
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessListOperation {
 	/**
@@ -1009,7 +1064,8 @@ class SuccessListOperation {
 
 if (!class_exists("SuccessRequestCampaign")) {
 /**
- * SuccessRequestCampaign
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessRequestCampaign {
 	/**
@@ -1021,7 +1077,8 @@ class SuccessRequestCampaign {
 
 if (!class_exists("SuccessSyncLead")) {
 /**
- * SuccessSyncLead
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessSyncLead {
 	/**
@@ -1033,7 +1090,8 @@ class SuccessSyncLead {
 
 if (!class_exists("SuccessSyncMultipleLeads")) {
 /**
- * SuccessSyncMultipleLeads
+ * @package External
+ * @subpackage Marketo
  */
 class SuccessSyncMultipleLeads {
 	/**
@@ -1045,7 +1103,8 @@ class SuccessSyncMultipleLeads {
 
 if (!class_exists("AuthenticationHeaderInfo")) {
 /**
- * AuthenticationHeaderInfo
+ * @package External
+ * @subpackage Marketo
  */
 class AuthenticationHeaderInfo {
 	/**
@@ -1077,8 +1136,8 @@ class AuthenticationHeaderInfo {
 
 if (!class_exists("MktMktowsApiService")) {
 /**
- * MktMktowsApiService
- * @author WSDLInterpreter
+ * @package External
+ * @subpackage Marketo
  */
 class MktMktowsApiService extends SoapClient {
 	/**
@@ -1380,4 +1439,3 @@ class MktMktowsApiService extends SoapClient {
 
 }}
 
-?>

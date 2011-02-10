@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package External
+ * @subpackage Marketo
+ */
 class MarketoApiService extends MktMktowsApiService
 {
 	const MKTOWS_NAMESPACE = 'http://www.marketo.com/mktows/';
