@@ -566,6 +566,7 @@ kmc.preview_embed = {
 		
         // default value for html5_compatible
         html5_compatible = (html5_compatible) ? html5_compatible : false;
+	html5_compatible = (previewOnly) ? false : html5_compatible;
 		
         if(id != "multitab_playlist") {
 
@@ -854,7 +855,7 @@ kmc.preview_embed = {
                 // Ran: Removed streamerUrl & rtmpFlavors flashvars [not needed]
                 embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
             } else if (kmc.vars.embed_code_delivery_type == "akamai") {
-                embed_code = embed_code.replace("{FLASHVARS}", "mediaProtocol=akamai&amp;{FLASHVARS}");
+                embed_code = embed_code.replace("{FLASHVARS}", "mediaProtocol=hdnetwork&amp;{FLASHVARS}");
             }
         }
         if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
