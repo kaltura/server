@@ -353,6 +353,8 @@ class UserService extends KalturaBaseUserService
 	 * @param string $password
 	 * @param string $newLoginId Optional, provide only when you want to update the login id
 	 * @param string $newPassword
+	 * @param string $newFirstName
+	 * @param string $newLastName
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -362,9 +364,9 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "")
+	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
 	{	
-		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword);
+		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName);
 	}
 	
 	/**

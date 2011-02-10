@@ -81,7 +81,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		);
 	}
 	
-	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null)
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null)
 	{
 		// if email is null, no need to do any DB queries
 		if (!$oldLoginEmail) {
@@ -130,19 +130,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if ($newPassword && $loginData->passwordUsedBefore($newPassword)) {
 			throw new kUserException('', kUserException::PASSWORD_ALREADY_USED);
 		}		
-		
+		 
 		// update password if requested
 		if ($newPassword && $newPassword != $oldPassword) {
 			$password = $loginData->resetPassword($newPassword, $oldPassword);
 		}
 		
 		// update email if requested
-		if ( $newLoginEmail && $newLoginEmail != $loginData->getLoginEmail()) 
+		if ($newLoginEmail || $newFirstName || $newLastName)
 		{
-			// update login email
-			$loginData->setLoginEmail($newLoginEmail);
+			if ($newLoginEmail) { $loginData->setLoginEmail($newLoginEmail); } // update login email
+			if ($newFirstName)  { $loginData->setFirstName($newFirstName);   } // update first name
+			if ($newLastName)   { $loginData->setLastName($newLastName);     } // update last name
 			
-			// update email for all kusers using this login data, in all partners
+			// update all kusers using this login data, in all partners
 			$c = new Criteria();
 			$c->addAnd(kuserPeer::LOGIN_DATA_ID, $loginData->getId(), Criteria::EQUAL);
 			$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
@@ -151,10 +152,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 			kuserPeer::setUseCriteriaFilter(true);
 			foreach ($kusers as $kuser)
 			{
-				$kuser->setEmail($newLoginEmail);
+				if ($newLoginEmail) { $kuser->setEmail($newLoginEmail);    } // update login email
+				if ($newFirstName)  { $kuser->setFirstName($newFirstName); } // update first name
+				if ($newLastName)   { $kuser->setLastName($newLastName);   } // update last name
 				$kuser->save();
 			}
-			
 		}
 				
 		$loginData->save();

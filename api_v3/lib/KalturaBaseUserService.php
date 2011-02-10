@@ -5,16 +5,17 @@ class KalturaBaseUserService extends KalturaBaseService
 	
 	protected function partnerRequired($actionName)
 	{
-		if ($actionName === 'loginByLoginId') {
+		$actionName = strtolower($actionName);
+		if ($actionName === 'loginbyloginid') {
 			return false;
 		}
-		if ($actionName === 'updatLoginData') {
+		if ($actionName === 'updatelogindata') {
 			return false;
 		}
-		if ($actionName === 'resetPassword') {
+		if ($actionName === 'resetpassword') {
 			return false;
 		}
-		if ($actionName === 'setInitialPassword') {
+		if ($actionName === 'setinitialpassword') {
 			return false;
 		}
 		return parent::partnerRequired($actionName);
@@ -43,7 +44,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "")
+	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName, $newLastName)
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -54,7 +55,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 
 		try {
-			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword );
+			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
