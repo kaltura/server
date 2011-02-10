@@ -178,22 +178,33 @@ class KAsyncFileSyncImport extends KBatchBase
 		// fetch each direcotry content
 		foreach ($contents as $current)
 		{
-			$current = trim($current,' /');
-			$newUrl = $sourceUrl .'/fileName/'.base64_encode($current);
-			$curlHeaderResponse = $this->fetchHeader($job, $newUrl);
-			if (!$curlHeaderResponse) {
-				return false; // job already closed with an error
+			$name     = trim($current[0],' /');
+			$type     = trim($current[1]);
+			$filesize = trim($current[2]);
+			
+			$newUrl = $sourceUrl .'/fileName/'.base64_encode($name);
+			
+			if (!$type || !$filesize)
+			{
+				$curlHeaderResponse = $this->fetchHeader($job, $newUrl);
+				if (!$curlHeaderResponse) {
+					return false; // job already closed with an error
+				}
+				// check if current is a file or directory
+				$isDir = $this->isDirectoryHeader($curlHeaderResponse);
+				$filesize = $this->getFilesizeFromHeader($curlHeaderResponse);
+			}
+			else {
+				$isDir = $type === 'dir';
 			}
 			
-			// check if current is a file or directory
-			$isDir = $this->isDirectoryHeader($curlHeaderResponse);
 			if ($isDir)
 			{
 				// is a directory - no need to fetch from server, just create it and proceed
-				$res = $this->createAndSetDir($dirDestination.'/'.$current);
+				$res = $this->createAndSetDir($dirDestination.'/'.$name);
 				if (!$res)
 				{
-					$msg = 'Error: Cannot create destination directory ['.$dirDestination.'/'.$current.']';
+					$msg = 'Error: Cannot create destination directory ['.$dirDestination.'/'.$name.']';
 					KalturaLog::err($msg);
 					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
 					return false;
@@ -202,7 +213,7 @@ class KAsyncFileSyncImport extends KBatchBase
 			else
 			{
 				// is a file - fetch it from server
-				$res = $this->fetchFile($job, $newUrl, $dirDestination.'/'.$current, $curlHeaderResponse);
+				$res = $this->fetchFile($job, $newUrl, $dirDestination.'/'.$name, null, $filesize);
 				if (!$res) {
 					return false; // job already closed with an error
 				}
@@ -221,23 +232,26 @@ class KAsyncFileSyncImport extends KBatchBase
 	 * @param string $fileDestination
 	 * @param KCurlHeaderResponse $curlHeaderResponse header fetched for the $sourceUrl
 	 */
-	private function fetchFile(KalturaBatchJob &$job, $sourceUrl, $fileDestination, $curlHeaderResponse = null)
+	private function fetchFile(KalturaBatchJob &$job, $sourceUrl, $fileDestination, $curlHeaderResponse = null, $fileSize = null)
 	{
 		KalturaLog::debug('fetchFile - job id ['.$job->id.'], source url ['.$sourceUrl.'], destination ['.$fileDestination.']');
 		
-		// fetch header if not given
-		if (!$curlHeaderResponse) {
-			$curlHeaderResponse = $this->fetchHeader($job, $sourceUrl);
+		if (!$fileSize)
+		{
+			// fetch header if not given
 			if (!$curlHeaderResponse) {
-				return false; // job already closed with an error
+				$curlHeaderResponse = $this->fetchHeader($job, $sourceUrl);
+				if (!$curlHeaderResponse) {
+					return false; // job already closed with an error
+				}
 			}
-		}
-		
-		// try to get file size from headers
-		$fileSize = null;
-		if (isset($curlHeaderResponse->headers['content-length'])) {
-			$fileSize = $curlHeaderResponse->headers['content-length'];
-		}
+			
+			// try to get file size from headers
+			$fileSize = null;
+			if (isset($curlHeaderResponse->headers['content-length'])) {
+				$fileSize = $curlHeaderResponse->headers['content-length'];
+			}
+		}		
 
 		// if file already exists - check if we can start from specific offset on exising partial content
 		$resumeOffset = 0;
@@ -459,6 +473,23 @@ class KAsyncFileSyncImport extends KBatchBase
 		
 		// header fetched successfully - return it
 		return $curlHeaderResponse;
+	}
+	
+	
+	
+	/**
+	 * Try to get the filesize from the given header
+	 * @param KCurlHeaderResponse $curlHeaderResponse
+	 * @return false|int file size or false on error
+	 */
+	private function getFilesizeFromHeader($curlHeaderResponse)
+	{
+		// try to get file size from headers
+		if (isset($curlHeaderResponse->headers['content-length'])) {
+			$fileSize = $curlHeaderResponse->headers['content-length'];
+			return $fileSize;
+		}
+		return false;	
 	}
 	
 	

@@ -5,7 +5,14 @@
  */
 class kFile
 {
-	
+	/**
+	 * Returns directory $path contents as an array of :
+	 *  array[0] = name
+	 *  array[1] = type (dir/file)
+	 *  array[2] = filesize
+	 * @param string $path
+	 * @param string $pathPrefix
+	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
 		$fileList = array();
@@ -23,12 +30,12 @@ class kFile
 			    	if (is_dir($fullPath))
 			    	{
 			    		$tmpPrefix = $tmpPrefix.'/';
-			    		$fileList[] = $tmpPrefix;
+			    		$fileList[] = array($tmpPrefix, 'dir', filesize($fullPath));
 			    		$fileList = array_merge($fileList, kFile::listDir($fullPath, $tmpPrefix));
 			    	}	
 			    	else
 			    	{
-			    		$fileList[] = $tmpPrefix;
+			    		$fileList[] = array($tmpPrefix, 'file', filesize($fullPath));
 			    	}	    	
 		    	}
 		    }
