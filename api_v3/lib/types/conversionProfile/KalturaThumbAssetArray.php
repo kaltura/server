@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaThumbAssetArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

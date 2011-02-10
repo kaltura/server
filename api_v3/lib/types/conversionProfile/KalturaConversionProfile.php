@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaConversionProfile extends KalturaObject implements IFilterable 
 {
 	/**

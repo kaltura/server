@@ -10,4 +10,3 @@ class KalturaDurationType extends KalturaStringEnum
 	const MEDIUM = "medium";
 	const LONG = "long";
 }
-?>

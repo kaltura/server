@@ -12,4 +12,3 @@ class KalturaBatchJobErrorTypes extends KalturaEnum
 	const KALTURA_API = 4;
 	const KALTURA_CLIENT = 5;
 }
-?>

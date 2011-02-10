@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaSiteRestrictionType extends KalturaEnum
 {
 	const RESTRICT_SITE_LIST = 0;

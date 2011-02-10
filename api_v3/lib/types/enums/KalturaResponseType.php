@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaResponseType extends KalturaEnum
 {
 	const RESPONSE_TYPE_JSON = 1;

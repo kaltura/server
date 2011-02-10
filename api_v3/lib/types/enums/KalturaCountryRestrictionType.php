@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaCountryRestrictionType extends KalturaEnum
 {
 	const RESTRICT_COUNTRY_LIST = 0;

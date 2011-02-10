@@ -2,44 +2,41 @@
 /**
  * @package api
  * @subpackage enum
- */
-
-
-/*
- *  from the Andromeda Nov 25 document:
- *  1.
-2.KMC  Content Section events
-page view (on each page)
-Add playlist
-Edit playlist
-Delete playlist
-Edit entry
-Change thumbnail
-Add tags
-Remove tags
-Add admin tags
-Remove admin tags
-Download
-Approve Moderation
-Reject Moderation
-Bulk upload
-Admin Upload via CW
-3.
-4.KMC Account events
-Change partner info
-Change login info
-Contact us usage
-Update server settings
-1.
-2.KMC App studio events
-New player � single video
-New player � Playlist
-New player � Multi-tab playlist
-Edit player � single video
-Edit player � Playlist
-Edit player � Multi-tab playlist
-Duplicate player
-3. 
+ * 
+ * from the Andromeda Nov 25 document:
+ * 1.
+ * 2.KMC  Content Section events
+ * page view (on each page)
+ * Add playlist
+ * Edit playlist
+ * Delete playlist
+ * Edit entry
+ * Change thumbnail
+ * Add tags
+ * Remove tags
+ * Add admin tags
+ * Remove admin tags
+ * Download
+ * Approve Moderation
+ * Reject Moderation
+ * Bulk upload
+ * Admin Upload via CW
+ * 3.
+ * 4.KMC Account events
+ * Change partner info
+ * Change login info
+ * Contact us usage
+ * Update server settings
+ * 1.
+ * 2.KMC App studio events
+ * New player � single video
+ * New player � Playlist
+ * New player � Multi-tab playlist
+ * Edit player � single video
+ * Edit player � Playlist
+ * Edit player � Multi-tab playlist
+ * Duplicate player
+ * 3. 
  */
 class KalturaStatsKmcEventType extends KalturaEnum
 {

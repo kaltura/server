@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaBulkUploadCsvVersion extends KalturaStringEnum
 {
 	const V1 = 1; // 5 values in a row

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaSyndicationFeedType extends KalturaEnum
 {
 	const GOOGLE_VIDEO = 1;

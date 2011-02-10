@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaContainerFormat extends KalturaStringEnum
 {
 	const FLV = "flv";

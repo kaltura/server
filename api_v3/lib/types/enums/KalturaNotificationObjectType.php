@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaNotificationObjectType extends KalturaEnum 
 {
 	const ENTRY = 1;

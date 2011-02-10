@@ -25,4 +25,3 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	
 	const THUMBNAIL_NOT_CREATED = 91;
 }
-?>

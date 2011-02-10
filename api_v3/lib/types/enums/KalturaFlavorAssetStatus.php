@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaFlavorAssetStatus extends KalturaEnum
 {
 	const ERROR = -1;

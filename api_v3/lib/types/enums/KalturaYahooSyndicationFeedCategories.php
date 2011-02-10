@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaYahooSyndicationFeedCategories extends KalturaStringEnum
 {
 	const ACTION = "Action";

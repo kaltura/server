@@ -9,4 +9,3 @@ class KalturaFlavorReadyBehaviorType extends KalturaEnum
 	const REQUIRED = 1;
 	const OPTIONAL = 2;
 }
-?>

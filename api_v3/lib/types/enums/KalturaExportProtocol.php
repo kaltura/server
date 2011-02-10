@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaExportProtocol extends KalturaEnum
 {
 	const KALTURA_DC = 0;
@@ -6,4 +10,3 @@ class KalturaExportProtocol extends KalturaEnum
 	const SCP = 2;
 	const SFTP = 3;
 }
-?>

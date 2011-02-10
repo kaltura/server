@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaAccessControlArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

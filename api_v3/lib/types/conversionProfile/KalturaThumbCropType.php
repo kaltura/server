@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaThumbCropType extends KalturaEnum
 {
 	const RESIZE = 1;

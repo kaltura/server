@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaITunesSyndicationFeedAdultValues extends KalturaStringEnum
 {
 	// applied on <itunes:explicit>

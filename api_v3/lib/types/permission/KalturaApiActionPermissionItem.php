@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaApiActionPermissionItem extends KalturaPermissionItem
 {
 	public $type = 'KalturaApiActionPermissionItem';

@@ -18,4 +18,3 @@ class KalturaBatchJobStatus extends KalturaEnum
 	const FATAL = 10; // done
 	const DONT_PROCESS = 11; // done
 }
-?>

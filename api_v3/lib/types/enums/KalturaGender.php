@@ -9,4 +9,3 @@ class KalturaGender extends KalturaEnum
 	const MALE = 1;
 	const FEMALE = 2;
 }
-?>

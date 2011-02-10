@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage objects
+ */
 class KalturaFlavorAssetWithParamsArray extends KalturaTypedArray
 {
 	public static function fromDbArray($arr)

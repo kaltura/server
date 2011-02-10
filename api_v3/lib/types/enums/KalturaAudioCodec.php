@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaAudioCodec extends KalturaStringEnum
 {
 	const NONE = "";

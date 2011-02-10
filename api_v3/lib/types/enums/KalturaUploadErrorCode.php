@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaUploadErrorCode extends KalturaEnum
 {
 	const NO_ERROR = 0;

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage enum
+ */
 class KalturaITunesSyndicationFeedCategories extends KalturaStringEnum
 {
 	const ARTS = "Arts";
