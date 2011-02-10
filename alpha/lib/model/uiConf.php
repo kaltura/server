@@ -68,6 +68,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_TYPE_KMC_DASHBOARD => "dashboard.swf",
 										self::UI_CONF_TYPE_KMC_LOGIN => "login.swf",
 										self::UI_CONF_TYPE_SLP => "KalturaPlayer.xap",
+										self::UI_CONF_CLIENTSIDE_ENCODER => "KEU_0.8_win.msi",
+										self::UI_CONF_KMC_GENERAL => "kmc.swf",
+										self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
 										);
 	
 	private static $swf_directory_map = array (
@@ -84,6 +87,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_TYPE_KMC_DASHBOARD => "kmc/dashboard",
 		self::UI_CONF_TYPE_KMC_LOGIN => "kmc/login",
 		self::UI_CONF_TYPE_SLP => "slp",
+		self::UI_CONF_CLIENTSIDE_ENCODER => "expressUploader",
+		self::UI_CONF_KMC_GENERAL => "kmc",
+		self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
 	);
 	
 	public function save(PropelPDO $con = null, $isClone = false)
@@ -169,6 +175,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_TYPE_KMC_DASHBOARD => "KMC Dashboard",
 				self::UI_CONF_TYPE_KMC_LOGIN => "KMC Login",
 				self::UI_CONF_TYPE_SLP => "SLP",
+				self::UI_CONF_CLIENTSIDE_ENCODER => "Express Uploader",
+				self::UI_CONF_KMC_GENERAL => "KMC",
+				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "KMC Roles and Permissions",
 			);
 		}
 	}
@@ -192,9 +201,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_TYPE_KMC_DASHBOARD => true,
 				self::UI_CONF_TYPE_KMC_LOGIN => true,
 				self::UI_CONF_TYPE_SLP => true,
-				self::UI_CONF_CLIENTSIDE_ENCODER => false,
-				self::UI_CONF_KMC_GENERAL => false,
-				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => true,
+				self::UI_CONF_CLIENTSIDE_ENCODER => true,
+				self::UI_CONF_KMC_GENERAL => true,
+				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => false,
 			);
 		}		
 	}
