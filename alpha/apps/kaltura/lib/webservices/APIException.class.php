@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage errors
+ */
 class APIException extends kException
 {
 	public $api_code = null;
@@ -12,4 +16,3 @@ class APIException extends kException
 		$this->api_code = $this->kaltura_code;
 	}
 }
-?>
