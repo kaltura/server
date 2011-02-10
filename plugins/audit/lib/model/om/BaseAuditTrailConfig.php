@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.audit
+ * @subpackage model.om
  */
 abstract class BaseAuditTrailConfig extends BaseObject  implements Persistent {
 

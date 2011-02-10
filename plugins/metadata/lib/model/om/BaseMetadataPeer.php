@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.metadata
+ * @subpackage model.om
  */
 abstract class BaseMetadataPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseMetadataPeer {
 	const OM_CLASS = 'Metadata';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.Metadata';
+	const CLASS_DEFAULT = 'plugins.metadata.Metadata';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'MetadataTableMap';

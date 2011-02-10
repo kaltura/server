@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.contentDistribution
+ * @subpackage model.om
  */
 abstract class BaseDistributionProfilePeer {
 
@@ -19,7 +20,7 @@ abstract class BaseDistributionProfilePeer {
 	const OM_CLASS = 'DistributionProfile';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.DistributionProfile';
+	const CLASS_DEFAULT = 'plugins.contentDistribution.DistributionProfile';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'DistributionProfileTableMap';

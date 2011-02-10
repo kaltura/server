@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.contentDistribution
+ * @subpackage model.om
  */
 abstract class BaseGenericDistributionProvider extends BaseObject  implements Persistent {
 

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.solr_search
+ * @subpackage model.om
  */
 abstract class BaseSolrLogServerPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSolrLogServerPeer {
 	const OM_CLASS = 'SolrLogServer';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SolrLogServer';
+	const CLASS_DEFAULT = 'plugins.solr_search.SolrLogServer';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SolrLogServerTableMap';

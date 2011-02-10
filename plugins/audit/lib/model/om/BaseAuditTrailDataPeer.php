@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.audit
+ * @subpackage model.om
  */
 abstract class BaseAuditTrailDataPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseAuditTrailDataPeer {
 	const OM_CLASS = 'AuditTrailData';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.AuditTrailData';
+	const CLASS_DEFAULT = 'plugins.audit.AuditTrailData';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'AuditTrailDataTableMap';

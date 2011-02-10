@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.annotation
+ * @subpackage model.om
  */
 abstract class BaseAnnotationPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseAnnotationPeer {
 	const OM_CLASS = 'Annotation';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.Annotation';
+	const CLASS_DEFAULT = 'plugins.annotation.Annotation';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'AnnotationTableMap';

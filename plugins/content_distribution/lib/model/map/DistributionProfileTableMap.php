@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.contentDistribution
+ * @subpackage model.map
  */
 class DistributionProfileTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.DistributionProfileTableMap';
+	const CLASS_NAME = 'plugins.contentDistribution.DistributionProfileTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class DistributionProfileTableMap extends TableMap {
 		$this->setName('distribution_profile');
 		$this->setPhpName('DistributionProfile');
 		$this->setClassname('DistributionProfile');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.contentDistribution');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

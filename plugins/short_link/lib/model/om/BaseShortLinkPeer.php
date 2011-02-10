@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.shortLink
+ * @subpackage model.om
  */
 abstract class BaseShortLinkPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseShortLinkPeer {
 	const OM_CLASS = 'ShortLink';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.ShortLink';
+	const CLASS_DEFAULT = 'plugins.shortLink.ShortLink';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'ShortLinkTableMap';

@@ -62,7 +62,7 @@ CREATE TABLE `entry_distribution`
 	`remote_id` VARCHAR(31),
 	`plays` INTEGER,
 	`views` INTEGER,
-	`validation_errors` VARCHAR(1023),
+	`validation_errors` TEXT,
 	`error_type` INTEGER,
 	`error_number` INTEGER,
 	`error_description` VARCHAR(255),

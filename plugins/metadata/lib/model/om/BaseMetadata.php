@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.metadata
+ * @subpackage model.om
  */
 abstract class BaseMetadata extends BaseObject  implements Persistent {
 

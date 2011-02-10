@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.contentDistribution
+ * @subpackage model.om
  */
 abstract class BaseEntryDistributionPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseEntryDistributionPeer {
 	const OM_CLASS = 'EntryDistribution';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.EntryDistribution';
+	const CLASS_DEFAULT = 'plugins.contentDistribution.EntryDistribution';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'EntryDistributionTableMap';

@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.audit
+ * @subpackage model.map
  */
 class AuditTrailTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.AuditTrailTableMap';
+	const CLASS_NAME = 'plugins.audit.AuditTrailTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class AuditTrailTableMap extends TableMap {
 		$this->setName('audit_trail');
 		$this->setPhpName('AuditTrail');
 		$this->setClassname('AuditTrail');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.audit');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.contentDistribution
+ * @subpackage model.map
  */
 class EntryDistributionTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.EntryDistributionTableMap';
+	const CLASS_NAME = 'plugins.contentDistribution.EntryDistributionTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class EntryDistributionTableMap extends TableMap {
 		$this->setName('entry_distribution');
 		$this->setPhpName('EntryDistribution');
 		$this->setClassname('EntryDistribution');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.contentDistribution');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -52,7 +53,7 @@ class EntryDistributionTableMap extends TableMap {
 		$this->addColumn('REMOTE_ID', 'RemoteId', 'VARCHAR', false, 31, null);
 		$this->addColumn('PLAYS', 'Plays', 'INTEGER', false, null, null);
 		$this->addColumn('VIEWS', 'Views', 'INTEGER', false, null, null);
-		$this->addColumn('VALIDATION_ERRORS', 'ValidationErrors', 'VARCHAR', false, 1023, null);
+		$this->addColumn('VALIDATION_ERRORS', 'ValidationErrors', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('ERROR_TYPE', 'ErrorType', 'INTEGER', false, null, null);
 		$this->addColumn('ERROR_NUMBER', 'ErrorNumber', 'INTEGER', false, null, null);
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'VARCHAR', false, 255, null);

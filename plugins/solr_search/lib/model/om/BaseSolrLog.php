@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.solr_search
+ * @subpackage model.om
  */
 abstract class BaseSolrLog extends BaseObject  implements Persistent {
 

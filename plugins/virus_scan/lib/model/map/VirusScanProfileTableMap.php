@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.virusScan
+ * @subpackage model.map
  */
 class VirusScanProfileTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.VirusScanProfileTableMap';
+	const CLASS_NAME = 'plugins.virusScan.VirusScanProfileTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class VirusScanProfileTableMap extends TableMap {
 		$this->setName('virus_scan_profile');
 		$this->setPhpName('VirusScanProfile');
 		$this->setClassname('VirusScanProfile');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.virusScan');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

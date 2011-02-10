@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.sphinxSearch
+ * @subpackage model.om
  */
 abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 

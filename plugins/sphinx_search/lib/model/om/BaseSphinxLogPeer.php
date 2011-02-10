@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.sphinxSearch
+ * @subpackage model.om
  */
 abstract class BaseSphinxLogPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseSphinxLogPeer {
 	const OM_CLASS = 'SphinxLog';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.SphinxLog';
+	const CLASS_DEFAULT = 'plugins.sphinxSearch.SphinxLog';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'SphinxLogTableMap';

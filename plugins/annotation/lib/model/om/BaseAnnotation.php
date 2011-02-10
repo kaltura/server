@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.annotation
+ * @subpackage model.om
  */
 abstract class BaseAnnotation extends BaseObject  implements Persistent {
 

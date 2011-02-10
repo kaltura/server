@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.metadata
+ * @subpackage model.map
  */
 class MetadataProfileTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.MetadataProfileTableMap';
+	const CLASS_NAME = 'plugins.metadata.MetadataProfileTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class MetadataProfileTableMap extends TableMap {
 		$this->setName('metadata_profile');
 		$this->setPhpName('MetadataProfile');
 		$this->setClassname('MetadataProfile');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.metadata');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

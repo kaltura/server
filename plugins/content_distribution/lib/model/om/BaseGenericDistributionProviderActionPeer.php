@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.contentDistribution
+ * @subpackage model.om
  */
 abstract class BaseGenericDistributionProviderActionPeer {
 
@@ -19,7 +20,7 @@ abstract class BaseGenericDistributionProviderActionPeer {
 	const OM_CLASS = 'GenericDistributionProviderAction';
 
 	/** A class that can be returned by this peer. */
-	const CLASS_DEFAULT = 'lib.model.GenericDistributionProviderAction';
+	const CLASS_DEFAULT = 'plugins.contentDistribution.GenericDistributionProviderAction';
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'GenericDistributionProviderActionTableMap';

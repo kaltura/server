@@ -11,14 +11,15 @@
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    lib.model.map
+ * @package plugins.solr_search
+ * @subpackage model.map
  */
 class SolrLogTableMap extends TableMap {
 
 	/**
 	 * The (dot-path) name of this class
 	 */
-	const CLASS_NAME = 'lib.model.map.SolrLogTableMap';
+	const CLASS_NAME = 'plugins.solr_search.SolrLogTableMap';
 
 	/**
 	 * Initialize the table attributes, columns and validators
@@ -33,7 +34,7 @@ class SolrLogTableMap extends TableMap {
 		$this->setName('solr_log');
 		$this->setPhpName('SolrLog');
 		$this->setClassname('SolrLog');
-		$this->setPackage('lib.model');
+		$this->setPackage('plugins.solr_search');
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

@@ -5,7 +5,8 @@
  *
  * 
  *
- * @package    lib.model.om
+ * @package plugins.shortLink
+ * @subpackage model.om
  */
 abstract class BaseShortLink extends BaseObject  implements Persistent {
 
