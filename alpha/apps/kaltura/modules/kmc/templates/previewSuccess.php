@@ -19,7 +19,7 @@ $thumbnailUrl = $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/t
 	<script src="/html5/html5lib/v<?php echo $html5_version; ?>/mwEmbedLoader.php"></script>
 </head>
 <body>
-	<div id="main">
+	<div id="main" style="position: static;">
 
 		<div class="content">
 			<div class="title">
