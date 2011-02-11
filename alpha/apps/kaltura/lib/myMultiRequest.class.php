@@ -105,7 +105,8 @@ class myMultiRequest extends defPartnerservices2Action
 				break;
 
 			$clazz_name = $service_name . "Action";
-$include_result = include_once ( "{$clazz_name}.class.php");
+
+//			$include_result = include_once ( "{$clazz_name}.class.php");
 			if ( $include_result )
 			{
 				$myaction = new $clazz_name(  );
