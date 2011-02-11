@@ -1,12 +1,5 @@
 ﻿<?php 
 
-if( $uiConf ) {
-    echo $uiConf->width;
-    echo '<pre>';
-    print_r($uiConf);
-    exit();
-}
-
 // Create swf url
 $swfUrl = "http://". $partner_host ."/index.php/kwidget";
 $swfUrl .= "/cache_st/" . time()+(60*15);
@@ -39,9 +32,9 @@ $thumbnailUrl = "http://". $partner_cdnHost ."/p/". $partner_id ."/sp/". $partne
 				<input style="width: 100px; font-size: 12px;" id="showVideo" type="button" value="Change entry" disabled="true">
 			</div><br />
 */?>
-			<div id="videoContainer" style="width:400px">
+			<div id="videoContainer">
 			    <object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" 
-				    allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="333" width="400" 
+				    allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->getHeight();?>" width="<?php echo $uiConf->getWidth();?>"
 				    xmlns:dc="http://purl.org/dc/terms/" 
 				    xmlns:media="http://search.yahoo.com/searchmonkey/media/" 
 				    rel="media:video" 
