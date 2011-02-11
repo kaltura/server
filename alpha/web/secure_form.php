@@ -183,7 +183,7 @@ HTML;
 		<form method="post">
 			<input type="hidden" name="do" value="email" />
 			<div class="left">Current email address:</div>
-			<div class="right current">{$this->email}</div>
+			<div class="right current truncated">{$this->email}</div>
 			<br class="clear" />
 			<div class="left">Edit email address:</div>
 			<div class="right"><input id="focused" type="text" name="email" value="{$this->email}" /></div>
@@ -345,6 +345,7 @@ HTML;
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
 		input { font-size: 13px; width: 160px; }
+		.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 		#submit {  } 
 		</style>
 	</head>
