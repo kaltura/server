@@ -1,13 +1,28 @@
 ﻿<?php 
 
-// Create swf url
+// Build SWF URL
 $swfUrl = $partner_host ."/index.php/kwidget";
 $swfUrl .= "/cache_st/" . (time()+(60*15));
 $swfUrl .= "/wid/_" . $partner_id;
 $swfUrl .= "/uiconf_id/" . $uiconf_id;
 $swfUrl .= "/entry_id/" . $entry_id;
 
+// Build Thumbnail URL
 $thumbnailUrl = $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/thumbnail". $entry_id ."/width/120/height/90/bgcolor/000000/type/2";
+
+// Set the current flash vars for delivery type
+switch($delivery_type) {
+
+    case "rtmp":
+	$flash_vars = "streamerType=rtmp&amp;";
+	break;
+    case "akamai":
+	$flash_vars = "mediaProtocol=hdnetwork&amp;";
+	break;
+    default:
+	$flash_vars = "";
+	break;
+}
 ?>
 <!doctype html>
 <html>
@@ -44,7 +59,7 @@ $thumbnailUrl = $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/t
 				<param name="allowNetworking" value="all" />
 				<param name="allowScriptAccess" value="always" />
 				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="&" />
+				<param name="flashVars" value="<?php echo $flash_vars; ?>" />
 				<param name="movie" value="<?php echo $swfUrl; ?>" />
 				<a href="http://corp.kaltura.com">video platform</a> 
 				<a href="http://corp.kaltura.com/video_platform/video_management">video management</a> 

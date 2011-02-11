@@ -24,6 +24,8 @@ class previewAction extends kalturaAction
 		if(!$this->entry_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'entry_id');
 
+		$this->delivery_type = $this->getRequestParameter('delivery');
+
 		$this->partner_host = myPartnerUtils::getHost($this->partner_id);
 		$this->partner_cdnHost = myPartnerUtils::getCdnHost($this->partner_id);
 	}
