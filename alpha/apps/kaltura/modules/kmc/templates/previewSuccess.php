@@ -1,6 +1,7 @@
 ﻿<?php 
 
 if( $uiConf ) {
+    echo $uiConf->width;
     echo '<pre>';
     print_r($uiConf);
     exit();
