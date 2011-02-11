@@ -299,7 +299,7 @@ batch.getexclusivealmostdoneconvertcollectionjobs|			|N		|1	|0		|0		|1		|rw	|		|
 batch.getexclusivealmostdonebulkdownloadjobs	|			|N		|1	|0		|0		|1		|rw	|		|	|   |
 
 
-report.getgraphs					|			|2		|1	|0		|0		|1		|rw	|		|	|   |ANALYTICS_BASE
+report.getgraphs					|			|2		|1	|0		|0		|1		|rw	|		|	|   |ANALYTICS_BASE,KMC_READ_ONLY
 report.gettotal						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ANALYTICS_BASE
 report.gettable						|			|2		|1	|0		|0		|1		|rw	|		|	|   |ANALYTICS_BASE
 report.geturlforreportascsv			|			|2		|1	|0		|0		|1		|rw	|		|	|   |ANALYTICS_BASE
