@@ -102,11 +102,12 @@ class secForm {
 	// Handle errors
 	function errorDiv() {
 		if( isset($this->error) && !empty($this->error) ) { 
-			//echo '<pre>'; print_r($_COOKIE); exit();
-			//return '<div class="error">' . $this->error . '</div><br />';
-			return '<script>alert(' . json_encode($this->error) . ');</script>'; 
+		    //echo '<pre>'; print_r($_COOKIE); exit();
+		    //return '<div class="error">' . $this->error . '</div><br />';
+		    $error = str_replace("&lt;", "<", $this->error);
+		    return '<script>alert(' . json_encode($error) . ');</script>';
 		} else {
-			return '';
+		    return '';
 		}		
 	}
 
