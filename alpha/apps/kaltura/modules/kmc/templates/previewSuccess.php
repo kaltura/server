@@ -1,13 +1,13 @@
 ﻿<?php 
 
 // Create swf url
-$swfUrl = "http://". $partner_host ."/index.php/kwidget";
-$swfUrl .= "/cache_st/" . time()+(60*15);
+$swfUrl = $partner_host ."/index.php/kwidget";
+$swfUrl .= "/cache_st/" . (time()+(60*15));
 $swfUrl .= "/wid/_" . $partner_id;
 $swfUrl .= "/uiconf_id/" . $uiconf_id;
 $swfUrl .= "/entry_id/" . $entry_id;
 
-$thumbnailUrl = "http://". $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/thumbnail". $entry_id ."/width/120/height/90/bgcolor/000000/type/2";
+$thumbnailUrl = $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/thumbnail". $entry_id ."/width/120/height/90/bgcolor/000000/type/2";
 ?>
 <!doctype html>
 <html>
