@@ -12,7 +12,7 @@ class previewAction extends kalturaAction
 		if(!$this->uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
 
-		$this->uiConf = uiConfPeer::retrieveByPK($uiconf_id);
+		$this->uiConf = uiConfPeer::retrieveByPK($this->uiconf_id);
 		if(!$this->uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
 
