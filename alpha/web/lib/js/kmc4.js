@@ -877,7 +877,7 @@ kmc.preview_embed = {
         }
 			
         var iframe_url = kmc.vars.service_url + '/html5/html5lib/v1.2/mwEmbedFrame.php/entry_id/' + id + '/wid/_' + kmc.vars.partner_id + '/uiconf_id/' + uiconf_id;
-        var script_url = kmc.vars.service_url + '/html5/html5lib/v1.2/mwEmbedLoader.php';
+        var script_url = kmc.vars.service_url + '/html5/html5lib/v1.3a/mwEmbedLoader.php';
 			
         embed_code = embed_code.replace("{MEDIA}", "video");	// to be replaced by real media type once doPreviewEmbed (called from within KMC>Content) starts passing full entry object			embed_code = embed_code.replace(/{ENTRY_ID}/gi, (is_playlist ? "-1" : id));
         embed_code = embed_code.replace(/{HEIGHT}/gi,uiconf_details.height);
