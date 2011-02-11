@@ -755,14 +755,14 @@ kmc.preview_embed = {
         kmc.log('buildHTML5Option');
         kmc.log(arguments);
 			
-        var long_url = kmc.vars.service_url + '/index.php/kmc/preview/p/' + partner_id + '/e/' + entry_id + '/u/' + uiconf_id;
+        var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id;
         kmc.client.getShortURL(long_url);
 			
         var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
         if(has_mobile_flavors) {
             description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
                 ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' +
-                '<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Creating Short URL...</span></div>';
+                '<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
         }
         var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' +
             ' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
@@ -815,7 +815,8 @@ kmc.preview_embed = {
             '<param name="allowScriptAccess" value="always" /><param name="bgcolor" value="#000000" />' +
             '<param name="flashVars" value="{FLASHVARS}&{FLAVOR}" /><param name="movie" value="http://{HOST}/index.php/kwidget' +
             '/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" />{ALT} {SEO} ' + '</object>',
-        iframe_tag : 	'<script type="text/javascript" src="{SCRIPT_URL}"></script><iframe id="kaltura_player_{CACHE_ST}" name="kaltura_player" src="{IFRAME_URL}"' +
+	script_tag :	'<script type="text/javascript" src="{SCRIPT_URL}"></script>',
+        iframe_tag : 	'<iframe id="kaltura_player_{CACHE_ST}" name="kaltura_player" src="{IFRAME_URL}"' +
             ' height="{HEIGHT}" width="{WIDTH}" frameborder="0">{ALT} {SEO}</iframe>',
         playlist_flashvars :	'playlistAPI.autoInsert=true&playlistAPI.kpl0Name={PL_NAME}' +
             '&playlistAPI.kpl0Url=http%3A%2F%2F{HOST}%2Findex.php%2Fpartnerservices2%2Fexecuteplaylist%3Fuid%3D%26' +
@@ -848,7 +849,7 @@ kmc.preview_embed = {
         embed_code;
         //			kmc.log(uiconf_details); alert("uiconf_details logged");
         //			alert("cache_st = " + cache_st);
-        embed_code = (html5) ? kmc.preview_embed.embed_code_template.iframe_tag : kmc.preview_embed.embed_code_template.object_tag;
+        embed_code = (html5) ? kmc.preview_embed.embed_code_template.script_tag + kmc.preview_embed.embed_code_template.object_tag : kmc.preview_embed.embed_code_template.object_tag;
         if(!kmc.vars.jw) { // more efficient to add "&& !kmc.vars.silverlight" (?)
             kmc.vars.embed_code_delivery_type = kmc.vars.embed_code_delivery_type || "http";
             if(kmc.vars.embed_code_delivery_type == "rtmp") {
