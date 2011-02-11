@@ -105,6 +105,7 @@ class secForm {
 		    //echo '<pre>'; print_r($_COOKIE); exit();
 		    //return '<div class="error">' . $this->error . '</div><br />';
 		    $error = str_replace("&lt;", "<", $this->error);
+		    $error = str_replace("&gt;", ">", $error);
 		    return '<script>alert(' . json_encode($error) . ');</script>';
 		} else {
 		    return '';
