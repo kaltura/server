@@ -740,7 +740,7 @@ kmc.preview_embed = {
     buildRtmpOptions : function() {
         var selected = ' selected="selected"';
         var delivery_type = kmc.vars.embed_code_delivery_type || "http";
-        var html = '<div id="rtmp" class="label">Select Delivery Type:</div> <div class="right"><select id="delivery_type">';
+        var html = '<div id="rtmp" class="label">Select Flash Delivery Type:</div> <div class="right"><select id="delivery_type">';
         var options = '<option value="http"' + ((delivery_type == "http") ? selected : "") + '>Progressive Download (HTTP)&nbsp;</option>' +
             '<option value="rtmp"' + ((delivery_type == "rtmp") ? selected : "") + '>Adaptive Streaming (RTMP)&nbsp;</option>';
         if(!kmc.vars.hide_akamai_hd_network) {
@@ -755,7 +755,7 @@ kmc.preview_embed = {
         kmc.log('buildHTML5Option');
         kmc.log(arguments);
 			
-        var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id;
+        var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
         kmc.client.getShortURL(long_url);
 			
         var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
