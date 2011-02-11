@@ -1,7 +1,4 @@
 ﻿<?php 
-if( ! $partner_id || ! $entry_id ) {
-	die('Missing entry id or partner id');	
-}
 
 if( $uiConf ) {
     echo '<pre>';
