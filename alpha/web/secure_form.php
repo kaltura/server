@@ -356,8 +356,23 @@ HTML;
 		.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 		#submit {  } 
 		</style>
+		<script>
+		function focusFirstInput() {
+			// check all the input in the form
+			alert('done');
+			for(i=0; i < document.forms[0].length; i++)
+			{
+			  // check if input is not hidden & not disabled
+			  if ( (document.forms[0][i].type != "hidden") && (document.forms[0][i].disabled != true) )
+			  {
+				document.forms[0][i].focus();
+				break;
+			  }
+			}
+		}
+		</script>
 	</head>
-	<body>
+	<body onload="focusFirstInput();">
 		<div id="wrapper">
 HTML;
 	
