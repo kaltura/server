@@ -16,6 +16,11 @@ class KalturaBulkUpload extends KalturaObject
 	public $uploadedBy;
 	
 	/**
+	 * @var string
+	 */
+	public $uploadedByUserId;
+	
+	/**
 	 * @var int
 	 */
 	public $uploadedOn;
@@ -62,6 +67,7 @@ class KalturaBulkUpload extends KalturaObject
 		if($jobData instanceof kBulkUploadJobData)
 		{
 			$this->uploadedBy = $jobData->getUploadedBy();
+			$this->uploadedByUserId = $jobData->getUserId();
 			$this->numOfEntries = $jobData->getNumOfEntries();
 		}
 		
