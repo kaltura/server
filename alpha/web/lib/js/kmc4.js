@@ -222,8 +222,9 @@ kmc.utils = {
     resize : function() {
         var doc_height = $(document).height(),
         offset = $.browser.mozilla ? 37 : 74;
-        doc_height = (doc_height-offset)+"px";
+        doc_height = (doc_height-offset);
 	doc_height = (doc_height < 590) ? 590 : doc_height;
+	doc_height = doc_height + "px";
         $("#flash_wrap").height(doc_height);
         $("#server_wrap iframe").height(doc_height);
     },
