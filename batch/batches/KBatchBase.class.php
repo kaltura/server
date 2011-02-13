@@ -263,7 +263,10 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		$rand = rand(0, 32000);
 		$rand = microtime(true);
 		$expiry = time() + $expiry;
-		$fields = array($partnerId, '', $expiry, $sessionType, $rand, $puserId, $privileges);
+		$masterPartnerId = $this->taskConfig->getPartnerId();
+		$additionalData = null;
+		
+		$fields = array($partnerId, '', $expiry, $sessionType, $rand, $puserId, $privileges, $masterPartnerId, $additionalData);
 		$str = implode(";", $fields);
 		
 		$salt = $adminSecret;
