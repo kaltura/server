@@ -56,8 +56,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($object instanceof EntryDistribution)
 		{
 			$entry = entryPeer::retrieveByPK($object->getEntryId());
-			if($entry) // updated in the indexing server (sphinx)
-				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+			if($entry)
+			{
+				$entry->setUpdatedAt(time());
+				$entry->save();
+			}
 		}
 		
 		return true;

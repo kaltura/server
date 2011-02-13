@@ -114,7 +114,10 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		// updated in the indexing server (sphinx)
 		$relatedObject = kMetadataManager::getObjectFromPeer($object);
 		if($relatedObject && $relatedObject instanceof IIndexable)
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($relatedObject));
+		{
+			$relatedObject->setUpdatedAt(time());
+			$relatedObject->save();
+		}
 		
 		return true;
 	}
