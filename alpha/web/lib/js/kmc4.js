@@ -384,7 +384,7 @@ kmc.utils = {
         XD.receiveMessage(function(message){
             if(message.data == "reload") {
                 kmc.utils.closeModal();
-                window.location.href = window.location.href;
+                alert(window.location.href);// = window.location.href;
             } else {
                 kmc.utils.closeModal();
             }
