@@ -62,8 +62,9 @@ kmc.functions = {
                 return;
             }
         }
-        document.getElementById("flash_wrap").style.visibility = "visible";
-        kalturaCloseModalBox();
+        //document.getElementById("flash_wrap").style.visibility = "visible";
+        //kalturaCloseModalBox();
+	kmc.utils.closeModal();
     },
     saveEditor : function() { // KSE
         return;
