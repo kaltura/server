@@ -43,6 +43,8 @@ class KBatchEvent extends KDwhEventBase
 	const EVENT_KILLER_FILE_DOESNT_EXIST = 7;
 	const EVENT_KILLER_FILE_IDLE = 8;
 	const EVENT_KILLER_UP = 9;
+	const EVENT_BATCH_QUEUE = 10;
+	const EVENT_BATCH_RUNNING = 11;
 	
 	public $batch_client_version = null; 	// varchar(20)
 	public $batch_event_type_id = null; 	// smallint
