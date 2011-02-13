@@ -33,10 +33,10 @@ metadataprofile.revert				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFI
 
 
 metadata.list						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MANAGE_BASE,KMC_READ_ONLY
-metadata.add						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
-metadata.addfromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
-metadata.addfromurl					|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
-metadata.delete						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
+metadata.add						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
+metadata.addfromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
+metadata.addfromurl					|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
+metadata.delete						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
 metadata.get						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_BASE
 metadata.update						|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
-metadata.updatefromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA
+metadata.updatefromfile				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CONTENT_MANAGE_CUSTOM_DATA,CONTENT_MODERATE_CUSTOM_DATA
