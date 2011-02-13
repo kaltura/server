@@ -161,7 +161,8 @@ HTML;
 		
 		$client = $this->getClient();
 		try {
-			$client->user->updateLoginData($this->email, $_POST['cur_password'], $this->email, $_POST['new_password']);
+			//updateLoginData accepts [oldUserID, oldPassword, newUserID, newPassword, newFirstName, newLastName)
+			$client->user->updateLoginData($this->email, $_POST['cur_password'], null, $_POST['new_password'], null, null);
 			
 			// Show success message
 			$this->showSuccess();
@@ -217,7 +218,7 @@ HTML;
 		}
 		$client = $this->getClient();
 		try {
-			$client->user->updateLoginData($this->email, $_POST['password'], $_POST['email'], $_POST['password']);
+			$client->user->updateLoginData($this->email, $_POST['password'], $_POST['email'], null, null, null);
 			
 			// Show success message
 			$this->showSuccess();
@@ -275,11 +276,14 @@ HTML;
 		try {
 			
 			// Changing name
+			/*
 			$user = new KalturaUser();
 			$user->id = $this->userId;
 			$user->firstName = $_POST['fname'];
 			$user->lastName = $_POST['lname'];
 			$results = $client->user->update($this->userId, $user);
+			 */
+			$client->user->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
 			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
 			// Show success message
