@@ -289,7 +289,7 @@ class myPartnerUtils
 	public static function getCdnHost ( $partner_id, $protocol = null )
 	{
 		// in case the request came through https, force https url
-		if (@$_SERVER['HTTPS'] == 'on')
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
 			$protocol = 'https';
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
