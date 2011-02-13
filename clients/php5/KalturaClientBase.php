@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
 class KalturaClientBase 
 {
 	const KALTURA_SERVICE_FORMAT_JSON = 1;
@@ -34,6 +38,21 @@ class KalturaClientBase
 	 * @var unknown_type
 	 */
 	private $callsQueue = array();
+
+	/**
+	 * Array of all plugin services
+	 *
+	 * @var array<KalturaServiceBase>
+	 */
+	protected $pluginServices = array();
+	
+	public function __get($serviceName)
+	{
+		if(isset($this->pluginServices[$serviceName]))
+			return $this->pluginServices[$serviceName];
+		
+		return null;
+	}
 	
 	/**
 	 * Kaltura client constructor
@@ -48,6 +67,37 @@ class KalturaClientBase
 		if ($logger)
 		{
 			$this->shouldLog = true;	
+		}
+		
+		// load all plugins
+		$pluginsFolder = realpath(dirname(__FILE__)) . '/KalturaPlugins';
+		if(is_dir($pluginsFolder))
+		{
+			$dir = dir($pluginsFolder);
+			while (false !== $fileName = $dir->read())
+			{
+				$matches = null;
+				if(preg_match('/^([^.]+).php$/', $fileName, $matches))
+				{
+					require_once("$pluginsFolder/$fileName");
+					
+					$pluginClass = $matches[1];
+					if(!class_exists($pluginClass) || !in_array('IKalturaClientPlugin', class_implements($pluginClass)))
+						continue;
+						
+					$plugin = call_user_func(array($pluginClass, 'get'), $this);
+					if(!($plugin instanceof IKalturaClientPlugin))
+						continue;
+						
+					$pluginName = $plugin->getName();
+					$services = $plugin->getServices();
+					foreach($services as $serviceName => $service)
+					{
+						$service->setClient($this);
+						$this->pluginServices[$serviceName] = $service;
+					}
+				}
+			}
 		}
 	}
 
@@ -434,6 +484,44 @@ class KalturaClientBase
 	}
 }
 
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
+interface IKalturaClientPlugin
+{
+	/**
+	 * @return KalturaClientPlugin
+	 */
+	public static function get(KalturaClient $client);
+	
+	/**
+	 * @return array<KalturaServiceBase>
+	 */
+	public function getServices();
+	
+	/**
+	 * @return string
+	 */
+	public function getName();
+}
+
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
+abstract class KalturaClientPlugin implements IKalturaClientPlugin
+{
+	protected function __construct(KalturaClient $client)
+	{
+		
+	}
+}
+
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
 class KalturaServiceActionCall
 {
 	/**
@@ -514,8 +602,10 @@ class KalturaServiceActionCall
 }
 
 /**
- * Abstract base class for all client services 
- *
+ * Abstract base class for all client services
+ *  
+ * @package External
+ * @subpackage Kaltura
  */
 abstract class KalturaServiceBase
 {
@@ -529,15 +619,25 @@ abstract class KalturaServiceBase
 	 *
 	 * @param KalturaClient $client
 	 */
-	public function __construct(KalturaClient $client)
+	public function __construct(KalturaClient $client = null)
+	{
+		$this->client = $client;
+	}
+						
+	/**
+	 * @param KalturaClient $client
+	 */
+	public function setClient(KalturaClient $client)
 	{
 		$this->client = $client;
 	}
 }
 
 /**
- * Abstract base class for all client objects 
- *
+ * Abstract base class for all client objects
+ * 
+ * @package External
+ * @subpackage Kaltura
  */
 abstract class KalturaObjectBase
 {
@@ -568,6 +668,10 @@ abstract class KalturaObjectBase
 	}
 }
 
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
 class KalturaException extends Exception 
 {
     public function __construct($message, $code) 
@@ -577,6 +681,10 @@ class KalturaException extends Exception
     }
 }
 
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
 class KalturaClientException extends Exception 
 {
 	const ERROR_GENERIC = -1;
@@ -589,6 +697,10 @@ class KalturaClientException extends Exception
 	const ERROR_INVALID_OBJECT_TYPE = -8;
 }
 
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
 class KalturaConfiguration
 {
 	private $logger;
@@ -635,7 +747,9 @@ class KalturaConfiguration
 
 /**
  * Implement to get Kaltura Client logs
- *
+ * 
+ * @package External
+ * @subpackage Kaltura
  */
 interface IKalturaLogger 
 {
