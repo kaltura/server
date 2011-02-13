@@ -384,6 +384,7 @@ kmc.utils = {
         XD.receiveMessage(function(message){
             if(message.data == "reload") {
                 kmc.utils.closeModal();
+		alert(kmc.vars.service_url + "/index.php/kmc/#account|user");
                 window.location.href = kmc.vars.service_url + "/index.php/kmc/#account|user";
             } else {
                 kmc.utils.closeModal();
