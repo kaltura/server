@@ -345,8 +345,8 @@ kmc.utils = {
             case "email":
                 title = "Change Email Address";
                 break;
-                case "name":
-                    title = "Edit Name";
+            case "name":
+                title = "Edit Name";
                 break;
         }
 			
@@ -364,7 +364,7 @@ kmc.utils = {
         url = url + '&parent=' + encodeURIComponent(document.location.href);
 			
         var modal_width = 370;
-        var modal_height = 160;
+        var modal_height = (action  == "name") ? 180 : 160 ;
         var iframe_width = modal_width;
         if( $.browser.msie ) {
             modal_width = modal_width + 24;
