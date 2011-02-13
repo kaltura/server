@@ -119,7 +119,10 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		if(count($this->matchClause))
 		{
-			$matches = '(' . implode(') & (', $this->matchClause) . ')';
+			$matches = reset($this->matchClause);
+			if(count($this->matchClause) > 1)
+				$matches = '(' . implode(') & (', $this->matchClause) . ')';
+				
 			$this->whereClause[] = "MATCH('$matches')";
 		}
 		

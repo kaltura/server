@@ -285,7 +285,13 @@ class SphinxEntryCriteria extends SphinxCriteria
 				}
 			}
 			if(count($additionalConditions))
-				$this->matchClause[] = implode(' | ', $additionalConditions);
+			{	
+				$matches = reset($additionalConditions);
+				if(count($additionalConditions) > 1)
+					$matches = '(' . implode(') | (', $additionalConditions) . ')';
+					
+				$this->matchClause[] = $matches;
+			}
 		}
 		$filter->unsetByName('_free_text');
 		
