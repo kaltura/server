@@ -119,8 +119,8 @@ kmc.functions = {
     openChangeEmail : function(email) {
         kmc.utils.secureIframe('email', { email: email } );
     },
-    openChangeName : function(fname, lname) {
-        kmc.utils.secureIframe('name', { fname: fname, lname: lname } );
+    openChangeName : function(fname, lname, email) {
+        kmc.utils.secureIframe('name', { fname: fname, lname: lname, email: email } );
     }
 };
 
@@ -223,6 +223,7 @@ kmc.utils = {
         var doc_height = $(document).height(),
         offset = $.browser.mozilla ? 37 : 74;
         doc_height = (doc_height-offset)+"px";
+	doc_height = (doc_height < 590) ? 590 : doc_height;
         $("#flash_wrap").height(doc_height);
         $("#server_wrap iframe").height(doc_height);
     },
