@@ -7,7 +7,7 @@ function checkCache()
 	$start_time = microtime(true);
 
 	$uri = $_SERVER["REQUEST_URI"];
-	$protocol = (@$_SERVER['HTTPS'] == 'on') ? "https" : "http";
+	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
 	if (strpos($uri, "/partnerservices2") !== false)
 	{
