@@ -25,7 +25,7 @@ documents.convert					|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_RECONVE
 documents.addfromentry				|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
 documents.addfromflavorasset		|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
 documents.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |CONTENT_MANAGE_BASE
-documents.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
+documents.update					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 documents.delete					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_DELETE
 documents.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
 documents.upload					|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD

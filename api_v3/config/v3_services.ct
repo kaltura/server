@@ -89,7 +89,7 @@ media.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 media.convert						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_RECONVERT
 media.addfromentry					|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
 media.addfromflavorasset			|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
-media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
+media.update						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 media.upload						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 media.delete						|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 media.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
@@ -130,7 +130,7 @@ mixing.anonymousrank				|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MODERATE_META
 
 data.add							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 data.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
-data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
+data.update							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 data.delete							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_DELETE
 data.list							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,PLAYLIST_BASE,PLAYLIST_ADD,PLAYLIST_UPDATE
 data.serve							|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_MANAGE_BASE
@@ -405,7 +405,7 @@ permission.getcurrentpermissions    |			|0		|1	|0		|0		|1		|	|		|	|   |
 
 document.addfromuploadedfile		|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
 document.get						|			|1		|1	|1		|2		|1		|r	|		|1	|   |CONTENT_MANAGE_BASE
-document.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
+document.update						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_METADATA,CONTENT_MODERATE_METADATA,CONTENT_MANAGE_ASSIGN_CATEGORIES,CONTENT_MANAGE_THUMBNAIL,CONTENT_MANAGE_SCHEDULE,CONTENT_MANAGE_ACCESS_CONTROL
 document.delete						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_MANAGE_DELETE
 document.list						|			|1		|1	|1		|2		|1		|r	|		|	|   |CONTENT_MANAGE_BASE
 document.upload						|			|1		|1	|1		|2		|1		|rw	|		|	|   |CONTENT_INGEST_UPLOAD
