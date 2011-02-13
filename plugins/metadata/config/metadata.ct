@@ -21,9 +21,9 @@ name								|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags
 ------------------------------------------------------------------------------------------------
 
 metadataprofile.list				|			|1		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_BASE,CONTENT_MANAGE_BASE,CONTENT_MODERATE_BASE,KMC_READ_ONLY,CONTENT_MANAGE_DISTRIBUTION_PROFILE_MODIFY,SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY
-metadataprofile.add					|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_ADD
+metadataprofile.add					|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_ADD,CUSTOM_DATA_FIELD_ADD
 metadataprofile.addfromfile			|			|2		|1	|1		|2		|1		|	|		|	|   |CUSTOM_DATA_PROFILE_ADD
-metadataprofile.delete				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_DELETE
+metadataprofile.delete				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_DELETE,CUSTOM_DATA_FIELD_DELETE
 metadataprofile.get					|			|1		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_BASE
 metadataprofile.update				|			|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_UPDATE,CUSTOM_DATA_FIELD_ADD,CUSTOM_DATA_FIELD_UPDATE,CUSTOM_DATA_FIELD_DELETE
 metadataprofile.updatedefinitionfromfile|		|2		|1	|0		|0		|1		|rw	|		|	|   |CUSTOM_DATA_PROFILE_UPDATE
