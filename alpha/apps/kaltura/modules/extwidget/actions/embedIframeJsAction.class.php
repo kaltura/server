@@ -17,16 +17,6 @@ class embedIframeJsAction extends sfAction
 		$partner_id = $this->getRequestParameter('partner_id', $uiConf->getPartnerId());
 		if(!$partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
-
-		$subp_id = $uiConf->getSubpId();
-		if(!$subp_id)
-		{
-			$partner = PartnerPeer::retrieveByPK($partner_id);
-			if(!$partner)
-				KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
-				
-			$subp_id = $partner->getSubpid();
-		}
 		
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
