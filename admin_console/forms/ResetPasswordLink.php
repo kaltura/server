@@ -11,13 +11,23 @@ class Form_ResetPasswordLink extends Zend_Form
 			'required'   => true,
 			'filters'	=> array('StringTrim'),
 			'validators' => array(),
+			'decorators' => array(
+				'ViewHelper',
+				'Label',
+				array('HtmlTag', array('tag' => 'div', 'class' => 'item')) 
+			)
 		));
 		
 		$this->addElement('password', 'newPasswordConfirm', array(
-			'label'	  => 'Confirm new password:',
+			'label'	  => 'Confirm password:',
 			'required'   => true,
 			'filters'	=> array('StringTrim'),
 			'validators' => array(),
+			'decorators' => array(
+				'ViewHelper',
+				'Label',
+				array('HtmlTag', array('tag' => 'div', 'class' => 'item')) 
+			)
 		));
 		
 		$this->addElement('button', 'submit', array(

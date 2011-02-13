@@ -2,8 +2,7 @@
 * { margin:0; padding:0;}
 html, body { margin:0; padding:0; height: 100%; }
  body { background:#f4f4f4; font: normal 11px arial,sans-serif; color:#2B2B2B;}
-  body#user-login { background:#0E3B5A;}
-  body#user-reset-password-link { background:#0E3B5A;}
+  body#user-login, body#user-reset-password-link { background:#0E3B5A;}
   h1 { font: bold 18px arial,sans-serif; color:#2B2B2B;}
   p { max-width:900px; margin: 0 0 5px;}
   ul, ol { margin-left:20px;}
@@ -207,65 +206,35 @@ div#my_info, div#new_admin { clear: both;}
 
 	 
 /* user-login */
-#user-login { background: #272929; font-size: 12px; color: #414141; }
-#user-login #header { background: none; }
-#user-login #sub-header { background: none; }
+#user-login ,#user-reset-password-link { background: #272929; font-size: 12px; color: #414141; }
+#user-login #header, #user-reset-password-link #header { background: none; }
+#user-login #sub-header, #user-reset-password-link #sub-header { background: none; }
 	 
-#user-login div.box { position:relative; margin: 60px auto 0; width: 380px; background:#fff; -moz-border-radius:8px;}
-#user-login .header { height: 35px; background: #DCE4E8 url(../images/sprite.png) repeat-x 0 -239px; -moz-border-radius-topright:8px; -moz-border-radius-topleft:8px; -webkit-border-radius-topright:8px; -webkit-border-radius-topleft:8px;}
-#user-login .main { padding: 15px; }
-#user-login .footer { bottom: 0px; height: 52px; background: #E0E7EA url(../images/sprite.png) repeat-x 0 -275px; -moz-border-radius-bottomright:8px; -moz-border-radius-bottomleft:8px; -webkit-border-radius-bottomright:8px; -webkit-border-radius-bottomleft:8px;}
+#user-login div.box, #user-reset-password-link div.box { position:relative; margin: 60px auto 0; width: 380px; background:#fff; -moz-border-radius:8px;}
+#user-login .header, #user-reset-password-link .header { height: 35px; background: #DCE4E8 url(../images/sprite.png) repeat-x 0 -239px; -moz-border-radius-topright:8px; -moz-border-radius-topleft:8px; -webkit-border-radius-topright:8px; -webkit-border-radius-topleft:8px;}
+#user-login .main, #user-reset-password-link .main { padding: 15px; }
+#user-login .footer, #user-reset-password-link .footer { bottom: 0px; height: 52px; background: #E0E7EA url(../images/sprite.png) repeat-x 0 -275px; -moz-border-radius-bottomright:8px; -moz-border-radius-bottomleft:8px; -webkit-border-radius-bottomright:8px; -webkit-border-radius-bottomleft:8px;}
 	 
-#user-login p.hint { color: #FF3200; }
-#user-login h1 { font-size: 16px; padding: 8px 0 0 14px; color: #7AA5B3; }
+#user-login p.hint, #user-reset-password-link p.hint { color: #FF3200; }
+#user-login h1, #user-reset-password-link h1 { font-size: 16px; padding: 8px 0 0 14px; color: #7AA5B3; }
 #user-login form input[type=text], #user-login input.text { width:155px; height:17px; padding:3px 3px 0; margin-top:1px; -moz-border-radius:4px; -webkit-border-radius:4px;}
-#user-login .item { padding: 5px 0; }
-#user-login .item label { float: left; clear: both; padding: 5px 0; width: 110px; }
+#user-reset-password-link form input[type=password], #user-reset-password-link input.text { width:155px; height:17px; padding:3px 3px 0; margin-top:1px; -moz-border-radius:4px; -webkit-border-radius:4px;}
+#user-login .item, #user-reset-password-link .item { padding: 5px 0; }
+#user-login .item label, #user-reset-password-link .item label { float: left; clear: both; padding: 5px 0; width: 110px; }
 #user-login .rememeber { clear: both; padding: 10px 0; width: 100%; font-weight: bold; }
-#user-login form.login button { bottom: 0; position: absolute; right: 0; margin: 12px;}
-#user-login form.login label { display: block; padding-left: 0px; padding-top: 4px; }
+#user-login form.login button, #user-reset-password-link form.login button { bottom: 0; position: absolute; right: 0; margin: 12px;}
+#user-login form.login label, #user-reset-password-link form.login label { display: block; padding-left: 0px; padding-top: 4px; }
 #user-login form.login .rememeber label { display: inline; }
 #user-login #remember_me { margin-right:4px;}
 
 	 
-#user-login hr { color: #C4CCCC; height: 0px; border: none; border-top: solid 1px #C4CCCC; border-bottom: solid 1px #EEEEEE; }
+#user-login hr, #user-reset-password-link hr { color: #C4CCCC; height: 0px; border: none; border-top: solid 1px #C4CCCC; border-bottom: solid 1px #EEEEEE; }
 #user-login .reset-link { position: relative; top: 15px; left: 20px; }
 #user-login .reset-wrapper { display: none; height: 100px; zoom:1; min-height:1%;}
  #user-login .reset-wrapper p { margin-bottom:12px;}
  .display { display:table;}
 #user-login .reset-txt { margin: 8px 0 10px; }
 #user-login form.reset button { margin-left: 3px; }
-
-/* user-reset-password-link */
-#user-reset-password-link { background: #272929; font-size: 12px; color: #414141; }
-#user-reset-password-link #header { background: none; }
-#user-reset-password-link #sub-header { background: none; }
-	 
-#user-reset-password-link div.box { position:relative; margin: 60px auto 0; width: 380px; background:#fff; -moz-border-radius:8px;}
-#user-reset-password-link .header { height: 35px; background: #DCE4E8 url(../images/sprite.png) repeat-x 0 -239px; -moz-border-radius-topright:8px; -moz-border-radius-topleft:8px; -webkit-border-radius-topright:8px; -webkit-border-radius-topleft:8px;}
-#user-reset-password-link .main { padding: 15px; }
-#user-reset-password-link .footer { bottom: 0px; height: 52px; background: #E0E7EA url(../images/sprite.png) repeat-x 0 -275px; -moz-border-radius-bottomright:8px; -moz-border-radius-bottomleft:8px; -webkit-border-radius-bottomright:8px; -webkit-border-radius-bottomleft:8px;}
-	 
-#user-reset-password-link p.hint { color: #FF3200; }
-#user-reset-password-link h1 { font-size: 16px; padding: 8px 0 0 14px; color: #7AA5B3; }
-#user-reset-password-link form input[type=text], #user-reset-password-link input.text { width:155px; height:17px; padding:3px 3px 0; margin-top:1px; -moz-border-radius:4px; -webkit-border-radius:4px;}
-#user-reset-password-link .item { padding: 5px 0; }
-#user-reset-password-link .item label { float: left; clear: both; padding: 5px 0; width: 110px; }
-#user-reset-password-link .rememeber { clear: both; padding: 10px 0; width: 100%; font-weight: bold; }
-#user-reset-password-link form.login button { bottom: 0; position: absolute; right: 0; margin: 12px;}
-#user-reset-password-link form.login label { display: block; padding-left: 0px; padding-top: 4px; }
-#user-reset-password-link form.login .rememeber label { display: inline; }
-#user-reset-password-link #remember_me { margin-right:4px;}
-
-	 
-#user-reset-password-link hr { color: #C4CCCC; height: 0px; border: none; border-top: solid 1px #C4CCCC; border-bottom: solid 1px #EEEEEE; }
-#user-reset-password-link .reset-link { position: relative; top: 15px; left: 20px; }
-#user-reset-password-link .reset-wrapper { display: none; height: 100px; zoom:1; min-height:1%;}
- #user-reset-password-link .reset-wrapper p { margin-bottom:12px;}
- .display { display:table;}
-#user-reset-password-link .reset-txt { margin: 8px 0 10px; }
-#user-reset-password-link form.reset button { margin-left: 3px; }
-		
 		
 /* partner-create */
 #partner-create form { clear: both; }
@@ -327,11 +296,10 @@ body#monitoring-xymon {}
 
 	a#help { width:16px; height:17px; margin: 0 -16px 0 0; float:right; display:block; text-indent:-9999px; background: url(../images/sprite.png) no-repeat 0 -74px; cursor:help;} /* -44px -5px 0 0 */
 	a#help { display:none;}
-	 body#user-login a#help { margin-top:-35px; display:none;}
+	 body#user-login a#help, body#user-reset-password-link a#help { margin-top:-35px; display:none;}
 
 	#wrapper { padding: 0 0 22px 21px; display:table; zoom:1;}
-	 body#user-login #wrapper { display:block;}
-	body#user-reset-password-link #wrapper { display:block;}
+	 body#user-login #wrapper, body#user-reset-password-link #wrapper { display:block;}
 	ul#summary { margin: 6px 0 24px; font-weight:bold; padding: 2px 0 0;}
 	ul#summary li { list-style: square inside none; margin: 0 0 6px 12px;}
 	ul#summary li span { font-weight:normal;}
