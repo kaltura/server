@@ -173,6 +173,7 @@ class KGenericScheduler
 		$this->logDir = $this->schedulerConfig->getLogDir();
 		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
 		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
+		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
 				
 		set_time_limit($this->maxExecutionTime);
 		
@@ -257,6 +258,7 @@ class KGenericScheduler
 					$proc->_cleanup();
 					unset($tasks[$index]);
 				}
+				self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$taskName]));
 			}
 			
 			foreach($runningBatches as $workerName => $indexes)
@@ -330,6 +332,7 @@ class KGenericScheduler
 		$proc = new KProcessWrapper($taskIndex, $this->logDir, $this->phpPath, $tasksetPath, clone $taskConfig);
 						
 		$this->runningTasks[$taskConfig->name][$taskIndex] = &$proc;
+		self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$taskConfig->name]));
 	}
 
 	/**
@@ -468,10 +471,13 @@ class KGenericScheduler
 			if(!count($tasks))
 				continue;
 				
+			$taskConfig = null;
 			foreach($tasks as $index => &$proc)
 			{
+				$taskConfig = $proc->taskConfig;
 				$proc->_cleanup();
 			}
+			self::onRunningInstancesEvent($taskConfig, 0);
 		}
 		
 		$this->runningTasks = array();
@@ -530,8 +536,13 @@ class KGenericScheduler
 				
 			$this->queueSizes[$workerId] = $size;
 			
-			if($size && $size != $oldSize)
-				KalturaLog::info("Worker $taskConfig->name, queue size: $size");
+			if($size != $oldSize)
+			{
+				self::onQueueEvent($taskConfig, $size);
+				
+				if($size)
+					KalturaLog::info("Worker $taskConfig->name, queue size: $size");
+			}
 				
 			return;
 		}
@@ -692,7 +703,10 @@ class KGenericScheduler
 		}
 		
 		$proc = &$this->runningTasks[$name][$batchIndex];
+		$taskConfig = $proc->taskConfig;
 		$proc->_cleanup();
+		
+		self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$name]));
 		
 		KalturaLog::info("$name [$batchIndex] killed");
 		
@@ -759,6 +773,38 @@ class KGenericScheduler
 			$description = "Could not find any job of type $type";
 		
 		return $found_any;
+	}
+	
+	protected function onQueueEvent(KSchedularTaskConfig $taskConfig, $queueSize)
+	{
+		$event = new KBatchEvent();
+		$event->batch_event_type_id = KBatchEvent::EVENT_BATCH_QUEUE;
+		$event->value_1 = $queueSize;
+		
+		self::onEvent($event, $taskConfig);
+	}
+	
+	protected function onRunningInstancesEvent(KSchedularTaskConfig $taskConfig, $runningInstances)
+	{
+		$event = new KBatchEvent();
+		$event->batch_event_type_id = KBatchEvent::EVENT_BATCH_RUNNING;
+		$event->value_1 = $runningInstances;
+		
+		self::onEvent($event, $taskConfig);
+	}
+	
+	protected function onEvent(KBatchEvent $event, KSchedularTaskConfig $taskConfig)
+	{
+		$event->batch_client_version = "1.0";
+		$event->batch_event_time = time();
+		
+		$event->batch_name = $taskConfig->name;
+		$event->section_id = $taskConfig->id;
+		$event->batch_type = $taskConfig->type;
+		$event->location_id = $this->schedulerConfig->getId();
+		$event->host_name = $this->schedulerConfig->getName();
+	
+		KDwhClient::send($event);
 	}
 }
 
