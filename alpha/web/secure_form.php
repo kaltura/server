@@ -359,7 +359,6 @@ HTML;
 		<script>
 		function focusFirstInput() {
 			// check all the input in the form
-			alert('done');
 			for(i=0; i < document.forms[0].length; i++)
 			{
 			  // check if input is not hidden & not disabled
