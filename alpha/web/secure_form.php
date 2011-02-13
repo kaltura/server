@@ -247,7 +247,11 @@ HTML;
 			<br class="clear" />
 			<div class="left">Edit Last Name:</div>
 			<div class="right"><input type="text" name="lname" value="{$this->lname}" /></div>
-			<br class="clear" /><br />
+			<br class="clear" />
+			<div class="left">Password:</div>
+			<div class="right"><input type="password" name="password" /></div>
+			<br class="clear" />
+			<div class="note">* Password is required for editing your name.</div><br />
 			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
 			{$this->errorDiv()}			
 		</form>
@@ -262,7 +266,7 @@ HTML;
 		$this->curAction = 'name';		
 
 		// Checks if we have empty fields
-		$required = array('fname', 'lname');
+		$required = array('fname', 'lname', 'password');
 		foreach($required as $req) {
 			if( empty($_POST[$req]) ) {
 				$this->error = 'You must fill all the fields.';
