@@ -278,7 +278,7 @@ abstract class kFileTransferMgr
 			$last_error = error_get_last();
 			throw new kFileTransferMgrException ( "Can't authenticate [$user] - " . $last_error['message'], kFileTransferMgrException::cantAuthenticate);
 		}
-		$this->start_dir = $this->doPwd();
+		$this->start_dir = kString::removeNewLine($this->doPwd());
 	}
 
 
@@ -315,7 +315,7 @@ abstract class kFileTransferMgr
 			$last_error = error_get_last();
 			throw new kFileTransferMgrException ( "Can't authenticate [$user] - " . $last_error['message'], kFileTransferMgrException::cantAuthenticate);
 		}
-		$this->start_dir = $this->doPwd();
+		$this->start_dir = kString::removeNewLine($this->doPwd());
 	}
 
 
@@ -534,6 +534,8 @@ abstract class kFileTransferMgr
 	 */
 	public function fileExists($remote_file)
 	{
+		$remote_file = trim($remote_file);
+		
 		KalturaLog::debug("Checking if file exists [$remote_file]");
 		
 		if ($this->start_dir && strpos($this->start_dir, $remote_file) === 0) {
