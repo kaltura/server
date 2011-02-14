@@ -22,7 +22,7 @@ KAutoloader::setIncludePath(array(
 	KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library"),
 ));
 
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/unitTest/api/classMap.cache');
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/unitTest_api/classMap.cache');
 KAutoloader::register();
 
 // Timezone

@@ -20,7 +20,7 @@ KAutoloader::setClassPath ( array( 	KAutoloader::buildPath ( KALTURA_ROOT_PATH, 
 KAutoloader::setIncludePath ( array (KAutoloader::buildPath ( KALTURA_ROOT_PATH, "vendor", "ZendFramework", "library" ) ) );
 
 //File path to entire server cache folder
-KAutoloader::setClassMapFilePath ( kConf::get ( "cache_root_path" ) . 'unitTest/clientSide/classMap.cache' );
+KAutoloader::setClassMapFilePath ( kConf::get ( "cache_root_path" ) . 'unitTest_clientSide/classMap.cache' );
 
 KAutoloader::register ();
 
