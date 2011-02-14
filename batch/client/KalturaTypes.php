@@ -32,7 +32,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $userId = null;
 

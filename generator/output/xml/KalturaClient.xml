@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1297356734">
-  <!-- Generated on date 10/02/11 16:52:14 -->
+<xml apiVersion="3.1.1" generatedDate="1297700626">
+  <!-- Generated on date 14/02/11 18:23:46 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -388,9 +388,10 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
+      <const name="HULU" value="huluDistribution.HULU"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -1834,6 +1835,7 @@
     <class name="KalturaBulkUpload">
       <property name="id" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="uploadedBy" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="uploadedByUserId" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="uploadedOn" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="numOfEntries" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="status" type="int" enumType="KalturaBatchJobStatus" readOnly="0" insertOnly="0" description=""/>
@@ -4390,6 +4392,8 @@
         <param name="password" type="string" optional="0" description="&#13;"/>
         <param name="newLoginId" type="string" optional="1" default="" description="Optional, provide only when you want to update the login id&#13;"/>
         <param name="newPassword" type="string" optional="1" default="" description="&#13;"/>
+        <param name="newFirstName" type="string" optional="1" default="" description="&#13;"/>
+        <param name="newLastName" type="string" optional="1" default="" description="&#13;"/>
         <result/>
       </action>
       <action name="resetPassword" description="Reset admin user password and send it to the users email address&#10;">

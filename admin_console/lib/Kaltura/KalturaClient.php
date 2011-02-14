@@ -1781,13 +1781,15 @@ class KalturaUserService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function updateLoginData($oldLoginId, $password, $newLoginId = "", $newPassword = "")
+	function updateLoginData($oldLoginId, $password, $newLoginId = "", $newPassword = "", $newFirstName = "", $newLastName = "")
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "oldLoginId", $oldLoginId);
 		$this->client->addParam($kparams, "password", $password);
 		$this->client->addParam($kparams, "newLoginId", $newLoginId);
 		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->addParam($kparams, "newFirstName", $newFirstName);
+		$this->client->addParam($kparams, "newLastName", $newLastName);
 		$this->client->queueServiceActionCall("user", "updateLoginData", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
