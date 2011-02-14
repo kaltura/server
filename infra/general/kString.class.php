@@ -314,4 +314,11 @@ class kString
 		}
 		return array($firstName, $lastName);
 	}
+	
+	public static function removeNewLine($str)
+	{
+		$str = str_replace("\n", '', $str);
+		$str = str_replace("\r", '', $str);
+		return $str;
+	}
 }
