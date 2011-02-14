@@ -48,7 +48,10 @@ class ConversionProfileService extends KalturaBaseService
 		$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
 		
 		$conversionProfile->fromObject($conversionProfileDb);
-		$conversionProfile->loadFlavorParamsIds($conversionProfileDb);
+		
+		// load flavor params id with the same connection (master connection) that was used for insert
+		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+		$conversionProfile->loadFlavorParamsIds($conversionProfileDb, $con);
 		return $conversionProfile;
 	}
 	
@@ -103,7 +106,9 @@ class ConversionProfileService extends KalturaBaseService
 		}
 		
 		$conversionProfile->fromObject($conversionProfileDb);
-		$conversionProfile->loadFlavorParamsIds($conversionProfileDb);
+		// load flavor params id with the same connection (master connection) that was used for insert
+		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+		$conversionProfile->loadFlavorParamsIds($conversionProfileDb, $con);
 		
 		return $conversionProfile;
 	}

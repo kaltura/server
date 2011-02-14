@@ -164,9 +164,9 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		return explode(",", $this->flavorParamsIds);
 	}
 	
-	public function loadFlavorParamsIds(conversionProfile2 $conversionProfile)
+	public function loadFlavorParamsIds(conversionProfile2 $conversionProfile, $con = null)
 	{
-		$flavorParams = $conversionProfile->getflavorParamsConversionProfilesJoinflavorParams();
+		$flavorParams = $conversionProfile->getflavorParamsConversionProfilesJoinflavorParams(null, $con);
 		$flavorParamIds = array();
 		foreach($flavorParams as $flavorParam)
 		{
