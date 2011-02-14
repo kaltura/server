@@ -842,7 +842,7 @@ class myEntryUtils
 	static public function setEntryTypeAndMediaTypeFromFile(entry $entry, $entry_full_path)
 	{
 		$media_type = $entry->getMediaType();
-		if ($media_type == entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
+		if ($media_type == entry::ENTRY_MEDIA_TYPE_AUTOMATIC && $entry->getType() != entryType::DATA)
 		{
 			$media_type = myFileUploadService::getMediaTypeFromFileExt(pathinfo($entry_full_path, PATHINFO_EXTENSION));
 			$entry->setMediaType($media_type);
