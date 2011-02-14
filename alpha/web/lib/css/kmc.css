@@ -130,7 +130,7 @@ fieldset{ border:0 none; position:relative; }
 	/* modal.css overide */
 	#mbContent.new { padding:0; border:none; display:table; background:none;}
 
-	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto 15px; -moz-border-radius:8px; -webkit-border-radius:8px; background: #f7f7f7; font-size:12px;}
+	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto 15px; -moz-border-radius:8px; -webkit-border-radius:8px; background: #f7f7f7; font-size:13px;}
 	 #titlebar { height:19px; padding: 10px 16px 8px; font-weight:bold; color:#EEEEEE; font-size: 15px; -moz-border-radius-topleft:5px;; -moz-border-radius-topright:5px; -webkit-border-top-left-radius:5px; -webkit-border-top-right-radius:5px; background: url(../images/kmc/kmc_sprite.png) repeat-x 0 -115px;}
 	  #titlebar a { width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat -155px -152px;}
 		#titlebar a#help { background-position: -177px -152px;}
@@ -158,24 +158,27 @@ fieldset{ border:0 none; position:relative; }
 	  #modal_content input { width: auto; }
 	  #modal_content label { cursor: pointer; }
 	  
-	#modal div.right { float: right; margin: 6px 18px 6px 0; }
+	#modal div.right { float: left; margin: 6px 18px 6px 0; }
 	#modal div.center { text-align: center; }
 	#modal input#html5_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
 	#modal input, textarea { color: #777; }
-	#modal div.note { clear: both; font-size: 11px; color: #999 }	  
+	#modal div.note { clear: both; font-size: 11px; color: #999 }
 	#modal div.note a { color: #009acc; }
-	#modal div.red { color: #ff0000; }	   	
+	#modal div.red { color: #ff0000; }
+	#modal select { font-size: 14px; }
 
 	/* jw */
 	#modal input { background:#F7F7F7;}
 	#modal a.license { margin: 0 5px;}
-	#modal div.label { min-width:99px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold;}
+	#modal div.label { min-width:240px; margin: 10px 0 5px; float:left; clear:both; font-weight:bold;}
 	 #modal div#rtmp.label { margin-top:3px;}
 	#modal div.description { width:300px; margin: 10px 0 5px; float:left;}
 	#modal div.description ul { margin-top:2px; display:none;}
 	#modal div.description li { margin-bottom:3px;}
 	#modal div.description ul input { width:99px; height:16px; padding:1px; border: solid 1px #9B9B9B; background:#fff;}
+
+	#modal .embedcode { min-width: 150px !important; }
 
 	/* end jw */
 /* end KMC modal */

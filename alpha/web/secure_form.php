@@ -352,9 +352,9 @@ HTML;
 		.center { text-align: center; }
 		.clear { clear: both; }
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
-		input { font-size: 13px; width: 160px; }
+		input { font-size: 13px; width: 170px; }
 		.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-		#submit {  } 
+		#submit { font-weight: bold; height: 30px; width: 90px; } 
 		</style>
 		<script>
 		function focusFirstInput() {
