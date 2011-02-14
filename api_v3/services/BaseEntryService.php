@@ -41,7 +41,7 @@ class BaseEntryService extends KalturaEntryService
      */
     function addFromUploadedFileAction(KalturaBaseEntry $entry, $uploadTokenId, $type = -1)
     {
-		 try
+		try
 	    {
 	    	// check that the uploaded file exists
 			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
