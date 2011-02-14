@@ -46,7 +46,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$upCounter = 4;
 			while($currentFolder && $currentFolder != $rootPath)
 			{
-				$currentFolder = realpath("$servicePath/../");
+				$currentFolder = realpath("$currentFolder/../");
 				$upCounter++;
 			}
 			$bootstrapPath = str_repeat('/..', $upCounter) . '/tests/base/bootstrap.php';
