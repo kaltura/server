@@ -118,7 +118,7 @@ class secForm {
 		$this->showHead();
 		
 		echo <<<HTML
-		<form method="post">
+		<form method="post"><br />
 			<input type="hidden" name="do" value="password" />
 			<div class="left">Current Password:</div>
 			<div class="right"><input id="focused" type="password" name="cur_password" /></div>
