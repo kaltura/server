@@ -365,7 +365,7 @@ kmc.utils = {
         url = url + '&parent=' + encodeURIComponent(document.location.href);
 			
         var modal_width = 370;
-        var modal_height = (action  == "name") ? 200 : 160 ;
+        var modal_height = (action  == "name") ? 200 : 180 ;
         var iframe_width = modal_width;
         if( $.browser.msie ) {
             modal_width = modal_width + 24;
