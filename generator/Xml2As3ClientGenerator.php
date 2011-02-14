@@ -372,7 +372,10 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$fileAttributesNames[] = $prop->attributes()->name;
 			}
 			if(count($fileAttributesNames) > 1)
-				continue;			
+				continue;
+			$fileAttributeName = null;
+			if(count($fileAttributesNames) > 1)
+				$fileAttributeName = reset($fileAttributesNames);	
 			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
 			$str .= "{\n"; 
@@ -443,7 +446,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					if(count($fileAttributesNames))
 					{
 						$str .= "		override public function parse(result:XML):* {\n";
-						$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributesNames is FileReference) {\n";
+						$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
 						$str .= "				return super.parse(result);\n";
 						$str .= "			}\n";
 						$str .= "			else {\n";
@@ -464,8 +467,6 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 			if(count($fileAttributesNames))
 			{
-				$fileAttributeName = reset($fileAttributesNames);
-				
 				$str .= "		override protected function sendRequest():void {\n";
 				$str .= "			//construct the loader\n";
 				$str .= "			createURLLoader();\n";
