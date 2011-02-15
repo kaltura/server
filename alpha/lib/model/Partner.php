@@ -629,7 +629,8 @@ class Partner extends BasePartner
 		$id = $this->getFromCustomData('admin_session_role_id');
 		if (!$id) {
 			$role = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
-			$id = $role->getId();
+			if($role)
+				$id = $role->getId();
 		}
 		return $id;
 	}
