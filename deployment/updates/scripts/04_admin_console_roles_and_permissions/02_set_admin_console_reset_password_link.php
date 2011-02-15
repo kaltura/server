@@ -1,4 +1,12 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.admin_roles_and_permissions
+ * 
+ * Set different reset password link to admin console partner
+ * 
+ * No need to re-run after server code deploy
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')

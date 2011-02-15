@@ -1,7 +1,11 @@
 <?php
-
 /**
- * This script adds basic API object parameters that require permissions, to their associated permissions.
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Adds basic API object parameters that require permissions, to their associated permissions.
+ * 
+ * Delete from permission_to_permission_item where type = 'kApiParameterPermissionItem' to re-deploy
  */
 
 //-- Bootstraping

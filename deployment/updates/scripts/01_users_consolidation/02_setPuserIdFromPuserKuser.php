@@ -1,4 +1,12 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.user_consolidation
+ * 
+ * Update puser id in kuser table according to puser_kuser table
+ * Requires re-run after server code depoloy
+ * Touch stop_puser_id_migration to stop execution
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -14,7 +22,7 @@ set_time_limit(0);
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastPuserKuserFile = 'last_puser_kuser';
+$lastPuserKuserFile = '02.last_puser_kuser';
 $lastPuserKuser = 0;
 if(file_exists($lastPuserKuserFile)) {
 	$lastPuserKuser = file_get_contents($lastPuserKuserFile);

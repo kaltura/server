@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.user_consolidation
+ * 
+ * Create kuser and user_login_data record for each admin_kuser
+ * Define the new created kuser as the partner owner
+ * 
+ * Requires re-run after server code depoloy
+ * Touch stop_user_migration to stop execution
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -13,7 +23,7 @@ $admin_console_partner_id = -2;
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastUserFile = 'last_admin_user';
+$lastUserFile = '04.last_admin_user';
 $lastUser = 0;
 if(file_exists($lastUserFile)) {
 	$lastUser = file_get_contents($lastUserFile);

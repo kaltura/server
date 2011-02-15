@@ -1,4 +1,15 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.user_consolidation
+ * 
+ * 1. Splits name into first name and last name
+ * 2. Set is admin to false to all kusers
+ * 3. Copy login data to user_login_data table if salt is not null and user.login allowed for the partner
+ * 
+ * Requires re-run after server code depoloy
+ * Touch stop_user_migration to stop execution
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -14,7 +25,7 @@ set_time_limit(0);
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastUserFile = 'last_kuser';
+$lastUserFile = '03.last_kuser';
 $lastUser = 0;
 if(file_exists($lastUserFile)) {
 	$lastUser = file_get_contents($lastUserFile);

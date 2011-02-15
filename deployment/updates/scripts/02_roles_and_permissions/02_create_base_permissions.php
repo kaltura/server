@@ -1,4 +1,13 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Populate permission table with all base permissions
+ * 
+ * No need to re-run after server code depoloy
+ * In order to re-run delete from permission
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')

@@ -1,15 +1,25 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Creates permission items and their releationship with permissions
+ * Scans basic api_v3 services.ct files
+ * - v3_services.ct
+ * - v3_services_batch.ct
+ * - v3_services_console.ct
+ * 
+ * IMPORTENT: All plugins must be enabled in the kConf
+ * You can delete permission_item and permission_to_permission_item if you removed something from the services.ct
+ */
 
 /**
- * This script scans the 3 basic api_v3 services.ct files (v3_services.ct, v3_services_batch.ct, v3_services_console.ct)
  * and adds permission items objects to the database.
  * Each permission item is associated to the permission names defined in the TAGS section of the services.ct file.
  * Actions allowed for user KS or no KS will also be added to the basic system permissions: USER_SESSION_PERMISSION
  * & ALWAYS_ALLOWED_ACTIONS accordingly.
  */
-
 //-- Bootstraping
-
 error_reporting(E_ALL);
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');

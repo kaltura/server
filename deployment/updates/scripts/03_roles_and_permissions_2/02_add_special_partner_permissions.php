@@ -1,9 +1,16 @@
 <?php
-
 /**
- * TODO: add documentation
- * ticket type 0 or 1
- * partner group
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Creates permission items releationship with permissions for specail services.ct files
+ * Uses existing permission items
+ * - Special ticket type
+ * - Partner group
+ * 
+ * You can delete permission_item and permission_to_permission_item if you removed something from the services.ct
+ * 
+ * @todo scan folder and exclude base services.ct instead of hard coded list
  */
 
 //-- Bootstraping

@@ -1,4 +1,13 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Populate user_role table with all base user roles
+ * 
+ * No need to re-run after server code depoloy
+ * In order to re-run delete from user_role
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')

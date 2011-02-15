@@ -1,10 +1,21 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.user_consolidation
+ * 
+ * Create kuser and user_login_data record for each system_kuser
+ * 
+ * Requires re-run after server code depoloy
+ * Touch stop_user_migration to stop execution
+ * 
+ * @todo Use existing kuser if already migrated
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 	
-$admin_console_partner_id = -2;
+$admin_console_partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
 $stopFile = dirname(__FILE__).'/stop_user_migration'; // creating this file will stop the script
 $userLimitEachLoop = 1000; //TODO: change
 
@@ -13,7 +24,7 @@ $userLimitEachLoop = 1000; //TODO: change
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastUserFile = 'last_system_user';
+$lastUserFile = '05.last_system_user';
 $lastUser = 0;
 if(file_exists($lastUserFile)) {
 	$lastUser = file_get_contents($lastUserFile);

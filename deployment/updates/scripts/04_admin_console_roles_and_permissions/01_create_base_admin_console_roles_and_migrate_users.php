@@ -1,4 +1,14 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.admin_roles_and_permissions
+ * 
+ * Adds base admin console role
+ * Change mograted role to new created role
+ * 
+ * No need to re-run after server code deploy
+ */
+
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -7,7 +17,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 //------------------------------------------------------
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
-define('ADMIN_CONSOLE_PARTNER_ID', -2);
+define('ADMIN_CONSOLE_PARTNER_ID', Partner::ADMIN_CONSOLE_PARTNER_ID);
 
 //------------------------------------------------------
 

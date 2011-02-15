@@ -1,4 +1,15 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Set admin role to all is_admin kusers
+ * 
+ * Requires re-run after server code depoloy
+ * Touch stop_user_migration to stop execution
+ * 
+ * @todo maybe should run after updates/scripts/03_roles_and_permissions_2/02_add_special_partner_permissions.php
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -14,7 +25,7 @@ set_time_limit(0);
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastUserFile = 'last_kuser';
+$lastUserFile = '05.last_kuser';
 $lastUser = 0;
 if(file_exists($lastUserFile)) {
 	$lastUser = file_get_contents($lastUserFile);

@@ -1,4 +1,13 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.roles_and_permissions
+ * 
+ * Copy enabled plugin and features into permissions
+ * 
+ * Requires re-run after server code depoloy - DELETE LAST FILE
+ * Touch stop_permission_migration to stop execution
+ */
 
 $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
@@ -13,7 +22,7 @@ require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastPartnerFile = 'last_partner';
+$lastPartnerFile = '01.last_partner';
 $lastPartner = -10;
 if(file_exists($lastPartnerFile)) {
 	$lastPartner = file_get_contents($lastPartnerFile);

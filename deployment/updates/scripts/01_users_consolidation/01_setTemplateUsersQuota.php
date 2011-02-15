@@ -1,4 +1,12 @@
 <?php
+/**
+ * @package deployment
+ * @subpackage dragonfly.user_consolidation
+ * 
+ * Adds new partner custom data AdminLoginUsersQuota attribute with default value 3
+ * Requires re-run after server code depoloy
+ * Touch stop_partner_migration to stop execution
+ */
 
 $defaultLoginUsersQuota = 3; // must be set!
 $dryRun = true; //TODO: change for real run
@@ -19,7 +27,7 @@ require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 
 // stores the last handled admin kuser id, helps to restore in case of crash
-$lastPartnerFile = 'last_partner';
+$lastPartnerFile = '01.last_partner';
 $lastPartner = -10;
 if(file_exists($lastPartnerFile)) {
 	$lastPartner = file_get_contents($lastPartnerFile);
