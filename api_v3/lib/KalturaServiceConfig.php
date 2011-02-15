@@ -52,7 +52,7 @@ class KalturaServiceConfig extends myServiceConfig
 	}
 	
 	
-	protected function getDefaultName ()
+	public function getDefaultName ()
 	{
 		return "v3_services.ct";
 	}
