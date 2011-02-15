@@ -47,7 +47,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->writeMainClient($serviceNodes);
-		 
+		
 		$this->writeCsproj();
 	}
 	
@@ -442,6 +442,8 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("namespace Kaltura");
 		$this->appendLine("{");
 		$serviceName = $serviceNode->getAttribute("name");
+		$serviceId = $serviceNode->getAttribute("id");
+
 		
 		$dotNetServiceName = $this->upperCaseFirstLetter($serviceName)."Service";
 		$dotNetServiceType = "Kaltura" . $dotNetServiceName;
@@ -461,7 +463,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 			if ($actionNode->nodeType != XML_ELEMENT_NODE)
 				continue;
 				
-			$this->writeAction($serviceName, $actionNode);
+			$this->writeAction($serviceId, $actionNode);
 		}
 		$this->appendLine("	}");
 		$this->appendLine("}");
@@ -471,7 +473,7 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->_csprojIncludes[] = $file; 
 	}
 	
-	function writeAction($serviceName, DOMElement $actionNode)
+	function writeAction($serviceId, DOMElement $actionNode)
 	{
 		$action = $actionNode->getAttribute("name");
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
@@ -518,16 +520,20 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("		$signaturePrefix$signature");
 			$this->appendLine("		{");
 			$paramsStr = "";
-			$paramNumber = 0;
 			foreach($defaultParams as $paramNode)
 			{
-				$paramNumber++;
 				$optional = $paramNode->getAttribute("optional");
-				if ($optional == "1" && $paramNumber == count($defaultParams))
+				if ($optional == "1" && ! in_array ( $paramNode, $currentOptionalParams, true ))
 				{
 					$type = $paramNode->getAttribute("type");
 					if ($type == "string")
-						$paramsStr .=  "\"".$paramNode->getAttribute("default")."\"";
+					{
+						$value = $paramNode->getAttribute("default");
+						if($value == 'null')
+							$paramsStr .=  "null";
+						else
+							$paramsStr .=  "\"".$paramNode->getAttribute("default")."\"";
+					}
 					else if ($type == "int" && $paramNode->hasAttribute("enumType"))
 					{
 						$value = $paramNode->getAttribute("default");
@@ -611,9 +617,9 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		if ($haveFiles)
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceName\", \"$action\", kparams, kfiles);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams, kfiles);");
 		else
-			$this->appendLine("			_Client.QueueServiceCall(\"$serviceName\", \"$action\", kparams);");
+			$this->appendLine("			_Client.QueueServiceCall(\"$serviceId\", \"$action\", kparams);");
 		
 		$this->appendLine("			if (this._Client.IsMultiRequest)");
 		if (!$resultType) 
@@ -684,7 +690,10 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 						$dotNetType = $paramType;			
 					break;			
 				default:
-					$dotNetType = $paramType;
+					if ($isEnum)
+						$dotNetType = $paramNode->getAttribute("enumType");
+					else 
+						$dotNetType = $paramType;		 
 					break;
 			}
 
@@ -710,11 +719,10 @@ class DotNetClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("{");
 		$this->appendLine("	public class KalturaClient : KalturaClientBase");
 		$this->appendLine("	{");
-		$this->appendLine("		protected string _ApiVersion = \"$apiVersion\";");
-		$this->appendLine("		");
 		$this->appendLine("		public KalturaClient(KalturaConfiguration config)");
 		$this->appendLine("			: base(config)");
 		$this->appendLine("		{");
+		$this->appendLine("				_ApiVersion = \"$apiVersion\";");
 		$this->appendLine("		}");
 		foreach($serviceNodes as $serviceNode)
 		{
