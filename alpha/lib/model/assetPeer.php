@@ -115,9 +115,9 @@ class assetPeer extends BaseassetPeer
 	
 	/**
 	 * Retrieve by ID instead of INT_ID
-	 * @param $id
+	 * @param int $id
 	 * @param $con
-	 * @return flavorAsset
+	 * @return asset
 	 */
 	public static function retrieveById($id, $con = null)
 	{
@@ -127,10 +127,23 @@ class assetPeer extends BaseassetPeer
 	}
 	
 	/**
+	 * @param string $entryId
+	 * @return asset
+	 */
+	public static function retrieveOriginalByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(self::ENTRY_ID, $entryId);
+		$c->add(self::IS_ORIGINAL, true);
+		
+		return self::doSelectOne($c);
+	}
+	
+	/**
 	 * Retrieve by IDs instead of INT_ID
 	 * @param $ids
 	 * @param $con
-	 * @return array<flavorAsset>
+	 * @return array<asset>
 	 */
 	public static function retrieveByIds($ids, $con = null)
 	{
