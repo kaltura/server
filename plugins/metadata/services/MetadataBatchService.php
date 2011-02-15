@@ -88,6 +88,9 @@ class MetadataBatchService extends BatchService
 				$data = $job->getData();
 				$metadataProfileId = $data->getMetadataProfileId();
 				$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
+				if(!$metadataProfile)
+					continue;
+					
 				$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 				$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
 				$data->setDestXsdPath($xsdPath);
