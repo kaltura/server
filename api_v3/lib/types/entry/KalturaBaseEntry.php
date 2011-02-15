@@ -207,7 +207,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Thumbnail URL
 	 * 
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $thumbnailUrl;
 	
