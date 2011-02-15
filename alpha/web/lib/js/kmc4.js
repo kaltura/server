@@ -968,7 +968,8 @@ kmc.preview_embed = {
 		
     setShortURL : function(id) {
         var url = kmc.vars.service_url + '/tiny/' + id;
-        var url_text = url.replace(/http:\/\/|www./ig, '');
+        //var url_text = url.replace(/http:\/\/|www./ig, '');
+	var url_text = url.replace(/http:\/\//ig, '');
 			
         var html = '<a href="' + url + '" target="_blank">' + url_text + '</a>';
         $(".preview_url").html(html);
