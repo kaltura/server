@@ -1,14 +1,14 @@
 <?php
-class DotNetClientGenerator extends ClientGeneratorFromXml
+class CSharpClientGenerator extends ClientGeneratorFromXml
 {
 	private $_doc = null;
 	private $_csprojIncludes = array();
 	private $_classInheritance = array();
 	private $_enums = array();
 	
-	function DotNetClientGenerator($xmlPath)
+	function CSharpClientGenerator($xmlPath)
 	{
-		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/dotnet"));
+		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/csharp"));
 		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
