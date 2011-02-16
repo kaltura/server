@@ -141,8 +141,8 @@ else
 
 	<div id="kmcHeader"	<?php if($templatePartnerId) echo 'class="whiteLabel"'; ?>>
 	 <div id="logo"></div>
-     <ul id="hTabs">
-     	<li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
+	 <ul id="hTabs">
+	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
 <?php 
 if( count($allowedPartners) > 1 ) { 
@@ -157,13 +157,13 @@ if( count($allowedPartners) > 1 ) {
 	$currentAccount = ' ';
 }
 ?>
-     <div id="user_links">
-      <span>Hi <?php echo $screen_name; ?> &nbsp;&nbsp;<?php echo $currentAccount; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
-	      <?php if (!$templatePartnerId) { ?>
-	  <?php if( count($allowedPartners) > 1) { ?><a id="ChangePartner" href="#change_partner">Change Account</a> &nbsp; | &nbsp;<?php } ?> 
-      <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
-	  <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
-      <?php } ?>
+	 <div id="user_links">
+	  <span>Hi <?php echo $screen_name; ?> &nbsp;&nbsp;<?php echo $currentAccount; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">Logout</a></span><br />
+		  <?php if (!$templatePartnerId) { ?>
+	      <?php if( count($allowedPartners) > 1) { ?><a id="ChangePartner" href="#change_partner">Change Account</a> &nbsp; | &nbsp;<?php } ?>
+	  <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
+	      <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a> <!-- @todo: !!! -->
+	  <?php } ?>
 	 </div>
 	</div><!-- kmcHeader -->
 

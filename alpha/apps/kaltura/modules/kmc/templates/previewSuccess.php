@@ -32,7 +32,6 @@ switch($delivery_type) {
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Kaltura Player</title>
 	<!--<script src="/html5/html5lib/v<?php echo $html5_version; ?>/mwEmbedLoader.php"></script>-->
 	<script src="<?php echo $scriptUrl; ?>"></script>
