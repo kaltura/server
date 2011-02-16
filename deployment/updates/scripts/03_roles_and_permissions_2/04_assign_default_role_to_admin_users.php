@@ -8,7 +8,6 @@
  * Requires re-run after server code depoloy
  * Touch stop_user_migration to stop execution
  * 
- * @todo maybe should run after updates/scripts/03_roles_and_permissions_2/02_add_special_partner_permissions.php
  */
 
 $dryRun = true; //TODO: change for real run
