@@ -47,7 +47,19 @@ while(count($users))
 		$lastUser = $user->getId();
 		KalturaLog::log('-- system user id ' . $lastUser);
 		
-		$new_kuser = new kuser();
+		// check for existing kusers for this admin_kuser
+		$c = new Criteria();
+		$c->addAnd(kuserPeer::PUSER_ID, $user->getEmail(), Criteria::EQUAL);
+		$c->addAnd(kuserPeer::PARTNER_ID, $admin_console_partner_id, Criteria::EQUAL);
+		$existing_kuser = kuserPeer::doSelectOne($c);
+		
+		if ($existing_kuser) {
+			$new_kuser = $existing_kuser; // in case this script is executed more than once
+		}
+		else {
+			$new_kuser = new kuser();
+		}		
+		
 		$new_login_data = new UserLoginData();
 				
 		$new_kuser->setEmail($user->getEmail());
