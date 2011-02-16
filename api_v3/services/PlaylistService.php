@@ -134,6 +134,12 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
 		
 		$playlist->playlistType = $dbPlaylist->getMediaType();
+		
+		// Added the following 2 lines in order to make the permission verifications in toUpdatableObject work on the actual db object
+		// TODO: the following use of autoFillObjectFromObject should be replaced by a normal toUpdatableObject
+		$tmpDbPlaylist = clone $dbPlaylist;
+		$tmpDbPlaylist = $playlist->toUpdatableObject($tmpDbPlaylist);
+		
 		$playlistUpdate = null;
 		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
 
