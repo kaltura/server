@@ -29,7 +29,7 @@ if(file_exists($lastPartnerFile)) {
 	KalturaLog::log('last partner file already exists with value - '.$lastPartner);
 }
 if(!$lastPartner)
-	$lastPartner = 0;
+	$lastPartner = -10;
 
 $partners = getPartners($lastPartner, $partnerLimitEachLoop);
 
@@ -41,9 +41,14 @@ while(count($partners))
 		if (file_exists($stopFile)) {
 			die('STOP FILE CREATED');
 		}
-
+		
 		$lastPartner = $partner->getId();
 		KalturaLog::log('-- partner id ' . $lastPartner);
+		
+		if ($lastPartner == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
 		
 		$newPermissions = array();
 		
