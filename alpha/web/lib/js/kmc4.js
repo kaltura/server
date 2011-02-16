@@ -30,7 +30,7 @@
 (function($){$.fn.wresize=function(f){version='1.1';wresize={fired:false,width:0};function resizeOnce(){if($.browser.msie){if(!wresize.fired){wresize.fired=true}else{var version=parseInt($.browser.version,10);wresize.fired=false;if(version<7){return false}else if(version==7){var width=$(window).width();if(width!=wresize.width){wresize.width=width;return false}}}}return true}function handleWResize(e){if(resizeOnce()){return f.apply(this,[e])}}this.each(function(){if(this==window){$(this).resize(handleWResize)}else{$(this).resize(f)}});return this}})(jQuery);
 
 $(window).load(function(){
-    kmc.utils.activateHeader();
+    kmc.utils.handleMenu();
     $(window).wresize(kmc.utils.resize);
     kmc.vars.isLoadedInterval = setInterval("kmc.utils.isModuleLoaded()",200);
 });
@@ -125,7 +125,47 @@ kmc.functions = {
 };
 
 kmc.utils = {
-			
+
+    handleMenu : function() {
+
+	// Activate menu links
+ 	kmc.utils.activateHeader();
+	
+	// Calculate menu width
+	var menu_width = 15;
+	$("#user_links > *").each( function() {
+	   menu_width += $(this).width();
+	});
+
+	var openMenu = function() {
+
+	   var menuDefaultCss = {
+		"width": 0,
+		"visibility": 'visible',
+		"top": '2px',
+		"right": '1px'
+	   };
+
+	   var menuAnimationCss = {
+		"width": menu_width + 'px',
+		"padding-top": '6px',
+		"padding-bottom": '6px'
+	   };
+
+	    $("#user_links").css( menuDefaultCss );
+	    $("#user_links").animate( menuAnimationCss , 500);
+	};
+
+	var closeMenu = function(){
+	    $("#user_links").animate( { width: 0 } , 500, function() {
+		$("#user_links").css( { width: 'auto', visibility: 'hidden' } );
+	    });
+	};
+
+	$("#user").hover( openMenu ).click( openMenu );
+	$("#closeMenu").click(closeMenu);
+    },
+
     activateHeader : function() {
         $("#user_links a").click(function(e) {
             var tab = (e.target.tagName == "A") ? e.target.id : $(e.target).parent().attr("id");
@@ -292,6 +332,9 @@ kmc.utils = {
     },
 		
     createTabs : function(arr) {
+	// Close the user link menu
+	$("#closeMenu").trigger('click');
+	
         if(arr) {
             var module_url = kmc.vars.service_url + '/index.php/kmc/kmc4';
             var arrLen = arr.length;
