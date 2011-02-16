@@ -298,8 +298,6 @@ if ( count ( $partner_list ) > 1 )
 <?php echo  prop ( $partner , "loginBlockPeriod"  , "text" , "60" , ""  , ""  , "for how long is login block valid (in seconds!)"  ) ?>
 <?php echo  prop ( $partner , "numPrevPassToKeep"  , "text" , "60" , ""  , ""  , "number of previous passwords to keep (and not allow re-use)"  ) ?>
 <?php echo  prop ( $partner , "passReplaceFreq"  , "text" , "60" , ""  , ""  , "password replacement frequency (in seconds!)"  ) ?>
-<?php echo  prop ( $partner , "passResetUrlPrefix"  , "text" , "200" , ""  , ""  , "password reset url prefix"  ) ?>
-
 
 <tr><td style="font-weight:bold; text-" colspan="3"><hr/>Andromeda - KMC2</td></tr>
 <tr class="prop">
