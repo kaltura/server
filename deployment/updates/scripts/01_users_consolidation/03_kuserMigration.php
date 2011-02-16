@@ -66,7 +66,7 @@ while(count($users))
 			$newTempEmail = $user->getEmail();
 			
 			$c = new Criteria();
-			$c->addAnd(AdminKuserPeer::EMAIL, $newTempEmail, Criteria::EQUAL);
+			$c->addAnd(adminKuserPeer::EMAIL, $newTempEmail, Criteria::EQUAL);
 			$adminKuser = adminKuserPeer::doSelectOne($c);
 			
 			if ($adminKuser) {
