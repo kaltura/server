@@ -81,7 +81,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		/*
 		 * Non Mac transcoders should not mess up with QT/WMV/WMA
 		 * 
-		 */
+		 *
 		$qt_wmv_list = array("wmv1","wmv2","wmv3","wvc1","wmva","wma1","wma2","wmapro");
 		if(($this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::FFMPEG || $this->_id==KDLTranscoders::FFMPEG_AUX
 		|| $this->_id==KDLTranscoders::MENCODER || $this->_id==KDLTranscoders::ON2)
@@ -95,7 +95,7 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 				KDLWarnings::ToString(KDLWarnings::TranscoderFormat, $this->_id, "qt/wmv/wma");
 			return true;
 		}
-		
+		*/
 		return false;	
 	}
 }
