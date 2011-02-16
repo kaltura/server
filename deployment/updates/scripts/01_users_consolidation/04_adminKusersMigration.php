@@ -44,6 +44,11 @@ while(count($users))
 		$lastUser = $user->getId();
 		KalturaLog::log('-- admin kuser id ' . $lastUser);
 		
+		if ($user->getPartnerId() == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
+		
 		$new_kuser = new kuser();
 		$new_login_data = new UserLoginData();
 		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
@@ -61,8 +66,8 @@ while(count($users))
 		
 		if ($existing_login_data)
 		{
-			KalturaLog::alert('!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!');
-			echo '!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] - skipping user id ['.$lastUser.']! !!!';
+			KalturaLog::alert('!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] !!!!');
+			echo '!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] !!!!';
 			continue;
 		}
 		
