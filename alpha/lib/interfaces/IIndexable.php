@@ -47,11 +47,4 @@ interface IIndexable extends IBaseObject
 	 * @return IIndexable
 	 */
 	public function setUpdatedAt($time);
-	
-	/**
-	 * @param PropelPDO $con
-	 * @return int The number of rows affected by this insert/update and any referring fk objects' save() operations.
-	 * @throws PropelException
-	 */
-	public function save(PropelPDO $con = null);
 }
