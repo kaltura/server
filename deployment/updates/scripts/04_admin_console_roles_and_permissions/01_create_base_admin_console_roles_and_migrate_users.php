@@ -108,7 +108,7 @@ foreach ($users as $user)
 	
 	$newRole = getNewRole($oldRole, $userRoles);
 	if (!$newRole) {
-		KalturaLog::alert('Critical error occured - skipping to next user!');
+		KalturaLog::alert('ERROR - Critical error occured - skipping kuser id ['.$user->getId().'] email ['.$user->getEmail().']!');
 		continue;
 	}
 	
