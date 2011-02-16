@@ -14,7 +14,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 	
 $stopFile = dirname(__FILE__).'/stop_partner_migration'; // creating this file will stop the script
-$partnerLimitEachLoop = 1000;
+$partnerLimitEachLoop = 500;
 
 //------------------------------------------------------
 
