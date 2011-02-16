@@ -168,6 +168,8 @@ fieldset{ border:0 none; position:relative; }
 	#modal div.red { color: #ff0000; }
 	#modal select { font-size: 14px; }
 
+	#player_select, #delivery_type { width: 220px; }
+
 	/* jw */
 	#modal input { background:#F7F7F7;}
 	#modal a.license { margin: 0 5px;}

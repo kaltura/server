@@ -1,5 +1,8 @@
 ﻿<?php 
 
+//Build Script URL
+$scriptUrl = $partner_host . "/p/". $partner_id ."/sp/". $partner_id ."00/embedIframeJs/uiconf_id/". $uiconf_id ."/partner_id/". $partner_id;
+
 // Build SWF URL
 $swfUrl = $partner_host ."/index.php/kwidget";
 $swfUrl .= "/cache_st/" . (time()+(60*15));
@@ -31,7 +34,8 @@ switch($delivery_type) {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Kaltura Player</title>
-	<script src="/html5/html5lib/v<?php echo $html5_version; ?>/mwEmbedLoader.php"></script>
+	<!--<script src="/html5/html5lib/v<?php echo $html5_version; ?>/mwEmbedLoader.php"></script>-->
+	<script src="<?php echo $scriptUrl; ?>"></script>
 </head>
 <body>
 	<div id="main" style="position: static;">
