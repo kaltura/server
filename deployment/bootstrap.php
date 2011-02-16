@@ -2,7 +2,7 @@
 
 set_time_limit(0);
 
-ini_set("memory_limit","700M");
+ini_set("memory_limit","2048M");
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../'));
 require_once(ROOT_DIR . '/alpha/config/kConf.php');
