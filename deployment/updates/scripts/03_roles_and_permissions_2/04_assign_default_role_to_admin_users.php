@@ -60,6 +60,11 @@ while(count($users))
 			continue;
 		}
 		
+		if ($partner->getId() == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
+		
 		
 		
 		$adminRoleId = $partner->getAdminSessionRoleId();
