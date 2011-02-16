@@ -55,7 +55,7 @@ while(count($puserKusers))
 		
 		if (!$kuser)
 		{
-			$msg = 'ERROR - Kuser id ['.$kuserId.'] not found but pointed from puserKuser ['.$lastPuserKuser.']';
+			$msg = 'ERROR - Kuser id ['.$kuserId.'] not found but pointed from puserKuser ['.$lastPuserKuser.'] partner id ['.$partnerId.']';
 			KalturaLog::alert($msg);
 			echo $msg.PHP_EOL;
 			continue;
@@ -91,7 +91,7 @@ while(count($puserKusers))
 			}
 			else
 			{
-				$msg = 'ERROR - No puserId is set for puserKuser ['.$lastPuserKuser.'] or kuser ['.$kuserId.']';
+				$msg = 'ERROR - No puserId is set for puserKuser ['.$lastPuserKuser.'] or kuser ['.$kuserId.'] of partner id ['.$partnerId.']';
 				KalturaLog::alert($msg);
 				echo $msg.PHP_EOL;
 				continue;
@@ -101,7 +101,7 @@ while(count($puserKusers))
 		{
 			if ($kuser->getPuserId() != $puserId)
 			{
-				$msg = 'ERROR - Puser ids are not the same for puserKuser ['.$lastPuserKuser.'] with puserId ['.$puserId.'] and kuser ['.$kuserId.'] with puserId ['.$kuser->getPuserId().']';
+				$msg = 'ERROR - Puser ids are not the same for puserKuser ['.$lastPuserKuser.'] with puserId ['.$puserId.'] and kuser ['.$kuserId.'] with puserId ['.$kuser->getPuserId().'] of partner id ['.$partnerId.']';
 				KalturaLog::alert($msg);
 				echo $msg.PHP_EOL;
 				continue;
