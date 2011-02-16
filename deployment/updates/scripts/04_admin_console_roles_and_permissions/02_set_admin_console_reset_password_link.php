@@ -15,7 +15,7 @@ if($argc > 1 && $argv[1] == 'realrun')
 //------------------------------------------------------
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
-define('ADMIN_CONSOLE_PARTNER_ID', -2);
+define('ADMIN_CONSOLE_PARTNER_ID', Partner::ADMIN_CONSOLE_PARTNER_ID);
 
 $partner = PartnerPeer::retrieveByPK(ADMIN_CONSOLE_PARTNER_ID);
 $partner->setPassResetUrlPrefixName('admin_console');
