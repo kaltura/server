@@ -14,7 +14,7 @@ $dryRun = true; //TODO: change for real run
 if($argc > 1 && $argv[1] == 'realrun')
 	$dryRun = false;
 	
-$admin_console_partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
+
 $stopFile = dirname(__FILE__).'/stop_user_migration'; // creating this file will stop the script
 $userLimitEachLoop = 500; //TODO: change
 
@@ -32,6 +32,7 @@ if(file_exists($lastUserFile)) {
 if(!$lastUser)
 	$lastUser = 0;
 
+$admin_console_partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
 $users = getUsers($lastUser, $userLimitEachLoop);
 $partner = PartnerPeer::retrieveByPK($admin_console_partner_id);
 
