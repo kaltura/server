@@ -44,11 +44,15 @@ while(count($puserKusers))
 
 		$lastPuserKuser = $puserKuser->getId();
 		KalturaLog::log('-- kuser id ' . $lastPuserKuser);
-			
 		
 		$kuserId = $puserKuser->getKuserId();
 		$partnerId = $puserKuser->getPartnerId();
 		$puserId = $puserKuser->getPuserId();
+		
+		if ($partnerId == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
 		
 		kuserPeer::setUseCriteriaFilter(false);
 		$kuser = kuserPeer::retrieveByPK($kuserId);
