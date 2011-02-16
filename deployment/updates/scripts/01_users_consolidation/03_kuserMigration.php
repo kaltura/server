@@ -5,7 +5,7 @@
  * 
  * 1. Splits name into first name and last name
  * 2. Set is admin to false to all kusers
- * 3. Copy login data to user_login_data table if salt is not null and user.login allowed for the partner
+ * 3. Copy login data to user_login_data table if salt and sha1_password are not null and user.login allowed for the partner
  * 
  * Requires re-run after server code depoloy
  * Touch stop_user_migration to stop execution
@@ -47,6 +47,11 @@ while(count($users))
 
 		$lastUser = $user->getId();
 		KalturaLog::log('-- kuser id ' . $lastUser);
+		
+		if ($user->getPartnerId() == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
 			
 		list($firstName, $lastName) = kString::nameSplit($user->getFullName());
 		$user->setFirstName($firstName);
@@ -56,35 +61,51 @@ while(count($users))
 		
 		$new_login_data = null;
 		
-		if ($user->getSalt() && in_array($user->getPartnerId(), $loginPartnerIds) )
+		if ($user->getSalt() && $user->getSha1Password() && in_array($user->getPartnerId(), $loginPartnerIds) )
 		{
-			 // user can login - add a user_login_data record
-			$existingLoginData = UserLoginDataPeer::getByEmail($user->getEmail());
-			if (!$existingLoginData) {
-				$new_login_data = new UserLoginData();
-				$new_login_data->setConfigPartnerId($user->getPartnerId());
-				$new_login_data->setLoginEmail($user->getEmail()); 
-				$new_login_data->setFirstName($user->getFirstName());
-				$new_login_data->setLastName($user->getLastName());
-				$new_login_data->setSalt($user->getSalt());
-				$new_login_data->setSha1Password($user->getSha1Password());
-				$new_login_data->setCreatedAt($user->getCreatedAt());
-				$new_login_data->setUpdatedAt($user->getUpdatedAt());
+			$newTempEmail = $user->getEmail();
+			
+			$c = new Criteria();
+			$c->addAnd(AdminKuserPeer::EMAIL, $newTempEmail, Criteria::EQUAL);
+			$adminKuser = AdminKuserPeer::doSelectOne($c);
+			
+			if ($adminKuser) {
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				$msg = 'NOTICE - kuser ['.$lastUser.'] of partner ['.$user->getPartnerId().'] is set with email ['.$user->getEmail().'] already used by admin_kuser id ['.$adminKuser->getId().'] of partner ['.$adminKuser->getPartnerId().'] - setting kusers login email to ['.$newTempEmail.']!';
+				KalturaLog::notice($msg);
 			}
-			else {
-				if ($existingLoginData->getSalt() != $user->getSalt() || $existingLoginData->getSha1Password() != $user->getSha1Password()) {
-					KalturaLog::alert('ERROR - login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!');
-					echo 'ERROR - login data for the same email ['.$user->getEmail().'] already exists with a different password - kuser ['.$user->getId().'] will not be able to login!';
-					continue;
-				}
-				if (kuserPeer::getByLoginDataAndPartner($existingLoginData->getId(), $user->getPartnerId())) {
-					KalturaLog::alert('ERROR - another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']');
-					echo 'ERROR - another kuser with the same login data id ['.$existingLoginData->getId().'] already exists for partner ['.$user->getPartnerId().']';
-					continue;
-				}
-				KalturaLog::log('Kuser ['.$user->getId().'] is set with existing login data id ['.$existingLoginData->getId().']');
-				$user->setLoginDataId($existingLoginData->getId());
+			
+			if (!kString::isEmailString($user->getEmail())) {
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				$msg = 'NOTICE - kuser ['.$lastUser.'] of partner ['.$user->getPartnerId().'] is set with invalid email ['.$user->getEmail().'] - setting kusers login email to ['.$newTempEmail.']!'; 
+				KalturaLog::notice($msg);
 			}
+			
+			
+			// user can login - add a user_login_data record
+			$existingLoginData = UserLoginDataPeer::getByEmail($newTempEmail);
+			if ($existingLoginData) {
+				$msg = 'NOTICE - login data for the same email ['.$newTempEmail.'] partner id ['.$existingLoginData->getConfigPartnerId().'] already exists - setting kusers login email to';
+				
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				while ($temp = UserLoginDataPeer::getByEmail($newTempEmail)) {
+					$newTempEmail = '_'.$newTempEmail;
+				}
+				
+				$msg .= ' ['.$newTempEmail.']!';
+				KalturaLog::notice($msg);
+			}
+			
+
+			$new_login_data = new UserLoginData();
+			$new_login_data->setConfigPartnerId($user->getPartnerId());
+			$new_login_data->setLoginEmail($newTempEmail); 
+			$new_login_data->setFirstName($user->getFirstName());
+			$new_login_data->setLastName($user->getLastName());
+			$new_login_data->setSalt($user->getSalt());
+			$new_login_data->setSha1Password($user->getSha1Password());
+			$new_login_data->setCreatedAt($user->getCreatedAt());
+			$new_login_data->setUpdatedAt($user->getUpdatedAt());
 		}				
 		
 		if (!$dryRun) {
