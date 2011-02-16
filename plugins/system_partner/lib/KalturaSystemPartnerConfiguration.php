@@ -207,16 +207,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 		
-		if(class_exists('MetadataPlugin'))
+		if(class_exists('MetadataPlugin') && !is_null($this->enableMetadata))
 			$object_to_fill->setPluginEnabled(MetadataPlugin::getPluginName(), $this->enableMetadata);
 			
-		if(class_exists('ContentDistributionPlugin'))
+		if(class_exists('ContentDistributionPlugin') && !is_null($this->enableContentDistribution))
 			$object_to_fill->setPluginEnabled(ContentDistributionPlugin::getPluginName(), $this->enableContentDistribution);
 			
-		if(class_exists('AuditPlugin'))
+		if(class_exists('AuditPlugin') && !is_null($this->enableAuditTrail))
 			$object_to_fill->setPluginEnabled(AuditPlugin::getPluginName(), $this->enableAuditTrail);
 		
-		if(class_exists('AnnotationPlugin'))
+		if(class_exists('AnnotationPlugin') && !is_null($this->enableAnnotation))
 			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
 				
 		$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
