@@ -10,7 +10,6 @@
  * 
  * You can delete permission_item and permission_to_permission_item if you removed something from the services.ct
  * 
- * @todo scan folder and exclude base services.ct instead of hard coded list
  */
 
 //-- Bootstraping
@@ -38,23 +37,32 @@ $userSessionPermissionItemIds = $userSessionPermission->getPermissionItemIds();
 $noKsPermissionItemIds = $noKsPermission->getPermissionItemIds();
 
 
-// special service config files
-
-$serviceConfigFiles = array (
-	'v3_services_batch.ct',
-	'v3_services_console.ct',
-	'v3_services_6028.ct',
-	'v3_services_footbo.ct',
-	'v3_services-593-21658.ct',
-	'v3_services-17291-20772.ct',
-	'v3_services-disney-mediabowl.ct',
-	'v3_services-epen.ct',
-	'v3_services-epen-pppe.ct',
-	'v3_services-epen-ppre.ct',
-	'v3_services-epen-production.ct',
-	'v3_services-epen-pte.ct',
-	'v3_services-paramount-mobile.ct',
-);
+// special service config files - get .ct files except for the default v3_services.ct
+$tmpContents = scandir(ROOT_DIR.'/api_v3/config/');
+$excludeCts = array(); // files to exclude
+$excludeCts[] = KalturaServiceConfig::getDefaultName(); // v3_services.ct
+$excludeCts[] = 'v3_'.Partner::FULL_BLOCK_SERVICE_CONFIG_ID; // v3_services_block.ct
+$excludeCts[] = 'v3_'.Partner::CONTENT_BLOCK_SERVICE_CONFIG_ID; // v3_services_limited_partner.ct
+$excludeCts[] = 'v3_services_open_playlist.ct';
+$excludeCts[] = 'v3_services_sessionless.ct';
+$serviceConfigFiles = array();
+foreach ($tmpContents as $current)
+{
+	if ( @substr_compare($current, '.ct', -strlen('.ct'), strlen('.ct')) === 0 )
+	{
+		$add = true;
+		foreach ($excludeCts as $exclude)
+		{
+			if (strcmp($current, $exclude) === 0) {
+				$add = false;
+				break;
+			}
+		}	 
+		if ($add) {
+			$serviceConfigFiles[] = $current;
+		}
+	}
+}
 
 
 foreach ($serviceConfigFiles as $file)
