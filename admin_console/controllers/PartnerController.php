@@ -356,6 +356,7 @@ class PartnerController extends Zend_Controller_Action
 		$filter = new KalturaUserFilter();
 		$filter->isAdminEqual = true;
 		$filter->partnerIdEqual = $partnerId;
+		$filter->statusEqual = KalturaUserStatus::ACTIVE;
 		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", $partnerId, $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
