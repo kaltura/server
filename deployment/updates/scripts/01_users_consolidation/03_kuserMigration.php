@@ -70,13 +70,16 @@ while(count($users))
 			$adminKuser = AdminKuserPeer::doSelectOne($c);
 			
 			if ($adminKuser) {
-				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				if ($user->getPartnerId() === $adminKuser->getPartnerId() && $user->getPuserId() === '__ADMIN__' . $adminKuser->getId()) {
+					continue;
+				}
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail();
 				$msg = 'NOTICE - kuser ['.$lastUser.'] of partner ['.$user->getPartnerId().'] is set with email ['.$user->getEmail().'] already used by admin_kuser id ['.$adminKuser->getId().'] of partner ['.$adminKuser->getPartnerId().'] - setting kusers login email to ['.$newTempEmail.']!';
 				KalturaLog::notice($msg);
 			}
 			
 			if (!kString::isEmailString($user->getEmail())) {
-				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail();
 				$msg = 'NOTICE - kuser ['.$lastUser.'] of partner ['.$user->getPartnerId().'] is set with invalid email ['.$user->getEmail().'] - setting kusers login email to ['.$newTempEmail.']!'; 
 				KalturaLog::notice($msg);
 			}
@@ -87,7 +90,7 @@ while(count($users))
 			if ($existingLoginData) {
 				$msg = 'NOTICE - login data for the same email ['.$newTempEmail.'] partner id ['.$existingLoginData->getConfigPartnerId().'] already exists - setting kusers login email to';
 				
-				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail;
+				$newTempEmail = 'kuser_'.$user->getId().'_'.$user->getEmail();
 				while ($temp = UserLoginDataPeer::getByEmail($newTempEmail)) {
 					$newTempEmail = '_'.$newTempEmail;
 				}
