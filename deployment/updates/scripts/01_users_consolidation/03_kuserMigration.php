@@ -67,7 +67,7 @@ while(count($users))
 			
 			$c = new Criteria();
 			$c->addAnd(AdminKuserPeer::EMAIL, $newTempEmail, Criteria::EQUAL);
-			$adminKuser = AdminKuserPeer::doSelectOne($c);
+			$adminKuser = adminKuserPeer::doSelectOne($c);
 			
 			if ($adminKuser) {
 				if ($user->getPartnerId() === $adminKuser->getPartnerId() && $user->getPuserId() === '__ADMIN__' . $adminKuser->getId()) {
