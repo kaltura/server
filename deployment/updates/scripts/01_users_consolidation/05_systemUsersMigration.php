@@ -8,7 +8,6 @@
  * Requires re-run after server code depoloy
  * Touch stop_user_migration to stop execution
  * 
- * @todo Use existing kuser if already migrated
  */
 
 $dryRun = true; //TODO: change for real run
