@@ -34,7 +34,7 @@ if(file_exists($lastPartnerFile)) {
 	KalturaLog::log('last partner file already exists with value - '.$lastPartner);
 }
 if(!$lastPartner)
-	$lastPartner = 0;
+	$lastPartner = -10;
 
 $partners = getPartners($lastPartner, $partnerLimitEachLoop);
 
@@ -49,6 +49,11 @@ while(count($partners))
 
 		$lastPartner = $partner->getId();
 		KalturaLog::log('-- partner id ' . $lastPartner);
+		
+		if ($lastPartner == PartnerPeer::GLOBAL_PARTNER) {
+			KalturaLog::log('Skipping partner 0');
+			continue;
+		}
 		
 		$partner->setAdminLoginUsersQuota($defaultLoginUsersQuota);
 		if ($partner->getId() == -2) {
