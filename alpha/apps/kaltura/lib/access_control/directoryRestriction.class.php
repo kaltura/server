@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 class directoryRestriction extends baseRestriction
 {
 	const DIRECTORY_RESTRICTION_TYPE_DONT_DISPLAY = 0;

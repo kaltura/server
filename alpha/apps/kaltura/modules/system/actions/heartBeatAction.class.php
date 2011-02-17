@@ -1,6 +1,16 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class heartBeatAction extends kalturaSystemAction 
 {
 	private $_test_array = NULL;

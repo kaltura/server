@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 abstract class baseRestriction
 {
 	/**

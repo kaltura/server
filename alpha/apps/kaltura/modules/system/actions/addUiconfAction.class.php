@@ -1,7 +1,16 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class addUiconfAction extends kalturaSystemAction
 {
 	public function execute()

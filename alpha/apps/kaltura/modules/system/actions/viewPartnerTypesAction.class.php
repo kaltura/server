@@ -1,8 +1,17 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 require_once ( "viewPartnersAAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class viewPartnerTypesAction extends kalturaSystemAction
 {
 

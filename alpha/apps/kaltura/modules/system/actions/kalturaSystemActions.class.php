@@ -1,7 +1,16 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
-/** copied from sfActions */
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 abstract class kalturaSystemActions extends kalturaSystemAction
 {
 	/**

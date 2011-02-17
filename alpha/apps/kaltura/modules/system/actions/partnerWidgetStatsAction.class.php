@@ -1,5 +1,16 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
+
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class partnerWidgetStatsAction extends kalturaSystemAction
 {
 	public function execute()

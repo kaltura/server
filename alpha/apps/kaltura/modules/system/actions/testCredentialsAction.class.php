@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class testCredentialsAction extends kalturaAction
 {
 	private $_test_array = NULL;

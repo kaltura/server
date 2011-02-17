@@ -1,7 +1,16 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class viewPartnersAAction extends kalturaSystemAction
 {
 	const MAX_PAGE_SIZE = 20000;

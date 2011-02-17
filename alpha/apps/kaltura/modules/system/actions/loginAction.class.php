@@ -1,6 +1,16 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class loginAction extends kalturaSystemAction
 {
 	private static $PASSWORD = "30d390fb24c8e80a880e4f8bfce7a3a06757f1c7";

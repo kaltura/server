@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 class siteRestriction extends baseRestriction
 {
 	const SITE_RESTRICTION_TYPE_RESTRICT_LIST = 0;

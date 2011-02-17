@@ -1,5 +1,11 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemActions.class.php");
+
 /**
  * system actions.
  *

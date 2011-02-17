@@ -1,8 +1,18 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "model/genericObjectWrapper.class.php" );
 require_once ( "kalturaSystemAction.class.php" );
 require_once(MODULES . 'partnerservices2/actions/listentriesAction.class.php' );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class galleryAction extends kalturaSystemAction
 {
 	/**

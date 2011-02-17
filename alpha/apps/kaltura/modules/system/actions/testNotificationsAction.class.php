@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class testNotificationsAction extends sfAction 
 {
 	public function execute () 

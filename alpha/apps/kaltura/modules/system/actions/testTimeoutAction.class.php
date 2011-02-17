@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class testTimeoutAction extends sfAction 
 {
 	public function execute () 

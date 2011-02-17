@@ -1,7 +1,16 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 require_once ( "kalturaSystemAction.class.php" );
 
+/**
+ * @package    Core
+ * @subpackage system
+ * @deprecated
+ */
 class viewLogsAction extends kalturaSystemAction
 {
 	const LOG_DIR = "/web/logs/";
