@@ -127,12 +127,13 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "ContentDistributionPlugin";
 		// self::$map['default_plugins'][] = "MsnDistributionPlugin";
 		// self::$map['default_plugins'][] = "HuluDistributionPlugin";
-		self::$map['default_plugins'][] = "ComcastDistributionPlugin";
-		self::$map['default_plugins'][] = "YouTubeDistributionPlugin";
+		// self::$map['default_plugins'][] = "ComcastDistributionPlugin";
+		// self::$map['default_plugins'][] = "YouTubeDistributionPlugin";
 		// self::$map['default_plugins'][] = "ContentDistributionSphinxPlugin";
 		// self::$map['default_plugins'][] = "AnnotationPlugin"; 
 		// self::$map['default_plugins'][] = "SegmenterPlugin"; 
 		// self::$map['default_plugins'][] = "ShortLinkPlugin";
+		// self::$map['default_plugins'][] = "ProfesionalServicesPlugin";
 		
 }
 
