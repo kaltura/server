@@ -142,7 +142,7 @@ fieldset{ border:0 none; position:relative; }
 	 #modal_content { padding: 11px 12px;}
 	 #modal .embed_code_div { display: none; }
 	  #modal #player_wrap { min-height:290px; min-width:400px; padding-bottom:8px;  margin: 10px auto 0;}
-	  #modal textarea#embed_code { border: solid 1px #B7BABC; /*9B9B9B;*/ -moz-border-radius:6px; -webkit-border-radius:6px;}
+	  #modal textarea#embed_code { border: solid 1px #B7BABC; /*9B9B9B; -moz-border-radius:6px; -webkit-border-radius:6px; */ }
 	   #modal textarea#embed_code { width:300px; height: 14px; border: solid 1px #B7BABC; color:#333;}
 	  #modal button { font: normal 11px arial,sans-serif; color:#2B2B2B;}
 	  #modal button#select_code { height:24px; padding: 0 13px 0 0; border:none; margin: 11px auto 5px; line-height:normal; overflow:visible; background: url(../images/kmc/kmc_sprite.png) no-repeat -63px -152px; font: normal 11px arial,sans-serif; color:#2B2B2B; cursor:pointer;}
@@ -167,8 +167,8 @@ fieldset{ border:0 none; position:relative; }
 	#modal input#html5_support { width: auto;  }
 	.preview_url { padding: 2px; background: #FFFFBC; }
 	#modal input, textarea { color: #777; }
-	#modal div.note { clear: both; font-size: 11px; color: #999 }
-	#modal div.note a { color: #009acc; }
+	#modal div.note { clear: both; font-size: 11px; color: #333 }
+	#modal div.note a { color: #009ACC; }
 	#modal div.red { color: #ff0000; }
 	#modal select { font-size: 14px; }
 
