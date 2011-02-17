@@ -427,10 +427,13 @@ kmc.utils = {
         // event will have .data, .origin and .source properties. otherwise, it will only have the .data property.
         var from_domain = kmc.vars.service_url.replace("http", "https");
         XD.receiveMessage(function(message){
-	    alert(message.data);
             if(message.data == "reload") {
                 kmc.utils.closeModal();
-                window.location.href = kmc.vars.service_url + "/index.php/kmc/kmc4#account|user";
+		if( ($.browser.msie) && ($.browser.version < 8) ) {
+		    window.location.href = kmc.vars.service_url + "/index.php/kmc/kmc4#account|user";
+		} else {
+		    window.location.reload();
+		}
             } else {
                 kmc.utils.closeModal();
             }
