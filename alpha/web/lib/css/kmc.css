@@ -97,6 +97,9 @@ fieldset{ border:0 none; position:relative; }
 		#login .wrapper button:hover{ background-color:#7DB7CD; }
 		#login .wrapper a{ text-decoration:underline; color:#084258; }
 		#login .wrapper a:hover{ text-decoration:none; }
+	#login #login_swf span { display: block; margin-top: 30px; color: #fff; font-family: arial; }
+		#login #login_swf span a { color: #11B4EE; }
+	#login #login_swf img { margin-top: 30px; }
 
 
 /*--------------------------------

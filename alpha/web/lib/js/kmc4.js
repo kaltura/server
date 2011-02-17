@@ -43,7 +43,7 @@ kmc.vars.debug = false;
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
 
 kmc.log = function(str) {
-    if(kmc.vars.debug) { console.log(str); }
+    if(kmc.vars.debug) { if( typeof console !='undefined' && console.log){ console.log(str); } }
 };
 	
 kmc.functions = {
@@ -430,7 +430,7 @@ kmc.utils = {
             if(message.data == "reload") {
                 kmc.utils.closeModal();
 		if( ($.browser.msie) && ($.browser.version < 8) ) {
-		    window.location.href = kmc.vars.service_url + "/index.php/kmc/kmc4#account|user";
+		    window.location.href = kmc.vars.service_url + "/index.php/kmc/kmc4#account|user1";
 		} else {
 		    window.location.reload();
 		}
