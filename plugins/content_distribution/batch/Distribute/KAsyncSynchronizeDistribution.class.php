@@ -3,8 +3,8 @@ require_once("bootstrap.php");
 /**
  * Synchronize Distribution status and create delayed jobs
  *
- * @package Scheduler
- * @subpackage Distribute
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 class KAsyncSynchronizeDistribution extends KBatchBase
 {

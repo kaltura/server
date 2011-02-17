@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @package Scheduler
- * @subpackage Debug
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute.Debug
  */
 
 // /opt/kaltura/app/batch

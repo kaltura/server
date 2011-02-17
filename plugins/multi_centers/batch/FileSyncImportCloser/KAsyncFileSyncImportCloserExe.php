@@ -4,8 +4,8 @@ require_once('bootstrap.php');
 /**
  * Will run the KAsyncFileSyncImportCloser
  *
- * @package Scheduler
- * @subpackage FileSyncImportCloser
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 
 $instance = new KAsyncFileSyncImportCloser();

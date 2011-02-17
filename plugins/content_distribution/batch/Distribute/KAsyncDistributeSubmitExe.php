@@ -4,8 +4,8 @@ require_once("bootstrap.php");
 /**
  * Executes the KAsyncDistributeSubmit
  * 
- * @package Scheduler
- * @subpackage Distribute
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 
 $instance = new KAsyncDistributeSubmit();

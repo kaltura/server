@@ -4,8 +4,8 @@ require_once("bootstrap.php");
 /**
  * Executes the KAsyncDistributeFetchReport
  * 
- * @package Scheduler
- * @subpackage Distribute
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 
 $instance = new KAsyncDistributeFetchReport();

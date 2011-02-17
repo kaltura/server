@@ -3,8 +3,8 @@ require_once("bootstrap.php");
 /**
  * Distributes kaltura entries to remote destination  
  *
- * @package Scheduler
- * @subpackage Distribute
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 class KAsyncDistributeDelete extends KAsyncDistribute
 {

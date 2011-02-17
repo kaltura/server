@@ -1,7 +1,7 @@
 <?php
 /**
- * @package Scheduler
- * @subpackage Debug
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport.Debug
  */
 
 chdir(dirname( __FILE__ ) . "/../../../../batch");

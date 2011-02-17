@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @package Scheduler
- * @subpackage Debug
+ * @package plugins.virusScan
+ * @subpackage Scheduler.Debug
  */
 
 // /opt/kaltura/app/batch

@@ -4,8 +4,8 @@ require_once("bootstrap.php");
 /**
  * Executes the KAsyncTransformMetadata
  * 
- * @package Scheduler
- * @subpackage Metadata.Transform
+ * @package plugins.metadata
+ * @subpackage Scheduler.Transform
  */
 
 $instance = new KAsyncTransformMetadata();

@@ -9,8 +9,8 @@ require_once("bootstrap.php");
  * 		move the file to the archive
  * 		set the entry's new status and file details  (check if FLV) 
  *
- * @package Scheduler
- * @subpackage Metadata.Import
+ * @package plugins.metadata
+ * @subpackage Scheduler.Import
  */
 class KAsyncImportMetadata extends KBatchBase
 {

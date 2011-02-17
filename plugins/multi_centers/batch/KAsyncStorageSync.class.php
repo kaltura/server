@@ -3,8 +3,8 @@ require_once("bootstrap.php");
 /**
  * Will export a single file to ftp or scp server 
  *
- * @package Scheduler
- * @subpackage Storage
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 class KAsyncStorageSync extends KAsyncStorageExport
 {

@@ -3,8 +3,8 @@ require_once("bootstrap.php");
 /**
  * Closes asynchronous distribution jobs
  *
- * @package Scheduler
- * @subpackage Distribute
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
  */
 abstract class KAsyncDistributeCloser extends KAsyncDistribute
 {

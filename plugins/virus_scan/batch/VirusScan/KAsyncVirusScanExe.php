@@ -4,8 +4,8 @@ require_once("bootstrap.php");
 /**
  * Executes the KAsyncVirusScan
  * 
- * @package Scheduler
- * @subpackage VirusScan
+ * @package plugins.virusScan
+ * @subpackage Scheduler
  */
 
 $instance = new KAsyncVirusScan();

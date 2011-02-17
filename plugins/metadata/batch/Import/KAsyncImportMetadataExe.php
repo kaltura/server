@@ -4,8 +4,8 @@ require_once("bootstrap.php");
 /**
  * Executes the KAsyncImportMetadata
  * 
- * @package Scheduler
- * @subpackage Metadata.Import
+ * @package plugins.metadata
+ * @subpackage Scheduler.Import
  */
 
 $instance = new KAsyncImportMetadata();

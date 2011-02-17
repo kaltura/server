@@ -4,8 +4,8 @@ require_once('bootstrap.php');
 /**
  * Will run the KAsyncFileSyncImport
  *
- * @package Scheduler
- * @subpackage FileSyncImport
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 
 $instance = new KAsyncFileSyncImport();

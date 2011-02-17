@@ -4,8 +4,8 @@ require_once("bootstrap.php");
  * Will run KAsyncStorageSync.class.php 
  * 
  *
- * @package Scheduler
- * @subpackage Storage
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 
 

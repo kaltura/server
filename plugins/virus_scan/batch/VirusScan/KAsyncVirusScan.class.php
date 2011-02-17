@@ -3,8 +3,8 @@ require_once("bootstrap.php");
 /**
  * Will scan for viruses on specified file  
  *
- * @package Scheduler
- * @subpackage VirusScan
+ * @package plugins.virusScan
+ * @subpackage Scheduler
  */
 class KAsyncVirusScan extends KBatchBase
 {

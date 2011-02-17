@@ -4,8 +4,8 @@ require_once('bootstrap.php');
 /**
  *
  *
- * @package Scheduler
- * @subpackage FileSyncImport
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 class KAsyncFileSyncImport extends KBatchBase
 {

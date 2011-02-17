@@ -1,11 +1,10 @@
 <?php
 
 /**
- * @package Scheduler
- * @subpackage Debug
+ * @package plugins.multiCenters
+ * @subpackage Scheduler.FileSyncImport
  */
 
-// /opt/kaltura/app/batch
 chdir(dirname( __FILE__ ) . "/../../../../batch");
 
 require_once("bootstrap.php");
