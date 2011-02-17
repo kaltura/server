@@ -76,16 +76,21 @@ class getuiconfsAction extends kalturaAction
 		$jw_confs = ($type == 'player')? kmcUtils::getJWPlayerUIConfs(): kmcUtils::getJWPlaylistUIConfs();
 		
 		$merged_list = array();
-		foreach($default_uiconfs_array as $uiconf)
-			$merged_list[] = $uiconf;
-		foreach($kdp508_uiconfs as $uiconf)
-			$merged_list[] = $uiconf;
-		foreach($silverlight_uiconfs as $uiconf)
-			$merged_list[] = $uiconf;
-		foreach($partner_uiconfs_array as $uiconf)
-			$merged_list[] = $uiconf;
-		foreach($merged_list as $uiconf)
-			$merged_list[] = $uiconf;
+		if(count($default_uiconfs_array))
+			foreach($default_uiconfs_array as $uiconf)
+				$merged_list[] = $uiconf;
+		if(count($kdp508_uiconfs))
+			foreach($kdp508_uiconfs as $uiconf)
+				$merged_list[] = $uiconf;
+		if(count($silverlight_uiconfs))
+			foreach($silverlight_uiconfs as $uiconf)
+				$merged_list[] = $uiconf;
+		if(count($partner_uiconfs_array))
+			foreach($partner_uiconfs_array as $uiconf)
+				$merged_list[] = $uiconf;
+		if(count($jw_confs))
+			foreach($jw_confs as $uiconf)
+				$merged_list[] = $uiconf;
 			
 		return $this->renderText(json_encode($merged_list));
 	}
