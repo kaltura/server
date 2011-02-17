@@ -1574,7 +1574,7 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $thumbnailUrl = null;
 
@@ -1638,10 +1638,9 @@ class KalturaSchedulerStatus extends KalturaObjectBase
 
 	/**
 	 * The type of the job worker.
-	 * Could be KalturaBatchJobType or extended type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $workerType = null;
 
@@ -2140,7 +2139,7 @@ class KalturaSchedulerWorker extends KalturaObjectBase
 	 * The worker type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $type = null;
 
@@ -3008,10 +3007,9 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 class KalturaBatchQueuesStatus extends KalturaObjectBase
 {
 	/**
-	 * The job type (KalturaBatchJobType or extended)
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType = null;
 
@@ -3473,7 +3471,7 @@ class KalturaFreeJobResponse extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 * @readonly
 	 */
 	public $jobType = null;

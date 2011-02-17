@@ -474,7 +474,7 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $thumbnailUrl = null;
 
@@ -2748,6 +2748,87 @@ class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
  * @package Admin
  * @subpackage Client
  */
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -2842,10 +2923,9 @@ class KalturaSchedulerStatus extends KalturaObjectBase
 
 	/**
 	 * The type of the job worker.
-	 * Could be KalturaBatchJobType or extended type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $workerType = null;
 
@@ -3051,7 +3131,7 @@ class KalturaSchedulerWorker extends KalturaObjectBase
 	 * The worker type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $type = null;
 
@@ -3887,10 +3967,9 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 class KalturaBatchQueuesStatus extends KalturaObjectBase
 {
 	/**
-	 * The job type (KalturaBatchJobType or extended)
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType = null;
 
@@ -5660,87 +5739,6 @@ class KalturaUserListResponse extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
 class KalturaPartnerListResponse extends KalturaObjectBase
 {
 	/**
@@ -5926,7 +5924,7 @@ class KalturaFreeJobResponse extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 * @readonly
 	 */
 	public $jobType = null;
