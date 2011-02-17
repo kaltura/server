@@ -354,7 +354,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	}
 	
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData, $password, $partnerId = null, $validatePassword = true)
+	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true)
 	{
 		$requestedPartner = $partnerId;
 		
