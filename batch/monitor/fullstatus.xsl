@@ -8,45 +8,56 @@
 	
 	<xsl:variable name="alert-Queue-Size-Convert" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Import" select="200"/>
-	<xsl:variable name="alert-Queue-Size-Delete" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Flatten" select="5"/>
 	<xsl:variable name="alert-Queue-Size-Bulk-Upload" select="5"/>
-	<xsl:variable name="alert-Queue-Size-DVD-Creator" select="100"/>
-	<xsl:variable name="alert-Queue-Size-Download" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Convert-Profile" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Post-Convert" select="100"/>
-	<xsl:variable name="alert-Queue-Size-Pull" select="100"/>
-	<xsl:variable name="alert-Queue-Size-Remote-Convert" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Extract-Media" select="500"/>
 	<xsl:variable name="alert-Queue-Size-Mail" select="100"/>
 	<xsl:variable name="alert-Queue-Size-Notification" select="200"/>
 	<xsl:variable name="alert-Queue-Size-Bulk-Download" select="150"/>
-		
+	<xsl:variable name="alert-Queue-Size-Provision-Provide" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Convert-Collection" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Storage-Export" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Provision-Delete" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Storage-Delete" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Metadata-Transform" select="30"/>
+	<xsl:variable name="alert-Queue-Size-Filesync-Import" select="500"/>
+	<xsl:variable name="alert-Queue-Size-Capture-Thumb" select="50"/>
+	<xsl:variable name="alert-Queue-Size-Virus-Scan" select="50"/>
+	<xsl:variable name="alert-Queue-Size-Distribution-Submit" select="50"/>
+	<xsl:variable name="alert-Queue-Size-Distribution-Update" select="50"/>
+	<xsl:variable name="alert-Queue-Size-Distribution-Delete" select="50"/>
+	<xsl:variable name="alert-Queue-Size-Distribution-Fetch-Report" select="50"/>
+	
 	<xsl:template match="result">
 		<xsl:variable name="now" select="@timestamp"/>
 		
 		<xsl:variable name="Convert-Batches" select="sum(schedulers/item/workers/item[typeName='Convert']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Import-Batches" select="sum(schedulers/item/workers/item[typeName='Import']/statuses/item[type=1]/value)"/>
-		<xsl:variable name="Delete-Batches" select="sum(schedulers/item/workers/item[typeName='Delete']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Flatten-Batches" select="sum(schedulers/item/workers/item[typeName='Flatten']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Bulk-Upload-Batches" select="sum(schedulers/item/workers/item[typeName='Bulk Upload']/statuses/item[type=1]/value)"/>
-		<xsl:variable name="DVD-Creator-Batches" select="sum(schedulers/item/workers/item[typeName='DVD Creator']/statuses/item[type=1]/value)"/>
-		<xsl:variable name="Download-Batches" select="sum(schedulers/item/workers/item[typeName='Download']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Convert-Profile-Batches" select="sum(schedulers/item/workers/item[typeName='Convert Profile']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Post-Convert-Batches" select="sum(schedulers/item/workers/item[typeName='Post Convert']/statuses/item[type=1]/value)"/>
-		<xsl:variable name="Pull-Batches" select="sum(schedulers/item/workers/item[typeName='Pull']/statuses/item[type=1]/value)"/>
-		<xsl:variable name="Remote-Convert-Batches" select="sum(schedulers/item/workers/item[typeName='Remote Convert']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Extract-Media-Batches" select="sum(schedulers/item/workers/item[typeName='Extract Media']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Mail-Batches" select="sum(schedulers/item/workers/item[typeName='Mail']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Notification-Batches" select="sum(schedulers/item/workers/item[typeName='Notification']/statuses/item[type=1]/value)"/>
 		<xsl:variable name="Bulk-Download-Batches" select="sum(schedulers/item/workers/item[typeName='Bulk Download']/statuses/item[type=1]/value)"/>
 		
+		<xsl:variable name="Provision-Provide-Batches" select="sum(schedulers/item/workers/item[typeName='Provision Provide']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Convert-Collection-Batches" select="sum(schedulers/item/workers/item[typeName='Convert Collection']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Storage-Export-Batches" select="sum(schedulers/item/workers/item[typeName='Storage Export']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Provision-Delete-Batches" select="sum(schedulers/item/workers/item[typeName='Provision Delete']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Storage-Delete-Batches" select="sum(schedulers/item/workers/item[typeName='Storage Delete']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Metadata-Transform-Batches" select="sum(schedulers/item/workers/item[typeName='Metadata Transform']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Filesync-Import-Batches" select="sum(schedulers/item/workers/item[typeName='File Sync Import']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Capture-Thumb-Batches" select="sum(schedulers/item/workers/item[typeName='Capture Thumb']/statuses/item[type=1]/value)"/>
 		
-		
-		
-		
-		
-		
+		<xsl:variable name="Virus-Scan-Batches" select="sum(schedulers/item/workers/item[type='virusScan.VirusScan']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Distribution-Submit-Batches" select="sum(schedulers/item/workers/item[type='contentDistribution.DistributionSubmit']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Distribution-Update-Batches" select="sum(schedulers/item/workers/item[type='contentDistribution.DistributionUpdate']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Distribution-Delete-Batches" select="sum(schedulers/item/workers/item[type='contentDistribution.DistributionDelete']/statuses/item[type=1]/value)"/>
+		<xsl:variable name="Distribution-Fetch-Report-Batches" select="sum(schedulers/item/workers/item[type='contentDistribution.DistributionFetchReport']/statuses/item[type=1]/value)"/>
 		
 						
 		<xsl:variable name="message">
@@ -54,19 +65,6 @@
 			<xsl:for-each select="queuesStatus/item">
 			
 				<xsl:choose>
-					<!-- 
-					<xsl:when test="typeName = 'Delete'">
-						<xsl:if test="size &gt; $alert-Queue-Size-Delete">
-							Delete queue is <xsl:value-of select="size"/>
-						</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Download'">
-						<xsl:if test="size &gt; $alert-Queue-Size-Download">
-							Download queue is <xsl:value-of select="size"/>
-						</xsl:if>
-					</xsl:when>
-					-->
-					
 					<xsl:when test="typeName = 'Flatten'">
 						<xsl:if test="size &gt; $alert-Queue-Size-Flatten">
 							Flatten queue is <xsl:value-of select="size"/>
@@ -92,11 +90,6 @@
 							Bulk-Upload queue is <xsl:value-of select="size"/>
 						</xsl:if>
 					</xsl:when>
-					<xsl:when test="typeName = 'DVD Creator'">
-						<xsl:if test="size &gt; $alert-Queue-Size-DVD-Creator">
-							DVD-Creator queue is <xsl:value-of select="size"/>
-						</xsl:if>
-					</xsl:when>
 					<xsl:when test="typeName = 'Convert Profile'">
 						<xsl:if test="size &gt; $alert-Queue-Size-Convert-Profile">
 							Convert-Profile queue is <xsl:value-of select="size"/>
@@ -105,16 +98,6 @@
 					<xsl:when test="typeName = 'Post Convert'">
 						<xsl:if test="size &gt; $alert-Queue-Size-Post-Convert">
 							Post-Convert queue is <xsl:value-of select="size"/>
-						</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Pull'">
-						<xsl:if test="size &gt; $alert-Queue-Size-Pull">
-							Pull queue is <xsl:value-of select="size"/>
-						</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Remote Convert'">
-						<xsl:if test="size &gt; $alert-Queue-Size-Remote-Convert">
-							Remote-Convert queue is <xsl:value-of select="size"/>
 						</xsl:if>
 					</xsl:when>
 					<xsl:when test="typeName = 'Extract Media'">
@@ -132,73 +115,88 @@
 							Notification queue is <xsl:value-of select="size"/>
 						</xsl:if>
 					</xsl:when>
+					
+					<xsl:when test="typeName = 'Provision Provide'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Provision-Provide">
+							Provision Provide queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Convert Collection'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Convert-Collection">
+							Convert Collection queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Storage Export'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Storage-Export">
+							Storage Export queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Provision Delete'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Provision-Delete">
+							Provision Delete queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Storage Delete'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Storage-Delete">
+							Storage Delete queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Metadata Transform'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Metadata-Transform">
+							Metadata Transform queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'File Sync Import'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Filesync-Import">
+							File Sync Import queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="typeName = 'Capture Thumb'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Capture-Thumb">
+							Capture Thumb queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					
+					<xsl:when test="type = 'virusScan.VirusScan'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Virus-Scan">
+							Virus Scan queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="type = 'contentDistribution.DistributionSubmit'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Distribution-Submit">
+							Distribution Submit queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="type = 'contentDistribution.DistributionUpdate'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Distribution-Update">
+							Distribution Update queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="type = 'contentDistribution.DistributionDelete'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Distribution-Delete">
+							Distribution Delete queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+					
+					<xsl:when test="type = 'contentDistribution.DistributionFetchReport'">
+						<xsl:if test="size &gt; $alert-Queue-Size-Distribution-Fetch-Report">
+							Distribution Fetch Report queue is <xsl:value-of select="size"/>
+						</xsl:if>
+					</xsl:when>
+		
 				</xsl:choose>
 					
-				<!-- 
-				<xsl:choose>
-					<xsl:when test="typeName = 'Delete'">
-						<xsl:if test="$Delete-Batches &lt; (size div 2)">
-							Delete queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Convert-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Flatten'">
-						<xsl:if test="$Flatten-Batches &lt; (size div 2)">
-							Flatten queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Convert-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Download'">
-						<xsl:if test="$Download-Batches &lt; (size div 2)">
-							Download queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Download-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Convert'">
-						<xsl:if test="$Convert-Batches &lt; (size div 2)">
-							Convert queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Convert-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Import'">
-						<xsl:if test="$Import-Batches &lt; (size div 2)">
-							Import queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Import-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Bulk Download'">
-						<xsl:if test="$Bulk-Download-Batches &lt; (size div 2)">
-							Bulk-Download queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Bulk-Download-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Bulk Upload'">
-						<xsl:if test="$Bulk-Upload-Batches &lt; (size div 2)">
-							Bulk-Upload queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Bulk-Upload-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'DVD Creator'">
-						<xsl:if test="$DVD-Creator-Batches &lt; (size div 2)">
-							DVD-Creator queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$DVD-Creator-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Convert Profile'">
-						<xsl:if test="$Convert-Profile-Batches &lt; (size div 2)">
-							Convert-Profile queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Convert-Profile-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Post Convert'">
-						<xsl:if test="$Post-Convert-Batches &lt; (size div 2)">
-							Post-Convert queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Post-Convert-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Pull'">
-						<xsl:if test="$Pull-Batches &lt; (size div 2)">
-							Pull queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Pull-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Remote Convert'">
-						<xsl:if test="$Remote-Convert-Batches &lt; (size div 2)">
-							Remote-Convert queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Remote-Convert-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Extract Media'">
-						<xsl:if test="$Extract-Media-Batches &lt; (size div 2)">
-							Extract-Media queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Extract-Media-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Mail'">
-						<xsl:if test="$Mail-Batches &lt; (size div 2)">
-							Mail queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Mail-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-					<xsl:when test="typeName = 'Notification'">
-						<xsl:if test="$Notification-Batches &lt; (size div 2)">
-							Notification queue is <xsl:value-of select="size"/> and only <xsl:value-of select="$Notification-Batches"/> batches are running</xsl:if>
-					</xsl:when>
-				</xsl:choose>
-				-->
-				
 			</xsl:for-each>
 			
 			<xsl:for-each select="schedulers/item">

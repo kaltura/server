@@ -60,6 +60,8 @@ function check(&$msg, $url)
 		$xml = new DOMDocument;
 		$xml->load($getStatus);
 		
+		//file_put_contents('fullStatus.xml', $xml->saveXML());
+	
 		$resultElements = $xml->getElementsByTagName("result");
 		$resultElement = $resultElements->item(0);
 		$resultElement->setAttribute('timestamp', time());
@@ -112,6 +114,18 @@ function check_host($url, $host)
 	system($cmd);
 }
 	
+if(!file_exists($bbHosts))
+{
+	if($argc > 1)
+	{
+		$msg = '';
+		check($msg, $argv[1]);
+		echo $msg;
+	}
+		
+	exit;
+}
+
 $lines = file($bbHosts);
 foreach($lines as $line)
 {
