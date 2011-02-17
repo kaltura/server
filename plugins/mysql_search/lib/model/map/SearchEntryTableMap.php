@@ -45,9 +45,10 @@ class SearchEntryTableMap extends TableMap {
 		$this->addColumn('VIEWS', 'Views', 'INTEGER', false, null, 0);
 		$this->addColumn('RANK', 'Rank', 'INTEGER', false, null, 0);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('ENTRY_STATUS', 'EntryStatus', 'INTEGER', false, null, null);
 		$this->addColumn('SOURCE_LINK', 'SourceLink', 'VARCHAR', false, 1024, null);
 		$this->addColumn('DURATION', 'Duration', 'INTEGER', false, null, 0);
+		$this->addColumn('DURATION_TYPE', 'DurationType', 'VARCHAR', false, 30, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);

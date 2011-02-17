@@ -26,7 +26,7 @@ abstract class BaseSearchEntryPeer {
 	const TM_CLASS = 'SearchEntryTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 30;
+	const NUM_COLUMNS = 31;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -55,14 +55,17 @@ abstract class BaseSearchEntryPeer {
 	/** the column name for the TAGS field */
 	const TAGS = 'search_entry.TAGS';
 
-	/** the column name for the STATUS field */
-	const STATUS = 'search_entry.STATUS';
+	/** the column name for the ENTRY_STATUS field */
+	const ENTRY_STATUS = 'search_entry.ENTRY_STATUS';
 
 	/** the column name for the SOURCE_LINK field */
 	const SOURCE_LINK = 'search_entry.SOURCE_LINK';
 
 	/** the column name for the DURATION field */
 	const DURATION = 'search_entry.DURATION';
+
+	/** the column name for the DURATION_TYPE field */
+	const DURATION_TYPE = 'search_entry.DURATION_TYPE';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'search_entry.CREATED_AT';
@@ -137,11 +140,11 @@ abstract class BaseSearchEntryPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('EntryId', 'KuserId', 'Name', 'Type', 'MediaType', 'Views', 'Rank', 'Tags', 'Status', 'SourceLink', 'Duration', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'DisplayInSearch', 'GroupId', 'Plays', 'Description', 'MediaDate', 'AdminTags', 'ModerationStatus', 'ModerationCount', 'ModifiedAt', 'AccessControlId', 'Categories', 'StartDate', 'EndDate', 'FlavorParams', 'AvailableFrom', 'PluginData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('entryId', 'kuserId', 'name', 'type', 'mediaType', 'views', 'rank', 'tags', 'status', 'sourceLink', 'duration', 'createdAt', 'updatedAt', 'partnerId', 'displayInSearch', 'groupId', 'plays', 'description', 'mediaDate', 'adminTags', 'moderationStatus', 'moderationCount', 'modifiedAt', 'accessControlId', 'categories', 'startDate', 'endDate', 'flavorParams', 'availableFrom', 'pluginData', ),
-		BasePeer::TYPE_COLNAME => array (self::ENTRY_ID, self::KUSER_ID, self::NAME, self::TYPE, self::MEDIA_TYPE, self::VIEWS, self::RANK, self::TAGS, self::STATUS, self::SOURCE_LINK, self::DURATION, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::DISPLAY_IN_SEARCH, self::GROUP_ID, self::PLAYS, self::DESCRIPTION, self::MEDIA_DATE, self::ADMIN_TAGS, self::MODERATION_STATUS, self::MODERATION_COUNT, self::MODIFIED_AT, self::ACCESS_CONTROL_ID, self::CATEGORIES, self::START_DATE, self::END_DATE, self::FLAVOR_PARAMS, self::AVAILABLE_FROM, self::PLUGIN_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('entry_id', 'kuser_id', 'name', 'type', 'media_type', 'views', 'rank', 'tags', 'status', 'source_link', 'duration', 'created_at', 'updated_at', 'partner_id', 'display_in_search', 'group_id', 'plays', 'description', 'media_date', 'admin_tags', 'moderation_status', 'moderation_count', 'modified_at', 'access_control_id', 'categories', 'start_date', 'end_date', 'flavor_params', 'available_from', 'plugin_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
+		BasePeer::TYPE_PHPNAME => array ('EntryId', 'KuserId', 'Name', 'Type', 'MediaType', 'Views', 'Rank', 'Tags', 'EntryStatus', 'SourceLink', 'Duration', 'DurationType', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'DisplayInSearch', 'GroupId', 'Plays', 'Description', 'MediaDate', 'AdminTags', 'ModerationStatus', 'ModerationCount', 'ModifiedAt', 'AccessControlId', 'Categories', 'StartDate', 'EndDate', 'FlavorParams', 'AvailableFrom', 'PluginData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('entryId', 'kuserId', 'name', 'type', 'mediaType', 'views', 'rank', 'tags', 'entryStatus', 'sourceLink', 'duration', 'durationType', 'createdAt', 'updatedAt', 'partnerId', 'displayInSearch', 'groupId', 'plays', 'description', 'mediaDate', 'adminTags', 'moderationStatus', 'moderationCount', 'modifiedAt', 'accessControlId', 'categories', 'startDate', 'endDate', 'flavorParams', 'availableFrom', 'pluginData', ),
+		BasePeer::TYPE_COLNAME => array (self::ENTRY_ID, self::KUSER_ID, self::NAME, self::TYPE, self::MEDIA_TYPE, self::VIEWS, self::RANK, self::TAGS, self::ENTRY_STATUS, self::SOURCE_LINK, self::DURATION, self::DURATION_TYPE, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::DISPLAY_IN_SEARCH, self::GROUP_ID, self::PLAYS, self::DESCRIPTION, self::MEDIA_DATE, self::ADMIN_TAGS, self::MODERATION_STATUS, self::MODERATION_COUNT, self::MODIFIED_AT, self::ACCESS_CONTROL_ID, self::CATEGORIES, self::START_DATE, self::END_DATE, self::FLAVOR_PARAMS, self::AVAILABLE_FROM, self::PLUGIN_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('entry_id', 'kuser_id', 'name', 'type', 'media_type', 'views', 'rank', 'tags', 'entry_status', 'source_link', 'duration', 'duration_type', 'created_at', 'updated_at', 'partner_id', 'display_in_search', 'group_id', 'plays', 'description', 'media_date', 'admin_tags', 'moderation_status', 'moderation_count', 'modified_at', 'access_control_id', 'categories', 'start_date', 'end_date', 'flavor_params', 'available_from', 'plugin_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, )
 	);
 
 	/**
@@ -151,11 +154,11 @@ abstract class BaseSearchEntryPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('EntryId' => 0, 'KuserId' => 1, 'Name' => 2, 'Type' => 3, 'MediaType' => 4, 'Views' => 5, 'Rank' => 6, 'Tags' => 7, 'Status' => 8, 'SourceLink' => 9, 'Duration' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, 'PartnerId' => 13, 'DisplayInSearch' => 14, 'GroupId' => 15, 'Plays' => 16, 'Description' => 17, 'MediaDate' => 18, 'AdminTags' => 19, 'ModerationStatus' => 20, 'ModerationCount' => 21, 'ModifiedAt' => 22, 'AccessControlId' => 23, 'Categories' => 24, 'StartDate' => 25, 'EndDate' => 26, 'FlavorParams' => 27, 'AvailableFrom' => 28, 'PluginData' => 29, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('entryId' => 0, 'kuserId' => 1, 'name' => 2, 'type' => 3, 'mediaType' => 4, 'views' => 5, 'rank' => 6, 'tags' => 7, 'status' => 8, 'sourceLink' => 9, 'duration' => 10, 'createdAt' => 11, 'updatedAt' => 12, 'partnerId' => 13, 'displayInSearch' => 14, 'groupId' => 15, 'plays' => 16, 'description' => 17, 'mediaDate' => 18, 'adminTags' => 19, 'moderationStatus' => 20, 'moderationCount' => 21, 'modifiedAt' => 22, 'accessControlId' => 23, 'categories' => 24, 'startDate' => 25, 'endDate' => 26, 'flavorParams' => 27, 'availableFrom' => 28, 'pluginData' => 29, ),
-		BasePeer::TYPE_COLNAME => array (self::ENTRY_ID => 0, self::KUSER_ID => 1, self::NAME => 2, self::TYPE => 3, self::MEDIA_TYPE => 4, self::VIEWS => 5, self::RANK => 6, self::TAGS => 7, self::STATUS => 8, self::SOURCE_LINK => 9, self::DURATION => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, self::PARTNER_ID => 13, self::DISPLAY_IN_SEARCH => 14, self::GROUP_ID => 15, self::PLAYS => 16, self::DESCRIPTION => 17, self::MEDIA_DATE => 18, self::ADMIN_TAGS => 19, self::MODERATION_STATUS => 20, self::MODERATION_COUNT => 21, self::MODIFIED_AT => 22, self::ACCESS_CONTROL_ID => 23, self::CATEGORIES => 24, self::START_DATE => 25, self::END_DATE => 26, self::FLAVOR_PARAMS => 27, self::AVAILABLE_FROM => 28, self::PLUGIN_DATA => 29, ),
-		BasePeer::TYPE_FIELDNAME => array ('entry_id' => 0, 'kuser_id' => 1, 'name' => 2, 'type' => 3, 'media_type' => 4, 'views' => 5, 'rank' => 6, 'tags' => 7, 'status' => 8, 'source_link' => 9, 'duration' => 10, 'created_at' => 11, 'updated_at' => 12, 'partner_id' => 13, 'display_in_search' => 14, 'group_id' => 15, 'plays' => 16, 'description' => 17, 'media_date' => 18, 'admin_tags' => 19, 'moderation_status' => 20, 'moderation_count' => 21, 'modified_at' => 22, 'access_control_id' => 23, 'categories' => 24, 'start_date' => 25, 'end_date' => 26, 'flavor_params' => 27, 'available_from' => 28, 'plugin_data' => 29, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, )
+		BasePeer::TYPE_PHPNAME => array ('EntryId' => 0, 'KuserId' => 1, 'Name' => 2, 'Type' => 3, 'MediaType' => 4, 'Views' => 5, 'Rank' => 6, 'Tags' => 7, 'EntryStatus' => 8, 'SourceLink' => 9, 'Duration' => 10, 'DurationType' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'PartnerId' => 14, 'DisplayInSearch' => 15, 'GroupId' => 16, 'Plays' => 17, 'Description' => 18, 'MediaDate' => 19, 'AdminTags' => 20, 'ModerationStatus' => 21, 'ModerationCount' => 22, 'ModifiedAt' => 23, 'AccessControlId' => 24, 'Categories' => 25, 'StartDate' => 26, 'EndDate' => 27, 'FlavorParams' => 28, 'AvailableFrom' => 29, 'PluginData' => 30, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('entryId' => 0, 'kuserId' => 1, 'name' => 2, 'type' => 3, 'mediaType' => 4, 'views' => 5, 'rank' => 6, 'tags' => 7, 'entryStatus' => 8, 'sourceLink' => 9, 'duration' => 10, 'durationType' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'partnerId' => 14, 'displayInSearch' => 15, 'groupId' => 16, 'plays' => 17, 'description' => 18, 'mediaDate' => 19, 'adminTags' => 20, 'moderationStatus' => 21, 'moderationCount' => 22, 'modifiedAt' => 23, 'accessControlId' => 24, 'categories' => 25, 'startDate' => 26, 'endDate' => 27, 'flavorParams' => 28, 'availableFrom' => 29, 'pluginData' => 30, ),
+		BasePeer::TYPE_COLNAME => array (self::ENTRY_ID => 0, self::KUSER_ID => 1, self::NAME => 2, self::TYPE => 3, self::MEDIA_TYPE => 4, self::VIEWS => 5, self::RANK => 6, self::TAGS => 7, self::ENTRY_STATUS => 8, self::SOURCE_LINK => 9, self::DURATION => 10, self::DURATION_TYPE => 11, self::CREATED_AT => 12, self::UPDATED_AT => 13, self::PARTNER_ID => 14, self::DISPLAY_IN_SEARCH => 15, self::GROUP_ID => 16, self::PLAYS => 17, self::DESCRIPTION => 18, self::MEDIA_DATE => 19, self::ADMIN_TAGS => 20, self::MODERATION_STATUS => 21, self::MODERATION_COUNT => 22, self::MODIFIED_AT => 23, self::ACCESS_CONTROL_ID => 24, self::CATEGORIES => 25, self::START_DATE => 26, self::END_DATE => 27, self::FLAVOR_PARAMS => 28, self::AVAILABLE_FROM => 29, self::PLUGIN_DATA => 30, ),
+		BasePeer::TYPE_FIELDNAME => array ('entry_id' => 0, 'kuser_id' => 1, 'name' => 2, 'type' => 3, 'media_type' => 4, 'views' => 5, 'rank' => 6, 'tags' => 7, 'entry_status' => 8, 'source_link' => 9, 'duration' => 10, 'duration_type' => 11, 'created_at' => 12, 'updated_at' => 13, 'partner_id' => 14, 'display_in_search' => 15, 'group_id' => 16, 'plays' => 17, 'description' => 18, 'media_date' => 19, 'admin_tags' => 20, 'moderation_status' => 21, 'moderation_count' => 22, 'modified_at' => 23, 'access_control_id' => 24, 'categories' => 25, 'start_date' => 26, 'end_date' => 27, 'flavor_params' => 28, 'available_from' => 29, 'plugin_data' => 30, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, )
 	);
 
 	/**
@@ -233,9 +236,10 @@ abstract class BaseSearchEntryPeer {
 		$criteria->addSelectColumn(SearchEntryPeer::VIEWS);
 		$criteria->addSelectColumn(SearchEntryPeer::RANK);
 		$criteria->addSelectColumn(SearchEntryPeer::TAGS);
-		$criteria->addSelectColumn(SearchEntryPeer::STATUS);
+		$criteria->addSelectColumn(SearchEntryPeer::ENTRY_STATUS);
 		$criteria->addSelectColumn(SearchEntryPeer::SOURCE_LINK);
 		$criteria->addSelectColumn(SearchEntryPeer::DURATION);
+		$criteria->addSelectColumn(SearchEntryPeer::DURATION_TYPE);
 		$criteria->addSelectColumn(SearchEntryPeer::CREATED_AT);
 		$criteria->addSelectColumn(SearchEntryPeer::UPDATED_AT);
 		$criteria->addSelectColumn(SearchEntryPeer::PARTNER_ID);
