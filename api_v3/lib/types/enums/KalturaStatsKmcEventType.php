@@ -29,12 +29,12 @@
  * Update server settings
  * 1.
  * 2.KMC App studio events
- * New player � single video
- * New player � Playlist
- * New player � Multi-tab playlist
- * Edit player � single video
- * Edit player � Playlist
- * Edit player � Multi-tab playlist
+ * New player - single video
+ * New player - Playlist
+ * New player - Multi-tab playlist
+ * Edit player - single video
+ * Edit player - Playlist
+ * Edit player - Multi-tab playlist
  * Duplicate player
  * 3. 
  */
