@@ -79,7 +79,30 @@ class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEv
 			call_user_func(array($searchObject, $setter), $value);
 		}
 		
-		// TODO - load plugins data
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSearchDataContributor');
+		$pluginsData = array();
+		foreach($pluginInstances as $pluginName => $pluginInstance)
+		{
+			KalturaLog::debug("Loading $pluginName search texts");
+			$pluginData = null;
+			try
+			{
+				$pluginData = $pluginInstance->getSearchData($object);
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				continue;
+			}
+			
+			if($pluginData)
+			{
+				KalturaLog::debug("Search data for $pluginName [$pluginData]");
+				$pluginsData[] = $pluginData;
+			}
+		}
+		if(count($pluginsData))
+			$searchObject->setPluginData(implode(',', $pluginsData));
 		
 		$searchObject->save();
 	}

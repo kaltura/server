@@ -13,17 +13,32 @@
  * @package plugins.contentDistribution
  * @subpackage model
  */
-class SearchEntry extends BaseSearchEntry {
-
-	/**
-	 * Initializes internal state of SearchEntry object.
-	 * @see        parent::__construct()
+class SearchEntry extends BaseSearchEntry 
+{
+	/* (non-PHPdoc)
+	 * @see BaseSearchEntry::setCategories()
 	 */
-	public function __construct()
+	public function setCategories($v)
 	{
-		// Make sure that parent constructor is always invoked, since that
-		// is where any default values for this object are set.
-		parent::__construct();
+		if($v)
+		{
+			$arr = explode(',', $v);
+			$v = '_' . implode('_,_', $arr) . '_';
+		}
+		parent::setCategories($v);
+	}
+
+	/* (non-PHPdoc)
+	 * @see BaseSearchEntry::setFlavorParams()
+	 */
+	public function setFlavorParams($v)
+	{
+		if($v)
+		{
+			$arr = explode(',', $v);
+			$v = '_' . implode('_,_', $arr) . '_';
+		}
+		parent::setFlavorParams($v);
 	}
 
 } // SearchEntry
