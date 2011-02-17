@@ -39,15 +39,15 @@ class SchedulerTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CREATED_BY', 'CreatedBy', 'VARCHAR', false, 20, null);
+		$this->addColumn('CREATED_BY', 'CreatedBy', 'VARCHAR', false, 127, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('UPDATED_BY', 'UpdatedBy', 'VARCHAR', false, 20, null);
+		$this->addColumn('UPDATED_BY', 'UpdatedBy', 'VARCHAR', false, 127, null);
 		$this->addColumn('CONFIGURED_ID', 'ConfiguredId', 'INTEGER', false, null, null);
-		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 20, '');
-		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 20, '');
-		$this->addColumn('STATUSES', 'Statuses', 'VARCHAR', false, 255, '');
+		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 127, '');
+		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, '');
+		$this->addColumn('STATUSES', 'Statuses', 'VARCHAR', false, 1023, '');
 		$this->addColumn('LAST_STATUS', 'LastStatus', 'TIMESTAMP', false, null, null);
-		$this->addColumn('HOST', 'Host', 'VARCHAR', false, 63, '');
+		$this->addColumn('HOST', 'Host', 'VARCHAR', false, 255, '');
 		// validators
 	} // initialize()
 

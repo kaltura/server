@@ -39,19 +39,19 @@ class ControlPanelCommandTableMap extends TableMap {
 		// columns
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('CREATED_BY', 'CreatedBy', 'VARCHAR', false, 20, null);
+		$this->addColumn('CREATED_BY', 'CreatedBy', 'VARCHAR', false, 127, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('UPDATED_BY', 'UpdatedBy', 'VARCHAR', false, 20, null);
+		$this->addColumn('UPDATED_BY', 'UpdatedBy', 'VARCHAR', false, 127, null);
 		$this->addColumn('CREATED_BY_ID', 'CreatedById', 'INTEGER', false, null, null);
 		$this->addColumn('SCHEDULER_ID', 'SchedulerId', 'INTEGER', false, null, null);
 		$this->addColumn('SCHEDULER_CONFIGURED_ID', 'SchedulerConfiguredId', 'INTEGER', false, null, null);
 		$this->addColumn('WORKER_ID', 'WorkerId', 'INTEGER', false, null, null);
 		$this->addColumn('WORKER_CONFIGURED_ID', 'WorkerConfiguredId', 'INTEGER', false, null, null);
-		$this->addColumn('WORKER_NAME', 'WorkerName', 'VARCHAR', false, 50, null);
+		$this->addColumn('WORKER_NAME', 'WorkerName', 'VARCHAR', false, 127, null);
 		$this->addColumn('BATCH_INDEX', 'BatchIndex', 'INTEGER', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'SMALLINT', false, null, null);
-		$this->addColumn('TARGET_TYPE', 'TargetType', 'SMALLINT', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'SMALLINT', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', false, null, null);
+		$this->addColumn('TARGET_TYPE', 'TargetType', 'INTEGER', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
 		$this->addColumn('CAUSE', 'Cause', 'VARCHAR', false, 255, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, null);
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'VARCHAR', false, 255, null);
