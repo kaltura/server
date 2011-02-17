@@ -66,6 +66,16 @@ while(count($users))
 		
 		if ($existing_login_data)
 		{
+			if ($user->getPartnerId() === $existing_login_data->getConfigPartnerId())
+			{
+				$checkKuser = kuserPeer::getByLoginDataAndPartner($existing_login_data->getId(), $user->getPartnerId());
+				if ($checkKuser && $checkKuser->getIsAdmin()) {
+					KalturaLog::notice('!!! NOTICE - Existing ADMIN login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] since this was probably caused by a bug');
+					echo '!!! NOTICE - Existing ADMIN login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] since this was probably caused by a bug';
+					continue;
+				}
+			}
+			
 			KalturaLog::alert('!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] !!!!');
 			echo '!!! ERROR - Existing login data found with id ['.$existing_login_data->getId().'] partner ['.$existing_login_data->getConfigPartnerId().'] - skipping user id ['.$lastUser.'] of partner ['.$user->getPartnerId().'] !!!!';
 			continue;
