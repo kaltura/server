@@ -205,5 +205,6 @@ contentdistributionbatch.updateexclusivedistributionfetchreportjob			|			|2		|1	
 contentdistributionbatch.freeexclusivedistributionfetchreportjob			|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
 contentdistributionbatch.getexclusivealmostdonedistributionfetchreportjobs	|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
 contentdistributionbatch.createrequiredjobs									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
+contentdistributionbatch.updatesunstatus									|			|2		|1	|0		|0		|1		|rw	|	|	|  		|BATCH_BASE
 
 ---------------------------------------------------------------------------------------------------
