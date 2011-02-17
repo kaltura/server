@@ -175,6 +175,8 @@ class BatchControlService extends KalturaBaseService
 	 */
 	private function getOrCreateWorker(Scheduler $scheduler, $workerConfigId, $workerType = null, $workerName = null)
 	{
+		$workerType = kPluginableEnumsManager::apiToCore('BatchJobType', $workerType);
+		
 		$c = new Criteria();
 		$c->add ( SchedulerWorkerPeer::SCHEDULER_CONFIGURED_ID, $scheduler->getConfiguredId());
 		$c->add ( SchedulerWorkerPeer::CONFIGURED_ID, $workerConfigId);
