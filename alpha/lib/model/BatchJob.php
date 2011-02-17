@@ -106,7 +106,6 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 	public static function getTypeName($type)
 	{
-		$type = (int) $type;
 		if(!isset(self::$BATCHJOB_TYPE_NAMES[$type]))
 			return ucwords(str_replace('.', ' ', $type));
 			
