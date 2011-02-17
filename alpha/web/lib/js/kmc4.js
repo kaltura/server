@@ -429,11 +429,10 @@ kmc.utils = {
         XD.receiveMessage(function(message){
             if(message.data == "reload") {
                 kmc.utils.closeModal();
-		if( ($.browser.msie) && ($.browser.version < 7) ) {
-		    window.location.href = kmc.vars.service_url + "/index.php/kmc/kmc4#account|user1";
-		} else {
-		    window.location.reload();
+		if( ($.browser.msie) && ($.browser.version < 8) ) {
+		    window.location.hash = "account|user";
 		}
+		window.location.reload();
             } else {
                 kmc.utils.closeModal();
             }
