@@ -2,16 +2,27 @@
 
 class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
 {
-	const MYSQL_INDEX_NAME = 'kaltura';
-	const MYSQL_MAX_RECORDS = 1000;
+	const MYSQL_INDEX_NAME = 'Search';
 	
 	/**
 	 * @param string $baseName
 	 * @return string
 	 */
-	public static function getMySqlIndexName($baseName)
+	public static function getMySqlSearchObject($baseName, $id)
 	{
-		return self::MYSQL_INDEX_NAME . '_' . $baseName;
+		$objectClass = self::MYSQL_INDEX_NAME . ucfirst($baseName);
+		$peerClass = $objectClass . 'Peer';
+		if(!class_exists($peerClass))
+			return null;
+			
+		$object = call_user_func(array($peerClass, 'retrieveByPK'), $id);
+		if($object)
+			return $object;
+			
+		if(class_exists($objectClass))
+			return new $objectClass();
+			
+		return null;
 	}
 	
 	/**
@@ -36,159 +47,40 @@ class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEv
 		if(!($object instanceof IIndexable))
 			return true;
 
-		$this->saveToMySql($object, true);
+		$this->saveToMySql($object);
 		return true;
 	}
 	
 	/**
-	 * Get the [status] column value translated for MySql supported values.
-	 * 
-	 * @return     int
-	 */
-	public function getMySqlId($object)
-	{
-		return crc32($object->getId());
-	}
-
-	// TODO remove $force after replace bug solved
-	/**
 	 * @param IIndexable $object
-	 * @param bool $isInsert
-	 * @param bool $force
-	 * @return string|bool
 	 */
-	public function getMySqlSaveSql(IIndexable $object, $isInsert = false, $force = false)
+	public function saveToMySql(IIndexable $object)
 	{
-		$id = $object->getIntId();
+		$id = $object->getId();
 		if(!$id)
 		{
-			KalturaLog::err("Object [" . get_class($object) . "] id [" . $object->getId() . "] could not be saved to MySql, int_id is empty");
+			KalturaLog::err("Object [" . get_class($object) . "] id [" . $object->getId() . "] could not be saved to MySql, id is empty");
 			return false;
 		}
 		
-//		if(!$force && !$isInsert && !$this->saveToMySqlRequired($object))
-//			return false;
-			
-		$data = array('id' => $id);
-		
-		// NOTE: the order matters
-		$dataStrings = array();
-		$dataInts = array();
-		$dataTimes = array();
+		$searchObject = self::getMySqlSearchObject($object->getObjectIndexName(), $id);
 		
 		$fields = $object->getIndexFieldsMap();
 		foreach($fields as $field => $getterName)
 		{
-			$fieldType = $object->getIndexFieldType($field);
+			$setterName = str_replace('_', '', $field);
 			$getter = "get{$getterName}";
+			$setter = "set{$setterName}";
 			
-			switch($fieldType)
-			{
-				case IIndexable::FIELD_TYPE_STRING:
-					$dataStrings[$field] = $object->$getter();
-					break;
-					
-				case IIndexable::FIELD_TYPE_INTEGER:
-					$dataInts[$field] = $object->$getter();
-					break;
-					
-				case IIndexable::FIELD_TYPE_DATETIME:
-					$dataTimes[$field] = $object->$getter(null);
-					break;
-			}
-		}
-		
-		// TODO - remove after solving the replace bug that removes all fields
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSearchDataContributor');
-		$mySqlPluginsData = array();
-		foreach($pluginInstances as $pluginName => $pluginInstance)
-		{
-			KalturaLog::debug("Loading $pluginName MySql texts");
-			$mySqlPluginData = null;
-			try
-			{
-				$mySqlPluginData = $pluginInstance->getSearchData($object);
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::err($e->getMessage());
+			if(!method_exists($searchObject, $setter))
 				continue;
-			}
-			
-			if($mySqlPluginData)
-			{
-				KalturaLog::debug("MySql data for $pluginName [$mySqlPluginData]");
-				$mySqlPluginsData[] = $mySqlPluginData;
-			}
-		}
-		if(count($mySqlPluginsData))
-			$dataStrings['plugins_data'] = implode(',', $mySqlPluginsData);
-		
-		foreach($dataStrings as $key => $value)
-		{
-			$search=array("\\","\0","\n","\r","\x1a","'",'"');
-			$replace=array("\\\\","\\0","\\n","\\r","\\Z","\\'",'\"');
-			$value = str_replace($search, $replace, $value);
-			$data[$key] = "'$value'";
+				
+			$value = call_user_func(array($object, $getter));
+			call_user_func(array($searchObject, $setter), $value);
 		}
 		
-		foreach($dataInts as $key => $value)
-		{
-			$value = (int)$value;
-			$data[$key] = $value;
-		}
+		// TODO - load plugins data
 		
-		foreach($dataTimes as $key => $value)
-		{
-			$value = (int)$value;
-			$data[$key] = $value;
-		}
-		
-		$values = implode(',', $data);
-		$fields = implode(',', array_keys($data));
-		
-		$index = kMySqlSearchManager::getMySqlIndexName($object->getObjectIndexName());
-		$command = 'insert';
-		if(!$isInsert)
-			$command = 'replace';
-		
-		return "$command into $index ($fields) values($values)";
-	}
-		
-	/**
-	 * @param string $sql
-	 * @param IIndexable $object
-	 * @return bool
-	 */
-	public function execMySql($sql, IIndexable $object)
-	{
-		KalturaLog::debug($sql);
-		
-		$con = DbManager::getMySqlConnection();
-		$ret = $con->exec($sql);
-		if($ret)
-			return true;
-			
-		$arr = $con->errorInfo();
-		KalturaLog::err($arr[2]);
-		return false;
-	}
-		
-	/**
-	 * @param IIndexable $object
-	 * @param bool $isInsert
-	 * @param bool $force 
-	 * TODO remove $force after replace bug solved
-	 * 
-	 * @return bool
-	 */
-	public function saveToMySql(IIndexable $object, $isInsert = false, $force = false)
-	{
-		KalturaLog::debug('Updating MySql for object [' . get_class($object) . '] [' . $object->getId() . ']');
-		$sql = $this->getMySqlSaveSql($object, $isInsert, $force);
-		if(!$sql)
-			return true;
-		
-		return $this->execMySql($sql, $object);
+		$searchObject->save();
 	}
 }
