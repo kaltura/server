@@ -75,6 +75,9 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		
 		BatchJobType::METADATA_IMPORT => 'Metadata Import',
 		BatchJobType::METADATA_TRANSFORM => 'Metadata Transform',
+		
+		BatchJobType::FILESYNC_IMPORT => 'File Sync Import',
+		BatchJobType::CAPTURE_THUMB => 'Capture Thumbnail',
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(
@@ -105,7 +108,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	{
 		$type = (int) $type;
 		if(!isset(self::$BATCHJOB_TYPE_NAMES[$type]))
-			return "Extended ($type)";
+			return ucwords(str_replace('.', ' ', $type));
 			
 		return self::$BATCHJOB_TYPE_NAMES[$type];
 	}
