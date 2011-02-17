@@ -141,7 +141,7 @@ while(count($partners))
 			foreach($newPermissions as $permission) {
 				KalturaLog::log('SAVING new permission for partner ['.$partner->getId().']:');
 				
-				PermissionPeer::addToPartner($permission, $partner->getId());
+				PermissionPeer::enableForPartner($permission->getName(), $permission->getType(), $partner->getId(), $permission->getFriendlyName(), $permission->getDescription());
 				KalturaLog::log(print_r($permission, true));
 			}	
 		}
