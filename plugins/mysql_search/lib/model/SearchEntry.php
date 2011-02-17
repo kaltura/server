@@ -13,7 +13,7 @@
  * @package plugins.contentDistribution
  * @subpackage model
  */
-class SearchEntry extends BaseSearchEntry 
+class SearchEntry extends BaseSearchEntry implements IMySqlSearchObject
 {
 	/* (non-PHPdoc)
 	 * @see BaseSearchEntry::setCategories()

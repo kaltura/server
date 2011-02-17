@@ -13,6 +13,29 @@
  * @package plugins.contentDistribution
  * @subpackage model
  */
-class SearchEntryPeer extends BaseSearchEntryPeer {
-
+class SearchEntryPeer extends BaseSearchEntryPeer implements IMySqlSearchPeer 
+{
+	/* (non-PHPdoc)
+	 * @see IMySqlSearchPeer::getPrimaryKeyField()
+	 */
+	public static function getPrimaryKeyField()
+	{
+		return entryPeer::ID;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IMySqlSearchPeer::getSearchPrimaryKeyField()
+	 */
+	public static function getSearchPrimaryKeyField()
+	{
+		return self::ENTRY_ID;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IMySqlSearchPeer::doCountOnSourceTable()
+	 */
+	public static function doCountOnSourceTable(Criteria $criteria, $distinct = false, PropelPDO $con = null)
+	{
+		return entryPeer::doCount($criteria, $distinct, $con);
+	}
 } // SearchEntryPeer

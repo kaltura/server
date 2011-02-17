@@ -6,7 +6,7 @@ class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEv
 	
 	/**
 	 * @param string $baseName
-	 * @return string
+	 * @return IMySqlSearchObject
 	 */
 	public static function getMySqlSearchObject($baseName, $id)
 	{
