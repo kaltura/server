@@ -6,9 +6,7 @@
 class KalturaBatchQueuesStatus extends KalturaObject 
 {
 	/**
-	 * The job type (KalturaBatchJobType or extended)
-	 * 
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType;
 	

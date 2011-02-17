@@ -12,7 +12,7 @@ class KalturaFreeJobResponse extends KalturaObject
 	public $job;
 
 	/**
-	 * @var int
+	 * @var KalturaBatchJobType
 	 * @readonly 
 	 */
     public $jobType;

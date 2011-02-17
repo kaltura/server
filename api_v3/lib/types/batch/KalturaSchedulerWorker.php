@@ -42,7 +42,7 @@ class KalturaSchedulerWorker extends KalturaObject
 	/**
 	 * The worker type
 	 * 
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $type;
 	

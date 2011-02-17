@@ -36,9 +36,8 @@ class KalturaSchedulerStatus extends KalturaObject
 	
 	/**
 	 * The type of the job worker.
-	 * Could be KalturaBatchJobType or extended type
 	 *  
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $workerType;
 
