@@ -73,9 +73,9 @@ while(count($puserKusers))
 			continue;
 		}
 				
-		if (!$kuser->getPuserId())
+		if (is_null($kuser->getPuserId()) || strcmp($kuser->getPuserId(), '') === 0)
 		{
-			if ($puserId)
+			if (!is_null($puserId) && strcmp($puserId, '') !== 0)
 			{
 				$c = new Criteria();
 				$c->addAnd(kuserPeer::PUSER_ID, $puserId, Criteria::EQUAL);
@@ -103,7 +103,7 @@ while(count($puserKusers))
 		}
 		else
 		{
-			if ($kuser->getPuserId() != $puserId)
+			if (strtolower($kuser->getPuserId()) != strtolower($puserId))
 			{
 				$msg = 'ERROR - Puser ids are not the same for puserKuser ['.$lastPuserKuser.'] with puserId ['.$puserId.'] and kuser ['.$kuserId.'] with puserId ['.$kuser->getPuserId().'] of partner id ['.$partnerId.']';
 				KalturaLog::alert($msg);

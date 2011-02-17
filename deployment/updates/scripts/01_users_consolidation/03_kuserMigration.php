@@ -57,7 +57,9 @@ while(count($users))
 		$user->setFirstName($firstName);
 		$user->setLastName($lastName);
 		
-		$user->setIsAdmin(false);
+		if ($user->getIsAdmin() !== true) {
+			$user->setIsAdmin(false);
+		}
 		
 		$new_login_data = null;
 		

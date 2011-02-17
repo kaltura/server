@@ -136,6 +136,9 @@ echo $msg;
 
 function getNewRole($oldRoleName, $userRoles)
 {
+	if (!$oldRoleName) {
+		$oldRoleName = 'guest';
+	}
 	
 	if (!isset($userRoles[$oldRoleName]))
 	{
