@@ -88,7 +88,7 @@ class kConf extends kConfLocal
 				"kmc_account_show_usage" => true,			
 
 			/* kmc applications versions */
-				"kmc_content_version" => 'v3.2.12.1',
+				"kmc_content_version" => 'v3.2.12.2',
 				"kmc_account_version" => 'v3.1.3',
 				"kmc_appstudio_version" => 'v2.2.3',
 				"kmc_rna_version" => 'v1.1.8.4',
