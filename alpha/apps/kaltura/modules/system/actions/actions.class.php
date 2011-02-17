@@ -3,10 +3,9 @@ require_once ( "kalturaSystemActions.class.php");
 /**
  * system actions.
  *
- * @package    kaltura
+ * @package    Core
  * @subpackage system
- * @author     Your name here
- * @version    SVN: $Id: actions.class.php 2692 2006-11-15 21:03:55Z fabien $
+ * @deprecated
  */
 class systemActions extends kalturaSystemActions
 {
