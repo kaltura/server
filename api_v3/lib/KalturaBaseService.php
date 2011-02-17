@@ -106,8 +106,12 @@ abstract class KalturaBaseService
 		$actionPermitted = $this->isPermitted($allowPrivatePartnerData);
 		
 		// action not permitted at all, not even kaltura network
-		if (!$actionPermitted) {
-			throw new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
+		if (!$actionPermitted)
+		{			
+			$e = new KalturaAPIException ( APIErrors::SERVICE_FORBIDDEN, $this->serviceId.'->'.$this->actionName); //TODO: should sometimes thorow MISSING_KS instead
+			header("X-Kaltura:error-".$e->getCode());
+			header("X-Kaltura-App: exiting on error ".$e->getCode()." - ".$e->getMessage());
+			throw $e;		
 		}
 		
 		// init partner filter parameters
