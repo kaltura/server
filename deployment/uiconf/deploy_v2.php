@@ -16,7 +16,7 @@ error_reporting(E_ALL);
 $code = array();
 $uiConfIds = array();
 
-$argv = array( 1=> "--ini=c:/web/flash/kmc/v4.0.4/config.ini", 2 => "--no-create"); //used to teswt inside the zend studio
+//$argv = array( 1=> "--ini=c:/web/flash/kmc/v4.0.4/config.ini", 2 => "--no-create"); //used to teswt inside the zend studio
 
 $arguments = uiConfDeployment::setArguments($argv);
 
