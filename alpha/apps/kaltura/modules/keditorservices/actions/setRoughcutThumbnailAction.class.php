@@ -1,6 +1,15 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "myKshowUtils.class.php");
 require_once ( "defKeditorservicesAction.class.php");
+
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class setRoughcutThumbnailAction extends defKeditorservicesAction
 {
 	protected function executeImpl( kshow $kshow, entry &$entry )

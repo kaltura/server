@@ -1,5 +1,14 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "defKeditorservicesAction.class.php");
+
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class getEntryInfoAction extends defKeditorservicesAction
 {
 	// here the $kshow will be null (thanks to fetchKshow=false) and entry will 

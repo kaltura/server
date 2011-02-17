@@ -1,7 +1,15 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "defKeditorservicesAction.class.php");
 require_once ( "myKshowUtils.class.php");
 
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class getKshowInfoAction extends defKeditorservicesAction
 {
 	protected function executeImpl ( kshow $kshow, entry &$entry )

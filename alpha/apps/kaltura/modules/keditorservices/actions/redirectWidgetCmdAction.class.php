@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class redirectWidgetCmdAction extends kalturaAction
 {
 	public function execute()

@@ -1,8 +1,15 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "defKeditorservicesAction.class.php");
 
 /**
- * fetch global assets - ones that 
+ * fetch global assets - ones that
+ * 
+ * @package    Core
+ * @subpackage kEditorServices
  */
 class getGlobalAssetsAction extends defKeditorservicesAction
 {

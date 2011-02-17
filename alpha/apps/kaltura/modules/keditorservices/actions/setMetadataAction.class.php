@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "myFlvStreamer.class.php");
 require_once ( "myMetadataUtils.class.php");
 
@@ -6,6 +10,10 @@ require_once ( "defKeditorservicesAction.class.php");
 require_once ( "myStatisticsMgr.class.php");
 require_once ( "myKshowUtils.class.php");
 
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class setMetadataAction extends defKeditorservicesAction
 {
 	/**

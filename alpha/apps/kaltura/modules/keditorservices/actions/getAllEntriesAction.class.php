@@ -1,5 +1,14 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "defKeditorservicesAction.class.php");
+
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class getAllEntriesAction extends defKeditorservicesAction
 {
 	const LIST_TYPE_KSHOW = 1 ;

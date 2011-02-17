@@ -1,13 +1,13 @@
 <?php
-
-require_once ( "kalturaAction.class.php");
 /**
- * emailImport actions.
- *
- * @package    kaltura
- * @subpackage emailImport
- * @author     Your name here
- * @version    SVN: $Id: actions.class.php 2692 2006-11-15 21:03:55Z fabien $
+ * @package    Core
+ * @subpackage kEditorServices
+ */
+require_once ( "kalturaAction.class.php");
+
+/**
+ * @package    Core
+ * @subpackage kEditorServices
  */
 class defKeditorservicesAction extends kalturaAction
 {

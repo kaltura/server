@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class flvclipperAction extends kalturaAction
 {
 	static private function hmac($hashfunc, $key, $data)

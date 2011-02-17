@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class getRelatedKshowsAction extends kalturaAction
 {
 	public function execute ( )

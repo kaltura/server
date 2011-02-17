@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage externalServices
+ */
 class youtubeRedirectAction extends kalturaAction
 {
 	public function execute()

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 require_once ( "kalturaAction.class.php");
 require_once ( "mySmartPager.class.php");
 
@@ -8,6 +12,10 @@ require_once ( "mySmartPager.class.php");
 //search/actions/entryFilter.class.phprequire_once ( "../apps/kaltura/modules/search/actions/entryFilter.class.php");
 
 
+/**
+ * @package    Core
+ * @subpackage kEditorServices
+ */
 class searchEntriesAction extends kalturaAction
 {
 	public function execute ( )

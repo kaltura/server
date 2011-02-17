@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package    Core
+ * @subpackage externalServices
+ */
 class metacafeRedirectAction extends kalturaAction
 {
 	public function execute()
