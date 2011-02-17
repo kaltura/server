@@ -16,7 +16,7 @@ error_reporting(E_ALL);
 $code = array();
 $uiConfIds = array();
 
-//$argv = array( 1=> "--ini=c:/uiConf/config.ini", 2 => "--no-create"); //used to teswt inside the zend studio
+$argv = array( 1=> "--ini=c:/web/flash/kmc/v4.0.4/config.ini", 2 => "--no-create"); //used to teswt inside the zend studio
 
 $arguments = uiConfDeployment::setArguments($argv);
 
@@ -35,6 +35,8 @@ if($includeCode)
 {
 	$code = uiConfDeploymentCodeGenerator::generateCode();
 }
+
+uiConfDeployment::deprecateOldUiConfs(uiConfDeployment::$defaultTags);
 
 //deploy all the ui confs
 uiConfDeployment::deploy($confObj);
@@ -160,6 +162,9 @@ class uiConfDeployment
 				
 					if($uiConf) //If the ui conf was generated successfully 
 					{
+//						//First we need to delete old versions of the widget
+//						uiConfDeployment::deprecateOldUiConf($widgetValue);
+						
 						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
 						
@@ -198,6 +203,60 @@ class uiConfDeployment
 					echo PHP_EOL;
 				}
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Deprectes old ui confs which have the same Tags.
+	 * it replaces their tag from autodeploy to deprecated 
+	 */
+	public static function deprecateOldUiConfs($tag)
+	{
+		//Selects all the ui confs with the given $newTag
+		$con = Propel::getConnection();
+		$oldConfCriteria = new Criteria();
+		$oldConfCriteria->add(uiConfPeer::TAGS, "%{$tag}%", Criteria::LIKE);
+		$oldConfCriteria->addSelectColumn(uiConfPeer::ID);
+		$oldConfCriteria->addSelectColumn(uiConfPeer::TAGS);
+
+		//Select ID, tags from ui_conf where tags like %$newTag%;  
+		$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
+
+		$totalDepractedCount = 0;
+		
+		//For each uiconf:
+		foreach ($uiConfs as $oldUiConf)
+		{
+			$newTag = $oldUiConf[1];
+			$deprecatedTag = $newTag;
+			$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
+		
+			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} \n";
+			
+			$confCriteria = new Criteria();
+			$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
+			
+			$deprecatedConfValues = new Criteria();
+			$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
+			
+			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID 
+			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
+			
+			echo "uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag} \n\n";
+			
+			$totalDepractedCount += $deprecatedCount;
+		}
+		
+		//Add the status check to the select factor 
+		echo "{$totalDepractedCount} uiConfs were updated\n\n\n";
+
+		$count = uiConfPeer::doCount($oldConfCriteria);
+		
+		if($count > 0)
+		{
+			echo "Exiting, Tag: {$newTag} already found in the DB";
+			exit;
 		}
 	}
 	
@@ -307,20 +366,20 @@ class uiConfDeployment
 		global $skipAddUiconf;
 		if($skipAddUiconf) return rand(1000,1200); // return just any number if the no-create flag is on 
 		
-//		try
-//		{
+		try
+		{
 			$pe_conf->save();
 			
 			// chmod parent directory to 777 to allow changes by the apache user
 			$sync_key = $pe_conf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_DATA);
 			$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
 			@system('chmod 777 -R '.dirname($localPath));
-//		}
-//		catch(Exception $ex)
-//		{
-//			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
-//			exit(1);
-//		}
+		}
+		catch(Exception $ex)
+		{
+			echo 'Exiting on ERROR: '.$ex->getMessage().PHP_EOL;
+			exit(1);
+		}
 
 		return $pe_conf->getId();
 	}
