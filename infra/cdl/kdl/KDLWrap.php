@@ -170,6 +170,7 @@ KalturaLog::log(__METHOD__."==>\n");
 		$flavor = new flavorParamsOutputWrap();
 
 		$flavor->setFlavorParamsId($target->_id);
+		$flavor->setType($target->_type);
 		$flavor->setReadyBehavior($target->_ready_behavior);
 		$flavor->setTags($target->_tags);
 		
@@ -214,7 +215,10 @@ KalturaLog::log(__METHOD__."==>\n");
 			$flavor->setAudioChannels($target->_audio->_channels);
 			$flavor->setAudioSampleRate($target->_audio->_sampleRate);
 		}
-
+		
+		if($target->_pdf)
+			$flavor->putInCustomData('readonly',$target->_pdf->_readonly);
+		
 		$cdlOprSets = KDLWrap::convertOperatorsKdl2Cdl($target->_transcoders);
 		if($target->_engineVersion==1) {
 KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
@@ -276,13 +280,17 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 	public static function ConvertFlavorCdl2Kdl($cdlFlavor)
 	{
 		$kdlFlavor = new KDLFlavor();
-
+		
 		$kdlFlavor->_name = $cdlFlavor->getName();
 		$kdlFlavor->_id = $cdlFlavor->getId();
+		$kdlFlavor->_type = $cdlFlavor->getType();
 		$kdlFlavor->_ready_behavior = $cdlFlavor->getReadyBehavior();
-		$kdlFlavor->_tags = $cdlFlavor->getTags(); 
-		$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
-		$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
+		$kdlFlavor->_tags = $cdlFlavor->getTags();
+		if($cdlFlavor instanceof flavorParams)
+		{ 
+			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
+			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
+		}
 		
 			/* 
 			 * Media container initialization
@@ -385,6 +393,7 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_pdf->_resolution  = $cdlFlavor->getResolution();
 			$kdlFlavor->_pdf->_paperHeight = $cdlFlavor->getPaperHeight();
 			$kdlFlavor->_pdf->_paperWidth  = $cdlFlavor->getPaperWidth();
+			$kdlFlavor->_pdf->_readonly  = $cdlFlavor->getReadonly();
 		}
 		
 //KalturaLog::log(__METHOD__."\nKDL Flavor==>\n".print_r($kdlFlavor,true));
