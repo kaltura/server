@@ -28,6 +28,7 @@ class KDLFlavor extends KDLMediaDataSet {
 		 * to be moved to the KDLWrap
 		 */
 	public 	$_id = null;
+	public 	$_type = 1;
 	public  $_ready_behavior=null;
 	public  $_tags=null;
 	public  $_name=null;
