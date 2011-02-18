@@ -58,7 +58,7 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	 */
 	public function setReadonly($isReadonly)
 	{
-		parent::putInCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, $isReadonly, PdfFlavorParams::CUSTOM_DATA_NAMESPACE);
+		parent::putInCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, $isReadonly);
 	}
 	
 	/**
@@ -66,6 +66,6 @@ class PdfFlavorParamsOutput extends flavorParamsOutput implements PdfFlavorParam
 	 */
 	public function getReadonly()
 	{
-		return parent::getFromCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, PdfFlavorParams::CUSTOM_DATA_NAMESPACE);
+		return parent::getFromCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, null, false);
 	}
 }

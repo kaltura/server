@@ -5,7 +5,6 @@
  */
 class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 {
-	const CUSTOM_DATA_NAMESPACE = 'PDF';
 	const CUSTOM_DATA_FIELD_READONLY = 'readonly';
 	
 	/**
@@ -60,7 +59,7 @@ class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 	 */
 	public function setReadonly($isReadonly)
 	{
-		parent::putInCustomData(self::CUSTOM_DATA_FIELD_READONLY, $isReadonly, self::CUSTOM_DATA_NAMESPACE);
+		parent::putInCustomData(self::CUSTOM_DATA_FIELD_READONLY, $isReadonly);
 	}
 	
 	/**
@@ -68,7 +67,7 @@ class PdfFlavorParams extends flavorParams implements PdfFlavorParamsInterface
 	 */
 	public function getReadonly()
 	{
-		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_READONLY, self::CUSTOM_DATA_NAMESPACE);
+		return parent::getFromCustomData(self::CUSTOM_DATA_FIELD_READONLY, null,false);
 	}
 	
 }
