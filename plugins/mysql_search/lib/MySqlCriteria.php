@@ -10,6 +10,18 @@ abstract class MySqlCriteria extends KalturaCriteria
 	abstract protected function getDefaultCriteriaFilter();
 	
 	/**
+	 * @param string $field
+	 * @return string the name of the field in the search table
+	 */
+	abstract protected function getSearchFieldName($field);
+	
+	/**
+	 * @param string $fieldName
+	 * @return bool
+	 */
+	abstract public function hasMatchableField($fieldName);
+	
+	/**
 	 * @return IMySqlSearchPeer
 	 */
 	abstract protected function getSearchPeer();
@@ -40,11 +52,13 @@ abstract class MySqlCriteria extends KalturaCriteria
 			try
 			{
 				$peer->translateFieldName($field);
+				$this->remove($field);
+				$this->removedKeys[$field] = $criterion;
+				KalturaLog::debug("Criterion on [$field] moved to the search object");
 			}
 			catch(PropelException $pe)
 			{
-				$this->remove($field);
-				$this->removedKeys[$field] = $criterion;
+				KalturaLog::debug("Criterion on [$field] could not be moved to the search object");
 			}
 		}
 		
@@ -53,6 +67,7 @@ abstract class MySqlCriteria extends KalturaCriteria
 		
 		$stmt = $peer->doSelectStmt($this);
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		KalturaLog::debug("Search returned [" . count($ids) . "] ids");
 		
 		if(count($this->removedKeys))
 		{
@@ -78,7 +93,6 @@ abstract class MySqlCriteria extends KalturaCriteria
 	 * Applies all filter fields and unset the handled fields
 	 * 
 	 * @param baseObjectFilter $filter
-	 * @todo change the matches to mysql MATCH AGAINST where clauses
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
@@ -99,17 +113,20 @@ abstract class MySqlCriteria extends KalturaCriteria
 			
 			list($prefix, $operator, $fieldName) = $fieldParts;
 			
+			$mySqlField = $fieldName;
+			$mySqlCriterionField = $fieldName;
+			
 			$fieldNamesArr = explode(baseObjectFilter::OR_SEPARATOR, $fieldName);
 			if(count($fieldNamesArr) > 1)
 			{
 				$mySqlFieldNames = array();
 				foreach($fieldNamesArr as $fieldName)
 				{
-					$mySqlField = $this->getMySqlFieldName($fieldName);
-					$type = $this->getMySqlFieldType($mySqlField);
+					$mySqlField = $this->getSearchFieldName($fieldName);
 					$mySqlFieldNames[] = $mySqlField;
 				}
-				$mySqlField = '(' . implode(',', $mySqlFieldNames) . ')';
+				$mySqlCriterionField = $mySqlField;
+				$mySqlField = implode(',', $mySqlFieldNames);
 				$vals = is_array($val) ? $val : array_unique(explode(baseObjectFilter::OR_SEPARATOR, $val));
 				$val = implode(' ', $vals);
 			}
@@ -121,11 +138,11 @@ abstract class MySqlCriteria extends KalturaCriteria
 			else
 			{
 				$mySqlField = $this->getMySqlFieldName($fieldName);
-				$type = $this->getMySqlFieldType($mySqlField);
+				$mySqlCriterionField = $mySqlField;
 			}
 			$valStr = print_r($val, true);
 			
-			KalturaLog::debug("Attach field[$fieldName] as MySql field[$mySqlField] of type [$type] and comparison[$operator] for value[$valStr]");
+			KalturaLog::debug("Attach field[$fieldName] as search field[$mySqlField] and comparison[$operator] for value[$valStr]");
 			switch($operator)
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
@@ -143,8 +160,8 @@ abstract class MySqlCriteria extends KalturaCriteria
 					
 					if(count($vals))
 					{
-						$val = implode(' | ', $vals);
-						$this->matchClause[] = "@$mySqlField $val";
+						$val = implode(' ', $vals);
+						$this->add($mySqlCriterionField, "MATCH($mySqlField) AGAINST($val)", Criteria::CUSTOM);
 						$filter->unsetByName($field);
 					}
 					break;
@@ -165,8 +182,8 @@ abstract class MySqlCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
-						$val = '!' . implode(' & !', $vals);
-						$this->matchClause[] = "@$mySqlField $val";
+						$val = '-' . implode(' -', $vals);
+						$this->add($mySqlCriterionField, "MATCH($mySqlField) AGAINST($val)", Criteria::CUSTOM);
 						$filter->unsetByName($field);
 					}
 					break;
@@ -187,8 +204,8 @@ abstract class MySqlCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
-						$val = '(^' . implode('$ | ^', $vals) . '$)';
-						$this->matchClause[] = "@$mySqlField $val";
+						$val = '"' . implode('" "', $vals) . '"';
+						$this->add($mySqlCriterionField, "MATCH($mySqlField) AGAINST($val)", Criteria::CUSTOM);
 						$filter->unsetByName($field);
 					}
 					break;
@@ -197,7 +214,8 @@ abstract class MySqlCriteria extends KalturaCriteria
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 1)
 					{
-						$this->matchClause[] = "@$mySqlField ^$val$";
+						$val = '"' . $val . '"';
+						$this->add($mySqlCriterionField, "MATCH($mySqlField) AGAINST($val)", Criteria::CUSTOM);
 						$filter->unsetByName($field);
 					}
 					break;
@@ -218,8 +236,8 @@ abstract class MySqlCriteria extends KalturaCriteria
 							
 					if(count($vals))
 					{
-						$val = implode(' & ', $vals);
-						$this->matchClause[] = "@$mySqlField $val";
+						$val = '+' . implode(' +', $vals);
+						$this->add($mySqlCriterionField, "MATCH($mySqlField) AGAINST($val)", Criteria::CUSTOM);
 						$filter->unsetByName($field);
 					}
 					break;

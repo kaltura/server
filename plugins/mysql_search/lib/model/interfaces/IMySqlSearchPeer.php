@@ -13,6 +13,16 @@ interface IMySqlSearchPeer
 	public static function getSearchPrimaryKeyField();
 	
 	/**
+	 * @param string $name field name
+	 * @param string $fromType One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
+	 *                         BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM
+	 * @param string $toType   One of the class type constants
+	 * @return string translated name of the field.
+	 * @throws PropelException - if the specified name could not be found in the fieldname mappings.
+	 */
+	static public function translateFieldName($name, $fromType, $toType);
+	
+	/**
 	 * @param Criteria $criteria
 	 * @param PropelPDO $con
 	 * @return KalturaStatement
