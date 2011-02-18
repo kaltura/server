@@ -480,7 +480,8 @@ include_once("KDLCommon.php");
 		 */
 		public $_resolution, 
 			   $_paperHeight,
-			   $_paperWidth;
+			   $_paperWidth,
+			   $_readonly;
 			   
 
 		public function GetSectionEnum() { return KDLConstants::PdfIndex; }
@@ -510,6 +511,8 @@ include_once("KDLCommon.php");
 				$rvStr=$rvStr.","."paperHeight:".$this->_paperHeight;
 			if($this->_paperWidth)
 				$rvStr=$rvStr.","."paperWidth:".$this->_paperWidth;
+			if($this->_readonly)
+				$rvStr=$rvStr.","."readonly:".$this->_readonly;
 				
 			if($rvStr)
 				$rvStr = "PDF(".$rvStr.")";
@@ -527,6 +530,8 @@ include_once("KDLCommon.php");
 			if($this->_paperHeight)
 				return true;
 			if($this->_paperWidth)
+				return true;
+			if($this->_readonly)
 				return true;
 			return false;
 		}
