@@ -20,6 +20,29 @@ class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 	 * @var assetParamsPeer
 	 */
 	protected static $instance = null;
+	
+	public static function resetInstanceCriteriaFilter()
+	{
+		self::$instance = null;
+		
+		if ( self::$s_criteria_filter == null )
+			self::$s_criteria_filter = new criteriaFilter ();
+
+		$c = self::$s_criteria_filter->getFilter();
+		if($c)
+		{
+			$c->remove(self::DELETED_AT);
+			$c->remove(self::TYPE);
+		}
+		else
+		{
+			$c = new Criteria();
+		}
+
+		$c->add(self::DELETED_AT, null, Criteria::EQUAL);
+
+		self::$s_criteria_filter->setFilter ( $c );
+	}
 
 	public function setInstanceCriteriaFilter()
 	{
