@@ -428,7 +428,7 @@ class kBusinessPreConvertDL
 					return null;
 			}
 		}
-		
+
 		$dbConvertFlavorJob = null;
 		if ($parentJob)
 		{
@@ -436,7 +436,7 @@ class kBusinessPreConvertDL
 			$dbConvertFlavorJob->setEntryId($entryId);
 			$dbConvertFlavorJob->save();
 		}
-		
+
 		return kJobsManager::addFlavorConvertJob($srcSyncKey, $flavor, $flavorAsset->getId(), $mediaInfoId, $parentJob, null, $dbConvertFlavorJob);
 	}
 	
@@ -585,7 +585,7 @@ class kBusinessPreConvertDL
 	 * @param string $errDescription
 	 * @return flavorParamsOutputWrap or null for fail
 	 */
-	protected static function validateFlavorAndMediaInfo(flavorParams $flavor, mediaInfo $mediaInfo = null, &$errDescription)
+	protected static function validateFlavorAndMediaInfo(assetParams $flavor, mediaInfo $mediaInfo = null, &$errDescription)
 	{
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavor));
 		
@@ -792,7 +792,9 @@ class kBusinessPreConvertDL
 		
 		$sourceFlavor = null;
 		// gets the flavor params by the id
-		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
+		assetParamsPeer::resetInstanceCriteriaFilter();
+		$flavors = assetParamsPeer::retrieveByPKs($flavorsIds);
+
 		foreach($flavors as $index => $flavor)
 		{
 			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
@@ -899,11 +901,11 @@ class kBusinessPreConvertDL
 			$shouldConvert = false;
 	
 		if(!$shouldConvert)
-		{		
+		{
 			self::bypassConversion($originalFlavorAsset, $entry, $convertProfileJob);
 			return true;
 		}
-				
+
 		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams, $mediaInfo);
 	}
 		
