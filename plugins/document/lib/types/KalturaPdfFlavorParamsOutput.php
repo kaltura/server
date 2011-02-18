@@ -19,4 +19,15 @@ class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	public function fromObject($dbPdfFlavorParamsOutput)
+	{
+		parent::fromObject($dbPdfFlavorParamsOutput);
+		
+		if($dbPdfFlavorParamsOutput->getReadonly() == true){
+			$this->readonly = 1;
+		}else{
+			$this->readonly = 0;
+		}
+	}
 }
