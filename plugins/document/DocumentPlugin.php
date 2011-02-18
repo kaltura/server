@@ -28,7 +28,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-
+		KalturaLog::debug("document: baseClass [" . $baseClass ."]");
 		// ENTRY
 		if($baseClass == 'entry' && $enumValue == entryType::DOCUMENT)
 		{
@@ -120,13 +120,14 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		// DOCUMENT ENTRY
+		KalturaLog::debug("document: baseClass [" . $baseClass ."]");
 		if($baseClass == 'entry' && $enumValue == entryType::DOCUMENT)
 		{
 			return 'DocumentEntry';
 		}
 		
 		// FLAVOR PARAMS
-		if($baseClass == 'flavorParams')
+		if($baseClass == 'assetParams')
 		{
 			switch($enumValue)
 			{
@@ -144,7 +145,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			}
 		}
 	
-		if($baseClass == 'flavorParamsOutput')
+		if($baseClass == 'assetParamsOutput')
 		{
 			switch($enumValue)
 			{
