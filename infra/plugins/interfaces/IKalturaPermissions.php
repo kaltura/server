@@ -6,8 +6,10 @@
 interface IKalturaPermissions extends IKalturaBase
 {
 	/**
-	 * @param int $partnerId
-	 * @return bool
+	 * Grants or denies a partner permission to use a plugin.
+	 * 
+	 * @param int $partnerId The ID of the partner being checked for permission
+	 * @return bool The partner is allowed to use the plugin or not.
 	 */
 	public static function isAllowedPartner($partnerId);
 	

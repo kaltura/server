@@ -6,24 +6,24 @@
 interface IKalturaContentDistributionProvider extends IKalturaBase
 {
 	/**
-	 * Return a distribution provider instance
+	 * Returns the singelton instance of the plugin distribution provider.
 	 * 
 	 * @return IDistributionProvider
 	 */
 	public static function getProvider();
 	
 	/**
-	 * Return an API distribution provider instance
+	 * Returns an instance of a Kaltura API distribution provider that represents the singleton instance of the plugin distribution provider.
 	 * 
 	 * @return KalturaDistributionProvider
 	 */
 	public static function getKalturaProvider();
 	
 	/**
-	 * Append provider specific nodes and attributes to the MRSS
+	 * Appends nodes and attributes associated with a specific distribution provider and entry to an MRSS.
 	 * 
-	 * @param EntryDistribution $entryDistribution
-	 * @param SimpleXMLElement $mrss
+	 * @param EntryDistribution $entryDistribution The distribution entry whose data is appended to the MRSS 
+	 * @param SimpleXMLElement $mrss The MRSS to which the data is appended
 	 */
 	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss);
 }
