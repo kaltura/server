@@ -54,12 +54,11 @@ class KDLTranscoderPdfCreator extends KDLOperatorBase
 	
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
-		$cmdStr = '';
-		
-		// Using PDF creator's /PF option to auto identify file's extension
-		$cmdStr .= '/NoStart /PF' . KDLCmdlinePlaceholders::InFileName;
-				   //' /optionsFile"' . KDLCmdlinePlaceholders::ConfigFileName . '"';
-		
+		$cmdStr = KDLCmdlinePlaceholders::InFileName ." ". KDLCmdlinePlaceholders::OutFileName;
+		if ($target->_pdf->_readonly){
+			$cmdStr .=" --readonly";
+		}
+				
 		return $cmdStr;
 	}
 	
