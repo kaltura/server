@@ -288,16 +288,16 @@ class KCurlWrapper
 				if ( isset ( $curlHeaderResponse->headers["curl"] ) )
 				{
 					// example: curl: (10) the username and/or the password are incorrect
-					// in this case set the error code to unknowen error and use the whole string as the description
-					$curlHeaderResponse->code = -1; // unknowen error
+					// in this case set the error code to unknown error and use the whole string as the description
+					$curlHeaderResponse->code = -1; // unknown error
 					$curlHeaderResponse->codeName = "curl: " . $curlHeaderResponse->headers["curl"] ;						
 				}
 				else
 				{
 					// example: curl: (10) the username and/or the password are incorrect
-					// in this case set the error code to unknowen error and use the whole string as the description
-					$curlHeaderResponse->code = -1; // unknowen error
-					$curlHeaderResponse->codeName = "Unknowen FTP error" ;						
+					// in this case set the error code to unknown error and use the whole string as the description
+					$curlHeaderResponse->code = -1; // unknown error
+					$curlHeaderResponse->codeName = "Unknown FTP error" ;						
 				}
 			}
 		}
