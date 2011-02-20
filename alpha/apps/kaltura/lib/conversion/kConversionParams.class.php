@@ -6,6 +6,10 @@
  * 
  * This class is VERY similar to the one from the DB ConversionProfile, but becase we serialize it and manipulate it's data
  * I chose to create a thinner class  
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionParams
 {

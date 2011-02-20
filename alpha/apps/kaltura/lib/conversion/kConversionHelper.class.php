@@ -1,6 +1,10 @@
 <?php
-/*
+/**
  * Will hold severa helper functions common both to the client-side and the server side
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionHelper
 {

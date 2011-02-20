@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
+ */
 class kConversionEngineFfmpeg  extends kConversionEngine
 {
 	const FFMPEG = "ffmpeg";

@@ -1,6 +1,10 @@
 <?php
 /**
- * base class for the real ConversionEngines in the system - ffmpeg,menconder and flix. 
+ * base class for the real ConversionEngines in the system - ffmpeg,menconder and flix.
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 abstract class kConversionEngine
 {

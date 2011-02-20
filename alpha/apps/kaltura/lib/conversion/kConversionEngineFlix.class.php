@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
+ */
 class kConversionEngineFlix  extends kConversionEngine
 {
 	const FLIX = "cli_encode";

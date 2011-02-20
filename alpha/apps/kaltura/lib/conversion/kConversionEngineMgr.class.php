@@ -2,7 +2,11 @@
 /**
  * Will handle a kConversionCommand and make sure the best kConversionEngine does the conversion successfully.
  * The result will be a kConversionResult object that reflect the whole conversion process for the multiple results from the command
- * depending on the number of the kConversionParam objects. 
+ * depending on the number of the kConversionParam objects.
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated 
  */
 class kConversionEngineMgr 
 {

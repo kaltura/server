@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
+ */
 class kConversionEngineMencoder  extends kConversionEngine
 {
 	const MENCODER = "mencoder";

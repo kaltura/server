@@ -1,7 +1,8 @@
 <?php
 /**
- * @package Scheduler
+ * @package Core
  * @subpackage Conversion
+ * @deprecated
  */
 class kConversionEngineEncodingCom  extends kConversionEngineFlix
 {

@@ -6,6 +6,10 @@
  * 3. setting the kConversionResult in the correct place.
  * For version 1 - the  kConversionCommand, indicators and kConversionResult will be placed in directories.
  * For version 2 - will be able to use services to accuire the  kConversionCommand and report the kConversionResult
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionServer extends myBatchBase
 {

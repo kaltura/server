@@ -5,6 +5,10 @@
  * 	on disk in a specific directory or in the DB to be fetched by a direct query or dedicated service (phase 2).
  * 2. fetching the kConversionResult from the server (depending on the server's command-result mechanism).
  * Each Client can be triggered by different events in the system and update status of objects accordingly.
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 abstract class kConversionClientBase extends myBatchBase
 {

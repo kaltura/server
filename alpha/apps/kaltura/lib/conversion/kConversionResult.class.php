@@ -2,6 +2,10 @@
 /**
  * Will hold the result for a specific kConversionCommand.
  * This will include as much data about the kConversionEngines used and errors that occured during the conversion process
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionResult
 {

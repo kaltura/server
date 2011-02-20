@@ -3,6 +3,10 @@
  * will replace the previous natchConversioClient.
  * Use the kConverionProfile per entry to create akConversionCommand for the new server.
  * The kConversionResult will include data to set the status for the entry, create thumbnails and helpers for the flvWrapper
+ * 
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionClient extends kConversionClientBase 
 {

@@ -1,6 +1,10 @@
 <?php
-/*
+/**
  *  will hold an object that represents a conversion command for the kConversionServer / conversion manager.
+ *  
+ * @package Core
+ * @subpackage Conversion
+ * @deprecated
  */
 class kConversionCommand
 {
