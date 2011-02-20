@@ -35,7 +35,7 @@ class flavorParamsOutputPeer extends assetParamsOutputPeer
 		}
 
 		$c->add(self::DELETED_AT, null, Criteria::EQUAL);
-		$c->add(self::TYPE, assetType::FLAVOR);
+		$c->add(self::TYPE, assetType::THUMBNAIL, Criteria::NOT_EQUAL);
 			
 		self::$s_criteria_filter->setFilter ( $c );
 	}
