@@ -129,7 +129,7 @@ class secForm {
 			<div class="left">Retry New Password:</div>
 			<div class="right"><input type="password" name="retry_new_password" /></div>
 			<br class="clear" /><br />
-			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
+			<div class="center"><button id="submit"><span>Save</span></button></div><br />
 			{$this->errorDiv()}
 		</form>
 HTML;
@@ -193,7 +193,7 @@ HTML;
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
 			<div class="note">* Password is required for editing your email address.</div><br />
-			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
+			<div class="center"><button id="submit"><span>Save</span></button></div><br />
 			{$this->errorDiv()}			
 		</form>
 HTML;
@@ -252,7 +252,7 @@ HTML;
 			<div class="right"><input type="password" name="password" /></div>
 			<br class="clear" />
 			<div class="note">* Password is required for editing your name.</div><br />
-			<div class="center"><input id="submit" type="submit" value=" Save " /></div><br />
+			<div class="center"><button type="submit" id="submit"><span>Save</span></button></div><br />
 			{$this->errorDiv()}			
 		</form>
 HTML;
@@ -280,13 +280,6 @@ HTML;
 		try {
 			
 			// Changing name
-			/*
-			$user = new KalturaUser();
-			$user->id = $this->userId;
-			$user->firstName = $_POST['fname'];
-			$user->lastName = $_POST['lname'];
-			$results = $client->user->update($this->userId, $user);
-			 */
 			$client->user->updateLoginData($this->email, $_POST['password'], null, null, $_POST['fname'], $_POST['lname']);
 			setcookie("screen_name", $_POST['fname'] . ' ' . $_POST['lname'] );
 			
@@ -354,7 +347,13 @@ HTML;
 		.error { color: #ff0000; font-weight: bold; font-size: 12px; margin-bottom: -10px; }
 		input { font-size: 13px; width: 170px; }
 		.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-		#submit { font-weight: bold; height: 30px; width: 90px; } 
+		button { margin: 0 auto 5px; padding: 0 28px 0 0; height: 24px; border: 0; font: normal 11px arial,sans-serif; color:#2B2B2B; line-height: normal; overflow: visible; background: url(lib/images/kmc/kmc_sprite.png) no-repeat -72px -152px; cursor: pointer; }
+		button span { height:20px; padding: 4px 0 0 28px; margin: 1px 1px 0 0; float:left; white-space:nowrap; background:transparent url(lib/images/kmc/kmc_sprite.png) no-repeat scroll 0 -153px;}
+		button:hover span { background-position: 0 -178px;}
+		@-moz-document url-prefix() {
+	   		button span { margin: 0 2px 0 -3px; }
+	   		button { display: block; padding-right: 20px; }
+	   	}
 		</style>
 		<script>
 		function focusFirstInput() {

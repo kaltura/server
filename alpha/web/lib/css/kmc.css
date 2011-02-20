@@ -26,7 +26,7 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
      /* div#user_links span { float:right; color:#fff;} */
 	 /*div#user_links a { color:#A6E7F6;}
 	 div#user_links a:hover { color:#A6E7F6; text-decoration:underline;}*/
-#mask { height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
+#mask { z-index: 33; height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
 #wrap{ padding-bottom:4px; }
 #kcms {}
 table{ border: none; }
@@ -231,13 +231,8 @@ fieldset{ border:0 none; position:relative; }
 		  /*#modal button#select_code { display: inline; }*/
 		}
 	/* end webkit */
-	
-#change_partner {
-	cursor: pointer;
-}
-#partners_list {
-	display: none; position: absolute; top: 32px; right: 115px; width: 130px; z-index:100;
-}
-#partners_list ul { width: auto; margin: auto; padding: auto; }
-#partners_list ul li { background: #000; width: 130px; text-align: left; padding: 4px 0 4px 10px; }
-#partners_list ul li a { padding: 0; margin: 0; height: auto; color: #fff; font-weight: normal; }
+
+#change_account span { display: block; margin-bottom: 10px; }
+#change_account label { display: block; margin: 5px; }
+#change_account .container { overflow-x: hidden; height: 110px; margin-bottom: 10px; }
+#change_account button span { height: 18px; padding-right: 11px; margin-left: -1px; }

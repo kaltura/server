@@ -195,7 +195,7 @@ kmc.utils = {
     openSupport : function(href) {
         kalturaCloseModalBox();
         var modal_width = $.browser.msie ? 543 : 519;
-        var iframe_height = $.browser.msie ? 751 : ($.browser.safari ? 725 : 732);
+        var iframe_height = $.browser.msie ? 751 : ($.browser.safari ? 725 : 750);
         kmc.utils.hideFlash(true);
         modal = kalturaInitModalBox ( null , { width : modal_width , height: 450 } );
         modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
@@ -451,7 +451,7 @@ kmc.utils = {
         var modal_height = 180;
         var size = 'width: ' + modal_width + 'px; height: ' + modal_height + 'px';
         var title = 'Change Account';
-        var content = '<br />Please choose partner:<br /><br />';
+        var content = '<div id="change_account"><span>Please choose partner:</span><div class="container">';
         var pid = 0;
 			
         var partners_count = kmc.vars.allowed_partners.length;
@@ -464,10 +464,9 @@ kmc.utils = {
                 var selected = '';
                 var bolded = '';
             }
-            content += '<input id="cp' + pid + '" type="radio" name="pid" value="' + pid + '" ' + selected + '/> &nbsp;';
-            content += '<label for="cp' + pid + '"' + bolded + '>' + kmc.vars.allowed_partners[i].name + '</label><br />';
+            content += '<label' + bolded + '><input type="radio" name="pid" value="' + pid + '" ' + selected + '/> &nbsp;' + kmc.vars.allowed_partners[i].name + '</label>';
         }
-        content += '<br /><div class="center"><input id="do_change_partner" type="button" value=" Go " style="width: 100px;" /></div>';
+        content += '</div><div class="center"><button id="do_change_partner"><span>Continue</span></button></div>';
 			
         kmc.utils.hideFlash(true);
         kalturaCloseModalBox();
