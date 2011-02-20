@@ -106,6 +106,9 @@ class KalturaAssetType
 {
 	const FLAVOR = "1";
 	const THUMBNAIL = "2";
+	const DOCUMENT = "document.Document";
+	const SWF = "document.SWF";
+	const PDF = "document.PDF";
 }
 
 /**

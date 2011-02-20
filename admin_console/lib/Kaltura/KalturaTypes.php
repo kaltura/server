@@ -2748,87 +2748,6 @@ class KalturaLiveStreamAdminEntry extends KalturaLiveStreamEntry
  * @package Admin
  * @subpackage Client
  */
-abstract class KalturaPartnerBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $statusEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $statusIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaPartnerFilter extends KalturaPartnerBaseFilter
-{
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
 class KalturaCaptureThumbJobData extends KalturaJobData
 {
 	/**
@@ -4404,6 +4323,13 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	 */
 	public $formatEqual = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsEqual = null;
+
 
 }
 
@@ -5367,6 +5293,359 @@ class KalturaThumbParamsListResponse extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
+class KalturaUiConf extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Name of the uiConf, this is not a primary key
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUiConfObjType
+	 */
+	public $objType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $objTypeAsString = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $width = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $height = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $htmlParams = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $swfUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $confFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $confFile = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $confFileFeatures = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $confVars = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $useCdn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $swfUrlVersion = null;
+
+	/**
+	 * Entry creation date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Entry creation date as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUiConfCreationMode
+	 */
+	public $creationMode = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+abstract class KalturaUiConfBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUiConfObjType
+	 */
+	public $objTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaUiConfCreationMode
+	 */
+	public $creationModeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $creationModeIn = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaUiConfFilter extends KalturaUiConfBaseFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaUiConfListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaUiConf
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaString extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaUiConfTypeInfo extends KalturaObjectBase
+{
+	/**
+	 * UiConf Type
+	 * 
+	 *
+	 * @var KalturaUiConfObjType
+	 */
+	public $type = null;
+
+	/**
+	 * Available versions
+	 * 
+	 *
+	 * @var array of KalturaString
+	 */
+	public $versions;
+
+	/**
+	 * The direcotry this type is saved at
+	 * 
+	 *
+	 * @var string
+	 */
+	public $directory = null;
+
+	/**
+	 * Filename for this UiConf type
+	 * 
+	 *
+	 * @var string
+	 */
+	public $filename = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaUserRole extends KalturaObjectBase
 {
 	/**
@@ -5732,6 +6011,87 @@ class KalturaUserListResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+abstract class KalturaPartnerBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaPartnerFilter extends KalturaPartnerBaseFilter
+{
 
 }
 
@@ -7871,108 +8231,6 @@ abstract class KalturaTubeMogulSyndicationFeedBaseFilter extends KalturaBaseSynd
  * @subpackage Client
  */
 class KalturaTubeMogulSyndicationFeedFilter extends KalturaTubeMogulSyndicationFeedBaseFilter
-{
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-abstract class KalturaUiConfBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $nameLike = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUiConfObjType
-	 */
-	public $objTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeOr = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tagsMultiLikeAnd = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaUiConfCreationMode
-	 */
-	public $creationModeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $creationModeIn = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaUiConfFilter extends KalturaUiConfBaseFilter
 {
 
 }

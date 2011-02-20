@@ -1551,6 +1551,128 @@ class KalturaThumbParamsService extends KalturaServiceBase
  * @package Admin
  * @subpackage Client
  */
+class KalturaUiConfService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("uiconf", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function update($id, KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("uiconf", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("uiconf", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("uiconf", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function cloneAction($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("uiconf", "clone", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function listTemplates(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("uiconf", "listTemplates", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConfListResponse");
+		return $resultObject;
+	}
+
+	function listAction(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("uiconf", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConfListResponse");
+		return $resultObject;
+	}
+
+	function getAvailableTypes()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("uiconf", "getAvailableTypes", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaUserRoleService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1940,6 +2062,13 @@ class KalturaClient extends KalturaClientBase
 	public $thumbParams = null;
 
 	/**
+	 * UiConf service lets you create and manage your UIConfs for the various flash components
+	 * This service is used by the KMC-ApplicationStudio
+	 * @var KalturaUiConfService
+	 */
+	public $uiConf = null;
+
+	/**
 	 * UserRole service lets you create and manage user permissions
 	 * @var KalturaUserRoleService
 	 */
@@ -1971,6 +2100,7 @@ class KalturaClient extends KalturaClientBase
 		$this->session = new KalturaSessionService($this);
 		$this->thumbAsset = new KalturaThumbAssetService($this);
 		$this->thumbParams = new KalturaThumbParamsService($this);
+		$this->uiConf = new KalturaUiConfService($this);
 		$this->userRole = new KalturaUserRoleService($this);
 		$this->user = new KalturaUserService($this);
 	}
