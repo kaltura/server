@@ -62,6 +62,7 @@ class WidgetController extends Zend_Controller_Action
 					$form->populate($request->getParams());
 				}
 			}
+			$form->setEditorButtons();
 			$this->view->typesInfo = $client->uiConf->getAvailableTypes();
 			$this->view->form = $form;
 			$this->_helper->viewRenderer('edit'); 
@@ -76,19 +77,13 @@ class WidgetController extends Zend_Controller_Action
 		$form->setEditMode();
 		
 		$client = Kaltura_ClientHelper::getClient();
-		$filter = new KalturaUiConfFilter();
-		$filter->idEqual = $id;
-		// use uiconf.list because we don't have access to private uiconfs using uiconf.get
-		// and we don't know the partner id of this uiconf to impersonate
-		$uiConfResult = $client->uiConf->listAction($filter);
-		if (count($uiConfResult->objects) != 1)
+		$uiConf = $this->getUiConf($id);
+		if (is_null($uiConf))
 		{
 			$this->view->notFound = true;
 		}
 		else 
 		{
-			$uiConf = $uiConfResult->objects[0];
-			
 			if ($request->isPost())
 			{
 				$form->loadVersions($request->getParam('obj_type'));
@@ -113,6 +108,26 @@ class WidgetController extends Zend_Controller_Action
 		}
 		$this->view->typesInfo = $client->uiConf->getAvailableTypes();
 		$this->view->form = $form;
+	}
+	
+	public function kcwEditorAction()
+	{
+		$request = $this->getRequest();
+		$this->view->kcwEditorVersion = "v1.2.0"; 
+		$this->view->kcwBaseUrl = Kaltura_ClientHelper::getServiceUrl() . '/flash/kcweditor/';
+		$this->_helper->layout->setLayout('layout_empty');
+	}
+	
+	protected function getUiConf($id)
+	{
+		$client = Kaltura_ClientHelper::getClient();
+		$filter = new KalturaUiConfFilter();
+		$filter->idEqual = $id;
+		// use uiconf.list because we don't have access to private uiconfs using uiconf.get
+		// and we don't know the partner id of this uiconf to impersonate
+		$uiConfResult = $client->uiConf->listAction($filter);
+		
+		return (count($uiConfResult->objects) >= 1 ? $uiConfResult->objects[0] : null);
 	}
 	
 	protected function getUiConfFilterFromRequest(Zend_Controller_Request_Abstract $request)

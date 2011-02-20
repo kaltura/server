@@ -62,7 +62,7 @@ function updateSwfUrl() {
 		jqSwfUrl.removeClass('disabled');
 }
 
-function editXml() {
+function openEditor() {
 	var widthDif = 39;
 	var heightDif = 80;
 	var jqTextArea = jQuery(this).parents('dd').find('textarea');
@@ -109,12 +109,36 @@ function editXml() {
 	
 	codeMirrorEditor = CodeMirror.fromTextArea('editor', codeMirrorOptions);
 }
+
+function openVisualEditor() {
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'kcw-editor'), null, true); ?>';
+	var title = '<?php echo $this->translate('Contribution Wizard Editor'); ?>';
+	var dialogDiv = jQuery('<iframe id="kcw-editor" src="'+url+'"></iframe>').appendTo('body');
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: jQuery(window).width() * 0.8,
+		height: jQuery(window).height() * 0.8,
+		padding: 0,
+		title: title,
+		close: function() {
+			jQuery('#kcw-editor').remove();
+		}
+	});
+	
+	jQuery('#kcw-editor')
+		.width(jQuery('.ui-dialog').width())
+		.css('padding', 0);
+}
+
 jQuery(function() {
 	jQuery("select[name=obj_type]").change(updateSwfUrl);
 	jQuery("select[name=version]").change(updateSwfUrl);
 
 	updateSwfUrl();
 
-	jQuery('#conf_file, #conf_file_features').parent().find('.open-editor').click(editXml);
+	jQuery('#conf_file, #conf_file_features').parent().find('.open-editor').click(openEditor);
+	jQuery('#conf_file, #conf_file_features').parent().find('.open-visual-editor').click(openVisualEditor);
 });
 </script>

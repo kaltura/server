@@ -95,14 +95,12 @@ class Form_Widget extends Kaltura_Form
 		
 		$this->addElement('textarea', 'conf_file', array(
 			'label'			=> 'Conf File:',
-			'description' 	=> '<a class="open-editor">Open Editor</a>',
 			'validators' 	=> array()
 		));
 		$this->getElement('conf_file')->getDecorator('Description')->setEscape(false);
 		
 		$this->addElement('textarea', 'conf_file_features', array(
 			'label'			=> 'Conf File Features:',
-			'description' 	=> '<a class="open-editor">Open Editor</a>',
 			'validators' 	=> array()
 		));
 		$this->getElement('conf_file_features')->getDecorator('Description')->setEscape(false);
@@ -146,6 +144,7 @@ class Form_Widget extends Kaltura_Form
 	{
 		parent::populateFromObject($object, $addUnderscore);
 		$this->setDefault('version', $this->getVersionFromSwfUrl());
+		$this->setEditorButtons();
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -186,5 +185,22 @@ class Form_Widget extends Kaltura_Form
 			}
 		}
 		return $swfVersion;
+	}
+	
+	public function setEditorButtons()
+	{
+		$openEditorButton = '<a class="open-editor">Open Editor</a>';
+		$openVisualEditorButton = '<a class="open-visual-editor">Open Visual Editor</a>';
+		
+		$confFileButtons = array();
+		$confFileButtons[] = $openEditorButton;
+		if ($this->getValue('obj_type') == KalturaUiConfObjType::CONTRIBUTION_WIZARD)
+			$confFileButtons[] = $openVisualEditorButton;
+
+		$confFileFeaturesButtons = array();
+		$confFileFeaturesButtons[] = $openEditorButton;
+		
+		$this->getElement('conf_file')->setDescription(implode($confFileButtons, ' | '));
+		$this->getElement('conf_file_features')->setDescription(implode($confFileFeaturesButtons, ' | '));
 	}
 }
