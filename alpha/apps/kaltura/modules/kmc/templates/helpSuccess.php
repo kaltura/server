@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 ?>
 	<div id="header">
@@ -16,106 +16,106 @@
 						<h2>Table of Content</h2>
 						<h3>Content Section</h3>
 						<dl>
-							<dt><span>1.1</span><a href="#">Entries List</a></dt>
-							<dd><span>1.1.1</span><a href="#">Search</a></dd>
-							<dd><span>1.1.2</span><a href="#">Delete</a></dd>
-							<dd><span>1.1.3</span><a href="#">Add Tags</a></dd>
-							<dd><span>1.1.4</span><a href="#">Remove Tags</a></dd>
-							<dd><span>1.1.5</span><a href="#">Add Admin Tags</a></dd>
-							<dd><span>1.1.6</span><a href="#">Remove Admin Tags</a></dd>
-							<dd><span>1.1.7</span><a href="#">Download</a></dd>
-							<dd><span>1.1.8</span><a href="#">Review and Get Embed code Page</a></dd>
+							<dt><span>1.1</span><a href="#section1">Entries List</a></dt>
+							<dd><span>1.1.1</span><a href="#contentSection111">Search</a></dd>
+							<dd><span>1.1.2</span><a href="#contentSection112">Delete</a></dd>
+							<dd><span>1.1.3</span><a href="#section4">Add Tags</a></dd>
+							<dd><span>1.1.4</span><a href="#contentSection114">Remove Tags</a></dd>
+							<dd><span>1.1.5</span><a href="#contentSection115">Add Admin Tags</a></dd>
+							<dd><span>1.1.6</span><a href="#contentSection116">Remove Admin Tags</a></dd>
+							<dd><span>1.1.7</span><a href="#section3">Download</a></dd>
+							<dd><span>1.1.8</span><a href="#contentSection118">Review and Get Embed code Page</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.2</span><a href="#">Edit Entry</a></dt>
-							<dd><span>1.2.1</span><a href="#">Edit Metadata</a></dd>
-							<dd><span>1.2.2</span><a href="#">Update Thumbnail</a></dd>
-							<dd><span>1.2.3</span><a href="#">Content &ndash; Entry included in the following mixes</a></dd>
-							<dd><span>1.2.4</span><a href="#">Content &ndash; Entries included in the mix</a></dd>
+							<dt><span>1.2</span><a href="#section2">Edit Entry</a></dt>
+							<dd><span>1.2.1</span><a href="#contentSection121">Edit Metadata</a></dd>
+							<dd><span>1.2.2</span><a href="#contentSection122">Update Thumbnail</a></dd>
+							<dd><span>1.2.3</span><a href="#contentSection123">Content &ndash; Entry included in the following mixes</a></dd>
+							<dd><span>1.2.4</span><a href="#contentSection124">Content &ndash; Entries included in the mix</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.3</span><a href="#">Moderation</a></dt>
-							<dd><span>1.3.1</span><a href="#">Search</a></dd>
-							<dd><span>1.3.2</span><a href="#">Preview</a></dd>
-							<dd><span>1.3.3</span><a href="#">Reject Content</a></dd>
-							<dd><span>1.3.4</span><a href="#">Approve Content</a></dd>
-							<dd><span>1.3.5</span><a href="#">Ban User</a></dd>
+							<dt><span>1.3</span><a href="#section9">Moderation</a></dt>
+							<dd><span>1.3.1</span><a href="#contentSection131">Search</a></dd>
+							<dd><span>1.3.2</span><a href="#contentSection132">Preview</a></dd>
+							<dd><span>1.3.3</span><a href="#contentSection133">Reject Content</a></dd>
+							<dd><span>1.3.4</span><a href="#contentSection134">Approve Content</a></dd>
+							<dd><span>1.3.5</span><a href="#contentSection135">Ban User</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.4</span><a href="#">Playlist List</a></dt>
-							<dd><span>1.4.1</span><a href="#">Search</a></dd>
-							<dd><span>1.4.2</span><a href="#">Delete</a></dd>
-							<dd><span>1.4.3</span><a href="#">Add Tags</a></dd>
-							<dd><span>1.4.4</span><a href="#">Remove Tags</a></dd>
-							<dd><span>1.4.5</span><a href="#">Add Admin Tags</a></dd>
-							<dd><span>1.4.6</span><a href="#">Remove Admin Tags</a></dd>
-							<dd><span>1.4.7</span><a href="#">Preview and get Embed code</a></dd>
+							<dt><span>1.4</span><a href="#section10">Playlist List</a></dt>
+							<dd><span>1.4.1</span><a href="#contentSection141">Search</a></dd>
+							<dd><span>1.4.2</span><a href="#contentSection142">Delete</a></dd>
+							<dd><span>1.4.3</span><a href="#contentSection143">Add Tags</a></dd>
+							<dd><span>1.4.4</span><a href="#contentSection144">Remove Tags</a></dd>
+							<dd><span>1.4.5</span><a href="#contentSection145">Add Admin Tags</a></dd>
+							<dd><span>1.4.6</span><a href="#contentSection146">Remove Admin Tags</a></dd>
+							<dd><span>1.4.7</span><a href="#contentSection147">Preview and get Embed code</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.5</span><a href="#">Add / Edit Manual Playlist</a></dt>
-							<dd><span>1.5.1</span><a href="#">Edit Metadata</a></dd>
-							<dd><span>1.5.2</span><a href="#">Add / Edit Content</a></dd>
+							<dt><span>1.5</span><a href="#section11">Add / Edit Manual Playlist</a></dt>
+							<dd><span>1.5.1</span><a href="#contentSection151">Edit Metadata</a></dd>
+							<dd><span>1.5.2</span><a href="#contentSection152">Add / Edit Content</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.6</span><a href="#">Add / Edit Rules Based Playlist</a></dt>
-							<dd><span>1.6.1</span><a href="#">Edit Metadata</a></dd>
-							<dd><span>1.6.2</span><a href="#">Rules list</a></dd>
-							<dd><span>1.6.3</span><a href="#">Add / Edit Rule</a></dd>
+							<dt><span>1.6</span><a href="#section12">Add / Edit Rules Based Playlist</a></dt>
+							<dd><span>1.6.1</span><a href="#contentSection161">Edit Metadata</a></dd>
+							<dd><span>1.6.2</span><a href="#contentSection162">Rules list</a></dd>
+							<dd><span>1.6.3</span><a href="#section13">Add / Edit Rule</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.7</span><a href="#">Add / Edit External MRSS Playlist</a></dt>
-							<dd><span>1.7.1</span><a href="#">Edit Metadata</a></dd>
-							<dd><span>1.7.2</span><a href="#">Edit URL</a></dd>
+							<dt><span>1.7</span><a href="#section14">Add / Edit External MRSS Playlist</a></dt>
+							<dd><span>1.7.1</span><a href="#contentSection171">Edit Metadata</a></dd>
+							<dd><span>1.7.2</span><a href="#contentSection172">Edit URL</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.8</span><a href="#">Bulk Upload</a></dt>
-							<dd><span>1.8.1</span><a href="#">Upload Settings</a></dd>
-							<dd><span>1.8.2</span><a href="#">Upload (CW)</a></dd>
-							<dd><span>1.8.3</span><a href="#">Import from existing host</a></dd>
-							<dd><span>1.8.4</span><a href="#">Upload Settings</a></dd>
-							<dd><span>1.8.5</span><a href="#">Video Transcoding Settings</a></dd>
-							<dd><span>1.8.6</span><a href="#">Aspect Ratio</a></dd>
-							<dd><span>1.8.7</span><a href="#">Optimize Video Viewing</a></dd>
-							<dd><span>1.8.8</span><a href="#">ByPass Transcoding for content in FLV format</a></dd>
+							<dt><span>1.8</span><a href="#section17">Bulk Upload</a></dt>
+							<dd><span>1.8.1</span><a href="#contentSection181">Upload Settings</a></dd>
+							<dd><span>1.8.2</span><a href="#contentSection182">Upload (CW)</a></dd>
+							<dd><span>1.8.3</span><a href="#contentSection183">Import from existing host</a></dd>
+							<dd><span>1.8.4</span><a href="#contentSection184">Upload Settings</a></dd>
+							<dd><span>1.8.5</span><a href="#contentSection185">Video Transcoding Settings</a></dd>
+							<dd><span>1.8.6</span><a href="#contentSection186">Aspect Ratio</a></dd>
+							<dd><span>1.8.7</span><a href="#contentSection187">Optimize Video Viewing</a></dd>
+							<dd><span>1.8.8</span><a href="#contentSection188">ByPass Transcoding for content in FLV format</a></dd>
 						</dl>
 						<dl>
-							<dt><span>1.9</span><a href="#">Glossary of Terms</a></dt>
+							<dt><span>1.9</span><a href="#contentSection19">Glossary of Terms</a></dt>
 						</dl>
 						<h3>Account Section</h3>
 						<dl>
-							<dt><span>2.1</span><a href="#">Usage</a></dt>
-							<dd><span>2.1.1</span><a href="#">Usage Chart</a></dd>
+							<dt><span>2.1</span><a href="#contentSection21">Usage</a></dt>
+							<dd><span>2.1.1</span><a href="#contentSection211">Usage Chart</a></dd>
 						</dl>
 						<dl>
-							<dt><span>2.2</span><a href="#">Account Overview</a></dt>
-							<dd><span>2.2.1</span><a href="#">Partner Info</a></dd>
-							<dd><span>2.2.2</span><a href="#">Login Info</a></dd>
+							<dt><span>2.2</span><a href="#section20">Account Overview</a></dt>
+							<dd><span>2.2.1</span><a href="#contentSection221">Partner Info</a></dd>
+							<dd><span>2.2.2</span><a href="#contentSection222">Login Info</a></dd>
 						</dl>
 						<dl>
-							<dt><span>2.3</span><a href="#">Server Settings</a></dt>
-							<dd><span>2.3.1</span><a href="#">Partner Info</a></dd>
-							<dd><span>2.3.2</span><a href="#">Notifications</a></dd>
+							<dt><span>2.3</span><a href="#section21">Server Settings</a></dt>
+							<dd><span>2.3.1</span><a href="#contentSection231">Partner Info</a></dd>
+							<dd><span>2.3.2</span><a href="#contentSection232">Advanced Settings</a></dd>
+							<dd><span>2.3.3</span><a href="#contentSection233">Notifications</a></dd>
 						</dl>
 						<h3>Application Studio Section</h3>
 						<dl>
-							<dt><span>3.1</span><a href="#">Player List</a></dt>
-							<dd><span>3.1.1</span><a href="#">Edit</a></dd>
-							<dd><span>3.1.2</span><a href="#">Duplicate</a></dd>
-							<dd><span>3.1.3</span><a href="#">Delete</a></dd>
+							<dt><span>3.1</span><a href="#section18">Player List</a></dt>
+							<dd><span>3.1.1</span><a href="#contentSection311">Edit</a></dd>
+							<dd><span>3.1.2</span><a href="#contentSection312">Duplicate</a></dd>
+							<dd><span>3.1.3</span><a href="#contentSection313">Delete</a></dd>
 						</dl>
 						<dl>
-							<dt><span>3.2</span><a href="#">Add Player</a></dt>
-							<dd><span>3.2.1</span><a href="#">Choose template</a></dd>
-							<dd><span>3.2.2</span><a href="#">Template tab</a></dd>
-							<dd><span>3.2.3</span><a href="#">Features tab</a></dd>
-							<dd><span>3.2.4</span><a href="#">Style tab</a></dd>
-							<dd><span>3.2.5</span><a href="#">Content tab</a></dd>
+							<dt><span>3.2</span><a href="#section19">Add Player</a></dt>
+							<dd><span>3.2.2</span><a href="#contentSection321">Template tab</a></dd>
+							<dd><span>3.2.3</span><a href="#contentSection322">Features tab</a></dd>
+							<dd><span>3.2.4</span><a href="#contentSection323">Style tab</a></dd>
+							<dd><span>3.2.5</span><a href="#contentSection324">Content tab</a></dd>
 						</dl>
 					</div><!-- end toc -->
 					<div class="dataContent">
 						<h2>Content Section</h2>
 						<!--    1.1    -->
-						<div class="dataTitle" id="contentSection11"><a href="#main">Back to top</a><h3><span>1.1</span>Entries List</h3></div>
+						<div class="dataTitle" id="section1"><a href="#main">Back to top</a><h3><span>1.1</span>Entries List</h3></div>
 						<p>This is the main list of media entries related to your account. Here you can conduct several actions on a specific entry, or several entries simultaneously. You can search through entries, delete entries, add and remove tags and admin tags, and preview entries and grab the embed code to add to your site.  You can sort the list by clicking on the various columns and scroll through the pages at the bottom of the list.</p>
 						
 						<div class="dataTitle" id="contentSection111"><a href="#main">Back to top</a><h4><span>1.1.1</span>Search</h4></div>
@@ -124,7 +124,7 @@
 						<div class="dataTitle" id="contentSection112"><a href="#main">Back to top</a><h4><span>1.1.2</span>Delete</h4></div>
 						<p>To delete one or more entries, check the box that appears next to the entry name and press the "Delete" button on the bottom of the page. A prompt box will ask you to approve your selection and once you click "Yes" the checked entries will be deleted.  Note that you can delete more than one entry at a time, but only entries appearing on the same page of the main list.</p>
 						
-						<div class="dataTitle" id="contentSection113"><a href="#main">Back to top</a><h4><span>1.1.3</span>Add Tags</h4></div>
+						<div class="dataTitle" id="section4"><a href="#main">Back to top</a><h4><span>1.1.3</span>Add Tags</h4></div>
 						<p>You can add descriptive tags to your entry by checking the box to the left of the playlist and clicking the "Add Tags" button on the bottom of the page. In the "Add Tags" window that opens, type the tags you wish to add, separating the different terms by commas. Note that you can add tags to more than one entry at a time, but only on entries appearing on the same page of the main list. Clicking "Save" on the "Add Tags" window will add the tags to all the selected entries.</p>
 						
 						<div class="dataTitle" id="contentSection114"><a href="#main">Back to top</a><h4><span>1.1.4</span>Remove Tags</h4></div>
@@ -136,7 +136,7 @@
 						<div class="dataTitle" id="contentSection116"><a href="#main">Back to top</a><h4><span>1.1.6</span>Remove Admin Tags</h4></div>
 						<p>You can remove descriptive admin tags from your entry by checking the box to the left of the entry and clicking the "Remove Admin Tags" button on the bottom of the page. In the "Remove Admin Tags" window that opens, select all the tags you wish to remove by clicking the tag in the list so that it is highlighted and holding down the CTRL key for multiple selections. Note that you can remove tags from more than one entry at a time, but only on entries appearing on the same page of the main list. Clicking "Remove" on the "Remove Admin Tags" window will remove the tags from all the selected entries.</p>
 						
-						<div class="dataTitle" id="contentSection117"><a href="#main">Back to top</a><h4><span>1.1.7</span>Download</h4></div>
+						<div class="dataTitle" id="section3"><a href="#main">Back to top</a><h4><span>1.1.7</span>Download</h4></div>
 						<p>You can download files to your computer for offline use by checking the box to the left of the entry and clicking the "Download" button on the bottom of the page. Note that you can download more than one entry at a time, but only on entries appearing on the same page of the main list. Clicking "Download" will present you with a screen to select the format of the video files that you have selected to download.  Select your preferred format from the dropdown menu and click "Submit" to proceed. A message will appear stating that links to your downloaded files will be sent to your email. Click "OK" to proceed.</p>
 						
 						<div class="dataTitle" id="contentSection118"><a href="#main">Back to top</a><h4><span>1.1.8</span>Preview and Get Embed code Page</h4></div>
@@ -144,7 +144,7 @@
 						
 						<!--   1.2   -->
 						
-						<div class="dataTitle" id="contentSection12"><a href="#main">Back to top</a><h3><span>1.2</span>Edit Entry</h3></div>
+						<div class="dataTitle" id="section2"><a href="#main">Back to top</a><h3><span>1.2</span>Edit Entry</h3></div>
 						<p>Click the name of a specific entry in order to review and edit the information regarding the entry.</p>
 						
 						<div class="dataTitle" id="contentSection121"><a href="#main">Back to top</a><h4><span>1.2.1</span>Edit Metadata</h4></div>
@@ -165,7 +165,7 @@
 						
 						<!--   1.3   -->
 						
-						<div class="dataTitle" id="contentSection13"><a href="#main">Back to top</a><h3><span>1.3</span>Moderation</h3></div>
+						<div class="dataTitle" id="section9"><a href="#main">Back to top</a><h3><span>1.3</span>Moderation</h3></div>
 					 	<p>
 							This screen displays a list of all content that has been flagged as inappropriate content by users.  The list is sorted by default by the amount of flags that each entry has received.  You can sort the list by clicking on the various columns and scroll through the pages at the bottom of the list.
 							<br />
@@ -193,7 +193,7 @@
 						
 						<!--   1.4   -->
 						
-						<div class="dataTitle" id="contentSection14"><a href="#main">Back to top</a><h3><span>1.4</span>Playlist List</h3></div>
+						<div class="dataTitle" id="section10"><a href="#main">Back to top</a><h3><span>1.4</span>Playlist List</h3></div>
 						<p>
 							This is the main list of playlists created for your account. Here you can conduct several actions on a specific playlist, or several playlists simultaneously. You can search through playlists, delete playlists, 
 							add and remove tags and admin tags, and preview playlists and grab the embed code to add to your site. You can sort the list by clicking the various columns and scroll through the pages at the bottom of the list.
@@ -250,7 +250,7 @@
 						
 						<!--   1.5   -->
 						
-						<div class="dataTitle" id="contentSection15"><a href="#main">Back to top</a><h3><span>1.5</span>Add / Edit Manual Playlist</h3></div>
+						<div class="dataTitle" id="section11"><a href="#main">Back to top</a><h3><span>1.5</span>Add / Edit Manual Playlist</h3></div>
 						<p>To add a manual playlist click the "Add Playlist" button found underneath the search area on the main playlist page. To edit an existing playlist click on the playlist name. Both options will take you to the add/edit metadata and content windows.</p>
 						
 						<div class="dataTitle" id="contentSection151"><a href="#main">Back to top</a><h4><span>1.5.1</span>Edit Metadata</h4></div>
@@ -291,7 +291,7 @@
 						
 						<!--   1.6   -->
 						
-						<div class="dataTitle" id="contentSection16"><a href="#main">Back to top</a><h3><span>1.6</span>Add / Edit Rules Based Playlist</h3></div>
+						<div class="dataTitle" id="section12"><a href="#main">Back to top</a><h3><span>1.6</span>Add / Edit Rules Based Playlist</h3></div>
 						<p>
 							To add a rule-based playlist click the "Add Playlist" button found underneath the search area on the main playlist page. 
 							To edit an existing playlist click on the playlist name. Both options will take you to the add/edit metadata and content windows.
@@ -311,7 +311,7 @@
 							You can view the total number of videos and their duration under the main list of rules.
 						</p>
 						
-						<div class="dataTitle" id="contentSection1621"><a href="#main">Back to top</a><h4><span>1.6.2.1</span>Add Rule</h4></div>
+						<div class="dataTitle" id="section13"><a href="#main">Back to top</a><h4><span>1.6.2.1</span>Add Rule</h4></div>
 						<p>
 							To add a new rule click the "Add Rule" button. An "Add Rule" window will open allowing you to define the rule parameters. 
 							Select to show entries from your site only or the Kaltura Network as well, select words from the Tags or Admin Tags and choose 
@@ -344,7 +344,7 @@
 						
 						<!--   1.7   -->
 						
-						<div class="dataTitle" id="contentSection17"><a href="#main">Back to top</a><h3><span>1.7</span>Add / Edit External MRSS Playlist</h3></div>
+						<div class="dataTitle" id="section14"><a href="#main">Back to top</a><h3><span>1.7</span>Add / Edit External MRSS Playlist</h3></div>
 						<p>This section allows you to create a playlist of MRSS feeds from any source.</p>
 						
 						<div class="dataTitle" id="contentSection171"><a href="#main">Back to top</a><h4><span>1.7.1</span>Edit Metadata</h4></div>
@@ -362,7 +362,7 @@
 						
 						<!--   1.8   -->
 						
-						<div class="dataTitle" id="contentSection18"><a href="#main">Back to top</a><h3><span>1.8</span>Bulk Upload</h3></div>
+						<div class="dataTitle" id="section17"><a href="#main">Back to top</a><h3><span>1.8</span>Bulk Upload</h3></div>
 						<p>This is where you can upload large amounts of media files to the Kaltura servers in a simple and streamlined process.</p>
 						
 						<div class="dataTitle" id="contentSection181"><a href="#main">Back to top</a><h4><span>1.8.1</span>Upload Settings</h4></div>
@@ -494,7 +494,7 @@
 						<p>The column chart enables you to view your streaming consumption, by month or by year. Click either the "View Monthly" or "View Yearly" buttons and select the required month/year from the drop down menu. Mousing over the graph bars will show you the exact consumption per day/month. You can also view the data a continuous line format by clicking the button on the top right of the chart area.</p>
 					
 						<!--   2.2   -->
-						<div class="dataTitle" id="contentSection22"><a href="#main">Back to top</a><h3><span>2.2</span>Account Overview</h3></div>
+						<div class="dataTitle" id="section20"><a href="#main">Back to top</a><h3><span>2.2</span>Account Overview</h3></div>
 						
 						<div class="dataTitle" id="contentSection221"><a href="#main">Back to top</a><h4><span>2.2.1</span>Partner Info</h4></div>
 						<p>This area includes the data you submitted during the registration process. You can change or update any of the details in this section. Multiple content categories can be selected by holding down the CTRL key.</p>
@@ -503,7 +503,7 @@
 						<p><b>Change email</b> – to change your email, just enter the new one in the email text box and click "Save Changes". For authentication purposes, a confirmation email will be sent to both the old and new email addresses.<br /><b>Change Password</b> – to change your password first enter the old password, then the new one and a confirmation of the new one. Click "Save Changes" to complete the process. An email with the new password will be sent to you.</p>
 						
 						<!--   2.3   -->
-						<div class="dataTitle" id="contentSection23"><a href="#main">Back to top</a><h3><span>2.3</span>Server Settings</h3></div>
+						<div class="dataTitle" id="section21"><a href="#main">Back to top</a><h3><span>2.3</span>Server Settings</h3></div>
 						
 						<div class="dataTitle" id="contentSection231"><a href="#main">Back to top</a><h4><span>2.3.1</span>Partner Info</h4></div>
 						<p>Your Partner ID is your site’s identification and ticket to the Kaltura platform and API, and will enable you to connect to Kaltura, display media, upload media and experience all of Kaltura's functionality.</p>
@@ -537,7 +537,7 @@
 
 						<h2>Application Studio Section</h2>
 						<!--    3.1    -->
-						<div class="dataTitle" id="contentSection31"><a href="#main">Back to top</a><h3><span>3.1</span>Player List</h3></div>
+						<div class="dataTitle" id="section18"><a href="#main">Back to top</a><h3><span>3.1</span>Player List</h3></div>
 						<p>This page shows the list of the players defined in the system. It shows both default players that are included within the system, as well as players defined and created by administrators via the KMC.</p>
 						
 						<div class="dataTitle" id="contentSection311"><a href="#main">Back to top</a><h4><span>3.1.1</span>Edit</h4></div>
@@ -550,7 +550,7 @@
 						<p>To delete a player, select the relevant line on the Player List and then click "Delete". Note that deleting a player eliminates it from all the locations where it has been previously embedded – i.e. if you have embedded a player using this design on your site or an external site, after you delete it from the Player List, the player will no longer appear and a blank area will be displayed on the website.</p>
 
 						<!--    3.2    -->
-						<div class="dataTitle" id="contentSection32"><a href="#main">Back to top</a><h3><span>3.2</span>Add Player</h3></div>
+						<div class="dataTitle" id="section19"><a href="#main">Back to top</a><h3><span>3.2</span>Add Player</h3></div>
 						<p>To create a new player click on the "Create New Player (Wizard)" button.</p>
 						
 						<!--    3.2.1   -->

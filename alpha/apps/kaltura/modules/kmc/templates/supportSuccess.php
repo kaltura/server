@@ -214,7 +214,7 @@ if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 					<img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
 			<p> 
 				<label>* Subject:
-					<input name="subject" id="subject" maxlength="100" class="required" /> 
+					<input type="text" name="subject" id="subject" class="required" />
 					<img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /> 
 				</label> 
 			</p> 
