@@ -254,6 +254,14 @@ return array(
 	'credentials saved' => 'Your credentials were successfully changed',
 	'user change role' => 'Here you can change the role of an admin console user.',
 
+	// widgets
+	'widget-list intro text' => 'Here you can manage all widgets',
+
+	'KalturaUIConfObjType::PLAYER' => 'Player',
+	'KalturaUIConfObjType::PLAYER_V3' => 'KDP3',
+	'KalturaUIConfObjType::SIMPLE_EDITOR' => 'Simple Editor',
+	'KalturaUIConfObjType::ADVANCED_EDITOR' => 'Advanced Editor',
+	'KalturaUIConfObjType::CONTRIBUTION_WIZARD' => 'Contribution Wizard',
 
 
 	//batch index
@@ -781,6 +789,9 @@ return array(
 	'partner was blocked' => 'Publisher was blocked successfully',
 	'partner was unblocked' => 'Publisher was unblocked successfully',
 	'partner was removed' => 'Publisher was successfully removed',
+
+	// partner-selector
+	'partner-selector intro text' => 'Select a partner from the list below',
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this Publisher.',

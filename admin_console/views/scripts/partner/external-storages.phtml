@@ -61,7 +61,7 @@
 				<td><?php echo (isset($pathManagersNames[$storage->pathManagerClass]) ? $pathManagersNames[$storage->pathManagerClass] : $pathManagersNames['default']); ?></td>
 				<td><?php echo (isset($urlManagersNames[$storage->urlManagerClass]) ? $urlManagersNames[$storage->urlManagerClass] : $urlManagersNames['default']); ?></td>
 				<td><?php echo $triggersNames[$storage->trigger]; ?></td>
-				<td><?php $d = (new Zend_Date($storage->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
+				<td><?php echo $this->dateFormat($storage->createdAt, Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $storage->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>

@@ -46,6 +46,29 @@
 			</change-my-settings>
 		</pages>
 	</users>
+	<widgets>
+		<label>Widgets</label>
+		<controller>widget</controller>
+		<action>list</action>
+		<pages>
+			<widgets>
+				<label>Widgets Management</label>
+				<controller>widget</controller>
+				<action>list</action>
+				<pages>
+					<widget-edit>
+						<controller>widget</controller>
+						<action>edit</action>
+					</widget-edit>
+				</pages>
+			</widgets>
+			<create-widget>
+				<label>Add Widget</label>
+				<controller>widget</controller>
+				<action>create</action>
+			</create-widget>
+		</pages>
+	</widgets>
 	<batch-proccess-control>
 		<label>Batch Process Control</label>
 		<controller>batch</controller>

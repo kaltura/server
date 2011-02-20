@@ -1,0 +1,120 @@
+<?php 
+	$this->headScript()	->setIndent("	")
+						->appendFile($this->baseUrl('codemirror/js/codemirror.js'));
+?>
+
+<p><?php echo $this->translate('widget-edit intro text'); ?></p>
+<?php if ($this->notFound == true): ?>
+<p class="error"><?php echo $this->translate('Widget not found'); ?></p>
+<?php else: ?>
+<?php echo $this->form; ?>
+<?php endif; ?>
+
+<script type="text/javascript">
+
+var currentVersion = "<?php echo $this->form->getValue('version'); ?>";
+var typesInfo = <?php echo json_encode($this->typesInfo); ?>;
+var firstLoad = true;
+
+function updateSwfUrl() {
+	var jqVersions = jQuery("select[name=version]");
+	var type = jQuery("select[name=obj_type]").val();
+	var version = jqVersions.val();
+	var typeInfo;
+
+	for(var i = 0; i < typesInfo.length; i++) {
+		if (typesInfo[i].type == type) {
+			typeInfo = typesInfo[i];
+			break;
+		}
+	}
+	if (!typeInfo)
+		return;
+
+	jqVersions.empty().append('<option></option>');
+	jQuery.each(typeInfo.versions, function(i, version) {
+		var jqOption = jQuery('<option value="'+version.value+'">'+version.value+'</option>');
+		jqVersions.append(jqOption);
+	});
+	jqVersions.val(version);
+
+	var jqSwfUrl = jQuery("input[name=swf_url]");
+	if (version == "" || jqVersions.val() == "") {
+		jqSwfUrl.attr('readonly', false);
+		firstLoad = false;
+	}
+	else {
+		var swfUrl = "/flash/" + typeInfo.directory + "/" + version + "/" + typeInfo.filename;
+		if (firstLoad && (swfUrl != jqSwfUrl.val())) { // its a custom swf url, leave unchanged when page is loaded
+			jqSwfUrl.attr('readonly', false);
+			jqVersions.val('');
+			firstLoad = false;
+		}
+		else {
+			jqSwfUrl.attr('readonly', true);
+			jqSwfUrl.val(swfUrl);
+		}
+	}
+
+	if (jqSwfUrl.attr('readonly'))
+		jqSwfUrl.addClass('disabled');
+	else
+		jqSwfUrl.removeClass('disabled');
+}
+
+function editXml() {
+	var widthDif = 39;
+	var heightDif = 80;
+	var jqTextArea = jQuery(this).parents('dd').find('textarea');
+	var codeMirrorOptions = {
+	    parserfile: "parsexml.js",
+	    stylesheet: "<?php echo $this->baseUrl("css/xmlcolors.css"); ?>",
+	    path: "<?php echo $this->baseUrl("codemirror/js/")?>",
+	    continuousScanning: 500,
+	    lineNumbers: true,
+		textWrapping: false,
+		content: jqTextArea.val(),
+		initCallback: function() {}
+	  };
+	var dialogDiv = jQuery('<textarea id="editor"></textarea>').appendTo('body');
+	var codeMirrorEditor;
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: true,
+		width: jQuery(window).width() * 0.8,
+		height: jQuery(window).height() * 0.8,
+		title: "<?php echo $this->translate('XML Editor'); ?>",
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jqTextArea.val(codeMirrorEditor.getCode());
+				jQuery(this).dialog('close');
+			}
+		},
+		beforeclose: function() {
+			if (jqTextArea.val() != codeMirrorEditor.getCode()) {
+				var msg = '<?php echo $this->translate('Discard changes?'); ?>';
+				return confirm(msg);
+			}
+		},
+		close: function() {
+			jQuery('#editor').remove();
+		},
+		resize: function() {
+			jQuery('.CodeMirror-wrapping')
+				.width(jQuery('.ui-dialog').width() - widthDif)
+				.height(jQuery('.ui-dialog').height() - heightDif);
+		}
+	});
+	
+	codeMirrorEditor = CodeMirror.fromTextArea('editor', codeMirrorOptions);
+}
+jQuery(function() {
+	jQuery("select[name=obj_type]").change(updateSwfUrl);
+	jQuery("select[name=version]").change(updateSwfUrl);
+
+	updateSwfUrl();
+
+	jQuery('#conf_file, #conf_file_features').parent().find('.open-editor').click(editXml);
+});
+</script>

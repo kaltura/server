@@ -5,8 +5,8 @@ class Form_PartnerCreate extends Kaltura_Form
 	{
 		// Set the method for the display form to POST
 		$this->setMethod('post');
-		
 		$this->setName('new_account'); // form id
+		$this->setAttrib('class', 'inline-form');
 		
 		$this->addElement('text', 'name', array(
 			'label' => 'partner-create form name',

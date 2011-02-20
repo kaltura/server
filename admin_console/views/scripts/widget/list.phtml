@@ -1,0 +1,88 @@
+<p><?php echo $this->translate('widget-list intro text'); ?></p>
+<?php echo $this->form; ?>
+<div id="results" class="clear">
+	<?php $count = $this->paginator->getItemsCount(); ?>
+	<h2><?php echo $this->translate('Results'); ?><span> (<?php echo $count; ?> <?php echo $this->translate(array('widget', 'widgets', $count)); ?>)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Type'); ?></th>
+				<th><?php echo $this->translate('Publisher ID'); ?></th>
+				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Width'); ?></th>
+				<th><?php echo $this->translate('Height'); ?></th>
+				<th><?php echo $this->translate('SWF Version'); ?></th>
+				<th><?php echo $this->translate('Created At'); ?></th>
+				<th><?php echo $this->translate('Updated At'); ?></th>
+				<th><?php echo $this->translate('Tags'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* KalturaUIConf */ $uiConf): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $uiConf->id; ?></td>
+				<td><?php echo $this->enumTranslate('KalturaUIConfObjType', $uiConf->objType); ?></td>
+				<td><?php echo $uiConf->partnerId; ?></td>
+				<td><?php echo $uiConf->name; ?></td>
+				<td><?php echo $uiConf->width; ?></td>
+				<td><?php echo $uiConf->height; ?></td>
+				<td><?php echo $uiConf->swfUrlVersion; ?></td>
+				<td><?php echo $this->dateFormat($uiConf->createdAt, Zend_Date::DATE_LONG); ?></td>
+				<td><?php echo $this->dateFormat($uiConf->updatedAt, Zend_Date::DATE_LONG); ?></td>
+				<td><?php echo $uiConf->tags; ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $uiConf->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<?php if (Kaltura_AclHelper::isAllowed('widget','edit')): ?>
+							<option value="edit" ><?php echo $this->translate('Edit'); ?></option>
+						<?php endif; ?>
+							
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+
+jQuery('#filter_type').change();
+
+function doAction(action, id) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function edit(id) {
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'edit'), null, true); ?>' + '/id/' + id;
+	window.location = url;
+}
+</script>

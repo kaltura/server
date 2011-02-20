@@ -69,7 +69,8 @@ class PartnerController extends Zend_Controller_Action
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
-		$action = $this->view->url(array('controller' => 'partner', 'action' => 'list'), null, true);
+		// reset form url
+		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
 
 		$client = Kaltura_ClientHelper::getClient();
 		
@@ -91,6 +92,11 @@ class PartnerController extends Zend_Controller_Action
 		// set view
 		$this->view->form = $form;
 		$this->view->paginator = $paginator;
+	}
+	
+	public function selectorAction()
+	{
+		$this->listAction();
 	}
 		
 	public function updateStorageStatusAction()

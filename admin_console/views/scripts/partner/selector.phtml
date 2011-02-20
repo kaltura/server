@@ -1,0 +1,30 @@
+<?php $this->placeholder('text')->captureStart(); ?>
+
+<?php echo $this->translate('partner-selector intro text'); ?>
+
+<?php $this->placeholder('text')->captureEnd() ?>
+
+
+
+<?php $this->placeholder('options')->captureStart(); ?>
+
+<option value="select" ><?php echo $this->translate('Select'); ?></option>
+
+<?php $this->placeholder('options')->captureEnd() ?>
+
+
+
+<?php $this->placeholder('javascript')->captureStart(); ?>
+
+<script type="text/javascript">
+
+function select(partnerId) {
+	var url = '<?php echo $this->url(); ?>' + '/partner_id/' + partnerId;
+	window.location = url;
+}
+
+</script>
+
+<?php $this->placeholder('javascript')->captureEnd() ?>
+
+<?php echo $this->partial('partner/generic-list.phtml', null, $this); ?>

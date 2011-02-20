@@ -31,6 +31,7 @@ html, body { margin:0; padding:0; height: 100%; }
      #kmcHeader li.active a { background: url(../images/sprite.png) no-repeat right -185px; color:#222;}
      #kmcHeader li a { _width:0; height:24px; padding: 10px 24px 0 0; display:block; font: bold 11px arial,sans-serif; color:#D7F3DD; text-decoration:none;}
       #kmcHeader li a:hover { color:#A6E7F6;}
+    	#kmcHeader li.active a:hover { color: #222; }
    #kmcHeader div#user_links { margin-top:-2px; float:right; text-align:right; font-size:10px; color:#ccc;}
     div.login #kmcHeader div { margin-top:13px;}
      div#user_links span { float:right; color:#fff;}
@@ -146,6 +147,7 @@ div#my_info, div#new_admin { clear: both;}
 
 	a#clear_dates { margin-left:9px;}
 
+	form.simple { float: left; }
 	form.simple p, form.simple select, form.simple input, form.simple button, form.simple label { float:left; font-weight:bold;}
 	form.simple select { padding:3px; height:24px;}
 	form.simple fieldset { padding: 10px 20px 10px 10px;}
@@ -165,7 +167,6 @@ div#my_info, div#new_admin { clear: both;}
 		  form.form legend { padding: 0 5px; font-weight:bold;}
 		  form.form dt, form.form dd { padding: 3px 0; float:left;}
 		  form.form dt { width:150px; padding: 8px 0 0; clear:both;}
-		   dd#adult_content-element { padding-top:8px;}
 		  form.form label { padding:0;}
 		  form.form input[type="text"], form.form input[type="password"] { width:148px; height:18px; padding: 4px 0 0 4px;}
 		  form.form input[type="radio"] { vertical-align:-2px;}
@@ -239,7 +240,23 @@ div#my_info, div#new_admin { clear: both;}
 /* partner-create */
 #partner-create form { clear: both; }
 
-
+/* widget-edit / widget-create */
+#widget-edit form.inline-form #custom_data,
+#widget-edit form.inline-form input[type="text"],
+#widget-edit form.inline-form select,
+#widget-create form.inline-form #custom_data,
+#widget-create form.inline-form input[type="text"],
+#widget-create form.inline-form select { width: 340px; } 
+#widget-edit form.inline-form #width,
+#widget-create form.inline-form #width { width: 60px; }
+#widget-edit form.inline-form #height,
+#widget-create form.inline-form #height { width: 60px; }
+#widget-edit form.inline-form textarea,
+#widget-create form.inline-form textarea { width: 340px; height: 80px; }
+#widget-edit .CodeMirror-line-numbers,
+#widget-create .CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right; padding: .4em .3em 0 0; font-size: 9pt; font-family: monospace; }
+		
+		
 tbody tr:hover td { background:#D8EAEF;}
  
  tbody tr.additionalData td { max-width:1450px; padding-bottom:30px; overflow:visible; background:#f4f4f4;}
@@ -249,20 +266,24 @@ tbody tr:hover td { background:#D8EAEF;}
     tbody tr.additionalData table tr:hover td { background:#D8EAEF;}
 
 
-form#new_account { width:350px; padding-top:15px; display:table; clear:both;}
- form#new_account fieldset { width:305px; padding:15px; margin: 0 0 18px 0; display:block;}
-  form#new_account legend { font-weight:bold; color:#222;}
-  form#new_account dt, form#new_account dd { padding: 3px 0; float:left;}
-  form#new_account dt { width:150px; padding: 8px 0 0; clear:both;}
+form.inline-form { padding-top:15px; display:table; clear:both;}
+ form.inline-form fieldset { padding:15px; margin: 0 0 18px 0; display:block;}
+  form.inline-form legend { font-weight:bold; color:#222;}
+  form.inline-form dt, form.inline-form dd { padding: 3px 0; float:left;}
+  form.inline-form dt { width:150px; padding: 8px 0 0; clear:both;}
    dd#adult_content-element { padding-top:8px;}
-  form#new_account label { padding:0;}
-  form#new_account input[type="text"] { width:148px; height:18px; padding: 4px 0 0 4px;}
-  form#new_account input[type="radio"] { vertical-align:-2px;}
-  form#new_account select { width:152px; height:22px;}
-   form#new_account option { padding: 2px 8px 2px 0;}
-  form#new_account select[multiple="multiple"], form#new_account #content_categories { height:auto;}
+   dd#adult_content-element label { margin-right:10px;}
+  form.inline-form label { padding:0;}
+  form.inline-form input[type="text"],
+  form.inline-form input[type="password"] { width:148px; height:18px; padding: 4px 0 0 4px;}
+  form.inline-form input[type="radio"] { vertical-align:-2px;}
+  form.inline-form textarea { padding: 4px 0 0 4px; } 
+  form.inline-form select { width:152px; height:26px; padding: 4px; }
+  form.inline-form .disabled { background-color: #f0f0f0; color: #6d6d6d; }
+   form.inline-form option { padding: 2px 8px 2px 0;}
+  form.inline-form select[multiple="multiple"], form.inline-form #content_categories { height:auto;}
   div.buttons { text-align:center;}
-   form#new_account button { margin: 0 10px 0 0;}
+   form.inline-form button { margin: 0 10px 0 0;}
 	 button.secondary { background:none; text-transform:lowercase; color:#009ACC;}
 	  button.secondary div { background:none;}
 	  button.secondary:hover { color:#00C1FF;}
@@ -335,8 +356,6 @@ body#monitoring-xymon {}
 	 table tbody img.thumb { width:20px; height:15px; margin-top:6px; position:absolute;}
 	  table tbody img.thumb.on { width:100px; height:75px; padding:3px; border: solid 1px #707070; margin-top:0; background:#fff;}
 
-	  dd#adult_content-element { margin-top:5px; #margin-top:0;}
-
  body#partner-usage-index select#filter_type, body#partner-usage-index div#filter_text { float:left;}
  body#partner-usage-index div#filter_text, body#partner-usage-index fieldset#fieldset-filter_type_group div.help { margin-top:0;}
  body#partner-usage-index div#filter_text input { padding-top:1px;}
@@ -361,7 +380,6 @@ body#monitoring-xymon {}
    #partner-configure-dialog dd input#max_bulk_size { width:150px;}
 	#partner-configure-dialog select { width:156px; height:24px; padding:1px;}
   
-#partner-external-storages form { float: left; }
 #partner-external-storages #addNewStorage { margin-left:20px; }
 #partner-external-storages table#newStorageTable tbody td {min-width:0; max-width: 800px; border:0;}
 #partner-external-storages table#newStorageTable tbody td dt label { display: block; width:150px; float:left;}
@@ -390,11 +408,6 @@ body#monitoring-xymon {}
 #partner-external-storages div.commentFormObjects{ height: 240px; width: 400px; overflow: auto;}
 
 #frmDistributionProfileConfig fieldset { float: none; padding: 10px 20px 10px 10px; }
-
-
-  
-  
-#adult_content-element label { margin-right:10px;}
 
 
 th input[type="checkbox"], td input[type="checkbox"] { margin: 0 -7px 0 2px;}

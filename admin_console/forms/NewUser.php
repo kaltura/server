@@ -5,7 +5,7 @@ class Form_NewUser extends Zend_Form
 	{
 		// Set the method for the display form to POST
 		$this->setMethod('post');
-		$this->setAttrib('class', 'form');
+		$this->setAttrib('class', 'inline-form');
 
 		// Add an email address element
 		$this->addElement('text', 'email', array(
@@ -32,15 +32,6 @@ class Form_NewUser extends Zend_Form
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
 		));
-		
-		// Add the submit button
-		$this->addElement('button', 'submit', array(
-			'type' => 'submit',
-			'ignore'	=> true,
-			'label'		=> 'Create User',
-			'decorators' => array('ViewHelper')
-		));
-		
 
 		$this->addElement('select', 'role', array(
 			'label'			=> 'Role:',
@@ -59,14 +50,30 @@ class Form_NewUser extends Zend_Form
 			foreach($userRoles as $role) {
 				$element->addMultiOption($role->id, $role->name);
 			}
-		}	
+		}
 		
-		$this->setDecorators(array(
-			'FormElements',
-			array('HtmlTag', array('tag' => 'dl')),
-			array('Description', array('placement' => 'prepend')),
-			'Fieldset',
-			'Form',
+		$this->addDisplayGroup(array('email', 'first_name', 'last_name', 'submit', 'role'), 'user_info', array(
+			'decorators' => array(
+				'Description', 
+				'FormElements', 
+				array('Fieldset'),
+			)
+		));
+		
+		
+		// Add the submit button
+		$this->addElement('button', 'submit', array(
+			'type' => 'submit',
+			'ignore'	=> true,
+			'label'		=> 'Create',
+			'decorators' => array('ViewHelper')
+		));
+		
+		$this->addDisplayGroup(array('submit'), 'buttons1', array(
+			'decorators' => array(
+				'FormElements', 
+				array('HtmlTag', array('tag' => 'div', 'class' => 'buttons')),
+			)
 		));
 	}
 }

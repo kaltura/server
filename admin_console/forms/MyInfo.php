@@ -5,7 +5,7 @@ class Form_MyInfo extends Zend_Form
 	{
 		// Set the method for the display form to POST
 		$this->setMethod('post');
-		$this->setAttrib('class', 'form');
+		$this->setAttrib('class', 'inline-form');
 
 		$this->addElement('text', 'email_address', array(
 			'label'			=> 'Email address:',
@@ -36,21 +36,28 @@ class Form_MyInfo extends Zend_Form
 			'filters'		=> array('StringTrim'),
 			'validators'	=> array()
 		));
+		
+		$this->addDisplayGroup(array('email_address', 'old_password', 'new_password', 'new_password_again'), 'user_info', array(
+			'decorators' => array(
+				'Description', 
+				'FormElements', 
+				array('Fieldset'),
+			)
+		));
 
 		// Add the submit button
 		$this->addElement('button', 'submit', array(
 			'type' => 'submit',
 			'ignore'	=> true,
-			'label'		=> 'Save Changes',
+			'label'		=> 'Save',
 			'decorators' => array('ViewHelper')
 		));
 		
-		$this->setDecorators(array(
-			'FormElements',
-			array('HtmlTag', array('tag' => 'dl')),
-			array('Description', array('placement' => 'prepend')),
-			'Fieldset',
-			'Form',
+		$this->addDisplayGroup(array('submit'), 'buttons1', array(
+			'decorators' => array(
+				'FormElements', 
+				array('HtmlTag', array('tag' => 'div', 'class' => 'buttons')),
+			)
 		));
 	}
 	
