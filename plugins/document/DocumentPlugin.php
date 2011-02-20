@@ -216,7 +216,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	public static function getEnums($baseEnumName)
 	{
 		if($baseEnumName == 'assetType')
-			return array('KalturaDocumentType');
+			return array('DocumentAssetType');
 			
 		return array();
 	}
