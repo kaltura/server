@@ -2,6 +2,9 @@
 /**
  * @package plugins.contentDistribution
  * @subpackage lib
+ * 
+ * @todo add isMediaUpdateEnabled
+ * @todo add isThumbnailUpdateEnabled
  */
 interface IDistributionProvider
 {
