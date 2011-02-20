@@ -37,7 +37,7 @@
 			   fieldset div label { display:inline;}
 			   fieldset div input { width:86px !important; #height:18px; padding:0 !important; margin:0 !important; float:none;}
 			 div#submit { text-align:center}
-			 button { height:24px; padding: 0 13px 1px; border: solid 1px #B7BABC; margin: 11px auto 5px; #margin-top:21px; display:block;
+			 button { height:24px; padding: 0 13px 1px; border: solid 1px #B7BABC; margin: 0 auto 5px; #margin-top:21px;
 					 background: url(/lib/images/kmc/kmc_sprite.png) no-repeat -57px -153px; /* -94px -152px */ cursor:pointer; color:#2B2B2B;}
 			  button:hover { Xbackground-position: -94px -177px; color:#000; border-color:#5E5E5E;}
  

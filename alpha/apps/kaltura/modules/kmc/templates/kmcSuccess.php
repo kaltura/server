@@ -105,7 +105,7 @@ var kmc = {};
 	</div><!-- end kmcHeader -->
     
 	<div id="login">
-		<div id="login_swf"></div>
+	    <div id="login_swf"><img src="/lib/images/kmc/flash.jpg" alt="Install Flash Player" /><span>You must have flash installed. <a href="http://get.adobe.com/flashplayer/" target="_blank">click here to download</a></span></div>
 	</div>
 
 <script type="text/javascript">
@@ -138,7 +138,7 @@ var kmc = {};
 			wmode: "window" ,
 			movie: "<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf"
 		};
-		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf", "login_swf", "384", "350", "9.0.0", false, flashVars, params);
+		swfobject.embedSWF("<?php echo $flash_dir ?>/kmc/login/<?php echo $kmc_login_version ?>/login.swf", "login_swf", "384", "350", "10.0.0", "<?php echo $service_url ?>/expressInstall.swf", flashVars, params);
 	}
 </script>
 

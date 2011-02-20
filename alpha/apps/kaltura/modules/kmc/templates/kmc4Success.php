@@ -146,10 +146,10 @@ else
 	 </ul>
 <?php
 $currentAccount = '';
-if( count($allowedPartners) > 1 ) { 
+if( count($allowedPartners) > 1 ) {
     foreach( $allowedPartners as $p ) {
 	if($p['id'] == $partner_id) {
-	    $currentAccount = ' &nbsp;| Account: '.  $p['name'] .' ( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
+	    $currentAccount = ' &nbsp;|&nbsp; Account: '.  $p['name'] .' ( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
 	    break;
 	}
     }
