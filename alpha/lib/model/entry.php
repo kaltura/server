@@ -86,7 +86,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	
 	const MAX_NORMALIZED_RANK = 5;
 
-	const MAX_CATEGORIES_PER_ENTRY = 8;
+	const MAX_CATEGORIES_PER_ENTRY = 32;
 	
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA = 1;
 	const FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT = 2;
