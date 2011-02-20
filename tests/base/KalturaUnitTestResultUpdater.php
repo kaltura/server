@@ -17,7 +17,7 @@ class KalturaUnitTestResultUpdater
 		//Returns the inputs for the unit tests
 		$unitTestDataFile = KalturaUnitTestDataFile::generateFromDataXml($dataFilePath);
 				
-		$testsFailures = KalturaTestsFailures::generateFromXml($failuresFilePath);
+		$testsFailures = KalturaTestFailures::generateFromXml($failuresFilePath);
 			
 		$newUnitTestData = KalturaUnitTestResultUpdater::update($unitTestDataFile, $testsFailures);
 		
@@ -33,7 +33,7 @@ class KalturaUnitTestResultUpdater
 	 * @param KalturaTestsFailures $testsFailures
 	 * @return unitTestDataFile - The new unitTestDataFile with the changes
 	 */
-	private static function update(KalturaUnitTestDataFile $unitTestDataFile, KalturaTestsFailures $testsFailures)
+	private static function update(KalturaUnitTestDataFile $unitTestDataFile, KalturaTestFailures $testsFailures)
 	{
 		//Maybe a bug because of shallow copy, but currently we don't need the old object after the copy
 		//So bug can't be checked

@@ -24,13 +24,18 @@ class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 	/**
 	 * @return KalturaClientPlugin
 	 */
-	public static function get()
+	public static function get(KalturaClient $client)
 	{
 		if(!self::$instance)
 			self::$instance = new KalturaAnnotationClientPlugin();
 		return self::$instance;
 	}
 
+	public function getName()
+	{
+	
+	}
+	
 	/**
 	 * @return array<KalturaServiceBase>
 	 */

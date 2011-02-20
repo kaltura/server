@@ -26,7 +26,7 @@ class KalturaUnitTestDataObject
 	/**
 	 * the kaltura object type
 	 */
-	public $type;
+	private $type;
 	
 	/**
 	 * 
@@ -89,12 +89,12 @@ class KalturaUnitTestDataObject
 	 * @param unknown_type $actualValue
 	 * @throws Exception - if the object is not a propel object
 	 */
-	public function setByName($field, $actualValue)
+	public function setByName($field, $value)
 	{
 		//If object is propel object
 		if($this->dataObject instanceof BaseObject)
 		{			
-			$this->dataObject->setByName($field, $actualValue);
+			$this->dataObject->setByName($field, $value);
 		}
 		else
 		{

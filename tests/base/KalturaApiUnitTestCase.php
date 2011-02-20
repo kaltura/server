@@ -85,15 +85,14 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 		$kalturaConfiguration->curlTimeout = $testConfig->curlTimeout;
 		$kalturaConfiguration->setLogger($this);
 		
-		//TODO: unmark this
-//		$this->client = new KalturaClient($kalturaConfiguration);
-//		
-//		if($testConfig->startSession)
-//		{
-//			$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
-//			$this->client->setKs($ks);
-//			KalturaLog::info("Session started [$ks]");
-//		}
+		$this->client = new KalturaClient($kalturaConfiguration);
+		
+		if($testConfig->startSession)
+		{
+			$ks = $this->client->session->start($testConfig->secret, $testConfig->userId, $testConfig->sessionType, $testConfig->partnerId, $testConfig->expiry, $testConfig->privileges);
+			$this->client->setKs($ks);
+			KalturaLog::info("Session started [$ks]");
+		}
 	}
 	
 	/**

@@ -40,62 +40,16 @@ class KalturaUnitTestDataGenerator
    	 */
    	private function getUnitTestDataObject(KalturaUnitTestDataObject $unitTestObjectIdentifier)
    	{
-   		$unitTestDataObject = new KalturaUnitTestDataObject($unitTestObjectIdentifier->type, $unitTestObjectIdentifier->additionalData, $unitTestObjectIdentifier->dataObject);
+   		$unitTestDataObject = new KalturaUnitTestDataObject($unitTestObjectIdentifier->getType(), $unitTestObjectIdentifier->additionalData, $unitTestObjectIdentifier->dataObject);
    		
-   		$objectType = $unitTestObjectIdentifier->type;
+   		$objectType = $unitTestObjectIdentifier->getType();
    		$objectId = $unitTestObjectIdentifier->additionalData["key"];
    		
    		$unitTestDataObject->dataObject =  KalturaUnitTestDataGenerator::getObjectByTypeAndId($objectType, $objectId, $unitTestDataObject->additionalData);
    		   			   		
    		return $unitTestDataObject;
 	}
-	   	
-	/**
-	 * 
-	 * Gets an object from propel or from API by given type, id and additionalData
-	 * @param unknown_type $objectType - The object Type
-	 * @param unknown_type $objectId - The objetc Id
-	 * @param array<key=>value> $additionalData - Additional data is needed for api objects
-	 * @return $objectType - The object (or null if no object exists) 
-	 */
-	public static function getObjectByTypeAndId($objectType, $objectId, array $additionalData = null)
-	{
-		$dataObject = null;
-		
-		//if the class exists
-   		if(class_exists($objectType))
-   		{	   		
-   			//we create new object and by his type decide from where to get it (DB or API)
-	   		$objectInstance = new $objectType;
-	   		
-	   		if($objectInstance InstanceOf BaseObject)
-	   		{
-	   			$dataObject = KalturaUnitTestDataGenerator::getPropelObject($objectInstance, $objectId);
-	   		}
-	   		else if($objectInstance instanceof KalturaObject || $objectInstance instanceof KalturaObjectBase) // Object is Kaltura object (API)  
-	   		{
-	   			$partnerId = $additionalData["partnerId"];
-	   			$secret = $additionalData["secret"];
-	   			$serviceUrl = $additionalData["serviceUrl"];
-	   			$service = $additionalData["service"];
-	   			
-	   			$dataObject = KalturaUnitTestDataGenerator::getAPIObject($objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service);
-	   		}
-	   		else // normal objects types like string and int 
-	   		{
-	   			throw new Exception("What type am i? \n" , var_dump($objectInstance)); 
-	   		} 
-   		}
-   		else
-   		{
-   			//For unknown types we just copy the xml row as is
-   			//TODO: add support for fileData object... create it from the file path given...
-   			
-   		}
-   		
-   		return $dataObject; 
-	}
-	 
+ 
 	/**
 	 * 
 	 * Gets an API object from the API - using a client session and KS also using the action get from this service on the object id
@@ -197,7 +151,53 @@ class KalturaUnitTestDataGenerator
 		//4. Save the entire test data file to the test data file name path (in XML)
 		fwrite($unitTestDatFileHandle, $newTestDataFile->toDataXML());
 	}
+
+	/**
+	 * 
+	 * Gets an object from propel or from API by given type, id and additionalData
+	 * @param unknown_type $objectType - The object Type
+	 * @param unknown_type $objectId - The objetc Id
+	 * @param array<key=>value> $additionalData - Additional data is needed for api objects
+	 * @return $objectType - The object (or null if no object exists) 
+	 */
+	private static function getObjectByTypeAndId($objectType, $objectId, array $additionalData = null)
+	{
+		$dataObject = null;
+		
+		//if the class exists
+   		if(class_exists($objectType))
+   		{	   		
+   			//we create new object and by his type decide from where to get it (DB or API)
+	   		$objectInstance = new $objectType;
+	   		
+	   		if($objectInstance InstanceOf BaseObject)
+	   		{
+	   			$dataObject = KalturaUnitTestDataGenerator::getPropelObject($objectInstance, $objectId);
+	   		}
+	   		else if($objectInstance instanceof KalturaObject || $objectInstance instanceof KalturaObjectBase) // Object is Kaltura object (API)  
+	   		{
+	   			$partnerId = $additionalData["partnerId"];
+	   			$secret = $additionalData["secret"];
+	   			$serviceUrl = $additionalData["serviceUrl"];
+	   			$service = $additionalData["service"];
+	   			
+	   			$dataObject = KalturaUnitTestDataGenerator::getAPIObject($objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service);
+	   		}
+	   		else // normal objects types like string and int 
+	   		{
+	   			throw new Exception("What type am i? \n" , var_dump($objectInstance)); 
+	   		} 
+   		}
+   		else
+   		{
+   			//For unknown types we just copy the xml row as is
+   			//TODO: add support for fileData object... create it from the file path given...
+   			
+   		}
    		
+   		return $dataObject; 
+	}
+	
 	/**
 	 * 
 	 * Creates the Tests data files 

@@ -1,6 +1,6 @@
 <?php
 
-require_once (dirname(__FILE__) . '/../bootstrap/bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
@@ -8,7 +8,7 @@ require_once (dirname(__FILE__) . '/../bootstrap/bootstrap.php');
  * @author Roni
  *
  */
-class KalturaUnitTestCaseFailure
+class KalturaTestCaseFailure
 {
 	/**
 	 * 
@@ -18,8 +18,8 @@ class KalturaUnitTestCaseFailure
 	 */
 	function __construct(array $inputs = array(), array $failures = array())
 	{
-		$this->inputs = $inputs;
-		$this->failures  = $failures;
+		$this->testCaseInput = $inputs;
+		$this->testCaseFailures  = $failures;
 	}
 	
 	/**
@@ -27,28 +27,28 @@ class KalturaUnitTestCaseFailure
 	 * The inputs for the unit test
 	 * @var array<unknown_type>
 	 */
-	public $inputs = null;
+	public $testCaseInput = null;
 	
 	/**
 	 * 
 	 * The unit test failures
-	 * @var array(KalturaTestFailure)
+	 * @var array<KalturaFailure>
 	 */
-	public $failures = null;
+	public $testCaseFailures = null;
 	
 	public function __toString()
 	{
 		$string = "";
 		
 		$string = "inputs = ";
-		foreach ($this->inputs as $inputKey => $inputValue)
+		foreach ($this->testCaseInput as $inputKey => $inputValue)
 		{
 			$string = $string . $inputKey . $inputValue;
 		}
 		
 		$string = "\n";
 		
-		foreach ($this->failures as $failure)
+		foreach ($this->testCaseFailures as $failure)
 		{
 			$string .= $failure;
 		}
@@ -62,7 +62,7 @@ class KalturaUnitTestCaseFailure
 	 */
 	public static function generateFromXml(SimpleXMlElement $unitTestFailureXml)
 	{
-		$testCaseFailure = new KalturaUnitTestCaseFailure();
+		$testCaseFailure = new KalturaTestCaseFailure();
 		$testCaseFailure->fromXml($unitTestFailureXml);
 		return $testCaseFailure;
 	}
@@ -77,12 +77,12 @@ class KalturaUnitTestCaseFailure
 		//Sets the inputs as key => value byt the xml attributes
 		foreach ($unitTestFailureXml->Inputs->Input as $inputXml)
 		{
-			$this->inputs[] = kXml::getAttributesAsArray($inputXml);
+			$this->testCaseInput[] = kXml::getAttributesAsArray($inputXml);
 		}
 		
 		foreach ($unitTestFailureXml->Failures->Failure as $failureXml)
 		{
-			$this->failures[] = KalturaTestFailure::generateFromXml($failureXml);
+			$this->testCaseFailures[] = KalturaFailure::generateFromXml($failureXml);
 		}
 	}
 	
@@ -93,9 +93,9 @@ class KalturaUnitTestCaseFailure
 	 * @param string $rootNodeName - default to 'data'
 	 * @return DOMDocument - the xml for the given error
 	 */
-	public static function toXml(KalturaUnitTestCaseFailure $failure, $rootNodeName = 'data')
+	public static function toXml(KalturaTestCaseFailure $failure, $rootNodeName = 'data')
 	{
-		if(count($failure->failures) == 0)
+		if(count($failure->testCaseFailures) == 0)
 		{
 			return "";
 		}
@@ -106,7 +106,7 @@ class KalturaUnitTestCaseFailure
 		
 		$inputsNode = $xml->createElement("Inputs");
 				
-		foreach ($failure->inputs as $inputKey => $inputValue)
+		foreach ($failure->testCaseInput as $inputKey => $inputValue)
 		{
 			//TODO: add support for non propel objects
 			$node = $xml->createElement("Input");
@@ -133,33 +133,33 @@ class KalturaUnitTestCaseFailure
 		
 		$failuresNode = $xml->createElement("Failures");
 		
-		foreach ($failure->failures as $kalturaTestFailure)
+		foreach ($failure->testCaseFailures as $kalturaFailure)
 		{
 			$failureNode = $xml->createElement("Failure");
 			
-			$fieldNode = $xml->createElement("Field", $kalturaTestFailure->field);
+			$fieldNode = $xml->createElement("Field", $kalturaFailure->field);
 			$failureNode->appendChild($fieldNode);
 
 			$outputReferenceNode = $xml->createElement("OutputReference");
 			$failureNode->appendChild($outputReferenceNode);
-			KalturaUnitTestCaseFailure::setElementValue($xml, $outputReferenceNode, $kalturaTestFailure->outputReferenceValue, $kalturaTestFailure->field);
+			KalturaTestCaseFailure::setElementValue($xml, $outputReferenceNode, $kalturaFailure->outputReferenceValue, $kalturaFailure->field);
 
 			$actualOutputNode = $xml->createElement("ActualOutput");
 			$failureNode->appendChild($actualOutputNode);
-			KalturaUnitTestCaseFailure::setElementValue($xml, $actualOutputNode, $kalturaTestFailure->actualValue, $kalturaTestFailure->field);
+			KalturaTestCaseFailure::setElementValue($xml, $actualOutputNode, $kalturaFailure->actualValue, $kalturaFailure->field);
 			
-			if ($kalturaTestFailure->assert != null)
+			if ($kalturaFailure->assert != null)
 			{
 				$assertNode = $xml->createElement("Assert");
 				$failureNode->appendChild($assertNode);
-				KalturaUnitTestCaseFailure::setElementValue($xml, $assertNode, $kalturaTestFailure->assert);
+				KalturaTestCaseFailure::setElementValue($xml, $assertNode, $kalturaFailure->assert);
 			}
 			
-			if ($kalturaTestFailure->message != null)
+			if ($kalturaFailure->message != null)
 			{
 				$messageNode = $xml->createElement("Message");
 				$failureNode->appendChild($messageNode );
-				KalturaUnitTestCaseFailure::setElementValue($xml, $messageNode , $kalturaTestFailure->message);
+				KalturaTestCaseFailure::setElementValue($xml, $messageNode , $kalturaFailure->message);
 			}
 			
 			$failuresNode->appendChild($failureNode);

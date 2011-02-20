@@ -30,20 +30,6 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @var bool
 	 */
 	public $hasFailures = false;
-	
-	/**
-	 * 
-	 * The unit test failures 
-	 * @var testFailures
-	 */
-	public static $failures = null;
-	
-	/**
-	 * 
-	 * All the failures object will be parsed here so we can use them later for failure reporting and unittest overriding
-	 * @var unknown_type
-	 */
-	public static $failureObjectsFile = null;
 		
 	/**
 	 * 
@@ -76,6 +62,8 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 		$testFilePath = KAutoloader::getClassFilePath($class);
 		$this->testFolder = dirname($testFilePath);
 			
+		print ($testFilePath);
+		
 		$this->config = new KalturaUnitTestConfig("$testFilePath.ini");
 		$testConfig = $this->config->get('config');
 		if(!$testConfig)
@@ -276,12 +264,12 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 		//TODO: HOW to do nice :) and also how to know if this is a new test class or a new test or just another input
 		$this->currentFailure = null;
 		
-		if(KalturaUnitTestCase::$failureObjectsFile == null)
+		if(KalturaUnitTestListener::$failuresFile == null)
 		{
 			$class = get_class($this);
 
 			$classPath = KAutoloader::getClassFilePath($class);
-			KalturaUnitTestCase::$failureObjectsFile = fopen(dirname($classPath) . "/testsData/{$this->name}.failures", "w+");
+			KalturaUnitTestListener::$failuresFile = fopen(dirname($classPath) . "/testsData/{$this->name}.failures", "w+");
 			$this->result->addListener(new KalturaUnitTestListener());
 		}
 		
@@ -381,7 +369,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	{
 		try 
 		{
-			$this->currentFailure = new KalturaTestFailure($fieldName, $actualValue, $expectedValue, $assertToPerform, $message);
+			$this->currentFailure = new KalturaFailure($fieldName, $actualValue, $expectedValue, $assertToPerform, $message);
 			$this->$assertToPerform($expectedValue, $actualValue, $this->currentFailure);
 		}
 		catch (PHPUnit_Framework_AssertionFailedError $e) 

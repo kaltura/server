@@ -2052,7 +2052,7 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
-	 * @readonly
+	 * @insertonly
 	 */
 	public $thumbnailUrl = null;
 

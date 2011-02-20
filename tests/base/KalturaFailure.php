@@ -4,11 +4,11 @@ require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
- * Represents a unit test failures (single failure on a field)
+ * Represents a unit test failure (single failure on a field)
  * @author Roni
  *
  */
-class KalturaTestFailure
+class KalturaFailure
 {
 	/**
 	 * 
@@ -75,7 +75,7 @@ class KalturaTestFailure
 
 	/**
 	 * 
-	 * Generates a new KalturaTestFailure from a given SimpleXMLElement
+	 * Generates a new KalturaFailure from a given SimpleXMLElement
 	 * @param SimpleXMLElement $failureXml
 	 */
 	public static function generateFromXml(SimpleXMLElement $failureXml)
@@ -98,7 +98,7 @@ class KalturaTestFailure
 		//If we have an array
 		if(isset($failureXml->ActualOutput->Array))
 		{
-			$actualValue = KalturaTestFailure::getArrayValueFromXML($failureXml->ActualOutput->Array);
+			$actualValue = KalturaFailure::getArrayValueFromXML($failureXml->ActualOutput->Array);
 		}
 		else
 		{
@@ -114,7 +114,7 @@ class KalturaTestFailure
 		
 		if(isset($failureXml->OutputReference->Array))
 		{
-			$outputReferenceValue = KalturaTestFailure::getArrayValueFromXML($failureXml->OutputReference->Array);
+			$outputReferenceValue = KalturaFailure::getArrayValueFromXML($failureXml->OutputReference->Array);
 		}
 		else
 		{
@@ -127,8 +127,8 @@ class KalturaTestFailure
 			}
 		} 
 		
-		$kalturaTestFailure = new KalturaTestFailure($field, $actualValue, $outputReferenceValue, $assert, $message);
-		return $kalturaTestFailure;
+		$kalturaFailure = new KalturaFailure($field, $actualValue, $outputReferenceValue, $assert, $message);
+		return $kalturaFailure;
 	}
 	
 	/**

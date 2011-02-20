@@ -8,7 +8,7 @@ require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
  * @author Roni
  *
  */
-class KalturaTestsFailures
+class KalturaTestFailures
 {
 	/**
 	 * 
@@ -16,7 +16,7 @@ class KalturaTestsFailures
 	 */
 	function __construct()
 	{
-		$this->failures = array();
+		$this->testCaseFailures = array();
 	}
 	
 	/**
@@ -24,7 +24,7 @@ class KalturaTestsFailures
 	 * Holds all the tests failures
 	 * @var array<KalturaUnitTestCaseFailure>
 	 */
-	public $failures = array();
+	public $testCaseFailures = array();
 	
 	/**
 	 * 
@@ -33,7 +33,7 @@ class KalturaTestsFailures
 	 */
 	public function toXML()
 	{
-		if(count($this->failures) == 0)
+		if(count($this->testCaseFailures) == 0)
 		{
 			return "";
 		}
@@ -49,10 +49,10 @@ class KalturaTestsFailures
 		$failuresElement = $dom->createElement("Failures");
 
 		//For each unit test data
-		foreach ($this->failures as $testCaseFailure)
+		foreach ($this->testCaseFailures as $testCaseFailure)
 		{
 			//Create the xml from the object
-			$objectAsDOM = KalturaUnitTestCaseFailure::toXml($testCaseFailure, "UnitTestFailures");
+			$objectAsDOM = KalturaTestCaseFailure::toXml($testCaseFailure, "UnitTestFailures");
 		 
 			if($objectAsDOM->documentElement != NULL)
 			{
@@ -83,7 +83,7 @@ class KalturaTestsFailures
 	 */
 	public static function generateFromXml($failureFilePath)
 	{
-		$testsFailures = new KalturaTestsFailures();
+		$testsFailures = new KalturaTestFailures();
 		$testsFailures->fromXml($failureFilePath);
 		return $testsFailures;		
 	}
@@ -99,7 +99,7 @@ class KalturaTestsFailures
 
 		foreach ($simpleXML->Failures->UnitTestFailures as $unitTestFailureXml)
 		{
-			$this->failures[] = KalturaUnitTestCaseFailure::generateFromXml($unitTestFailureXml);
+			$this->testCaseFailures[] = KalturaTestCaseFailure::generateFromXml($unitTestFailureXml);
 						
 		}
 	}

@@ -1,8 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
-	/**
-	 * 
+/**
+ * 
  * Represents a Test data file including couple of tests scenarios
  * @author Roni
  *
@@ -22,20 +22,6 @@ class KalturaUnitTestDataFile
 	 * @var array<KalturaUnitTestData>
 	 */
 	public $unitTestsData = array();
-	
-	/**
-	 * 
-	 * Generates a new testDataFile object from simpleXMLElement
-	 * @param SimpleXMLElement $simpleXMLElement
-	 * 
-	 * @return testDataFile, new testDataFile object  
-	 */
-	public static function GeneratefromXML(SimpleXMLElement $simpleXMLElement)
-	{
-		$testDataFile = new KalturaUnitTestDataFile();
-		$testDataFile->fromXML($simpleXMLElement);
-		return $testDataFile;	
-	}
 	
 	/**
 	 * sets the testDataFile object from simpleXMLElement
