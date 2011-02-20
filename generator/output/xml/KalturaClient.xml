@@ -2050,6 +2050,7 @@
     </class>
     <class name="KalturaAssetParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAssetParamsFilter" base="KalturaAssetParamsBaseFilter"/>
