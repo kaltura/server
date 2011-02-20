@@ -2,7 +2,7 @@
 /**
  * @package plugins.document
  */
-class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers
+class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -208,5 +208,16 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/**
+	 * @return array<string> list of enum classes names that extend the base enum name
+	 */
+	public static function getEnums($baseEnumName)
+	{
+		if($baseEnumName == 'assetType')
+			return array('KalturaDocumentType');
+			
+		return array();
 	}
 }
