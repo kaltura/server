@@ -177,7 +177,7 @@ if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 			<p><label>* Partner Id: <input type="text" class="required" name="partner_id" id="partner_id" value="<?php echo $pid; ?>" /><img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
             <p><label>* Your Full Name: <input type="text" class="required" name="your_name" id="your_name" /><img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
             <p><label>* Email: <input type="text" class="required" name="email" id="email" value="<?php echo $email; ?>" /><img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
-            <p><label id="checkbox">* Confirm email: <input type="checkbox" class="required" id="confirm_email" value="confirmed" /><em>&nbsp;this is the (only) email to which we will respond</em><img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p> 
+            <p><label id="checkbox">* Confirm email: <input type="checkbox" class="required" id="confirm_email" value="confirmed" /><em>&nbsp;This is the (only) email to which we will respond</em><img src="http://www.kaltura.com/lib/images/kmc/error.jpg" height="20" width="20" alt="error" /></label></p>
 		</fieldset> 
  
 		<fieldset> 
