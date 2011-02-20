@@ -1,8 +1,5 @@
 <?php
 /**
- * @package api
- * @subpackage enum
- * 
  * from the Andromeda Nov 25 document:
  * 1.
  * 2.KMC  Content Section events
@@ -37,6 +34,9 @@
  * Edit player - Multi-tab playlist
  * Duplicate player
  * 3. 
+ * 
+ * @package api
+ * @subpackage enum
  */
 class KalturaStatsKmcEventType extends KalturaEnum
 {
