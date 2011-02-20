@@ -122,7 +122,14 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getFlavorParamsOutput()
 	{
-		return $this->flavorParamsOutput;
+		if ($this->flavorParamsOutput)
+			return $this->flavorParamsOutput;
+			
+		if (is_null($this->flavorParamsOutputId))
+			return null;
+			
+		assetParamsOutputPeer::resetInstanceCriteriaFilter();
+		return assetParamsOutputPeer::retrieveByPK($this->flavorParamsOutputId);
 	}
 
 	/**
