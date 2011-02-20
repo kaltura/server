@@ -35,7 +35,7 @@ class flavorAssetPeer extends assetPeer
 		}
 
 		$c->add ( self::STATUS, asset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL );
-		$c->add ( self::TYPE, assetType::FLAVOR );
+		$c->add(self::TYPE, assetType::THUMBNAIL, Criteria::NOT_EQUAL);
 			
 		self::$s_criteria_filter->setFilter ( $c );
 	}
