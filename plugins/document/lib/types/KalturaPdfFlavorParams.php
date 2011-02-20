@@ -5,6 +5,15 @@
  */
 class KalturaPdfFlavorParams extends KalturaFlavorParams 
 {
+	public function toObject($object = null, $skip = array())
+	{
+		if(is_null($object))
+			$object = new PdfFlavorParams();
+		
+		parent::toObject($object, $skip);
+		$object->setType(DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF));
+	}
+	
 	/**
 	 * @var bool
 	 */
