@@ -486,7 +486,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 	 *
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
-	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED

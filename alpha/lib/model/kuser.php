@@ -867,7 +867,6 @@ class kuser extends Basekuser
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
-	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
 	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true, $sendEmail = null)
 	{
