@@ -11,6 +11,8 @@ class KalturaUiConfBaseFilter extends KalturaFilter
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
 		"nameLike" => "_like_name",
+		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
 		"objTypeEqual" => "_eq_obj_type",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
@@ -60,6 +62,20 @@ class KalturaUiConfBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $nameLike;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $partnerIdIn;
 
 	/**
 	 * 

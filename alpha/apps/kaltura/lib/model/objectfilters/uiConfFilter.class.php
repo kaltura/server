@@ -11,7 +11,10 @@ class uiConfFilter extends baseObjectFilter
 		// or can use this to set default valuse
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id" , 
+			"_in_id",
 			"_gte_id" ,
+			"_eq_partner_id",
+			"_in_partner_id",
 			"_eq_status" ,
 			"_eq_obj_type" ,
 			"_like_name" ,

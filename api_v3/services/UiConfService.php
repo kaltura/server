@@ -225,5 +225,51 @@ class UiConfService extends KalturaBaseService
 		
 		return $response;
 	}
+	
+	/**
+	 * Retrieve a list of all available versions by object type
+	 * 
+	 * @action getAvailableTypes
+	 * @return KalturaUiConfTypeInfoArray
+	 */
+	function getAvailableTypesAction()
+	{
+		$flashPath = myContentStorage::getFSContentRootPath() . myContentStorage::getFSFlashRootPath();
+		$flashPath = realpath($flashPath);
+		$uiConf = new uiConf();
+		$dirs = $uiConf->getDirectoryMap();
+		$swfNames = $uiConf->getSwfNames();
+		
+		$typesInfoArray = new KalturaUiConfTypeInfoArray();
+		foreach($dirs as $objType => $dir)
+		{
+			$typesInfo = new KalturaUiConfTypeInfo();
+			$typesInfo->type = $objType;
+			$typesInfo->directory = $dir;
+			$typesInfo->filename = isset($swfNames[$objType]) ? $swfNames[$objType] : '';
+			$versions = array();
+			$path = $flashPath . '/' . $dir . '/';
+			$path = realpath($path);
+			$files = scandir($path);
+			foreach($files as $file)
+			{
+				if (is_dir(realpath($path . '/' . $file)) && strpos($file, 'v') === 0)
+					$versions[] = $file;
+			}
+			rsort($versions);
+			
+			$versionsObjectArray = new KalturaStringArray();
+			foreach($versions as $version)
+			{
+				$versionString = new KalturaString();
+				$versionString->value = $version;
+				$versionsObjectArray[] = $versionString;
+			}
+		
+			$typesInfo->versions = $versionsObjectArray;
+			$typesInfoArray[] = $typesInfo;
+		}
+		return $typesInfoArray;
+	}
 }
 ?>
