@@ -3,7 +3,7 @@
  * base class for the real ConversionEngines in the system - ffmpeg,menconder and flix. 
  * 
  * @package Scheduler
- * @subpackage Conversion
+ * @subpackage Conversion.engines
  */
 abstract class KJobConversionEngine extends KConversionEngine
 {

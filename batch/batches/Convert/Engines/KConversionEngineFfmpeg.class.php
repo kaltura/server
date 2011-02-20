@@ -1,8 +1,7 @@
 <?php
 /**
- * 
  * @package Scheduler
- * @subpackage Conversion
+ * @subpackage Conversion.engines
  */
 class KConversionEngineFfmpeg  extends KJobConversionEngine
 {

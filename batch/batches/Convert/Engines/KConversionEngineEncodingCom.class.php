@@ -3,7 +3,7 @@
  * Encoding.com API: http://www.encoding.com/wdocs/ApiDoc
  * 
  * @package Scheduler
- * @subpackage Conversion
+ * @subpackage Conversion.engines
  */
 class KConversionEngineEncodingCom  extends KJobConversionEngine
 {
