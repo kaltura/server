@@ -15,6 +15,7 @@ class kmc4Action extends kalturaAction
 		$allowed = array();
 		$c = new Criteria();
 		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
+		$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL);
 		PartnerPeer::setUseCriteriaFilter(false);
 		$partners = PartnerPeer::doSelect($c);
 		PartnerPeer::setUseCriteriaFilter(true);
