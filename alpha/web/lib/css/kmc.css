@@ -235,4 +235,5 @@ fieldset{ border:0 none; position:relative; }
 #change_account span { display: block; margin-bottom: 10px; }
 #change_account label { display: block; margin: 5px; }
 #change_account .container { overflow-x: hidden; height: 110px; margin-bottom: 10px; }
+#change_account button { cursor: pointer; }
 #change_account button span { height: 18px; padding-right: 11px; margin-left: -1px; }
