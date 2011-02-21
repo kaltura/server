@@ -428,8 +428,6 @@ class kuserPeer extends BasekuserPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
-		$forumsLink = kConf::get('forum_url');
-		$unsubscribeLink = kConf::get('unsubscribe_mail_url');
 		
 		$mailType = self::KALTURA_NEW_USER_EMAIL_TO_ADMINS;
 		$bodyParams = null;
@@ -455,7 +453,7 @@ class kuserPeer extends BasekuserPeer
 				if (!$adminName) { $adminName = $admin->getPuserId(); }
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = null;
-				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId, $forumsLink, $unsubscribeLink);
+				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId);
 			
 				// add mail job
 				kJobsManager::addMailJob(
@@ -499,8 +497,6 @@ class kuserPeer extends BasekuserPeer
 		$contactLink = kConf::get('contact_url');
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
-		$forumsLink = kConf::get('forum_url');
-		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$loginEmail;
 		
 		// setup mail
 		$mailType = null;
@@ -509,12 +505,12 @@ class kuserPeer extends BasekuserPeer
 		if ($existingUser)
 		{
 			$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}
 		else
 		{
 			$mailType = self::KALTURA_NEW_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}		
 		
 		// add mail job

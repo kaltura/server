@@ -219,7 +219,10 @@ class KAsyncMailer extends KBatchBase
 		$footer = ( isset($common_taxt_arr[$type . '_footer']) ) ? $common_taxt_arr[$type . '_footer'] : $common_taxt_arr['footer'];
 		$body = $this->texts_array[$culture]['bodies'][$type];
 
-		$footer = vsprintf( $footer, array( $recipientemail , self::createBlockEmailStr( $recipientemail ) ) );
+		$forumsLink = kConf::get('forum_url');
+		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$recipientemail;
+		
+		$footer = vsprintf( $footer, array( $forumsLink, $unsubscribeLink , self::createBlockEmailStr( $recipientemail ) ) );
 
 		$body .= "\n" . $footer;
 		KalturaLog::debug( __METHOD__ . " Debug: type [$type]\n " . print_r ( $bodyParamsArray , true ) );

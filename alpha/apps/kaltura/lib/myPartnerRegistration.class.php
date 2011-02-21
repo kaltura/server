@@ -83,9 +83,8 @@ class myPartnerRegistration
 		$contactPhone = kConf::get('contact_phone_number');		
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
-		$forumsLink = kConf::get('forum_url');
 		if ( $recipient_email == null ) $recipient_email = $loginEmail;
-		$unsubscribeLink = kConf::get('unsubscribe_mail_url').$recipient_email;
+
 		
 	 	// send the $cms_email,$cms_password, TWICE !
 	 	if(kConf::get('kaltura_installation_type') == 'CE')	{
@@ -96,21 +95,21 @@ class myPartnerRegistration
 			case 1: // KMC signup
 				if ($existingUser) {
 					$mailType = self::KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				else {
 					$mailType = self::KALTURAS_CMS_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				break;
 			default: // all others
 			 	if ($existingUser) {
 					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				else {
 					$mailType = self::KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION;
-					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink, $forumsLink, $unsubscribeLink);
+					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				break;
 		}
