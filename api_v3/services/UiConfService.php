@@ -232,6 +232,7 @@ class UiConfService extends KalturaBaseService
 	 * @action getAvailableTypes
 	 * @return KalturaUiConfTypeInfoArray
 	 */
+	/* Action put in comments until after dragonfly deployment
 	function getAvailableTypesAction()
 	{
 		$flashPath = myContentStorage::getFSContentRootPath() . myContentStorage::getFSFlashRootPath();
@@ -271,5 +272,6 @@ class UiConfService extends KalturaBaseService
 		}
 		return $typesInfoArray;
 	}
+	*/
 }
 ?>
