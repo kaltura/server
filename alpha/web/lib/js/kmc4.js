@@ -43,7 +43,7 @@ kmc.vars.debug = false;
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf#"; // cassiopea
 
 kmc.log = function(str) {
-    if(kmc.vars.debug) { if( typeof console !='undefined' && console.log){ console.log(str); } }
+    if(kmc.vars.debug) {if( typeof console !='undefined' && console.log){console.log(str);}}
 };
 	
 kmc.functions = {
@@ -73,7 +73,7 @@ kmc.functions = {
 
         // use wrap = 0 to indicate se should be open withou the html & form wrapper ????
         kmc.utils.hideFlash(true);
-        modal = kalturaInitModalBox ( null , { width: 700, height: 360 } );
+        modal = kalturaInitModalBox ( null , {width: 700, height: 360} );
         modal.innerHTML = '<div id="kcw"></div>';
         var flashvars = {
             host			: kmc.vars.host,
@@ -113,13 +113,13 @@ kmc.functions = {
         // nullify flash object inside div kcw
     },
     openChangePwd : function(email) {
-        kmc.utils.secureIframe('password', { email: email } );
+        kmc.utils.secureIframe('password', {email: email} );
     },
     openChangeEmail : function(email) {
-        kmc.utils.secureIframe('email', { email: email } );
+        kmc.utils.secureIframe('email', {email: email} );
     },
     openChangeName : function(fname, lname, email) {
-        kmc.utils.secureIframe('name', { fname: fname, lname: lname, email: email } );
+        kmc.utils.secureIframe('name', {fname: fname, lname: lname, email: email} );
     }
 };
 
@@ -131,38 +131,51 @@ kmc.utils = {
  	kmc.utils.activateHeader();
 	
 	// Calculate menu width
-	var menu_width = 15;
+	var menu_width = 10;
 	$("#user_links > *").each( function() {
 	   menu_width += $(this).width();
 	});
 
 	var openMenu = function() {
 
+	   // Set close menu to true
+	   kmc.vars.close_menu = true;
+
 	   var menu_default_css = {
 		"width": 0,
 		"visibility": 'visible',
-		"top": '2px',
-		"right": '1px'
+		"top": '6px',
+		"right": '6px'
 	   };
 
 	   var menu_animation_css = {
 		"width": menu_width + 'px',
-		"padding-top": '6px',
-		"padding-bottom": '6px'
+		"padding-top": '2px',
+		"padding-bottom": '2px'
 	   };
 
 	    $("#user_links").css( menu_default_css );
 	    $("#user_links").animate( menu_animation_css , 500);
 	};
 
-	var closeMenu = function(){
-	    $("#user_links").animate( { width: 0 } , 500, function() {
-		$("#user_links").css( { width: 'auto', visibility: 'hidden' } );
-	    });
-	};
-
 	$("#user").hover( openMenu ).click( openMenu );
-	$("#closeMenu").click(closeMenu);
+	$("#user_links").mouseover( function(){ kmc.vars.close_menu = false; } )
+	$("#user_links").mouseleave( function() { 
+	    kmc.vars.close_menu = true;
+	    setTimeout( "kmc.utils.closeMenu()" , 650 );
+	} );
+	$("#closeMenu").click( function() {
+	    kmc.vars.close_menu = true;
+	    kmc.utils.closeMenu();
+	} );
+    },
+
+    closeMenu : function() {
+	if( kmc.vars.close_menu ) {
+	    $("#user_links").animate( {width: 0} , 500, function() {
+		$("#user_links").css( {width: 'auto', visibility: 'hidden'} );
+	    });
+	}
     },
 
     activateHeader : function() {
@@ -197,7 +210,7 @@ kmc.utils = {
         var modal_width = $.browser.msie ? 543 : 519;
         var iframe_height = $.browser.msie ? 751 : ($.browser.safari ? 725 : 750);
         kmc.utils.hideFlash(true);
-        modal = kalturaInitModalBox ( null , { width : modal_width , height: 450 } );
+        modal = kalturaInitModalBox ( null , {width : modal_width , height: 450} );
         modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
             '<b>Support Request</b></div> <div id="modal_content"><iframe id="support" src="' + href + '" scrolling="no" frameborder="0"' +
             'marginheight="0" marginwidth="0" height="' + iframe_height + '" width="519"></iframe></div></div>';
@@ -246,7 +259,7 @@ kmc.utils = {
         $.ajax({
             url: location.protocol + "//" + location.hostname + "/index.php/kmc/logout",
             type: "POST",
-            data: { "ks": kmc.vars.ks },
+            data: {"ks": kmc.vars.ks},
             dataType: "json",
             complete: function() {
                 window.location = kmc.vars.service_url + "/index.php/kmc/kmc#" + state.moduleName + "|" + state.subtab;
@@ -349,7 +362,7 @@ kmc.utils = {
                 var tab = (e.target.tagName == "A") ? e.target.id : $(e.target).parent().attr("id");
                 var subtab = (e.target.tagName == "A") ? $(e.target).attr("rel") : $(e.target).parent().attr("rel");
 					
-                var go_to = { moduleName : tab, subtab : subtab };
+                var go_to = {moduleName : tab, subtab : subtab};
                 //alert($("#kcms")[0].id);
                 $("#kcms")[0].gotoPage(go_to);
                 return false;
@@ -417,7 +430,7 @@ kmc.utils = {
         }
         kmc.utils.hideFlash(true);
         kalturaCloseModalBox();
-        modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
+        modal = kalturaInitModalBox ( null , {width : modal_width , height: modal_height} );
         modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
             '<b>' + title + '</b></div> <div id="modal_content"><iframe id="sec_iframe" src="' + url + '" scrolling="no" frameborder="0"' +
             ' height="' + modal_height + '" width="' + iframe_width + '"></iframe></div></div>';
@@ -470,7 +483,7 @@ kmc.utils = {
 			
         kmc.utils.hideFlash(true);
         kalturaCloseModalBox();
-        modal = kalturaInitModalBox ( null , { width : modal_width , height: modal_height } );
+        modal = kalturaInitModalBox ( null , {width : modal_width , height: modal_height} );
         modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
             '<b>' + title + '</b></div> <div id="modal_content" style="' + size + '">' + content + '</div></div>';
         $("#mbContent").addClass("new");
@@ -546,8 +559,8 @@ kmc.mediator =  {
         var module_url = {data : eval("kmc.modules." + module + ".swf_url")};
         //	alert("module_url="+module_url.data);
         var attributes = kmc.utils.mergeJson(kmc.modules.shared.attributes,module_url);
-        var flashvars = kmc.utils.mergeJson(kmc.modules.shared.flashvars,eval("kmc.modules." + module + ".flashvars"),{ subNavTab : subtab });
-        flashvars = { flashvars : kmc.utils.jsonToQuerystring(flashvars) };
+        var flashvars = kmc.utils.mergeJson(kmc.modules.shared.flashvars,eval("kmc.modules." + module + ".flashvars"),{subNavTab : subtab});
+        flashvars = {flashvars : kmc.utils.jsonToQuerystring(flashvars)};
         var params = kmc.utils.mergeJson(kmc.modules.shared.params,flashvars);
         //			params.wmode = (module == "reports") ? "window" : "opaque";
         //			if(module == "settings") {
@@ -595,14 +608,14 @@ kmc.mediator =  {
                 }
             }
         }
-        return { "moduleName" : module, "subtab" : subtab, "extra" : extra };
+        return {"moduleName" : module, "subtab" : subtab, "extra" : extra};
     },
     selectContent : function(uiconf_id,is_playlist) { // called by selectPlaylistContent which is caled from appstudio
         //			alert("selectContent("+uiconf_id+","+is_playlist+")");
         var subtab = is_playlist ? "playlists" : "manage";
         //			kmc.vars.current_uiconf = uiconf_id; // used by doPreviewEmbed
-        kmc.vars.current_uiconf = { "uiconf_id" : uiconf_id , "is_playlist" : is_playlist }; // used by doPreviewEmbed
-        kmc.mediator.setState( { module : "content", subtab : subtab } );
+        kmc.vars.current_uiconf = {"uiconf_id" : uiconf_id , "is_playlist" : is_playlist}; // used by doPreviewEmbed
+        kmc.mediator.setState( {module : "content", subtab : subtab} );
     }
 };
 
@@ -721,7 +734,7 @@ kmc.preview_embed = {
 
         kmc.utils.hideFlash(true);
 			
-        modal = kalturaInitModalBox ( null , { width : parseInt(uiconf_details.width) + 140 , height: parseInt(uiconf_details.height) + 200 } );
+        modal = kalturaInitModalBox ( null , {width : parseInt(uiconf_details.width) + 140 , height: parseInt(uiconf_details.height) + 200} );
         modal.innerHTML = modal_html;
         $("#mbContent").addClass("new");
         // attach events here instead of writing them inline
@@ -827,7 +840,7 @@ kmc.preview_embed = {
         //			var flavor_asset_name = kmc.utils.escapeQuotes(flavor_details.flavor_name) || "unknown";
         kalturaCloseModalBox();
         kmc.utils.hideFlash(true);
-        modal = kalturaInitModalBox ( null , { width : parseInt(kmc.vars.default_kdp.width) + 20 , height: parseInt(kmc.vars.default_kdp.height) + 10 } );
+        modal = kalturaInitModalBox ( null , {width : parseInt(kmc.vars.default_kdp.width) + 20 , height: parseInt(kmc.vars.default_kdp.height) + 10} );
         $("#mbContent").addClass("new");
         var player_code = kmc.preview_embed.buildKalturaEmbed(entry_id,entry_name,null,false,kmc.vars.default_kdp);
         //			alert("flavor_details.asset_id="+flavor_details.asset_id);
@@ -994,7 +1007,7 @@ kmc.preview_embed = {
         $.ajax({
             url: kmc.vars.getuiconfs_url,
             type: "POST",
-            data: { "type": type, "partner_id": kmc.vars.partner_id, "ks": kmc.vars.ks },
+            data: {"type": type, "partner_id": kmc.vars.partner_id, "ks": kmc.vars.ks},
             dataType: "json",
             success: function(data) {
                 //					alert(data);
@@ -1096,7 +1109,7 @@ kmc.preview_embed = {
             var share			= uiconf_details.share;
             var skin			= uiconf_details.skin;
             var jw_flashvars = '';
-            var unique_id = new Date(); unique_id = unique_id.getTime();
+            var unique_id = new Date();unique_id = unique_id.getTime();
             var jw_plugins =  new Array();
 
             if(!is_playlist || is_playlist == "undefined") {
@@ -1119,7 +1132,7 @@ kmc.preview_embed = {
             }
 
             /* for AdSolution */
-            var jw_ads = { channel : $("#adSolution_channel").val() };
+            var jw_ads = {channel : $("#adSolution_channel").val()};
             if ($("#AdSolution").is(":checked") && jw_ads.channel != "") {
                 jw_ads.flashvars =	'&ltas.cc=' + jw_ads.channel + 	// &ltas.xmlprefix=http://zo.longtailvideo.com.s3.amazonaws.com/ //uacbirxmcnulxmf
                 '&mediaid=' + entry_id;
@@ -1162,7 +1175,7 @@ kmc.editors = {
             jQuery.ajax({
                 url: kmc.vars.createmix_url,
                 type: "POST",
-                data: { "entry_id": entry_id, "entry_name": entry_name, "partner_id": kmc.vars.partner_id, "ks": kmc.vars.ks, "editor_type": editor_type, "user_id": kmc.vars.user_id },
+                data: {"entry_id": entry_id, "entry_name": entry_name, "partner_id": kmc.vars.partner_id, "ks": kmc.vars.ks, "editor_type": editor_type, "user_id": kmc.vars.user_id},
                 //						dataType: "json",
                 success: function(data) {
                     //							alert("ajax success: " + data);
@@ -1199,7 +1212,7 @@ kmc.editors = {
         kmc.editors.flashvars.entry_id = entry_id;
         width = $.browser.msie ? parseInt(width) + 32 : parseInt(width) + 22;
         kmc.utils.hideFlash(true);
-        modal = kalturaInitModalBox( null, { width: width, height: height } );
+        modal = kalturaInitModalBox( null, {width: width, height: height} );
         modal.innerHTML = '<div id="keditor"></div>';
         swfobject.embedSWF(	kmc.vars.service_url + "/kse/ui_conf_id/" + editor_uiconf,
         "keditor",
@@ -1447,7 +1460,8 @@ kmc.vars.kmc_swf = {
         openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
         openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
         email				: kmc.vars.email,
-        openCw				: "kmc.functions.openKcw"
+        openCw				: "kmc.functions.openKcw",
+	maxNumCategories		: 32
 		
         // path to modules (optional):
         //modules_path:kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/modules",
