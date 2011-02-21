@@ -207,20 +207,6 @@ $acodec = "libmp3lam";
 				case KDLVideoTarget::H264H:
 					$vcodecParams = $this->generateH264params(KDLTranscoders::FFMPEG);
 					break; 				
-/*
-				case KDLVideoTarget::H264:
-					$vcodecParams = "libx264";
-					break;
-				case KDLVideoTarget::H264B:
-					$vcodecParams = "libx264 -coder 0";
-					break;
-				case KDLVideoTarget::H264M:
-					$vcodecParams = "libx264 -bf 8 -coder 1 -refs 2";
-					break;
-				case KDLVideoTarget::H264H:
-					$vcodecParams = "libx264 -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
-					break;
-*/
 				case KDLVideoTarget::MPEG4:
 					$vcodecParams = "mpeg4";
 					break;
@@ -241,8 +227,6 @@ $acodec = "libmp3lam";
 			}
 			
 			$cmdStr = $cmdStr." -vcodec ".$vcodecParams;
-//			if($vid->_id==KDLVideoTarget::H264)
-//				$cmdStr = $cmdStr." -qmin 10";
 			if($this->_vidBr){
 				$cmdStr = $cmdStr." -b ".$this->_vidBr."k";
 			}
@@ -401,16 +385,6 @@ $format = "fl";
 				case KDLVideoTarget::H264H:
 					$cmdStr .= $this->generateH264params(KDLTranscoders::MENCODER);
 					break; 				
-/*				$cmdStr = $cmdStr." -ovc x264 -x264encopts";
-					if($this->_vidBr) {
-						$cmdStr .= " bitrate=".$this->_vidBr;
-						$cmdStr .= ":";
-					}
-					else {
-						$cmdStr .= " ";
-					}
-					$cmdStr = $cmdStr."subq=5:8x8dct:frameref=2:bframes=3:b_pyramid=1:weight_b:threads=auto";
-					break;*/
 				case KDLVideoTarget::MPEG4:
 					$cmdStr = $cmdStr." -ovc lavc";
 					$cmdStr = $cmdStr." -lavcopts vcodec=mpeg4";
@@ -760,12 +734,18 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 					case KDLTranscoders::FFMPEG_AUX:
 					case KDLTranscoders::FFMPEG_VP8:
 						$h264params=" libx264 -subq 2".$ffQsettings;
+						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+							$h264params .= " -crf 30";
+						}
 						break;
 					case KDLTranscoders::MENCODER:
 						$h264params = $h264params." -ovc x264 -x264encopts ";
 						if($this->_vidBr) {
 							$h264params .= "bitrate=".$this->_vidBr;
 							$h264params .= ":";
+							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+								$h264params .= "crf=30:";
+							}
 						}
 						$h264params .= "subq=2:8x8dct:frameref=2:bframes=3:b_pyramid=1:weight_b:threads=auto";
 						break;
@@ -780,12 +760,18 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 					case KDLTranscoders::FFMPEG_AUX:
 					case KDLTranscoders::FFMPEG_VP8:
 						$h264params=" libx264 -subq 2".$ffQsettings." -coder 0";;
+						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+							$h264params .= " -crf 30";
+						}
 						break;
 					case KDLTranscoders::MENCODER:
 						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
 						if($this->_vidBr) {
 							$h264params .= " bitrate=".$this->_vidBr;
 							$h264params .= ":";
+							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+								$h264params .= "crf=30:";
+							}
 						}
 						$h264params .= "subq=2:frameref=6:bframes=0:threads=auto:nocabac:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh";
 						break;
@@ -800,12 +786,18 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 					case KDLTranscoders::FFMPEG_AUX:
 					case KDLTranscoders::FFMPEG_VP8:
 						$h264params="libx264 -subq 5".$ffQsettings." -coder 1 -refs 2";
+						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+							$h264params .= " -crf 30";
+						}
 						break;
 					case KDLTranscoders::MENCODER:
 						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
 						if($this->_vidBr) {
 							$h264params .= " bitrate=".$this->_vidBr;
 							$h264params .= ":";
+							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+								$h264params .= "crf=30:";
+							}
 						}
 						$h264params .= "subq=5:frameref=6:bframes=3:threads=auto:level_idc=30:global_header:partitions=all:trellis=1:chroma_me:me=umh";
 						break;
@@ -820,12 +812,18 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 					case KDLTranscoders::FFMPEG_AUX:
 					case KDLTranscoders::FFMPEG_VP8:
 						$h264params=" libx264 -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
+						if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+							$h264params .= " -crf 30";
+						}
 						break;
 					case KDLTranscoders::MENCODER:
 						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
 						if($this->_vidBr) {
 							$h264params .= " bitrate=".$this->_vidBr;
 							$h264params .= ":";
+							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
+								$h264params .= "crf=30:";
+							}
 						}
 						$h264params .= "subq=7:frameref=6:bframes=3:b_pyramid=1:weight_b=1:threads=auto:level_idc=30:global_header:8x8dct:trellis=1:chroma_me:me=umh";
 						break;
