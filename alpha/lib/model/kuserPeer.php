@@ -404,7 +404,7 @@ class kuserPeer extends BasekuserPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$user->enableLogin($user->getEmail(), $password, true, $sendEmail);
+			$user->enableLogin($user->getEmail(), $password, $checkPasswordStructure, $sendEmail);
 		}	
 		
 		$user->save();
