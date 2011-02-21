@@ -32,7 +32,8 @@
 
 		const ProductDurationFactor = 0.95;
 		const ProductBitrateFactor = 0.7;
-
+		const LowBitrateThresHold = 200;		// Video clips below that value will get special quantization/quality issue
+		
 				/*
 				 * TranscodersSourceBlackList
 				 */
