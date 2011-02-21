@@ -18,6 +18,9 @@ class PlaylistService extends KalturaEntryService
 	
 	protected function kalturaNetworkAllowed($actionName)
 	{
+		if ($actionName === 'execute') {
+			return true;
+		}
 		if ($actionName === 'executeFromContent') {
 			return true;
 		}
