@@ -35,6 +35,10 @@ class Kaltura_AclHelper
 	public static function isAllowed($resource, $privilege)
 	{
 		$acl = Zend_Registry::get('acl');
+		if (!$acl->has($resource)) {
+			KalturaLog::err("Resource [$resource] privilege [$privilege] not found!");
+			return false;
+		}
 		$allowed = $acl->isAllowed(self::getCurrentRole(), $resource, $privilege);
 		return $allowed;
 	}
