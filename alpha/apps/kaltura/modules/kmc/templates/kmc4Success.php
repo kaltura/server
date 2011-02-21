@@ -139,7 +139,7 @@ else
 	}
 </script>
 
-	<div id="kmcHeader"	<?php if($templatePartnerId) echo 'class="whiteLabel"'; ?>>
+	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
 	 <div id="logo"></div>
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
@@ -157,7 +157,7 @@ if( count($allowedPartners) > 1 ) {
 ?>
 	 <div id="user">&lt; &nbsp; <?php echo $full_name; ?></div>
 	 <div id="user_links">
-	  <span id="closeMenu">x&nbsp;</span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp;&nbsp;( <a id="Logout" href="#logout">Logout</a> )&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>
+	  <span id="closeMenu">x&nbsp;</span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp; ( <a id="Logout" href="#logout">Logout</a> )&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>
 	    <?php if (!$templatePartnerId) { ?>
 	    <span> | &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
 	      <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a></span>
