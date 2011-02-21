@@ -24,6 +24,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::UNKNOWN_PARTNER_ID
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID
 	 */
 	function addAction(KalturaUser $user)
 	{				
@@ -49,7 +50,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID, $user->email); //backward compatibility
 			}
 			else if ($code == kUserException::USER_ID_MISSING) {
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('id'));
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $user->getFormattedPropertyNameWithClassName('id'));
 			}
 			else if ($code == kUserException::INVALID_EMAIL) {
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
@@ -92,7 +93,6 @@ class UserService extends KalturaBaseUserService
 	 * @return KalturaUser
 	 *
 	 * @throws KalturaErrors::INVALID_USER_ID
-	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER
 	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
 	 * @throws KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE
