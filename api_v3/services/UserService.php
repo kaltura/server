@@ -28,7 +28,7 @@ class UserService extends KalturaBaseUserService
 	 */
 	function addAction(KalturaUser $user)
 	{				
-		$user->validatePropertyNotNull("id");
+		$user->validatePropertyMinLength("id", 1);
 		
 		if ($user instanceof KalturaAdminUser) {
 			$user->isAdmin = true;
