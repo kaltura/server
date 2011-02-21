@@ -1166,8 +1166,11 @@ class myPartnerUtils
  		uiConfPeer::setUseCriteriaFilter ( true );
  		foreach($uiConfs as $uiConf)
  		{
- 			$newUiConf = $uiConf->cloneToNew(null);
+			// create a new uiConf, set its partner Id (so that upcoming file_sync will have the new partner's id)
+			// and clone fileds from current uiConf
+ 			$newUiConf = new uiConf();
  			$newUiConf->setPartnerId($toPartner->getId());
+ 			$newUiConf = $uiConf->cloneToNew($newUiConf);
  			$newUiConf->save();
  			KalturaLog::log("copyUiConfsByType - UIConf [".$newUiConf->getId()."] was created");
  		}
