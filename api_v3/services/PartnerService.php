@@ -88,6 +88,8 @@ class PartnerService extends KalturaBaseService
 		
 		$partner = new KalturaPartner(); // start from blank
 		$partner->fromPartner( $dbPartner );
+		$partner->secret = $dbPartner->getSecret();
+		$partner->adminSecret = $dbPartner->getAdminSecret();
 		$partner->cmsPassword = $pass;
 		
 		return $partner;
