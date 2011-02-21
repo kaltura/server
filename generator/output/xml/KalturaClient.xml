@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1297700626">
-  <!-- Generated on date 14/02/11 18:23:46 -->
+<xml apiVersion="3.1.1" generatedDate="1298307962">
+  <!-- Generated on date 21/02/11 19:06:02 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -54,6 +54,9 @@
     <enum name="KalturaAssetType" enumType="string">
       <const name="FLAVOR" value="1"/>
       <const name="THUMBNAIL" value="2"/>
+      <const name="DOCUMENT" value="document.Document"/>
+      <const name="SWF" value="document.SWF"/>
+      <const name="PDF" value="document.PDF"/>
     </enum>
     <enum name="KalturaAudioCodec" enumType="string">
       <const name="NONE" value=""/>
@@ -1710,7 +1713,7 @@
       <property name="searchText" type="string" readOnly="1" insertOnly="0" description="Indexed search text for full text search&#13;"/>
       <property name="licenseType" type="int" enumType="KalturaLicenseType" readOnly="0" insertOnly="0" description="License type used for this entry&#10;"/>
       <property name="version" type="int" readOnly="1" insertOnly="0" description="Version of the entry data&#13;"/>
-      <property name="thumbnailUrl" type="string" readOnly="1" insertOnly="0" description="Thumbnail URL&#10;"/>
+      <property name="thumbnailUrl" type="string" readOnly="0" insertOnly="1" description="Thumbnail URL&#10;"/>
       <property name="accessControlId" type="int" readOnly="0" insertOnly="0" description="The Access Control ID assigned to this entry (null when not set, send -1 to remove)  &#10;"/>
       <property name="startDate" type="int" readOnly="0" insertOnly="0" description="Entry scheduling start date (null when not set, send -1 to remove)&#10;"/>
       <property name="endDate" type="int" readOnly="0" insertOnly="0" description="Entry scheduling end date (null when not set, send -1 to remove)&#10;"/>
@@ -2050,8 +2053,8 @@
     </class>
     <class name="KalturaAssetParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
-      <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAssetParamsFilter" base="KalturaAssetParamsBaseFilter"/>
     <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
@@ -2439,6 +2442,8 @@
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="nameLike" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="objTypeEqual" type="int" enumType="KalturaUiConfObjType" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>

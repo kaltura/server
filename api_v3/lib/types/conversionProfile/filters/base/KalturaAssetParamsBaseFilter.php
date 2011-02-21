@@ -9,8 +9,8 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 	private $map_between_objects = array
 	(
 		"isSystemDefaultEqual" => "_eq_is_system_default",
-		"formatEqual" => "_eq_format",
 		"tagsEqual" => "_eq_tags",
+		"formatEqual" => "_eq_format",
 	);
 
 	private $order_by_map = array
@@ -37,14 +37,14 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaContainerFormat
-	 */
-	public $formatEqual;
-	
-	/**
-	 * 
-	 * 
 	 * @var string
 	 */
 	public $tagsEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaContainerFormat
+	 */
+	public $formatEqual;
 }

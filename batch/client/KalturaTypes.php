@@ -6238,6 +6238,13 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	 */
 	public $formatEqual = null;
 
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsEqual = null;
+
 
 }
 
@@ -7030,6 +7037,20 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $nameLike = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
 
 	/**
 	 * 

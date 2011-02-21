@@ -5589,63 +5589,6 @@ class KalturaUiConfListResponse extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
-class KalturaString extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $value = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaUiConfTypeInfo extends KalturaObjectBase
-{
-	/**
-	 * UiConf Type
-	 * 
-	 *
-	 * @var KalturaUiConfObjType
-	 */
-	public $type = null;
-
-	/**
-	 * Available versions
-	 * 
-	 *
-	 * @var array of KalturaString
-	 */
-	public $versions;
-
-	/**
-	 * The direcotry this type is saved at
-	 * 
-	 *
-	 * @var string
-	 */
-	public $directory = null;
-
-	/**
-	 * Filename for this UiConf type
-	 * 
-	 *
-	 * @var string
-	 */
-	public $filename = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
 class KalturaUserRole extends KalturaObjectBase
 {
 	/**

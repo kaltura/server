@@ -1655,18 +1655,6 @@ class KalturaUiConfService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaUiConfListResponse");
 		return $resultObject;
 	}
-
-	function getAvailableTypes()
-	{
-		$kparams = array();
-		$this->client->queueServiceActionCall("uiconf", "getAvailableTypes", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "array");
-		return $resultObject;
-	}
 }
 
 /**
