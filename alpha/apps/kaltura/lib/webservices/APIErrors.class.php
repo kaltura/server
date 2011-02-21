@@ -181,7 +181,7 @@ class APIErrors
 	// %s - field name
 	const INVALID_FIELD_VALUE = "INVALID_FIELD_VALUE,value in field [%s] is not valid";
 	
-	const ADMIN_KUSER_WRONG_OLD_PASSWORD = "ADMIN_KUSER_WRONG_OLD_PASSWORD,old password is wrong";
+	const ADMIN_KUSER_WRONG_OLD_PASSWORD = "ADMIN_KUSER_WRONG_OLD_PASSWORD,Old password is wrong";
 
 	const INVALID_PARTNER_PACKAGE = "INVALID_PARTNER_PACKAGE,Invalid package id";
 	
