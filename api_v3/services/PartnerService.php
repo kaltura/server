@@ -173,8 +173,14 @@ class PartnerService extends KalturaBaseService
 
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );
 		
+		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
+		$ks = null;
+		kSessionUtils::createKSessionNoValidations ( $partnerId ,  $adminKuser->getPuserId() , $ks , 86400 , $adminKuser->getIsAdmin() , "" , '*' );
+		kCurrentContext::initKsPartnerUser($ks);
+		kPermissionManager::init();		
+		
 		$dbPartner = PartnerPeer::retrieveByPK( $partnerId );
-		$partner = new KalturaPartner;
+		$partner = new KalturaPartner();
 		$partner->fromPartner( $dbPartner );
 		$partner->cmsPassword = $cmsPassword;
 		
