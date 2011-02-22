@@ -173,7 +173,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * @var int
-	 * @readonly
 	 */
 	public $allowMultiNotification;
 	
