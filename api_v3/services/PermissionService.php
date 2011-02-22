@@ -59,10 +59,10 @@ class PermissionService extends KalturaBaseService
 			$permission->status = KalturaPermissionStatus::ACTIVE;
 		}
 		
-		// only normal permission types are added through this services
-		$permission->type = KalturaPermissionType::NORMAL;
 											
 		$dbPermission = $permission->toInsertableObject();
+		
+		$dbPermission->setType(PermissionType::NORMAL);  // only normal permission types are added through this services
 		$dbPermission->setPartnerId($this->getPartnerId());
 		
 		try { PermissionPeer::addToPartner($dbPermission, $this->getPartnerId()); }
