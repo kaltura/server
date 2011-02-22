@@ -112,7 +112,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		}
 		
 		// if this is an update request (and not just password reset), check that old password is valid
-		if ( $newPassword && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
+		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
 		{
 			throw new kUserException('', kUserException::WRONG_PASSWORD);
 		}
