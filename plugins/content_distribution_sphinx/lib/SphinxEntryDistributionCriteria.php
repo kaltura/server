@@ -37,6 +37,30 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		EntryDistributionPeer::LAST_REPORT => 'last_report',
 		EntryDistributionPeer::NEXT_REPORT => 'next_report',
 	);
+	
+	public static $sphinxTypes = array(
+		'entry_distribution_id' => 'int',
+		'created_at' => 'timestamp',
+		'updated_at' => 'timestamp',
+		'submitted_at' => 'timestamp',
+		'entry_id' => 'string',
+		'partner_id' => 'int',
+		'distribution_profile_id' => 'int',
+		'entry_distribution_status' => 'int',
+		'dirty_status' => 'int',
+		'thumb_asset_ids' => 'string',
+		'flavor_asset_ids' => 'string',
+		'sunrise' => 'timestamp',
+		'sunset' => 'timestamp',
+		'sun_status' => 'int',
+		'remote_id' => 'string',
+		'plays' => 'int',
+		'views' => 'int',
+		'error_type' => 'int',
+		'error_number' => 'int',
+		'last_report' => 'timestamp',
+		'next_report' => 'timestamp',
+	);
 
 	/**
 	 * @return criteriaFilter
