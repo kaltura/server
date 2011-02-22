@@ -21,7 +21,7 @@ $profileName = null;
 $profileStatus = KalturaVirusScanProfileStatus::ENABLED; // can be changed to KalturaVirusScanProfileStatus::DISABLED
 
 // please choose engine type:
-$engineType = null; // Value from KalturaVirusScanEngineType
+$engineType = SymantecScanEnginePlugin::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . SymantecScanEngineVirusScanEngineType::SYMANTEC_SCAN_ENGINE; // Value from KalturaVirusScanEngineType
 
 // action if file is found infected:
 $actionIfInfected = KalturaVirusFoundAction::CLEAN_NONE;
