@@ -21,7 +21,9 @@ class kmc4Action extends kalturaAction
 		PartnerPeer::setUseCriteriaFilter(true);
 		foreach ($partners as $partner)
 		{
-			$allowed[] = array('id' => $partner->getId(), 'name' => $partner->getName());
+			if (!in_array($partner->getId(), array(PartnerPeer::GLOBAL_PARTNER, Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID))) {
+				$allowed[] = array('id' => $partner->getId(), 'name' => $partner->getName());
+			}
 		}
 		return $allowed;
 	}
