@@ -40,6 +40,7 @@
 			if($serviceReflector->isDeprecated() || $serviceReflector->isServerOnly())
 				unset($services[$serviceName]);
 		}
+		ksort($services, SORT_STRING);
 		
 		if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 		{
