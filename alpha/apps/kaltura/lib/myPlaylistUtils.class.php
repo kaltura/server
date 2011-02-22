@@ -114,12 +114,12 @@ class myPlaylistUtils
 
 		if ( ! $playlist )
 		{
-			throw new Exception( "Invalid entry id [$playlist_id]" ) ; 
+			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID); 
 		}
 		
 		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
-			throw new Exception( "Invalid entry id [$playlist_id]" ) ;
+			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_TYPE);
 		}
 		
 		// the default of detrailed should be true - most of the time the kuse is needed 
@@ -131,7 +131,7 @@ class myPlaylistUtils
 	{
 		if ( ! $playlist )
 		{
-			throw new Exception( "Invalid entry id" ) ;
+			throw new kCoreException("Invalid entry id", APIErrors::INVALID_ENTRY_ID);
 		}
 		 
 		// the default of detrailed should be true - most of the time the kuse is needed 
@@ -168,12 +168,12 @@ class myPlaylistUtils
 
 		if ( ! $playlist )
 		{
-			throw new Exception( "Invalid entry id [$playlist_id]" ) ; 
+			throw new kCoreException("Invalid entry id [$playlist_id]", APIErrors::INVALID_ENTRY_ID);
 		}
 		
 		if ( $playlist->getType() != entryType::PLAYLIST )
 		{
-			throw new Exception( "Invalid entry id [$playlist_id]" ) ;
+			throw new kCoreException("Invalid entry type [$playlist_id]", APIErrors::INVALID_ENTRY_TYPE);
 		}
 		
 		return self::getPlaylistFilters ( $playlist );
@@ -565,7 +565,7 @@ class myPlaylistUtils
 		
 		if ( ! $ui_conf ) 
 		{
-			throw new Exception( "Invalid uiconf id [$ui_conf_id] for widget [$wid]" ) ;
+			throw new kCoreException("Invalid uiconf id [$ui_conf_id] for widget [$wid]", APIErrors::INVALID_UI_CONF_ID);
 		}
 		
 //		$autoplay_str = $autoplay ? "autoPlay=true" : "autoPlay=false" ; 
