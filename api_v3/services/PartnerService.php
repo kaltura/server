@@ -150,27 +150,19 @@ class PartnerService extends KalturaBaseService
 	function getSecretsAction( $partnerId , $adminEmail , $cmsPassword )
 	{
 		KalturaResponseCacher::disableCache();
-		
-		$loginData = UserLoginDataPeer::getByEmail($adminEmail);
-		if (!$loginData) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
-		}
-		if (!$loginData->isPasswordValid($cmsPassword)) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
-		}
-		
-		$c = new Criteria();
-		$c->add ( kuserPeer::EMAIL , $adminEmail );
-		$c->add ( kuserPeer::PARTNER_ID , $partnerId );
-		$c->add ( kuserPeer::LOGIN_DATA_ID , $loginData->getId() );
-		$c->add ( kuserPeer::IS_ADMIN, true);
-		$adminKuser = kuserPeer::doSelectOne( $c );
-		
-		// be sure to return the same error if there are no admins in the list and when there are none matched -
-		// so no hint about existing admin will leak 
-		if ( count ( $adminKuser ) < 1 )
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
 
+		$adminKuser = null;
+		try {
+			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId);
+		}
+		catch (kUserException $e) {
+			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+		}
+		
+		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
+			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+		}
+		
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );
 		
 		// user logged in - need to re-init kPermissionManager in order to determine current user's permissions
