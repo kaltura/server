@@ -136,7 +136,7 @@ class embedIframeAction extends sfAction
 		
 		$url =  $host;
 		$url .=  "/html5/html5lib/v{$html5_version}/mwEmbedFrame.php";
-		$url .=  "/entry_id/{$entry_id}/widget_id/_{$widget_id}/uiconf_id/{$uiconf_id}";
+		$url .=  "/entry_id/{$entry_id}/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
 		
 		if ($allowCache)
 			$cache->put($requestKey, $url);
