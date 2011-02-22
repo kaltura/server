@@ -184,7 +184,7 @@ HTML;
 		<form method="post">
 			<input type="hidden" name="do" value="email" />
 			<div class="left">Current email address:</div>
-			<div class="right current truncated">{$this->email}</div>
+			<div class="right current truncated" title="{$this->email}">{$this->email}</div>
 			<br class="clear" />
 			<div class="left">Edit email address:</div>
 			<div class="right"><input id="focused" type="text" name="email" value="{$this->email}" /></div>
@@ -240,7 +240,7 @@ HTML;
 		<form method="post">
 			<input type="hidden" name="do" value="name" />
 			<div class="left">Current name:</div>
-			<div class="right current">{$this->fname} {$this->lname}</div>
+			<div class="right current truncated" title="{$this->fname} {$this->lname}">{$this->fname} {$this->lname}</div>
 			<br class="clear" />
 			<div class="left">Edit First Name:</div>
 			<div class="right"><input type="text" name="fname" value="{$this->fname}" /></div>

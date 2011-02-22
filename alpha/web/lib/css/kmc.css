@@ -235,5 +235,9 @@ fieldset{ border:0 none; position:relative; }
 #change_account span { display: block; margin-bottom: 10px; }
 #change_account label { display: block; margin: 5px; }
 #change_account .container { overflow-x: hidden; height: 110px; margin-bottom: 10px; }
-#change_account button { cursor: pointer; }
-#change_account button span { height: 18px; padding-right: 11px; margin-left: -1px; }
+#change_account button { cursor: pointer; background: url("/lib/images/kmc/kmc_sprite.png") no-repeat scroll -57px -153px transparent; border: 1px solid #B7BABC; color: #2B2B2B; cursor: pointer; height: 24px; margin: 0 auto 5px; padding: 0 13px 1px; }
+#change_account button { width /*\**/: 75px\9 }
+  #change_account button span { background: none; padding: 3px 0 0 3px; }
+  @-moz-document url-prefix() {
+      #change_account button span { background: none; padding: 3px 0 0 6px; }
+  }
