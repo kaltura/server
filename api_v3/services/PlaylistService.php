@@ -282,18 +282,33 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function executeAction( $id , $detailed = false )
 	{
-		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-
-		$extraFilters = array();
 		
+		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
+	
+		$extraFilters = array();
+			
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
-			
-		$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed );
+
+		try 
+		{		
+			$entryList= myPlaylistUtils::executePlaylistById( $this->getPartnerId() , $id , $extraFilters , $detailed );
+		} 
+		catch (kCoreException $ex) 
+		{
+			if ($ex->getCode() ==  APIErrors::INVALID_ENTRY_ID)
+	    		throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
+			else if ($ex->getCode() == APIErrors::INVALID_ENTRY_TYPE)
+				throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
+					    		
+    		throw $ex;
+		}	
+
 		myEntryUtils::updatePuserIdsForEntries ( $entryList );
-		
-		return KalturaBaseEntryArray::fromEntryArray( $entryList );		
+			
+		return KalturaBaseEntryArray::fromEntryArray( $entryList );
 	}
+	
 
 	/**
 	 * Retrieve playlist for playing purpose, based on content
