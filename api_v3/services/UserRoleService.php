@@ -25,6 +25,9 @@ class UserRoleService extends KalturaBaseService
 		if ($actionName === 'list') {
 			return true;
 		}
+		if ($actionName === 'clone') {
+			return true;
+		}
 		return parent::globalPartnerAllowed($actionName);
 	}
 
@@ -114,7 +117,9 @@ class UserRoleService extends KalturaBaseService
 		   the partner group for the current action and context */
 		$c = new Criteria();
 		$c->addAnd(UserRolePeer::ID, $userRoleId, Criteria::EQUAL);
-		$c->addAnd(UserRolePeer::PARTNER_ID, $this->partnerGroup(), Criteria::IN);
+		if ($this->partnerGroup() != myPartnerUtils::ALL_PARTNERS_WILD_CHAR) {
+			$c->addAnd(UserRolePeer::PARTNER_ID, explode(',',$this->partnerGroup()), Criteria::IN);
+		}
 		$dbUserRole = UserRolePeer::doSelectOne($c);
 	
 		if (!$dbUserRole) {
