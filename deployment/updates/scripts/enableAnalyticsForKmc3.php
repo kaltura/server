@@ -39,7 +39,8 @@ while(count($partners))
 		
 		$kmcVersion = $partner->getKmcVersion();
 		
-		if ($kmcVersion != 3) {
+		if ($kmcVersion != 3 && $lastPartner != kConf::get('template_partner_id'))
+		{
 			KalturaLog::log('Partner ['.$lastPartner.'] has kmc version ['.$kmcVersion.'] - skipping!');
 			continue;
 		}
