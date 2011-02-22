@@ -87,11 +87,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if (!$oldLoginEmail) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
-		
-		if ($newLoginEmail === $oldLoginEmail) {
-			$newLoginEmail = null;
-		}
-		
+
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $oldLoginEmail ); 
 		$loginData = UserLoginDataPeer::doSelectOne($c);
@@ -99,6 +95,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		// check if login data exists
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		
+		// if this is an update request (and not just password reset), check that old password is valid
+		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
+		{
+			throw new kUserException('', kUserException::WRONG_PASSWORD);
+		}
+		
+		// no need to query the DB if login email is the same
+		if ($newLoginEmail === $oldLoginEmail) {
+			$newLoginEmail = null;
 		}
 		
 		// check if the email string is a valid email
@@ -110,13 +117,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if ($newLoginEmail && UserLoginDataPeer::getByEmail($newLoginEmail)) {
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
-		
-		// if this is an update request (and not just password reset), check that old password is valid
-		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
-		{
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
-		}
-		
+				
 		// check that new password structure is valid
 		if ($newPassword && 
 				  !UserLoginDataPeer::isPasswordStructureValid($newPassword) ||
