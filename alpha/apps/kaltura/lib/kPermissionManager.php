@@ -184,10 +184,23 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	private static function getPermissions($roleId)
 	{
 		$map = self::initEmptyMap();
+				
+		// get role from cache
+		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
+		$cacheRole = self::getFromCache($roleCacheKey);
 		
-		// get role from DB
+		// compare updatedAt between DB and cache
+		if ( $cacheRole && isset($cacheRole['updatedAt']) && $cacheRole['updatedAt'] >= self::$operatingPartner->getRoleCacheDirtyAt() )
+		{
+			// cache is updated - init from cache
+			unset($cacheRole['updatedAt']);
+			$map = $cacheRole;
+			return $map; // initialization from cache finished
+		}
+		
+		// cache is not updated - delete stored value and re-init from DB
+		
 		$dbRole = null;
-		$roleUpdatedAt = null;
 		if (!is_null($roleId))
 		{
 			UserRolePeer::setUseCriteriaFilter(false);
@@ -199,30 +212,15 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				KalturaLog::alert('User role ID ['.$roleId.'] set for user ID ['.self::$ksUserId.'] of partner ['.self::$operatingPartnerId.'] was not found in the DB');
 				throw new kPermissionException('User role ID ['.$roleId.'] set for user ID ['.self::$ksUserId.'] of partner ['.self::$operatingPartnerId.'] was not found in the DB', kPermissionException::ROLE_NOT_FOUND);
 			}
-			$roleUpdatedAt = $dbRole->getUpdatedAt();
-		}
+		}		
 		
-		// get role from cache
-		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
-		$cacheRole = self::getFromCache($roleCacheKey);
 		
-		// compare updatedAt between DB and cache
-		if ( ($cacheRole && isset($cacheRole['updatedAt']) && $cacheRole['updatedAt'] >= $roleUpdatedAt )
-			  || ($cacheRole && !$dbRole) ) // role == null but saved in cache
-		{
-			// cache is updated - init from cache
-			unset($cacheRole['updatedAt']);
-			$map = $cacheRole;
-			return $map; // initialization from cache finished
-		}
-		
-		// cache is not updated - delete stored value and re-init from DB
 		self::deleteFromCache($roleCacheKey);
 		$map = self::getPermissionsFromDb($dbRole);
 		
 		// update cache
 		$cacheRole = $map;
-		$cacheRole['updatedAt'] = $roleUpdatedAt;
+		$cacheRole['updatedAt'] = time();
 		self::storeInCache($roleCacheKey, $cacheRole);
 		
 		return $map;
@@ -428,6 +426,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		self::$adminSession = !self::isEmpty(kCurrentContext::$is_admin_session) ? kCurrentContext::$is_admin_session : false;
 			
 		// clear instance pools
+		//TODO: may not be needed
 		UserRolePeer::clearInstancePool();
 		PermissionPeer::clearInstancePool();
 		PermissionItemPeer::clearInstancePool();
@@ -753,22 +752,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	
-	/**
-	 * Will delete all partner roles from cache so they will be re-generated next time.
-	 * @param int $partnerId Partner id
-	 */
-	private function delPartnerCache($partnerId)
-	{
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
-		$roles = UserRolePeer::doSelect($c);
-		
-		foreach ($roles as $role)
-		{
-			self::delFromCache($role->getId(), $partnerId);
-		}
-	}
-	
 	private function delFromCache($roleId, $partnerId)
 	{
 		if (!self::useCache())
@@ -784,18 +767,30 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	public function objectChanged(BaseObject $object, array $modifiedColumns) {
 		if($object instanceof Permission)
 		{
-			if ($object->getPartnerId() !== PartnerPeer::GLOBAL_PARTNER)
+			if ($object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			{
-				self::delPartnerCache($object->getPartnerId());
+				self::markPartnerRoleCacheDirty($object->getPartnerId());
 				return true;
 			}
 		}
 		
 		if ($object instanceof UserRole)
 		{
-			if (in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
+			if ( $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER     &&
+			     in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns) &&
+			     in_array(UserRolePeer::STATUS, $modifiedColumns)    )
 			{
-				self::delFromCache($object->getId(), $object->getPartnerId());
+				self::markPartnerRoleCacheDirty($object->getPartnerId());
+				return true;
+			}
+		}
+		
+		if ($object instanceof PermissionToPermissionItem)
+		{
+			$permission = $object->getPermission();
+			if ($permission && $permission->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+			{
+				self::markPartnerRoleCacheDirty($object->getPartnerId());
 				return true;
 			}
 		}
@@ -807,17 +802,35 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if($object instanceof Permission)
 		{
 			// changes in permissions for partner, may require new cache generation
-			if ( $object->getType() == PermissionType::PLUGIN ||
-				 $object->getType() == PermissionType::SPECIAL_FEATURE ||
-				 $object->getType() == PermissionType::PARTNER_GROUP      )
+			if ($object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			{
-				self::delPartnerCache($object->getPartnerId());
+				self::markPartnerRoleCacheDirty($object->getPartnerId());
+				return true;
+			}
+		}
+		
+		if ($object instanceof PermissionToPermissionItem)
+		{
+			$permission = $object->getPermission();
+			if ($permission && $permission->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+			{
+				self::markPartnerRoleCacheDirty($object->getPartnerId());
 				return true;
 			}
 		}
 		
 		return true;
-		
+	}
+	
+	private static function markPartnerRoleCacheDirty($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner) {
+			KalturaLog::err("Cannot find partner with id [$partnerId]");
+			return;
+		}
+		$partner->setRoleCacheDirtyAt(time());
+		$partner->save();
 	}
 
 		

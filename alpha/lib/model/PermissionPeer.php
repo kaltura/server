@@ -235,6 +235,7 @@ class PermissionPeer extends BasePermissionPeer
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::PLUGIN, PermissionType::SPECIAL_FEATURE), Criteria::IN);
+		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		$c->addSelectColumn(PermissionPeer::NAME);
 		$stmt = PermissionPeer::doSelectStmt($c);
 		$additionalPartnerPermissionNames = $stmt->fetchAll(PDO::FETCH_COLUMN);

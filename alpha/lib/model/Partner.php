@@ -737,6 +737,17 @@ class Partner extends BasePartner
 	}
 	
 	
+	public function setRoleCacheDirtyAt($time)
+	{
+		$this->putInCustomData('role_cache_dirty_at', $time);
+	}
+	
+	public function getRoleCacheDirtyAt()
+	{
+		return $this->getFromCustomData('role_cache_dirty_at');
+	}
+	
+	
 	// -------------------------------------------------
 	// -- start of account owner kuser related functions
 	// -------------------------------------------------

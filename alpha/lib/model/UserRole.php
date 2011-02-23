@@ -54,27 +54,26 @@ class UserRole extends BaseUserRole
 		// get from DB
 		$permissionNames = parent::getPermissionNames();
 		$permissionNames = array_map('trim', explode(',', $permissionNames));
-		$permissionNames = implode(',', $permissionNames);
+		
+		$currentPartnerId = kCurrentContext::$ks_partner_id;
+		if (is_null($currentPartnerId) || $currentPartnerId === '') {
+			$currentPartnerId = kCurrentContext::$partner_id;
+		}
 		
 		// translate * to permission names of all permissions valid for partner
-		if ($permissionNames === self::ALL_PARTNER_PERMISSIONS_WILDCARD)
+		if (in_array(self::ALL_PARTNER_PERMISSIONS_WILDCARD, $permissionNames))
 		{
-			$permissionNames = '';
-			$currentPartnerId = kCurrentContext::$ks_partner_id;
-			if (is_null($currentPartnerId) || $currentPartnerId === '') {
-				$currentPartnerId = kCurrentContext::$partner_id;
-			}
+			$permissionNames = array();
 			$permissions = PermissionPeer::getAllValidForPartner($currentPartnerId, $filterDependencies);
 			foreach ($permissions as $permission)
 			{
-				$permissionNames .= $permission->getName().',';	
-			}
-			trim($permissionNames, ',');
-			
+				$permissionNames[$permission->getName()] = $permission->getName();
+			}			
 		}
-		else if ($filterDependencies)
+		$permissionNames = implode(',', $permissionNames);
+		if ($filterDependencies)
 		{
-			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames, $this->getPartnerId());
+			$permissionNames = PermissionPeer::filterDependenciesByNames($permissionNames, $currentPartnerId);
 		}
 		return $permissionNames;
 	}
