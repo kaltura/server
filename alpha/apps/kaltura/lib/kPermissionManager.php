@@ -835,6 +835,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		$partner->setRoleCacheDirtyAt(time());
 		$partner->save();
+		PartnerPeer::removePartnerFromCache($partnerId);
 	}
 
 		
