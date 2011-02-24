@@ -794,7 +794,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$permission = $object->getPermission();
 			if ($permission && $permission->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			{
-				self::markPartnerRoleCacheDirty($object->getPartnerId());
+				self::markPartnerRoleCacheDirty($permission->getPartnerId());
 				return true;
 			}
 		}
@@ -818,7 +818,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$permission = $object->getPermission();
 			if ($permission && $permission->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			{
-				self::markPartnerRoleCacheDirty($object->getPartnerId());
+				self::markPartnerRoleCacheDirty($permission->getPartnerId());
 				return true;
 			}
 		}
