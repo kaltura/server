@@ -4,11 +4,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	/**
 	 * @var DOMDocument
 	 */
-	private $_doc = null;
+	protected $_doc = null;
 	
-	function Php5ClientGenerator($xmlPath)
+	function Php5ClientGenerator($xmlPath, $sourcePath = null)
 	{
-		parent::ClientGeneratorFromXml($xmlPath, realpath("sources/php5"));
+		if(!$sourcePath)
+			$sourcePath = realpath("sources/php5");
+			
+		parent::ClientGeneratorFromXml($xmlPath, $sourcePath);
 		$this->_doc = new DOMDocument();
 		$this->_doc->load($this->_xmlFile);
 	}
@@ -21,10 +24,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		
 		// enumes
 		$this->appendLine('<?php');
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+			
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('');
@@ -41,10 +48,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		// classes
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('');
@@ -61,10 +72,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		// services
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		$this->appendLine('require_once("KalturaClientBase.php");');
 		$this->appendLine('require_once("KalturaEnums.php");');
@@ -92,19 +107,29 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
+	protected function getPluginClass(DOMElement $pluginNode)
+	{
+		$pluginName = $pluginNode->getAttribute("name");
+		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+	}
+	
 	function writePlugin(DOMElement $pluginNode)
 	{
 		$xpath = new DOMXPath($this->_doc);
 		
 		$pluginName = $pluginNode->getAttribute("name");
-		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+		$pluginClassName = $this->getPluginClass($pluginNode);
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaClientBase.php");');
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaEnums.php");');
@@ -133,11 +158,14 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$services = array();
 		foreach($serviceNodes as $serviceNode)
 			$services[] = $serviceNode->getAttribute("name");
-		
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+			
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
 		$this->appendLine('{');
@@ -202,14 +230,22 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->addFile("KalturaPlugins/$pluginClassName.php", $this->getTextBlock());
 	}
 	
+	protected function getEnumClass(DOMElement $enumNode)
+	{
+		return $enumNode->getAttribute("name");
+	}
+	
 	function writeEnum(DOMElement $enumNode)
 	{
-		$enumName = $enumNode->getAttribute("name");
+		$enumName = $this->getEnumClass($enumNode);
 		
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 	 	$this->appendLine("class $enumName");		
 		$this->appendLine("{");
@@ -229,18 +265,26 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
+	protected function getTypeClass(DOMElement $classNode)
+	{
+		return $classNode->getAttribute("name");
+	}
+	
 	function writeClass(DOMElement $classNode)
 	{
-		$type = $classNode->getAttribute("name");
+		$type = $this->getTypeClass($classNode);
 		
 		$abstract = '';
 		if ($classNode->hasAttribute("abstract"))
 			$abstract = 'abstract ';
-		
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+			
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
 		// class definition
 		if ($classNode->hasAttribute("base"))
@@ -296,17 +340,28 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
+	protected function getServiceClass(DOMElement $serviceNode)
+	{
+		$serviceName = $serviceNode->getAttribute("name");
+		return "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+	}
+	
 	function writeService(DOMElement $serviceNode)
 	{
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
 		
-		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
+		$serviceClassName = $this->getServiceClass($serviceNode);
 		$this->appendLine();
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
+		
 		$this->appendLine("class $serviceClassName extends KalturaServiceBase");
 		$this->appendLine("{");
 		$this->appendLine("	function __construct(KalturaClient \$client = null)");
@@ -473,16 +528,25 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		return $signature;
 	}
 	
+	protected function getMainClass()
+	{
+		return 'KalturaClient';
+	}
+	
 	function writeMainClient(DOMNodeList $serviceNodes)
 	{
+		$mainClassName = $this->getMainClass();
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		
-		$this->appendLine('/**');
-		$this->appendLine(" * @package $this->package");
-		$this->appendLine(" * @subpackage $this->subpackage");
-		$this->appendLine(' */');
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
 		
-		$this->appendLine("class KalturaClient extends KalturaClientBase");
+		$this->appendLine("class $mainClassName extends KalturaClientBase");
 		$this->appendLine("{");
 		$this->appendLine("	/**");
 		$this->appendLine("	 * @var string");

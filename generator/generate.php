@@ -46,6 +46,9 @@ foreach($config as $name => $item)
 		
 		$instance = $reflectionClass->newInstance("temp.xml");
 		
+		if($item->get("generateDocs"))
+			$instance->setGenerateDocs($item->get("generateDocs"));
+			
 		if($item->get("package"))
 			$instance->setPackage($item->get("package"));
 			

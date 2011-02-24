@@ -7,14 +7,20 @@ abstract class ClientGeneratorFromXml
 	protected $_sourcePath = "";
 	protected $_params = array();
 	
+	protected $generateDocs = false;
 	protected $package = 'External';
 	protected $subpackage = 'Kaltura';
+	
+	public function setGenerateDocs($generateDocs)
+	{
+		$this->generateDocs = $generateDocs;
+	}
 	
 	public function setPackage($package)
 	{
 		$this->package = $package;
 	}
-
+	
 	public function setSubpackage($subpackage)
 	{
 		$this->subpackage = $subpackage;
