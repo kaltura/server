@@ -104,7 +104,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
 		$value = serialize($value);
-		$success = apc_store($key, $value); // try to store in cache
+		$success = apc_store($key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
 
 		if ($success)
 		{
@@ -189,8 +189,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$roleCacheKey = self::getRoleIdKey($roleId, self::$operatingPartnerId);
 		$cacheRole = self::getFromCache($roleCacheKey);
 		
-		// compare updatedAt between DB and cache
-		if ( $cacheRole && isset($cacheRole['updatedAt']) && $cacheRole['updatedAt'] >= self::$operatingPartner->getRoleCacheDirtyAt() )
+		$roleCacheDirtyAt = 0;
+		if (self::$operatingPartner) {
+			$roleCacheDirtyAt = self::$operatingPartner->getRoleCacheDirtyAt();
+		}
+		
+		// compare updatedAt between partner dirty flag and cache
+		if ( $cacheRole && isset($cacheRole['updatedAt']) && ( $cacheRole['updatedAt'] >= $roleCacheDirtyAt ) )
 		{
 			// cache is updated - init from cache
 			unset($cacheRole['updatedAt']);

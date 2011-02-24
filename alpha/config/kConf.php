@@ -149,6 +149,8 @@ class kConf extends kConfLocal
 				"general_cache_dir" => dirname(__FILE__).'/../../cache/general',
                 'response_cache_dir' => dirname(__FILE__).'/../../cache/response/',
                 
+                'apc_cache_ttl' => 900, // 15 minutes in seconds - ttl for apc cache values
+                
 				"exec_sphinx" => false, // Should be set to false in multiple data centers environments
                 
                 'user_login_set_password_hash_key_validity' => 60*60*24, /* 24 hours */
