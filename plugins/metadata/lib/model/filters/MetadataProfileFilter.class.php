@@ -17,6 +17,7 @@ class MetadataProfileFilter extends baseObjectFilter
 			"_lte_updated_at",
 			"_eq_status",
 			"_in_status",
+			"_eq_name",
 			) , NULL );
 
 		$this->allowed_order_fields = array ("created_at" , "updated_at")	;
