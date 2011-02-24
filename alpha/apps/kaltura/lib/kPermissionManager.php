@@ -782,8 +782,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if ($object instanceof UserRole)
 		{
 			if ( $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER     &&
-			     in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns) &&
-			     in_array(UserRolePeer::STATUS, $modifiedColumns)    )
+			     (in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns) || in_array(UserRolePeer::STATUS, $modifiedColumns))    )
 			{
 				self::markPartnerRoleCacheDirty($object->getPartnerId());
 				return true;
