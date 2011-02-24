@@ -10,6 +10,7 @@ class KalturaConversionProfileBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"nameEqual" => "_eq_name",
 	);
 
 	private $order_by_map = array
@@ -41,4 +42,11 @@ class KalturaConversionProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $nameEqual;
 }
