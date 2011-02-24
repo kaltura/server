@@ -24,6 +24,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * The name of the Conversion Profile
 	 * 
 	 * @var string
+	 * @filter eq
 	 */
 	public $name;
 	
