@@ -107,18 +107,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
-	protected function getPluginClass(DOMElement $pluginNode)
-	{
-		$pluginName = $pluginNode->getAttribute("name");
-		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
-	}
-	
 	function writePlugin(DOMElement $pluginNode)
 	{
 		$xpath = new DOMXPath($this->_doc);
 		
 		$pluginName = $pluginNode->getAttribute("name");
-		$pluginClassName = $this->getPluginClass($pluginNode);
+		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
@@ -230,14 +224,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
     	$this->addFile("KalturaPlugins/$pluginClassName.php", $this->getTextBlock());
 	}
 	
-	protected function getEnumClass(DOMElement $enumNode)
-	{
-		return $enumNode->getAttribute("name");
-	}
-	
 	function writeEnum(DOMElement $enumNode)
 	{
-		$enumName = $this->getEnumClass($enumNode);
+		$enumName = $enumNode->getAttribute("name");
 		
 		if($this->generateDocs)
 		{
@@ -265,14 +254,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
-	protected function getTypeClass(DOMElement $classNode)
-	{
-		return $classNode->getAttribute("name");
-	}
-	
 	function writeClass(DOMElement $classNode)
 	{
-		$type = $this->getTypeClass($classNode);
+		$type = $classNode->getAttribute("name");;
 		
 		$abstract = '';
 		if ($classNode->hasAttribute("abstract"))
@@ -340,18 +324,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
-	protected function getServiceClass(DOMElement $serviceNode)
-	{
-		$serviceName = $serviceNode->getAttribute("name");
-		return "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
-	}
-	
 	function writeService(DOMElement $serviceNode)
 	{
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
 		
-		$serviceClassName = $this->getServiceClass($serviceNode);
+		$serviceClassName = "Kaltura".$this->upperCaseFirstLetter($serviceName)."Service";
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -528,14 +506,9 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		return $signature;
 	}
 	
-	protected function getMainClass()
-	{
-		return 'KalturaClient';
-	}
-	
 	function writeMainClient(DOMNodeList $serviceNodes)
 	{
-		$mainClassName = $this->getMainClass();
+		$mainClassName = 'KalturaClient';
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		
 		if($this->generateDocs)
