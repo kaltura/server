@@ -157,7 +157,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	protected function getEnumClass($enumName)
 	{
 		if(!isset($this->cacheTypes[$enumName]))
-			throw new Exception("Type [$enumName] not cached"); 
+			return $enumName; 
 		
 		return $this->cacheTypes[$enumName];
 	}
@@ -165,7 +165,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	protected function getTypeClass($className)
 	{
 		if(!isset($this->cacheTypes[$className]))
-			throw new Exception("Type [$className] not cached"); 
+			return $className; 
 		
 		return $this->cacheTypes[$className];
 	}
@@ -331,10 +331,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		// class definition
-		if ($classNode->hasAttribute("base"))
-			$this->appendLine($abstract . "class $type extends " . $classNode->getAttribute("base"));
-		else
-			$this->appendLine($abstract . "class $type extends Kaltura_Client_ObjectBase");
+		$baseClass = 'Kaltura_Client_ObjectBase';
+		if ($classNode->hasAttribute('base'))
+			$baseClass = $this->getTypeClass($classNode->getAttribute('base'));
+			
+		$this->appendLine($abstract . "class $type extends $baseClass");
 		$this->appendLine("{");
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)
@@ -350,6 +351,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
+			$propType = $this->getTypeClass($propType);
 			$propDescription = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
