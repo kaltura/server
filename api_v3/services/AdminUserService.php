@@ -68,6 +68,8 @@ class AdminUserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * 
+	 * @deprecated
 	 */
 	public function updatePasswordAction( $email , $password , $newEmail = "" , $newPassword = "" )
 	{
