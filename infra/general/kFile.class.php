@@ -507,14 +507,28 @@ class kFile
 	
 	public static function dumpApiRequest($host)
 	{
+		$post_params = array();
+		
+		// pass uploaded files by adding them as post data with curl @ prefix
+		// signifying a file. the $_FILES[xxx][tmp_name] points to the location
+		// of the uploaded file.
+		// we dont care about the original file name here. if we would, we should have
+		// moved it to a temp folder and set it to its original name
+		foreach($_FILES as $key => $value)
+		{
+			$post_params[$key] = "@".$value['tmp_name'];
+		}
+		
 		foreach($_POST as $key => $value)
 		{
 			$post_params[$key] = $value;
 		}
+		
 		foreach($_GET as $key => $value)
 		{
 			$get_params[$key] = $value;
 		}
+		
 		$url = $_SERVER['REQUEST_URI'];
 		$getQuery = http_build_query($get_params);
 		
