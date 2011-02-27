@@ -647,6 +647,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
+				$distributionProvider = $distributionProfile->getProvider();
+				if(!$distributionProvider->isUpdateEnabled())
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					continue;
+				}
+				
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
@@ -754,6 +761,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 				{
 					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+					continue;
+				}
+				
+				if(!$distributionProvider->isUpdateEnabled())
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 					continue;
 				}
 
@@ -865,6 +878,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 			return true;
 		}
+				
+		$distributionProvider = $distributionProfile->getProvider();
+		if(!$distributionProvider->isUpdateEnabled())
+		{
+			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+			return true;
+		}
 
 		if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
 		{
@@ -929,6 +949,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if(!$distributionProvider)
 			{
 				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+				continue;
+			}
+				
+			if(!$distributionProvider->isUpdateEnabled())
+			{
+				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 				continue;
 			}
 			
@@ -1094,6 +1120,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if($entryDistribution->getStatus() == EntryDistributionStatus::READY || $entryDistribution->getStatus() == EntryDistributionStatus::ERROR_UPDATING)
 			{
+				$distributionProvider = $distributionProfile->getProvider();
+				if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					continue;
+				}
+				
 				kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 				kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
 				
