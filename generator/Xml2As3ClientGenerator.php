@@ -374,7 +374,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			if(count($fileAttributesNames) > 1)
 				continue;
 			$fileAttributeName = null;
-			if(count($fileAttributesNames) > 1)
+			if(count($fileAttributesNames))
 				$fileAttributeName = reset($fileAttributesNames);	
 			
 			$str = "package com.kaltura.delegates." . $xml->attributes()->name . "\n";
