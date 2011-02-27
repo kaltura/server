@@ -823,7 +823,7 @@ kmc.preview_embed = {
         var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section1432">Read more</a></div>';
         if(has_mobile_flavors) {
             description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-                ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' +
+                ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section1432">Read more</a>' +
                 '<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
         }
         var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' +
