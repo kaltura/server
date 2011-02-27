@@ -26,7 +26,13 @@ interface IDistributionProvider
 	public function isDeleteEnabled();
 	
 	/**
-	 * indicates if this provider enables media or metadata changes.
+	 * indicates if this provider enables media changes.
+	 * @return bool
+	 */
+	public function isMediaUpdateEnabled();
+	
+	/**
+	 * indicates if this provider enables metadata changes.
 	 * @return bool
 	 */
 	public function isUpdateEnabled();

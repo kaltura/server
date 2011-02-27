@@ -59,6 +59,14 @@ class ComcastDistributionProvider implements IDistributionProvider
 	}
 
 	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isMediaUpdateEnabled()
+	 */
+	public function isMediaUpdateEnabled()
+	{
+		return $this->isUpdateEnabled();
+	}
+
+	/* (non-PHPdoc)
 	 * @see IDistributionProvider::isReportsEnabled()
 	 */
 	public function isReportsEnabled()
