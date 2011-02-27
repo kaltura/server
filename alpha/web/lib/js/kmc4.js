@@ -1479,6 +1479,8 @@ kmc.mediator.loadKmc = function() {
     };
     var flashvars = kmc.vars.kmc_swf.flashvars;
     var params = {
+	allowNetworking: "all",
+	allowScriptAccess: "always",
         flashvars: kmc.utils.jsonToQuerystring(flashvars)
     };
     // attruib, params,
