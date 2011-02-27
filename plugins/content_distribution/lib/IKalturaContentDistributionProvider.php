@@ -25,5 +25,5 @@ interface IKalturaContentDistributionProvider extends IKalturaBase
 	 * @param EntryDistribution $entryDistribution The distribution entry whose data is appended to the MRSS 
 	 * @param SimpleXMLElement $mrss The MRSS to which the data is appended
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss);
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss);
 }

@@ -209,7 +209,7 @@ class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 	 * @param EntryDistribution $entryDistribution
 	 * @param SimpleXMLElement $mrss
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		// append IDETIC specific report statistics
 	}

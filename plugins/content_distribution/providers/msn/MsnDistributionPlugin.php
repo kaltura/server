@@ -205,7 +205,7 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 	 * @param EntryDistribution $entryDistribution
 	 * @param SimpleXMLElement $mrss
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		// append MSN specific report statistics
 		$status = $mrss->addChild('status');

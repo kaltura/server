@@ -203,7 +203,7 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 * @param EntryDistribution $entryDistribution
 	 * @param SimpleXMLElement $mrss
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		
 	}

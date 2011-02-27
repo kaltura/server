@@ -209,7 +209,7 @@ class MyspaceDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 * @param EntryDistribution $entryDistribution
 	 * @param SimpleXMLElement $mrss
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		// append MYSPACE specific report statistics
 	}

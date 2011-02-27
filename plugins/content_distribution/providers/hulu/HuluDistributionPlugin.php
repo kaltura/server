@@ -205,7 +205,7 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 	 * @param EntryDistribution $entryDistribution
 	 * @param SimpleXMLElement $mrss
 	 */
-	public static function contibuteMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
+	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		// append Hulu specific report statistics
 		$status = $mrss->addChild('status');
