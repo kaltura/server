@@ -1431,7 +1431,8 @@ $(function() {
 });
 
 kmc.vars.kmc_swf = {
-    url : kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/kmc.swf",
+    //url : kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/kmc.swf",
+    url : 'http://' + kmc.vars.cdn_host + "/flash/kmc/"+kmc.vars.kmc_version+"/kmc.swf",
     flashvars : {
         // kmc configuration
         kmc_uiconf			: kmc.vars.kmc_general_uiconf,
