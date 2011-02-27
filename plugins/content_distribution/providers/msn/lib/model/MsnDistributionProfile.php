@@ -81,7 +81,9 @@ class MsnDistributionProfile extends DistributionProfile
 			{
 				if(!strlen($value))
 				{
-					$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $field);
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $field);
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+					$validationErrors[] = $validationError;
 					return $validationErrors;
 				}
 			}

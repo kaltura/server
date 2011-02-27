@@ -29,6 +29,19 @@ class kDistributionValidationError
 	private $description;
 	
 	/**
+	 * enum from DistributionValidationErrorType
+	 * @var int
+	 */
+	private $validationErrorType;
+	
+	/**
+	 * Parameter for the validation error
+	 * For example, minimum value for DistributionValidationErrorType::STRING_TOO_SHORT
+	 * @var string
+	 */
+	private $validationErrorParam;
+	
+	/**
 	 * @return the $action
 	 */
 	public function getAction()
@@ -90,5 +103,37 @@ class kDistributionValidationError
 	public function setDescription($description)
 	{
 		$this->description = $description;
+	}
+	
+	/**
+	 * @return the $validationErrorType
+	 */
+	public function getValidationErrorType()
+	{
+		return $this->validationErrorType;
+	}
+
+	/**
+	 * @param int $validationErrorType
+	 */
+	public function setValidationErrorType($validationErrorType)
+	{
+		$this->validationErrorType = $validationErrorType;
+	}
+	
+	/**
+	 * @return the $validationErrorParam
+	 */
+	public function getValidationErrorParam()
+	{
+		return $this->validationErrorParam;
+	}
+
+	/**
+	 * @param string $validationErrorParam
+	 */
+	public function setValidationErrorParam($validationErrorParam)
+	{
+		$this->validationErrorParam = $validationErrorParam;
 	}
 }

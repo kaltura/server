@@ -63,7 +63,9 @@ class ComcastDistributionProfile extends DistributionProfile
 		{
 			if(!strlen($value))
 			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY);
+				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY);
+				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+				$validationErrors[] = $validationError;
 				return $validationErrors;
 			}
 		}

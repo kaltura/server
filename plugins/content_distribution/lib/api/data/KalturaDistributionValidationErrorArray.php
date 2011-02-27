@@ -29,7 +29,7 @@ class KalturaDistributionValidationErrorArray extends KalturaTypedArray
     				break;
     			
 				case DistributionErrorType::INVALID_DATA:
-    				$nObj = new KalturaDistributionValidationErrorInvalidMetadata();
+    				$nObj = new KalturaDistributionValidationErrorInvalidData();
     				break;
     			
 				default:
