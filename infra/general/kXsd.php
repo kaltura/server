@@ -24,13 +24,13 @@ class kXsd
 		if($from->getAttribute('id') != $to->getAttribute('id'))
 		{
 			KalturaLog::debug("Elements ids are different [" . $from->getAttribute('id') . "] [" . $to->getAttribute('id') . "]");
-			throw new kXsdException(kXsdException::CAN_NOT_CHANGE_ELEMENT_ID, $from->getAttribute('id'), $to->getAttribute('id'), $xPath);
+			return '';
 		}
 			
 		if(!$from->hasAttribute('id') && $fromName != $toName)
 		{
 			KalturaLog::debug("Elements names are different [$fromName] [$toName]");
-			throw new kXsdException(kXsdException::CAN_NOT_CHANGE_ELEMENT_NAME, $fromName, $toName, $xPath);
+			return '';
 		}
 			
 		if($from->getAttribute('type') != $to->getAttribute('type'))
