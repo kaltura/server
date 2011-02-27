@@ -927,11 +927,26 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
+		$ignoreStatuses = array(
+			EntryDistributionStatus::PENDING,
+			EntryDistributionStatus::DELETED,
+			EntryDistributionStatus::DELETING,
+			EntryDistributionStatus::QUEUED,
+			EntryDistributionStatus::REMOVED,
+			EntryDistributionStatus::ERROR_SUBMITTING,
+		);
+		
 		KalturaLog::debug("Entry [" . $entry->getId() . "] changed");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+			if(in_array($entryDistribution->getStatus(), $ignoreStatuses))
+			{
+				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
+				continue;
+			}
+				
+			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 			{
 				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
 				continue;
