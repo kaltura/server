@@ -63,7 +63,7 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function isMediaUpdateEnabled()
 	{
-		return $this->isUpdateEnabled();
+		return true;
 	}
 
 	/* (non-PHPdoc)
