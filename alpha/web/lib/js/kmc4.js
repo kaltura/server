@@ -710,7 +710,7 @@ kmc.preview_embed = {
             embed_code = embed_code.replace('{FLAVOR}','');
         }
         var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-            '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#contentSection118"></a>' + id_type +
+            '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section118"></a>' + id_type +
             ': ' + name + '</div> <div id="modal_content">' +
             //							 ((typeof(live_bitrates) == "object") ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') + // always return true because null is an object
         ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
@@ -809,7 +809,7 @@ kmc.preview_embed = {
             options += '<option value="akamai"' + ((delivery_type == "akamai") ? selected : "") + '>Akamai HD Network &nbsp;</option>';
         }
         html += options + '</select></div><br /><div class="note">Adaptive Streaming automatically adjusts to the viewer\'s bandwidth,' +
-            'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#deliveryType">Read more</a></div><br />';
+            'while Progressive Download allows buffering of the content. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#1431">Read more</a></div><br />';
         return html;
     },
 		
@@ -820,7 +820,7 @@ kmc.preview_embed = {
         var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
         kmc.client.getShortURL(long_url);
 			
-        var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a></div>';
+        var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section1432">Read more</a></div>';
         if(has_mobile_flavors) {
             description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
                 ' <a target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/help#html5Support">Read more</a>' +

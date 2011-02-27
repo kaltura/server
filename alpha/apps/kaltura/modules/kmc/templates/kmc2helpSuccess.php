@@ -1,7 +1,3 @@
-﻿<?php
-
-?>
-
 <style>
 	body, #wrap, #main { background:#fff;}
 	 #header { display:none;}
@@ -36,103 +32,122 @@
 			<h1>KMC Help</h1>
 		</div>
 		<div class="contwrap">
-			<div class="toc clearfix" id="contentSection">
+			<div class="toc clearfix" id="section">
 				<h2>Table of Content</h2>
 				<h3>CONTENT SECTION</h3>
 				<dl>
-					<dt><span>1.1</span><a href="#">ENTRIES TABLE (CONTENT > MANAGE)</a></dt>
-					<dd><span>1.1.1</span><a href="#">Filters</a></dd>
-					<dd><span>1.1.2</span><a href="#">Delete</a></dd>
-					<dd><span>1.1.3</span><a href="#">Add Tags</a></dd>
-					<dd><span>1.1.4</span><a href="#">Remove Tags</a></dd>
+					<dt><span>1.1</span><a href="#section11">ENTRIES TABLE (CONTENT > MANAGE)</a></dt>
+					<dd><span>1.1.1</span><a href="#section111">Filters</a></dd>
+					<dd><span>1.1.2</span><a href="#section112">Delete</a></dd>
+					<dd><span>1.1.3</span><a href="#section113">Add Tags</a></dd>
+					<dd><span>1.1.4</span><a href="#section114">Remove Tags</a></dd>
 					<!--dd><span>1.1.5</span><a href="#">Add Admin Tags</a></dd> -->
 					<!--<dd><span>1.1.6</span><a href="#">Remove Admin Tags</a></dd> -->
-					<dd><span>1.1.5</span><a href="#">Download</a></dd>
-					<dd><span>1.1.6</span><a href="#">Create Playlist</a></dd>
-					<dd><span>1.1.7</span><a href="#">More Actions</a></dd>
-					<dd><span>1.1.8</span><a href="#">Review and Embed</a></dd>
+					<dd><span>1.1.5</span><a href="#section115">Download</a></dd>
+					<dd><span>1.1.6</span><a href="#section116">Create Playlist</a></dd>
+					<dd><span>1.1.7</span><a href="#section117">More Actions</a></dd>
+					<dd><span>1.1.8</span><a href="#section118">Peview and Embed</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.2</span><a href="#">EDIT ENTRY</a></dt>
-					<dd><span>1.2.1</span><a href="#">Metadata</a></dd>
-					<dd><span>1.2.2</span><a href="#">Access Control</a></dd>
-					<dd><span>1.2.3</span><a href="#">Scheduling</a></dd>
-					<dd><span>1.2.4</span><a href="#">FLAVORS</a></dd>
-					<dd><span>1.2.5</span><a href="#">Mixes</a></dd>
+					<dt><span>1.2</span><a href="#section12">EDIT ENTRY</a></dt>
+					<dd><span>1.2.1</span><a href="#section121">Metadata</a></dd>
+					<dd><span>1.2.2</span><a href="#section122">Access Control</a></dd>
+					<dd><span>1.2.3</span><a href="#section123">Scheduling</a></dd>
+					<dd><span>1.2.4</span><a href="#section124">FLAVORS</a></dd>
+					<dd><span>1.2.5</span><a href="#section125">Mixes</a></dd>
 					<!--<dd><span>1.2.3</span><a href="#">Content &ndash; Entry included in the following mixes</a></dd>
 							<dd><span>1.2.4</span><a href="#">Content &ndash; Entries included in the mix</a></dd> -->
 				</dl>
 				<dl>
-					<dt><span>1.3</span><a href="#">MODERATE</a></dt>
-					<dd><span>1.3.1</span><a href="#">Preview</a></dd>
-					<dd><span>1.3.2</span><a href="#">Reject Content</a></dd>
-					<dd><span>1.3.3</span><a href="#">Approve Content</a></dd>
-					<dd><span>1.3.4</span><a href="#">Ban User</a></dd>
+					<dt><span>1.3</span><a href="#section13">MODERATE</a></dt>
+					<dd><span>1.3.1</span><a href="#section131">Preview</a></dd>
+					<dd><span>1.3.2</span><a href="#section132">Reject Content</a></dd>
+					<dd><span>1.3.3</span><a href="#section133">Approve Content</a></dd>
+					<dd><span>1.3.4</span><a href="#section134">Ban User</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.4</span><a href="#">PLAYLISTS</a></dt>
-					<dd><span>1.4.1</span><a href="#">Search</a></dd>
-					<dd><span>1.4.2</span><a href="#">Delete</a></dd>
-					<dd><span>1.4.3</span><a href="#">Preview and Embed</a></dd>
+					<dt><span>1.4</span><a href="#section14">PLAYLISTS</a></dt>
+					<dd><span>1.4.1</span><a href="#section141">Search</a></dd>
+					<dd><span>1.4.2</span><a href="#section142">Delete</a></dd>
+					<dd><span>1.4.3</span><a href="#section143">Preview and Embed</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.5</span><a href="#">ADD / EDIT PLAYLIST</a></dt>
-					<dd><span>1.5.1</span><a href="#">Add Manual Playlist</a></dd>
-					<dd><span>1.5.2</span><a href="#">Add Rule Based Playlist</a></dd>
+					<dt><span>1.5</span><a href="#section15">ADD / EDIT PLAYLIST</a></dt>
+					<dd><span>1.5.1</span><a href="#section151">Add Manual Playlist</a></dd>
+					<dd><span>1.5.2</span><a href="#section152">Add Rule Based Playlist</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.6</span><a href="#">UPLOAD</a></dt>
-					<dd><span>1.6.1</span><a href="#">Upload - the Kaltura Uploader (aka Contribution Wizard)</a></dd>
-					<dd><span>1.6.2</span><a href="#">Import from existing host</a></dd>
+					<dt><span>1.6</span><a href="#section16">UPLOAD</a></dt>
+					<dd><span>1.6.1</span><a href="#section161">Upload - the Kaltura Uploader (aka Contribution Wizard)</a></dd>
+					<dd><span>1.6.2</span><a href="#section162">Import from existing host</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.7</span><a href="#">SYNDICATE</a></dt>
-					<dd><span>1.7.1</span><a href="#">Google</a></dd>
-					<dd><span>1.7.2</span><a href="#">Yahoo</a></dd>
-					<dd><span>1.7.3</span><a href="#">iTunes</a></dd>
-					<dd><span>1.7.4</span><a href="#">TubeMogul</a></dd>
+					<dt><span>1.7</span><a href="#section17">SYNDICATE</a></dt>
+					<dd><span>1.7.1</span><a href="#section171">Google</a></dd>
+					<dd><span>1.7.2</span><a href="#section172">Yahoo</a></dd>
+					<dd><span>1.7.3</span><a href="#section173">iTunes</a></dd>
+					<dd><span>1.7.4</span><a href="#section174">TubeMogul</a></dd>
 				</dl>
 				<dl>
-					<dt><span>1.8</span><a href="#">GLOSSARY OF TERMS</a></dt>
+					<dt><span>1.8</span><a href="#section18">GLOSSARY OF TERMS</a></dt>
 				</dl>
 				<h3>ACCOUNT SECTION</h3>
 				<dl>
-					<dt><span>2.2</span><a href="#">ACCOUNT OVERVIEW</a></dt>
-					<dd><span>2.2.1</span><a href="#">Account Info</a></dd>
-					<dd><span>2.2.2</span><a href="#">Login Info</a></dd>
+					<dt><span>2.1</span><a href="#section21">ACCOUNT OVERVIEW</a></dt>
+					<dd><span>2.1.1</span><a href="#section211">Partner Info</a></dd>
+					<dd><span>2.1.2</span><a href="#section212">Login Info</a></dd>
 				</dl>
 				<dl>
-					<dt><span>2.3</span><a href="#">INTEGRATION SETTINGS</a></dt>
-					<dd><span>2.3.1</span><a href="#">Partner Info</a></dd>
-					<dd><span>2.3.2</span><a href="#">Advanced Settings</a></dd>
-					<dd><span>2.3.3</span><a href="#">Notifications</a></dd>
+					<dt><span>2.2</span><a href="#section22">INTEGRATION SETTINGS</a></dt>
+					<dd><span>2.2.1</span><a href="#section221">Partner Info</a></dd>
+					<dd><span>2.2.2</span><a href="#section222">Advanced Settings</a></dd>
+					<dd><span>2.2.3</span><a href="#section223">Notifications</a></dd>
 				</dl>
 				<dl>
-					<dt><span>2.4</span><a href="#">ACCESS CONTROL</a></dt>
-					<dd><span>2.4.1</span><a href="#">Add New Access Profile</a></dd>
-					<dd><span>2.4.2</span><a href="#">Edit Existing Access Profile</a></dd>
+					<dt><span>2.3</span><a href="#section23">ACCESS CONTROL</a></dt>
+					<dd><span>2.3.1</span><a href="#section231">Add New Access Profile</a></dd>
+					<dd><span>2.3.2</span><a href="#section232">Edit Existing Access Profile</a></dd>
 				</dl>
 				<dl>
-					<dt><span>2.5</span><a href="#">TRANSCODING SETTINGS</a></dt>
-					<dd><span>2.5.1</span><a href="#">Advanced Mode (multiple transcoding profiles)</a></dd>
-					<dd><span>2.5.2</span><a href="#">Add Profile</a></dd>
-					<dd><span>2.5.3</span><a href="#">Custom transcoding parameters</a></dd>
+					<dt><span>2.4</span><a href="#section24">TRANSCODING SETTINGS</a></dt>
+					<dd><span>2.4.1</span><a href="#section241">Advanced Mode (multiple transcoding profiles)</a></dd>
+					<dd><span>2.4.2</span><a href="#section242">Add Profile</a></dd>
+					<dd><span>2.4.3</span><a href="#section243">Custom transcoding parameters</a></dd>
 				</dl>
 				<dl>
-					<dt><span>2.6</span><a href="#">ACCOUNT UPGRADE</a></dt>
+					<dt><span>2.5</span><a href="#section25">ACCOUNT UPGRADE</a></dt>
+				</dl>
+				<dl>
+					<dt><span>2.6</span><a href="#section26">MY USER SETTING</a></dt>
 				</dl>
 				<h3>APPLICATION STUDIO SECTION</h3>
 				<dl>
-					<dt><span>3.1</span><a href="#">PLAYER LIST</a></dt>
-					<dd><span>3.1.1</span><a href="#">Edit</a></dd>
-					<dd><span>3.1.2</span><a href="#">Duplicate</a></dd>
-					<dd><span>3.1.3</span><a href="#">Delete</a></dd>
+					<dt><span>3.1</span><a href="#section31">PLAYER LIST</a></dt>
+					<dd><span>3.1.1</span><a href="#section311">Edit</a></dd>
+					<dd><span>3.1.2</span><a href="#section312">Duplicate</a></dd>
+					<dd><span>3.1.3</span><a href="#section313">Delete</a></dd>
 				</dl>
 				<dl>
-					<dt><span>3.2</span><a href="#">ADD PLAYER</a></dt>
-					<dd><span>3.2.1</span><a href="#">Template tab</a></dd>
-					<dd><span>3.2.2</span><a href="#">Features tab</a></dd>
+					<dt><span>3.2</span><a href="#section32">ADD PLAYER</a></dt>
+					<dd><span>3.2.1</span><a href="#section321">Template tab</a></dd>
+					<dd><span>3.2.2</span><a href="#section322">Features tab</a></dd>
 				</dl>
+				<h3>ADMINISTRATION SECTION</h3>
+				<dl>
+					<dt><span>4.1</span><a href="#section41">Users Managment</a></dt>
+					<dd><span>4.1.1</span><a href="#section411">Add Users</a></dd>
+					<dd><span>4.1.2</span><a href="#section412">Edit User</a></dd>
+					<dd><span>4.1.3</span><a href="#section413">Block/Unblock User</a></dd>
+					<dd><span>4.1.4</span><a href="#section414">Delete User</a></dd>
+				</dl>
+				<dl>
+					<dt><span>4.2</span><a href="#section42">Roles Managment</a></dt>
+					<dd><span>4.2.1</span><a href="#section421">Add Roles</a></dd>
+					<dd><span>4.2.2</span><a href="#section422">Edit Role</a></dd>
+					<dd><span>4.2.3</span><a href="#section423">Duplicate Role</a></dd>
+					<dd><span>4.2.4</span><a href="#section424">Delete Role</a></dd>
+				</dl>
+				
 			</div><!-- end toc -->
 			<div class="dataContent">
 
@@ -144,28 +159,28 @@
 
 				<!--    1.1    -->
 
-				<div class="dataTitle" id="contentSection11"><a href="#main">Back to top</a>
+				<div class="dataTitle" id="section11"><a href="#main">Back to top</a>
 					<h3><span>1.1</span>ENTRIES TABLE (CONTENT -> MANAGE)</h3></div>
 				<p>This is the main list of media entries related to your account.&nbsp; Here you can conduct several actions with a specific entry or several entries simultaneously (to choose multiple entries, either use the CTRL key or the "Select? links at the bottom of the list).&nbsp; You can search through entries, delete entries,  preview entries and grab the embed code to add to your site, as well as other actions specified below.&nbsp; You can sort the list by clicking on the various columns and scroll through the pages at the bottom of the list.&nbsp; At the bottom of the list you can also decide how many items to display per page (10 to 500).&nbsp; Note that the list of entries can be filtered according to the parameters that are specified on the Additional Filters and Categories bars on the left side of the page.&nbsp; You can filter by search criteria, specific category, or any number of additional filters.&nbsp; If the entries list is filtered, this will be indicated at the top of the list.</p>
 
-				<div class="dataTitle" id="contentSection111">
+				<div class="dataTitle" id="section111">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.1</span>Filter</h4>
 				</div>
 				<p>To the left of the entries table you will find the Filters bar.&nbsp; This bar allows you to filter your entry list according to various parameters and search criteria.</p>
 
-				<div class="dataTitle" id="contentSection1111">
+				<div class="dataTitle" id="section1111">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.1.1</span>Search</h4>
 				</div>
 				<p>The search box enables you to search for specific entries existing in your account.&nbsp; Here you can search for any word in the entry name, tags or both - just enter your search criteria and click the magnifying icon on the right (or press Enter).&nbsp;  To clear the search box, click the little X icon on the right.</p>
-				<div class="dataTitle" id="contentSection1112">
+				<div class="dataTitle" id="section1112">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.1.2</span>Categories</h4>
 				</div>
 				<p>Your media entries are divided into categories.&nbsp; The different categories are built in a tree-like hierarchy where each category can include multiple sub-categories.&nbsp; You can add or remove categories by clicking on the "Edit? link on the top left corner of the Filter bar, and then clicking on the "+ / -? icons that appear when you hover with your mouse over a specific category.&nbsp; You can also drag-and-drop categories from one location of the 'tree' to another.In order to assign a media entry to a specific category, just drag-and-drop in the entry from the entries table on the right to the desired category on the left.
 				</p>
-				<div class="dataTitle" id="contentSection1113">
+				<div class="dataTitle" id="section1113">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.1.3</span>Categories</h4>
 				</div>
@@ -178,60 +193,60 @@
 					<li>Filter by transcoding status</li>
 					<li>Filter by duration - Short clips (up to 4 minutes), Medium clips (4 to 20 minutes) and Long clips (more than 20 minutes)</li>
 					<li>Filter by video quality (or "transcoding flavor?)</li>
-					<li> Filter by Access Control Profile (for more details see section 1.2.3)</li>
-					<li> Filter by Scheduling status (Past, Live now, or Scheduled to go live at a later date)</li>
+					<li>Filter by Access Control Profile (for more details see section 1.2.3)</li>
+					<li>Filter by Scheduling status (Past, Live now, or Scheduled to go live at a later date)</li>
 				</ul>
 				<p>You can filter by one criterion or multiple criteria.</p>
 
-				<div class="dataTitle" id="contentSection112">
+				<div class="dataTitle" id="section112">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.2</span>Delete</h4>
 				</div>
 				<p>To delete one or more entries, select the entry you would like to delete (or multiple entries using the CTRL key) and press the "Delete" button on the bottom of the page.&nbsp; A prompt box will ask you to approve your selection and once you click "Yes" the selected entries will be deleted.&nbsp; Note that you can delete more than one entry at a time, but only entries appearing on the same page of the main list.</p>
 
-				<div class="dataTitle" id="contentSection113">
+				<div class="dataTitle" id="section113">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.3</span>Add Tags</h4>
 				</div>
 				<p>You can add descriptive tags to your entry by selecting one or more entries and clicking the "Add Tags" button on the Manage Tags dropdown menu at the bottom of the page.&nbsp; In the "Add Tags" window that opens, type the tags you wish to add, separating the different tags by commas.&nbsp; Note that you can add tags to more than one entry at a time, but only on entries appearing on the same page of the entries list.&nbsp; Clicking "Save" on the "Add Tags" window will add the tags to all selected entries.</p>
 
-				<div class="dataTitle" id="contentSection114">
+				<div class="dataTitle" id="section114">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.4</span>Remove Tags</h4>
 				</div>
 				<p>You can remove descriptive tags from your entry by selecting one or more entries and clicking the "Remove Tags" button on the Manage Tags dropdown menu at the bottom of the page.&nbsp; In the "Remove Tags" window that opens, select all the tags you wish to remove, use the CTRL key for multiple selection.&nbsp; Note that you can remove tags from more than one entry at a time, but only on entries appearing on the same page of the entries list.&nbsp; Clicking "Remove" on the "Remove Tags" window will remove the tags from all selected entries.</p>
 
-				<div class="dataTitle" id="contentSection115">
+				<div class="dataTitle" id="section115">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.5</span>Download</h4>
 				</div>
 				<p>You can download files to your computer for offline use by selecting an entry and clicking the "Download" button on the bottom of the page.&nbsp; Note that you can download more than one entry at a time, but only entries appearing on the same page of the entries list.&nbsp; Clicking "Download" will present you with a screen to choose the flavor (format/quality) of the video files that you have selected to download.&nbsp; Select your preferred flavor from the dropdown menu and click "Submit" to proceed.&nbsp; A message will appear stating that links to your downloaded files will be sent to your email.&nbsp; Click "OK" to proceed.</p>
 
-				<div class="dataTitle" id="contentSection116">
+				<div class="dataTitle" id="section116">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.6</span>Create Playlist</h4>
 				</div>
 				<p>The "Create Playlist? dropdown menu enables you to quickly create manual or rule based playlists.&nbsp; You can select multiple entries in the entries list and then click "Create Playlist? in order to create a new playlist with the specific entries included in the playlist.&nbsp; For information on how to create playlists, please refer to section 1.4.</p>
 
-				<div class="dataTitle" id="contentSection117">
+				<div class="dataTitle" id="section117">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.7</span>More Action</h4>
 				</div>
 
-				<div class="dataTitle" id="contentSection1171">
+				<div class="dataTitle" id="section1171">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.7.1</span>Set Access Control</h4>
 				</div>
 				<p>Sets access control for all selected entries.&nbsp; To learn more about access control please refer to access control paragraph in "Settings? section.
 				</p>
-				<div class="dataTitle" id="contentSection1172">
+				<div class="dataTitle" id="section1172">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.7.2</span>Set Scheduling</h4>
 				</div>
 				<p>Sets scheduling  for all selected entries.&nbsp; To learn more about scheduling  please refer to scheduling  paragraph in "Settings? section.
 				</p>
 
-				<div class="dataTitle" id="contentSection118">
+				<div class="dataTitle" id="section118">
 					<a href="#main">Back to top</a>
 					<h4><span>1.1.8</span>Preview and Embed</h4>
 				</div>
@@ -239,55 +254,55 @@
 
 				<!--   1.2   -->
 
-				<div class="dataTitle" id="contentSection12">
+				<div class="dataTitle" id="section12">
 					<a href="#main">Back to top</a>
 					<h3><span>1.2</span>Edit Entry</h3></div>
 				<p>Click the name of a specific entry in order to review and edit its information.&nbsp; After editing an entry (as specified below) don't forget to click on the "Save Changes? button at the bottom of the window.</p>
 
-				<div class="dataTitle" id="contentSection121">
+				<div class="dataTitle" id="section121">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.1</span>Metadata</h4>
 				</div>
 				<p>In this section you can add or edit the entry's metadata.&nbsp; You can change the name of the entry, edit tags (separated by commas) or categories, and edit the description.&nbsp; You can also see the current thumbnail for the entry, Entry ID, type of entry (video, video mix, image or audio), moderation status (approved, flagged for review or rejected), flags, duration, date of creation, creator, rating, votes count and number of plays.&nbsp;  Note that you can also perform the following actions - </p>
 
-				<div class="dataTitle" id="contentSection1211">
+				<div class="dataTitle" id="section1211">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.1.1</span>Update Thumbnail</h4>
 				</div>
 				<p>The Metadata screen includes a small player where you can see a preview of your entry, as well as capture a new thumbnail from the video.&nbsp; In order to select a new thumbnail from the video, play the entry and click the "Capture Thumbnail" button when you see the image you would like to use as the thumbnail.&nbsp; Alternatively, you can update the thumbnail by uploading an external image to be associated with the video by clicking on the "Upload new? link.&nbsp;
 				</p>
-				<div class="dataTitle" id="contentSection1212">
+				<div class="dataTitle" id="section1212">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.1.2</span>Preview & Embed</h4>
 				</div>
 				<p>By clicking on the "Preview & Embed? link under the player you can quickly switch to the "Preview & Embed? window (see section 1.1.8)
 				</p>
-				<div class="dataTitle" id="contentSection1213">
+				<div class="dataTitle" id="section1213">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.1.3</span>Create a Mix</h4>
 				</div>
 				<p>Under "Create a mix? you can open Kaltura Standard Video Editor or Advanced Editor and create a new mix that is based on the entry.&nbsp; Note that this will not modify the entry, but will create a new video mix entry.&nbsp;
 				</p>
-				<div class="dataTitle" id="contentSection122">
+				<div class="dataTitle" id="section122">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.2</span>Access Control</h4>
 				</div>
 				<p>In this section you can control who has access to your entry.&nbsp; This is done by assigning an access control profile to the entry.&nbsp; You can choose an existing profile (from the dropdown menu) or create a new profile (by clicking the "add profile? link).&nbsp; For more information about Access Control, please refer to access control paragraph in "Settings? section.
 				</p>
 
-				<div class="dataTitle" id="contentSection123">
+				<div class="dataTitle" id="section123">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.3</span>Scheduling</h4>
 				</div>
 				<p>In this section you can set specific scheduling parameters for your content - i.e.&nbsp; when you entry should be displayed on your website.&nbsp; You can set the entry to be available for display at any time (e.g.&nbsp; no schedule limitations) or you can set the entry to be available during a limited timeframe - for example, display this video starting on X date with no end time, or display this video only between X date and Y date.&nbsp; Note that when users try to access a video that is no longer valid (in terms of its scheduling), they will receive an error message explaining that this content is no longer valid.</p>
 
-				<div class="dataTitle" id="contentSection124">
+				<div class="dataTitle" id="section124">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.4</span>FLAVORS</h4>
 				</div>
 				<p>Flavor is  a single output file with its specific file type, bitrate, gop size, etc.&nbsp; could be either used for playback, download or editing..&nbsp; in this page you can view the list of flavors that the system has created for this specific entry.&nbsp; You can transcode the entry to additional flavors by clicking the transcode button, or preview, download or delete any specific flavor.</p>
 
-				<div class="dataTitle" id="contentSection125">
+				<div class="dataTitle" id="section125">
 					<a href="#main">Back to top</a>
 					<h4><span>1.2.5</span>Mixes</h4>
 				</div>
@@ -295,31 +310,31 @@
 
 				<!--   1.3   -->
 
-				<div class="dataTitle" id="contentSection13">
+				<div class="dataTitle" id="section13">
 					<a href="#main">Back to top</a>
 					<h3><span>1.3</span>MODERATE</h3></div>
 				<p>This screen displays a list of all content that has been flagged as inappropriate by users.&nbsp; By default, the list is filtered and sorted according to the amount of flags that each entry has received.&nbsp; You can sort the list by clicking on the various columns and scroll through the pages at the bottom of the list.</p>
 				<p>When clicking on the name of an entry, you will be presented with the Edit Entry window (see section 1.2).&nbsp; Similar to the Manage tab, you will find the Filters bar to the left of the entries table.&nbsp; This tab allows you to filter your moderation entry list according to various parameters and search criteria (See section 1.1.1 for more details).&nbsp; Please note, that by default the list is already filtered by content that was flagged for review.&nbsp; To change this, click on the "Additional Filters? button (see section 1.1.1.3).</p>
 
-				<div class="dataTitle" id="contentSection131">
+				<div class="dataTitle" id="section131">
 					<a href="#main">Back to top</a>
 					<h4><span>1.3.1</span>Preview</h4>
 				</div>
 				<p>When clicking on a certain entry in the list, the entry is displayed in the small player to the right of the list.&nbsp; Note that on the bottom right of the preview pane you will find a "View full details? link for quickly reviewing or editing the content of an entry.</p>
 
-				<div class="dataTitle" id="contentSection132">
+				<div class="dataTitle" id="section132">
 					<a href="#main">Back to top</a>
 					<h4><span>1.3.2</span>Reject Content</h4>
 				</div>
 				<p>To reject one or more entries, select the relevant entries (for multiple choice either use the CTRL key or the selection dropdown menu at the bottom of the page) and press the "Reject Selected" button.&nbsp; Note that you can reject more than one entry at a time, but only entries appearing on the same page of the main list.</p>
 
-				<div class="dataTitle" id="contentSection133">
+				<div class="dataTitle" id="section133">
 					<a href="#main">Back to top</a>
 					<h4><span>1.3.3</span>Approve Content</h4>
 				</div>
 				<p>To approve one or more entries, select the relevant entries (for multiple choice either use the CTRL key or use the selection dropdown menu at the bottom of the page)and press the "Approve Selected" button.&nbsp; Note that you can approve more than one entry at a time, but only entries appearing on the same page of the main list.</p>
 
-				<div class="dataTitle" id="contentSection134">
+				<div class="dataTitle" id="section134">
 					<a href="#main">Back to top</a>
 					<h4><span>1.3.4</span>Ban User</h4>
 				</div>
@@ -327,27 +342,27 @@
 
 				<!--   1.4   -->
 
-				<div class="dataTitle" id="contentSection14">
+				<div class="dataTitle" id="section14">
 					<a href="#main">Back to top</a>
 					<h3><span>1.4</span>PLAYLISTS</h3></div>
 				<p>This is the main page for playlists created in your account.&nbsp; Here you can create new playlists (either manual or rule based), search through playlists, and conduct several actions on a specific playlist or multiple playlists simultaneously.&nbsp; You can sort the list by clicking the various columns and scroll through the pages at the bottom of the list.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection141">
+				<div class="dataTitle" id="section141">
 					<a href="#main">Back to top</a>
 					<h4><span>1.4.1</span>Search</h4>
 				</div>
 				<p>The Filters pane on the left side of the page enables you to search for specific playlists existing in your account.&nbsp; You can search for any word in the playlist name, tags or both.&nbsp; You can also filter by date - by clicking the calendar icons on the "Created between" field you selecting a date range.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection142">
+				<div class="dataTitle" id="section142">
 					<a href="#main">Back to top</a>
 					<h4><span>1.4.2</span>Delete</h4>
 				</div>
 				<p>To delete one or more playlists, select the playlist to be deleted (for multiple selection use the CTRL button or the "Select? links at the bottom of the page) and press the "Delete" button on the bottom of the page.&nbsp; A prompt box will ask you to approve your selection and once you click "Yes" the selected playlists will be deleted.&nbsp; Note that you can delete more than one playlist at a time, but only playlists appearing on the same page of the main list.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection143">
+				<div class="dataTitle" id="section143">
 					<a href="#main">Back to top</a>
 					<h4><span>1.4.3</span>Preview And Embed</h4>
 				</div>
@@ -356,23 +371,23 @@
 
 				<!--   1.5   -->
 
-				<div class="dataTitle" id="contentSection15">
+				<div class="dataTitle" id="section15">
 					<a href="#main">Back to top</a>
 					<h3><span>1.5</span>ADD / EDIT PLAYLIST</h3></div>
 				<p>To add a manual playlist click the "Add Manual Playlist" button found to the right of the main list.&nbsp; To add a rule based playlist click the "Add Rule Based Playlist" button found to the right of the main list.&nbsp; To edit an existing playlist, simply click on the playlist name.</p>
 
-				<div class="dataTitle" id="contentSection151">
+				<div class="dataTitle" id="section151">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.1</span>Add Manual Playlist</h4>
 				</div>
 				<p>In this window you can create a new manual playlist.&nbsp; Enter a name for your playlist (required) and description (optional).&nbsp; You can search for clips to include and filter through your content on the left side of the screen.&nbsp; Add and remove clips to/from your playlist using the left-right arrows.&nbsp; You can change the order of the clips in the playlist using the up/down arrows at the bottom right corner of the page.&nbsp; When you are finished, click the "Save? button at the bottom.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection152">
+				<div class="dataTitle" id="section152">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2</span>Add Rule Based Playlist</h4>
 				</div>
-				<div class="dataTitle" id="contentSection1521">
+				<div class="dataTitle" id="section1521">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.1</span>Defining Rule</h4>
 				</div>
@@ -385,29 +400,29 @@
 							If you would like to apply more than one rule to your playlist, click the "Switch to Advanced Mode? link at the bottom of the window.&nbsp;  Note that this will clear all previous information that you have saved in your playlist.
 				</p>
 
-				<div class="dataTitle" id="contentSection1522">
+				<div class="dataTitle" id="section1522">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.2</span>Advanced Mode</h4>
 				</div>
 				<p>Here you can create multiple rules to apply to your playlist.&nbsp;  The rules will be applied to the playlist in the order that the rules are listed in and therefore you can rearrange the order of the rules with the arrows at the bottom of the screen.&nbsp;  Start creating your rules list by selecting the total number of entries you would like to include in the playlist.&nbsp; Add, edit, remove or move your created rules.&nbsp; You can view the total number of videos and their duration under the main list of rules.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection15211">
+				<div class="dataTitle" id="section15211">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.1.1</span>Add Rule</h4>
 				</div>
 				<p>To add a new rule, click the "Add Rule" button.&nbsp; An "Add Rule" window will open allowing you to define the rule parameters.&nbsp; Select words from the Tags and choose one or more media types (video mix, video, audio, image).&nbsp; You can also set the date range by clicking on the calendar icons, order the entries by most viewed, most recent or highest rated and finally limit the maximum entries for this rule.&nbsp; You can use one, several or all fields to create the rule.&nbsp; When more than one field is used, the logical relationship between fields is an "AND" relationship.&nbsp; Click "Save Changes" to complete the process.&nbsp; A single playlist can have more than one rule, the entries in the playlist will be displayed according to the order of the rules in the main content menu.</p>
-				<div class="dataTitle" id="contentSection15212">
+				<div class="dataTitle" id="section15212">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.1.2</span>Edit Rule</h4>
 				</div>
 				<p>To edit a rule click the rule line on the main table and press the "Edit Rule" button on the bottom of the page.&nbsp; An "Edit Rule" window will open where you can edit any of the rule parameters.&nbsp; Click "Save Changes" to finish.</p>
-				<div class="dataTitle" id="contentSection15213">
+				<div class="dataTitle" id="section15213">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.1.3</span>Remove Rule</h4>
 				</div>
 				<p>To remove a rule click the rule line on the main table and press the "Remove Rule" button on the bottom of the page.</p>
-				<div class="dataTitle" id="contentSection15214">
+				<div class="dataTitle" id="section15214">
 					<a href="#main">Back to top</a>
 					<h4><span>1.5.2.1.4</span>Change the order od rule</h4>
 				</div>
@@ -415,20 +430,20 @@
 
 				<!--   1.6   -->
 
-				<div class="dataTitle" id="contentSection16">
+				<div class="dataTitle" id="section16">
 					<a href="#main">Back to top</a>
 					<h3><span>1.6</span>UPLOAD</h3></div>
 				<p>This is where you can upload media files to the Kaltura servers in a simple and streamlined process.
 				</p>
 
-				<div class="dataTitle" id="contentSection161">
+				<div class="dataTitle" id="section161">
 					<a href="#main">Back to top</a>
 					<h4><span>1.6.1</span>Upload - the Kaltura Uploader (aka&nbsp; Contribution Wizard)</h4>
 				</div>
 				<p>This option will open the Kaltura Uploader/Importer wizard (Contributor Wizard).&nbsp; Here you can upload videos from your computer or import media from online sources including Flickr, MySpace, New York Public Library and more.&nbsp;
 				</p>
 
-				<div class="dataTitle" id="contentSection1611">
+				<div class="dataTitle" id="section1611">
 					<a href="#main">Back to top</a>
 					<h4><span>1.6.1.1</span>Video</h4>
 				</div>
@@ -438,7 +453,7 @@
 							To upload videos from online services like Metacafe which do not require authentication, simply click on the relevant tab to the left.&nbsp; Now you can enter a search term in the text box and hit the search button.&nbsp; Select the clips you want added and click "Next?.&nbsp; Enter the title and tags you want for each selected video and click "Next? again.&nbsp; To wrap things up, hit the "Finish? button.
 							Finally, to record videos from a Webcam, choose the "Webcam? tab on the left, select the webcam you would like to use, and record your video.&nbsp; When you are done, click "Next?, enter the title and tags, and hit "Next? again.&nbsp; To complete the process, simply click "Finish?.
 				</p>
-				<div class="dataTitle" id="contentSection1612">
+				<div class="dataTitle" id="section1612">
 					<a href="#main">Back to top</a>
 					<h4><span>1.6.1.2</span>Audio</h4>
 				</div>
@@ -447,7 +462,7 @@
 							To upload audio from online services that require authentication, click on the relevant tab on the left and enter your login information by clicking on the "Search your audio? link.&nbsp; Now you can enter a search term in the text box and hit the search button.&nbsp; Select the clips you want added and click "Next? (you can also listen to the clips by pressing the play icon to the right of each clip).&nbsp; Enter the title and tags you want for each selected audio and click "Next? again.&nbsp; To wrap things up hit the "Finish? button.
 							Please note that some services do not require login details in order to enable search of content.&nbsp; In these cases you can simply enter your search query without logging in to the service first.
 				</p>
-				<div class="dataTitle" id="contentSection1613">
+				<div class="dataTitle" id="section1613">
 					<a href="#main">Back to top</a>
 					<h4><span>1.6.1.3</span>Audio</h4>
 				</div>
@@ -457,7 +472,7 @@
 							Please note that some services (Flickr for example) do not require login details in order to enable search of content.&nbsp; In these cases you can simply enter your search query without logging in to the service first.
 				</p>
 
-				<div class="dataTitle" id="contentSection162">
+				<div class="dataTitle" id="section162">
 					<a href="#main">Back to top</a>
 					<h4><span>1.6.2</span>Import from existing host</h4>
 				</div>
@@ -486,13 +501,13 @@
 				</ul>
 				<!--   1.7   -->
 
-				<div class="dataTitle" id="contentSection17">
+				<div class="dataTitle" id="section17">
 					<a href="#main">Back to top</a>
 					<h3><span>1.7</span>SYNDICATE</h3>
 				</div>
 				<p>Kaltura allows you to create video feeds in multiple formats that are ready for submission to 3rd party platforms.&nbsp; For each destination there are detailed instructions below.&nbsp; If you wish to syndicate your content in a different format, please contact Kaltura professional services.</p>
 
-				<div class="dataTitle" id="contentSection171">
+				<div class="dataTitle" id="section171">
 					<a href="#main">Back to top</a>
 					<h4><span>1.7.1</span>Google</h4>
 				</div>
@@ -538,7 +553,7 @@
 					</li>
 				</ol>
 
-				<div class="dataTitle" id="contentSection172">
+				<div class="dataTitle" id="section172">
 					<a href="#main">Back to top</a>
 					<h4><span>1.7.2</span>Yahoo</h4>
 				</div>
@@ -560,7 +575,7 @@
                     <li>Fill in the form and submit your feed as a "Full feed"</li>
                 </ol>
 
-				<div class="dataTitle" id="contentSection173">
+				<div class="dataTitle" id="section173">
 					<a href="#main">Back to top</a>
 					<h4><span>1.7.3</span>iTunes</h4>
 				</div>
@@ -603,7 +618,7 @@
 					<li>Submit your feed</li>
 				</ol>
 
-				<div class="dataTitle" id="contentSection174">
+				<div class="dataTitle" id="section174">
 					<a href="#main">Back to top</a>
 					<h4><span>1.7.4</span>TubeMogul</h4>
 				</div>
@@ -1001,7 +1016,7 @@
 
 				</p>
 				<p>&nbsp;</p>
-				<div class="dataTitle" id="contentSection18">
+				<div class="dataTitle" id="section18">
 					<a href="#main">Back to top</a>
 					<h3><span>1.8</span>Glossary of Terms</h3></div>
 				<dl>
@@ -1054,34 +1069,34 @@
 
 				<!--   2.1   -->
 
-				<div class="dataTitle" id="contentSection21">
+				<div class="dataTitle" id="section21">
 					<a href="#main">Back to top</a>
 					<h3><span>2.1</span>ACCOUNT OVERVIEW</h3></div>
 
-				<div class="dataTitle" id="contentSection211">
+				<div class="dataTitle" id="section211">
 					<a href="#main">Back to top</a>
 					<h4><span>2.1.1</span>Partner Info</h4>
 				</div>
-				<p>This area includes the data you submitted during the registration process.&nbsp; You can change or update any of the details in this section.&nbsp; Multiple content categories can be selected by holding down the CTRL key.</p>
+				<p>This area includes the data you submitted during the registration process.  You can change or update any of the details in this section.  Multiple content categories can be selected by holding down the CTRL key. <br />Account Owner - The Account Owner is the user who created the KMC account, and he is the recipient of account level email communication.  The drop down menu lists the names of all users of the KMC account who are associated with the ‘Publisher Administrator’ role (full permission to account’s KMC functionalities), so it is possible to set a different account owner, when needed.</p>
 
-				<div class="dataTitle" id="contentSection212">
+				<div class="dataTitle" id="section212">
 					<a href="#main">Back to top</a>
 					<h4><span>2.1.2</span>Login Info</h4>
 				</div>
 				<p><b>Change email</b> - to change your email, just enter the new one in the email text box and click "Save Changes".&nbsp; For authentication purposes, a confirmation email will be sent to both the old and new email addresses.<br /><b>Change Password</b> - to change your password first enter the old password, then the new one and a confirmation of the new one.&nbsp; Click "Save Changes" to complete the process.&nbsp; An email with the new password will be sent to you.</p>
 
 				<!--   2.2   -->
-				<div class="dataTitle" id="contentSection22">
+				<div class="dataTitle" id="section22">
 					<a href="#main">Back to top</a>
 					<h3><span>2.2</span>INTEGRATION SETTINGS</h3></div>
 
-				<div class="dataTitle" id="contentSection221">
+				<div class="dataTitle" id="section221">
 					<a href="#main">Back to top</a>
 					<h4><span>2.2.1</span>Partner Info</h4>
 				</div>
 				<p>Your Partner ID is your site's identification and ticket to the Kaltura platform and API, and will enable you to connect to Kaltura, display media, upload media and experience all of Kaltura's functionality.</p>
 
-				<div class="dataTitle" id="contentSection222">
+				<div class="dataTitle" id="section222">
 					<a href="#main">Back to top</a>
 					<h4><span>2.2.2</span>Advanced Settings</h4>
 				</div>
@@ -1108,7 +1123,7 @@
 				<p><b>User Upload Limit</b><br />
 						By default users can upload files up to 150 MB per file.&nbsp; This can be changed here.&nbsp;  Note that users cannot upload more than 1GB, per session.&nbsp;  E.g., setting the upload limit to 100MB allows users to upload up to 10 files at a time.</p>
 
-				<div class="dataTitle" id="contentSection223">
+				<div class="dataTitle" id="section223">
 					<a href="#main">Back to top</a>
 					<h4><span>2.2.3</span>Notifications</h4>
 				</div>
@@ -1116,12 +1131,12 @@
 
 				<!--   2.3   -->
 
-				<div class="dataTitle" id="contentSection23">
+				<div class="dataTitle" id="section23">
 					<a href="#main">Back to top</a>
 					<h3><span>2.3</span>ACCESS CONTROL</h3></div>
 				<p>An Access Control profile defines authorized and restricted domains where your content can or cannot appear, countries from which it can be viewed and Kaltura Network preferences and security settings.&nbsp; In this area you can view existing profiles and create new ones.</p><br />
 
-				<div class="dataTitle" id="contentSection231">
+				<div class="dataTitle" id="section231">
 					<a href="#main">Back to top</a>
 					<h4><span>2.3.1</span>Add New Access Profile</h4>
 				</div>
@@ -1135,7 +1150,7 @@
 				<p><b>Advanced Security & Play-per_view </b>- If you plan to show premium content or pay-per-view, check the "secure viewing? box to restrict the access to your content with server secret.&nbsp;  To allow a free preview of your content, check the "Free Preview? box and then place your cursor on either the minutes or seconds to define the preview time.</p><br />
 
 
-				<div class="dataTitle" id="contentSection232">
+				<div class="dataTitle" id="section232">
 					<a href="#main">Back to top</a>
 					<h4><span>2.3.2</span>Edit Existing Access Profile</h4>
 				</div>
@@ -1143,7 +1158,7 @@
 
 				<!--   2.4   -->
 
-				<div class="dataTitle" id="contentSection24">
+				<div class="dataTitle" id="section24">
 					<a href="#main">Back to top</a>
 					<h3><span>2.4</span>TRANSCODING SETTING</h3></div>
 				<p>To ensure optimal playback, source files uploaded to the system will be transcoded into multiple file flavors.<br />
@@ -1156,7 +1171,7 @@
 						For every file uploaded, the system tries to convert it to all selected default flavors.&nbsp; If the source file is in low quality, low bitrate, or small dimensions, the system will convert only to flavors that are applicable for this source file.&nbsp; For example if the file bitrate is 300 Kbps, the system will not create an additional flavor for HD (that requires over 4000 kbps).&nbsp; Transcoding only to the relevant flavors, allows you to minimize your storage requirements, and reduce storage costs.
 				</p><br />
 
-				<div class="dataTitle" id="contentSection231">
+				<div class="dataTitle" id="section241">
 					<a href="#main">Back to top</a>
 					<h4><span>2.4.1</span>Advanced Mode (multiple transcoding profiles)</h4>
 				</div>
@@ -1165,14 +1180,14 @@
 				</p><br />
 
 
-				<div class="dataTitle" id="contentSection242">
+				<div class="dataTitle" id="section242">
 					<a href="#main">Back to top</a>
 					<h4><span>2.4.2</span>Add Profile</h4>
 				</div>
 				<p>In the advanced mode you can add additional profiles, each profile will receive a unique ID that should be passed on uploading sessions.</p><br />
 
 
-				<div class="dataTitle" id="contentSection243">
+				<div class="dataTitle" id="section243">
 					<a href="#main">Back to top</a>
 					<h4><span>2.4.3</span>Add Profile</h4>
 				</div>
@@ -1180,11 +1195,15 @@
 
 				<!--   2.5   -->
 
-				<div class="dataTitle" id="contentSection24">
+				<div class="dataTitle" id="section25">
 					<a href="#main">Back to top</a>
-					<h3><span>2.4</span>ACCOUNT UPGRADE</h3></div>
-				<p>To learn more and upgrade your account fill in your details and our Sales Team will get right back to you.</p><br />
+					<h3><span>2.5</span>ACCOUNT UPGRADE</h3></div>
+				<p>To learn more and upgrade your account fill in your details and our Sales Team will get right back to you.</p>
 
+				<div class="dataTitle" id="section26">
+					<a href="#main">Back to top</a>
+					<h3><span>2.6</span>MY USER SETTING</h3></div>
+				<p>Every KMC admin user can change his personal details i.e. name, email address (KMC login) and password from the My User Setting page (under the Settings tab). To change these details, just click the relevant link and put in the updated information.  For authentication purposes you will need to provide your current password before being able to make any changes in the system.</p><br /><br />
 				<!-------------------------------->
 				<!-- APPLICATION STUDIO SECTION -->
 				<!-------------------------------->
@@ -1193,24 +1212,24 @@
 
 				<!--    3.1    -->
 
-				<div class="dataTitle" id="contentSection31">
+				<div class="dataTitle" id="section31">
 					<a href="#main">Back to top</a>
 					<h3><span>3.1</span>PLAYER LIST</h3></div>
 				<p>This page shows the list of the players defined in the system.&nbsp; It shows both default players that are included within the system, as well as players defined and created by administrators via the KMC.</p>
 
-				<div class="dataTitle" id="contentSection311">
+				<div class="dataTitle" id="section311">
 					<a href="#main">Back to top</a>
 					<h4><span>3.1.1</span>Edit</h4>
 				</div>
 				<p>To edit players previously created via the KMC, click on the relevant line in the Player List and then click "Edit" (players created manually through Kaltura's professional services cannot be edited in this area).&nbsp; This will open the player configuration area described in the following sections.&nbsp; Note that any changes you make to an existing player will carry over to any place it has been embedded - on your site as well as any syndicated players on other sites.</p>
 
-				<div class="dataTitle" id="contentSection312">
+				<div class="dataTitle" id="section312">
 					<a href="#main">Back to top</a>
 					<h4><span>3.1.2</span>Duplicate</h4>
 				</div>
 				<p>To duplicate players previously created via the KMC, click on the relevant line in the Player List and then click "Duplicate" (players created manually through Kaltura's professional services cannot be duplicated in this area).&nbsp; This will open the player configuration area described in the following sections.&nbsp; Duplication creates a copy of an existing player to use as a starting point for further editing, without making changes to the original player.</p>
 
-				<div class="dataTitle" id="contentSection313">
+				<div class="dataTitle" id="section313">
 					<a href="#main">Back to top</a>
 					<h4><span>3.1.3</span>Delete</h4>
 				</div>
@@ -1218,14 +1237,14 @@
 
 				<!--    3.2    -->
 
-				<div class="dataTitle" id="contentSection32">
+				<div class="dataTitle" id="section32">
 					<a href="#main">Back to top</a>
 					<h3><span>3.2</span>ADD PLAYER</h3></div>
 				<p>To create a new player click on the "Create New Player (Wizard)" button.</p>
 
 				<!--    3.2.1   -->
 
-				<div class="dataTitle" id="contentSection321">
+				<div class="dataTitle" id="section321">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.1</span>Template Tab</h4>
 				</div>
@@ -1233,7 +1252,7 @@
 
 				<!--    3.2.2   -->
 
-				<div class="dataTitle" id="contentSection322">
+				<div class="dataTitle" id="section322">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2</span>Features Tab</h4>
 				</div>
@@ -1241,7 +1260,7 @@
 
 				<!--    3.2.2.1   -->
 
-				<div class="dataTitle" id="contentSection3221">
+				<div class="dataTitle" id="section3221">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1</span>Features List</h4>
 				</div>
@@ -1250,7 +1269,7 @@
 
 				<!--    3.2.2.1.1   -->
 
-				<div class="dataTitle" id="contentSection32211">
+				<div class="dataTitle" id="section32211">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.1</span>Controls</h4>
 				</div>
@@ -1258,7 +1277,7 @@
 
 				<!--    3.2.2.1.2   -->
 
-				<div class="dataTitle" id="contentSection32212">
+				<div class="dataTitle" id="section32212">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.2</span>Viral & Distribution</h4>
 				</div>
@@ -1269,7 +1288,7 @@
 
 				<!--    3.2.2.1.3   -->
 
-				<div class="dataTitle" id="contentSection32213">
+				<div class="dataTitle" id="section32213">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.3</span>UGC & User Interaction</h4>
 				</div>
@@ -1278,7 +1297,7 @@
 
 				<!--    3.2.2.1.4   -->
 
-				<div class="dataTitle" id="contentSection32214">
+				<div class="dataTitle" id="section32214">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.4</span>Data Layer</h4>
 				</div>
@@ -1286,7 +1305,7 @@
 
 				<!--    3.2.2.1.5   -->
 
-				<div class="dataTitle" id="contentSection32215">
+				<div class="dataTitle" id="section32215">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.5</span>Custom Buttons</h4>
 				</div>
@@ -1294,7 +1313,7 @@
 
 				<!--    3.2.2.1.6   -->
 
-				<div class="dataTitle" id="contentSection32216">
+				<div class="dataTitle" id="section32216">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.1.6</span>Playlist Items (Available only for players with playlist)</h4>
 				</div>
@@ -1302,7 +1321,7 @@
 
 				<!--    3.2.2.2   -->
 
-				<div class="dataTitle" id="contentSection3222">
+				<div class="dataTitle" id="section3222">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.2</span>Preview Pane</h4>
 				</div>
@@ -1310,7 +1329,7 @@
 
 				<!--    3.2.2.2.1   -->
 
-				<div class="dataTitle" id="contentSection32221">
+				<div class="dataTitle" id="section32221">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.2.1</span>Player Size</h4>
 				</div>
@@ -1318,7 +1337,7 @@
 
 				<!--    3.2.2.2.2   -->
 
-				<div class="dataTitle" id="contentSection32222">
+				<div class="dataTitle" id="section32222">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.2.2.2</span>Preview States Buttons</h4>
 				</div>
@@ -1326,7 +1345,7 @@
 
 				<!--    3.2.3   -->
 
-				<div class="dataTitle" id="contentSection323">
+				<div class="dataTitle" id="section323">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3</span>Style Tab</h4>
 				</div>
@@ -1334,7 +1353,7 @@
 
 				<!--    3.2.3.1   -->
 
-				<div class="dataTitle" id="contentSection3231">
+				<div class="dataTitle" id="section3231">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3.1</span>Theme</h4>
 				</div>
@@ -1342,7 +1361,7 @@
 
 				<!--    3.2.3.2   -->
 
-				<div class="dataTitle" id="contentSection3232">
+				<div class="dataTitle" id="section3232">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3.2</span>Icon colors</h4>
 				</div>
@@ -1350,7 +1369,7 @@
 
 				<!--    3.2.3.2.1   -->
 
-				<div class="dataTitle" id="contentSection32221">
+				<div class="dataTitle" id="section32221">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3.2.1</span>Color of On-Video Buttons</h4>
 				</div>
@@ -1358,7 +1377,7 @@
 
 				<!--    3.2.3.2.2   -->
 
-				<div class="dataTitle" id="contentSection32222">
+				<div class="dataTitle" id="section32222">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3.2.2</span>Color of on-video buttons during hover state</h4>
 				</div>
@@ -1366,7 +1385,7 @@
 
 				<!--    3.2.3.3   -->
 
-				<div class="dataTitle" id="contentSection3233">
+				<div class="dataTitle" id="section3233">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.3.3</span>Font</h4>
 				</div>
@@ -1374,7 +1393,7 @@
 
 				<!--    3.2.4   -->
 
-				<div class="dataTitle" id="contentSection324">
+				<div class="dataTitle" id="section324">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.4</span>Content Tab </h4>
 				</div>
@@ -1382,7 +1401,7 @@
 
 				<!--    3.2.4.1   -->
 
-				<div class="dataTitle" id="contentSection3241">
+				<div class="dataTitle" id="section3241">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.4.1</span>Add Playlist (Tab) to Player</h4>
 				</div>
@@ -1390,7 +1409,7 @@
 
 				<!--    3.2.4.2   -->
 
-				<div class="dataTitle" id="contentSection3242">
+				<div class="dataTitle" id="section3242">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.4.2</span>Remove Playlist (Tab) from Player</h4>
 				</div>
@@ -1398,12 +1417,88 @@
 
 				<!--    3.2.4.3   -->
 
-				<div class="dataTitle" id="contentSection3243">
+				<div class="dataTitle" id="section3243">
 					<a href="#main">Back to top</a>
 					<h4><span>3.2.4.3</span>Change Playlists (Tabs) Order</h4>
 				</div>
 				<p>Select a playlist and use the up and down buttons on the bottom of the list to change the order of the playlists.&nbsp; This will also change the order of the playlist tabs.</p>
 
+				<!-------------------------------->
+				<!-- ADMINISTRATION SECTION -->
+				<!-------------------------------->
+
+				<h2>ADMINISTRATION SECTION</h2>
+
+				<!--    4.1    -->
+
+				<div class="dataTitle" id="section41">
+					<a href="#main">Back to top</a>
+					<h3><span>4.1</span>USER MANAGEMENT</h3></div>
+				<p>This page shows the list of the users defined in the system.</p>
+
+				<div class="dataTitle" id="section411">
+					<a href="#main">Back to top</a>
+					<h4><span>4.1.1</span>Add Users</h4>
+				</div>
+				<p>The following information should be provided for adding a new KMC admin user. Please note that a limited number of users is allocated by default to each KMC account. If you reached the KMC users quota for your account and need to set additional users, please contact Kaltura with a <a href="http://site.kaltura.com/Request-Users.html" target="_blank">request for additional KMC admin users</a>.<br /><br />
+				<strong>Email address</strong> – This should be the user’s actual email address – it will serve as a unique identifier of the user in the Kaltura system, as his login username and as a recipient address for system generated messages.  Upon the creation of a new user account a welcome email notification will be sent to this email address with a link for setting the initial password.<br />
+				<strong>First name, Last name</strong> - User’s name<br />
+				<strong>Publisher ID (Optional)</strong> - this is a unique identifier that may be in use by the publisher in different systems. This will serve as the KMC user identifier as content contributor in all KMC related locations.   In case a publisher id is not provided the user email address will be used as a default value.<br/>
+				<strong>User Role</strong> – The selection of a KMC user role will define the set of permissions granted to the user for the different KMC functionalities. This role should be set according to the tasks he needs to work on and functionalities he needs access to within the KMC. The different KMC user roles are set (by users who are granted with permission to do so) from the KMC Roles page (under the Administration tab).<br />
+				</p>
+
+				<div class="dataTitle" id="section412">
+					<a href="#main">Back to top</a>
+					<h4><span>4.1.2</span>Edit User</h4>
+				</div>
+				<p>After a user account is set in the system, the user’s personal details can only be set by the user himself from the ‘My User Settings’ page (under the Settings tab). Only the user role and the user publisher ID information are available for editing from the Edit User window.  Please note that it is not possible to edit the user role of the user who is defined as the Account Owner. In addition, a KMC user with access to user management functionalities cannot edit the user role selection of his own user account. </p>
+
+				<div class="dataTitle" id="section413">
+					<a href="#main">Back to top</a>
+					<h4><span>4.1.3</span>Block/Unblock User</h4>
+				</div>
+				<p>Blocking a KMC user will prevent him from logging into the KMC. This restriction can be removed by applying the unblock action.</p>
+
+				<div class="dataTitle" id="section414">
+					<a href="#main">Back to top</a>
+					<h4><span>4.1.4</span>Delete User</h4>
+				</div>	
+				<p>This is a permanent action. The deleted user cannot log into the KMC anymore. His content contribution records will be kept in the system.</p>
+
+				<!--	4.2	-->
+
+				<div class="dataTitle" id="section42">
+					<a href="#main">Back to top</a>
+					<h3><span>4.2</span>ROLES MANAGEMENT</h3></div>
+				<p>This page shows the list of the roles defined in the system.</p>
+
+				<div class="dataTitle" id="section421">
+					<a href="#main">Back to top</a>
+					<h4><span>4.2.1</span>Add Roles</h4>
+				</div>
+				<p>When adding a new KMC admin user role to a specific publisher account, the relevant set of permissions should be selected within the “Add Role” window. Here you should select which KMC functionalities should be available for users who will be set with this new defined role. Most of the permissions are organized under KMC high-level functionalities – group names(e.g. content management, playlist management etc). Clicking the “advanced” option provides a more detailed list of the specific KMC functionalities related to the group. Clicking the check mark next to each permission group name will toggle the permission level for the specific KMC functionality to the following modes:<br /><br /><ul>
+				    <li><strong>Full permission (checked mark)</strong> - granting access to all KMC functionalities listed under the permission group.</li>
+				    <li><strong>View only Permission (Partially checked)</strong> – granting view only access to the KMC functionalities listed under the permission group.</li>
+				    <li><strong>No Permission (unchecked)</strong> – no access to the KMC pages that are relevant to the KMC functionalities listed under the permission group.</li>
+				</ul></p>
+
+				<div class="dataTitle" id="section422">
+					<a href="#main">Back to top</a>
+					<h4><span>4.2.2</span>Edit Role</h4>
+				</div>
+				<p>Applying changes to user roles will have effect on access level of the KMC users associated with this role only after they login again to the KMC. It is recommended to edit “in-use” roles when users associated with this role are not logged into the KMC.</p>
+
+				<div class="dataTitle" id="section423">
+					<a href="#main">Back to top</a>
+					<h4><span>4.2.3</span>Duplicate Role</h4>
+				</div>
+				<p>The duplicated role action may be useful as a quick way to create a new KMC user role with a similar, but not identical, set of permissions as an existing user role. The duplicated role will be populated   with the permission set of the duplication source role, so minor changes to this permission set can be easily made.</p>
+
+				<div class="dataTitle" id="section424">
+					<a href="#main">Back to top</a>
+					<h4><span>4.2.4</span>Delete Role</h4>
+				</div>
+				<p>This is a permanent action. It is not possible to delete a user role record as long as KMC admin users are associated with the role.   In such cases, make sure to update the relevant KMC user accounts with another user role before attempting to delete their existing role.</p>
 
 			</div><!-- end dataContent -->
 		</div><!-- end contwrap -->
