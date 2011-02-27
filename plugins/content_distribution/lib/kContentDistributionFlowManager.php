@@ -23,7 +23,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
 		{
 			if(in_array(assetPeer::STATUS, $modifiedColumns))
-				return self::onAssetReady($object);
+				return self::onAssetReadyOrDeleted($object);
 				
 			if(in_array(assetPeer::VERSION, $modifiedColumns))
 				return self::onAssetVersionChanged($object);
@@ -42,7 +42,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function objectCreated(BaseObject $object)
 	{
 		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-			return self::onAssetReady($object);
+			return self::onAssetReadyOrDeleted($object);
 			
 		return true;
 	}
@@ -115,6 +115,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($object instanceof GenericDistributionProvider)
 			return self::onGenericDistributionProviderDeleted($object);
 	
+		if($object instanceof Metadata)
+			return self::onMetadataDeleted($object);
+	
+		if($object instanceof asset)
+			return self::onAssetReadyOrDeleted($object);
+			
 		if($object instanceof EntryDistribution)
 		{
 			$entry = entryPeer::retrieveByPK($object->getEntryId());
@@ -585,6 +591,90 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param Metadata $metadata
 	 */
+	public static function onMetadataDeleted(Metadata $metadata)
+	{
+		if(!ContentDistributionPlugin::isAllowedPartner($metadata->getPartnerId()))
+			return true;
+			
+		if($metadata->getObjectType() != KalturaMetadataObjectType::ENTRY)
+			return true;
+		
+		KalturaLog::debug("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
+		
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
+		foreach($entryDistributions as $entryDistribution)
+		{
+			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING && $entryDistribution->getStatus() != EntryDistributionStatus::READY)
+				continue;
+		
+			$distributionProfileId = $entryDistribution->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(!$distributionProfile)
+			{
+				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				continue;
+			}
+			
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider)
+			{
+				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+				continue;
+			}
+			
+			if($entryDistribution->getStatus() == EntryDistributionStatus::PENDING || $entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+			{
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+			
+				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+				{
+					if(count($validationErrors))
+						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+	
+					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+				}
+				continue;
+			}
+		
+			if($entryDistribution->getStatus() == EntryDistributionStatus::READY)
+			{
+				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+					continue;
+				}
+				
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+				
+				if(count($validationErrors))
+				{
+					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+				}
+				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				{
+					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+				}
+				else
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+					$entryDistribution->save();
+					continue;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * @param Metadata $metadata
+	 */
 	public static function onMetadataChanged(Metadata $metadata, $previousVersion)
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($metadata->getPartnerId()))
@@ -716,15 +806,25 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;	
 				}
 				
-				if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+				
+				if(count($validationErrors))
+				{
+					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+				}
+				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				{
+					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+				}
+				else
 				{
 					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 					$entryDistribution->save();
 					continue;
 				}
-				
-				self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 			}
 		}
 		
@@ -955,7 +1055,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	/**
 	 * @param asset $asset
 	 */
-	public static function onAssetReady(asset $asset)
+	public static function onAssetReadyOrDeleted(asset $asset)
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
 			return true;
@@ -968,29 +1068,55 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if($entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $entryDistribution->getStatus() != EntryDistributionStatus::PENDING)
-				continue;
-				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
 				continue;
 				
-			kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-			kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
-			
-			$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
-			$entryDistribution->setValidationErrorsArray($validationErrors);
-			$entryDistribution->save();
-			
-			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
+				kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+				kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+				
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+				
+				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
+				{
+					if(count($validationErrors))
+						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
+	
+					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+				}
+			} // submit
+			
+			if($entryDistribution->getStatus() == EntryDistributionStatus::READY || $entryDistribution->getStatus() == EntryDistributionStatus::ERROR_UPDATING)
+			{
+				kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+				kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+				
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+				
 				if(count($validationErrors))
+				{
 					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-
-				if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
-					self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
-			}
+				}
+				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				{
+					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
+				}
+				else
+				{
+					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+					$entryDistribution->save();
+					continue;
+				}
+			} // update
 		}
 		
 		return true;

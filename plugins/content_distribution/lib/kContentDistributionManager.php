@@ -178,6 +178,14 @@ class kContentDistributionManager
 			return null;
 		} 
 		
+		
+		$validationErrors = $entryDistribution->getValidationErrors();
+		if(count($validationErrors))
+		{
+			KalturaLog::debug("Validation errors found");
+			return null;
+		}
+		
 		$distributionProvider = $distributionProfile->getProvider();
 		if($distributionProvider->isUpdateEnabled())
 			return self::addSubmitUpdateJob($entryDistribution, $distributionProfile);
@@ -187,10 +195,10 @@ class kContentDistributionManager
 			$job = self::addSubmitDeleteJob($entryDistribution, $distributionProfile);
 			return self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		}
-		
+	
 		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
 		$entryDistribution->save();
-			
+		
 		return null;
 	}
 	
@@ -325,6 +333,7 @@ class kContentDistributionManager
 		if(!is_array($flavorParamsIds))
 			return;
 			
+		// remove deleted flavor assets
 		$assignedFlavorAssetIds = $entryDistribution->getFlavorAssetIds();
 		if($assignedFlavorAssetIds)
 		{
@@ -337,6 +346,8 @@ class kContentDistributionManager
 					unset($flavorParamsIds[$flavorParamsKey]);
 			}
 		}
+		
+		// adds added flavor assets
 		$newFlavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
 		foreach($newFlavorAssetIds as $newFlavorAssetId)
 			$flavorAssetIds[] = $newFlavorAssetId;
@@ -352,6 +363,7 @@ class kContentDistributionManager
 		foreach($thumbDimensions as $thumbDimension)
 			$thumbDimensionsWithKeys[$thumbDimension->getKey()] = $thumbDimension;
 		
+		// remove deleted thumb assets
 		$assignedThumbAssetIds = $entryDistribution->getThumbAssetIds();
 		if($assignedThumbAssetIds)
 		{
@@ -365,6 +377,7 @@ class kContentDistributionManager
 			}
 		}
 		
+		// add new thumb assets
 		$requiredThumbParamsIds = $distributionProfile->getAutoCreateThumbArray();
 		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
 		foreach($thumbAssets as $thumbAsset)
