@@ -294,7 +294,7 @@ class kUploadTokenMgr
 		{
 			return FALSE;
 		}
-		if ($localDcId && $localDcId == $uploadToken->getDc())
+		if ($localDcId !== null && $localDcId == $uploadToken->getDc())
 		{
 			// return FALSE if token's DC is not remote, but the same as $localDcId
 			return FALSE;
