@@ -764,8 +764,8 @@ kmc.preview_embed = {
             embed_code = embed_code.replace('{FLAVOR}','');
         }
         var modal_html = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
-            '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section118"></a>' + id_type +
-            ': ' + name + '</div> <div id="modal_content">' +
+            '<a id="help" target="_blank" href="' + kmc.vars.service_url + '/index.php/kmc/kmc2help#section118"></a>' + 
+	    '<span title="' + name + '">' + id_type + ': ' + name + '</span></div> <div id="modal_content">' +
             //							 ((typeof(live_bitrates) == "object") ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') + // always return true because null is an object
         ((live_bitrates) ? kmc.preview_embed.buildLiveBitrates(name,live_bitrates) : '') +
             '<div id="player_wrap">' + preview_player + '</div>' +
