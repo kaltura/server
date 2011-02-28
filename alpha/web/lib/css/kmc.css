@@ -141,6 +141,7 @@ fieldset{ border:0 none; position:relative; }
 	 #titlebar { height:19px; padding: 10px 16px 8px; font-weight:bold; color:#EEEEEE; font-size: 15px; -moz-border-radius-topleft:5px;; -moz-border-radius-topright:5px; -webkit-border-top-left-radius:5px; -webkit-border-top-right-radius:5px; background: url(../images/kmc/kmc_sprite.png) repeat-x 0 -115px;}
 	  #titlebar a { width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat -155px -152px;}
 		#titlebar a#help { background-position: -177px -152px;}
+	  #titlebar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin-right: 20px; }
 	  #modal span#entry_id { padding-left:3px; color:#555;}
 	 #modal_content { padding: 11px 12px;}
 	 #modal .embed_code_div { display: none; }
@@ -157,6 +158,7 @@ fieldset{ border:0 none; position:relative; }
 	   @-moz-document url-prefix() { 
 	   		#modal button span { margin-top: 0; margin-left: -3px; } 
 	   		#modal button { display: block; }
+			#titlebar span { margin-right: 50px; }
 	   	}
 
 	   #modal dl { margin: 15px 0 10px 10px;}
