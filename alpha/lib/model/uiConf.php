@@ -296,9 +296,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		// TODO - implement field version
 		self::validateFileSyncSubType ( $sub_type );
 		if ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA )
-			$res =$this->getConfFilePathImpl( null , true );
+			$res =$this->getConfFilePathImpl( null , true , $version);
 		elseif ( $sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES )
-			$res =$this->getConfFilePathImpl( self::FILE_NAME_FEATURES );
+			$res =$this->getConfFilePathImpl( self::FILE_NAME_FEATURES, false, $version );
 			
 		$file_root = myContentStorage::getFSContentRootPath( );
 		$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $res );	
@@ -575,17 +575,17 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		return $this->getConfFilePathImpl( $file_suffix ,$inc_version );
 	}
 	
-	private function getConfFilePathImpl( $file_suffix = null , $inc_version = false )
+	private function getConfFilePathImpl( $file_suffix = null , $inc_version = false, $version = null )
 	{
 		$conf_file_path = parent::getConfFilePath();
 
 		if ( $this->getCreationMode() != self::UI_CONF_CREATION_MODE_MANUAL )
 		{
-			if( ! $conf_file_path || $inc_version )
+			if( ! $conf_file_path || $inc_version || $version)
 			{
 				if ( ! $this->getId() ) return null;
 				
-				$conf_file_path = $this->createConfFilePath();
+				$conf_file_path = $this->createConfFilePath($version);
 				$this->setConfFilePath( $conf_file_path );
 			}
 		}
@@ -654,10 +654,10 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		}
 	}
 		
-	private function createConfFilePath ()
+	private function createConfFilePath ($version = null)
 	{
-		if ( $this->getVersion() )
-			$version = "_" . $this->getVersion();
+		if ( $this->getVersion() || $version)
+			$version = "_" . ($version ? $version : $this->getVersion());
 		else
 			$version = "";
 		$file_name = "content/generatedUiConf/{$this->getPartnerId()}/{$this->getCreationModeAsStr()}/{$this->getId()}/ui_conf{$version}.xml";
