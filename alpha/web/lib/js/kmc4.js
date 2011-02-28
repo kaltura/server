@@ -607,7 +607,61 @@ kmc.mediator =  {
                     extra[tmp2[0]] = tmp2[1];
                 }
             }
+
+	    // Support old hash links
+	    switch(module) {
+
+		// case for Content tab
+		case "content":
+		    switch(subtab) {
+			case "Moderate":
+			    subtab = "moderation";
+			    break;
+			case "Syndicate":
+			    subtab = "syndication";
+			    break;
+		    }
+		    subtab = subtab.toLowerCase();
+		    break;
+
+		// case for Studio tab
+		case "appstudio":
+		    module = "studio";
+		    subtab = "playersList";
+		    break;
+
+		// case for Settings tab
+		case "Settings":
+		    module = "account";
+		    switch(subtab) {
+			case "Account_Settings":
+			    subtab = "overview";
+			    break;
+			case "Integration Settings":
+			    subtab = "integration";
+			    break;
+			case "Access Control":
+			    subtab = "accessControl";
+			    break;
+			case "Transcoding Settings":
+			    subtab = "transcoding";
+			    break;
+			case "Account Upgrade":
+			    subtab = "upgrade";
+			    break;
+		    }
+		    break;
+		    
+		// case for Analytics tab
+		case "reports":
+		    module = "analytics";
+		    if(subtab == "Bandwidth Usage Reports") {
+			subtab = "usageTabTitle";
+		    }
+		    break;
+	    }
         }
+
         return {"moduleName" : module, "subtab" : subtab, "extra" : extra};
     },
     selectContent : function(uiconf_id,is_playlist) { // called by selectPlaylistContent which is caled from appstudio
