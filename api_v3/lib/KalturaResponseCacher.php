@@ -96,7 +96,7 @@ class KalturaResponseCacher
 	 * This functions checks if a certain response resides in cache.
 	 * In case it dose, the response is returned from cache and a response header is added.
 	 * There are two possibilities on which this function is called:
-	 * 1)	The request is a single “stand alone” request (maybe this request is a multi request containing several sub-requests)
+	 * 1)	The request is a single ï¿½stand aloneï¿½ request (maybe this request is a multi request containing several sub-requests)
 	 * 2)	The request is a single request that is part of a multi request (sub-request in a multi request)
 	 * 
 	 * in case this function is called when handling a sub-request (single request as part of a multirequest) it
@@ -139,7 +139,7 @@ class KalturaResponseCacher
 			if ($contentTypeHdr) {
 				header($contentTypeHdr, true);
 			}	
-			header("Expires: Thu, 19 Nov 2000 08:52:00 GMT", true);
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
 			header("Pragma: no-cache", true);
 			

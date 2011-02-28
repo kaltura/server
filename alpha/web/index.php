@@ -41,7 +41,7 @@ function checkCache()
                 {
 					$processing_time = microtime(true) - $start_time;
 					header("X-Kaltura:cached-dispatcher,$key,$processing_time");
-					header("Expires: Thu, 19 Nov 2000 08:52:00 GMT");
+					header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 					header("Cache-Control" , "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 					header("Pragma" , "no-cache" );
 					echo $response;
@@ -69,7 +69,7 @@ function checkCache()
 				header("Content-Type: application/x-shockwave-flash");
 				header("Cache-Control: private, max-age=$max_age max-stale=0");
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-				header('Last-Modified: Thu, 19 Nov 2000 08:52:00 GMT');
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 				header("Content-Length: ".strlen($cachedResponse));
 				echo $cachedResponse;
 				die;
@@ -87,7 +87,7 @@ function checkCache()
 				setrawcookie( 'uv', $uv_cookie, time() + 3600 * 24 * 365, '/' );
 		
 				header("X-Kaltura:cached-dispatcher");
-				header("Expires: Thu, 19 Nov 2000 08:52:00 GMT");
+				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 				header("Cache-Control" , "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 				header("Pragma" , "no-cache" );
 
@@ -143,7 +143,7 @@ function checkCache()
 				header("X-Kaltura:cached-dispatcher-thumb");
 				header("Cache-Control: public, max-age=$max_age max-stale=0");
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-				header('Last-Modified: Thu, 19 Nov 2000 08:52:00 GMT');
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 				header("Content-Length: $total_length ");
 				header("Pragma:");
 				header("Content-Type: $content_type");

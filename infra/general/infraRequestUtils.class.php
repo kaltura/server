@@ -124,12 +124,12 @@ class infraRequestUtils
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-			header('Last-Modified: Thu, 19 Nov 2000 08:52:00 GMT');
+			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 		}
 		else
 		{
 			header("Cache-Control:");
-			header("Expires: Thu, 19 Nov 2000 08:52:00 GMT");
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 		}
 		
 		header("Content-Length: $content_length ");

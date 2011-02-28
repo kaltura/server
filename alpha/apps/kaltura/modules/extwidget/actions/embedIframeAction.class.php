@@ -105,7 +105,7 @@ class embedIframeAction extends sfAction
 		if ($allowCache && $cachedResponse) // dont use cache if we want to force no caching
 		{
 			header("X-Kaltura: cached-action");
-			header("Expires: Thu, 19 Nov 2000 08:52:00 GMT");
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
 			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 			header("Pragma: no-cache");
 			header("Location:$cachedResponse");
