@@ -414,7 +414,7 @@ kmc.utils = {
         // pass in the fields
         for(var i in fields) {
             var fld = (fields[i]) ? fields[i] : '';
-            url += '&' + i + '=' + fld;
+            url += '&' + i + '=' + encodeURIComponent(fld);
         }
         // change http to https
         url = url.replace("http", "https");
