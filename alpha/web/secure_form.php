@@ -28,9 +28,9 @@ class secForm {
 		$this->Ks = $_COOKIE['kmcks'];
 
 		// Get data from url parameters
-		$this->email = isset($_GET['email']) ? $this->clean($_GET['email']) : "john@smith.com";
-		$this->fname = isset($_GET['fname']) ? $this->clean($_GET['fname']) : "John";
-		$this->lname = isset($_GET['lname']) ? $this->clean($_GET['lname']) : "Smith";
+		$this->email = isset($_GET['email']) ? $this->clean($_GET['email']) : "";
+		$this->fname = isset($_GET['fname']) ? $this->clean($_GET['fname']) : "";
+		$this->lname = isset($_GET['lname']) ? $this->clean($_GET['lname']) : "";
 						
 		// select which action to do
 		if( isset($_POST['do']) ) {
@@ -95,6 +95,7 @@ class secForm {
 		$str = str_replace("eval", "", $str);
 		$str = str_replace("document", "", $str);
 		$str = htmlspecialchars($str);
+		$str = addslashes($str);
 		
 		return $str;
 	}
