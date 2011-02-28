@@ -103,7 +103,7 @@ else
 			partner_id		: "<?php echo $partner_id; ?>",
 			subp_id			: "<?php echo $subp_id; ?>",
 			user_id			: "<?php echo $uid; ?>",
-			screen_name		: "<?php echo $screen_name; ?>",
+			screen_name		: <?php echo json_encode($screen_name); ?>,
 			email			: "<?php echo $email; ?>",
 			first_login		: <?php echo ($first_login) ? "true" : "false"; ?>,
 			paying_partner	: "<?php echo $payingPartner; ?>",
