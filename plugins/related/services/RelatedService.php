@@ -3,7 +3,8 @@
  * Exposes specific functionality to retreive related entries
  * 
  * @service related
- * @author Roman
+ * @package plugins.related
+ * @subpackage api.services
  */
 class RelatedService extends KalturaBaseService
 {
@@ -28,20 +29,51 @@ class RelatedService extends KalturaBaseService
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 			
+		if ($pager->pageIndex != 1)
+			throw new KalturaAPIException(KalturaRelatedErrors::PAGING_NOT_SUPPORTED);
+			 
 		$originalKs = kCurrentContext::$ks;
 		$adminKs = $this->getAdminSessionForPartner($entry->partnerId);
-		
 		$mediaEntryFilter = new KalturaMediaEntryFilter();
-		$mediaEntryFilter->tagsMultiLikeOr = $entry->tags;
-		$mediaEntryFilter->orderBy = KalturaMediaEntryOrderBy::CREATED_AT_DESC;
-		$mediaEntryFilter->advancedSearch = $this->getAdvancedSearch($entry, $scope);
-		
+		$mediaEntryFilter->idNotIn = $entryId;
+		$mediaEntryFilter->startDateLessThanOrEqualOrNull = time();
+		$mediaEntryFilter->startDateGreaterThanOrEqualOrNull = time();
 		kCurrentContext::initKsPartnerUser($adminKs);
 		$mediaService->initService('media', 'media', 'list');
-		$response = $mediaService->listAction($mediaEntryFilter, $pager);
-		kCurrentContext::initKsPartnerUser($originalKs);
+		
+		$mediaEntryFilter->freeText = $entry->tags . ', ' . $entry->name;
+		$mediaResponse = $mediaService->listAction($mediaEntryFilter, $pager);
 
-		return $response;
+		// if we have less results than the page size, get all entries
+		if ($pager->pageSize > count($mediaResponse->objects))
+		{
+			$mediaEntryFilter->freeText = null;
+			$allMediaResponse = $mediaService->listAction($mediaEntryFilter, $pager);
+			
+			// let's merge entries from all media response, keeping uniqueness
+			$entries = array();
+			foreach($mediaResponse->objects as $entry)
+			{
+				$entries[$entry->id] = $entry;
+			}
+			
+			foreach($allMediaResponse->objects as $entry)
+			{
+				$entries[$entry->id] = $entry;
+				if (count($entries) >= $pager->pageSize)
+					break;
+			}
+			$mediaResponse->objects = new KalturaMediaEntryArray();
+			foreach($entries as $entry)
+			{
+				$mediaResponse->objects[] = $entry;
+			}
+			$mediaResponse->totalCount = count($entries);
+		}
+		
+		kCurrentContext::initKsPartnerUser($originalKs);
+		
+		return $mediaResponse;
 	}
 	
 	protected function getAdminSessionForPartner($partnerId)
@@ -53,23 +85,5 @@ class RelatedService extends KalturaBaseService
 		$sessionService = new SessionService();
 		$sessionService->initService('session', 'session', 'start');
 		return $sessionService->startAction($partner->getAdminSecret(), "", KalturaSessionType::ADMIN, $partnerId);
-	}
-	
-	protected function getAdvancedSearch()
-	{
-		return null;
-		$medataProfile = null;
-		$metadataProfile = new MetadataProfileService();
-		$metadataProfilesResponse = $metadataProfile->listAction();
-		if (count($metadataProfilesResponse->objects) > 0)
-			$medataProfile = $metadataProfilesResponse->objects[0];
-			
-		$advancedSearch = new KalturaSearchOperator();
-		$advancedSearch->items = array();
-		$filter1 = new KalturaSearchComparableCondition();
-		$filter1->comparison = KalturaSearchConditionComparison::EQUEL;
-		$filter1->field = 'tags';
-		$filter1->field = 'logo';
-		
 	}
 }
