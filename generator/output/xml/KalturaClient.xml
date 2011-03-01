@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1298307962">
-  <!-- Generated on date 21/02/11 19:06:02 -->
+<xml apiVersion="3.1.1" generatedDate="1298982313">
+  <!-- Generated on date 01/03/11 12:25:13 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -391,10 +391,9 @@
     <enum name="KalturaDistributionProviderType" enumType="string" plugin="contentDistribution">
       <const name="GENERIC" value="1"/>
       <const name="MSN" value="msnDistribution.MSN"/>
-      <const name="HULU" value="huluDistribution.HULU"/>
-      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
       <const name="COMCAST" value="comcastDistribution.COMCAST"/>
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
+      <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
@@ -1895,6 +1894,7 @@
     <class name="KalturaConversionProfileBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaConversionProfileFilter" base="KalturaConversionProfileBaseFilter"/>
     <class name="KalturaConversionProfileListResponse">
@@ -2053,8 +2053,8 @@
     </class>
     <class name="KalturaAssetParamsBaseFilter" abstract="1" base="KalturaFilter">
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
-      <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaAssetParamsFilter" base="KalturaAssetParamsBaseFilter"/>
     <class name="KalturaFlavorParamsBaseFilter" abstract="1" base="KalturaAssetParamsFilter"/>
@@ -2177,7 +2177,7 @@
       <property name="secret" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="adminSecret" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="cmsPassword" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="allowMultiNotification" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="allowMultiNotification" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="adminLoginUsersQuota" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="adminUserId" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -2619,6 +2619,7 @@
       <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="metadataObjectTypeEqual" type="int" enumType="KalturaMetadataObjectType" readOnly="0" insertOnly="0" description=""/>
       <property name="versionEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2969,6 +2970,37 @@
       <property name="objects" type="array" arrayType="KalturaVirusScanProfile" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaAnnotationBaseFilter" abstract="1" base="KalturaFilter" plugin="annotation">
+      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="parentIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="userIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationFilter" base="KalturaAnnotationBaseFilter" plugin="annotation"/>
+    <class name="KalturaAnnotation" plugin="annotation">
+      <property name="id" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="parentId" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="text" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="startTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="endTime" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="userId" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaAnnotationListResponse" plugin="annotation">
+      <property name="objects" type="array" arrayType="KalturaAnnotation" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaDistributionProfileBaseFilter" abstract="1" base="KalturaFilter" plugin="contentDistribution">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3118,37 +3150,6 @@
     <class name="KalturaGenericDistributionProviderActionFilter" base="KalturaGenericDistributionProviderActionBaseFilter" plugin="contentDistribution"/>
     <class name="KalturaGenericDistributionProviderActionListResponse" plugin="contentDistribution">
       <property name="objects" type="array" arrayType="KalturaGenericDistributionProviderAction" readOnly="1" insertOnly="0" description=""/>
-      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaAnnotationBaseFilter" abstract="1" base="KalturaFilter" plugin="annotation">
-      <property name="idEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="entryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="parentIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="parentIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="userIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="userIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaAnnotationFilter" base="KalturaAnnotationBaseFilter" plugin="annotation"/>
-    <class name="KalturaAnnotation" plugin="annotation">
-      <property name="id" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="entryId" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="parentId" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
-      <property name="text" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="tags" type="string" readOnly="0" insertOnly="0" description=""/>
-      <property name="startTime" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="endTime" type="int" readOnly="0" insertOnly="0" description=""/>
-      <property name="userId" type="string" readOnly="1" insertOnly="0" description=""/>
-      <property name="partnerData" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaAnnotationListResponse" plugin="annotation">
-      <property name="objects" type="array" arrayType="KalturaAnnotation" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaShortLinkBaseFilter" abstract="1" base="KalturaFilter" plugin="shortLink">
@@ -3417,13 +3418,6 @@
       </action>
     </service>
     <service id="adminuser" name="adminUser" description="Manage details for the administrative user&#13;">
-      <action name="updatePassword" description="Update admin user password and email&#10;">
-        <param name="email" type="string" optional="0" description="&#13;"/>
-        <param name="password" type="string" optional="0" description="&#13;"/>
-        <param name="newEmail" type="string" optional="1" default="" description="Optional, provide only when you want to update the email&#13;"/>
-        <param name="newPassword" type="string" optional="1" default="" description="&#13;"/>
-        <result type="KalturaAdminUser"/>
-      </action>
       <action name="resetPassword" description="Reset admin user password and send it to the users email address&#10;">
         <param name="email" type="string" optional="0" description="&#13;"/>
         <result/>
@@ -4769,6 +4763,30 @@
         <result type="int"/>
       </action>
     </service>
+    <service id="annotation_annotation" name="annotation" description="Annotation service - Video Annotation&#13;" plugin="annotation">
+      <action name="list" description="List annotation objects by filter and pager&#10;">
+        <param name="filter" type="KalturaAnnotationFilter" optional="1" default="null" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaAnnotationListResponse"/>
+      </action>
+      <action name="add" description="Allows you to add an annotation object and Annotation content associated with Kaltura object&#10;">
+        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+      <action name="get" description="Retrieve an Annotation object by id&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+      <action name="delete" description="delete annotation by id, and delete all children annotations&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <result/>
+      </action>
+      <action name="update" description="Update annotation by id &#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
+        <result type="KalturaAnnotation"/>
+      </action>
+    </service>
     <service id="contentdistribution_distributionprofile" name="distributionProfile" description="Distribution Profile service&#13;" plugin="contentDistribution">
       <action name="add" description="Add new Distribution Profile&#10;">
         <param name="distributionProfile" type="KalturaDistributionProfile" optional="0" description="&#13;"/>
@@ -4953,30 +4971,6 @@
         <result type="KalturaGenericDistributionProviderActionListResponse"/>
       </action>
     </service>
-    <service id="annotation_annotation" name="annotation" description="Annotation service - Video Annotation&#13;" plugin="annotation">
-      <action name="list" description="List annotation objects by filter and pager&#10;">
-        <param name="filter" type="KalturaAnnotationFilter" optional="1" default="null" description="&#13;"/>
-        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
-        <result type="KalturaAnnotationListResponse"/>
-      </action>
-      <action name="add" description="Allows you to add an annotation object and Annotation content associated with Kaltura object&#10;">
-        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
-        <result type="KalturaAnnotation"/>
-      </action>
-      <action name="get" description="Retrieve an Annotation object by id&#10;">
-        <param name="id" type="string" optional="0" description="&#13;"/>
-        <result type="KalturaAnnotation"/>
-      </action>
-      <action name="delete" description="delete annotation by id, and delete all children annotations&#10;">
-        <param name="id" type="string" optional="0" description="&#13;"/>
-        <result/>
-      </action>
-      <action name="update" description="Update annotation by id &#10;">
-        <param name="id" type="string" optional="0" description="&#13;"/>
-        <param name="annotation" type="KalturaAnnotation" optional="0" description="&#13;"/>
-        <result type="KalturaAnnotation"/>
-      </action>
-    </service>
     <service id="shortlink_shortlink" name="shortLink" description="Short link service&#13;" plugin="shortLink">
       <action name="list" description="List short link objects by filter and pager&#10;">
         <param name="filter" type="KalturaShortLinkFilter" optional="1" default="null" description="&#13;"/>
@@ -5034,15 +5028,15 @@
     <plugin name="virusScan">
       <pluginService name="virusScanProfile"/>
     </plugin>
+    <plugin name="annotation">
+      <pluginService name="annotation"/>
+    </plugin>
     <plugin name="contentDistribution">
       <pluginService name="distributionProfile"/>
       <pluginService name="entryDistribution"/>
       <pluginService name="distributionProvider"/>
       <pluginService name="genericDistributionProvider"/>
       <pluginService name="genericDistributionProviderAction"/>
-    </plugin>
-    <plugin name="annotation">
-      <pluginService name="annotation"/>
     </plugin>
     <plugin name="shortLink">
       <pluginService name="shortLink"/>
