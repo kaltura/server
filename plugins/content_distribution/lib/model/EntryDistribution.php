@@ -22,6 +22,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	const FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA = 5;
 	const FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA = 6;
 	
+	const CUSTOM_DATA_FIELD_MEDIA_FILES = "MediaFiles";
 	const CUSTOM_DATA_FIELD_SUBMIT_RESULTS_VERSION = "SubmitResultsVersion";
 	const CUSTOM_DATA_FIELD_UPDATE_RESULTS_VERSION = "UpdateResultsVersion";
 	const CUSTOM_DATA_FIELD_DELETE_RESULTS_VERSION = "DeleteResultsVersion";
@@ -376,5 +377,26 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function incrementSubmitDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_SUBMIT_DATA_VERSION);}
 	public function incrementUpdateDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_DATA_VERSION);}
 	public function incrementDeleteDataVersion()		{return $this->incInCustomData(self::CUSTOM_DATA_FIELD_DELETE_DATA_VERSION);}
+
 	
+	/**
+	 * @return array $mediaFiles
+	 */
+	public function getMediaFiles()
+	{
+		$mediaFiles = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MEDIA_FILES);
+		if(!$mediaFiles || !is_array($mediaFiles))
+			return array();
+			
+		return $mediaFiles;
+	}
+
+	/**
+	 * @param array<kDistributionRemoteMediaFile> $mediaFiles
+	 */
+	public function setMediaFiles(array $mediaFiles)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_MEDIA_FILES, $mediaFiles);
+		return $this;
+	}
 } // EntryDistribution

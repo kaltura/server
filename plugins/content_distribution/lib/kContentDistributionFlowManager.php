@@ -170,6 +170,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if($data->getRemoteId())
 				$entryDistribution->setRemoteId($data->getRemoteId());
 				
+			if($data->getMediaFiles())
+				$entryDistribution->setMediaFiles($data->getMediaFiles());
+				
 			$entryDistribution->save();
 			
 			if($data->getResults())
