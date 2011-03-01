@@ -923,7 +923,7 @@ kmc.preview_embed = {
     // eventually replace with <? php echo $embedCodeTemplate; ?>  ;  (variables used: HEIGHT WIDTH HOST CACHE_ST UICONF_ID PARTNER_ID PLAYLIST_ID ENTRY_ID) + {VER}, {SILVERLIGHT}, {INIT_PARAMS} for Silverlight + NAME, DESCRIPTION
     embed_code_template :	{
         object_tag :	'<object id="kaltura_player_{CACHE_ST}" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" ' +
-            'allowNetworking="all" allowScriptAccess="always" height="{HEIGHT}" width="{WIDTH}" ' +
+            'allowNetworking="all" allowScriptAccess="always" height="{HEIGHT}" width="{WIDTH}" bgcolor="#000000" ' +
             'xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:{MEDIA}" ' +
             'resource="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}" ' +
             'data="http://{HOST}/index.php/kwidget/cache_st/{CACHE_ST}/wid/_{PARTNER_ID}/uiconf_id/{UICONF_ID}{ENTRY_ID}">' +
