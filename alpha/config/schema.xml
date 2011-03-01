@@ -427,7 +427,7 @@
 			<index-column name="partner_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="scheduler">
+	<table skipSql="false" abstract="false" name="scheduler" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="127" />
@@ -440,7 +440,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_status" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="host" type="varchar" default="" size="255" />
 	</table>
-	<table skipSql="false" abstract="false" name="scheduler_worker">
+	<table skipSql="false" abstract="false" name="scheduler_worker" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="127" />
@@ -455,7 +455,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="statuses" type="varchar" default="" size="1023" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_status" type="timestamp" />
 	</table>
-	<table skipSql="false" abstract="false" name="scheduler_status">
+	<table skipSql="false" abstract="false" name="scheduler_status" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="127" />
@@ -482,7 +482,7 @@
 			<index-column name="worker_type" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="scheduler_config">
+	<table skipSql="false" abstract="false" name="scheduler_config" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="127" />
@@ -513,7 +513,7 @@
 			<index-column name="worker_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="control_panel_command">
+	<table skipSql="false" abstract="false" name="control_panel_command" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="127" />
@@ -616,7 +616,7 @@
 			<index-column name="worker_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="priority_group">
+	<table skipSql="false" abstract="false" name="priority_group" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_by" type="varchar" size="20" />
@@ -1370,7 +1370,7 @@
 		<column primaryKey="false" lazyLoad="false" name="input_tags_map" type="varchar" required="false" default="null" size="1023" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creation_mode" type="smallint" default="1" />
 	</table>
-	<table skipSql="false" abstract="false" name="flavor_params_conversion_profile" phpName="flavorParamsConversionProfile">
+	<table skipSql="false" abstract="false" name="flavor_params_conversion_profile" phpName="flavorParamsConversionProfile" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="conversion_profile_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="flavor_params_id" type="integer" required="true" />
@@ -1429,7 +1429,7 @@
 			<index-column name="int_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="track_entry">
+	<table skipSql="false" abstract="false" name="track_entry" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="track_event_type_id" type="smallint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="ps_version" type="varchar" size="10" />
@@ -1559,7 +1559,7 @@
 			<index-column name="created_at" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="invalid_session" phpName="invalidSession">
+	<table skipSql="false" abstract="false" name="invalid_session" phpName="invalidSession" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="ks" type="varchar" size="300" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="ks_valid_until" type="timestamp" />

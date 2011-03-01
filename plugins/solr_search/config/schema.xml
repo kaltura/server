@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.solr_search">
-	<table skipSql="false" abstract="false" name="solr_log">
+	<table skipSql="false" abstract="false" name="solr_log" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
 			required="true" primaryKey="true" />
 		<column primaryKey="false" required="false" autoIncrement="false"
@@ -18,7 +18,7 @@
 			<index-column name="created_at" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="solr_log_server">
+	<table skipSql="false" abstract="false" name="solr_log_server" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
 			required="true" primaryKey="true" />
 		<column primaryKey="false" required="false" autoIncrement="false"

@@ -86,6 +86,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		return $pkg;
 	}
 	
+	public function shouldRaiseEvents()
+	{
+		return ($this->getTable()->getAttribute('raiseEvents', 'true') == 'true');
+	}
+	
 	public function getSubpackage()
 	{
 		$pkg = $this->getBuildProperty('subpackage');
@@ -202,7 +207,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		return true;
 	}
+	";
+
+		if(!$this->shouldRaiseEvents())
+			return;
 	
+		$script .= "
 	/**
 	 * Code to be run after inserting to database
 	 * @param PropelPDO \$con 

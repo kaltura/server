@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.audit">
-	<table skipSql="false" abstract="false" name="audit_trail">
+	<table skipSql="false" abstract="false" name="audit_trail" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="parsed_at" type="timestamp" />
@@ -40,7 +40,7 @@
 			<index-column name="status" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="audit_trail_data">
+	<table skipSql="false" abstract="false" name="audit_trail_data" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="audit_trail_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
@@ -62,7 +62,7 @@
 			<index-column name="audit_trail_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="audit_trail_config">
+	<table skipSql="false" abstract="false" name="audit_trail_config" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="varchar" size="31" />

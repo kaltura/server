@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.contentDistribution">
-	<table skipSql="false" abstract="false" name="search_entry">
+	<table skipSql="false" abstract="false" name="search_entry" raiseEvents="false">
 		<column primaryKey="true"  required="true"  autoIncrement="false" lazyLoad="false" name="entry_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="60" />
