@@ -54,6 +54,13 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public $sentData;
 	
+	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 * @var KalturaDistributionRemoteMediaFileArray
+	 */
+	public $mediaFiles;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -73,6 +80,8 @@ class KalturaDistributionJobData extends KalturaJobData
 	public function fromObject($sourceObject)
 	{
 		parent::fromObject($sourceObject);
+		
+		$this->mediaFiles = KalturaDistributionRemoteMediaFileArray::fromDbArray($sourceObject->getMediaFiles());
 		
 		if(!$this->distributionProfileId)
 			return;
@@ -115,6 +124,15 @@ class KalturaDistributionJobData extends KalturaJobData
 	public function toObject($object = null, $skip = array())
 	{
 		$object = parent::toObject($object, $skip);
+				
+		if($this->mediaFiles)
+		{
+			$mediaFiles = array();
+			foreach($this->mediaFiles as $mediaFile)
+				$mediaFiles[] = $mediaFile;
+				
+			$object->setMediaFiles($mediaFiles);
+		}
 		
 		if($this->providerType && $this->providerData && $this->providerData instanceof KalturaDistributionJobProviderData)
 		{

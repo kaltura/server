@@ -46,6 +46,13 @@ class kDistributionJobData extends kJobData
 	private $sentData;
 	
 	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 * @var array<kDistributionRemoteMediaFile>
+	 */
+	private $mediaFiles = array();
+	
+	/**
 	 * @return the $results
 	 */
 	public function getResults()
@@ -155,5 +162,24 @@ class kDistributionJobData extends kJobData
 	public function setSentData($sentData)
 	{
 		$this->sentData = $sentData;
+	}
+	
+	/**
+	 * @return array $mediaFiles
+	 */
+	public function getMediaFiles()
+	{
+		if(!$this->mediaFiles || !is_array($this->mediaFiles))
+			return array();
+			
+		return $this->mediaFiles;
+	}
+
+	/**
+	 * @param array<kDistributionRemoteMediaFile> $mediaFiles
+	 */
+	public function setMediaFiles(array $mediaFiles)
+	{
+		$this->mediaFiles = $mediaFiles;
 	}
 }

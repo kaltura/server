@@ -81,6 +81,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaComcastDistributionProfile))
 			throw new Exception("Distribution profile must be of type KalturaComcastDistributionProfile");
 	
+		if($data->entryDistribution->remoteId)
+			return $this->doUpdate($data, $data->distributionProfile);
+			
 		return $this->doSubmit($data, $data->distributionProfile);
 	}
 
@@ -150,48 +153,61 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	{	
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$media = $this->getComcastMedia($entry, $data, $distributionProfile);
-		if($data->entryDistribution->remoteId)
-			$media->ID = $data->entryDistribution->remoteId;
 	
+		$data->mediaFiles = array();
+		$mediaFiles = array();
+		
 		$thumbAssets = $this->getThumbAssets($data->entryDistribution->partnerId, $data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
 		{
 			foreach($thumbAssets as $thumbAsset)
 			{
-				if($thumbAsset->width == 72 && $thumbAsset->height = 92)
-				{				
-					$media->thumbnailURL = $this->getThumbAssetUrl($thumbAsset->id);
-					break;
-				}
-			}
-		}
-		
-		$mediaFiles = array();
-		
-		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->partnerId, $data->entryDistribution->flavorAssetIds);
-		
-		// TODO add support to update media files
-		if(!$data->entryDistribution->remoteId)
-		{
-			$this->impersonate($data->entryDistribution->partnerId);
-			foreach($flavorAssets as $flavorAsset)
-			{
-				$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
+				$url = $this->getThumbAssetUrl($thumbAsset->id);
 				
 				$mediaFile = new ComcastMediaFile();
 				$mediaFile->allowRelease = true;
-				$mediaFile->bitrate = $flavorAsset->bitrate;
-				$mediaFile->contentType = ComcastContentType::_VIDEO;
-				$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
-				$mediaFile->length = $entry->duration;
+				$mediaFile->contentType = ComcastContentType::_IMAGE;
+				$mediaFile->format = ComcastFormat::_JPEG;
 				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-				$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}";
-				$mediaFile->height = $flavorAsset->width;
-				$mediaFile->width = $flavorAsset->height;
+				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}";
+				$mediaFile->height = $thumbAsset->width;
+				$mediaFile->width = $thumbAsset->height;
+				$mediaFile->assetTypes = array();
+				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
 				$mediaFiles[] = $mediaFile;
+				
+				$remoteMediaFile = new KalturaDistributionRemoteMediaFile();
+				$remoteMediaFile->assetId = $thumbAsset->id;
+				$remoteMediaFile->version = $thumbAsset->version;
+				$data->mediaFiles[$thumbAsset->id] = $remoteMediaFile;
 			}
-			$this->unimpersonate();
 		}
+		
+		$flavorAssets = $this->getFlavorAssets($data->entryDistribution->partnerId, $data->entryDistribution->flavorAssetIds);
+		
+		$this->impersonate($data->entryDistribution->partnerId);
+		foreach($flavorAssets as $flavorAsset)
+		{
+			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
+			
+			$mediaFile = new ComcastMediaFile();
+			$mediaFile->allowRelease = true;
+			$mediaFile->bitrate = $flavorAsset->bitrate;
+			$mediaFile->contentType = ComcastContentType::_VIDEO;
+			$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
+			$mediaFile->length = $entry->duration;
+			$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
+			$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}";
+			$mediaFile->height = $flavorAsset->width;
+			$mediaFile->width = $flavorAsset->height;
+			$mediaFiles[] = $mediaFile;
+				
+			$remoteMediaFile = new KalturaDistributionRemoteMediaFile();
+			$remoteMediaFile->assetId = $flavorAsset->id;
+			$remoteMediaFile->version = $flavorAsset->version;
+			$data->mediaFiles[$flavorAsset->id] = $remoteMediaFile;
+		}
+		$this->unimpersonate();
 		
 		$options = new ComcastAddContentOptions();
 		$options->generateThumbnail = false;
@@ -199,21 +215,70 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$options->deleteSource = false;
 
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
-		
-		if($data->entryDistribution->remoteId)
-			$comcastAddContentResults = $comcastMediaService->setContent($media, $mediaFiles, $options);
-		else
-			$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);
+		$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);
 		
 		$data->sentData = $comcastMediaService->request;
 		$data->results = $comcastMediaService->response;
+		$data->remoteId = $comcastAddContentResults->mediaID;
 		
-		if($data->entryDistribution->remoteId)
-			$data->remoteId = $data->entryDistribution->remoteId;
-		elseif($comcastAddContentResults->mediaID)
-			$data->remoteId = $comcastAddContentResults->mediaID;
+		$mediaFileIDs = array();
+		foreach($comcastAddContentResults->mediaFileIDs as $mediaFileID)
+			$mediaFileIDs[] = $mediaFileID;
+
+		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
+		if($comcastMediaFileList)
+		{
+			foreach($comcastMediaFileList as $comcastMediaFile)
+			{
+				// the storedFileName is the asset id because we specified it at the end of the url
+				$assetId = $comcastMediaFile->storedFileName;
+				$remoteMediaFileId = $comcastMediaFile->ID;
+				if(isset($data->mediaFiles[$assetId]))
+					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
+			}
+		}
 		
 		return false;
+	}
+	
+	/**
+	 * @param KalturaComcastDistributionProfile $distributionProfile
+	 * @param array $mediaFileIDs
+	 * @return ComcastMediaFileList
+	 */
+	public function getMediaFiles(KalturaComcastDistributionProfile $distributionProfile, array $mediaFileIDs)
+	{
+		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
+		
+		$template = new ComcastMediaFileTemplate();
+		$template->fields[] = array();
+		$template->fields[] = ComcastMediaFileField::_ID;
+		$template->fields[] = ComcastMediaFileField::_STOREDFILENAME;
+		
+		$query = new ComcastQuery();
+		$query->name = 'ByIDs';
+		$query->parameterNames = array('IDs');
+		
+		$ids = new soapval('item', 'IDSet', $mediaFileIDs, false, 'ns12');
+		$query->parameterValues = array($ids);
+		
+		$sort = new ComcastMediaFileSort();
+		$sort->field = ComcastMediaFileField::_ID;
+		$sort->descending = true;
+		
+		$range = new ComcastRange();
+		//$range->startIndex = 1;
+		//$range->endIndex = 10;
+		
+		try
+		{
+			return $comcastMediaService->getMediaFiles($template, $query, $sort, $range);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Error: " . $e->getMessage());
+		}
+		return null;
 	}
 	
 	/* (non-PHPdoc)
