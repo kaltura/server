@@ -11,17 +11,18 @@ require_once 'C:\web\kaltura\infra\nusoap\class.soapclient.php';
 require_once 'C:\web\kaltura\infra\nusoap\class.soap_val.php';
 require_once 'C:\web\kaltura\infra\nusoap\SoapTypes.php';
 
+require_once 'ComcastExpression.class.php';
 require_once 'ComcastIDSet.class.php';
 require_once 'ComcastBusinessObject.class.php';
 require_once 'ComcastStatusObject.class.php';
 require_once 'ComcastContent.class.php';
-require_once 'ComcastMedia.class.php';
-require_once 'ComcastMediaList.class.php';
-require_once 'ComcastMediaTemplate.class.php';
+require_once 'ComcastMediaFile.class.php';
+require_once 'ComcastMediaFileList.class.php';
+require_once 'ComcastMediaFileTemplate.class.php';
 require_once 'ComcastQuery.class.php';
-require_once 'ComcastMediaSort.class.php';
+require_once 'ComcastMediaFileSort.class.php';
 require_once 'ComcastRange.class.php';
-require_once 'ComcastMediaField.class.php';
+require_once 'ComcastMediaFileField.class.php';
 
 require_once 'ComcastClient.php';
 require_once 'ComcastMediaService.php';
@@ -32,26 +33,20 @@ $password = 'Roman1234';
 
 $comcastMediaService = new ComcastMediaService($userName, $password);
 
-$template = new ComcastMediaTemplate();
+$template = new ComcastMediaFileTemplate();
 $template->fields[] = array();
-$template->fields[] = ComcastMediaField::_ID;
-$template->fields[] = ComcastMediaField::_PID;
-$template->fields[] = ComcastMediaField::_REFRESHSTATUS;
-$template->fields[] = ComcastMediaField::_STATUS;
-$template->fields[] = ComcastMediaField::_STATUSDESCRIPTION;
-$template->fields[] = ComcastMediaField::_STATUSDETAIL;
-$template->fields[] = ComcastMediaField::_STATUSMESSAGE;
-$template->fields[] = ComcastMediaField::_MEDIAFILEIDS;
+$template->fields[] = ComcastMediaFileField::_ID;
+$template->fields[] = ComcastMediaFileField::_STOREDFILENAME;
 
 $query = new ComcastQuery();
 $query->name = 'ByIDs';
 $query->parameterNames = array('IDs');
 
-$ids = new soapval('item', 'IDSet', array(1821076214), false, 'ns12');
+$ids = new soapval('item', 'IDSet', array(1813810213), false, 'ns12');
 $query->parameterValues = array($ids);
 
-$sort = new ComcastMediaSort();
-$sort->field = ComcastMediaField::_ID;
+$sort = new ComcastMediaFileSort();
+$sort->field = ComcastMediaFileField::_ID;
 $sort->descending = true;
 
 $range = new ComcastRange();
@@ -60,7 +55,8 @@ $range = new ComcastRange();
 
 try
 {
-	$comcastMediaList = $comcastMediaService->getMedia($template, $query, $sort, $range);
+	$comcastMediaFileList = $comcastMediaService->getMediaFiles($template, $query, $sort, $range);
+	var_dump($comcastMediaFileList);
 }
 catch(Exception $e)
 {
@@ -69,5 +65,3 @@ catch(Exception $e)
 }
 file_put_contents('request.xml', $comcastMediaService->request);
 file_put_contents('response.xml', $comcastMediaService->responseData);
-
-var_dump($comcastMediaList);

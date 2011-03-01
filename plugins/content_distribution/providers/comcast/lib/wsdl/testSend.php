@@ -2,12 +2,18 @@
 
 date_default_timezone_set('America/New_York');
 
-require_once 'C:\web\kaltura\infra\nusoap\nusoap.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.nusoap_base.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.soap_transport_http.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.xmlschema.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.wsdl.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.soap_parser.php';
+require_once 'C:\web\kaltura\infra\nusoap\class.soapclient.php';
 require_once 'C:\web\kaltura\infra\nusoap\SoapTypes.php';
 
 require_once 'ComcastClient.php';
 require_once 'ComcastMediaService.php';
 
+require_once 'ComcastIDList.class.php';
 require_once 'ComcastBusinessObject.class.php';
 require_once 'ComcastStatusObject.class.php';
 require_once 'ComcastContent.class.php';
@@ -29,7 +35,7 @@ $password = 'Roman1234';
 
 $mediaService = new ComcastMediaService($userName, $password);
 
-$entryId = '0_n4qy9nh6';
+$entryId = '0_n4qy9ni8';
 $entryDuration = 26749;
 $thumbnailURL = 'http://62.90.210.41:81/p/140/sp/14000/thumbnail/entry_id/0_n4qy9nh3/version/100000';
 $entryTitle = 'test to comcast';
@@ -314,11 +320,11 @@ $options->deleteSource = false;
 
 try{
 $results = $mediaService->addContent($media, $mediaFiles, $options);
+var_dump($results);
 }
 catch(Exception $e){}
 file_put_contents('err.log', $mediaService->getError());
 file_put_contents('request.xml', $mediaService->request);
 file_put_contents('response.xml', $mediaService->responseData);
 
-var_dump($results);
 
