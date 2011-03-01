@@ -390,7 +390,7 @@ class myFileConverter
 			$bgcolor = hexdec('0x' . $bgcolor);
 		
 		// check if the source file is not an image file
-		if (getimagesize($source_file) === false)
+		if (!file_exists($source_file) || getimagesize($source_file) === false)
 		{
         	KalturaLog::log("convertImage - failed to get image size [$source_file] while creating [$target_file]");
         		return null;
