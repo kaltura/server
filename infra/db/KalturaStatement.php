@@ -17,10 +17,6 @@ class KalturaStatement extends PDOStatement
 
 	public function execute ($input_parameters = null) 
 	{
-		$sqlStart = microtime(true);
-		parent::execute($input_parameters);
-		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
-		
 		$search = array();
 		$replace = array();
 		
@@ -43,6 +39,10 @@ class KalturaStatement extends PDOStatement
 			
 		$sql = str_replace($search, $replace, $this->queryString);
 		KalturaLog::debug($sql);
+		
+		$sqlStart = microtime(true);
+		parent::execute($input_parameters);
+		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
 	}
 	
 }
