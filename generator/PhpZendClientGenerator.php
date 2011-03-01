@@ -64,6 +64,41 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		foreach($classNodes as $classNode)
 			$this->cacheType($classNode);
 		
+    	$this->startNewTextBlock();
+		$this->appendLine('<?php');
+		
+		if($this->generateDocs)
+		{
+			$this->appendLine('/**');
+			$this->appendLine(" * @package $this->package");
+			$this->appendLine(" * @subpackage $this->subpackage");
+			$this->appendLine(' */');
+		}
+			
+		$this->appendLine('class Kaltura_Client_TypeMap');
+		$this->appendLine('{');
+		
+		$classNodes = $xpath->query("/xml/classes/class");
+		$this->appendLine('	private static $map = array(');
+		foreach($classNodes as $classNode)
+		{
+			$kalturaType = $classNode->getAttribute('name');
+			$zendType = $this->getTypeClass($kalturaType);
+			$this->appendLine("		'$kalturaType' => '$zendType',");
+		}
+		$this->appendLine('	);');
+		$this->appendLine('	');
+		
+		$this->appendLine('	public static function getZendType($kalturaType)');
+		$this->appendLine('	{');
+		$this->appendLine('		if(isset(self::$map[$kalturaType]))');
+		$this->appendLine('			return self::$map[$kalturaType];');
+		$this->appendLine('		return null;');
+		$this->appendLine('	}');
+		$this->appendLine('}');
+		
+    	$this->addFile($this->getMapPath(), $this->getTextBlock());
+			
 		// enumes
 		$enumNodes = $xpath->query("/xml/enums/enum");
 		foreach($enumNodes as $enumNode)
@@ -152,6 +187,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	protected function getMainPath()
 	{
 		return 'Kaltura/Client/Client.php';
+	}
+	
+	protected function getMapPath()
+	{
+		return 'Kaltura/Client/TypeMap.php';
 	}
 	
 	protected function getEnumClass($enumName)
@@ -316,7 +356,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 	function writeClass(DOMElement $classNode)
 	{
-		$type = $this->getTypeClass($classNode->getAttribute('name'));
+		$kalturaType = $classNode->getAttribute('name');
+		$type = $this->getTypeClass($kalturaType);
 		
 		$abstract = '';
 		if ($classNode->hasAttribute("abstract"))
@@ -337,6 +378,12 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			
 		$this->appendLine($abstract . "class $type extends $baseClass");
 		$this->appendLine("{");
+		$this->appendLine("	public function getKalturaObjectType()");
+		$this->appendLine("	{");
+		$this->appendLine("		return '$kalturaType';");
+		$this->appendLine("	}");
+		$this->appendLine("	");
+		
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)
 		{

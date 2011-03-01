@@ -7,6 +7,8 @@
  */
 abstract class Kaltura_Client_ObjectBase
 {
+	abstract public function getKalturaObjectType();
+	
 	protected function addIfNotNull(&$params, $paramName, $paramValue)
 	{
 		if ($paramValue !== null)

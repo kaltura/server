@@ -35,7 +35,7 @@ class Kaltura_Client_ClientBase
 	private $isMultiRequest = false;
 	
 	/**
-	 * @var unknown_type
+	 * @var array<Kaltura_Client_ServiceActionCall>
 	 */
 	private $callsQueue = array();
 
@@ -111,7 +111,6 @@ class Kaltura_Client_ClientBase
 		
 		// reset
 		$this->callsQueue = array();
-		$this->isMultiRequest = false; 
 		
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
@@ -124,21 +123,20 @@ class Kaltura_Client_ClientBase
 		}
 		else 
 		{
-			if(strlen($postResult) > 1024)
+			if(strlen($postResult) > 8192)
 				$this->log("result (serialized): " . strlen($postResult) . " bytes");
 			else
 				$this->log("result (serialized): " . $postResult);
 			
-			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
+			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
 			{
-				$result = @unserialize($postResult);
+				$result = $this->unmarshal($postResult);
 
-				if ($result === false && serialize(false) !== $postResult) 
-				{
+				if (is_null($result)) 
 					throw new Kaltura_Client_ClientException("failed to unserialize server result\n$postResult", Kaltura_Client_ClientException::ERROR_UNSERIALIZE_FAILED);
-				}
+					
 				$dump = print_r($result, true);
-				if(strlen($dump) < 1024)
+				if(strlen($dump) < 8192)
 					$this->log("result (object dump): " . $dump);
 			}
 			else
@@ -146,12 +144,43 @@ class Kaltura_Client_ClientBase
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
+		$this->isMultiRequest = false; 
 		
 		$endTime = microtime (true);
 		
 		$this->log("execution time for [".$url."]: [" . ($endTime - $startTime) . "]");
 		
 		return $result;
+	}
+
+	private function unmarshalItem(DOMElement $xml)
+	{
+		if(!$xml->objectType)
+			return $xml->textContent;
+			
+		$type = Kaltura_Client_TypeMap::getZendType($xml->objectType);
+		$ret = new $type();
+	}
+
+	private function unmarshal($xmlData)
+	{
+		$xml = new DOMDocument();
+		$xml->loadXML($xmlData);
+		$xPath = new DOMXPath($xml);
+		
+		if(!$this->isMultiRequest)
+		{
+			$results = $xPath->query("/xml/result");
+			$result = reset($results);
+			return $this->unmarshalItem($result);
+		}
+			
+		$items = $xPath->query("/xml/result/item");
+		$ret = array();
+		foreach($items as $item)
+			$ret[] = $this->unmarshalItem($item);
+		
+		return $ret;
 	}
 
 	/**
@@ -322,7 +351,7 @@ class Kaltura_Client_ClientBase
 			
 		if(is_object($paramValue) && $paramValue instanceof Kaltura_Client_ObjectBase)
 		{
-			$this->addParam($params, "$paramName:objectType", get_class($paramValue));
+			$this->addParam($params, "$paramName:objectType", $paramValue->getKalturaObjectType());
 		    foreach($paramValue as $prop => $val)
 				$this->addParam($params, "$paramName:$prop", $val);
 				
@@ -365,8 +394,8 @@ class Kaltura_Client_ClientBase
 	/**
 	 * Validate that the passed object type is of the expected type
 	 *
-	 * @param unknown_type $resultObject
-	 * @param unknown_type $objectType
+	 * @param any $resultObject
+	 * @param string $objectType
 	 */
 	public function validateObjectType($resultObject, $objectType)
 	{

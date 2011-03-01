@@ -15,7 +15,6 @@ class Kaltura_Client_ServiceActionCall
 	 */
 	public $action;
 	
-	
 	/**
 	 * @var array
 	 */
