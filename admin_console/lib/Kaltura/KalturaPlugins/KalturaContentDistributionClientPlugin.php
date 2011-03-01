@@ -94,10 +94,9 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
-	const VERIZON = "verizonDistribution.VERIZON";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const VERIZON = "verizonDistribution.VERIZON";
 }
 
 /**
@@ -629,6 +628,36 @@ abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
+class KalturaDistributionRemoteMediaFile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaDistributionJobData extends KalturaJobData
 {
 	/**
@@ -693,6 +722,14 @@ class KalturaDistributionJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $sentData = null;
+
+	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 *
+	 * @var array of KalturaDistributionRemoteMediaFile
+	 */
+	public $mediaFiles;
 
 
 }
