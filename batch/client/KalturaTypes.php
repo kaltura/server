@@ -4210,7 +4210,6 @@ class KalturaPartner extends KalturaObjectBase
 	 * 
 	 *
 	 * @var int
-	 * @readonly
 	 */
 	public $allowMultiNotification = null;
 
@@ -6234,16 +6233,16 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var KalturaContainerFormat
+	 * @var string
 	 */
-	public $formatEqual = null;
+	public $tagsEqual = null;
 
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var KalturaContainerFormat
 	 */
-	public $tagsEqual = null;
+	public $formatEqual = null;
 
 
 }
@@ -6322,6 +6321,13 @@ abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
 
 
 }
