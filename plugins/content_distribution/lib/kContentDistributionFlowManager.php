@@ -1119,8 +1119,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
-				kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+				$listChanged = ($listChanged || kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+				
+				if(!$listChanged)
+					continue;
 				
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
@@ -1145,9 +1148,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					continue;
 				}
 				
-				kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
+				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
+				$listChanged = ($listChanged || kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
 				
+				if(!$listChanged)
+					continue;
+					
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();

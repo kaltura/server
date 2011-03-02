@@ -325,6 +325,12 @@ class kContentDistributionManager
 		return null;
 	}
 	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param entry $entry
+	 * @param DistributionProfile $distributionProfile
+	 * @return boolean true if the list of flavors modified
+	 */
 	public static function assignFlavorAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
 	{
 		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
@@ -332,10 +338,11 @@ class kContentDistributionManager
 		$flavorParamsIds = array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds);
 		$flavorAssetIds = array();
 		if(!is_array($flavorParamsIds))
-			return;
+			return false;
 			
+		$originalList = $entryDistribution->getFlavorAssetIds();
 		// remove deleted flavor assets
-		$assignedFlavorAssetIds = $entryDistribution->getFlavorAssetIds();
+		$assignedFlavorAssetIds = $originalList;
 		if($assignedFlavorAssetIds)
 		{
 			$flavorAssetIds = explode(',', $assignedFlavorAssetIds);
@@ -354,8 +361,15 @@ class kContentDistributionManager
 			$flavorAssetIds[] = $newFlavorAssetId;
 			
 		$entryDistribution->setFlavorAssetIds($flavorAssetIds);
+		return ($originalList != $entryDistribution->getFlavorAssetIds());
 	}
 	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param entry $entry
+	 * @param DistributionProfile $distributionProfile
+	 * @return boolean true if the list of thumbnails modified
+	 */
 	public static function assignThumbAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
 	{
 		$thumbAssetsIds = array();
@@ -364,8 +378,10 @@ class kContentDistributionManager
 		foreach($thumbDimensions as $thumbDimension)
 			$thumbDimensionsWithKeys[$thumbDimension->getKey()] = $thumbDimension;
 		
+		$originalList = $entryDistribution->getThumbAssetIds();
+		
 		// remove deleted thumb assets
-		$assignedThumbAssetIds = $entryDistribution->getThumbAssetIds();
+		$assignedThumbAssetIds = $originalList;
 		if($assignedThumbAssetIds)
 		{
 			$thumbAssetsIds = explode(',', $assignedThumbAssetIds);
@@ -399,6 +415,8 @@ class kContentDistributionManager
 			}
 		}
 		$entryDistribution->setThumbAssetIds($thumbAssetsIds);
+		
+		return ($originalList != $entryDistribution->getThumbAssetIds());
 	}
 	
 	/**
