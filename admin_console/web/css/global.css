@@ -145,7 +145,8 @@ div#my_info, div#new_admin { clear: both;}
 	  #filters img { vertical-align:middle; #vertical-align:2px; padding-right:5px;}
 
 	#results { float:left;}
-	 body#batch-in-progress-tasks #results, body#batch-failed-tasks #results { margin-left:20px;}
+	*:first-child+html #results { margin-top: 18px; } /* ie7 only */
+	body#batch-in-progress-tasks #results, body#batch-failed-tasks #results { margin-left:20px;}
 
 	.ui-datepicker-trigger { margin: 0 0 -4px 3px;}
 
@@ -302,6 +303,8 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
   form.inline-form select[multiple="multiple"], form.inline-form #content_categories { height:auto;}
   
   /* user_info */
+  body#user-create form.inline-form { width: 285px; }
+  body#user-settings form.inline-form { width: 285px; }
   form.inline-form #fieldset-user_info { width: 285px; }
   form.inline-form #fieldset-user_info dt { width: 125px; } 
 
