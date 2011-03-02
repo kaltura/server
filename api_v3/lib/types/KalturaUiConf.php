@@ -36,7 +36,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaUiConfObjType $objType
-	 * @filter eq
+	 * @filter eq,in
 	 */
 	public $objType;
 

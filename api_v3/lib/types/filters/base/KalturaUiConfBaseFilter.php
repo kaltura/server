@@ -14,6 +14,7 @@ class KalturaUiConfBaseFilter extends KalturaFilter
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
 		"objTypeEqual" => "_eq_obj_type",
+		"objTypeIn" => "_in_obj_type",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -83,6 +84,13 @@ class KalturaUiConfBaseFilter extends KalturaFilter
 	 * @var KalturaUiConfObjType
 	 */
 	public $objTypeEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $objTypeIn;
 
 	/**
 	 * 

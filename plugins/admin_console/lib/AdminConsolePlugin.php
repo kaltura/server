@@ -26,6 +26,7 @@ class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKaltu
 			'thumbParamsOutput' => 'ThumbParamsOutputService',
 			'mediaInfo' => 'MediaInfoService',
 			'entryAdmin' => 'EntryAdminService',
+			'uiConfAdmin' => 'UiConfAdminService',
 		);
 		return $map;
 	}

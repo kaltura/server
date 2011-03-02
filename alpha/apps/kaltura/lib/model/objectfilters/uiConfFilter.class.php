@@ -17,6 +17,7 @@ class uiConfFilter extends baseObjectFilter
 			"_in_partner_id",
 			"_eq_status" ,
 			"_eq_obj_type" ,
+			"_in_obj_type" ,
 			"_like_name" ,
 			"_mlikeor_tags" ,
 			"_mlikeand_tags" ,
