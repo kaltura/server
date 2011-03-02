@@ -410,7 +410,7 @@ body#monitoring-xymon {}
 #partner-external-storages div.newStorageDiv {width:850px; line-height: 2;}
 #partner-external-storages div.newStorageDiv div #desciption-label {width:auto;}
 #partner-external-storages #toggleLink {color:blue;}
-#partner-external-storages div.newStorageDiv div dt { display: block; width:211px; float:left; line-height: 1.8;}
+#partner-external-storages div.newStorageDiv div dt { display: block; width:211px; float:left; line-height: 1.8; clear:both;}
 #partner-external-storages div.newStorageDiv div dd { display: block;}
 #partner-external-storages div.newStorageDiv div dd input { width:200px; }
 #partner-external-storages div.newStorageDiv div dd select { width:205px; }
