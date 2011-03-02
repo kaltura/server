@@ -10,6 +10,7 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"nameLike" => "_like_name",
 		"nameMultiLikeOr" => "_mlikeor_name",
 		"nameMultiLikeAnd" => "_mlikeand_name",
@@ -100,6 +101,13 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * This filter should be in use for retrieving specific entries. It should include only one string to search for in entry names (no wildcards, spaces are treated as part of the string).

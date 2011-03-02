@@ -10,7 +10,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $id;
 	
