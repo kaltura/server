@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator
+class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, Countable
 {
 	private $array = array();
 	private $class = "";
@@ -77,5 +77,10 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator
 	public function getType()
 	{
 		return $this->class;
+	}
+	
+	public function count()
+	{
+		return count($this->array);
 	}
 }
