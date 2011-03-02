@@ -57,9 +57,6 @@ class Kaltura_FilterPaginator implements Zend_Paginator_Adapter_Interface
 	 */
 	public function count()
 	{
-		if (is_null($this->totalCount))
-			$this->callService(0, 1);
-			
 		return $this->totalCount;
 	}
 	
