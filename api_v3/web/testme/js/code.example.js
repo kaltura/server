@@ -665,13 +665,10 @@ function toggleCode(){
 	$('#codeExample').toggle();
 	if($('#codeToggle').html() == 'Hide Code Example'){
 		$('#codeToggle').html('Show Code Example');
-		codeHeight = 14;
 	}
 	else{
 		$('#codeToggle').html('Hide Code Example');
-		codeHeight = 179;
 	}
-
-        kTestMe.calculateDimensions(1);
-        kTestMe.jqWindow.resize();
+	kTestMe.calculateDimensions(1);
+	kTestMe.jqWindow.resize();
 }

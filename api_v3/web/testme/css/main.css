@@ -1,8 +1,8 @@
 body, html { margin:0; padding:0; height: 100%; }
 
 * { margin:0; padding:0;}
-body { background: #f7f7f7; font: normal 62.5% arial,sans-serif; }*
-.body-bg { background: url(../images/bg.png) repeat-x;}
+body { background: #f7f7f7; font: normal 62.5% arial,sans-serif; overflow: hidden; }
+.body-bg { background: url(../images/bg.png) repeat-x #f7f7f7;}
 
 a { color: #202020; } 
 a:hover { color: #505050; }
@@ -28,7 +28,8 @@ button { background-color: #A0A0A0; border-color: #DEDEDE #202020 #202020 #DEDED
 
 .object-name { cursor: pointer; }
 .object-type {font-size: 9px}
-.object-properties { display: none; overflow: scroll; position: absolute; top: 65px; padding: 0 10px; background-color: #F7F7F7;  }
+.object-properties { display: none; overflow: scroll; position: absolute; top: 0; padding: 0 10px; background-color: #F7F7F7;  }
+.body-bg .object-properties { top: 62px; }
 
 
 .helpTooltip { }
