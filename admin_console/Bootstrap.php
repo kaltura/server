@@ -3,6 +3,20 @@ require_once(dirname(__FILE__) . '/../alpha/config/kConf.php');
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+	protected $startTime;
+	
+	function __construct($application) 
+	{
+		$this->startTime = microtime(true);
+		parent::__construct($application);
+	}
+	
+	function __destruct() 
+	{
+		$t = microtime(true) - $this->startTime;
+		KalturaLog::debug('boostrap destructed, application run for ' . $t . ' seconds');
+	}
+	
 	protected function _initLog()
 	{
 		$this->bootstrap('autoloaders');
@@ -10,6 +24,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		$config = Zend_Registry::get('config');
 		KalturaLog::initLog($config->logger);
+		KalturaLog::debug('starting request');
 	}
 	
 	protected function _initDoctype()
