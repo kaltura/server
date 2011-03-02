@@ -1,15 +1,22 @@
+<?php 
+	$this->headScript()	->setIndent("	")
+						->appendFile($this->baseUrl('codemirror/js/codemirror.js'));
+?>
+
 <p><?php echo $this->translate('widget-list intro text'); ?></p>
 <?php echo $this->form; ?>
+<?php echo $this->newButton; ?>
 <div id="results" class="clear">
 	<?php $count = $this->paginator->getItemsCount(); ?>
 	<h2><?php echo $this->translate('Results'); ?><span> (<?php echo $count; ?> <?php echo $this->translate(array('widget', 'widgets', $count)); ?>)</span></h2>
 	<table class="clear">
 		<thead>
 			<tr>
-				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Widget ID'); ?></th>
+				<th><?php echo $this->translate('Widget Name'); ?></th>
 				<th><?php echo $this->translate('Type'); ?></th>
 				<th><?php echo $this->translate('Publisher ID'); ?></th>
-				<th><?php echo $this->translate('Name'); ?></th>
+				<th><?php echo $this->translate('Publisher Name'); ?></th>
 				<th><?php echo $this->translate('Width'); ?></th>
 				<th><?php echo $this->translate('Height'); ?></th>
 				<th><?php echo $this->translate('SWF Version'); ?></th>
@@ -28,9 +35,10 @@
 			<?php foreach($this->paginator as /* KalturaUIConf */ $uiConf): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $uiConf->id; ?></td>
-				<td><?php echo $this->enumTranslate('KalturaUIConfObjType', $uiConf->objType); ?></td>
-				<td><?php echo $uiConf->partnerId; ?></td>
 				<td><?php echo $uiConf->name; ?></td>
+				<td><?php echo $this->enumTranslate('KalturaUiConfObjType', $uiConf->objType); ?></td>
+				<td><?php echo $uiConf->partnerId; ?></td>
+				<td><?php echo (isset($uiConf->partner)) ? $uiConf->partner->name : ''; ?></td>
 				<td><?php echo $uiConf->width; ?></td>
 				<td><?php echo $uiConf->height; ?></td>
 				<td><?php echo $uiConf->swfUrlVersion; ?></td>
@@ -41,9 +49,14 @@
 					<select class="options" onchange="doAction(this.value, <?php echo $uiConf->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if (Kaltura_AclHelper::isAllowed('widget','edit')): ?>
-							<option value="edit" ><?php echo $this->translate('Edit'); ?></option>
+							<option value="editForm" ><?php echo $this->translate('Edit'); ?></option>
 						<?php endif; ?>
-							
+						<?php if (Kaltura_AclHelper::isAllowed('widget','delete')): ?>
+							<option value="deleteWidget" ><?php echo $this->translate('Delete'); ?></option>
+						<?php endif; ?>
+						<?php if (Kaltura_AclHelper::isAllowed('widget','duplicate')): ?>
+							<option value="duplicateWidget" ><?php echo $this->translate('Duplicate'); ?></option>
+						<?php endif; ?>
 					</select>
 				</td>
 			</tr>
@@ -81,8 +94,128 @@ function doAction(action, id) {
 	jQuery('select.options').val('');
 }
 
-function edit(id) {
+function editForm(id) {
 	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'edit'), null, true); ?>' + '/id/' + id;
-	window.location = url;
+	
+	jQuery('#widget-dialog').remove();
+	dialogDiv = jQuery('<div id="widget-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 390,
+		height: Math.min(jQuery(window).height() * 0.9, 970),
+		title: '<?php echo $this->translate('Edit Widget'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('form').submit();
+			},
+				'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		}
+	});	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(formSubmit); 
+		}
+	);
 }
+
+function newForm(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'create'), null, true); ?>' + '/partner_id/' + partnerId;
+	
+	jQuery('#widget-dialog').remove();
+	dialogDiv = jQuery('<div id="widget-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 390,
+		height: Math.min(jQuery(window).height() * 0.9, 970),
+		title: '<?php echo $this->translate('Add New Widget'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('form').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		}
+	});	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(formSubmit); 
+		}
+	);
+}
+
+function deleteWidget(id) {
+	var ok = confirm('<?php echo $this->translate('are you sure delete widget?'); ?>');
+
+	if (ok) {
+		var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'delete', 'id' => '')); ?>' + id;
+
+		jQuery.ajax({
+			url: url,
+			dataType: 'json',
+			success: function(result) {
+				if (result != 'ok')
+					return this.error();
+				alert('<?php echo $this->translate('widget was deleted');?>');
+				jQuery('#frmPaginator1').submit();
+			},
+			error: function() {
+				alert('<?php echo $this->translate('widget was not deleted');?>');
+			}
+		});
+	}
+}
+
+function duplicateWidget(id) {
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'duplicate', 'id' => '')); ?>' + id;
+
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		success: function(result) {
+			if (result != 'ok')
+				return this.error();
+			alert('<?php echo $this->translate('widget was duplicated');?>');
+			jQuery('#frmPaginator1').submit();
+		},
+		error: function() {
+			alert('<?php echo $this->translate('widget was not duplicated');?>');
+		}
+	});
+}
+
+function formSubmit(html) {
+	if (jQuery(html).parent().find('form').hasClass('valid')) 
+	{
+		dialogDiv.dialog('close');
+		jQuery('#frmPaginator1').submit();
+	}
+	else
+	{
+		jQuery('#widget-dialog').find('form').replaceWith(html);
+		jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
+	}
+}
+
+jQuery(function() {
+	jQuery('#new_button').click(function() {
+		var partnerId = '';
+		if (jQuery('#filter_type').val() == 'by-partner-id') {
+			partnerId = jQuery('#filter_input').val();
+		}
+		doAction('newForm', partnerId);
+	});
+});
 </script>

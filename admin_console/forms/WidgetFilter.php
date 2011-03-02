@@ -10,6 +10,7 @@ class Form_WidgetFilter extends Form_PartnerFilter
 			'none' => 'None',
 			'by-uiconf-id' => 'Widget ID', 
 			'by-partner-id' => 'Publisher ID',
+			'by-partner-name' => 'Publisher Name',
 		));
 	}
 }

@@ -5577,6 +5577,13 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	 *
 	 * @var string
 	 */
+	public $objTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $tagsMultiLikeOr = null;
 
 	/**
@@ -5661,6 +5668,63 @@ class KalturaUiConfListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaString extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaUiConfTypeInfo extends KalturaObjectBase
+{
+	/**
+	 * UiConf Type
+	 * 
+	 *
+	 * @var KalturaUiConfObjType
+	 */
+	public $type = null;
+
+	/**
+	 * Available versions
+	 * 
+	 *
+	 * @var array of KalturaString
+	 */
+	public $versions;
+
+	/**
+	 * The direcotry this type is saved at
+	 * 
+	 *
+	 * @var string
+	 */
+	public $directory = null;
+
+	/**
+	 * Filename for this UiConf type
+	 * 
+	 *
+	 * @var string
+	 */
+	public $filename = null;
 
 
 }

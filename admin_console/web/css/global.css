@@ -39,7 +39,7 @@ html, body { margin:0; padding:0; height: 100%; }
 	 div#user_links a:hover { color:#A6E7F6; text-decoration:underline;}
     
 /* sub-header */
-#sub-header { padding:5px 20px 10px; background: transparent url(../images/sub-bg.png) repeat-x 0 -2px; }
+#sub-header { padding:5px 20px 19px; min-height: 25px; background: transparent url(../images/sub-bg.png) repeat-x 0 -2px; }
 
 /* wrapper */
 #wrapper { padding: 10px; clear: both; }
@@ -101,6 +101,10 @@ div#my_info, div#new_admin { clear: both;}
 /* partner-usage-index */ 
 #partner-usage-index input { vertical-align: top; }
 
+/* partner-create */
+#partner-create #new_account { width: 350px; }
+#partner-create #new_account fieldset { width: 305px; }
+
 	option { padding-right:8px;}
 	input, select { font: normal 11px arial,sans-serif;}
 	select { height:19px;}
@@ -156,6 +160,7 @@ div#my_info, div#new_admin { clear: both;}
 	form.simple p { padding: 5px 10px 5px 0;}
 	form.simple label { padding-top:5px;}
 	form.simple input { height:18px; padding-top:4px; margin-left:8px;}
+	form.simple#new_button_form { margin-left:20px; }
 
 	fieldset#fieldset-statuses { padding: 12px 10px 5px;}
 
@@ -240,21 +245,34 @@ div#my_info, div#new_admin { clear: both;}
 /* partner-create */
 #partner-create form { clear: both; }
 
-/* widget-edit / widget-create */
-#widget-edit form.inline-form #custom_data,
-#widget-edit form.inline-form input[type="text"],
-#widget-edit form.inline-form select,
-#widget-create form.inline-form #custom_data,
-#widget-create form.inline-form input[type="text"],
-#widget-create form.inline-form select { width: 340px; } 
-#widget-edit form.inline-form #width,
-#widget-create form.inline-form #width { width: 60px; }
-#widget-edit form.inline-form #height,
-#widget-create form.inline-form #height { width: 60px; }
-#widget-edit form.inline-form textarea,
-#widget-create form.inline-form textarea { width: 340px; height: 80px; }
-#widget-edit .CodeMirror-line-numbers,
-#widget-create .CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right; padding: .4em .3em 0 0; font-size: 9pt; font-family: monospace; }
+/* widget-dialog*/
+#widget-dialog { padding-top:10px;}
+ #widget-dialog label { padding:0;}
+  #widget-dialog dl { margin-top:15px;}
+   #widget-dialog dl p { margin-top:5px; }
+   #widget-dialog dt { margin: 10px 0 5px;}
+   #widget-dialog dd input { width:333px; height:22px;}
+   #widget-dialog dd input[type=checkbox] { width: auto; }
+   #widget-dialog dd select { width: 343px; height:24px; padding:4px; }
+   #widget-dialog dd textarea { width: 340px; height: 80px; }
+   #widget-dialog dd #width { width: 60px; }
+   #widget-dialog dd #height { width: 60px; }
+   #widget-dialog ul.errors { margin: 0; }
+   #widget-dialog ul.errors li { list-style: none; }  
+   #widget-dialog .disabled { background-color: #f0f0f0; color: #6d6d6d; }
+   #widget-dialog #name-element { margin-bottom: 8px; }
+   #widget-dialog #width-label,
+   #widget-dialog #width-element, 
+   #widget-dialog #height-label,
+   #widget-dialog #height-element { float: left; }
+   #widget-dialog #creation_mode-label { clear: both; }
+   #widget-dialog #width-element, #widget-dialog #height-element { margin: 5px 10px 12px; }
+   #widget-dialog #conf_file_features-element .description,
+   #widget-dialog #conf_file-element .description { text-align: right; }
+   #widget-dialog #use_cdn-label { float: left; }
+   #widget-dialog #use_cdn-element { float: left; margin: 5px; } 
+		
+.CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right; padding: .4em .3em 0 0; font-size: 9pt; font-family: monospace; } 
 		
 		
 tbody tr:hover td { background:#D8EAEF;}
@@ -269,8 +287,8 @@ tbody tr:hover td { background:#D8EAEF;}
 form.inline-form { padding-top:15px; display:table; clear:both;}
  form.inline-form fieldset { padding:15px; margin: 0 0 18px 0; display:block;}
   form.inline-form legend { font-weight:bold; color:#222;}
-  form.inline-form dt, form.inline-form dd { padding: 3px 0; float:left;}
-  form.inline-form dt { width:150px; padding: 8px 0 0; clear:both;}
+  form.inline-form dt, form.inline-form dd { padding: 3px 0; }
+  form.inline-form dt { width:150px; padding: 8px 0 0; float:left; clear:both;}
    dd#adult_content-element { padding-top:8px;}
    dd#adult_content-element label { margin-right:10px;}
   form.inline-form label { padding:0;}
@@ -278,10 +296,15 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
   form.inline-form input[type="password"] { width:148px; height:18px; padding: 4px 0 0 4px;}
   form.inline-form input[type="radio"] { vertical-align:-2px;}
   form.inline-form textarea { padding: 4px 0 0 4px; } 
-  form.inline-form select { width:152px; height:26px; padding: 4px; }
+  form.inline-form select { width:154px; height:26px; padding: 4px; }
   form.inline-form .disabled { background-color: #f0f0f0; color: #6d6d6d; }
    form.inline-form option { padding: 2px 8px 2px 0;}
   form.inline-form select[multiple="multiple"], form.inline-form #content_categories { height:auto;}
+  
+  /* user_info */
+  form.inline-form #fieldset-user_info { width: 285px; }
+  form.inline-form #fieldset-user_info dt { width: 125px; } 
+
   div.buttons { text-align:center;}
    form.inline-form button { margin: 0 10px 0 0;}
 	 button.secondary { background:none; text-transform:lowercase; color:#009ACC;}
@@ -331,15 +354,13 @@ body#monitoring-xymon {}
 	iframe {border: 0px;}
 
 	#index-apc { }
-	 #index-apc #wrapper { padding:0; margin-top:-1px;}	
+	 #index-apc #wrapper { padding:0; overflow: hidden; }	
 	
 	#index-testme { }
-	 #index-testme #wrapper { padding:0; margin-top:-1px;}
-	 ;#index-testme #sub-header { display:none;}
+	 #index-testme #wrapper { padding:0; overflow: hidden; }
 
 	#index-testme-doc { }
-	 #index-testme-doc #wrapper { padding:0; margin-top:-1px;}
-	 ;#index-testme-doc #sub-header { display:none;}	
+	 #index-testme-doc #wrapper { padding:0; overflow: hidden; }
 
 	table.ui-datepicker-calendar { min-width:100%;}
 	img.ui-datepicker-trigger { cursor:pointer;}
@@ -408,6 +429,11 @@ body#monitoring-xymon {}
 #partner-external-storages div.commentFormObjects{ height: 240px; width: 400px; overflow: auto;}
 
 #frmDistributionProfileConfig fieldset { float: none; padding: 10px 20px 10px 10px; }
+  
+form#addNewDistributionProfile { margin-left: 20px; }
+form#addNewDistributionProfile dd, 
+form#addNewDistributionProfile dt { float: left; }
+form#addNewDistributionProfile #newPartnerId { width: 60px; }
 
 
 th input[type="checkbox"], td input[type="checkbox"] { margin: 0 -7px 0 2px;}

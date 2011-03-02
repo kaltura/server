@@ -93,11 +93,6 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->form = $form;
 		$this->view->paginator = $paginator;
 	}
-	
-	public function selectorAction()
-	{
-		$this->listAction();
-	}
 		
 	public function updateStorageStatusAction()
 	{

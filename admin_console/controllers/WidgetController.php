@@ -9,6 +9,8 @@ class WidgetController extends Zend_Controller_Action
 		
 		$action = $this->view->url(array('controller' => $request->getControllerName(), 'action' => $request->getActionName()), null, true);
 
+		$newButton = new Form_NewButton();
+		
 		$form = new Form_WidgetFilter();
 		$form->setAction($action);
 		$form->populate($request->getParams());
@@ -17,97 +19,106 @@ class WidgetController extends Zend_Controller_Action
 		$uiConfFilter->orderBy = KalturaUiConfOrderBy::CREATED_AT_DESC;
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("uiConf", "listAction", null, $uiConfFilter);
+		$paginatorAdapter = new Kaltura_FilterPaginatorWithPartnerLoader(null, $uiConfFilter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
 		// set view
 		$this->view->form = $form;
+		$this->view->newButton = $newButton;
 		$this->view->paginator = $paginator;
 	}
 	
 	public function createAction()
 	{
+		$this->_helper->layout->disableLayout();
 		$request = $this->getRequest();
+		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')));
 		$form = new Form_Widget();
+		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setAction($action);
 		$client = Kaltura_ClientHelper::getClient();
 		
-		$partnerId = $request->getParam('partner_id');
-		
-		if (!$partnerId)
+		if ($request->isPost())
 		{
-			$this->_forward('selector', 'partner');
-		}
-		else
-		{
-			if ($request->isPost())
+			$form->loadVersions($request->getParam('obj_type'));
+			if ($form->isValid($request->getParams()))
 			{
-				$form->loadVersions($request->getParam('obj_type'));
-				if ($form->isValid($request->getParams()))
-				{
-					$uiConf = $form->getObject('KalturaUiConf', $request->getPost());
-					$uiConf->partnerId = $partnerId;
-					Kaltura_ClientHelper::impersonate($partnerId);
-					$uiConf = $client->uiConf->add($uiConf);
-					Kaltura_ClientHelper::unimpersonate();
-					
-					$this->_helper->redirector('list', 'widget', null, array(
-						'filter_type' => 'by-partner-id',
-						'filter_input' => $partnerId,
-					));
-				}
-				else
-				{
-					$form->populate($request->getParams());
-				}
+				$uiConf = $form->getObject('KalturaUiConf', $request->getPost());
+				$uiConf = $client->uiConfAdmin->add($uiConf);
+				$form->setAttrib('class', 'valid');
 			}
-			$form->setEditorButtons();
-			$this->view->typesInfo = $client->uiConf->getAvailableTypes();
-			$this->view->form = $form;
-			$this->_helper->viewRenderer('edit'); 
 		}
+		$form->populate($request->getParams());
+		$form->setEditorButtons();
+		$this->view->typesInfo = $client->uiConf->getAvailableTypes();
+		$this->view->form = $form;
+		$this->_helper->viewRenderer('edit'); 
 	}
 	
 	public function editAction()
 	{
+		$this->_helper->layout->disableLayout();
 		$request = $this->getRequest();
 		$id = $request->getParam('id');
+		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')));
 		$form = new Form_Widget();
-		$form->setEditMode();
+		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setAction($action);
 		
 		$client = Kaltura_ClientHelper::getClient();
-		$uiConf = $this->getUiConf($id);
-		if (is_null($uiConf))
+		$uiConf = $client->uiConfAdmin->get($id);
+
+		if ($request->isPost())
 		{
-			$this->view->notFound = true;
-		}
-		else 
-		{
-			if ($request->isPost())
+			$form->loadVersions($request->getParam('obj_type'));
+			if ($form->isValid($request->getParams()))
 			{
-				$form->loadVersions($request->getParam('obj_type'));
-				if ($form->isValid($request->getParams()))
-				{
-					$uiConfUpdate = $form->getObject('KalturaUiConf', $request->getPost());
-					Kaltura_ClientHelper::impersonate($uiConf->partnerId);
-					$uiConf = $client->uiConf->update($id, $uiConfUpdate);
-					Kaltura_ClientHelper::unimpersonate();
-					$form->populateFromObject($uiConf);
-				}
-				else
-				{
-					$form->populate($request->getParams());
-				}
+				$uiConfUpdate = $form->getObject('KalturaUiConf', $request->getPost());
+				$uiConf = $client->uiConfAdmin->update($id, $uiConfUpdate);
+				$form->populateFromObject($uiConf);
+				$form->setAttrib('class', 'valid');
 			}
 			else
 			{
-				$form->loadVersions($uiConf->objType);
-				$form->populateFromObject($uiConf);
+				$form->populate($request->getParams());
 			}
 		}
+		else
+		{
+			$form->loadVersions($uiConf->objType);
+			$form->populateFromObject($uiConf);
+		}
+		$form->setEditorButtons();
 		$this->view->typesInfo = $client->uiConf->getAvailableTypes();
 		$this->view->form = $form;
+	}
+	
+	public function deleteAction() 
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$request = $this->getRequest();
+		$id = $request->getParam('id');
+		$client = Kaltura_ClientHelper::getClient();
+		
+		$uiConf = $client->uiConfAdmin->delete($id);
+		
+		echo $this->_helper->json('ok', false);
+	}
+	
+	public function duplicateAction() 
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$request = $this->getRequest();
+		$id = $request->getParam('id');
+		$client = Kaltura_ClientHelper::getClient();
+		
+		$uiConf = $client->uiConfAdmin->get($id);
+		$uiConf->id = null;
+		$uiConf = $client->uiConfAdmin->add($uiConf);
+		
+		echo $this->_helper->json('ok', false);
 	}
 	
 	public function kcwEditorAction()
@@ -118,34 +129,62 @@ class WidgetController extends Zend_Controller_Action
 		$this->_helper->layout->setLayout('layout_empty');
 	}
 	
-	protected function getUiConf($id)
-	{
-		$client = Kaltura_ClientHelper::getClient();
-		$filter = new KalturaUiConfFilter();
-		$filter->idEqual = $id;
-		// use uiconf.list because we don't have access to private uiconfs using uiconf.get
-		// and we don't know the partner id of this uiconf to impersonate
-		$uiConfResult = $client->uiConf->listAction($filter);
-		
-		return (count($uiConfResult->objects) >= 1 ? $uiConfResult->objects[0] : null);
-	}
-	
 	protected function getUiConfFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
 		$uiConfFilter = new KalturaUiConfFilter();
+		$uiConfFilter->objTypeIn = implode(',', array_keys($this->getSupportedUiConfTypes()));
 		$partnerFilter = null;
 		$filterType = $request->getParam('filter_type');
 		$filterInput = $request->getParam('filter_input');
 		switch($filterType)
 		{
-			case 'by-partner-id':
-				$uiConfFilter->partnerIdIn = $filterInput;
-				break;
 			case 'by-uiconf-id':
 				$uiConfFilter->idIn = $filterInput;
 				break;
+			case 'by-partner-id':
+				$uiConfFilter->partnerIdIn = $filterInput;
+				break;
+			case 'by-partner-name':
+				$partnerFilter = new KalturaPartnerFilter();
+				$partnerFilter->nameLike = $filterInput;
+				$statuses = array();
+				$statuses[] = KalturaPartnerStatus::ACTIVE;
+				$statuses[] = KalturaPartnerStatus::BLOCKED;
+				$partnerFilter->statusIn = implode(',', $statuses);
+				$partnerFilter->orderBy = KalturaPartnerOrderBy::ID_DESC;
+				$client = Kaltura_ClientHelper::getClient();
+				$partnersResponse = $client->systemPartner->listAction($partnerFilter);
+				if (count($partnersResponse->objects) == 0)
+				{
+					$uiConfFilter->idEqual = -1; // nothing should be found
+				}
+				else
+				{
+					$partnerIds = array();
+					foreach($partnersResponse->objects as $partner)
+						$partnerIds[] = $partner->id;
+					$uiConfFilter->partnerIdIn = implode(',', $partnerIds);
+				}
 		}
 		
 		return $uiConfFilter;
+	}
+	
+	protected function getSupportedUiConfTypes()
+	{
+		$types = array();
+		$typesConfig = Zend_Registry::get('config')->settings->uiConfTypes;
+		if ($typesConfig) 
+		{
+			foreach($typesConfig as $config)
+			{
+				if (is_string($config))
+				{
+					$value = eval('return ' . $config . ';');
+					$types[$value] = $config;
+				}
+			}
+		}
+		return $types;
 	}
 }

@@ -5,19 +5,25 @@ class Form_Widget extends Kaltura_Form
 	{
 		// Set the method for the display form to POST
 		$this->setMethod('post');
-		$this->setAttrib('class', 'inline-form');
+		$this->setAttrib('class', 'widget-form');
 		
 
 		$this->addElement('text', 'id', array(
-			'label'			=> 'ID:',
+			'label'			=> 'Widget ID:',
 			'required'		=> false,
 			'disabled' 		=> true,
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
 		));
 		
+		$this->addElement('text', 'partner_id', array(
+			'label'			=> 'Publisher ID:',
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'name', array(
-			'label'			=> 'Name:',
+			'label'			=> 'Widget Name:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
@@ -51,8 +57,6 @@ class Form_Widget extends Kaltura_Form
 			'required'		=> true,
 			'multiOptions' 		=> array(
 				'' => '',
-				KalturaUiConfObjType::PLAYER_V3 => 'KDP3',
-				KalturaUiConfObjType::CONTRIBUTION_WIZARD => 'Contribution Wizard',
 			)
 		));
 
@@ -65,7 +69,7 @@ class Form_Widget extends Kaltura_Form
 		));
 		
 		$this->addElement('text', 'swf_url', array(
-			'label'			=> 'SWF Url:',
+			'label'			=> 'SWF URL:',
 			'required'		=> true,
 			'readonly' 		=> true,
 			'filters'		=> array('StringTrim'),
@@ -73,15 +77,8 @@ class Form_Widget extends Kaltura_Form
 		));
 		
 		$this->addElement('text', 'conf_vars', array(
-			'label'			=> 'Conf Vars:',
+			'label'			=> 'Additional flashvars:',
 			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-			'validators' 	=> array()
-		));
-		
-		$this->addElement('checkbox', 'use_cdn', array(
-			'label'			=> 'Use CDN:',
-			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
 		));
@@ -100,7 +97,7 @@ class Form_Widget extends Kaltura_Form
 		$this->getElement('conf_file')->getDecorator('Description')->setEscape(false);
 		
 		$this->addElement('textarea', 'conf_file_features', array(
-			'label'			=> 'Conf File Features:',
+			'label'			=> 'Studio Features:',
 			'validators' 	=> array()
 		));
 		$this->getElement('conf_file_features')->getDecorator('Description')->setEscape(false);
@@ -112,31 +109,12 @@ class Form_Widget extends Kaltura_Form
 			'validators' 	=> array()
 		));
 		
-		$elements = $this->getElements();
-		$ids = array();
-		foreach($elements as $element)
-			$ids[] = $element->getId();
-		
-		$this->addDisplayGroup($ids, 'widget_info', array(
-			'decorators' => array(
-				'Description', 
-				'FormElements', 
-				array('Fieldset'),
-			)
-		));
-		
-		$this->addElement('button', 'submit', array(
-			'label' => 'Create',
-			'type' => 'submit',
-			'decorators' => array('ViewHelper')
-		));
-		
-		
-		$this->addDisplayGroup(array('submit'), 'buttons1', array(
-			'decorators' => array(
-				'FormElements', 
-				array('HtmlTag', array('tag' => 'div', 'class' => 'buttons')),
-			)
+		$this->addElement('checkbox', 'use_cdn', array(
+			'label'			=> 'Use CDN:',
+			'required'		=> true,
+			'value'			=> '1',
+			'filters'		=> array('StringTrim'),
+			'validators' 	=> array()
 		));
 	}
 	
@@ -144,7 +122,6 @@ class Form_Widget extends Kaltura_Form
 	{
 		parent::populateFromObject($object, $addUnderscore);
 		$this->setDefault('version', $this->getVersionFromSwfUrl());
-		$this->setEditorButtons();
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -166,11 +143,6 @@ class Form_Widget extends Kaltura_Form
 					$versionElement->addMultiOption($version->value, $version->value);
 			}
 		}
-	}
-	
-	public function setEditMode()
-	{
-		$this->getElement('submit')->setLabel('Save');
 	}
 	
 	public function getVersionFromSwfUrl()
@@ -202,5 +174,10 @@ class Form_Widget extends Kaltura_Form
 		
 		$this->getElement('conf_file')->setDescription(implode($confFileButtons, ' | '));
 		$this->getElement('conf_file_features')->setDescription(implode($confFileFeaturesButtons, ' | '));
+	}
+	
+	public function setObjTypes($array)
+	{
+		$this->getElement('obj_type')->addMultiOptions($array);
 	}
 }

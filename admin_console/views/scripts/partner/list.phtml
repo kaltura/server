@@ -1,46 +1,105 @@
-<?php $this->placeholder('options')->captureStart(); ?>
+<p><?php echo $this->translate('partner-list intro text'); ?></p>
+<?php echo $this->form; ?>
+<div id="results" class="clear">
+	<?php $count = $this->paginator->getItemsCount(); ?>
+	<h2><?php echo $this->translate('Results'); ?><span> (<?php echo $count; ?> <?php echo $this->translate(array('publisher', 'publishers', $count)); ?>)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Publisher Name'); ?></th>
+				<th><?php echo $this->translate('Website URL'); ?></th>
+				<th><?php echo $this->translate('Admin Name'); ?></th>
+				<th><?php echo $this->translate('Admin Email'); ?></th>
+				<th><?php echo $this->translate('Admin Phone'); ?></th>
+				<th><?php echo $this->translate('Account Creation Date'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as /* KalturaPartner */ $partner): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaPartnerStatus', $partner->status); ?></td>
+				<td><?php echo $partner->id; ?></td>
+				<td><?php echo $partner->name; ?></td>
+				<td><?php echo $partner->website; ?></td>
+				<td><?php echo $partner->adminName; ?></td>
+				<td><?php echo $partner->adminEmail; ?></td>
+				<td><?php echo $partner->phone; ?></td>
+				<td><?php echo $this->dateFormat($partner->createdAt, Zend_Date::DATE_LONG); ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+							<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
+						<?php endif; ?>	
+						<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-users')): ?>
+							<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
+						<?php endif; ?>
+						<?php if (Kaltura_AclHelper::isAllowed('widget','list')): ?>
+							<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
+						<?php endif; ?>	
+						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
+							<?php if (Kaltura_AclHelper::isAllowed('partner','configure')): ?>
+								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+							<?php endif; ?>								
+							<?php if (Kaltura_AclHelper::isAllowed('partner','configure-storage')): ?>	
+								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+							<?php endif; ?>	
+							<?php if (Kaltura_AclHelper::isAllowed('partner','block')): ?>		
+								<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
+									<option value="block"><?php echo $this->translate('Block'); ?></option>
+								<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
+									<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
+								<?php endif; ?>
+							<?php endif; ?>
+							<?php if (Kaltura_AclHelper::isAllowed('partner','remove')): ?>
+								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
+							<?php endif; ?>
+						<?php endif; ?>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>
 
-<?php echo $this->translate('partner-list intro text'); ?>
+<script type="text/javascript">
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+// <div class="help" title="<?php //echo this_tooltip_text ?>"></div>
 
-<?php $this->placeholder('options')->captureEnd() ?>
+jQuery('#filter_type').change();
 
-
-
-<?php $this->placeholder('options')->captureStart(); ?>
-
-<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-redirect')): ?>
-	<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
-<?php endif; ?>	
-<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-users')): ?>
-	<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
-<?php endif; ?>
-<?php if (Kaltura_AclHelper::isAllowed('widget','list')): ?>
-	<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
-<?php endif; ?>	
-<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
-	<?php if (Kaltura_AclHelper::isAllowed('partner','configure')): ?>
-		<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-	<?php endif; ?>								
-	<?php if (Kaltura_AclHelper::isAllowed('partner','configure-storage')): ?>	
-		<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
-	<?php endif; ?>	
-	<?php if (Kaltura_AclHelper::isAllowed('partner','block')): ?>		
-		<?php if ($partner->status == KalturaPartnerStatus::ACTIVE): ?>
-			<option value="block"><?php echo $this->translate('Block'); ?></option>
-		<?php elseif ($partner->status == KalturaPartnerStatus::BLOCKED): ?>
-			<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
-		<?php endif; ?>
-	<?php endif; ?>
-	<?php if (Kaltura_AclHelper::isAllowed('partner','remove')): ?>
-		<option value="remove"><?php echo $this->translate('Remove'); ?></option>
-	<?php endif; ?>
-<?php endif; ?>
-
-<?php $this->placeholder('options')->captureEnd() ?>
-
-
-
-<?php $this->placeholder('javascript')->captureStart(); ?>
+function doAction(action, partnerId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+</script>
 
 <script type="text/javascript">
 jQuery('#filter_type').change(function() {
@@ -258,9 +317,3 @@ jQuery(function() {
 });
 
 </script>
-
-<?php $this->placeholder('javascript')->captureEnd() ?>
-
-
-
-<?php echo $this->partial('partner/generic-list.phtml', null, $this); ?>

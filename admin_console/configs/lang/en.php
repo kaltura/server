@@ -256,12 +256,17 @@ return array(
 
 	// widgets
 	'widget-list intro text' => 'Here you can manage all widgets',
+	'are you sure delete widget?' => 'Are you sure you want to delete this widget?',
+	'widget was deleted' => 'Widget was deleted successfully',
+	'widget was not deleted' => 'Widget could not be deleted',
+	'widget was duplicated' => 'Widget was duplicated successfully',
+	'widget was not duplicated' => 'Widget could not be duplicated',
 
-	'KalturaUIConfObjType::PLAYER' => 'Player',
-	'KalturaUIConfObjType::PLAYER_V3' => 'KDP3',
-	'KalturaUIConfObjType::SIMPLE_EDITOR' => 'Simple Editor',
-	'KalturaUIConfObjType::ADVANCED_EDITOR' => 'Advanced Editor',
-	'KalturaUIConfObjType::CONTRIBUTION_WIZARD' => 'Contribution Wizard',
+	'KalturaUiConfObjType::PLAYER' => 'Player',
+	'KalturaUiConfObjType::PLAYER_V3' => 'KDP3',
+	'KalturaUiConfObjType::SIMPLE_EDITOR' => 'Simple Editor',
+	'KalturaUiConfObjType::ADVANCED_EDITOR' => 'Advanced Editor',
+	'KalturaUiConfObjType::CONTRIBUTION_WIZARD' => 'Contribution Wizard',
 
 
 	//batch index
