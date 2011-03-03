@@ -1,18 +1,18 @@
 
 
-<form id="frmSystemHelper" enctype="application/x-www-form-urlencoded" method="post" class="form" action=""><fieldset id="fieldset-frmSystemHelper" class="form"><dl>
-	<dt id="Algorithm-label"><label class="required"><h2>Algorithm</h2></label></dt>
+<form id="frmSystemHelper" enctype="application/x-www-form-urlencoded" method="post" class="inline-form" action=""><fieldset id="fieldset-frmSystemHelper" class="form"><dl>
+	<dt id="Algorithm-label">Algorithm</dt>
 	<dd id="Algorithm-element">
-	<input type="radio" name="Algorithm" id="Algorithm-wikidecode" value="wiki_decode" <?php echo $this->algo == "wiki_decode" ? "checked='checked'" : "" ; ?> />Wiki Decode<br>
-	<input type="radio" name="Algorithm" id="Algorithm-wikidecodenoserialize" value="wiki_decode_no_serialize" <?php echo $this->algo == "wiki_decode_no_serialize" ? "checked='checked'" : "" ; ?>/>Wiki Decode (No unserialize)<br>
-	<input type="radio" name="Algorithm" id="Algorithm-base64encode" value="base64_encode" <?php echo $this->algo == "base64_encode" ? "checked='checked'" : "" ; ?>/>Base64 Encode<br>
-	<input type="radio" name="Algorithm" id="Algorithm-base64decode" value="base64_decode" <?php echo $this->algo == "base64_decode" ? "checked='checked'" : "" ; ?>/>Base64 Decode<br>
-	<input type="radio" name="Algorithm" id="Algorithm-base643desencode" value="base64_3des_encode" <?php echo $this->algo == "base64_3des_encode" ? "checked='checked'" : "" ; ?>/>Base64 3des Encode key: <input type="text" name="des_key" id="des_key" value="<?php echo  @$this->des_key ?>" /><br>
-	<input type="radio" name="Algorithm" id="Algorithm-base643desdecode" value="base64_3des_decode" <?php echo $this->algo == "base64_3des_decode" ? "checked='checked'" : "" ; ?>/>Base64 3des Decode<br>
-	<input type="radio" name="Algorithm" id="Algorithm-ks" value="ks" <?php echo $this->algo == "ks" ? "checked='checked'" : "" ; ?>/>KS<br>
-	<input type="radio" name="Algorithm" id="Algorithm-kwid" value="kwid" <?php echo $this->algo == "kwid" ? "checked='checked'" : "" ; ?>/>kwid (wiki) secret: <input type="text" name="secret" id="secret" value="" /><br>
-	<input type="radio" name="Algorithm" id="Algorithm-ip" value="ip" <?php echo $this->algo == "ip" ? "checked='checked'" : "" ; ?>/>ip to country</dd>
-		
+		<input type="radio" name="Algorithm" id="Algorithm-wikidecode" value="wiki_decode" <?php echo $this->algo == "wiki_decode" ? "checked='checked'" : "" ; ?> />Wiki Decode<br>
+		<input type="radio" name="Algorithm" id="Algorithm-wikidecodenoserialize" value="wiki_decode_no_serialize" <?php echo $this->algo == "wiki_decode_no_serialize" ? "checked='checked'" : "" ; ?>/>Wiki Decode (No unserialize)<br>
+		<input type="radio" name="Algorithm" id="Algorithm-base64encode" value="base64_encode" <?php echo $this->algo == "base64_encode" ? "checked='checked'" : "" ; ?>/>Base64 Encode<br>
+		<input type="radio" name="Algorithm" id="Algorithm-base64decode" value="base64_decode" <?php echo $this->algo == "base64_decode" ? "checked='checked'" : "" ; ?>/>Base64 Decode<br>
+		<input type="radio" name="Algorithm" id="Algorithm-base643desencode" value="base64_3des_encode" <?php echo $this->algo == "base64_3des_encode" ? "checked='checked'" : "" ; ?>/>Base64 3des Encode key: <input type="text" name="des_key" id="des_key" value="<?php echo  @$this->des_key ?>" /><br>
+		<input type="radio" name="Algorithm" id="Algorithm-base643desdecode" value="base64_3des_decode" <?php echo $this->algo == "base64_3des_decode" ? "checked='checked'" : "" ; ?>/>Base64 3des Decode<br>
+		<input type="radio" name="Algorithm" id="Algorithm-ks" value="ks" <?php echo $this->algo == "ks" ? "checked='checked'" : "" ; ?>/>KS<br>
+		<input type="radio" name="Algorithm" id="Algorithm-kwid" value="kwid" <?php echo $this->algo == "kwid" ? "checked='checked'" : "" ; ?>/>kwid (wiki) secret: <input type="text" name="secret" id="secret" value="" /><br>
+		<input type="radio" name="Algorithm" id="Algorithm-ip" value="ip" <?php echo $this->algo == "ip" ? "checked='checked'" : "" ; ?>/>ip to country
+	</dd>
 	<dt id="StringToManipulate-label"><label for="StringToManipulate" class="optional">String to manipulate:</label></dt>
 	<dd id="StringToManipulate-element">
 	<textarea name="StringToManipulate" id="StringToManipulate" cols="48" rows="3"><?php echo $this->str ?></textarea></dd>

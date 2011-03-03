@@ -3,11 +3,6 @@ class Form_SystemHelper extends Zend_Form
 {
 	public function init()
 	{
-		// Set the method for the display form to POST
-		$this->setMethod('post');
-		$this->setAttrib('class', 'form');
-		$this->setAttrib('id', 'frmSystemHelper');
-
 		$this->addElement('radio', 'Algorithm', array(
 			'label'	=> 'Algorithm',
 			'required' => true,
@@ -51,15 +46,6 @@ class Form_SystemHelper extends Zend_Form
 		$this->addElement('button', 'submit', array(
 			'type' => 'submit',
 			'label'		=> 'Submit',
-			'decorators' => array('ViewHelper')
-		));
-		
-		$this->setDecorators(array(
-			'FormElements',
-			array('HtmlTag', array('tag' => 'dl')),
-			array('Description', array('placement' => 'prepend')),
-			'Fieldset',
-			'Form',
 		));
 	}
 }
