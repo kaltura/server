@@ -55,8 +55,11 @@ class QuickTimeToolsPlugin extends KalturaPlugin implements IKalturaObjectLoader
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
 	 */
-	public static function getEnums($baseEnumName)
+	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+			return array('QuickTimeToolsConversionEngineType');
+	
 		if($baseEnumName == 'conversionEngineType')
 			return array('QuickTimeToolsConversionEngineType');
 			

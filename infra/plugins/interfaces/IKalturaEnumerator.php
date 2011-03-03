@@ -14,8 +14,8 @@ interface IKalturaEnumerator extends IKalturaBase
 	
 	/**
 	 * Returns a list of enumeration class names that implement the baseEnumName interface.
-	 * 
+	 * @param string $baseEnumName the base implemented enum interface, set to null to retrieve all plugin enums
 	 * @return array<string> A string listing the enum class names that extend baseEnumName
 	 */
-	public static function getEnums($baseEnumName);
+	public static function getEnums($baseEnumName = null);
 }
