@@ -16,7 +16,14 @@ class entryPeer extends BaseentryPeer
 	private static $s_default_count_limit = 301;
 	
 	// cache classes by their type
-	private static $class_types_cache = array();
+	private static $class_types_cache = array(
+		entryType::AUTOMATIC => parent::OM_CLASS,
+		entryType::MEDIA_CLIP => parent::OM_CLASS,
+		entryType::MIX => parent::OM_CLASS,
+		entryType::PLAYLIST => parent::OM_CLASS,
+		entryType::DATA => parent::OM_CLASS,
+		entryType::LIVE_STREAM => parent::OM_CLASS,
+	);
 	
 	/**
 	 * This function sets the requested order of entries to the given criteria object.
