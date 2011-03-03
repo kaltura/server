@@ -659,6 +659,22 @@ class playManifestAction extends kalturaAction
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
+		
+		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
+		{ 
+			$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
+			if ($flavorParamId)
+			{
+				$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavorParamId);
+				if(!$flavorAsset)
+				{
+					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				}
+				
+				$this->flavorId = $flavorAsset->getId();
+			}
+		}	
+		
 		$this->validateStorageId();
 		
 		$this->protocol = $this->getRequestParameter ( "protocol", null );
@@ -737,7 +753,7 @@ class playManifestAction extends kalturaAction
 				
 			case "hdnetwork":
 				$duration = $this->entry->getDurationInt();
-				$mediaUrl = "<media url=\"".str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."/>"; 
+				$mediaUrl = "<media url=\"".requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."\"/>"; 
 						
 				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, null, 'video/x-flv', $duration, null, $mediaUrl);
 				break;
