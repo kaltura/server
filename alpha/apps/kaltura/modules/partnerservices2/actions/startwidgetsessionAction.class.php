@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'startsessionAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class startwidgetsessionAction extends startsessionAction
 {
 	public function describe()
