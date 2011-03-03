@@ -99,24 +99,27 @@ class kJobsManager
 	/**
 	 * @param int $jobId
 	 * @param int $jobType
+	 * @param bool $force - forces retry even if the job is locked.
 	 * @return BatchJob
 	 */
-	public static function retryJob($jobId, $jobType)
+	public static function retryJob($jobId, $jobType, $force = false)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
 		$dbBatchJob->setAbort(false);
-		$dbBatchJob->setExecutionAttempts(0);
 		
 		// if not currently locked
 		if(!$dbBatchJob->getSchedulerId())
 		{
+			$dbBatchJob->setExecutionAttempts(0);
 			$dbBatchJob = self::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_RETRY);
 		}
-		else
+		elseif($force)
 		{
+			$dbBatchJob->setExecutionAttempts(0);
+			$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
 			$dbBatchJob->save();
 		}
 			

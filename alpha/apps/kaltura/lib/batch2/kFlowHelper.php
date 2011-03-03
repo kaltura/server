@@ -1122,7 +1122,7 @@ class kFlowHelper
 				// sometimes, because of disc IO load, it takes long time for the thumb to be moved.
 				// in such cases, the entry thumb version may be increased by other process.
 				// retry the job, it solves the issue.
-				kJobsManager::retryJob($dbBatchJob->getId(), $dbBatchJob->getJobType());
+				kJobsManager::retryJob($dbBatchJob->getId(), $dbBatchJob->getJobType(), true);
 				$dbBatchJob->reload();
 				return $dbBatchJob;
 			}
