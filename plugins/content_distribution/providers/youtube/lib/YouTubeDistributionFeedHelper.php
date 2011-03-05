@@ -59,6 +59,9 @@ class YouTubeDistributionFeedHelper
 		
 		if ($entryDistribution->sunrise)
 			$this->setStartTime(date('c', $entryDistribution->sunrise));
+		else
+			$this->setStartTime(date('c', time() - 24*60*60)); // yesterday, to make the video public by default
+			
 		if ($entryDistribution->sunset)
 			$this->setEndTime(date('c', $entryDistribution->sunset));
 		

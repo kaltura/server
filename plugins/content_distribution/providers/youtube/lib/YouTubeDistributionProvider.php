@@ -63,7 +63,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function isMediaUpdateEnabled()
 	{
-		return $this->isUpdateEnabled();
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -119,11 +119,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(entryPeer::NAME, entryPeer::DESCRIPTION);
-
-		return array();
+		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
 	}
 
 	/* (non-PHPdoc)
