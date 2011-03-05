@@ -159,4 +159,9 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 			$this->feedUrl .= 'feedId=' . $this->id;
 		}
 	}
+	
+    function __construct()
+	{
+		$this->type = KalturaSyndicationFeedType::KALTURA;
+	}
 }
