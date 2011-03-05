@@ -255,4 +255,15 @@ class KalturaErrors extends APIErrors
 	
 	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exist";
 	
+	/*
+	 * syndication service
+	 */
+	const INVALID_XSLT = "INVALID_XSLT,Invalid xslt";
+	
+	const INVALID_XSLT_MISSING_TEMPLATE_RSS = "INVALID_XSLT_MISSING_TEMPLATE_RSS,Invalid xslt, missing rss's template tag with the following convention: xsl:template name=\"rssx\" match=\"/\"";
+	
+	const INVALID_XSLT_MISSING_TEMPLATE_ITEM = "INVALID_XSLT_MISSING_TEMPLATE_ITEM,Invalid xslt, missing item's template tag with the following convention: xsl:template name=\"item\" match=\"item\"";
+	
+	const INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM = "INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM,Invalid xslt, missing apply-template tag for item's template with the following convention: xsl:apply-templates name=\"item\"";
+	
 }
