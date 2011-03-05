@@ -1408,7 +1408,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="playlist_id" type="varchar" size="20" />
 		<column primaryKey="false" lazyLoad="false" name="name" type="varchar" required="true" default="" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="type" type="tinyint" />
+		<column primaryKey="false" lazyLoad="false" name="type" type="tinyint" required="false" inheritance="single" />
 		<column primaryKey="false" lazyLoad="false" name="landing_page" type="varchar" required="true" default="" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_param_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="player_uiconf_id" type="integer" />
@@ -1425,6 +1425,8 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="feed_image_url" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="feed_author" type="varchar" size="50" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
 		<index name="int_id_index">
 			<index-column name="int_id" />
 		</index>
