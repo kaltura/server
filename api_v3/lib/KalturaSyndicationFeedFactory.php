@@ -17,6 +17,12 @@ class KalturaSyndicationFeedFactory
 			case KalturaSyndicationFeedType::TUBE_MOGUL:
 				$obj = new KalturaTubeMogulSyndicationFeed();
 				break;
+			case KalturaSyndicationFeedType::KALTURA:
+				$obj = new KalturaBaseSyndicationFeed();
+				break;
+			case KalturaSyndicationFeedType::KALTURA_XSLT:
+				$obj = new KalturaXsltSyndicationFeed();
+				break;
 			default:
 				$obj = new KalturaBaseSyndicationFeed();
 				break;

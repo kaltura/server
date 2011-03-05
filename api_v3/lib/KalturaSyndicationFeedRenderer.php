@@ -354,6 +354,12 @@ class KalturaSyndicationFeedRenderer
 			case KalturaSyndicationFeedType::YAHOO:
 				$this->renderYahooFeed();
 				break;
+			case KalturaSyndicationFeedType::KALTURA:
+				$this->renderKalturaFeed();
+				break;
+			case KalturaSyndicationFeedType::KALTURA_XSLT:
+				$this->renderKalturaXsltFeed();
+				break;
 		}
 		
 		$microTimeEnd = microtime(true);
@@ -389,6 +395,43 @@ class KalturaSyndicationFeedRenderer
 		$ret .= ($seconds >= 10)? "$seconds": "0$seconds";
 		
 		return $ret;
+	}
+	
+	private function renderKalturaFeed()
+	{
+		//header xml
+		echo genericSyndicationFeed::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
+		//items
+		while($entry = $this->getNextEntry())
+		{
+			$e= new KalturaMediaEntry();
+			$e->fromObject($entry);
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
+			{
+				continue;
+			}			
+			echo genericSyndicationFeed::getKalturaEntryMrss($entry, $this->syndicationFeed);				
+		}
+		echo genericSyndicationFeed::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
+	}
+	
+	private function renderKalturaXsltFeed()
+	{
+		//header xml
+		echo genericSyndicationFeed::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeed->xslt);
+		//items
+		while($entry = $this->getNextEntry())
+		{
+			$e= new KalturaMediaEntry();
+			$e->fromObject($entry);
+			// in case no video player is requested by user and the entry is mix, skip it	
+			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
+				continue;
+				
+			echo genericSyndicationFeed::getKalturaEntryMrss($entry, $this->syndicationFeed);					
+		}
+		echo genericSyndicationFeed::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeed->xslt);
 	}
 	
 	private function renderYahooFeed()
