@@ -10,6 +10,16 @@
  */ 
 class syndicationFeedPeer extends BasesyndicationFeedPeer
 {
+	// cache classes by their type
+	private static $class_types_cache = array(
+		syndicationFeedType::GOOGLE_VIDEO => parent::OM_CLASS,
+		syndicationFeedType::ITUNES => parent::OM_CLASS,
+		syndicationFeedType::TUBE_MOGUL => parent::OM_CLASS,
+		syndicationFeedType::YAHOO => parent::OM_CLASS,
+		syndicationFeedType::KALTURA => parent::OM_CLASS,
+		syndicationFeedType::KALTURA_XSLT => genericSyndicationFeedPeer::OM_CLASS,		
+	);
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if ( self::$s_criteria_filter == null )
@@ -36,5 +46,28 @@ class syndicationFeedPeer extends BasesyndicationFeedPeer
 		$res = parent::retrieveByPKs( $pks , $con );
 		self::setUseCriteriaFilter ( true );
 		return $res;
-	}    
+	} 
+
+	/**
+	 * The returned Class will contain objects of the default type or
+	 * objects that inherit from the default.
+	 *
+	 * @param      array $row PropelPDO result row.
+	 * @param      int $colnum Column to examine for OM class information (first is 0).
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function getOMClass($row, $colnum)
+	{
+		if($row)
+		{
+			$syndicationFeedType = $row[$colnum + 6]; // type
+			if(isset(self::$class_types_cache[$syndicationFeedType]))
+				return self::$class_types_cache[$syndicationFeedType];
+				
+			self::$class_types_cache[$syndicationFeedType] = parent::OM_CLASS;
+		}
+			
+		return parent::OM_CLASS;
+	}
 }
