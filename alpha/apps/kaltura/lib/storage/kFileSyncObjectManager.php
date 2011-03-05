@@ -35,9 +35,9 @@ class kFileSyncObjectManager
 				flavorAssetPeer::setUseCriteriaFilter ( true );
 				break;
 			case FileSyncObjectType::SYNDICATION_FEED:
-				syndicationFeedPeer::setUseCriteriaFilter ( false );
-				$object = syndicationFeedPeer::retrieveByPK( $objectId );
-				syndicationFeedPeer::setUseCriteriaFilter ( true );
+				genericSyndicationFeedPeer::setUseCriteriaFilter ( false );
+				$object = genericSyndicationFeedPeer::retrieveByPK( $objectId );
+				genericSyndicationFeedPeer::setUseCriteriaFilter ( true );
 				break;
 		}
 		
