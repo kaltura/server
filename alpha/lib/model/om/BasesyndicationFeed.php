@@ -163,6 +163,18 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
+	 * The value for the display_in_search field.
+	 * @var        int
+	 */
+	protected $display_in_search;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -473,6 +485,26 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [display_in_search] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDisplayInSearch()
+	{
+		return $this->display_in_search;
 	}
 
 	/**
@@ -1031,6 +1063,49 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     syndicationFeed The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = syndicationFeedPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
+	 * Set the value of [display_in_search] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     syndicationFeed The current object (for fluent API support)
+	 */
+	public function setDisplayInSearch($v)
+	{
+		if(!isset($this->oldColumnsValues[syndicationFeedPeer::DISPLAY_IN_SEARCH]))
+			$this->oldColumnsValues[syndicationFeedPeer::DISPLAY_IN_SEARCH] = $this->display_in_search;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->display_in_search !== $v) {
+			$this->display_in_search = $v;
+			$this->modifiedColumns[] = syndicationFeedPeer::DISPLAY_IN_SEARCH;
+		}
+
+		return $this;
+	} // setDisplayInSearch()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1105,6 +1180,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$this->feed_image_url = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->feed_author = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
 			$this->created_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->custom_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->display_in_search = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1114,7 +1191,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 23; // 23 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 25; // 25 = syndicationFeedPeer::NUM_COLUMNS - syndicationFeedPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating syndicationFeed object", $e);
@@ -1314,6 +1391,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1323,7 +1402,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1579,6 +1660,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			case 22:
 				return $this->getCreatedAt();
 				break;
+			case 23:
+				return $this->getCustomData();
+				break;
+			case 24:
+				return $this->getDisplayInSearch();
+				break;
 			default:
 				return null;
 				break;
@@ -1623,6 +1710,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$keys[20] => $this->getFeedImageUrl(),
 			$keys[21] => $this->getFeedAuthor(),
 			$keys[22] => $this->getCreatedAt(),
+			$keys[23] => $this->getCustomData(),
+			$keys[24] => $this->getDisplayInSearch(),
 		);
 		return $result;
 	}
@@ -1723,6 +1812,12 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			case 22:
 				$this->setCreatedAt($value);
 				break;
+			case 23:
+				$this->setCustomData($value);
+				break;
+			case 24:
+				$this->setDisplayInSearch($value);
+				break;
 		} // switch()
 	}
 
@@ -1770,6 +1865,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[20], $arr)) $this->setFeedImageUrl($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setFeedAuthor($arr[$keys[21]]);
 		if (array_key_exists($keys[22], $arr)) $this->setCreatedAt($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setCustomData($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setDisplayInSearch($arr[$keys[24]]);
 	}
 
 	/**
@@ -1804,6 +1901,8 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(syndicationFeedPeer::FEED_IMAGE_URL)) $criteria->add(syndicationFeedPeer::FEED_IMAGE_URL, $this->feed_image_url);
 		if ($this->isColumnModified(syndicationFeedPeer::FEED_AUTHOR)) $criteria->add(syndicationFeedPeer::FEED_AUTHOR, $this->feed_author);
 		if ($this->isColumnModified(syndicationFeedPeer::CREATED_AT)) $criteria->add(syndicationFeedPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(syndicationFeedPeer::CUSTOM_DATA)) $criteria->add(syndicationFeedPeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(syndicationFeedPeer::DISPLAY_IN_SEARCH)) $criteria->add(syndicationFeedPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 
 		return $criteria;
 	}
@@ -1902,6 +2001,10 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 
 		$copyObj->setCreatedAt($this->created_at);
 
+		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setDisplayInSearch($this->display_in_search);
+
 
 		$copyObj->setNew(true);
 
@@ -1981,4 +2084,121 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BasesyndicationFeed
