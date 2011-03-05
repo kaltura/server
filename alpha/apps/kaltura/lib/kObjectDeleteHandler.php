@@ -20,6 +20,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		if($object instanceof asset)
 			$this->assetDeleted($object);
 			
+		if($object instanceof syndicationFeed)
+			$this->syndicationFeedDeleted($object);
+			
 		return true;
 	}
 
@@ -97,5 +100,15 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	protected function assetDeleted(asset $asset) 
 	{
 		$this->syncableDeleted($asset->getId(), FileSyncObjectType::FLAVOR_ASSET);
+	}
+	
+	
+	/**
+	 * @param syndicationFeed $syndicationFeed
+	 */
+	protected function syndicationFeedDeleted(syndicationFeed $syndicationFeed)
+	{
+		if($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT)
+			$this->syncableDeleted($syndicationFeed->getId(), FileSyncObjectType::SYNDICATION_FEED);
 	}
 }
