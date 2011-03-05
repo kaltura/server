@@ -3,10 +3,10 @@
  * @package api
  * @subpackage enum
  */
-class KalturaSyndicationFeedType extends KalturaEnum
+class KalturaSyndicationFeedType extends KalturaDynamicEnum implements syndicationFeedType
 {
-	const GOOGLE_VIDEO = 1;
-	const YAHOO = 2;
-	const ITUNES = 3;
-	const TUBE_MOGUL = 4;
+	public static function getEnumClass()
+	{
+		return 'syndicationFeedType';
+	}
 }
