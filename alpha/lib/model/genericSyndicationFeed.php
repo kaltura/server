@@ -59,7 +59,6 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	public function getSyncKey($sub_type, $version = null)
 	{
 		self::validateFileSyncSubType($sub_type);
-		
 		if(!$version)
 			$version = $this->getVersion();
 		
@@ -83,7 +82,6 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 */
 	public function generateFileName($sub_type, $version = null)
 	{
-		KalturaLog::log("generateFileName 1");
 		self::validateFileSyncSubType($sub_type);
 		
 		if(!$version)

@@ -78,30 +78,4 @@ class genericSyndicationFeedPeer extends SyndicationFeedPeer
 		return parent::doSelectStmt($criteria, $con);	
 	}
 	
-	/**
-	 * Retrieve a single object by pkey.
-	 *
-	 * @param      int $pk the primary key.
-	 * @param      PropelPDO $con the connection to use
-	 * @return     genericSyndicationFeed
-	 */
-	public static function retrieveByPK($pk, PropelPDO $con = null)
-	{
-		self::getInstance();
-		return parent::retrieveByPK($pk, $con);
-	}
-
-	/**
-	 * Retrieve multiple objects by pkey.
-	 *
-	 * @param      array $pks List of primary keys
-	 * @param      PropelPDO $con the connection to use
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 */
-	public static function retrieveByPKs($pks, PropelPDO $con = null)
-	{
-		self::getInstance();
-		return parent::retrieveByPKs($pks, $con);
-	}
 }
