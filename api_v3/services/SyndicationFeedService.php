@@ -24,6 +24,9 @@ class SyndicationFeedService extends KalturaBaseService
 		if ($actionName === 'get') {
 			return true;
 		}
+		if ($actionName === 'list') {
+			return true;
+		}
 
 		return parent::kalturaNetworkAllowed($actionName);
 	}
