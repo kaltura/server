@@ -264,7 +264,7 @@ class KalturaEntryService extends KalturaBaseService
    	 */
 	protected function checkAndSetValidUser(KalturaBaseEntry $entry, entry $dbEntry)
 	{
-		KalturaLog::debug("API user id [{$entry->userId}] DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
+		KalturaLog::debug("DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
 		// for new entry, puser ID is null - set it from service scope
 		if($dbEntry->getPuserId() === null)
 		{
@@ -273,29 +273,29 @@ class KalturaEntryService extends KalturaBaseService
 			return;
 		}
 		
-		
 		// get puser ID from entry to compare to userId on the updated entry object
 		$entryPuserId = $dbEntry->getPuserId();
-		if(!is_null($entryPuserId))
+		
+		$kuser = null;
+		if($dbEntry->getKuserId())
 		{
-			// puserId not set on entry - might be old entry before we added puser_id on the entry table
 			// get kuser object from entry kuserId
 			$kuser = kuserPeer::retrieveByPK($dbEntry->getKuserId());
-			// get puserId from kuser
-			if($kuser && $kuser->getPuserId())
-			{
-				$entryPuserId = $kuser->getPuserId();
-			}
-			else
-			{
-				// probably old kuser with no puserId in the record before we added puser_id on the kuser table
-				// search in puser_kuser table
-				$entryPuserId = PuserKuserPeer::getByKuserId($dbEntry->getKuserId(), 1);
-			}
+			if($kuser->getPuserId() != $dbEntry->getPuserId())
+				$kuser = null;
 		}
-		// userID doesn't require change (it is null or the same as the db entry) - do nothing
-		if($entry->userId === null || $entry->userId === $entryPuserId)
+		else
+		{
+			// get kuser object from entry puserId
+			$kuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), $dbEntry->getPuserId());
+		}
+		
+		if($kuser)
+		{
+			KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+			$dbEntry->setKuserId($kuser->getId());
 			return;
+		}
 		
 		// db user is going to be changed, only admin allowed - otherwise, throw exception
 		if(!$this->getKs() || !$this->getKs()->isAdmin())
@@ -305,7 +305,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// passed previous conditions, need to change userID on entry
 		// first step is to make sure the user exists
-		$puserKuser = PuserKuserPeer::createPuserKuser($this->getPartnerId(), $this->getPartnerId() * 100, $entry->userId, $entry->userId, $entry->userId, true);
+		$puserKuser = PuserKuserPeer::createPuserKuser($this->getPartnerId(), $this->getPartnerId() * 100, $dbEntry->getPuserId(), $dbEntry->getPuserId(), $dbEntry->getPuserId(), true);
 		// second step is simply changing the userID on the entry
 		$dbEntry->setKuserId($puserKuser->getKuserId());	
 		KalturaLog::debug("Set kuser id [" . $puserKuser->getKuserId() . "] line [" . __LINE__ . "]");	
