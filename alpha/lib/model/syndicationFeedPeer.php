@@ -16,8 +16,8 @@ class syndicationFeedPeer extends BasesyndicationFeedPeer
 		syndicationFeedType::ITUNES => parent::OM_CLASS,
 		syndicationFeedType::TUBE_MOGUL => parent::OM_CLASS,
 		syndicationFeedType::YAHOO => parent::OM_CLASS,
-		syndicationFeedType::KALTURA => parent::OM_CLASS,
-		syndicationFeedType::KALTURA_XSLT => genericSyndicationFeedPeer::OM_CLASS,		
+		syndicationFeedType::KALTURA => 'genericSyndicationFeed',
+		syndicationFeedType::KALTURA_XSLT => 'genericSyndicationFeed',		
 	);
 	
 	public static function setDefaultCriteriaFilter ()
@@ -28,7 +28,7 @@ class syndicationFeedPeer extends BasesyndicationFeedPeer
 		}
 
 		$c = new Criteria();
-		$c->add ( self::STATUS, KalturaSyndicationFeedStatus::ACTIVE , Criteria::EQUAL );
+		$c->add ( self::STATUS, syndicationFeed::SYNDICATION_ACTIVE , Criteria::EQUAL );
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	
