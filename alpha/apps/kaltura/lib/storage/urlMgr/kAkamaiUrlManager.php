@@ -166,10 +166,8 @@ class kAkamaiUrlManager extends kUrlManager
 		$authHeaderTimeout = $this->params['auth_header_timeout'];
 		$authHeaderSalt = $this->params['auth_header_salt'];
 		
-		//'auth_data_header' => 'HTTP_X_AKAMAI_G2O_AUTH_DATA' 
-		//'auth_sign_header' => 'HTTP_X_AKAMAI_G2O_AUTH_SIGN' 
-		$authData = $this->params[$authDataHeader];
-		$authSign = $this->params[$authSignHeader];
+		$authData = @$_SERVER[$authHeaderData];
+		$authSign = @$_SERVER[$authHeaderSign];
 		$window = $this->params['smooth_auth_seconds'];
 		$param = $this->params['smooth_auth_param'];
 		$salt = $this->params['smooth_auth_salt'];
