@@ -20,7 +20,12 @@ class kJobsManager
 		return self::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_FAILED);
 	}
 	
-	// helper function for setting the error description and status of a batchJob
+	/**
+	 * @param BatchJob $batchJob
+	 * @param int $status
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
 	public static function updateBatchJob(BatchJob $batchJob, $status, BatchJob $twinJob = null)
 	{
 		$batchJob->setStatus($status);
