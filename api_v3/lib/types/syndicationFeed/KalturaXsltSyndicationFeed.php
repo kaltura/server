@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaXsltSyndicationFeed extends KalturaBaseSyndicationFeed
+class KalturaXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 {
 	/**
 	*

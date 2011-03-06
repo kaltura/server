@@ -2,6 +2,7 @@
 /**
  * @package api
  * @subpackage objects
+ * @abstract
  */
 class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 {
@@ -158,10 +159,5 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 				
 			$this->feedUrl .= 'feedId=' . $this->id;
 		}
-	}
-	
-    function __construct()
-	{
-		$this->type = KalturaSyndicationFeedType::KALTURA;
 	}
 }
