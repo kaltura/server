@@ -37,10 +37,13 @@ while($run)
 		$lines = explode("\n", $lines);
 		foreach($lines as $line)
 		{
+			if(!strlen($line))
+				continue;
+				
 			foreach($clients as $index => $client)
 			{
-				$written = fwrite($client, $line . chr(0));
-				if($written === false)
+				$written = @fwrite($client, $line . chr(0));
+				if(!$written)
 					unset($clients[$index]);
 			}
 		}
