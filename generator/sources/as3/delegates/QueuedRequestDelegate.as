@@ -17,6 +17,7 @@ package com.kaltura.delegates {
 		override public function parse( result : XML ) : *
 		{
 			var resArr : Array = new Array();
+			var resInd:int = 0;	// index for scanning result
 			for ( var i:int=0; i<(call as QueuedRequest).calls.length; i++ )
 			{
 				var callClassName : String = getQualifiedClassName( (call as QueuedRequest).calls[i] );
@@ -31,7 +32,8 @@ package com.kaltura.delegates {
 				if (commandName == "MultiRequest") {
 					clsName = "com.kaltura.delegates.MultiRequestDelegate"; 
 					cls = getDefinitionByName( clsName ) as Class;
-					myInst = new cls(/*(call as QueuedRequest).calls[i]*/null , null);
+					myInst = new cls(null , null);
+					// set the call after the constructor, so we don't fire execute()
 					myInst.call = (call as QueuedRequest).calls[i];
 				}
 				else {
@@ -47,13 +49,14 @@ package com.kaltura.delegates {
 					// add as many items as the multirequest had
 					var nActions:int = ((call as QueuedRequest).calls[i] as MultiRequest).actions.length;
 					for (var j:int = 0; j<nActions ; j++) {
-						xml += result.result.item[j + i].toString();	
+						xml += result.result.item[j + resInd].toXMLString();	
 					}
 					// skip to the result of the next call that wasn't part of the MR:
-					i+= nActions;
+					resInd+= nActions-1;
 				}
 				else {
-					xml += result.result.item[i].children().toString();
+					xml += result.result.item[resInd].children().toString();
+					resInd++;
 				}
 				xml +="</result></result>";
 				
