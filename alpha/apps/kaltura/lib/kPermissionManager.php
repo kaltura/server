@@ -81,7 +81,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$value = apc_fetch($key); // try to fetch from cache
 		if ($value) {
 			KalturaLog::debug("Found an APC cache value for key [$key]");
-			$value = unserialize($value);
+			$value = unserialize($value); // TODO: check - serialize/unserialize may not be needed as APC can save full objects
 			return $value;
 		}
 		else {
@@ -103,7 +103,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return false;
 		}
 		$key = self::GLOBAL_CACHE_KEY_PREFIX.$key; // add prefix to given key
-		$value = serialize($value);
+		$value = serialize($value); // TODO: check - serialize/unserialize may not be needed as APC can save full objects
 		$success = apc_store($key, $value, kConf::get('apc_cache_ttl')); // try to store in cache
 
 		if ($success)
