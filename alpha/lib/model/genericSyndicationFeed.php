@@ -16,7 +16,13 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	private static $xslItem = null;
 	private static $xslMrss = null;
 	
-	
+	/* (non-PHPdoc)
+	 * @see BasesyndicationFeed::applyDefaultValues()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->type = syndicationFeedType::KALTURA_XSLT;
+	}
 		
 	/**
 	 * @var FileSync
@@ -90,15 +96,6 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 		return $this->getId(). "_" . "version_$version.xml";
 	}
 	
-	/* (non-PHPdoc)
-	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
-	 */
-	public function preInsert(PropelPDO $con = null)
-	{
-		$this->setVersion(1);
-		return parent::preInsert($con);
-	}
-	
 	public function getVersion()
 	{
 		$this->getFromCustomData("version",null,0);
@@ -170,6 +167,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * 
 	 * @param entry $entry
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
+	 * @todo Move to peer or to kSyndicationFeedManager
 	 */
 	private static function getKalturaEntryMrssXml(entry $entry, KalturaBaseSyndicationFeed  $syndicationFeed)
 	{
@@ -199,6 +197,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @param string $link
 	 * @param string $description
 	 * @return string
+	 * @todo Move to peer or to kSyndicationFeedManager
 	 */
 	public static function getMrssHeader($title, $link = null, $description = null, $xslt = null)
 	{
@@ -221,6 +220,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @param string $link
 	 * @param string $description
 	 * @return string
+	 * @todo Move to peer or to kSyndicationFeedManager
 	 */
 	public static function getMrssFooter($title, $link = null, $description = null, $xslt = null)
 	{
@@ -242,6 +242,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	/**
 	 * @param string $mrss
 	 * @return string
+	 * @todo Move to peer or to kSyndicationFeedManager
 	 */
 	private static function removeXmlHeader($mrss)
 	{
@@ -265,6 +266,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
 	 * @param string $xslt
 	 * @return string
+	 * @todo Move to peer or to kSyndicationFeedManager
 	 */
 	public static function getKalturaEntryMrss(entry $entry, KalturaBaseSyndicationFeed $syndicationFeed)
 	{
@@ -293,6 +295,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * return xlts with item template only when given xslt compatible with kaltura feed
 	 * @param string $xslt
 	 * @return string $xslt
+	 * @todo make static and move to peer or to kSyndicationFeedManager
 	 */
 	private function createKalturaItemXslt($xslt)
 	{
@@ -315,6 +318,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * return xlts with item place holder only when given xslt compatible with kaltura feed
 	 * @param string $xslt
 	 * @return string $xslt
+	 * @todo make static and move to peer or to kSyndicationFeedManager
 	 */
 	private function createKalturaMrssXslt($xslt)
 	{
@@ -345,6 +349,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * @param string $xml
 	 * @param string $xslt
 	 * @return string  
+	 * @todo move to peer or to kSyndicationFeedManager
 	 */
 	private static function transformXmlUsingXslt($xmlStr, $xslt)
 	{
