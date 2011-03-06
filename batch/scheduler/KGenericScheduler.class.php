@@ -206,9 +206,10 @@ class KGenericScheduler
 			
 			$statuses = array();
 			$taskConfigs = $this->schedulerConfig->getTaskConfigList();
-			
+			$indexedTaskConfigs = array();
 			foreach($taskConfigs as $taskConfig)
 			{
+				$indexedTaskConfigs[$taskConfig->name] = $taskConfig;
 				if(!$taskConfig->type)
 					continue;
 				
@@ -257,8 +258,10 @@ class KGenericScheduler
 						
 					$proc->_cleanup();
 					unset($tasks[$index]);
+					
+					$taskConfig = $indexedTaskConfigs[$taskName];
+					self::onRunningInstancesEvent($taskConfig, count($tasks));
 				}
-				self::onRunningInstancesEvent($taskConfig, count($this->runningTasks[$taskName]));
 			}
 			
 			foreach($runningBatches as $workerName => $indexes)
