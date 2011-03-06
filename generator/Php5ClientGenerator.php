@@ -164,7 +164,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("class $pluginClassName extends KalturaClientPlugin");
 		$this->appendLine('{');
 		$this->appendLine('	/**');
-		$this->appendLine('	 * @var KalturaClientPlugin');
+		$this->appendLine("	 * @var $pluginClassName");
 		$this->appendLine('	 */');
 		$this->appendLine('	protected static $instance;');
 		$this->appendLine('');
@@ -190,7 +190,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
-		$this->appendLine('	 * @return KalturaClientPlugin');
+		$this->appendLine("	 * @return $pluginClassName");
 		$this->appendLine('	 */');
 		$this->appendLine('	public static function get(KalturaClient $client)');
 		$this->appendLine('	{');

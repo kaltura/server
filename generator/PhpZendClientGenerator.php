@@ -245,18 +245,10 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(" * @package $this->package");
-			$this->appendLine(" * @subpackage $this->subpackage");
-			$this->appendLine(' */');
-		}
-		
 		$this->appendLine("class $pluginClassName extends Kaltura_Client_Plugin");
 		$this->appendLine('{');
 		$this->appendLine('	/**');
-		$this->appendLine('	 * @var Kaltura_Client_Plugin');
+		$this->appendLine("	 * @var $pluginClassName");
 		$this->appendLine('	 */');
 		$this->appendLine('	protected static $instance;');
 		$this->appendLine('');
@@ -286,7 +278,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
-		$this->appendLine('	 * @return Kaltura_Client_Plugin');
+		$this->appendLine("	 * @return $pluginClassName");
 		$this->appendLine('	 */');
 		$this->appendLine('	public static function get(Kaltura_Client_Client $client)');
 		$this->appendLine('	{');
@@ -477,7 +469,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
 		
-	    KalturaLog::debug("$serviceId.$action");
 		// method signature
 		$signature = "";
 		if (in_array($action, array("list", "clone"))) // because list & clone are preserved in PHP
