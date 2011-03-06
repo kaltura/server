@@ -19,6 +19,15 @@ class SyndicationFeedService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new syndicationFeedPeer());
 	}
 	
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if ($actionName === 'get') {
+			return true;
+		}
+
+		return parent::kalturaNetworkAllowed($actionName);
+	}
+	
 	/**
 	 * Add new Syndication Feed
 	 * 
