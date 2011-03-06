@@ -52,7 +52,7 @@ package com.kaltura.delegates {
 						xml += result.result.item[j + resInd].toXMLString();	
 					}
 					// skip to the result of the next call that wasn't part of the MR:
-					resInd+= nActions-1;
+					resInd+= nActions;
 				}
 				else {
 					xml += result.result.item[resInd].children().toString();
