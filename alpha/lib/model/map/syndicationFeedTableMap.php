@@ -60,6 +60,8 @@ class syndicationFeedTableMap extends TableMap {
 		$this->addColumn('FEED_IMAGE_URL', 'FeedImageUrl', 'VARCHAR', false, 512, null);
 		$this->addColumn('FEED_AUTHOR', 'FeedAuthor', 'VARCHAR', false, 50, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, null);
 		// validators
 	} // initialize()
 
