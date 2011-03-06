@@ -1649,7 +1649,7 @@ CREATE TABLE `syndication_feed`
 	`feed_author` VARCHAR(50),
 	`created_at` DATETIME,
 	`custom_data` TEXT,
-	`display_in_search` TINYINT,
+	`display_in_search` TINYINT default 1,
 	PRIMARY KEY (`id`),
 	KEY `int_id_index`(`int_id`)
 )Type=MyISAM;
