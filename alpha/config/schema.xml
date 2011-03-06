@@ -537,7 +537,7 @@
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_type" type="smallint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="job_sub_type" type="smallint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="data" type="varchar" size="4096" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="data" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size" type="integer" default="null" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="duplication_key" type="varchar" size="2047" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />

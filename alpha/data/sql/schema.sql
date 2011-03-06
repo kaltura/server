@@ -564,7 +564,7 @@ CREATE TABLE `batch_job`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`job_type` SMALLINT,
 	`job_sub_type` SMALLINT,
-	`data` VARCHAR(4096),
+	`data` TEXT,
 	`file_size` INTEGER,
 	`duplication_key` VARCHAR(2047),
 	`status` INTEGER,
