@@ -3,13 +3,14 @@ package com.kaltura.delegates
 	import com.kaltura.commands.MultiRequest;
 	import com.kaltura.config.KalturaConfig;
 	import com.kaltura.errors.KalturaError;
-
+	import com.kaltura.net.KalturaCall;
+	
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 
 	public class MultiRequestDelegate extends WebDelegateBase
 	{
-		public function MultiRequestDelegate(call:MultiRequest, config:KalturaConfig)
+		public function MultiRequestDelegate(call:KalturaCall, config:KalturaConfig)
 		{
 			super(call, config);
 		}

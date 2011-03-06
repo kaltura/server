@@ -192,6 +192,10 @@ package com.kaltura.delegates {
 			dispatchEvent(new KalturaEvent(KalturaEvent.FAILED, false, false, false, null, kError));
 		}
 		
+		/**
+		 * parse the server's response and let the call process it. 
+		 * @param result	server's response
+		 */		
 		protected function handleResult(result:XML):void {
 			clean();
 			
@@ -205,6 +209,9 @@ package com.kaltura.delegates {
 			}
 		}
 		
+		/**
+		 * stop timers and clean event listeners 
+		 */		
 		protected function clean():void {
 			connectTimer.stop();
 			loadTimer.stop();
@@ -217,7 +224,13 @@ package com.kaltura.delegates {
 			loader.removeEventListener(Event.OPEN, onOpen);
 		}
 		
-		//override this parssing function in the spasific delegate 
+		/**
+		 * create the correct object and populate it with the given values. if the needed class is not found 
+		 * in the file, a generic object is created with attributes matching the XML attributes.
+		 * Override this parssing function in the specific delegate to create the correct object.
+		 * @param	result	instance attributes
+		 * @return an instance of the class declared by the given XML.
+		 * */ 
 		public function parse( result : XML ) : * 
 		{ 
 			//by defualt create the response object
@@ -234,7 +247,13 @@ package com.kaltura.delegates {
 			return obj;
 		}
 		
-		//Overide this to create validation object and fill it
+		/**
+		 * If the result string holds an error, return a KalturaError object with 
+		 * relevant values. <br/>
+		 * Overide this to create validation object and fill it.
+		 * @param result	the string returned from the server.
+		 * @return	matching error object 
+		 */
 		protected function validateKalturaResponse(result:String) : KalturaError 
 		{ 
 			var kError : KalturaError = null;
