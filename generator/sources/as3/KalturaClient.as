@@ -3,9 +3,19 @@ package com.kaltura {
 	import com.kaltura.config.KalturaConfig;
 	import com.kaltura.net.KalturaCall;
 	
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 
 	public class KalturaClient extends EventDispatcher {
+		
+		[Event(name="callQueued", type="Event")]
+		
+		[Event(name="queueFlushed", type="Event")]
+		
+		public static const CALL_QUEUED:String = "callQueued"; 
+		public static const QUEUE_FLUSHED:String = "queueFlushed"; 
+		
+		
 		protected var _currentConfig:KalturaConfig;
 
 		/**
@@ -107,6 +117,7 @@ package com.kaltura {
 				_queue = new QueuedRequest();
 			}
 			_queue.addAction(call);
+			dispatchEvent(new Event(KalturaClient.CALL_QUEUED));
 		}
 		
 		
@@ -115,8 +126,15 @@ package com.kaltura {
 		 */
 		public function flush():void {
 			if (_queue) {
-				post(_queue);
+				if (_queue.calls.length > 1) {
+					post(_queue);
+				} else {
+					// if there is only one call, don't post it as a multirequest.
+					// this makes fiddler easier to use.
+					_queue.calls[0].execute();
+				}
 				_queue = null;
+				dispatchEvent(new Event(KalturaClient.QUEUE_FLUSHED));
 			}
 		}
 
