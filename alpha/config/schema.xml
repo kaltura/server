@@ -1426,7 +1426,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="feed_author" type="varchar" size="50" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" default="1"/>
 		<index name="int_id_index">
 			<index-column name="int_id" />
 		</index>
