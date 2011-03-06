@@ -972,7 +972,7 @@ kmc.preview_embed = {
                 // Ran: Removed streamerUrl & rtmpFlavors flashvars [not needed]
                 embed_code = embed_code.replace("{FLASHVARS}", "streamerType=rtmp&amp;{FLASHVARS}"); // rtmp://rtmpakmi.kaltura.com/ondemand
             } else if (kmc.vars.embed_code_delivery_type == "akamai") {
-                embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;mediaProtocol=http&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
+                embed_code = embed_code.replace("{FLASHVARS}", "streamerType=hdnetwork&amp;akamaiHD.loadingPolicy=preInitialize&amp;akamaiHD.asyncInit=true&amp;{FLASHVARS}");
             }
         }
         if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
