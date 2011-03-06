@@ -114,8 +114,10 @@ package com.kaltura {
 		 * post all calls in the queue and reset it.
 		 */
 		public function flush():void {
-			post(_queue);
-			_queue = null;
+			if (_queue) {
+				post(_queue);
+				_queue = null;
+			}
 		}
 
 
