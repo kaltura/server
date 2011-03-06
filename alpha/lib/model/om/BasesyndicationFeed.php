@@ -170,6 +170,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the display_in_search field.
+	 * Note: this column has a database default value of: 1
 	 * @var        int
 	 */
 	protected $display_in_search;
@@ -215,6 +216,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$this->allow_embed = true;
 		$this->transcode_existing_content = false;
 		$this->add_to_default_conversion_profile = false;
+		$this->display_in_search = 1;
 	}
 
 	/**
@@ -1097,7 +1099,7 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->display_in_search !== $v) {
+		if ($this->display_in_search !== $v || $this->isNew()) {
 			$this->display_in_search = $v;
 			$this->modifiedColumns[] = syndicationFeedPeer::DISPLAY_IN_SEARCH;
 		}
@@ -1132,6 +1134,10 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 			}
 
 			if ($this->add_to_default_conversion_profile !== false) {
+				return false;
+			}
+
+			if ($this->display_in_search !== 1) {
 				return false;
 			}
 
