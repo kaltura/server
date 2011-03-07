@@ -11,17 +11,15 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 {
 	const FILE_SYNC_SYNDICATION_FEED_XSLT = 1;
 	
-	const ITEMS_PLACEHOLDER = '<ITEMS_PLACEHOLDER>';
-	
-	private static $xslItem = null;
-	private static $xslMrss = null;
-	
+	private $xslt;
+		
 	/* (non-PHPdoc)
 	 * @see BasesyndicationFeed::applyDefaultValues()
 	 */
 	public function applyDefaultValues()
 	{
-		$this->type = syndicationFeedType::KALTURA_XSLT;
+		parent::applyDefaultValues();
+		$this->type = syndicationFeedType::KALTURA;
 	}
 		
 	/**
@@ -74,7 +72,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 		$key->object_id = $this->getId();
 		$key->version = $version;
 		$key->partner_id = $this->getPartnerId();
-		
+		KalturaLog::debug("syndication key version : ".$version);
 		return $key;
 	}
 	
@@ -98,7 +96,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	
 	public function getVersion()
 	{
-		$this->getFromCustomData("version",null,0);
+		return $this->getFromCustomData("version",null,0);
 	}
 	
 	public function setVersion($value)
@@ -122,268 +120,19 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}
-	
-	
-		/*
-	 * @params string $xslt
-	 * @return string
-	 */
-	public static function getKalturaItemXslt($xslt)
-	{
-		if(self::$xslItem)
-			return self::$xslItem;
-			
-		self::$xslItem = self::createKalturaItemXslt($xslt);
-		return self::$xslItem;
-	}
-	
-	
-	/*
-	 * @params string $xslt
-	 * @return string
-	 */
-	public static function getKalturaMrssXslt($xslt)
-	{
-		if(self::$xslMrss)
-			return self::$xslMrss;
-			
-		self::$xslMrss = self::createKalturaMrssXslt($xslt);
-		return self::$xslMrss;
-	}
-	
-		private static function getKalturaMrssXml($title, $link = null, $description = null)
-	{
-		$mrss = kMrssManager::getMrssXml($title, $link, $description);
-		
-		foreach ($mrss->children() as $second_gen) {
-			if ($second_gen->getName() == 'channel')
-				$second_gen->addChild('items',ITEMS_PLACEHOLDER);
-		}
-		
-		return $mrss->asXML();
-	}
-	
-	/**
-	 * 
-	 * @param entry $entry
-	 * @param KalturaBaseSyndicationFeed $syndicationFeed
-	 * @todo Move to peer or to kSyndicationFeedManager
-	 */
-	private static function getKalturaEntryMrssXml(entry $entry, KalturaBaseSyndicationFeed  $syndicationFeed)
-	{
-		$mrss = kMrssManager::getEntryMrssXml($entry);
-		
-		if(!$mrss)
-		{
-			KalturaLog::err("No MRSS returned for entry [".$entry->getId()."]");
-			return null;
-		}
-		
-		if ((!is_null($syndicationFeed))  && !is_null($syndicationFeed->playerUiconfId))
-		{
-			$host = myPartnerUtils::getCdnHost($entry->getPartnerId());
-			
-			$playerUrl = 'http://'.$host.
-							'/kwidget/wid/_'.$entry->getPartnerId().
-							'/entry_id/'.$entry->getId().$syndicationFeed->playerUiconfId;
-			$mrss->addChild('player',$playerUrl);
-		}
-		
-		return $mrss->asXML();
-	}
-	
-	/**
-	 * @param string $title
-	 * @param string $link
-	 * @param string $description
-	 * @return string
-	 * @todo Move to peer or to kSyndicationFeedManager
-	 */
-	public static function getMrssHeader($title, $link = null, $description = null, $xslt = null)
-	{
-		$mrss = self::getKalturaMrssXml($title, $link, $description);
-		
-		if (!is_null($xslt))
-		{
-			$kalturaXslt = self::getKalturaMrssXslt($xslt);
-			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
-		}
-		
-		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER);		
-		$mrss = substr($mrss,0,$divideHeaderFromFooter);
-		
-		return $mrss;
-	}
-	
-	/**
-	 * @param string $title
-	 * @param string $link
-	 * @param string $description
-	 * @return string
-	 * @todo Move to peer or to kSyndicationFeedManager
-	 */
-	public static function getMrssFooter($title, $link = null, $description = null, $xslt = null)
-	{
-		$mrss = self::getKalturaMrssXml($title, $link, $description);
-		
-		if (!is_null($xslt))
-		{
-			$kalturaXslt = self::getKalturaMrssXslt($xslt);
-			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
-		}
-		
-		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER) + strlen(ITEMS_PLACEHOLDER);
-		
-		
-		$mrss = substr($mrss,$divideHeaderFromFooter);	
-		return $mrss;
-	}
-	
-	/**
-	 * @param string $mrss
-	 * @return string
-	 * @todo Move to peer or to kSyndicationFeedManager
-	 */
-	private static function removeXmlHeader($mrss)
-	{
-		$position = strpos($mrss,'<?xml version="1.0"?>');
-		if($position !== false){
-			$divideHeaderFromFooter = $position + strlen('<?xml version="1.0"?>') + 1;
-			$mrss = substr($mrss,$divideHeaderFromFooter);
-		}
-		
-		$position = strpos($mrss,'<?xml version="1.0" encoding="UTF-8"?>');
-		if($position !== false){
-			$divideHeaderFromFooter = $position + strlen('<?xml version="1.0" encoding="UTF-8"?>') + 1;
-			$mrss = substr($mrss,$divideHeaderFromFooter);
-		}
-		
-		return $mrss;		
-	}
-	
-		/**
-	 * @param entry $entry
-	 * @param KalturaBaseSyndicationFeed $syndicationFeed
-	 * @param string $xslt
-	 * @return string
-	 * @todo Move to peer or to kSyndicationFeedManager
-	 */
-	public static function getKalturaEntryMrss(entry $entry, KalturaBaseSyndicationFeed $syndicationFeed)
-	{
-		
-		$entryMrss =  self::getKalturaEntryMrssXml($entry, $syndicationFeed);
-		
-		if(!$entryMrss)
-		{
-			KalturaLog::err("No MRSS returned for entry [".$entry->getId()."]");
-			return null;
-		}
-		
-		
-		if ($syndicationFeed instanceof KalturaXsltSyndicationFeed)
-		{
-			$itemXslt = self::getKalturaItemXslt($syndicationFeed->xslt);
-			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt);
-		}
-		$entryMrss = self::removeXmlHeader($entryMrss);
-		
-		return $entryMrss;
-	}
-	
-	
-	/**
-	 * return xlts with item template only when given xslt compatible with kaltura feed
-	 * @param string $xslt
-	 * @return string $xslt
-	 * @todo make static and move to peer or to kSyndicationFeedManager
-	 */
-	private function createKalturaItemXslt($xslt)
-	{
-		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
-		{
-			KalturaLog::debug("Could not load xslt");
-			return null;
-		}
-		
-		$xpath = new DOMXpath($xsl);
-		$xslStylesheet = $xpath->query("//xsl:stylesheet");		
-		$rss = $xpath->query("//xsl:template[@name='rss']");		
-		$xslStylesheet->item(0)->removeChild($rss->item(0));	
-	
-		return $xsl->saveXML();
-	}
-	
-	/**
-	 * return xlts with item place holder only when given xslt compatible with kaltura feed
-	 * @param string $xslt
-	 * @return string $xslt
-	 * @todo make static and move to peer or to kSyndicationFeedManager
-	 */
-	private function createKalturaMrssXslt($xslt)
-	{
-		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
-		{
-			KalturaLog::debug("Could not load xslt");
-			return null;
-		}
-		
-		$xpath = new DOMXpath($xsl);
-		
-		//remove items template
-		$xslStylesheet = $xpath->query("//xsl:stylesheet");
-		$item = $xpath->query("//xsl:template[@name='item']");
-		$item->item(0)->parentNode->removeChild($item->item(0));
-		
-		//add place holder for items
-		$items = $xpath->query("//xsl:apply-templates[@name='item']"); 
-		$itemPlaceHolderNode = $xsl->createTextNode(ITEMS_PLACEHOLDER);
-		$items->item(0)->parentNode->replaceChild($itemPlaceHolderNode,$items->item(0));
-	
-		return $xsl->saveXML();
-	}
-	
-	/**
-	 * 
-	 * @param string $xml
-	 * @param string $xslt
-	 * @return string  
-	 * @todo move to peer or to kSyndicationFeedManager
-	 */
-	private static function transformXmlUsingXslt($xmlStr, $xslt)
-	{
-					
-		$xml = new DOMDocument();
-		if(!$xml->loadXML($xmlStr))
-		{
-			KalturaLog::debug("Could not load xmlStr");
-			return null;
-		}
-		
-		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
-		{
-			KalturaLog::debug("Could not load xslt");
-			return null;
-		}
 
-		$proc = new XSLTProcessor;
-		$proc->registerPHPFunctions();
-		$proc->importStyleSheet($xsl);
-		
-		$xml = $proc->transformToDoc($xml);
-		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
-		
-		if(!$xml)
-		{
-			KalturaLog::err("XML Transformation failed");
-			return null;
-		}
-				
-		return $xml->saveXML();
-	}	
-	
+	/*
+	 * @return string
+	 */
+	public function getXslt()
+	{
+		if (!is_null($this->xslt))
+			return $this->xslt;
+
+		$key = $this->getSyncKey(self::FILE_SYNC_SYNDICATION_FEED_XSLT);
+		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+		return $this->xslt;
+	}
 	
 	
 }
