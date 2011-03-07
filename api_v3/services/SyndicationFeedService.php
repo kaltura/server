@@ -42,12 +42,13 @@ class SyndicationFeedService extends KalturaBaseService
 	{
 		$syndicationFeed->validatePlaylistId();
 		
-		if ($syndicationFeed instanceof KalturaXsltSyndicationFeed ){
+		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
 			$syndicationFeed->validateXslt();
 			$syndicationFeedDB = new genericSyndicationFeed();
+			$syndicationFeedDB->setVersion(1);	
 		}else
 		{
-			$syndicationFeedDB = new syndicationFeed();	
+			$syndicationFeedDB = new syndicationFeed();
 		}
 		
 		$syndicationFeed->partnerId = $this->getPartnerId();
@@ -74,7 +75,7 @@ class SyndicationFeedService extends KalturaBaseService
 			}
 		}
 		
-		if ($syndicationFeed instanceof KalturaXsltSyndicationFeed ){
+		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
 			$key = $syndicationFeedDB->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 			kFileSyncUtils::file_put_contents($key, $syndicationFeed->xslt);
 		}
@@ -96,6 +97,7 @@ class SyndicationFeedService extends KalturaBaseService
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+			
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		//echo $syndicationFeed->feedUrl; die;
 		$syndicationFeed->fromObject($syndicationFeedDB);
@@ -112,23 +114,26 @@ class SyndicationFeedService extends KalturaBaseService
 	 */
 	public function updateAction($id, KalturaBaseSyndicationFeed $syndicationFeed)
 	{
-		if ($syndicationFeed instanceof KalturaXsltSyndicationFeed ){
-			$syndicationFeed->validateXslt();
-		}
-		
-		$syndicationFeed->type = null;
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+			
+		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){
+			$syndicationFeed->validateXslt();
+			$syndicationFeedDB->incrementVersion();
+			$syndicationFeedDB->save();
+		}
+				
+		$syndicationFeed->type = null;
 		
-        	$syndicationFeed = $syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));
-		$syndicationFeedDB->save();
-		
-		if ($syndicationFeed instanceof KalturaXsltSyndicationFeed ){
+		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed)){// && ($syndicationFeed->xslt != null)){			
 			$key = $syndicationFeedDB->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 			kFileSyncUtils::file_put_contents($key, $syndicationFeed->xslt);
 		}
 		
+        $syndicationFeed = $syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));
+        $syndicationFeedDB->save();
+				
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		$syndicationFeed->fromObject($syndicationFeedDB);
 		return $syndicationFeed;
