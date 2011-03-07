@@ -755,7 +755,7 @@ class playManifestAction extends kalturaAction
 				$duration = $this->entry->getDurationInt();
 				$mediaUrl = "<media url=\"".requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."\"/>"; 
 						
-				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, null, 'video/x-flv', $duration, null, $mediaUrl);
+				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, array(), 'video/x-flv', $duration, null, $mediaUrl);
 				break;
 		}
 		
