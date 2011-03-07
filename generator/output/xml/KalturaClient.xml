@@ -550,6 +550,16 @@
       <const name="ACTIVE" value="2"/>
       <const name="DELETED" value="3"/>
     </enum>
+    <enum name="KalturaGenericXsltSyndicationFeedOrderBy" enumType="string">
+      <const name="PLAYLIST_ID_ASC" value="+playlistId"/>
+      <const name="PLAYLIST_ID_DESC" value="-playlistId"/>
+      <const name="NAME_ASC" value="+name"/>
+      <const name="NAME_DESC" value="-name"/>
+      <const name="TYPE_ASC" value="+type"/>
+      <const name="TYPE_DESC" value="-type"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
+    </enum>
     <enum name="KalturaGoogleSyndicationFeedAdultValues" enumType="string">
       <const name="YES" value="Yes"/>
       <const name="NO" value="No"/>
@@ -1444,16 +1454,6 @@
     <enum name="KalturaWidgetSecurityType" enumType="int">
       <const name="NONE" value="1"/>
       <const name="TIMEHASH" value="2"/>
-    </enum>
-    <enum name="KalturaXsltSyndicationFeedOrderBy" enumType="string">
-      <const name="PLAYLIST_ID_ASC" value="+playlistId"/>
-      <const name="PLAYLIST_ID_DESC" value="-playlistId"/>
-      <const name="NAME_ASC" value="+name"/>
-      <const name="NAME_DESC" value="-name"/>
-      <const name="TYPE_ASC" value="+type"/>
-      <const name="TYPE_DESC" value="-type"/>
-      <const name="CREATED_AT_ASC" value="+createdAt"/>
-      <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
     <enum name="KalturaYahooSyndicationFeedAdultValues" enumType="string">
       <const name="ADULT" value="adult"/>
@@ -2377,7 +2377,7 @@
       <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="data" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaBaseSyndicationFeed">
+    <class name="KalturaBaseSyndicationFeed" abstract="1">
       <property name="id" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="feedUrl" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
@@ -3379,8 +3379,8 @@
     <class name="KalturaApiActionPermissionItemFilter" base="KalturaApiActionPermissionItemBaseFilter"/>
     <class name="KalturaApiParameterPermissionItemBaseFilter" abstract="1" base="KalturaPermissionItemFilter"/>
     <class name="KalturaApiParameterPermissionItemFilter" base="KalturaApiParameterPermissionItemBaseFilter"/>
-    <class name="KalturaXsltSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
-    <class name="KalturaXsltSyndicationFeedFilter" base="KalturaXsltSyndicationFeedBaseFilter"/>
+    <class name="KalturaGenericXsltSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
+    <class name="KalturaGenericXsltSyndicationFeedFilter" base="KalturaGenericXsltSyndicationFeedBaseFilter"/>
     <class name="KalturaAssetParamsOutput" base="KalturaAssetParams">
       <property name="assetParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="assetParamsVersion" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3399,6 +3399,10 @@
       <property name="parameter" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="action" type="string" enumType="KalturaApiParameterPermissionItemAction" readOnly="0" insertOnly="0" description=""/>
     </class>
+    <class name="KalturaGenericSyndicationFeed" base="KalturaBaseSyndicationFeed"/>
+    <class name="KalturaGenericXsltSyndicationFeed" base="KalturaGenericSyndicationFeed">
+      <property name="xslt" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaGoogleVideoSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="adultContent" type="string" enumType="KalturaGoogleSyndicationFeedAdultValues" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -3415,9 +3419,6 @@
     </class>
     <class name="KalturaTubeMogulSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="category" type="string" enumType="KalturaTubeMogulSyndicationFeedCategories" readOnly="1" insertOnly="0" description=""/>
-    </class>
-    <class name="KalturaXsltSyndicationFeed" base="KalturaBaseSyndicationFeed">
-      <property name="xslt" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaYahooSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="category" type="string" enumType="KalturaYahooSyndicationFeedCategories" readOnly="1" insertOnly="0" description=""/>
