@@ -4,7 +4,7 @@
  * @subpackage filters.base
  * @abstract
  */
-class KalturaXsltSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+class KalturaGenericXsltSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
 {
 	private $map_between_objects = array
 	(
