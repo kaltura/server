@@ -358,7 +358,7 @@ class KalturaSyndicationFeedRenderer
 				$this->renderKalturaFeed();
 				break;
 			case KalturaSyndicationFeedType::KALTURA_XSLT:
-				$this->renderKalturaXsltFeed();
+				$this->renderKalturaFeed();
 				break;
 		}
 		
@@ -399,39 +399,22 @@ class KalturaSyndicationFeedRenderer
 	
 	private function renderKalturaFeed()
 	{
+		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($this->syndicationFeed->id);
+		if( !$syndicationFeedDB )
+			throw new Exception("Feed Id not found");
+			
 		//header xml
-		echo genericSyndicationFeed::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
+		echo kSyndicationFeedManager::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 		//items
 		while($entry = $this->getNextEntry())
 		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
-			// in case no video player is requested by user and the entry is mix, skip it	
-			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
-			{
-				continue;
-			}			
-			echo genericSyndicationFeed::getKalturaEntryMrss($entry, $this->syndicationFeed);				
-		}
-		echo genericSyndicationFeed::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription);
-	}
-	
-	private function renderKalturaXsltFeed()
-	{
-		//header xml
-		echo genericSyndicationFeed::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeed->xslt);
-		//items
-		while($entry = $this->getNextEntry())
-		{
-			$e= new KalturaMediaEntry();
-			$e->fromObject($entry);
 			// in case no video player is requested by user and the entry is mix, skip it	
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
 				continue;
-				
-			echo genericSyndicationFeed::getKalturaEntryMrss($entry, $this->syndicationFeed);					
+					
+			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB);				
 		}
-		echo genericSyndicationFeed::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $this->syndicationFeed->xslt);
+		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $syndicationFeedDB);
 	}
 	
 	private function renderYahooFeed()

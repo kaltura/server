@@ -21,7 +21,7 @@ class KalturaSyndicationFeedFactory
 				$obj = new KalturaBaseSyndicationFeed();
 				break;
 			case KalturaSyndicationFeedType::KALTURA_XSLT:
-				$obj = new KalturaXsltSyndicationFeed();
+				$obj = new KalturaGenericXsltSyndicationFeed();
 				break;
 			default:
 				$obj = new KalturaBaseSyndicationFeed();
