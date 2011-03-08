@@ -126,7 +126,6 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 					{
 						$varNode->textContent = $distributionJobData->$name;
 						$varNode->appendChild($xsl->createTextNode($distributionJobData->$name));
-						KalturaLog::debug("Set variable [$name] to [{$distributionJobData->$name}]");
 					}
 				}
 				
