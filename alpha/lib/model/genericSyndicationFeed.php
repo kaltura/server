@@ -19,7 +19,7 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->type = syndicationFeedType::KALTURA;
+		$this->setType(syndicationFeedType::KALTURA);
 	}
 		
 	/**
