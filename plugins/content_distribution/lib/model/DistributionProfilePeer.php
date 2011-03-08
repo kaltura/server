@@ -18,6 +18,7 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		DistributionProviderType::GENERIC => GenericDistributionProfilePeer::OM_CLASS,
+		DistributionProviderType::SYNDICATION => 'SyndicationDistributionProfile',
 	);
 
 	/**
@@ -60,7 +61,7 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 	public static function getOMClass($row, $colnum)
 	{
 		$class = self::getOMClassImpl($row, $colnum);
-		KalturaLog::debug("Loads object [$class]");
+		KalturaLog::log("Loads object [$class]");
 		return $class;
 	}
 
@@ -91,6 +92,9 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 	{
 		if($providerType == DistributionProviderType::GENERIC)
 			return new GenericDistributionProfile();
+			
+		if($providerType == DistributionProviderType::SYNDICATION)
+			return new SyndicationDistributionProfile();
 			
 		$distributionProfile = KalturaPluginManager::loadObject(parent::OM_CLASS, $providerType);
 		if($distributionProfile)
