@@ -201,8 +201,6 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	protected static function generateXML($entryId, KalturaMsnDistributionJobProviderData $providerData)
 	{
-		KalturaLog::debug("Generates XML for entry [$entryId]");
-		
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		if(!$entry)
 			return null;
@@ -213,7 +211,6 @@ class MsnDistributionProvider implements IDistributionProvider
 			KalturaLog::err("No MRSS returned for entry [$entryId]");
 			return null;
 		}
-		KalturaLog::debug("mrss[$mrss]");
 			
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($mrss))
@@ -244,10 +241,8 @@ class MsnDistributionProvider implements IDistributionProvider
 			{
 				$varNode->textContent = $providerData->$name;
 				$varNode->appendChild($xsl->createTextNode($providerData->$name));
-				KalturaLog::debug("Set variable [$name] to [{$providerData->$name}]");
 			}
 		}
-		KalturaLog::debug("xsl[" . $xsl->saveXML() . "]");
 
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
@@ -257,7 +252,6 @@ class MsnDistributionProvider implements IDistributionProvider
 		$xml->encoding = 'UTF-8';
 		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
 		
-		KalturaLog::debug("xml[" . $xml->saveXML() . "]");
 		if(!$xml)
 		{
 			KalturaLog::err("XML Transformation failed");

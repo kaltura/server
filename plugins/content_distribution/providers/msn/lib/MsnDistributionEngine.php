@@ -87,7 +87,6 @@ class MsnDistributionEngine extends DistributionEngine implements
 //		$pattern = '/<([^\/]+)\/>/';
 //		$replacement = '<$1></$1>';
 //		$xml = preg_replace($pattern, $replacement, $providerData->xml);
-		KalturaLog::debug("xml [$providerData->xml]");
 		
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
@@ -126,7 +125,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
 		}
 		curl_close($ch);
-		KalturaLog::debug("MSN HTTP response:\n$results\n");
+		KalturaLog::log("MSN HTTP response:\n$results\n");
 		$data->sentData = $providerData->xml;
 		$data->results = $results;
 		return $results;
