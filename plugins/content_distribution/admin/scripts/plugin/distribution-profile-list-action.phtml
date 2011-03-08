@@ -28,7 +28,7 @@
 				<td><?php echo $this->enumTranslate('KalturaDistributionProfileStatus', $profile->status); ?></td>
 				<td><?php echo $profile->id; ?></td>
 				<td><?php echo $profile->partnerId; ?></td>
-				<td><?php echo ($profile->providerType == KalturaDistributionProviderType::GENERIC ? 'Generic (' . $this->genericProviders[$profile->genericProviderId] . ')' : $this->providers[$profile->providerType]); ?></td>
+				<td><?php echo ($profile->providerType == KalturaDistributionProviderType::GENERIC ? 'Generic ' . (isset($this->genericProviders[$profile->genericProviderId]) ? '(' . $this->genericProviders[$profile->genericProviderId] . ')' : '') : $this->providers[$profile->providerType]); ?></td>
 				<td><?php echo $profile->name; ?></td>
 				<td><?php $d = (new Zend_Date($profile->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td>

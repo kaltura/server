@@ -35,7 +35,7 @@ class GenericDistributionProfile extends DistributionProfile
 	public function preSave(PropelPDO $con = null)
 	{
 		$provider = $this->getProvider();
-		if($provider instanceof GenericDistributionProvider)
+		if($provider && $provider instanceof GenericDistributionProvider)
 		{
 			$requiredFlavorParams = $this->getRequiredFlavorParamsIdsArray();
 			foreach($provider->getRequiredFlavorParamsIdsArray() as $flavorParamsId)
@@ -62,7 +62,11 @@ class GenericDistributionProfile extends DistributionProfile
 	 */
 	public function getSubmitEnabled()
 	{
-		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::SUBMIT);
+		$provider = $this->getProvider();
+		if(!$provider)
+			return DistributionProfileActionStatus::DISABLED;
+			
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($provider->getId(), DistributionAction::SUBMIT);
 		if(!$action)
 			return DistributionProfileActionStatus::DISABLED;
 		
@@ -74,7 +78,11 @@ class GenericDistributionProfile extends DistributionProfile
 	 */
 	public function getUpdateEnabled()
 	{
-		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::UPDATE);
+		$provider = $this->getProvider();
+		if(!$provider)
+			return DistributionProfileActionStatus::DISABLED;
+	
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($provider->getId(), DistributionAction::UPDATE);
 		if(!$action)
 			return DistributionProfileActionStatus::DISABLED;
 		
@@ -86,7 +94,11 @@ class GenericDistributionProfile extends DistributionProfile
 	 */
 	public function getDeleteEnabled()
 	{
-		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::DELETE);
+		$provider = $this->getProvider();
+		if(!$provider)
+			return DistributionProfileActionStatus::DISABLED;
+	
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($provider->getId(), DistributionAction::DELETE);
 		if(!$action)
 			return DistributionProfileActionStatus::DISABLED;
 		
@@ -98,7 +110,11 @@ class GenericDistributionProfile extends DistributionProfile
 	 */
 	public function getReportEnabled()
 	{
-		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($this->getProvider()->getId(), DistributionAction::FETCH_REPORT);
+		$provider = $this->getProvider();
+		if(!$provider)
+			return DistributionProfileActionStatus::DISABLED;
+	
+		$action = GenericDistributionProviderActionPeer::retrieveByProviderAndAction($provider->getId(), DistributionAction::FETCH_REPORT);
 		if(!$action)
 			return DistributionProfileActionStatus::DISABLED;
 		

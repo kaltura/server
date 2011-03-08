@@ -160,4 +160,14 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 		$this->updateRequiredEntryFields = implode(',', $object->getUpdateRequiredEntryFields());
 		$this->updateRequiredMetadataXPaths = implode(',', $object->getUpdateRequiredMetadataXPaths());
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert()
+	{
+		parent::validateForInsert();
+		
+		$this->validatePropertyNumeric('genericProviderId');
+	}
 }
