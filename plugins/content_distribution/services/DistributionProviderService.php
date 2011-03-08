@@ -51,6 +51,11 @@ class DistributionProviderService extends KalturaBaseService
 		$response->objects = KalturaDistributionProviderArray::fromGenericDistributionProvidersArray($list);
 		$response->totalCount = $count;
 	
+		$syndicationProvider = new KalturaSyndicationDistributionProvider();
+		$syndicationProvider->fromObject(SyndicationDistributionProvider::get());
+		$response->objects[] = $syndicationProvider;
+		$response->totalCount++;
+		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaContentDistributionProvider');
 		foreach($pluginInstances as $pluginInstance)
 		{

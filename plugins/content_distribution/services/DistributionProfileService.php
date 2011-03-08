@@ -127,7 +127,7 @@ class DistributionProfileService extends KalturaBaseService
 	{
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($id);
 		if (!$dbDistributionProfile)
-			throw new KalturaAPIException(ContentDistributionErrors::GENERIC_DISTRIBUTION_PROVIDER_NOT_FOUND, $id);
+			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $id);
 
 		$dbDistributionProfile->setStatus(DistributionProfileStatus::DELETED);
 		$dbDistributionProfile->save();
