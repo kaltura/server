@@ -86,7 +86,7 @@ class KAsyncVirusScan extends KBatchBase
 			switch ($data->scanResult)
 			{
 				case KalturaVirusScanJobResult::SCAN_ERROR:
-					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::RETRY, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_IS_CLEAN:
