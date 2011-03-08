@@ -14,7 +14,6 @@ class kContentDistributionManager
 	 */
 	public static function addEntryDistribution(entry $entry, DistributionProfile $distributionProfile, $submit = false)
 	{
-		KalturaLog::debug("Adding entry [" . $entry->getId() . "] for distribution profile [" . $distributionProfile->getId() . "]");
 		$entryDistribution = self::createEntryDistribution($entry, $distributionProfile);
 		$entryDistribution->save();
 		
@@ -147,7 +146,7 @@ class kContentDistributionManager
 			
 		if(!$distributionProvider->isScheduleUpdateEnabled() || !$distributionProvider->isUpdateEnabled())
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] doesn't support delete or update");
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] doesn't support delete or update");
 			return null;
 		}
 			
@@ -183,7 +182,7 @@ class kContentDistributionManager
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(count($validationErrors))
 		{
-			KalturaLog::debug("Validation errors found");
+			KalturaLog::log("Validation errors found");
 			return null;
 		}
 		
@@ -266,7 +265,6 @@ class kContentDistributionManager
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(!count($validationErrors))
 		{
-			KalturaLog::debug("Entry ready for submit");
 			$sunrise = $entryDistribution->getSunrise(null);
 			if($sunrise)
 			{
@@ -286,7 +284,7 @@ class kContentDistributionManager
 			return self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		}
 		
-		KalturaLog::debug("Validation errors found");
+		KalturaLog::log("Validation errors found");
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
 		if(!$entry)
 		{
@@ -402,7 +400,7 @@ class kContentDistributionManager
 			if(in_array($thumbAsset->getFlavorParamsId(), $requiredThumbParamsIds))
 			{
 				$thumbAssetsIds[] = $thumbAsset->getId();
-				KalturaLog::debug("Assign thumb asset [" . $thumbAsset->getId() . "] from required thumbnail params ids");
+				KalturaLog::log("Assign thumb asset [" . $thumbAsset->getId() . "] from required thumbnail params ids");
 				continue;
 			}
 			
@@ -410,7 +408,7 @@ class kContentDistributionManager
 			if(isset($thumbDimensionsWithKeys[$key]))
 			{
 				unset($thumbDimensionsWithKeys[$key]);
-				KalturaLog::debug("Assign thumb asset [" . $thumbAsset->getId() . "] from dimension [$key]");
+				KalturaLog::log("Assign thumb asset [" . $thumbAsset->getId() . "] from dimension [$key]");
 				$thumbAssetsIds[] = $thumbAsset->getId();
 			}
 		}
@@ -441,8 +439,6 @@ class kContentDistributionManager
 		
 		$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 		$entryDistribution->setValidationErrorsArray($validationErrors);
-		if(count($validationErrors))
-			KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
 
 		return $entryDistribution;
 	}

@@ -11,7 +11,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		KalturaLog::debug(print_r($modifiedColumns, true));
 		if($object instanceof entry && $object->getStatus() == entryStatus::READY)
 		{
 			if(in_array(entryPeer::STATUS, $modifiedColumns))
@@ -114,6 +113,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($object instanceof GenericDistributionProvider)
 			return self::onGenericDistributionProviderDeleted($object);
+	
+		if($object instanceof SyndicationDistributionProfile)
+			return self::onSyndicationDistributionProfileDeleted($object);
 	
 		if($object instanceof Metadata)
 			return self::onMetadataDeleted($object);
@@ -341,6 +343,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setStatus(EntryDistributionStatus::SUBMITTING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
+	
+		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
+		{
+			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		}
 		
 		return $dbBatchJob;
 	}
@@ -363,6 +370,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
+	
+		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
+		{
+			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		}
 		
 		return $dbBatchJob;
 	}
@@ -385,6 +397,11 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$entryDistribution->setStatus(EntryDistributionStatus::DELETING);
 		$entryDistribution->setDirtyStatus(null);
 		$entryDistribution->save();
+	
+		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
+		{
+			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		}
 		
 		return $dbBatchJob;
 	}
@@ -415,7 +432,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$distributionProfile)
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 			return $dbBatchJob;
 		}
 		
@@ -454,7 +471,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$distributionProfile)
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 			return $dbBatchJob;
 		}
 		
@@ -602,7 +619,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($metadata->getObjectType() != KalturaMetadataObjectType::ENTRY)
 			return true;
 		
-		KalturaLog::debug("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
+		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] deleted");
 		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($metadata->getObjectId());
 		foreach($entryDistributions as $entryDistribution)
@@ -614,14 +631,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
 			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
 				continue;
 			}
 			
@@ -633,9 +650,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
-					if(count($validationErrors))
-						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-	
 					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 				}
@@ -646,14 +660,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
 					continue;
 				}
 				
 				$distributionProvider = $distributionProfile->getProvider();
 				if(!$distributionProvider->isUpdateEnabled())
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 					continue;
 				}
 				
@@ -661,17 +675,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
 				
-				if(count($validationErrors))
-				{
-					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-				}
-				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
 					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 				}
 				else
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 					$entryDistribution->save();
 					continue;
@@ -693,13 +703,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($metadata->getObjectType() != KalturaMetadataObjectType::ENTRY)
 			return true;
 		
-		KalturaLog::debug("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
+		KalturaLog::log("Metadata [" . $metadata->getId() . "] for entry [" . $metadata->getObjectId() . "] changed");
 		
 		$syncKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		if(!$xmlPath)
 		{
-			KalturaLog::debug("Entry metadata xml not found");
+			KalturaLog::log("Entry metadata xml not found");
 			return true;
 		}
 		$xml = new DOMDocument();
@@ -717,7 +727,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			}
 			else 
 			{
-				KalturaLog::debug("Entry metadata previous version xml not found");
+				KalturaLog::log("Entry metadata previous version xml not found");
 			}
 		}
 		
@@ -731,14 +741,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
 			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
 				continue;
 			}
 			
@@ -750,9 +760,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
-					if(count($validationErrors))
-						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-	
 					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 				}
@@ -763,13 +770,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
 					continue;
 				}
 				
 				if(!$distributionProvider->isUpdateEnabled())
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 					continue;
 				}
 
@@ -778,8 +785,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 				foreach($updateRequiredMetadataXPaths as $updateRequiredMetadataXPath)
 				{
-					KalturaLog::debug("Query xPath [$updateRequiredMetadataXPath] on metadata xml");
-					
 					$xPath = new DOMXpath($xml);
 					$newElements = $xPath->query($updateRequiredMetadataXPath);
 					
@@ -818,7 +823,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 				if(!$updateRequired)
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] update not required");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
 					continue;	
 				}
 				
@@ -826,17 +831,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
 				
-				if(count($validationErrors))
-				{
-					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-				}
-				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
 					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 				}
 				else
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 					$entryDistribution->save();
 					continue;
@@ -852,8 +853,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
-		KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] of entry [" . $entryDistribution->getEntryId() . "] changed");
-		
 		$ignoreStatuses = array(
 			EntryDistributionStatus::PENDING,
 			EntryDistributionStatus::DELETED,
@@ -864,13 +863,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if(in_array($entryDistribution->getStatus(), $ignoreStatuses))
 		{			
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] does not require update");
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] does not require update");
 			return true;
 		}
 		
 		if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 		{			
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already requires update");
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already requires update");
 			return true;
 		}
 			
@@ -878,20 +877,20 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$distributionProfile)
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 			return true;
 		}
 				
 		$distributionProvider = $distributionProfile->getProvider();
 		if(!$distributionProvider->isUpdateEnabled())
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 			return true;
 		}
 
 		if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
 		{
-			KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 			$entryDistribution->save();
 			return true;
@@ -939,19 +938,18 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			EntryDistributionStatus::ERROR_SUBMITTING,
 		);
 		
-		KalturaLog::debug("Entry [" . $entry->getId() . "] changed");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
 			if(in_array($entryDistribution->getStatus(), $ignoreStatuses))
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
 				continue;
 			}
 				
 			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
 				continue;
 			}
 				
@@ -959,20 +957,20 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
 
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
 				continue;
 			}
 				
 			if(!$distributionProvider->isUpdateEnabled())
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 				continue;
 			}
 			
@@ -990,13 +988,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 			if(!$updateRequired)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] update not required");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
 				continue;	
 			}
 			
 			if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 				$entryDistribution->save();
 				continue;
@@ -1006,6 +1004,31 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * @param SyndicationDistributionProfile $syndicationDistributionProfile
+	 */
+	public static function onSyndicationDistributionProfileDeleted(SyndicationDistributionProfile $syndicationDistributionProfile)
+	{
+		// deletes the feed
+		$feed = syndicationFeedPeer::retrieveByPK($syndicationDistributionProfile->getFeedId());
+		if(!$feed)
+			return;
+			
+		if($feed->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_NONE)
+		{
+			$feed->setStatus(syndicationFeed::SYNDICATION_DELETED);
+			$feed->save();
+		}
+		
+		// deletes the playlist
+		$playlist = entryPeer::retrieveByPK($feed->getPlaylistId());
+		if($playlist && $playlist->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_NONE)
+		{
+			$playlist->setStatus(entryStatus::DELETED);
+			$playlist->save();
+		}
 	}
 	
 	/**
@@ -1029,19 +1052,18 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
-		KalturaLog::debug("Entry [" . $entry->getId() . "] deleted");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
 			if($entryDistribution->getStatus() == EntryDistributionStatus::DELETING)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already deleting");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already deleting");
 				continue;
 			}
 				
 			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::DELETE_REQUIRED)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] already flaged for deletion");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for deletion");
 				continue;
 			}
 				
@@ -1049,7 +1071,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile || $distributionProfile->getDeleteEnabled() != DistributionProfileActionStatus::AUTOMATIC)
 			{
-				KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be deleted automatically");
 				continue;
 			}
 				
@@ -1067,7 +1089,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
-		KalturaLog::debug("Entry [" . $entry->getId() . "] ready");
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 			if($distributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::AUTOMATIC)
@@ -1088,7 +1109,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!$entry)
 			return true;
 			
-		KalturaLog::debug("Asset [" . $asset->getId() . "] of entry [" . $asset->getEntryId() . "] version changed");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
 			self::onEntryDistributionUpdateRequired($entryDistribution);
@@ -1108,7 +1128,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!$entry)
 			return true;
 			
-		KalturaLog::debug("Asset [" . $asset->getId() . "] of entry [" . $asset->getEntryId() . "] ready");
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -1131,9 +1150,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 				if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED)
 				{
-					if(count($validationErrors))
-						KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-	
 					if($entryDistribution->getDirtyStatus() != EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 				}
@@ -1144,7 +1160,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$distributionProvider = $distributionProfile->getProvider();
 				if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
 					continue;
 				}
 				
@@ -1158,17 +1174,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$entryDistribution->setValidationErrorsArray($validationErrors);
 				$entryDistribution->save();
 				
-				if(count($validationErrors))
-				{
-					KalturaLog::debug("Validation errors [" . print_r($validationErrors, true) . "]");
-				}
-				elseif($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
+				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
 					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 				}
 				else
 				{
-					KalturaLog::debug("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 					$entryDistribution->save();
 					continue;
