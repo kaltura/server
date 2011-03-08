@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaSystemPartnerClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaSystemPartnerClientPlugin
 	 */
 	protected static $instance;
 
@@ -24,7 +24,7 @@ class KalturaSystemPartnerClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaSystemPartnerClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

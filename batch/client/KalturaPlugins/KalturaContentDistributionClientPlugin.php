@@ -73,6 +73,7 @@ class KalturaDistributionProtocol
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const SYNDICATION = "2";
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
@@ -840,6 +841,30 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaSyndicationDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xsl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $feedId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -899,6 +924,15 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 	 */
 	public $updateRequiredMetadataXPaths = null;
 
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSyndicationDistributionProvider extends KalturaDistributionProvider
+{
 
 }
 
@@ -2250,7 +2284,7 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 class KalturaContentDistributionClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaContentDistributionClientPlugin
 	 */
 	protected static $instance;
 
@@ -2266,7 +2300,7 @@ class KalturaContentDistributionClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaContentDistributionClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

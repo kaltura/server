@@ -1162,7 +1162,7 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaVirusScanClientPlugin
 	 */
 	protected static $instance;
 
@@ -1178,7 +1178,7 @@ class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaVirusScanClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

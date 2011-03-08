@@ -4042,7 +4042,7 @@ class KalturaPartner extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 * @readonly
 	 */
 	public $createdAt = null;
@@ -5353,6 +5353,13 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idNotIn = null;
 
 	/**
 	 * This filter should be in use for retrieving specific entries. It should include only one string to search for in entry names (no wildcards, spaces are treated as part of the string).
@@ -7070,6 +7077,13 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	 *
 	 * @var string
 	 */
+	public $objTypeIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $tagsMultiLikeOr = null;
 
 	/**
@@ -7721,6 +7735,42 @@ abstract class KalturaUserRoleBaseFilter extends KalturaFilter
  * @subpackage Client
  */
 class KalturaUserRoleFilter extends KalturaUserRoleBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaGenericSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericSyndicationFeedFilter extends KalturaGenericSyndicationFeedBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaGenericXsltSyndicationFeedBaseFilter extends KalturaGenericSyndicationFeedFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericXsltSyndicationFeedFilter extends KalturaGenericXsltSyndicationFeedBaseFilter
 {
 
 }

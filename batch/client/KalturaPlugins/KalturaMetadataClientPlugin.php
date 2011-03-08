@@ -1655,7 +1655,7 @@ class KalturaMetadataBatchService extends KalturaServiceBase
 class KalturaMetadataClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaMetadataClientPlugin
 	 */
 	protected static $instance;
 
@@ -1677,7 +1677,7 @@ class KalturaMetadataClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaMetadataClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{
