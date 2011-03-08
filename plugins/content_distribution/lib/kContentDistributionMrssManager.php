@@ -61,6 +61,11 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 			{
 				$distribution->addAttribute('distributionProviderId', $distributionsProvider->getId());
 			}
+			elseif($distributionsProvider->getType() == DistributionProviderType::SYNDICATION)
+			{
+				if($distributionsProfile instanceof SyndicationDistributionProfile)
+					$distribution->addAttribute('feedId', $distributionsProfile->getFeedId());
+			}
 			else
 			{
 				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaContentDistributionProvider');
