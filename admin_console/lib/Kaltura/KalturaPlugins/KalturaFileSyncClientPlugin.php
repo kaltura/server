@@ -538,7 +538,7 @@ class KalturaFileSyncService extends KalturaServiceBase
 class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaFileSyncClientPlugin
 	 */
 	protected static $instance;
 
@@ -554,7 +554,7 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaFileSyncClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

@@ -1973,6 +1973,13 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	public $idIn = null;
 
 	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idNotIn = null;
+
+	/**
 	 * This filter should be in use for retrieving specific entries. It should include only one string to search for in entry names (no wildcards, spaces are treated as part of the string).
 	 * @var string
 	 *
@@ -4666,7 +4673,7 @@ class KalturaPartner extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var string
+	 * @var int
 	 * @readonly
 	 */
 	public $createdAt = null;
@@ -8453,6 +8460,42 @@ abstract class KalturaApiParameterPermissionItemBaseFilter extends KalturaPermis
  * @subpackage Client
  */
 class KalturaApiParameterPermissionItemFilter extends KalturaApiParameterPermissionItemBaseFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+abstract class KalturaGenericSyndicationFeedBaseFilter extends KalturaBaseSyndicationFeedFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaGenericSyndicationFeedFilter extends KalturaGenericSyndicationFeedBaseFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+abstract class KalturaGenericXsltSyndicationFeedBaseFilter extends KalturaGenericSyndicationFeedFilter
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaGenericXsltSyndicationFeedFilter extends KalturaGenericXsltSyndicationFeedBaseFilter
 {
 
 }

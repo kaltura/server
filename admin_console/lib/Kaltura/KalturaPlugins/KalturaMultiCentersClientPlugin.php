@@ -1146,7 +1146,7 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaMultiCentersClientPlugin
 	 */
 	protected static $instance;
 
@@ -1162,7 +1162,7 @@ class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaMultiCentersClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

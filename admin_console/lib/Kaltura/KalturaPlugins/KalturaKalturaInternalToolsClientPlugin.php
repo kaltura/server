@@ -129,7 +129,7 @@ class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
 class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaKalturaInternalToolsClientPlugin
 	 */
 	protected static $instance;
 
@@ -145,7 +145,7 @@ class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaKalturaInternalToolsClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

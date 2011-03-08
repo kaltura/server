@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaAnnotationClientPlugin
 	 */
 	protected static $instance;
 
@@ -24,7 +24,7 @@ class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaAnnotationClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

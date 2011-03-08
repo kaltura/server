@@ -559,6 +559,7 @@ class KalturaFileSyncObjectType
 	const FLAVOR_ASSET = "4";
 	const METADATA = "5";
 	const METADATA_PROFILE = "6";
+	const SYNDICATION_FEED = "7";
 	const GENERIC_DISTRIBUTION_ACTION = "contentDistribution.GenericDistributionAction";
 	const ENTRY_DISTRIBUTION = "contentDistribution.EntryDistribution";
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";
@@ -620,6 +621,38 @@ class KalturaGender
 	const UNKNOWN = 0;
 	const MALE = 1;
 	const FEMALE = 2;
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaGenericSyndicationFeedOrderBy
+{
+	const PLAYLIST_ID_ASC = "+playlistId";
+	const PLAYLIST_ID_DESC = "-playlistId";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const TYPE_ASC = "+type";
+	const TYPE_DESC = "-type";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaGenericXsltSyndicationFeedOrderBy
+{
+	const PLAYLIST_ID_ASC = "+playlistId";
+	const PLAYLIST_ID_DESC = "-playlistId";
+	const NAME_ASC = "+name";
+	const NAME_DESC = "-name";
+	const TYPE_ASC = "+type";
+	const TYPE_DESC = "-type";
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
 }
 
 /**
@@ -1354,6 +1387,20 @@ class KalturaSourceType
 	const URL = 5;
 	const SEARCH_PROVIDER = 6;
 	const AKAMAI_LIVE = 29;
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaSyndicationFeedType
+{
+	const GOOGLE_VIDEO = "1";
+	const YAHOO = "2";
+	const ITUNES = "3";
+	const TUBE_MOGUL = "4";
+	const KALTURA = "5";
+	const KALTURA_XSLT = "6";
 }
 
 /**

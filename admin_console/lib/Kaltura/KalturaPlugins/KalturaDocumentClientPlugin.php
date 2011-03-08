@@ -76,7 +76,7 @@ class KalturaSwfFlavorParams extends KalturaFlavorParams
 class KalturaDocumentClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaDocumentClientPlugin
 	 */
 	protected static $instance;
 
@@ -86,7 +86,7 @@ class KalturaDocumentClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaDocumentClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

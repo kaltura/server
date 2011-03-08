@@ -332,7 +332,7 @@ class KalturaStorageProfileService extends KalturaServiceBase
 class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaStorageProfileClientPlugin
 	 */
 	protected static $instance;
 
@@ -348,7 +348,7 @@ class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaStorageProfileClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{
