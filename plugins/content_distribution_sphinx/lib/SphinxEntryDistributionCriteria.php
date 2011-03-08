@@ -101,11 +101,11 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		}
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
-		KalturaLog::debug("Found " . count($ids) . " ids");
+		KalturaLog::log("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)
 		{
-			KalturaLog::debug("Removing key [$key] from criteria");
+			KalturaLog::log("Removing key [$key] from criteria");
 			$this->remove($key);
 		}
 		
@@ -127,7 +127,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 			{
 				foreach($meta as $metaItem)
 				{
-					KalturaLog::debug("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
+					KalturaLog::log("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
 					if($metaItem['Variable_name'] == 'total_found')
 						$this->recordsCount = (int)$metaItem['Value'];
 				}
