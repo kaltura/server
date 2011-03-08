@@ -57,6 +57,11 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 				$form = new Form_GenericProviderProfileConfiguration($partnerId, $providerType);
 				$profileClass = 'KalturaGenericDistributionProfile';
 			}
+			elseif($providerType == KalturaDistributionProviderType::SYNDICATION)
+			{
+				$form = new Form_SyndicationProviderProfileConfiguration($partnerId, $providerType);
+				$profileClass = 'KalturaSyndicationDistributionProfile';
+			}
 			else
 			{
 				$form = KalturaPluginManager::loadObject('Form_ProviderProfileConfiguration', $providerType, array($partnerId, $providerType));

@@ -65,12 +65,13 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		$paginator->setItemCountPerPage($pageSize);
 		
 		$providers = array(
-			KalturaDistributionProviderType::GENERIC => 'GENERIC'
+			KalturaDistributionProviderType::GENERIC => 'Generic',
+			KalturaDistributionProviderType::SYNDICATION => 'Syndication'
 		);
 		$genericProviders = array();
 		$client = Kaltura_ClientHelper::getClient();
-		$providersList = $client->distributionProvider->listAction();
-		KalturaLog::debug('providers list: ' . print_r($providersList, true));
+		$contentDistributionClientPlugin = KalturaContentDistributionClientPlugin::get($client);
+		$providersList = $contentDistributionClientPlugin->distributionProvider->listAction();
 		if($providersList)
 		{
 			foreach($providersList->objects as $provider)
@@ -89,7 +90,6 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		$action->view->paginator = $paginator;
 		$action->view->providers = $providers;
 		$action->view->genericProviders = $genericProviders;
-		
 		
 	}
 }

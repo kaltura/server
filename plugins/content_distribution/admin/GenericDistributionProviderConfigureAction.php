@@ -82,12 +82,10 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		}
 		
 		$genericDistributionProviderActionId = $genericDistributionProviderAction->id;
-		KalturaLog::debug("Saved generic distribution provider action [$genericDistributionProviderActionId]");
 	
 		$upload = new Zend_File_Transfer_Adapter_Http();
 		$files = $upload->getFileInfo();
 		
-		KalturaLog::debug(print_r($files, true));
 		if(count($files))
 		{
 			if(isset($files["mrssTransformer{$action}"]) && $files["mrssTransformer{$action}"]['size'])

@@ -24,7 +24,6 @@ class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
 		$action->getHelper('viewRenderer')->setNoRender();
 		$profileId = $this->_getParam('profile_id');
 		$status = $this->_getParam('status');
-		KalturaLog::debug("profileId: $profileId, status: $status");
 		$client = Kaltura_ClientHelper::getClient();
 		
 		try

@@ -95,14 +95,13 @@ function configure(profileId) {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
 				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
 			}
 		},
 		close: function() {
-			jQuery('#frmPaginator1').submit();
 		}	
 	});
 	
@@ -204,10 +203,10 @@ function newDistributionProfile(partnerId, providerType) {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
 				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
 			}
 		},
 		close: function() {

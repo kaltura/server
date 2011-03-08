@@ -34,11 +34,67 @@ function actionEnabledChanged(action){
 		fields.show();
 }
 
+function fileClicked(dataClass){
+	var dataField = jQuery("." + dataClass);
+	if(!dataField.size())
+		return false;
+	
+	var data = dataField.val();
+	
+	jQuery('#file-view-dialog').remove();
+	dialogDiv = jQuery('<div id="file-view-dialog"/>|</div>').appendTo('body');
+	dialogDiv.text(data);
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 400,
+		height: 200,
+		title: '<?php echo $this->translate('File data'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+		}	
+	});	
+	dialogDiv.load();
+	
+	return false;
+}
+
+function filesLoaded(){
+	var $dataField = jQuery(".file-data");
+	if(!$dataField.size())
+		return false;
+
+	$dataField.each(function(index, element){
+		var classes = element.className.split(" ");
+		for(var i = 0; i < classes.length; i++){
+			var dataClass = classes[i];
+			var labelClass = dataClass.replace("-data", "-file-label");
+			var $label = $("." + labelClass);
+			if(!$label.size())
+				return;
+
+			$label.click(function(){
+				fileClicked(dataClass);
+				return false;
+			});
+			$label.wrap('<a href="#"/>');
+		}
+	});
+}
+
 jQuery(function() {
 	actionEnabledChanged("submit");
 	actionEnabledChanged("update");
 	actionEnabledChanged("delete");
 	actionEnabledChanged("report");
+
+	filesLoaded();
 });
 
 </script>
