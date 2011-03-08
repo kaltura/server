@@ -268,7 +268,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		$validationErrors = array();
 		
 		$requiredFlavorParamsIds = $this->getRequiredFlavorParamsIdsArray();
-		KalturaLog::debug("Required Flavor Params Ids [" . print_r($requiredFlavorParamsIds, true) . "]");
+		KalturaLog::log("Required Flavor Params Ids [" . print_r($requiredFlavorParamsIds, true) . "]");
 		$entryFlavorAssets = flavorAssetPeer::retreiveReadyByEntryId($entryDistribution->getEntryId());
 		
 		$requiredFlavorParamsIdsKeys = array_flip($requiredFlavorParamsIds);
@@ -283,7 +283,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_FLAVOR, $requiredFlavorParamsId);
 		
 		$requiredThumbDimensions = $this->getRequiredThumbDimensionsObjects();
-		KalturaLog::debug("Required Thumb Dimensions [" . print_r($requiredThumbDimensions, true) . "]");
+		KalturaLog::log("Required Thumb Dimensions [" . print_r($requiredThumbDimensions, true) . "]");
 		$entryThumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entryDistribution->getEntryId());
 		
 		$requiredThumbDimensionsWithKeys = array();
@@ -338,7 +338,6 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		$validationError->setErrorType($type);
 		$validationError->setData($data);
 		
-		KalturaLog::debug(print_r($validationError, true));
 		return $validationError;
 	}
 
