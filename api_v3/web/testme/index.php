@@ -123,9 +123,9 @@
 	<li class="code-menu code-menu-java"><a href="#"
 		onclick="switchToJava()">Java</a></li>
 	<li class="code-menu"><a class="code-menu-toggle" href="#"
-		onclick="toggleCode()" id="codeToggle">Hide Code Example</a></li>
+		onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
 </ul>
-<div class="code" id="codeExample">
+<div class="code" id="codeExample" style="display: none;">
 <div id="example"></div>
 </div>
 </body>
