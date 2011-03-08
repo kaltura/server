@@ -62,8 +62,6 @@ abstract class KAsyncDistribute extends KBatchBase
 	
 	protected function distribute(KalturaBatchJob $job, KalturaDistributionJobData $data)
 	{
-		KalturaLog::debug("distribute($job->id)");
-		
 		try
 		{
 			$this->engine = $this->getDistributionEngine($job->jobSubType, $data);
