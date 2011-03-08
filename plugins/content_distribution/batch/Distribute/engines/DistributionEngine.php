@@ -121,9 +121,10 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getFlavorAssetUrl($flavorAssetId)
 	{
-//		TODO
-//		$domain = $this->kalturaClient->getConfig()->serviceUrl;
-//		return "$domain/service/flavorAsset/action/serve/flavorAssetId/$flavorAssetId";
+		$this->impersonate($this->partnerId);
+		$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAssetId, true);
+		$this->unimpersonate();
+		return $url;
 	}
 
 	/**
