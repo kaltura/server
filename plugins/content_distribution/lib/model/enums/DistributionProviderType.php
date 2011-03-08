@@ -6,4 +6,5 @@
 interface DistributionProviderType extends BaseEnum
 {
 	const GENERIC = 1;
+	const SYNDICATION = 2;
 }
