@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1299414369">
-  <!-- Generated on date 06/03/11 12:26:09 -->
+<xml apiVersion="3.1.1" generatedDate="1299575803">
+  <!-- Generated on date 08/03/11 09:16:43 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -549,6 +549,16 @@
     <enum name="KalturaGenericDistributionProviderStatus" enumType="int" plugin="contentDistribution">
       <const name="ACTIVE" value="2"/>
       <const name="DELETED" value="3"/>
+    </enum>
+    <enum name="KalturaGenericSyndicationFeedOrderBy" enumType="string">
+      <const name="PLAYLIST_ID_ASC" value="+playlistId"/>
+      <const name="PLAYLIST_ID_DESC" value="-playlistId"/>
+      <const name="NAME_ASC" value="+name"/>
+      <const name="NAME_DESC" value="-name"/>
+      <const name="TYPE_ASC" value="+type"/>
+      <const name="TYPE_DESC" value="-type"/>
+      <const name="CREATED_AT_ASC" value="+createdAt"/>
+      <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
     <enum name="KalturaGenericXsltSyndicationFeedOrderBy" enumType="string">
       <const name="PLAYLIST_ID_ASC" value="+playlistId"/>
@@ -1613,7 +1623,10 @@
       <property name="updateRequiredEntryFields" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="updateRequiredMetadataXPaths" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaSyndicationDistributionProfile" base="KalturaDistributionProfile" plugin="contentDistribution"/>
+    <class name="KalturaSyndicationDistributionProfile" base="KalturaDistributionProfile" plugin="contentDistribution">
+      <property name="xsl" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="feedId" type="string" readOnly="1" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaDistributionProvider" abstract="1" plugin="contentDistribution">
       <property name="type" type="string" enumType="KalturaDistributionProviderType" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1624,9 +1637,7 @@
       <property name="updateRequiredEntryFields" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="updateRequiredMetadataXPaths" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaSyndicationDistributionProvider" base="KalturaDistributionProvider" plugin="contentDistribution">
-      <property name="feedId" type="int" readOnly="0" insertOnly="0" description=""/>
-    </class>
+    <class name="KalturaSyndicationDistributionProvider" base="KalturaDistributionProvider" plugin="contentDistribution"/>
     <class name="KalturaComcastDistributionProfile" base="KalturaDistributionProfile" plugin="comcastDistribution">
       <property name="email" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="password" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -3379,7 +3390,9 @@
     <class name="KalturaApiActionPermissionItemFilter" base="KalturaApiActionPermissionItemBaseFilter"/>
     <class name="KalturaApiParameterPermissionItemBaseFilter" abstract="1" base="KalturaPermissionItemFilter"/>
     <class name="KalturaApiParameterPermissionItemFilter" base="KalturaApiParameterPermissionItemBaseFilter"/>
-    <class name="KalturaGenericXsltSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
+    <class name="KalturaGenericSyndicationFeedBaseFilter" abstract="1" base="KalturaBaseSyndicationFeedFilter"/>
+    <class name="KalturaGenericSyndicationFeedFilter" base="KalturaGenericSyndicationFeedBaseFilter"/>
+    <class name="KalturaGenericXsltSyndicationFeedBaseFilter" abstract="1" base="KalturaGenericSyndicationFeedFilter"/>
     <class name="KalturaGenericXsltSyndicationFeedFilter" base="KalturaGenericXsltSyndicationFeedBaseFilter"/>
     <class name="KalturaAssetParamsOutput" base="KalturaAssetParams">
       <property name="assetParamsId" type="int" readOnly="0" insertOnly="0" description=""/>
