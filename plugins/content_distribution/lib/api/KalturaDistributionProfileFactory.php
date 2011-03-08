@@ -14,6 +14,9 @@ class KalturaDistributionProfileFactory
 		if($providerType == KalturaDistributionProviderType::GENERIC)
 			return new KalturaGenericDistributionProfile();
 			
+		if($providerType == KalturaDistributionProviderType::SYNDICATION)
+			return new KalturaSyndicationDistributionProfile();
+			
 		$distributionProfile = KalturaPluginManager::loadObject('KalturaDistributionProfile', $providerType);
 		if($distributionProfile)
 			return $distributionProfile;
