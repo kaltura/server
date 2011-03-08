@@ -25,6 +25,9 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	
 	private function saveIfShouldScan($flavorAsset)
 	{
+		if (!PermissionPeer::isAllowedPlugin(VirusScanPlugin::PLUGIN_NAME, $flavorAsset->getPartnerId()))
+			return false;
+		
 		if (isset(self::$flavorAssetIdsToScan[$flavorAsset->getId()]))
 		{
 			return true;
