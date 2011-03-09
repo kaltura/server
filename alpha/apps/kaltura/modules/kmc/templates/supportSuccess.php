@@ -36,6 +36,7 @@
 			   fieldset div * { font-size:11px;}
 			   fieldset div label { display:inline;}
 			   fieldset div input { width:86px !important; #height:18px; padding:0 !important; margin:0 !important; float:none;}
+			  #login_info { display: block; }
 			 div#submit { text-align:center}
 			 button { height:24px; padding: 0 13px 1px; border: solid 1px #B7BABC; margin: 0 auto 5px; #margin-top:21px;
 					 background: url(/lib/images/kmc/kmc_sprite.png) no-repeat -57px -153px; /* -94px -152px */ cursor:pointer; color:#2B2B2B;}

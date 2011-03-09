@@ -208,7 +208,7 @@ kmc.utils = {
     openSupport : function(href) {
         kalturaCloseModalBox();
         var modal_width = $.browser.msie ? 543 : 519;
-        var iframe_height = $.browser.msie ? 751 : ($.browser.safari ? 725 : 750);
+        var iframe_height = $.browser.msie ? 761 : ($.browser.safari ? 755 : 780);
         kmc.utils.hideFlash(true);
         modal = kalturaInitModalBox ( null , {width : modal_width , height: 450} );
         modal.innerHTML = '<div id="modal"><div id="titlebar"><a id="close" href="#close"></a>' +
