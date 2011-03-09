@@ -37,9 +37,9 @@ class ThumbAssetService extends KalturaBaseService
 	 * Serves thumbnail by entry id and thumnail params id
 	 *  
 	 * @action serveByEntryId
-	 * @serverOnly
 	 * @param string $entryId
 	 * @param int $thumbParamId if not set, default thumbnail will be used.
+	 * @return file
 	 * 
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
@@ -79,8 +79,8 @@ class ThumbAssetService extends KalturaBaseService
 	 * Serves thumbnail by its id
 	 *  
 	 * @action serve
-	 * @serverOnly
 	 * @param string $thumbAssetId
+	 * @return file
 	 *  
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
