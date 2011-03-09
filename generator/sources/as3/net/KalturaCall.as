@@ -24,12 +24,22 @@ package com.kaltura.net {
 		
 		public var delegate : IKalturaCallDelegate;
 		
+		/**
+		 * when the client is in queueing mode, determined whether the call is queued. 
+		 */
+		public var queued:Boolean = true;
+		
+		
 		public function KalturaCall() {}
 		
-		//OVERRIDE this function in case something needs to be initialized prior to execution
+		/**
+		 * OVERRIDE this function in case something needs to be initialized prior to execution
+		 * */
 		public function initialize():void {}
 		
-		//OVERRIDE this function to make init the right delegate action
+		/**
+		 * OVERRIDE this function to make init the right delegate action
+		 * */
 		public function execute():void {}
 		
 		public function setRequestArgument(name:String, value:Object):void {
@@ -51,7 +61,7 @@ package com.kaltura.net {
 			dispatchEvent(new KalturaEvent(KalturaEvent.COMPLETE, false, false, true, result));
 		}
 		/**
-		 * dispatch an Error when a request has faild for any reasone  
+		 * dispatch an Error when a request has faild for any reason  
 		 * @param error
 		 * 
 		 */		
