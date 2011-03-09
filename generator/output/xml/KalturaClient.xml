@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1299575803">
-  <!-- Generated on date 08/03/11 09:16:43 -->
+<xml apiVersion="3.1.1" generatedDate="1299689123">
+  <!-- Generated on date 09/03/11 16:45:23 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -3650,6 +3650,12 @@
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="Pager&#13;"/>
         <result type="KalturaDataListResponse"/>
       </action>
+      <action name="serve" description="serve action returan the file from dataContent field.&#10;">
+        <param name="entryId" type="string" optional="0" description="Data entry id&#13;"/>
+        <param name="version" type="int" optional="1" default="-1" description="Desired version of the data&#13;"/>
+        <param name="forceProxy" type="bool" optional="1" default="false" description="force to get the content without redirect&#13;"/>
+        <result type="file"/>
+      </action>
     </service>
     <service id="emailingestionprofile" name="EmailIngestionProfile" description="EmailIngestionProfile service lets you manage email ingestion profile records&#13;">
       <action name="add" description="EmailIngestionProfile Add action allows you to add a EmailIngestionProfile to Kaltura DB&#13;">
@@ -4215,6 +4221,15 @@
       </action>
     </service>
     <service id="thumbasset" name="thumbAsset" description="Retrieve information and invoke actions on Thumb Asset&#13;">
+      <action name="serveByEntryId" description="Serves thumbnail by entry id and thumnail params id&#10;">
+        <param name="entryId" type="string" optional="0" description="&#13;"/>
+        <param name="thumbParamId" type="int" optional="1" default="" description="if not set, default thumbnail will be used.&#13;"/>
+        <result type="file"/>
+      </action>
+      <action name="serve" description="Serves thumbnail by its id&#10;">
+        <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
+        <result type="file"/>
+      </action>
       <action name="setAsDefault" description="Tags the thumbnail as DEFAULT_THUMB and removes that tag from all other thumbnail assets of the entry.&#10;Create a new file sync link on the entry thumbnail that points to the thumbnail asset file sync.&#10;">
         <param name="thumbAssetId" type="string" optional="0" description="&#13;"/>
         <result/>
@@ -4659,6 +4674,18 @@
         <param name="entryId" type="string" optional="0" description="&#13;"/>
         <result type="string"/>
       </action>
+      <action name="serve" description="Serves the file content&#10;">
+        <param name="entryId" type="string" optional="0" description="Document entry id&#13;"/>
+        <param name="flavorAssetId" type="string" optional="1" default="" description="Flavor asset id&#13;"/>
+        <param name="forceProxy" type="bool" optional="1" default="false" description="force to get the content without redirect&#13;"/>
+        <result type="file"/>
+      </action>
+      <action name="serveByFlavorParamsId" description="Serves the file content&#10;">
+        <param name="entryId" type="string" optional="0" description="Document entry id&#13;"/>
+        <param name="flavorParamsId" type="string" optional="1" default="" description="Flavor params id&#13;"/>
+        <param name="forceProxy" type="bool" optional="1" default="false" description="force to get the content without redirect&#13;"/>
+        <result type="file"/>
+      </action>
     </service>
     <service id="storageprofile_storageprofile" name="storageProfile" description="Storage Profiles service&#13;" plugin="storageProfile">
       <action name="listByPartner" description="">
@@ -4939,6 +4966,16 @@
         <param name="id" type="int" optional="0" description="&#13;"/>
         <result type="KalturaEntryDistribution"/>
       </action>
+      <action name="serveSentData" description="Serves entry distribution sent data&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <param name="actionType" type="int" enumType="KalturaDistributionAction" optional="0" description="&#13;"/>
+        <result type="file"/>
+      </action>
+      <action name="serveReturnedData" description="Serves entry distribution returned data&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <param name="actionType" type="int" enumType="KalturaDistributionAction" optional="0" description="&#13;"/>
+        <result type="file"/>
+      </action>
     </service>
     <service id="contentdistribution_distributionprovider" name="distributionProvider" description="Distribution Provider service&#13;" plugin="contentDistribution">
       <action name="list" description="List all distribution providers&#10;">
@@ -5063,6 +5100,11 @@
       <action name="delete" description="Mark the short link as deleted&#10;">
         <param name="id" type="string" optional="0" description="&#13;"/>
         <result type="KalturaShortLink"/>
+      </action>
+      <action name="goto" description="Serves short link&#10;">
+        <param name="id" type="string" optional="0" description="&#13;"/>
+        <param name="proxy" type="bool" optional="1" default="false" description="proxy the response instead of redirect&#13;"/>
+        <result type="file"/>
       </action>
     </service>
   </services>

@@ -432,25 +432,34 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
 			}
 		}
-		if ($haveFiles)
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
-		else
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
-		$this->appendLine("		if (\$this->client->isMultiRequest())");
-		$this->appendLine("			return null;");
-		$this->appendLine("		\$resultObject = \$this->client->doQueue();");
-		$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 		
-		if (!$resultType)
-			$resultType = "null";
-		
-		if ($resultType == 'int')
-			$resultType = "integer";
+	    if($resultType == 'file')
+	    {
+			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', \$kparams);");
+			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
+	    }
+	    else
+	    {
+			if ($haveFiles)
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
+			else
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			return null;");
+			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
+			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 			
-		if ($resultType == 'bool')
-			$this->appendLine("		\$resultObject = (bool) \$resultObject;");
-		else
-			$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+			if (!$resultType)
+				$resultType = "null";
+			
+			if ($resultType == 'int')
+				$resultType = "integer";
+				
+			if ($resultType == 'bool')
+				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+			else
+				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+	    }
 			
 		$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");

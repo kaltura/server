@@ -367,6 +367,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
+			if($child->result->attributes()->type == 'file')
+				continue;
+				
 			$fileAttributesNames = array();
 			foreach($child->children() as $prop)
 			{

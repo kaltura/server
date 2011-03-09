@@ -150,6 +150,9 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 	    $action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
+	    
+	    if($resultType == 'file')
+	    	return;
 		
 		$signaturePrefix = "def ".$this->camelCaseToUnderscoreAndLower($action)."(";
 			

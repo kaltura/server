@@ -349,7 +349,11 @@ abstract class ClientGeneratorFromPhp
 		}
 			
 		if (array_key_exists($serviceName, $this->_services))
-			throw new Exception("Service already exists [$serviceName]");
+		{
+			KalturaLog::err("Service already exists [$serviceName]");
+//			throw new Exception("Service already exists [$serviceName]");
+			return;
+		}
 			
 		$this->_services[$serviceName] = $serviceReflector;
 	}

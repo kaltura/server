@@ -359,6 +359,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	
 	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector)
 	{
+		if($outputTypeReflector && $outputTypeReflector->isFile())
+			return;
+			
 		KalturaLog::info("Generates action [$serviceName.$action]");
 		if($action == 'add')
 			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);

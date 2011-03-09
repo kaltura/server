@@ -175,6 +175,10 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		
 		//parse the service actions
 		foreach($serviceNodes->children() as $action) {
+			
+			if($action->result->attributes()->type == 'file')
+				continue;
+				
 			$actionDesc = "/**\r\n";
 			$description = str_replace("\n", "\n *\t", $action->attributes()->description); // to format multi-line descriptions
 			$actionDesc .= " * $description.\r\n";

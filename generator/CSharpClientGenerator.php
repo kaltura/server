@@ -478,6 +478,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 		$resultNode = $actionNode->getElementsByTagName("result")->item(0);
 		$resultType = $resultNode->getAttribute("type");
+	    
+	    if($resultType == 'file')
+	    	return;
 		
 		switch($resultType)
 		{

@@ -53,6 +53,34 @@ class Kaltura_Client_ClientBase
 			$this->shouldLog = true;	
 	}
 
+	public function getServeUrl($service, $action, array $params = null)
+	{
+		if (count($this->callsQueue) != 1)
+			return null;
+			 
+		$params = array();
+		$files = array();
+		$this->log("service url: [" . $this->config->serviceUrl . "]");
+		
+		// append the basic params
+		$this->addParam($params, "apiVersion", $this->apiVersion);
+		$this->addParam($params, "format", $this->config->format);
+		$this->addParam($params, "clientTag", $this->config->clientTag);
+		
+		$call = $this->callsQueue[0];
+		$this->callsQueue = array();
+		$this->isMultiRequest = false; 
+		
+		$params = array_merge($params, $call->params);
+		$signature = $this->signature($params);
+		$this->addParam($params, "kalsig", $signature);
+		
+		$url = $this->config->serviceUrl . "/api_v3/index.php?service={$call->service}&action={$call->action}";
+		$url .= '&' . http_build_query($params); 
+		$this->log("Returned url [$url]");
+		return $url;
+	}
+
 	public function queueServiceActionCall($service, $action, $params = array(), $files = array())
 	{
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
