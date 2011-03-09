@@ -60,6 +60,21 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 	
 	/**
 	 * @param      int $partnerId
+	 * @param      string $key
+	 * @param      PropelPDO $con the connection to use
+	 * @return     array<MetadataProfileField>
+	 */
+	public static function retrieveByPartnerAndKey($partnerId, $key, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MetadataProfileFieldPeer::PARTNER_ID, $partnerId);
+		$criteria->add(MetadataProfileFieldPeer::KEY, $key);
+
+		return MetadataProfileFieldPeer::doSelect($criteria, $con);
+	}
+	
+	/**
+	 * @param      int $partnerId
 	 * @param      PropelPDO $con the connection to use
 	 * @return     array<string> keys
 	 */
