@@ -1,7 +1,7 @@
 <?php
 
 /**
- * UserRole service lets you create and manage user permissions
+ * UserRole service lets you create and manage user roles
  * @service userRole
  * @package api
  * @subpackage services
