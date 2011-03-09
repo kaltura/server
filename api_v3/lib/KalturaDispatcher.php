@@ -19,42 +19,6 @@ class KalturaDispatcher
 		return self::$instance;
 	}
 	
-	public function clearMemory() 
-	{
-		accessControlPeer::clearInstancePool();
-		BatchJobPeer::clearInstancePool();
-		BulkUploadResultPeer::clearInstancePool();
-		categoryPeer::clearInstancePool();
-		EmailIngestionProfilePeer::clearInstancePool();
-		entryPeer::clearInstancePool();
-		FileSyncPeer::clearInstancePool();
-		flavorAssetPeer::clearInstancePool();
-		flavorParamsConversionProfilePeer::clearInstancePool();
-		flavorParamsOutputPeer::clearInstancePool();
-		flavorParamsPeer::clearInstancePool();
-		kshowPeer::clearInstancePool();
-		mediaInfoPeer::clearInstancePool();
-		moderationFlagPeer::clearInstancePool();
-		moderationPeer::clearInstancePool();
-		notificationPeer::clearInstancePool();
-		roughcutEntryPeer::clearInstancePool();
-		SchedulerConfigPeer::clearInstancePool();
-		SchedulerPeer::clearInstancePool();
-		SchedulerStatusPeer::clearInstancePool();
-		SchedulerWorkerPeer::clearInstancePool();
-		StorageProfilePeer::clearInstancePool();
-		syndicationFeedPeer::clearInstancePool();
-		TrackEntryPeer::clearInstancePool();
-		uiConfPeer::clearInstancePool();
-		UploadTokenPeer::clearInstancePool();
-		
-		// TODO clear default filters
-		// TODO call all memory cleaner plugins
-		
-		if(function_exists('gc_collect_cycles')) // php 5.3 and above
-			gc_collect_cycles();
-	}
-	
 	public function dispatch($service, $action, $params = array()) 
 	{
 		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($params, true));
@@ -121,7 +85,7 @@ class KalturaDispatcher
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");
 				
-		$this->clearMemory();
+		kMemoryManager::clearMemory();
 		
 		return $res;
 	}
