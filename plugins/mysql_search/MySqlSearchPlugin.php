@@ -2,7 +2,7 @@
 /**
  * @package plugins.mySqlSearch
  */
-class MySqlSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
+class MySqlSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'mySqlSearch';
 	const MYSQL_SEARCH_MANAGER = 'kMySqlSearchManager';
@@ -34,5 +34,10 @@ class MySqlSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers,
 			return new MySqlEntryCriteria();
 			
 		return null;
+	}
+
+	public static function cleanMemory()
+	{
+	    SearchEntryPeer::clearInstancePool();
 	}
 }

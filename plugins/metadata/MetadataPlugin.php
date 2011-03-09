@@ -2,7 +2,7 @@
 /**
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor
+class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -518,6 +518,13 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		}
 			
 		return null;
+	}
+
+	public static function cleanMemory()
+	{
+	    MetadataProfilePeer::clearInstancePool();
+	    MetadataProfileFieldPeer::clearInstancePool();
+	    MetadataPeer::clearInstancePool();
 	}
 
 //	/**

@@ -2,7 +2,7 @@
 /**
  * @package plugins.sphinxSearch
  */
-class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
+class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'sphinxSearch';
 	const SPHINX_SEARCH_MANAGER = 'kSphinxSearchManager';
@@ -34,5 +34,11 @@ class SphinxSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers
 			return new SphinxEntryCriteria();
 			
 		return null;
+	}
+
+	public static function cleanMemory()
+	{
+	    SphinxLogPeer::clearInstancePool();
+//	    SphinxLogServerPeer::clearInstancePool();
 	}
 }

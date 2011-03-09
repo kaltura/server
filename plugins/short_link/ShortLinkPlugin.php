@@ -2,7 +2,7 @@
 /**
  * @package plugins.shortLink
  */
-class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers
+class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'shortLink';
 	const SHORT_LINK_FLOW_MANAGER_CLASS = 'kShortLinkFlowManager';
@@ -39,5 +39,10 @@ class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		return array(
 			self::SHORT_LINK_FLOW_MANAGER_CLASS
 		);
+	}
+
+	public static function cleanMemory()
+	{
+	    ShortLinkPeer::clearInstancePool();
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * @package plugins.annotation
  */
-class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers
+class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'annotation';
 	const ANNOTATION_MANAGER = 'kAnnotationManager';
@@ -58,4 +58,8 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		);
 	}
 
+	public static function cleanMemory()
+	{
+	    AnnotationPeer::clearInstancePool();
+	}
 }

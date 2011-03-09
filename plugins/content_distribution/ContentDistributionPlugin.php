@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistribution
  */
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -295,5 +295,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	public static function cleanMemory()
+	{
+	    DistributionProfilePeer::clearInstancePool();
+	    EntryDistribution::clearInstancePool();
+//	    GenericDistributionProviderPeer::clearInstancePool();
+//	    GenericDistributionProviderActionPeer::clearInstancePool();
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * @package plugins.solr_search
  */
-class SolrSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory
+class SolrSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaCriteriaFactory, IKalturaMemoryCleaner
 {
 	const PLUGIN_NAME = 'solr_search';
 	const SOLR_SEARCH_MANAGER = 'kSolrSearchManager';
@@ -34,5 +34,11 @@ class SolrSearchPlugin extends KalturaPlugin implements IKalturaEventConsumers, 
 			return new SolrEntryCriteria();
 			
 		return null;
+	}
+
+	public static function cleanMemory()
+	{
+	    SolrLogPeer::clearInstancePool();
+//	    SolrLogServerPeer::clearInstancePool();
 	}
 }
