@@ -360,7 +360,7 @@ class ContentDistributionBatchService extends BatchService
 	{
 		// serach all records that their next report time arrived
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
-		$criteria->add(EntryDistributionPeer::NEXT_REPORT, time(), Criteria::GREATER_EQUAL);
+		$criteria->add(EntryDistributionPeer::NEXT_REPORT, time(), Criteria::LESS_EQUAL);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -375,7 +375,7 @@ class ContentDistributionBatchService extends BatchService
 		// serach all records that arrived their sunrise time and requires submittion
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::SUBMIT_REQUIRED);
-		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::GREATER_EQUAL);
+		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_EQUAL);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution)
 		{
@@ -390,7 +390,7 @@ class ContentDistributionBatchService extends BatchService
 		// serach all records that arrived their sunset time and requires deletion
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::DELETE_REQUIRED);
-		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::GREATER_EQUAL);
+		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_EQUAL);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution)
 		{
