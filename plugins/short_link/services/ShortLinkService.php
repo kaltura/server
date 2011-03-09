@@ -165,9 +165,9 @@ class ShortLinkService extends KalturaBaseService
 	 * Serves short link
 	 * 
 	 * @action goto
-	 * @serverOnly
 	 * @param string $id
 	 * @param bool $proxy proxy the response instead of redirect
+	 * @return file
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		

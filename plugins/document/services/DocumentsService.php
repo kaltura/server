@@ -360,10 +360,10 @@ class DocumentsService extends KalturaEntryService
 	 * Serves the file content
 	 * 
 	 * @action serve
-	 * @serverOnly
 	 * @param string $entryId Document entry id
 	 * @param string $flavorAssetId Flavor asset id
 	 * @param bool $forceProxy force to get the content without redirect
+	 * @return file
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
@@ -409,10 +409,10 @@ class DocumentsService extends KalturaEntryService
 	 * Serves the file content
 	 * 
 	 * @action serveByFlavorParamsId
-	 * @serverOnly
 	 * @param string $entryId Document entry id
 	 * @param string $flavorParamsId Flavor params id
 	 * @param bool $forceProxy force to get the content without redirect
+	 * @return file
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY

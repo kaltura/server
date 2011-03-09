@@ -417,9 +417,9 @@ class EntryDistributionService extends KalturaBaseService
 	 * Serves entry distribution sent data
 	 *  
 	 * @action serveSentData
-	 * @serverOnly
 	 * @param int $id
 	 * @param KalturaDistributionAction $actionType
+	 * @return file
 	 *  
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
@@ -454,9 +454,9 @@ class EntryDistributionService extends KalturaBaseService
 	 * Serves entry distribution returned data
 	 *  
 	 * @action serveReturnedData
-	 * @serverOnly
 	 * @param int $id
 	 * @param KalturaDistributionAction $actionType
+	 * @return file
 	 *  
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
