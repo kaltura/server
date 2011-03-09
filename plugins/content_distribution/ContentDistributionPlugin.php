@@ -300,7 +300,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function cleanMemory()
 	{
 	    DistributionProfilePeer::clearInstancePool();
-	    EntryDistribution::clearInstancePool();
+	    EntryDistributionPeer::clearInstancePool();
 //	    GenericDistributionProviderPeer::clearInstancePool();
 //	    GenericDistributionProviderActionPeer::clearInstancePool();
 	}
