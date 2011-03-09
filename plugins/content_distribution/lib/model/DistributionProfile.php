@@ -331,12 +331,13 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $results;
 	}
 	
-	protected function createValidationError($action, $type, $data = null)
+	protected function createValidationError($action, $type, $data = null, $description)
 	{
 		$validationError = new kDistributionValidationError();
 		$validationError->setAction($action);
 		$validationError->setErrorType($type);
 		$validationError->setData($data);
+		$validationError->setDescription($description);
 		
 		return $validationError;
 	}
