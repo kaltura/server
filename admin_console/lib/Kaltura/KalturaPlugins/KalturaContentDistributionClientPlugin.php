@@ -2114,6 +2114,26 @@ class KalturaEntryDistributionService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
 		return $resultObject;
 	}
+
+	function serveSentData($id, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall('contentdistribution_entrydistribution', 'serveSentData', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
+
+	function serveReturnedData($id, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall('contentdistribution_entrydistribution', 'serveReturnedData', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
 }
 
 /**
