@@ -468,9 +468,6 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
-	    
-	    if($resultType == 'file')
-	    	return;
 		
 		// method signature
 		$signature = "";
@@ -540,37 +537,46 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				$this->appendLine("		\$this->client->addParam(\$kparams, \"$paramName\", \$$paramName);");
 			}
 		}
-		if ($haveFiles)
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
-		else
-			$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
-		$this->appendLine("		if (\$this->client->isMultiRequest())");
-		$this->appendLine("			return null;");
-		$this->appendLine("		\$resultObject = \$this->client->doQueue();");
-		$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 		
-		switch($resultType)
-		{
-			case 'int':
-				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"integer\");");
-				break;
+	    if($resultType == 'file')
+	    {
+			$this->appendLine("		\$this->client->queueServiceActionCall('" . strtolower($serviceId) . "', '$action', \$kparams);");
+			$this->appendLine('		$resultObject = $this->client->getServeUrl();');
+	    }
+	    else
+	    {
+			if ($haveFiles)
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams, \$kfiles);");
+			else
+				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
+			$this->appendLine("		if (\$this->client->isMultiRequest())");
+			$this->appendLine("			return null;");
+			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
+			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
+			
+			switch($resultType)
+			{
+				case 'int':
+					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"integer\");");
+					break;
 				
-			case 'bool':
-				$this->appendLine("		\$resultObject = (bool) \$resultObject;");
-				break;
+				case 'bool':
+					$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+					break;
 				
-			case 'string':
-			case 'array':
-				$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
-				break;
-				
-			default:
-				if ($resultType)
-				{
-					$resultType = $this->getTypeClass($resultType);	
+				case 'string':
+				case 'array':
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
-				}
-		}
+					break;
+				
+				default:
+					if ($resultType)
+					{
+						$resultType = $this->getTypeClass($resultType);	
+						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
+					}
+			}
+	    	}
 			
 		$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");

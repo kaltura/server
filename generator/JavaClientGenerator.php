@@ -160,6 +160,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$imports = "";
 		
 		$imports .= "package com.kaltura.client.types;\n\n";
+		$imports .= "import java.util.IllegalFormatException;\n";
 		$imports .= "import org.w3c.dom.Element;\n";
 		$imports .= "import org.w3c.dom.Node;\n";
 		$imports .= "import org.w3c.dom.NodeList;\n";
@@ -205,8 +206,17 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			switch ($propType) 
 			{
 				case "string" :
-					$javaType = "String";
-					$initial_value = "";
+					if ($isEnum) 
+					{
+						$javaType = $propertyNode->getAttribute ( "enumType" );
+						$initial_value = ""; // we do not want to initialize enums
+						$imports .= "import com.kaltura.client.enums.$javaType;\n";
+					} 
+					else 
+					{
+						$javaType = "String";
+						$initial_value = "";
+					}
 					break;
 				case "float" :
 					$javaType = "float";
@@ -304,7 +314,17 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 						}
 						break;
 					case "string" :
-						$propBlock .= "                this.$propName = txt;\n";
+						if ($isEnum) 
+						{
+							$enumType = $propertyNode->getAttribute ( "enumType" );
+							$propBlock .= "                try {\n";
+							$propBlock .= "                    if (!txt.equals(\"\")) this.$propName = $enumType.get(txt);\n";
+							$propBlock .= "                } catch (IllegalFormatException ife) {}\n";
+						} 
+						else
+						{
+							$propBlock .= "                this.$propName = txt;\n";
+						}
 						break;
 					case "bool" :
 						$propBlock .= "                if (!txt.equals(\"\")) this.$propName = ((txt.equals(\"0\")) ? false : true);\n";
@@ -341,6 +361,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		// ToParams method
 		$this->appendLine ( "    public KalturaParams toParams() {" );
 		$this->appendLine ( "        KalturaParams kparams = super.toParams();" );
+		$this->appendLine ( "        kparams.setString(\"objectType\", \"$type\");" );
 		
 		foreach ( $classNode->childNodes as $propertyNode ) 
 		{
@@ -363,13 +384,19 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 						$this->appendLine ( "        kparams.addIntIfNotNull(\"$propName\", this.$propName);" );
 					break;
 				case "string" :
-					$this->appendLine ( "        kparams.addStringIfNotNull(\"$propName\", this.$propName);" );
+					if ($isEnum)
+						$this->appendLine ( "        if ($propName != null) kparams.addStringIfNotNull(\"$propName\", this.$propName.getHashCode());" );
+					else
+						$this->appendLine ( "        kparams.addStringIfNotNull(\"$propName\", this.$propName);" );
 					break;
 				case "bool" :
 					$this->appendLine ( "        kparams.addBoolIfNotNull(\"$propName\", this.$propName);" );
 					break;
 				case "float" :
 					$this->appendLine ( "        kparams.addFloatIfNotNull(\"$propName\", this.$propName);" );
+					break;
+				default :
+					$this->appendLine ( "        kparams.addObjectIfNotNull(\"$propName\", this.$propName);" );
 					break;
 			}
 		}
@@ -660,6 +687,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine ( "	" );
 		$this->appendLine ( "	public KalturaClient(KalturaConfiguration config) {" );
 		$this->appendLine ( "		super(config);" );
+		$this->appendLine ( "	}" );
+		$this->appendLine ( "	" );
+		$this->appendLine ( "	@Override" );
+		$this->appendLine ( "	String getApiVersion(){" );
+		$this->appendLine ( "		return apiVersion;" );
 		$this->appendLine ( "	}" );
 		$this->appendLine ( "	" );
 		

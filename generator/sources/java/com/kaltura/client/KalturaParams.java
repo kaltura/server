@@ -1,6 +1,7 @@
 package com.kaltura.client;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -44,6 +45,45 @@ public class KalturaParams extends HashMap<String, String> {
 
 	public void add(KalturaParams objectProperties) {
 		this.putAll(objectProperties);
+    }
+
+	public void setString(String key, String value) {
+		if(this.get(key) != null)
+			this.remove(key);
+        this.put(key, value);
+    }
+	
+	public void addObjectIfNotNull(String key, KalturaObjectBase object) {
+		if (object == null)
+			return;
+		
+		KalturaParams params = object.toParams();
+		Set<String> s = params.keySet();
+		Iterator<String> it = s.iterator( );
+		while (it.hasNext()) {
+			String name = (String)it.next();
+			String value = (String)params.get(name);
+			this.put(key + ":" + name, value);
+		}
+    }
+	
+	public void addObjectIfNotNull(String key, ArrayList array) {
+		if (array == null)
+			return;
+		
+		int index = 0;
+		for(KalturaObjectBase object : (ArrayList<KalturaObjectBase>)array)
+		{
+			KalturaParams params = object.toParams();
+			Set<String> s = params.keySet();
+			Iterator<String> it = s.iterator( );
+			while (it.hasNext()) {
+				String name = (String)it.next();
+				String value = (String)params.get(name);
+				this.put(key + ":" + index + ":" + name, value);
+			}
+			index++;
+		}
     }
 
 	public void addStringIfNotNull(String key, String value) {

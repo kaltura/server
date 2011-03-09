@@ -12,6 +12,7 @@ import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -34,9 +35,8 @@ import com.kaltura.client.utils.XmlUtils;
  * @author jpotts
  *
  */
-public class KalturaClientBase {
+abstract public class KalturaClientBase {
 
-    protected String apiVersion;
     protected KalturaConfiguration kalturaConfiguration;
     protected String sessionId;
     protected List<KalturaServiceActionCall> callsQueue;
@@ -53,6 +53,8 @@ public class KalturaClientBase {
         this.callsQueue = new ArrayList<KalturaServiceActionCall>();
         this.multiRequestParamsMap = new KalturaParams();
     }
+    
+    abstract String getApiVersion();
     
     public String getSessionId() {
     	return this.sessionId;
@@ -101,7 +103,7 @@ public class KalturaClientBase {
         KalturaFiles kfiles = new KalturaFiles();
 
         // append the basic params
-        kparams.put("apiVersion", this.apiVersion);
+        kparams.put("apiVersion", this.getApiVersion());
         kparams.put("clientTag", this.kalturaConfiguration.getClientTag());
         kparams.addIntIfNotNull("format", this.kalturaConfiguration.getServiceFormat().getHashCode());
 
@@ -139,7 +141,7 @@ public class KalturaClientBase {
 
         kparams.put("sig", this.signature(kparams));
 
-        logger.debug("full reqeust url: [" + url + "]");
+        logger.debug("full reqeust url: [" + url + "?" + kparams.toQueryString() + "]");
 
         // build request
         HttpClient client = new HttpClient();
@@ -164,6 +166,10 @@ public class KalturaClientBase {
 			// Execute the method.
 			int statusCode = client.executeMethod(method);
 
+			Header[] headers = method.getRequestHeaders();
+			for(Header header : headers)
+				logger.debug("Header [" + header.getName() + " value [" + header.getValue() + "]");
+	        
 			if (statusCode != HttpStatus.SC_OK) {
 				System.err.println ( "Method failed: " + method.getStatusLine ( ) );
 			}
