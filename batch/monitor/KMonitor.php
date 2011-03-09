@@ -18,6 +18,7 @@ while($run)
 		continue;
 		
 	$clients[] = $client;
+//	echo "Client [" . (count($clients) - 1) . "] connected\n";
 	
 	clearstatcache(false, $filename);
 	$pointer = filesize($filename);
@@ -26,7 +27,10 @@ while($run)
 //		sleep($sleep);
 		$client = @stream_socket_accept($server, $sleep);
 		if($client)
+		{
+//			echo "Client [" . (count($clients) - 1) . "] connected\n";
 			$clients[] = $client;
+		}
 			
 		clearstatcache(false, $filename);
 		$nextPointer = filesize($filename);
@@ -40,11 +44,16 @@ while($run)
 			if(!strlen($line))
 				continue;
 				
+//			echo "Write bytes [" . strlen($line) . "] to [" . count($clients) . "]\n";
 			foreach($clients as $index => $client)
 			{
 				$written = @fwrite($client, $line . chr(0));
+				var_dump($written);
 				if(!$written)
+				{
+//					echo "Client [$index] disconnected\n";
 					unset($clients[$index]);
+				}
 			}
 		}
 			
