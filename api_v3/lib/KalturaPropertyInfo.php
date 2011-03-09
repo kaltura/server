@@ -83,6 +83,11 @@ class KalturaPropertyInfo
 		return $this->_arrayTypeReflector;
 	}
 	
+	public function isFile()
+	{
+		return $this->_type == 'file';
+	}
+	
 	public function isSimpleType()
 	{
 		$simpleTypes = array("int", "string", "bool", "float");
@@ -91,7 +96,7 @@ class KalturaPropertyInfo
 	
 	public function isComplexType()
 	{
-		return !$this->isSimpleType();
+		return !$this->isSimpleType() && !$this->isFile();
 	}
 	
 	public function isEnum()
