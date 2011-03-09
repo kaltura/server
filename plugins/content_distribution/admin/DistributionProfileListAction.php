@@ -27,7 +27,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		if(!strlen($filterInput))
 			return null;
 			
-		$filter = new KalturaProfesionalServicesPartnerFilter();
+		$filter = new KalturaPartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		if ($filterType == 'byid')
 		{
