@@ -240,24 +240,10 @@ class KalturaSyndicationFeedRenderer
 		return $entry;
 	}
 	
-	private function clearMemory()
-	{
-		entryPeer::clearInstancePool();
-		flavorAssetPeer::clearInstancePool();
-		FileSyncPeer::clearInstancePool();
-		categoryPeer::clearInstancePool();
-		
-		if(class_exists('MetadataPeer'))
-		{
-			MetadataPeer::clearInstancePool();
-			MetadataProfilePeer::clearInstancePool();
-		}
-	}
-	
 	private function fetchNextPage()
 	{
 		$this->entriesCurrentPage = null;
-		$this->clearMemory();
+		kMemoryManager::clearMemory();
 		
 		if($this->currentCriteria)
 		{
