@@ -16,6 +16,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 
 	public function generate() 
 	{
+		parent::generate();
+	
 		$this->load();
 		
 		$this->writeBeforeServices();

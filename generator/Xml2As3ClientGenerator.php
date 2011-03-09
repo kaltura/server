@@ -11,6 +11,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	
 	public function generate(  ) 
 	{
+		parent::generate();
+	
 		$this->base_client_dir = $this->getParam("type");
 		
 		$this->xml = new SimpleXMLElement( $this->_xmlFile , NULL, TRUE);
