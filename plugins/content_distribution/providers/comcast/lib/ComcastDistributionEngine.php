@@ -133,8 +133,13 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			
 		$media->copyright = $this->findMetadataValue($metadataObjects, 'copyright');
 		
-		$media->formats = new ComcastArrayOfFormat();
-		$media->formats = ComcastFormat::_FLV;
+		$media->formats = array();
+		$media->formats[] = ComcastFormat::_JPEG;
+		$media->formats[] = ComcastFormat::_FLV;
+		$media->formats[] = ComcastFormat::_QT;
+		$media->formats[] = ComcastFormat::_WM;
+		$media->formats[] = ComcastFormat::_MPEG;
+		$media->formats[] = ComcastFormat::_MPEG4;
 		
 		$media->externalID = $entry->id;
 		$media->length = $entry->duration;
