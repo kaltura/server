@@ -334,8 +334,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 		$ksUserId = $ksObj->user;
 		$ksPartnerId = $ksObj->partner_id;
+		$kuser = null;
 		
-		if (!$ksUserId && $useOwnerIfNoUser)
+		if (is_null($ksUserId) && $useOwnerIfNoUser)
 		{
 			KalturaLog::log('No user id on KS, trying to login as the account owner');
 			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
@@ -343,9 +344,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 				throw new kUserException('Invalid partner id ['.$ksPartnerId.']', kUserException::INVALID_PARTNER);
 			}
 			$ksUserId = $partner->getAccountOwnerKuserId();
+			$kuser = kuserPeer::retrieveByPK($ksUserId);
 		}
 		
-		$kuser = kuserPeer::getKuserByPartnerAndUid($ksPartnerId, $ksUserId, true);
+		if (!$kuser) {
+			$kuser = kuserPeer::getKuserByPartnerAndUid($ksPartnerId, $ksUserId, true);
+		}
 		if (!$kuser)
 		{
 			throw new kUserException('User with id ['.$ksUserId.'] was not found for partner with id ['.$ksPartnerId.']', kUserException::USER_NOT_FOUND);
