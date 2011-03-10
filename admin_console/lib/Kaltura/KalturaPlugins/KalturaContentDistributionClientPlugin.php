@@ -97,7 +97,21 @@ class KalturaDistributionProviderType
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const EXAMPLE = "exampleDistribution.EXAMPLE";
 	const VERIZON = "verizonDistribution.VERIZON";
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorType
+{
+	const CUSTOM_ERROR = 0;
+	const STRING_EMPTY = 1;
+	const STRING_TOO_LONG = 2;
+	const STRING_TOO_SHORT = 3;
+	const INVALID_FORMAT = 4;
 }
 
 /**
@@ -1034,6 +1048,85 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 	 * @var KalturaGenericDistributionProviderParser
 	 */
 	public $resultParserType = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorMissingMetadata extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionThumbDimensions
+	 */
+	public $dimensions;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorMissingFlavor extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorParamsId = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorInvalidData extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionValidationErrorType
+	 */
+	public $validationErrorType = null;
+
+	/**
+	 * Parameter of the validation error
+	 * For example, minimum value for KalturaDistributionValidationErrorType::STRING_TOO_SHORT validation error
+	 *
+	 * @var string
+	 */
+	public $validationErrorParam = null;
 
 
 }

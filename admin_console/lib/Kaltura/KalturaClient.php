@@ -2069,7 +2069,7 @@ class KalturaClient extends KalturaClientBase
 	public $uiConf = null;
 
 	/**
-	 * UserRole service lets you create and manage user permissions
+	 * UserRole service lets you create and manage user roles
 	 * @var KalturaUserRoleService
 	 */
 	public $userRole = null;
