@@ -243,10 +243,10 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	public function getSunStatus()
 	{		
 		$now = time();
-		if($now < $this->getSunrise(null))
+		if($this->getSunrise(null) && $now < $this->getSunrise(null))
 			return EntryDistributionSunStatus::BEFORE_SUNRISE;
 			
-		if($now > $this->getSunset(null))
+		if($this->getSunset(null) && $now > $this->getSunset(null))
 			return EntryDistributionSunStatus::AFTER_SUNSET;
 
 		return EntryDistributionSunStatus::AFTER_SUNRISE;

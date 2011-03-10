@@ -466,6 +466,9 @@ class kContentDistributionManager
 	
 	public static function getSearchStringDistributionFlag($entryDistributionFlag, $distributionProfileId = null)
 	{
+		if(is_null($entryDistributionFlag))
+			$entryDistributionFlag = EntryDistributionDirtyStatus::NONE;
+			
 		if($distributionProfileId)
 			return "entryDistFlag $entryDistributionFlag $distributionProfileId";
 			
