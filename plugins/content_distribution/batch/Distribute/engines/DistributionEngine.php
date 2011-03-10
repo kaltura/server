@@ -111,9 +111,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getThumbAssetUrl($thumbAssetId)
 	{
-		$domain = $this->kalturaClient->getConfig()->serviceUrl;
-		$ks = $this->kalturaClient->getKs();
-		return "$domain/api_v3/service/thumbAsset/action/serve/ks/$ks/thumbAssetId/$thumbAssetId";
+		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($this->kalturaClient);
+		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($thumbAssetId);
+	
+//		$domain = $this->kalturaClient->getConfig()->serviceUrl;
+//		return "$domain/api_v3/service/thumbAsset/action/serve/thumbAssetId/$thumbAssetId";
 	}
 
 	/**
@@ -122,10 +124,13 @@ abstract class DistributionEngine implements IDistributionEngine
 	 */
 	protected function getFlavorAssetUrl($flavorAssetId)
 	{
-		$this->impersonate($this->partnerId);
-		$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAssetId, true);
-		$this->unimpersonate();
-		return $url;
+		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($this->kalturaClient);
+		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($flavorAssetId);
+		
+//		$this->impersonate($this->partnerId);
+//		$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAssetId, true);
+//		$this->unimpersonate();
+//		return $url;
 	}
 
 	/**

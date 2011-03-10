@@ -402,5 +402,39 @@ class ContentDistributionBatchService extends BatchService
 		}
 	}
 // --------------------------------- Distribution Synchronizer functions 	--------------------------------- //
-	
+
+
+	/**
+	 * returns absolute valid url for asset file
+	 * 
+	 * @action getAssetUrl
+	 * @param string $assetId
+	 * @return string
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 */
+	function getAssetUrlAction($assetId)
+	{
+		assetPeer::resetInstanceCriteriaFilter();
+		$asset = assetPeer::retrieveById($assetId);
+		if(!$asset)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $assetId);
+		
+		$ext = $asset->getFileExt();
+		if(is_null($ext))
+			$ext = 'jpg';
+			
+		$fileName = $asset->getEntryId() . "_" . $asset->getId() . ".$ext";
+		
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY, $asset->getId());
+
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		if(!$fileSync)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $asset->getId());
+			
+		return $fileSync->getExternalUrl();
+	}
 }
