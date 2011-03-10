@@ -84,7 +84,7 @@
 											</tfoot>
 											<tbody>
 												<?php foreach($fileSyncs as $file): ?>
-													<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbFiles$thumbAsset->id")->next(); ?>">
+													<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbFiles{$distribution->id}")->next(); ?>">
 														<?php 
 															if(strlen($file->fileContent))
 															{
