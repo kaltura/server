@@ -155,6 +155,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
+			if($child->result->attributes()->type == 'file')
+				continue;
+				
 			$const_props = "";
 			$const_doc_params = array();
 			$imports = "";
