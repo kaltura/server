@@ -133,7 +133,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			
 		$media->copyright = $this->findMetadataValue($metadataObjects, 'copyright');
 		
-		$media->formats = new ComcastArrayOfFormat();
+		$media->formats = array();
 		$media->formats[] = ComcastFormat::_JPEG;
 		$media->formats[] = ComcastFormat::_FLV;
 		$media->formats[] = ComcastFormat::_QT;
@@ -178,8 +178,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
 				$mediaFile->isThumbnail = true;
-				$mediaFile->assetTypes = array();
-				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
+//				$mediaFile->assetTypes = array();
+//				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
 				$mediaFiles[] = $mediaFile;
 				
 				$remoteMediaFile = new KalturaDistributionRemoteMediaFile();
@@ -387,8 +387,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
 				$mediaFile->isThumbnail = true;
-				$mediaFile->assetTypes = array();
-				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
+//				$mediaFile->assetTypes = array();
+//				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
 				
 				if(isset($submittedMediaFiles[$thumbAsset->id]))
 				{
