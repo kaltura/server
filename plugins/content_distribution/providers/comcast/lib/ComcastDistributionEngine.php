@@ -127,7 +127,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media->expirationDate = $data->entryDistribution->sunset;
 		
 		$categories = $this->findMetadataValue($metadataObjects, 'ComcastCategory', true);
-		$media->categories = new ComcastArrayOfstring();
+		$media->categories = array();
 		foreach($categories as $category)
 			$media->categories[] = $category;
 			
@@ -146,7 +146,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media->title = $entry->name;
 		$media->description = $entry->description;
 		
-		$media->customData = new ComcastCustomData();
+		$media->customData = array();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
 		$media->customData[] = $this->newCustomDataElement('Link Href');
 		$media->customData[] = $this->newCustomDataElement('Link Text');
