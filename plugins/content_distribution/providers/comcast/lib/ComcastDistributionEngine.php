@@ -133,7 +133,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			
 		$media->copyright = $this->findMetadataValue($metadataObjects, 'copyright');
 		
-		$media->formats = array();
+		$media->formats = new ComcastArrayOfFormat();
 		$media->formats[] = ComcastFormat::_JPEG;
 		$media->formats[] = ComcastFormat::_FLV;
 		$media->formats[] = ComcastFormat::_QT;
@@ -146,7 +146,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media->title = $entry->name;
 		$media->description = $entry->description;
 		
-		$media->customData = array();
+		$media->customData = new ComcastCustomData();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
 		$media->customData[] = $this->newCustomDataElement('Link Href');
 		$media->customData[] = $this->newCustomDataElement('Link Text');
