@@ -112,7 +112,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	protected function getThumbAssetUrl($thumbAssetId)
 	{
 		$domain = $this->kalturaClient->getConfig()->serviceUrl;
-		return "$domain/service/thumbAsset/action/serve/thumbAssetId/$thumbAssetId";
+		return "$domain/api_v3/service/thumbAsset/action/serve/thumbAssetId/$thumbAssetId";
 	}
 
 	/**

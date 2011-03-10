@@ -172,6 +172,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}";
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
+				$mediaFile->isThumbnail = true;
 				$mediaFile->assetTypes = array();
 				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
 				$mediaFiles[] = $mediaFile;
@@ -380,6 +381,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}";
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
+				$mediaFile->isThumbnail = true;
 				$mediaFile->assetTypes = array();
 				$mediaFile->assetTypes[] = "{$thumbAsset->width}x{$thumbAsset->height} Image";
 				
