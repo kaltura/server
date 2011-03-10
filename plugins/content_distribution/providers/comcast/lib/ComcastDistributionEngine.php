@@ -186,6 +186,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$remoteMediaFile->assetId = $thumbAsset->id;
 				$remoteMediaFile->version = $thumbAsset->version;
 				$data->mediaFiles[$thumbAsset->id] = $remoteMediaFile;
+				
+				if(!$media->thumbnailURL)
+					$media->thumbnailURL = $mediaFile->originalLocation;
 			}
 		}
 		
@@ -365,6 +368,10 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$submittedMediaFiles = array();	
 		$finalMediaFiles = array();
 		
+		
+		// TODO - compare the thumbnails dimensions for swapping to different asset
+		// TODO - adding new assets using media add
+		// TODO - don't remove deleted assets
 		if($data->mediaFiles && is_array($data->mediaFiles))
 		{
 			foreach($data->mediaFiles as $mediaFile)
