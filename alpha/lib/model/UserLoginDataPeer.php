@@ -336,7 +336,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		$ksPartnerId = $ksObj->partner_id;
 		$kuser = null;
 		
-		if (is_null($ksUserId) && $useOwnerIfNoUser)
+		if ((is_null($ksUserId) || $ksUserId === '') && $useOwnerIfNoUser)
 		{
 			KalturaLog::log('No user id on KS, trying to login as the account owner');
 			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
