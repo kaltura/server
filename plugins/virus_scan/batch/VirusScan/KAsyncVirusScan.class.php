@@ -101,6 +101,11 @@ class KAsyncVirusScan extends KBatchBase
 				
 					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, $data);
 					break;
+					
+				default:
+					$data->scanResult = KalturaVirusScanJobResult::SCAN_ERROR;
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: Emtpy scan result returned", KalturaBatchJobStatus::RETRY, $data);
+					break;
 			}
 			
 		}
