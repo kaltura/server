@@ -106,7 +106,7 @@ class KAsyncVirusScan extends KBatchBase
 		}
 		catch(Exception $ex)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $data);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, $data);
 		}
 		return $job;
 	}
