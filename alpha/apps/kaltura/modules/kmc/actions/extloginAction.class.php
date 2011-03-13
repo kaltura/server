@@ -95,7 +95,8 @@ class extloginAction extends kalturaAction
 			$screen_name = $this->getP ( "screen_name" );
 		}
 		
-		if ($ksPartnerId != $partner_id)
+		$noUserInKs = is_null($ksObj->user) || $ksObj->user === '';
+		if ( ($ksPartnerId != $partner_id) || ($partner->getKmcVersion() >= 4 && $noUserInKs) )
 		{
 			$ks = null;	
 			$sessionType = $adminKuser->getIsAdmin() ? SessionType::ADMIN : SessionType::USER;
