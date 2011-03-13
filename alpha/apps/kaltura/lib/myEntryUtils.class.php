@@ -998,7 +998,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->setFlavorParamsIds(implode(',', $newFlavorParams));
  		}
  		
- 		
+ 		$newKuser = null;
  		if (!$dontCopyUsers)
  		{
  			// copy the kuser (if the same puser id exists its kuser will be used)
