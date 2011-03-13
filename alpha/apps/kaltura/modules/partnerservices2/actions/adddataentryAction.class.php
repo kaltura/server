@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'addentrybaseAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class adddataentryAction extends addentrybaseAction
 {
 	public function describe()
