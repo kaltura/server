@@ -365,6 +365,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$options->deleteSource = false;
 
 		$mediaFiles = array();
+		$additionalMediaFiles = array();
 		$submittedMediaFiles = array();	
 		$finalMediaFiles = array();
 		
@@ -402,15 +403,18 @@ class ComcastDistributionEngine extends DistributionEngine implements
 					$remoteMediaFile = $submittedMediaFiles[$thumbAsset->id];
 					$mediaFile->ID = $remoteMediaFile->remoteId;
 					$finalMediaFiles[$thumbAsset->id] = $remoteMediaFile;
+					$mediaFiles[] = $mediaFile;
 				}
 				else
 				{
+					$mediaFile->mediaID = $data->remoteId;
+					
 					$remoteMediaFile = new KalturaDistributionRemoteMediaFile();
 					$remoteMediaFile->assetId = $thumbAsset->id;
 					$remoteMediaFile->version = $thumbAsset->version;
 					$finalMediaFiles[$thumbAsset->id] = $remoteMediaFile;
+					$additionalMediaFiles[] = $mediaFile;
 				}
-				$mediaFiles[] = $mediaFile;
 			}
 		}
 		
@@ -437,18 +441,22 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$remoteMediaFile = $submittedMediaFiles[$flavorAsset->id];
 				$mediaFile->ID = $remoteMediaFile->remoteId;
 				$finalMediaFiles[$flavorAsset->id] = $remoteMediaFile;
+				$mediaFiles[] = $mediaFile;
 			}
 			else
 			{
+				$mediaFile->mediaID = $data->remoteId;
+				
 				$remoteMediaFile = new KalturaDistributionRemoteMediaFile();
 				$remoteMediaFile->assetId = $flavorAsset->id;
 				$remoteMediaFile->version = $flavorAsset->version;
 				$finalMediaFiles[$flavorAsset->id] = $remoteMediaFile;
+				$additionalMediaFiles[] = $mediaFile;
 			}
-			$mediaFiles[] = $mediaFile;
 		}
 		$this->unimpersonate();
 		
+		// updating the existing media
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		$comcastSetContentResults = $comcastMediaService->setContent($media, $mediaFiles, $options);
 		
@@ -459,6 +467,11 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		foreach($comcastSetContentResults->mediaFileIDs as $mediaFileID)
 			$mediaFileIDs[] = $mediaFileID;
 
+		// adding additional media files
+		$comcastIDList = $comcastMediaService->addMediaFiles($additionalMediaFiles);
+		foreach($comcastIDList as $mediaFileID)
+			$mediaFileIDs[] = $mediaFileID;
+		
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
 		$data->mediaFiles = $finalMediaFiles;
 		if($comcastMediaFileList)
