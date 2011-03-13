@@ -78,10 +78,8 @@ class assetParamsPeer extends BaseassetParamsPeer
 					
 					if($hasPartnerZero)
 					{
-						$partnerZero = $criteria->getNewCriterion(self::PARTNER_ID, 0);
-						$isDefaultCriterion = $criteria->getNewCriterion(self::IS_DEFAULT, 1);
-						$partnerZero->addAnd($isDefaultCriterion);
-						$criterion->addOr($partnerZero);
+						$query = "(" . self::PARTNER_ID . " = 0 AND " . self::IS_DEFAULT . " = 1)";
+						$criterion->addOr($criteria->getNewCriterion(self::PARTNER_ID, $query, Criteria::CUSTOM));
 					}
 				}
 				else 
