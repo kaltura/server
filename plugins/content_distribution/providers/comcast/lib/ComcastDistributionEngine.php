@@ -464,13 +464,15 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$data->results = $comcastMediaService->response;
 	
 		$mediaFileIDs = array();
-		foreach($comcastSetContentResults->mediaFileIDs as $mediaFileID)
-			$mediaFileIDs[] = $mediaFileID;
+		if($comcastSetContentResults->mediaFileIDs && count($comcastSetContentResults->mediaFileIDs))
+			foreach($comcastSetContentResults->mediaFileIDs as $mediaFileID)
+				$mediaFileIDs[] = $mediaFileID;
 
 		// adding additional media files
 		$comcastIDList = $comcastMediaService->addMediaFiles($additionalMediaFiles);
-		foreach($comcastIDList as $mediaFileID)
-			$mediaFileIDs[] = $mediaFileID;
+		if($comcastIDList && count($comcastIDList))
+			foreach($comcastIDList as $mediaFileID)
+				$mediaFileIDs[] = $mediaFileID;
 		
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
 		$data->mediaFiles = $finalMediaFiles;
