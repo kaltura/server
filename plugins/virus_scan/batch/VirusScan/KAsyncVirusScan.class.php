@@ -86,27 +86,27 @@ class KAsyncVirusScan extends KBatchBase
 			switch ($data->scanResult)
 			{
 				case KalturaVirusScanJobResult::SCAN_ERROR:
-					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::RETRY, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, "Error: " . $errorDescription, KalturaBatchJobStatus::RETRY, $data);
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_IS_CLEAN:
-					$this->closeJob($job, null, null, "Scan finished - file was found to be clean", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					$this->closeJob($job, null, null, "Scan finished - file was found to be clean", KalturaBatchJobStatus::FINISHED, null, $data);
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_WAS_CLEANED:
-					$this->closeJob($job, null, null, "Scan finished - file was infected but scan has managed to clean it", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					$this->closeJob($job, null, null, "Scan finished - file was infected but scan has managed to clean it", KalturaBatchJobStatus::FINISHED, null, $data);
 					break;
 					
 				case KalturaVirusScanJobResult::FILE_INFECTED:
 				
-					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, null, $job->data);
+					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, null, $data);
 					break;
 			}
 			
 		}
 		catch(Exception $ex)
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $job->data);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED, KalturaEntryStatus::ERROR_CONVERTING, $data);
 		}
 		return $job;
 	}
