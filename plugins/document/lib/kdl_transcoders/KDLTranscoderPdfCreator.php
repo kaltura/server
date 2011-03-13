@@ -55,7 +55,7 @@ class KDLTranscoderPdfCreator extends KDLOperatorBase
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
 	{
 		$cmdStr = KDLCmdlinePlaceholders::InFileName ." ". KDLCmdlinePlaceholders::OutFileName;
-		if ($target->_pdf->_readonly){
+		if ($target->_pdf && $target->_pdf->_readonly){
 			$cmdStr .=" --readonly";
 		}
 				
