@@ -90,16 +90,16 @@ class KAsyncVirusScan extends KBatchBase
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_IS_CLEAN:
-					$this->closeJob($job, null, null, "Scan finished - file was found to be clean", KalturaBatchJobStatus::FINISHED, null, $data);
+					$this->closeJob($job, null, null, "Scan finished - file was found to be clean", KalturaBatchJobStatus::FINISHED, $data);
 					break;
 				
 				case KalturaVirusScanJobResult::FILE_WAS_CLEANED:
-					$this->closeJob($job, null, null, "Scan finished - file was infected but scan has managed to clean it", KalturaBatchJobStatus::FINISHED, null, $data);
+					$this->closeJob($job, null, null, "Scan finished - file was infected but scan has managed to clean it", KalturaBatchJobStatus::FINISHED, $data);
 					break;
 					
 				case KalturaVirusScanJobResult::FILE_INFECTED:
 				
-					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, null, $data);
+					$this->closeJob($job, null, null, "File was found INFECTED and wasn't cleaned!", KalturaBatchJobStatus::FINISHED, $data);
 					break;
 			}
 			
