@@ -226,6 +226,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);
 		
+		KalturaLog::debug("Request [$comcastMediaService->request]");
+		KalturaLog::debug("Response [$comcastMediaService->response]");
+		KalturaLog::debug("Media ID [$comcastAddContentResults->mediaID]");
 		$data->sentData = $comcastMediaService->request;
 		$data->results = $comcastMediaService->response;
 		$data->remoteId = $comcastAddContentResults->mediaID;
@@ -235,6 +238,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFileIDs[] = $mediaFileID;
 
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
+		KalturaLog::debug("Request [$comcastMediaService->request]");
+		KalturaLog::debug("Response [$comcastMediaService->response]");
 		if($comcastMediaFileList)
 		{
 			foreach($comcastMediaFileList as $comcastMediaFile)
@@ -460,6 +465,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		$comcastSetContentResults = $comcastMediaService->setContent($media, $mediaFiles, $options);
 		
+		KalturaLog::debug("Request [$comcastMediaService->request]");
+		KalturaLog::debug("Response [$comcastMediaService->response]");
 		$data->sentData = $comcastMediaService->request;
 		$data->results = $comcastMediaService->response;
 	
@@ -470,6 +477,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 
 		// adding additional media files
 		$comcastIDList = $comcastMediaService->addMediaFiles($additionalMediaFiles);
+		KalturaLog::debug("Request [$comcastMediaService->request]");
+		KalturaLog::debug("Response [$comcastMediaService->response]");
 		if($comcastIDList && count($comcastIDList))
 			foreach($comcastIDList as $mediaFileID)
 				$mediaFileIDs[] = $mediaFileID;
@@ -501,6 +510,9 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$ids = array($data->remoteId);
 		$comcastMediaService->deleteMedia($ids);
+		
+		KalturaLog::debug("Request [$comcastMediaService->request]");
+		KalturaLog::debug("Response [$comcastMediaService->response]");
 		
 		return true;
 	}
