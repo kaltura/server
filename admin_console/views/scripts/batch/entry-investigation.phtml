@@ -1052,6 +1052,7 @@
 				</tbody>
 			</table>
 			
+			<div id="paintarea" style="width:1500px; height:1200px"></div>
 			
 			<br/><br/>
 			<h3><?php echo $this->translate('entry-investigate track entry title'); ?></h3>
@@ -1107,22 +1108,163 @@
 	}
 ?>
 <br /><br />&nbsp;
+
+<script src='/admin_console/js/draw2d/wz_jsgraphics.js'></script>          
+<script src='/admin_console/js/draw2d/mootools.js'></script>          
+<script src='/admin_console/js/draw2d/moocanvas.js'></script>                        
+<script src='/admin_console/js/draw2d/draw2d.js'></script> 
+ 
+<script src="/admin_console/js/draw2d/shape/Job.js"></script> 
+			
 <script type="text/javascript">
 
+	function generateFlow(){
+
+		var $paintarea = jQuery("#paintarea");
+		if(!$paintarea)
+			return;
+		
+		var offset = $paintarea.offset();
+		var x = offset.left + 5;
+		var y = offset.top + 5;
+
+		var workflow  = new draw2d.Workflow("paintarea");
+		var jobNodes = {};
+
+		<?php if($investigateData->jobs && $investigateData->jobs->totalCount): ?>
+			<?php foreach($investigateData->jobs->objects as $job): ?>
+
+				<?php 
+					$color = '255, 255, 255';
+					switch($job->status)
+					{
+						case KalturaBatchJobStatus::QUEUED:
+						case KalturaBatchJobStatus::PROCESSING:
+						case KalturaBatchJobStatus::PROCESSED:
+						case KalturaBatchJobStatus::MOVEFILE:
+						case KalturaBatchJobStatus::ALMOST_DONE:
+							$color = '200, 255, 200';
+							break;
+	
+						case KalturaBatchJobStatus::FINISHED:
+						case KalturaBatchJobStatus::DONT_PROCESS:
+							$color = '128, 255, 128';
+							break;
+							
+						case KalturaBatchJobStatus::ABORTED:
+						case KalturaBatchJobStatus::FAILED:										
+						case KalturaBatchJobStatus::FATAL:
+							$color = '255, 0, 0';
+							break;
+					}
+					
+					if($job->deletedAt)
+						$color = '255, 0, 0';
+				?>
+				var bgColor = new draw2d.Color(<?php echo $color; ?>);
+				
+				var jobNode = new draw2d.shape.Job("<?php echo $this->jobTypeTranslate($job->jobType, $job->jobSubType); ?>");
+				jobNode.setBackgroundColor(bgColor);
+				jobNode.addAttribute("id", <?php echo $job->id; ?>);
+				jobNode.addAttribute("status", "<?php echo $this->enumTranslate('KalturaBatchJobStatus', $job->status); ?>");
+				jobNodes["job_<?php echo $job->id; ?>"] = jobNode;
+
+				<?php if($job->parentJobId && $job->parentJobId != $job->id): ?>
+				
+					if(jobNodes["job_<?php echo $job->parentJobId; ?>"]){
+						jobNodes["job_<?php echo $job->parentJobId; ?>"].addChildJob(jobNode);
+					}
+					
+				<?php endif; ?>
+				
+
+			<?php endforeach; ?>
+
+			var firstLevelX = x + 5;
+			var maxLevel = 1;
+			
+			for(var i in jobNodes){
+				jobNode = jobNodes[i];
+				
+				var jobX = firstLevelX;
+				if(jobNode.getNodeLevel())
+					jobX = jobNode.getJobParentX();
+				jobNode.setJobX(jobX);
+				
+				var jobW = (jobNode.getChildrenWidth() / 2);
+				
+				var jobY = y + (jobNode.getNodeLevel() * 110);
+				workflow.addFigure(jobNode, jobX, jobY);
+
+				if(jobNode.getNodeLevel())
+					jobNode.setJobParentX(jobX + jobW);
+				else
+					firstLevelX += jobW;
+
+				if(jobNode.getNodeLevel() >= maxLevel)
+					maxLevel = jobNode.getNodeLevel() + 1;
+			}
+			$paintarea.height(maxLevel * 110);
+
+			var maxWidth = 10;
+			for(var i in jobNodes){
+				jobNode = jobNodes[i];
+				
+				if(jobNode.getNodeLevel())
+					continue;
+
+				jobNode.addConnections(workflow);
+				maxWidth += (jobNode.getChildrenWidth() / 2);
+			}
+			$paintarea.width(maxWidth);
+			
+		<?php else: ?>
+			$paintarea.remove();
+		<?php endif; ?>
+		
+//		var object = new draw2d.shape.uml.Class("Convert");
+//		object.addAttribute("id", 3453453);
+//		object.setDimension(20, 10);
+//		workflow.addFigure(object, x + 10, y + 10);
+//		
+//		var rectangle = new draw2d.shape.uml.Class("Rectangle");
+//		rectangle.setDimension(20, 10);
+//		rectangle.addAttribute("width","Integer","0");
+//		rectangle.addAttribute("height","Integer","0");
+//		workflow.addFigure(rectangle, x + 100, y + 300);
+//		
+//		var circle = new draw2d.shape.uml.Class("Circle");
+//		circle.setDimension(20, 10);
+//		circle.addAttribute("diameter","Integer","0");
+//		workflow.addFigure(circle, x + 500, y + 300);
+//		
+//		var con = new draw2d.shape.uml.InheritanceConnection();
+//		con.setSource(rectangle.portTop);
+//		con.setTarget(object.portTop);
+//		workflow.addFigure(con);
+//		
+//		var con = new draw2d.shape.uml.InheritanceConnection();
+//		con.setSource(circle.portTop);
+//		con.setTarget(object.portTop);
+//		workflow.addFigure(con);
+			
+	}
+	
 	function doThumbs() {
-		$(".thumbWrap").mouseover(function(){
-			$(this).children("img").addClass("on");
+		jQuery(".thumbWrap").mouseover(function(){
+			jQuery(this).children("img").addClass("on");
 		});
-		$(".thumbWrap").mouseout(function(){
-			$(this).children("img").removeClass("on");
+		jQuery(".thumbWrap").mouseout(function(){
+			jQuery(this).children("img").removeClass("on");
 		});
 	}
 
 	function toggleView(entityId) {
-		$("#" + entityId).toggle();
+		jQuery("#" + entityId).toggle();
 	}
 
 	jQuery(function() {
+		generateFlow();
 		doThumbs();
 	});
 

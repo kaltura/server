@@ -1,5 +1,5 @@
 $(function() {
-	if ($('iframe.auto-height').size() > 0) {
+	if ($('iframe.auto-height') && $('iframe.auto-height').size() > 0) {
 		autoSizeIframe();
 		$(window).resize(autoSizeIframe);
 	}
