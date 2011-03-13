@@ -222,9 +222,11 @@ class myInsertEntryHelper
 		
 		if ($ext == null)
 		{
-			$qpos = strpos($entry_fullPath, "?");
+			$entry_fullPathTmp = $entry_fullPath;
+			$qpos = strpos($entry_fullPathTmp, "?");
 			if ($qpos !== false)
-				$entry_fullPathTmp = substr($entry_fullPath, 0, $qpos);
+				$entry_fullPathTmp = substr($entry_fullPathTmp, 0, $qpos);
+				
 			$ext = strtolower(pathinfo($entry_fullPathTmp, PATHINFO_EXTENSION));
 		}
 		
