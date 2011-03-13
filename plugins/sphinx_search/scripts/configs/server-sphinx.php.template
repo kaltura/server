@@ -1,0 +1,2 @@
+<?php
+$sphinxServer = '@SPHINX_SERVER@';
