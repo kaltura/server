@@ -122,6 +122,8 @@
 		onclick="switchToPHP()">PHP</a></li>
 	<li class="code-menu code-menu-java"><a href="#"
 		onclick="switchToJava()">Java</a></li>
+	<li class="code-menu code-menu-csharp"><a href="#"
+		onclick="switchToCSharp()">C#</a></li>
 	<li class="code-menu"><a class="code-menu-toggle" href="#"
 		onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
 </ul>

@@ -30,8 +30,8 @@ KCodeExampleBase.prototype.service = null;
 KCodeExampleBase.prototype.action = null;
 KCodeExampleBase.prototype.params = null;
 
-KCodeExampleJava.prototype.jqImports = null;
-KCodeExampleJava.prototype.jqActionImports = null;
+KCodeExampleBase.prototype.jqImports = null;
+KCodeExampleBase.prototype.jqActionImports = null;
 
 KCodeExampleBase.prototype.getNull = function (){
 	return jQuery("<span class=\"code-" + this.lang + "-system\">null</span>");
@@ -57,8 +57,16 @@ KCodeExampleBase.prototype.getArrayCloser = function (){
 	return "]";
 };
 
+KCodeExampleBase.prototype.getKsVar = function (){
+	return false;
+};
+
 KCodeExampleBase.prototype.getKsMethod = function (){
 	return "setKs";
+};
+
+KCodeExampleBase.prototype.getActionMethod = function (action){
+	return action;
 };
 
 KCodeExampleBase.prototype.getService = function (service){
@@ -82,8 +90,13 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		
 		if(name == "ks"){
 			var value = jqField.val();
-			var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
-			scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(), jqSetKs), scope.jqParams);
+			if(scope.getKsMethod()){
+				var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
+				scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(), jqSetKs), scope.jqParams);
+			}
+			else if(scope.getKsVar()){
+				scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
+			}
 			return;
 		}
 		
@@ -132,7 +145,8 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 					var jqNewInstance;
 					if(jqType.hasClass("array-type")){
 						var objectType = jqType.text();
-						jqNewInstance = "array()";
+						var arrayObjectType = jqType.next().text();
+						jqNewInstance = scope.codeNewArray(arrayObjectType);
 					}
 					else{
 						var objectType = jqType.find("option:selected").text();
@@ -196,9 +210,8 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 		}
 	}
 
-	jqService = this.getService(service);
-	
-	var actionMethod = action == "list" ? "listAction" : action;
+	var jqService = this.getService(service);
+	var actionMethod = this.getActionMethod(action);
 	var jqResult = this.codeVar("results");
 	var jqResultDeclare = this.codeVarDefine(jqResult, "Object");
 	var jqActionFunction = this.codeUserFunction(actionMethod, jqActionArgs);
@@ -370,7 +383,7 @@ KCodeExampleBase.prototype.codeFunctionDeclare = function (functionName, jqBode,
 			if(i)
 				jqCode.append(", ");
 			
-			jqCode.append(modifiers[functionArgs]);
+			jqCode.append(functionArgs[i]);
 		}
 	}
 
@@ -440,6 +453,10 @@ KCodeExampleBase.prototype.codeFunction = function (functionName, functionArgs){
 	return jqCode;
 };
 
+KCodeExampleBase.prototype.codeNewArray = function (className){
+	return "array";
+};
+
 KCodeExampleBase.prototype.codeNewInstance = function (className, constructorArgs){
 	var bracketCounter = this.bracketsCounter++;
 	var jqCode = jQuery("<span class=\"code-" + this.lang + "-new-instance code-" + this.lang + "-system\"/>");
@@ -486,6 +503,10 @@ KCodeExamplePHP.prototype.getObjectDelimiter = function (){
 	return "->";
 };
 
+KCodeExamplePHP.prototype.getActionMethod = function (action){
+	return action == "list" ? "listAction" : action;
+};
+
 KCodeExamplePHP.prototype.getClassDelimiter = function (){
 	return "::";
 };
@@ -511,6 +532,17 @@ KCodeExamplePHP.prototype.addCode = function (code, entity){
 KCodeExamplePHP.prototype.codeDeclareVar = function (jqObjectDef, type){
 	return this.codeAssign(jqObjectDef);
 };
+
+KCodeExamplePHP.prototype.codeNewArray = function (className){
+	return "array()";
+};
+
+KCodeExamplePHP.prototype.codeNewInstance = function (className, constructorArgs){
+	if(className == "array")
+		return this.codeNewArray();
+	
+	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
+}
 
 KCodeExamplePHP.prototype.codeVarDefine = function (jqObject, type){
 	return jqObject;
@@ -564,6 +596,20 @@ KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type){
 	}
 };
 
+KCodeExampleJava.prototype.codeNewArray = function (className){
+	if(className)
+		return this.codeNewInstance("ArrayList&lt;" + className + "&gt;");
+	
+	return this.codeNewInstance("ArrayList");
+};
+
+KCodeExampleJava.prototype.codeNewInstance = function (className, constructorArgs){
+	if(className == "array")
+		className = "ArrayList";
+	
+	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
+}
+
 KCodeExampleJava.prototype.codeVarDefine = function (jqObject, type){
 
 	switch(type){
@@ -598,6 +644,9 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	this.jqEntity.append(this.jqImports);
 	this.jqEntity.append(this.jqActionImports);
 
+	this.addCode(this.codeImport("com.kaltura.client.enums.*"), this.jqImports);
+	this.addCode(this.codeImport("com.kaltura.client.types.*"), this.jqImports);
+	this.addCode(this.codeImport("com.kaltura.client.services.*"), this.jqImports);
 	this.addCode(this.codeImport("com.kaltura.client.KalturaApiException"), this.jqImports);
 	this.addCode(this.codeImport("com.kaltura.client.KalturaClient"), this.jqImports);
 	this.addCode(this.codeImport("com.kaltura.client.KalturaConfiguration"), this.jqImports);
@@ -647,6 +696,149 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	this.jqEntity.append(jqClass);
 };
 
+
+function KCodeExampleCsharp(entity){
+	this.init(entity, 'csharp');
+}
+
+KCodeExampleCsharp.prototype = new KCodeExampleBase();
+
+KCodeExampleCsharp.prototype.init = function(entity, codeLanguage){
+	KCodeExampleBase.prototype.init.apply(this, arguments);
+};
+
+KCodeExampleCsharp.prototype.getKsMethod = function (){
+	return false;
+};
+
+KCodeExampleBase.prototype.getKsVar = function (){
+	return "KS";
+};
+
+KCodeExampleCsharp.prototype.getActionMethod = function (action){
+	return action.substr(0, 1).toUpperCase() + action.substr(1);
+};
+
+KCodeExampleCsharp.prototype.getService = function (service){
+	service = service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
+	return this.codeObjectAttribute(this.jqClientObject.clone(), service);
+};
+
+KCodeExampleCsharp.prototype.addCode = function (code, entity){
+	code.append(";");
+	KCodeExampleBase.prototype.addCode.apply(this, arguments);
+};
+
+KCodeExampleCsharp.prototype.codeImport = function (packageName){
+	var jqCode = jQuery("<span/>");
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">using </span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-package\">" + packageName + "</span>");
+	
+	return jqCode;
+};
+
+KCodeExampleCsharp.prototype.codePackage = function (packageName, jqBode){
+	var jqCode = jQuery("<span class=\"code-" + this.lang + "-package\"/>");
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">namespace </span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-package-name\">" + packageName + "</span>");
+
+	jqCode.append("{");
+	jqCode.append(jqBode);
+	jqCode.append("}");
+	
+	return jqCode;
+};
+
+KCodeExampleCsharp.prototype.codeDeclareVar = function (jqObjectDef, type){
+	switch(type){
+		case "int":
+			return this.codeAssign(jqObjectDef, "0");
+
+		case "bool":
+			return this.codeAssign(jqObjectDef, "false");
+			
+		default:
+			return this.codeAssign(jqObjectDef);
+	}
+};
+
+KCodeExampleCsharp.prototype.codeNewArray = function (className){
+	if(className)
+		return this.codeNewInstance("List&lt;" + className + "&gt;");
+	
+	return this.codeNewInstance("List");
+};
+
+KCodeExampleCsharp.prototype.codeNewInstance = function (className, constructorArgs){
+	if(className == "array")
+		className = "List";
+	
+	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
+}
+
+KCodeExampleCsharp.prototype.codeVarDefine = function (jqObject, type){
+
+	switch(type){
+		case "int":
+		case "bool":
+		case "Object":
+			break;
+
+		case "string":
+			type = "String";
+			break;
+
+		case "file":
+			type = "File";
+			break;
+			
+		default:
+			break;
+	}
+		
+	return KCodeExampleBase.prototype.codeVarDefine.apply(this, arguments);
+};
+
+KCodeExampleCsharp.prototype.codeHeader = function (){
+	
+	this.jqImports = jQuery("<div class=\"code-csharp-imports\"/>");
+	this.jqActionImports = jQuery("<div class=\"code-csharp-action-imports\"/>");
+	this.jqEntity.append(this.jqImports);
+	this.jqEntity.append(this.jqActionImports);
+
+	this.addCode(this.codeImport("System"), this.jqImports);
+	this.addCode(this.codeImport("System.Collections.Generic"), this.jqImports);
+	this.addCode(this.codeImport("System.Text"), this.jqImports);
+	this.addCode(this.codeImport("System.IO"), this.jqImports);
+	
+	this.jqAction = jQuery("<div class=\"code-action\"/>");
+	
+	var jqBody = jQuery("<div/>");
+	var jqConfigObject = this.codeVar("config");
+	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
+	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")]));
+	this.addCode(jqConfigObjectInit, jqBody);
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "ServiceUrl"), this.codeString("http://" + location.hostname + "/")), jqBody);
+
+	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(), "KalturaClient");
+	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone()]));
+	this.addCode(jqClientInit, jqBody);
+	
+	jqBody.append(this.jqAction);
+	jqBody.addClass("indent");
+
+	var jqArgsDeclare = this.codeVarDefine("args", "string[]");
+	var jqMain = this.codeFunctionDeclare("Main", jqBody, ["static"], [jqArgsDeclare], this.getVoid());
+	jqMain.addClass("indent");
+	
+	var jqClass = this.codeClassDeclare("CodeExample", jqMain);
+	jqClass.addClass("indent");
+	var jqPackage = this.codePackage("Kaltura", jqClass);
+	this.jqEntity.append(jqPackage);
+};
+
 function switchToCodeGenerator(type, generator){
 	kTestMe.initCodeExample(generator);
 	jQuery(".code-menu").removeClass("active");
@@ -659,6 +851,10 @@ function switchToPHP(){
 
 function switchToJava(){
 	switchToCodeGenerator('java', new KCodeExampleJava(jQuery("#example")));
+}
+
+function switchToCSharp(){
+	switchToCodeGenerator('csharp', new KCodeExampleCsharp(jQuery("#example")));
 }
 
 function toggleCode(){

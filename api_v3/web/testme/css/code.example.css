@@ -38,3 +38,17 @@
 .code-java-str {color: #0000FF;}
 .code-java-system {color: #800000; font-weight: bolder;}
 
+
+.code-csharp-package {}
+.code-csharp-package-name {}
+.code-csharp-bracket {color: #000000; font-weight: normal;}
+.code-csharp-bracket-over {font-weight: bolder;}
+.code-csharp-var {color: #000000; font-weight: normal;}
+.code-csharp-assign {}
+.code-csharp-new-instance {}
+.code-csharp-class-name {color: #000000; font-weight: normal;}
+.code-csharp-call-func {}
+.code-csharp-func-name {} 
+.code-csharp-str {color: #0000FF;}
+.code-csharp-system {color: #800000; font-weight: bolder;}
+

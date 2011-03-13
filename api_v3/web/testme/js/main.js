@@ -431,7 +431,7 @@ KTestMe.prototype = {
 		var jqArray = jQuery("<div class=\"array\">");
 		var objectTypeId = "object-type-" + param.name.replace(/:/g, "_");
 		var jqArrayName = jQuery("<div class=\"array-name\">temp</div>");  // temp required by IE
-		jqArrayName.html(param.name + " (<span id=\"" + objectTypeId + "\" class=\"array-type\">array</span>)");
+		jqArrayName.html(param.name + " (<span id=\"" + objectTypeId + "\" class=\"array-type\">array</span><span style=\"display:none;\" class=\"array-type-type\">" + param.arrayType.type + "</span>)");
 		jqArray.append(jqArrayName);
 		
 		var jqAdd = jQuery("<button class=\"array-button\">Add</button>");
