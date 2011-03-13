@@ -137,19 +137,6 @@ if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 		curl_close($ch); 
 		if ($result === true)
 		{
-			// send a mail to the support team
-			$to = 'support.team@kaltura.com';
-			$subject = 'A new KMC case was opened by ' . trim($_POST['your_name']) . ' - ' . trim($_POST['subject']);
-			$message = 	wordwrap('Partner Id: ' . trim($_POST['partner_id']), 70, "\n", true) . "\n" .
-						wordwrap('Description: ' . trim($_POST['description_text']), 70, "\n", true) . "\n" .   
-						wordwrap('Email: ' . trim($_POST['email']), 70, "\n", true) . "\n" .
-						wordwrap('Component/ Feature: ' . trim($_POST['00N70000002RZpf']), 70, "\n", true) . "\n" . 
-						wordwrap('Affected Functionality: ' . trim($_POST['00N70000002S7nb']), 70, "\n", true) . "\n" . 
-						wordwrap('Steps to Reproduce: ' . trim($_POST['00N70000002RcnD']), 70, "\n", true) . "\n" . 
-						wordwrap('Sample Link: ' . trim($_POST['00N70000002Rcn8']), 70, "\n", true) . "\n" .
-						wordwrap('Website URL: ' . trim($_POST['00N70000002S7oK']), 70, "\n", true) . "\n" .
-						wordwrap('Kaltura CMS Extension: ' . trim($_POST['00N70000002RZmb']), 70, "\n", true) . "\n";
-			$mailResult = mail($to, $subject, $message);
 		?>
 <div id="thx">
 	<p>Thank you for your submission.</p>
