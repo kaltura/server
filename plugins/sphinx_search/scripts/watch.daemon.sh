@@ -3,7 +3,14 @@ MAILTO="@ADMIN_CONSOLE_ADMIN_MAIL@"
 MAINT=@BASE_DIR@/maintenance
 SUDO_USER=searchd
 
-BASE_PATH=@BIN_DIR@
+while getopts "u:" o
+do	case "$o" in
+	u)	SUDO_USER="$OPTARG";;
+	
+	esac
+done
+
+BASE_PATH=@SPHINX_BIN_DIR@
 PID_FILE=@BASE_DIR@/sphinx/searchd.pid
 CONFIG_FILE=@APP_DIR@/configurations/sphinx/kaltura.conf
 
