@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'updateentryAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class updatedvdentryAction extends updateentryAction
 {
 	public function describe()

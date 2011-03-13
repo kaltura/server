@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'listmyentriesAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class listmydvdentriesAction extends listmyentriesAction
 {
 	public function describe()

@@ -1,5 +1,11 @@
 <?php
 /**
+ * @package api
+ * @subpackage ps2
+ */
+require_once 'deleteentryAction.class.php';
+
+/**
  * After making sure the ticket is a valid admin ticket - the setrvice is allowed and no other validations should be done
  * 
  * @package api

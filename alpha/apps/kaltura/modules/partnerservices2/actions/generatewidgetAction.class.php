@@ -1,5 +1,11 @@
 <?php
 /**
+ * @package api
+ * @subpackage ps2
+ */
+require_once 'addkshowAction.class.php';
+
+/**
  * 1. Will create a kshow with name and summary for a specific partner.
  * 2. Will generate widget-html for this kshow.
  * 

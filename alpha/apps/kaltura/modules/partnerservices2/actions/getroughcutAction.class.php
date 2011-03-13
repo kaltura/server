@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'getentryAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class getroughcutAction extends getentryAction
 {
 	public function describe()

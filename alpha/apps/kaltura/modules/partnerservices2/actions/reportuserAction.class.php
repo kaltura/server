@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'addmoderationAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class reportuserAction extends addmoderationAction
 {
 	public function describe()

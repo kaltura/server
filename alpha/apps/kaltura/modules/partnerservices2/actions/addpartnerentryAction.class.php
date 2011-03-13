@@ -3,6 +3,12 @@
  * @package api
  * @subpackage ps2
  */
+require_once 'addentryAction.class.php';
+
+/**
+ * @package api
+ * @subpackage ps2
+ */
 class addpartnerentryAction extends addentryAction
 {
     public function describe()
