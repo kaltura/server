@@ -410,14 +410,15 @@ kmc.utils = {
         }
 			
         // set url
-        var url = kmc.vars.service_url + "/secure_form.php?action=" + action;
+        var url = window.location.hostname + "/secure_form.php?action=" + action;
         // pass in the fields
         for(var i in fields) {
             var fld = (fields[i]) ? fields[i] : '';
             url += '&' + i + '=' + encodeURIComponent(fld);
         }
         // change http to https
-        url = url.replace("http", "https");
+        //url = url.replace("http", "https");
+	url = 'https://' + url;
 			
         // Pass the parent url for the postMessage to work
         url = url + '&parent=' + encodeURIComponent(document.location.href);
@@ -438,7 +439,7 @@ kmc.utils = {
 		 
         // setup a callback to handle the dispatched MessageEvent. if window.postMessage is supported the passed
         // event will have .data, .origin and .source properties. otherwise, it will only have the .data property.
-        var from_domain = kmc.vars.service_url.replace("http", "https");
+        var from_domain = 'https://' + window.location.hostname;
         XD.receiveMessage(function(message){
             if(message.data == "reload") {
                 kmc.utils.closeModal();
@@ -1354,7 +1355,8 @@ kmc.editors = {
 kmc.client = {
 			
     buildClientURL : function(service, action) {
-        return kmc.vars.service_url + '/api_v3/index.php?service='+service+'&action='+action;
+        //return kmc.vars.service_url + '/api_v3/index.php?service='+service+'&action='+action;
+	return 'http://' + window.location.hostname + '/api_v3/index.php?service='+service+'&action='+action;
     },
 		
     // Get the Short URL code
