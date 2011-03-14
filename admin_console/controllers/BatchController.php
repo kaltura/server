@@ -863,6 +863,21 @@ class BatchController extends Zend_Controller_Action
 			return;
 		}
 		
+		if (($request->getParam('searchType') == 'by-flavor-asset-id'))
+		{
+			try
+			{
+				// $entryId is actually flavor id in this case
+				$entry = $client->entryAdmin->getByFlavorId($entryId);
+			}
+			catch(Exception $e)
+			{
+				$this->view->errors[] = 'Flavor asset not found: ' . $e->getMessage();
+				return;
+			}
+			$entryId = $entry->id;
+		}
+		
 		$submitAction = $request->getParam('submitAction', false);
 		if($submitAction && strlen($submitAction))
 		{

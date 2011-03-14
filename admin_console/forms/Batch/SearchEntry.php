@@ -11,6 +11,14 @@ class Form_Batch_SearchEntry extends Form_Base
         $this->setEnctype('multipart/form-data');
         $this->setAttrib('id', 'frmSearch');
 
+        $this->addElement('select', 'searchType', array(
+			'required' 		=> true,
+			'multiOptions' 	=> array( 
+				'by-entry-id' => 'By Entry ID',
+				'by-flavor-asset-id' => 'By Flavor Asset ID',
+			)
+		));
+		
 		// Add an entryId element
         $this->addElement('text', 'entryId', array(
             'required'   => true,

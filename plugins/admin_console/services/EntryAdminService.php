@@ -43,6 +43,23 @@ class EntryAdminService extends KalturaBaseService
 
 		return $entry;
 	}
+	
+	/**
+	 * Get base entry by flavor ID with no filters.
+	 * 
+	 * @action getByFlavorId
+	 * @param string $flavorId
+	 * @param int $version Desired version of the data
+	 * @return KalturaBaseEntry The requested entry
+	 */
+	public function getByFlavorIdAction($flavorId, $version = -1)
+	{
+		$flavorAssetDb = flavorAssetPeer::retrieveById($flavorId);
+		if (!$flavorAssetDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorId);
+			
+		return $this->getAction($flavorAssetDb->getEntryId(), $version);
+	}
 
 	/**
 	 * Get base entry by ID with no filters.

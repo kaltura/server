@@ -318,6 +318,7 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
   div.error, div.message { padding:10px; border: solid 1px red; margin: 18px 0; display:inline; float:left; clear:both; font-weight:bold; color:red;}
   div.message { border-color:green; color:green;}
   body#batch-entry-investigation div.error { margin-top:6px;}
+  body#batch-entry-investigation #frmSearch { clear: both; }
 
 /*
   body#monitoring-xymon #wrapper { padding-left:22px;}
