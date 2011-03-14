@@ -65,6 +65,7 @@ class ComcastDistributionProfile extends DistributionProfile
 			{
 				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY);
 				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+				$validationError->setMetadataProfileId($metadataProfileId);
 				$validationErrors[] = $validationError;
 				return $validationErrors;
 			}

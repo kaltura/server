@@ -42,6 +42,11 @@ class kDistributionValidationError
 	private $validationErrorParam;
 	
 	/**
+	 * @var int
+	 */
+	private $metadataProfileId;
+	
+	/**
 	 * @return the $action
 	 */
 	public function getAction()
@@ -135,5 +140,21 @@ class kDistributionValidationError
 	public function setValidationErrorParam($validationErrorParam)
 	{
 		$this->validationErrorParam = $validationErrorParam;
+	}
+	
+	/**
+	 * @return the $metadataProfileId
+	 */
+	public function getMetadataProfileId()
+	{
+		return $this->metadataProfileId;
+	}
+
+	/**
+	 * @param int $metadataProfileId
+	 */
+	public function setMetadataProfileId($metadataProfileId)
+	{
+		$this->metadataProfileId = $metadataProfileId;
 	}
 }

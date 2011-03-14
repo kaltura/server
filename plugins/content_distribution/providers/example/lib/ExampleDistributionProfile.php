@@ -78,49 +78,55 @@ class ExampleDistributionProfile extends DistributionProfile
 		}
 		elseif(count($metadatas))
 		{
-			foreach($metadataProfileFields as $metadataProfileField)
+			// get the values for the testData key from all metadata objects
+			$values = $this->findMetadataValue($metadatas, self::METADATA_FIELD_TEST_DATA);
+			if(!count($values))
 			{
-				// get the values for the testData key from all metadata objects
-				$values = $this->findMetadataValue($metadatas, self::METADATA_FIELD_TEST_DATA);
-				if(!count($values))
+				$description = 'field is not defined in any of the metadata objects';
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_TEST_DATA, $description);
+				continue;
+			}	
+			else
+			{
+				foreach($metadatas as $metadata)
 				{
-					$description = 'field is not defined in any of the metadata objects';
-					$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_TEST_DATA, $description);
-					continue;
-				}	
-			
-				foreach($values as $value)
-				{
-					// validate that the field is not empty
-					if(!strlen($value))
+					$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_TEST_DATA);
+					foreach($values as $value)
 					{
-						$description = 'field is empty';
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
-						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-						$validationErrors[] = $validationError;
-						continue;
-					}
-				
-					// match the value to the required format
-					$matches = null;
-					$isMatched = preg_match('/' . self::METADATA_FIELD_TEST_DATA_FORMAT . '/', $value, $matches);
+						// validate that the field is not empty
+						if(!strlen($value))
+						{
+							$description = 'field is empty';
+							$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
+							$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+							$validationError->setMetadataProfileId($metadata->getMetadataProfileId());
+							$validationErrors[] = $validationError;
+							continue;
+						}
 					
-					if(!$isMatched)
-					{
-						$description = 'test data must match the required format';
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
-						$validationError->setValidationErrorType(DistributionValidationErrorType::INVALID_FORMAT);
-						$validationError->setValidationErrorParam(self::METADATA_FIELD_TEST_DATA_FORMAT);
-						$validationErrors[] = $validationError;
-					}
-					
-					$formatNumber = (int) $matches[1];
-					if($formatNumber < self::METADATA_FIELD_TEST_DATA_MINIMUM_FORMAT || $formatNumber > self::METADATA_FIELD_TEST_DATA_MAXIMUM_FORMAT)
-					{
-						$description = 'format number must be between ' . self::METADATA_FIELD_TEST_DATA_MINIMUM_FORMAT . ' and ' . self::METADATA_FIELD_TEST_DATA_MAXIMUM_FORMAT;
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
-						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-						$validationErrors[] = $validationError;
+						// match the value to the required format
+						$matches = null;
+						$isMatched = preg_match('/' . self::METADATA_FIELD_TEST_DATA_FORMAT . '/', $value, $matches);
+						
+						if(!$isMatched)
+						{
+							$description = 'test data must match the required format';
+							$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
+							$validationError->setValidationErrorType(DistributionValidationErrorType::INVALID_FORMAT);
+							$validationError->setValidationErrorParam(self::METADATA_FIELD_TEST_DATA_FORMAT);
+							$validationError->setMetadataProfileId($metadata->getMetadataProfileId());
+							$validationErrors[] = $validationError;
+						}
+						
+						$formatNumber = (int) $matches[1];
+						if($formatNumber < self::METADATA_FIELD_TEST_DATA_MINIMUM_FORMAT || $formatNumber > self::METADATA_FIELD_TEST_DATA_MAXIMUM_FORMAT)
+						{
+							$description = 'format number must be between ' . self::METADATA_FIELD_TEST_DATA_MINIMUM_FORMAT . ' and ' . self::METADATA_FIELD_TEST_DATA_MAXIMUM_FORMAT;
+							$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
+							$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+							$validationError->setMetadataProfileId($metadata->getMetadataProfileId());
+							$validationErrors[] = $validationError;
+						}
 					}
 				}
 			}

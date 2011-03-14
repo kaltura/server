@@ -83,6 +83,7 @@ class MsnDistributionProfile extends DistributionProfile
 				{
 					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $field);
 					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+					$validationError->setMetadataProfileId($metadataProfileId);
 					$validationErrors[] = $validationError;
 					return $validationErrors;
 				}
