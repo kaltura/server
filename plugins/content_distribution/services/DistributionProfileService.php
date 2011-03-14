@@ -198,6 +198,8 @@ class DistributionProfileService extends KalturaBaseService
 			
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
+			
+		$c->addDescendingOrderByColumn(DistributionProfilePeer::CREATED_AT);
 		
 		$totalCount = DistributionProfilePeer::doCount($c);
 		$pager->attachToCriteria($c);

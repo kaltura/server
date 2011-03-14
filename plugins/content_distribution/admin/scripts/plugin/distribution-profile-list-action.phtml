@@ -82,7 +82,7 @@ function configure(profileId) {
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileConfigureAction', 'profile_id' => '')); ?>' + profileId;
 	
 	jQuery('#provider-configure-dialog').remove();
-	var dialogDiv = jQuery('<div id="provider-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	dialogDiv = jQuery('<div id="provider-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
 	dialogDiv.dialog({
 		bgiframe: true,
@@ -94,15 +94,11 @@ function configure(profileId) {
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
-				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
-		},
-		close: function() {
-		}	
+		}
 	});
 	
 	dialogDiv.load(
@@ -178,7 +174,6 @@ function updateStatus(profileId, status, callback)
 	});
 }
 
-var dialogDiv;
 function newDistributionProfile(partnerId, providerType) {
 	if(!partnerId.length || isNaN(partnerId)){
 		alert('<?php echo $this->translate('partner id not supplied'); ?>');
@@ -202,16 +197,11 @@ function newDistributionProfile(partnerId, providerType) {
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmDistributionProfileConfig').submit();
-				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
-		},
-		close: function() {
-			jQuery('#frmPaginator1').submit();
-		}	
+		}
 	});	
 	dialogDiv.load(
 		url, 
@@ -226,6 +216,7 @@ function newDistributionProfileSuccess(html) {
 	if (jQuery(html).parent().find('#frmDistributionProfileConfig').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
+		jQuery('#frmPaginator1').submit();
 	}
 	else
 	{
@@ -233,8 +224,5 @@ function newDistributionProfileSuccess(html) {
 		jQuery('#frmDistributionProfileConfig').ajaxForm(newDistributionProfileSuccess);
 	}
 }
-
-jQuery(function() {
-});
 
 </script>

@@ -89,6 +89,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$form->resetUnUpdatebleAttributes($distributionProfile);
 					$distributionProfile = $this->client->distributionProfile->update($profileId, $distributionProfile);
 					$form->saveProviderAdditionalObjects($distributionProfile);
+					$form->setAttrib('class', 'valid');
 				}
 				else
 				{
@@ -109,8 +110,8 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 						$form->addThumbDimensions($dimensions, false);
 						
 					$form->addThumbDimensionsForm();
-					$action->view->form = $form;
 				}
+				$action->view->form = $form;
 			}
 			else
 			{
@@ -126,13 +127,14 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$distributionProfile = $this->client->distributionProfile->add($distributionProfile);
 					Kaltura_ClientHelper::unimpersonate();
 					$form->saveProviderAdditionalObjects($distributionProfile);
+					$form->setAttrib('class', 'valid');
 				}
 				else 
 				{
 					$form->addFlavorParamsFields($flavorParamsResponse);
 					$form->addThumbDimensionsForm();
-					$action->view->form = $form;
 				}
+				$action->view->form = $form;
 			}
 		}
 		catch(Exception $e)

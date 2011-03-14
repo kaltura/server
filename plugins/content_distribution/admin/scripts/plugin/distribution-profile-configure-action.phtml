@@ -88,13 +88,16 @@ function filesLoaded(){
 	});
 }
 
-jQuery(function() {
-	actionEnabledChanged("submit");
-	actionEnabledChanged("update");
-	actionEnabledChanged("delete");
-	actionEnabledChanged("report");
-
-	filesLoaded();
-});
+// in case the form has file upload fields (YouTube for example), ajaxForm will use iframe to submit 
+// this form and the result data will be injected to an empty iframe without jquery, causing a js error.
+if (typeof(jQuery) != 'undefined') {
+	jQuery(function() {
+		actionEnabledChanged("submit");
+		actionEnabledChanged("update");
+		actionEnabledChanged("delete");
+		actionEnabledChanged("report");
+		filesLoaded();
+	});
+}
 
 </script>
