@@ -48,7 +48,7 @@ class varpartnerlistAction extends kalturaAction
 		foreach($partners as $partner)
 		{
 			$ks = null;
-			kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  'varAdmin' , $ks , 30 * 86400 , 2 , "" , "*" );
+			kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  $partner->getAdminUserId() , $ks , 30 * 86400 , 2 , "" , "*" );
 			$adminUser_email = $partner->getAdminEmail();
 			$partner_id_param_name = 'pid';
 			$subpid_param_name = 'subpid';
@@ -59,7 +59,8 @@ class varpartnerlistAction extends kalturaAction
 			}
 			$kmc2Query = '?'.$partner_id_param_name.'='.$partner->getId().'&'.$subpid_param_name.'='.($partner->getId()*100).'&ks='.$ks.'&email='.$adminUser_email.'&screen_name=varAdmin';
 			//$kmcLink = url_for('index.php/kmc/kmc2'.$kmc2Query);
-			$kmcLink = 'http://'.kConf::get('www_host').'/index.php/kmc/kmc'.$partner->getKmcVersion().$kmc2Query;
+//			$kmcLink = 'http://'.kConf::get('www_host').'/index.php/kmc/kmc'.$partner->getKmcVersion().$kmc2Query;
+			$kmcLink = 'http://'.kConf::get('www_host')."/index.php/kmc/extlogin?ks=$ks&partner_id=" . $partner->getId();
 			$this->partners[$partner->getId()] = array(
 				'name' => $partner->getPartnerName(),
 				'kmcLink' => $kmcLink,
