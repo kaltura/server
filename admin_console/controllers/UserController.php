@@ -119,7 +119,12 @@ class UserController extends Zend_Controller_Action
 	{
 		Zend_Session::forgetMe();
 		$client = Kaltura_ClientHelper::getClient();
-		$client->session->end();
+		try {
+			$client->session->end();
+		}
+		catch (Exception $e) {
+			// do nothing - continue logout
+		}
 		Zend_Auth::getInstance()->clearIdentity();
 		$this->_helper->redirector('index', 'index');
 	}
