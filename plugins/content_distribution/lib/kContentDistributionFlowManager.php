@@ -190,6 +190,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
 				$data->setSentData(null);
 			}
+			$dbBatchJob->setData($data);
 			$dbBatchJob->save();
 		}
 		
@@ -245,6 +246,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
 				$data->setSentData(null);
 			}
+			$dbBatchJob->setData($data);
 			$dbBatchJob->save();
 		}
 		
@@ -300,6 +302,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
 				$data->setSentData(null);
 			}
+			$dbBatchJob->setData($data);
 			$dbBatchJob->save();
 		}
 		
