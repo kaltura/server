@@ -1,14 +1,33 @@
 <?php 
 require_once("bootstrap.php");
+$generateSingle = isset($argv[1]) ? $argv[1] : null;
 
 $config = new Zend_Config_Ini("config.ini");
 KalturaTypeReflectorCacher::disable();
+
+if ($generateSingle)
+{
+	$found = false;
+	// just to check that is exists
+	foreach($config as $name => $item)
+	{
+		if (strtolower($name) === strtolower($generateSingle))
+			$found = true;
+	}
+	if (!$found)
+		throw new Exception("Configuration for [".$generateSingle."] was not found");
+}
 
 foreach($config as $name => $item)
 {
 	$generator = $item->get("generator");
 	if ($generator === null)
 		throw new Exception("No generator for [".$name."]");
+		
+	if ($generateSingle && strtolower($name) !== strtolower($generateSingle))
+	{
+		continue;
+	}
 		
 	KalturaLog::info("$name using $generator");
 	

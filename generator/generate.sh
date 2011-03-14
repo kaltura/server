@@ -3,7 +3,7 @@
 rm -fr ../cache/api_v3/*
 rm -fr ../cache/generatorv3/*
 
-php generate.php
+php generate.php "$@"
 
-cp output/adminConsoleClient/* ../admin_console/lib/Kaltura
-cp output/batchClient/* ../batch/client
+rsync -avC output/adminConsoleClient/ ../admin_console/lib/Kaltura
+rsync -avC output/batchClient/ ../batch/client
