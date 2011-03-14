@@ -375,7 +375,7 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_warnings = $kdlFlavor->_warnings + $cdlFlavor->_warnings;
 		}
 		
-		if($cdlFlavor instanceof SwfFlavorParams) {
+		if($cdlFlavor instanceof SwfFlavorParams || $cdlFlavor instanceof SwfFlavorParamsOutput) {
 			$kdlFlavor->_swf = new KDLSWFData();
 			$kdlFlavor->_swf->_flashVersion = $cdlFlavor->getFlashVersion();
 			$kdlFlavor->_swf->_zoom         = $cdlFlavor->getZoom();
@@ -388,7 +388,7 @@ KalturaLog::log(__METHOD__."\ntranscoders==>\n".print_r($transObjArr,true));
 			$kdlFlavor->_swf->_flatten      = $cdlFlavor->getFlatten();
 		}
 		
-		if($cdlFlavor instanceof PdfFlavorParams) {
+		if($cdlFlavor instanceof PdfFlavorParams || $cdlFlavor instanceof PdfFlavorParamsOutput) {
 			$kdlFlavor->_pdf = new KDLPDFData();
 			$kdlFlavor->_pdf->_resolution  = $cdlFlavor->getResolution();
 			$kdlFlavor->_pdf->_paperHeight = $cdlFlavor->getPaperHeight();
