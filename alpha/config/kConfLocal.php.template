@@ -58,8 +58,8 @@ class kConfLocal
 				"bin_path_mencoder" => '@BIN_DIR@/mencoder',
 				"bin_path_flix" => '@BIN_DIR@/cli_encode',
 				"bin_path_encoding_com" => '@BIN_DIR@/encoding_com.php',
-				"bin_path_imagemagick" => '@BIN_DIR@/convert',
-				"bin_path_curl" => '@BIN_DIR@/curl',
+				"bin_path_imagemagick" => '@IMAGE_MAGICK_BIN_DIR@/convert',
+				"bin_path_curl" => '@CURL_BIN_DIR@/curl',
 				"bin_path_mediainfo" => '@BIN_DIR@/mediainfo',
 			
 				"image_proxy_url" => "",
