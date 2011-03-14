@@ -319,6 +319,7 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
   div.message { border-color:green; color:green;}
   body#batch-entry-investigation div.error { margin-top:6px;}
   body#batch-entry-investigation #frmSearch { clear: both; }
+  body#batch-entry-lifecycle #frmSearch { clear: both; }
 
 /*
   body#monitoring-xymon #wrapper { padding-left:22px;}
