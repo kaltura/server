@@ -129,7 +129,7 @@ class KalturaDistributionJobData extends KalturaJobData
 		{
 			$mediaFiles = array();
 			foreach($this->mediaFiles as $mediaFile)
-				$mediaFiles[] = $mediaFile;
+				$mediaFiles[] = $mediaFile->toObject();
 				
 			$object->setMediaFiles($mediaFiles);
 		}
