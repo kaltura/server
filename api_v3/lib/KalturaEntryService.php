@@ -281,7 +281,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			// get kuser object from entry kuserId
 			$kuser = kuserPeer::retrieveByPK($dbEntry->getKuserId());
-			if($kuser->getPuserId() != $dbEntry->getPuserId())
+			if(!$kuser || $kuser->getPuserId() != $dbEntry->getPuserId())
 				$kuser = null;
 		}
 		else
@@ -298,12 +298,16 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		// userID doesn't require change (it is null or the same as the db entry) - do nothing
-		if($entry->userId === null || $entry->userId === $entryPuserId)
+		if($entry->userId === null || $entry->userId === $entryPuserId) {
+			KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['.$entryPuserId.'] - no need to change - quitting');
 			return;
+		}
+			
 		
 		// db user is going to be changed, only admin allowed - otherwise, throw exception
 		if(!$this->getKs() || !$this->getKs()->isAdmin())
 		{
+			KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['.$entryPuserId.'] - change required but KS is not admin');
 			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 		}
 		
