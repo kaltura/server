@@ -47,7 +47,7 @@ class ExampleDistributionProfile extends DistributionProfile
 		if(strlen($entry->getName()) < self::ENTRY_NAME_MINIMUM_LENGTH)
 		{
 			$description = 'entry name length must be between ' . self::ENTRY_NAME_MINIMUM_LENGTH . ' and ' . self::ENTRY_NAME_MAXIMUM_LENGTH;
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
+			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, $description);
 			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
 			$validationError->setValidationErrorParam(self::ENTRY_NAME_MINIMUM_LENGTH);
 			$validationErrors[] = $validationError;
@@ -55,7 +55,7 @@ class ExampleDistributionProfile extends DistributionProfile
 		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
 		{
 			$description = 'entry name length must be between ' . self::ENTRY_NAME_MINIMUM_LENGTH . ' and ' . self::ENTRY_NAME_MAXIMUM_LENGTH;
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TEST_DATA, $description);
+			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, $description);
 			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
 			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
 			$validationErrors[] = $validationError;
