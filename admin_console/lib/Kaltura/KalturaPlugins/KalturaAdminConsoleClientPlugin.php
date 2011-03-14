@@ -506,6 +506,20 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getByFlavorId($flavorId, $version = -1)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "flavorId", $flavorId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->queueServiceActionCall("adminconsole_entryadmin", "getByFlavorId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+
 	function getTracks($entryId)
 	{
 		$kparams = array();
