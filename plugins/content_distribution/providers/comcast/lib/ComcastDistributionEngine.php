@@ -383,6 +383,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			foreach($data->mediaFiles as $mediaFile)
 				$submittedMediaFiles[$mediaFile->assetId] = $mediaFile;
 		}
+		KalturaLog::debug("Submitted Media Files [" . print_r($submittedMediaFiles, true) . "]");
 		
 		$thumbAssets = $this->getThumbAssets($data->entryDistribution->partnerId, $data->entryDistribution->thumbAssetIds);
 		if($thumbAssets && count($thumbAssets))
@@ -483,8 +484,11 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			foreach($comcastIDList as $mediaFileID)
 				$mediaFileIDs[] = $mediaFileID;
 		
+		KalturaLog::debug("Created Media Files [" . print_r($mediaFileIDs, true) . "]");
+		
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
 		$data->mediaFiles = $finalMediaFiles;
+		KalturaLog::debug("Sent Media Files [" . print_r($finalMediaFiles, true) . "]");
 		if($comcastMediaFileList)
 		{
 			foreach($comcastMediaFileList as $comcastMediaFile)
@@ -496,6 +500,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
 			}
 		}
+		KalturaLog::debug("Final Media Files [" . print_r($data->mediaFiles, true) . "]");
 		
 		return true;
 	}
