@@ -181,13 +181,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_RESULTS);
 				kFileSyncUtils::file_put_contents($key, $data->getResults());
+				$data->setResults(null);
 			}
 			
 			if($data->getSentData())
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_SUBMIT_DATA);
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
+				$data->setSentData(null);
 			}
+			$dbBatchJob->save();
 		}
 		
 		switch($dbBatchJob->getStatus())
@@ -233,13 +236,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS);
 				kFileSyncUtils::file_put_contents($key, $data->getResults());
+				$data->setResults(null);
 			}
 			
 			if($data->getSentData())
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA);
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
+				$data->setSentData(null);
 			}
+			$dbBatchJob->save();
 		}
 		
 		switch($dbBatchJob->getStatus())
@@ -285,13 +291,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_RESULTS);
 				kFileSyncUtils::file_put_contents($key, $data->getResults());
+				$data->setResults(null);
 			}
 			
 			if($data->getSentData())
 			{
 				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_DELETE_DATA);
 				kFileSyncUtils::file_put_contents($key, $data->getSentData());
+				$data->setSentData(null);
 			}
+			$dbBatchJob->save();
 		}
 		
 		switch($dbBatchJob->getStatus())
