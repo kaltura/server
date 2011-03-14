@@ -40,6 +40,8 @@ class kuser extends Basekuser
 	const KUSER_SORT_MOST_ENTRIES = 9;
 	const KUSER_SORT_PRODUCED_KSHOWS = 10;
 	
+	const PUSER_ID_REGEXP = '/^[a-zA-Z0-9._@]{1,30}$/';
+	
 	private $roughcut_count = -1;
 	
 	public static function getColumnNames()	{	return array ( 

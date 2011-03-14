@@ -28,7 +28,9 @@ class UserService extends KalturaBaseUserService
 	 */
 	function addAction(KalturaUser $user)
 	{				
-		$user->validatePropertyMinLength("id", 1);
+		if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
+		} 
 		
 		if ($user instanceof KalturaAdminUser) {
 			$user->isAdmin = true;
@@ -115,6 +117,10 @@ class UserService extends KalturaBaseUserService
 				UserRolePeer::testValidRolesForUser($user->roleIds);
 			}
 			if ($user->id != $userId) {
+				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
+					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
+				} 
+				
 				$existingUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $user->id);
 				if ($existingUser) {
 					throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
