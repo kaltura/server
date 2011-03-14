@@ -147,7 +147,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('acl');
 		
 		$front = Zend_Controller_Front::getInstance();
-		$front->throwExceptions(true);
 		
 		$front->registerPlugin(new Kaltura_AuthPlugin());
 		
