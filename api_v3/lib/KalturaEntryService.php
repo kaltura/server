@@ -297,6 +297,10 @@ class KalturaEntryService extends KalturaBaseService
 			return;
 		}
 		
+		// userID doesn't require change (it is null or the same as the db entry) - do nothing
+		if($entry->userId === null || $entry->userId === $entryPuserId)
+			return;
+		
 		// db user is going to be changed, only admin allowed - otherwise, throw exception
 		if(!$this->getKs() || !$this->getKs()->isAdmin())
 		{
