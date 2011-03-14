@@ -22,7 +22,7 @@ class Form_ExampleProfileConfiguration extends Form_ProviderProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 	
-		$this->addElement('text', 'accountId', array(
+		$this->addElement('text', 'account_id', array(
 			'label'			=> 'Account:',
 			'filters'		=> array('StringTrim'),
 		));
