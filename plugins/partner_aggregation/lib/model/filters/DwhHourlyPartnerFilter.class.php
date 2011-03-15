@@ -156,10 +156,7 @@ class DwhHourlyPartnerFilter extends baseObjectFilter
 		return null;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see baseObjectFilter::attachToFinalCriteria()
-	 */
-	public function attachToFinalCriteria ( Criteria $criteria )
+	public function attachToFinalCriteria(Criteria $c)
 	{
 		$fromHour = $c->getNewCriterion(DwhHourlyPartnerPeer::HOUR_ID, $this->get('_gte_hour_id') || 0);
 		$fromDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_gte_date_id') || 0);
