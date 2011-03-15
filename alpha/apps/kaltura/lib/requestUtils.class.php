@@ -347,6 +347,8 @@ class requestUtils
 				$content_type ="video/x-flv";
 			elseif ($ext == "mp4")
 				$content_type ="video/mp4";
+			elseif ($ext == "webm")
+				$content_type ="video/webm";
 			elseif ($ext == "ogg")
 				$content_type ="video/ogg";
 			elseif ($ext == "mp3")
