@@ -97,7 +97,6 @@ class KalturaDistributionProviderType
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
-	const EXAMPLE = "exampleDistribution.EXAMPLE";
 	const VERIZON = "verizonDistribution.VERIZON";
 }
 
@@ -1127,6 +1126,22 @@ class KalturaDistributionValidationErrorInvalidData extends KalturaDistributionV
 	 * @var string
 	 */
 	public $validationErrorParam = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaDistributionValidationErrorInvalidMetadata extends KalturaDistributionValidationErrorInvalidData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
 
 
 }

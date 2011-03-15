@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Admin
+ * @package Scheduler
  * @subpackage Client
  */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
@@ -8,13 +8,13 @@ require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
 /**
- * @package Admin
+ * @package Scheduler
  * @subpackage Client
  */
-class KalturaAuditClientPlugin extends KalturaClientPlugin
+class KalturaPartnerAggregationClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaAuditClientPlugin
+	 * @var KalturaPartnerAggregationClientPlugin
 	 */
 	protected static $instance;
 
@@ -24,12 +24,12 @@ class KalturaAuditClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaAuditClientPlugin
+	 * @return KalturaPartnerAggregationClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{
 		if(!self::$instance)
-			self::$instance = new KalturaAuditClientPlugin($client);
+			self::$instance = new KalturaPartnerAggregationClientPlugin($client);
 		return self::$instance;
 	}
 
@@ -48,7 +48,7 @@ class KalturaAuditClientPlugin extends KalturaClientPlugin
 	 */
 	public function getName()
 	{
-		return 'audit';
+		return 'partnerAggregation';
 	}
 }
 

@@ -77,7 +77,6 @@ class KalturaDistributionProviderType
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
-	const EXAMPLE = "exampleDistribution.EXAMPLE";
 	const VERIZON = "verizonDistribution.VERIZON";
 }
 
