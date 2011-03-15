@@ -683,7 +683,11 @@ class kFile
 		}
 		else
 			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
-		
+
+		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
+		// upon detecting this header it cancels its original request and starts sending byte range requests
+		header("Accept-Ranges: bytes");
+			
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");
 		if($fh)
