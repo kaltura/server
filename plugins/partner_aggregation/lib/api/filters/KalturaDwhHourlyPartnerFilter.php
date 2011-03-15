@@ -16,13 +16,13 @@ class KalturaDwhHourlyPartnerFilter extends KalturaDwhHourlyPartnerBaseFilter
 			
 		if($this->aggregatedTimeLessThanOrEqual)
 		{
-			$object_to_fill->set('_lte_date_id', date('Ymd'), $this->aggregatedTimeLessThanOrEqual);
-			$object_to_fill->set('_lte_hour_id', date('G'), $this->aggregatedTimeLessThanOrEqual);
+			$object_to_fill->set('_lte_date_id', date('Ymd', $this->aggregatedTimeLessThanOrEqual));
+			$object_to_fill->set('_lte_hour_id', date('G', $this->aggregatedTimeLessThanOrEqual));
 		}
 		if($this->aggregatedTimeGreaterThanOrEqual)
 		{
-			$object_to_fill->set('_gte_date_id', date('Ymd'), $this->aggregatedTimeGreaterThanOrEqual);
-			$object_to_fill->set('_gte_hour_id', date('G'), $this->aggregatedTimeGreaterThanOrEqual);
+			$object_to_fill->set('_gte_date_id', date('Ymd', $this->aggregatedTimeGreaterThanOrEqual));
+			$object_to_fill->set('_gte_hour_id', date('G', $this->aggregatedTimeGreaterThanOrEqual));
 		}
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
