@@ -182,7 +182,7 @@
 			<td class="link" onclick="toggleView('tr_worker_data_<?php echo $worker->id; ?>')"><?php echo $friendlyName; ?></td>
 			<td><?php echo $worker->name; ?></td>
 			<td><?php echo $this->jobTypeTranslate($worker->type); ?></td>
-			<td><?php echo $schedulers[$worker->schedulerId]; ?></td>
+			<td><?php echo (isset($schedulers[$worker->schedulerId]) ? $schedulers[$worker->schedulerId] : ''); ?></td>
 			<td><?php echo $runningStr; ?></td>
 			<td><?php echo $enabledStr; ?></td>
 			<td><?php echo $maxInstances; ?></td>
