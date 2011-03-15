@@ -20,4 +20,4 @@ tags = 	tags for extra hints about the service - use ',' to separate tags. shoul
 name																		|id			|ticket	|rp	|nkfp	|cuod	|aep	|rw	|pg	|kn	|mip	|tags 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-partnerAggregation.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
+partneraggregation.list													|			|2		|1	|0		|0		|1		|rw	|	|	|  		|CONTENT_MANAGE_DISTRIBUTION_BASE
