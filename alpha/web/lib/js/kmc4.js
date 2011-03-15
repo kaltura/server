@@ -447,18 +447,15 @@ kmc.utils = {
 				break;
 		}
 			
-		// set url
-		var url = window.location.hostname + "/secure_form.php?action=" + action;
+		// setup url
+		var from_domain = 'https://' + window.location.hostname;
+		var url = from_domain + "/secure_form.php?action=" + action;
 		// pass in the fields
 		for(var i in fields) {
 			var fld = (fields[i]) ? fields[i] : '';
 			url += '&' + i + '=' + encodeURIComponent(fld);
-		}
-		// change http to https
-		//url = url.replace("http", "https");
-		url = 'https://' + url;
-			
-		// Pass the parent url for the postMessage to work
+		}			
+		// pass the parent url for the postMessage to work
 		url = url + '&parent=' + encodeURIComponent(document.location.href);
 			
 		var modal_width = 370;
@@ -480,7 +477,6 @@ kmc.utils = {
 		 
 		// setup a callback to handle the dispatched MessageEvent. if window.postMessage is supported the passed
 		// event will have .data, .origin and .source properties. otherwise, it will only have the .data property.
-		var from_domain = 'https://' + window.location.hostname;
 		XD.receiveMessage(function(message){
 			if(message.data == "reload") {
 				kmc.utils.closeModal();
