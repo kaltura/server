@@ -159,15 +159,19 @@ class DwhHourlyPartnerFilter extends baseObjectFilter
 	public function attachToFinalCriteria(Criteria $c)
 	{
 		$fromHour = $c->getNewCriterion(DwhHourlyPartnerPeer::HOUR_ID, $this->get('_gte_hour_id'), Criteria::GREATER_EQUAL);
-		$fromDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_gte_date_id'), Criteria::GREATER_EQUAL);
-		$fromDate->addAnd($fromHour);
+		$theDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_gte_date_id'));
+		$theDate->addAnd($fromHour);
+		$fromDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_gte_date_id'), Criteria::GREATER_THAN);
+		$fromDate->addOr($theDate);
 		$c->addAnd($fromDate);
 		$this->unsetByName('_gte_hour_id');
 		$this->unsetByName('_gte_date_id');
 		
 		$toHour = $c->getNewCriterion(DwhHourlyPartnerPeer::HOUR_ID, $this->get('_lte_hour_id'), Criteria::LESS_EQUAL);
-		$toDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_lte_date_id'), Criteria::LESS_EQUAL);
-		$toDate->addAnd($toHour);
+		$theDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_lte_date_id'));
+		$theDate->addAnd($toHour);
+		$toDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_lte_date_id'), Criteria::LESS_THAN);
+		$toDate->addOr($theDate);
 		$c->addAnd($toDate);
 		$this->unsetByName('_lte_hour_id');
 		$this->unsetByName('_lte_date_id');
