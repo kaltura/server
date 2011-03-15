@@ -5,18 +5,18 @@ require_once(dirname(__FILE__) . '/../bootstrap/bootstrapClient.php');
 
 /**
  * Responsible for importing objects from kaltura DB 
- * and creating the unit tests data files 
+ * and creating the tests data files 
  * @author Roni
  *
  */
-class KalturaUnitTestDataGenerator
+class KalturaTestDataGenerator
 {
 	/**
 	 * 
 	 * The config file for the data importer
-	 * @var dataGeneratorConfigFile - the config file for the generator
+	 * @var KalturaTestDataSourceFile - the config file for the generator
 	 */
-	private $generatorConfigFile = NULL;
+	private $dataSourceFile = NULL;
 					
 	/**
 	 * Creates a new Kaltura objects DataGenerator
@@ -27,8 +27,8 @@ class KalturaUnitTestDataGenerator
 	public function __construct($dataGeneratorConfigFilePath)
 	{
 		$simpleXMLElement = kXml::openXmlFile($dataGeneratorConfigFilePath);		
-		$this->generatorConfigFile = KalturaDataGeneratorConfigFile::generateFromXML($simpleXMLElement);
-		$this->generatorConfigFile->filePath = $dataGeneratorConfigFilePath;	
+		$this->dataSourceFile = KalturaTestDataSourceFile::generateFromXML($simpleXMLElement);
+		$this->dataSourceFile->setFilePath($dataGeneratorConfigFilePath);	
    	}
    
    	/**
@@ -36,18 +36,20 @@ class KalturaUnitTestDataGenerator
    	 *  
    	 * @param string $objectId
    	 * @param string $objectType
-   	 * @return KalturaUnitTestDataObject - returns the unit test object with propel object from the DB
+   	 * @return KalturaTestDataObject - returns the test object with propel object from the DB
    	 */
-   	private function getUnitTestDataObject(KalturaUnitTestDataObject $unitTestObjectIdentifier)
+   	private function getTestDataObject(KalturaTestDataObject $testObjectIdentifier)
    	{
-   		$unitTestDataObject = new KalturaUnitTestDataObject($unitTestObjectIdentifier->getType(), $unitTestObjectIdentifier->additionalData, $unitTestObjectIdentifier->dataObject);
+   		$testDataObject = new KalturaTestDataObject($testObjectIdentifier->getType(), $testObjectIdentifier->getAdditionalData(), $testObjectIdentifier->getDataObject());
    		
-   		$objectType = $unitTestObjectIdentifier->getType();
-   		$objectId = $unitTestObjectIdentifier->additionalData["key"];
+   		$objectType = $testObjectIdentifier->getType();
+   		$additionalData = $testObjectIdentifier->getAdditionalData();
    		
-   		$unitTestDataObject->dataObject =  KalturaUnitTestDataGenerator::getObjectByTypeAndId($objectType, $objectId, $unitTestDataObject->additionalData);
+   		$objectId = $additionalData["key"];
+   		
+   		$testDataObject->setDataObject(KalturaTestDataGenerator::getObjectByTypeAndId($objectType, $objectId, $testDataObject->getAdditionalData()));
    		   			   		
-   		return $unitTestDataObject;
+   		return $testDataObject;
 	}
  
 	/**
@@ -65,7 +67,6 @@ class KalturaUnitTestDataGenerator
 	private static function getAPIObject(KalturaObjectBase $objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service)
 	{
 		//here we create the KS and get the data from the API calls
-		//TODO: how to get the right service from the $objectInstace or type or more info is needed?
 		$config = new KalturaConfiguration((int)$partnerId);
 		$config->serviceUrl = $serviceUrl;
 		$client = new KalturaClient($config);
@@ -105,51 +106,63 @@ class KalturaUnitTestDataGenerator
 		
 	/**
 	 * 
-   	 * Creates a test file from the given testDataFile object
+   	 * Creates a test file from the given KalturaTestCaseDataFile object (the data source for the test)
 	 * @param testDataFile $testDataFile
 	 */
-	private function createTestFile($testDataFile)
+	private function createTestDataFile(KalturaTestCaseDataFile $testDataSourceFile)
 	{
-		//1. Create the new unit test data file  
-		$newTestDataFile = new KalturaUnitTestDataFile();
+		//TODO: break this function to 2 parts!
+		
+		//1. Create the new test data file
+		$newTestDataFile = new KalturaTestCaseDataFile($testDataSourceFile->getTestCaseName());
+				
+	  	//2.For every test data we need to:
+	   	foreach ($testDataSourceFile->getTestProceduresData() as $testProcedureData)
+	   	{
+	   		$newTestProcedureData = new KalturaTestProcedureData($testProcedureData->getProcedureName());
+	   			   			   		
+		   	foreach ($testProcedureData->getTestCasesData() as $testCaseData)
+			{
+				$newTestCaseData = new KalturaTestCaseInstanceData($testCaseData->getTestCaseInstanceName());
+			 
+				//1. Create the input and output reference objects
+				$inputObjects = array();
+				$outputReferenceObjects = array();
 					
-	  	//2.For every unit test data we need to:	   		   		
-	   	foreach ($testDataFile->unitTestsData as $unitTestData)
-		{
-			$unitTestDataObjects = new KalturaUnitTestData();
-		 
-			//1. Create the input and output reference objects
-			$inputObjects = array();
-			$outputReferenceObjects = array();
-				
-			//2. Foreach input - Get the object from kaltura DB and add it to the inputObjects array
-			foreach ($unitTestData->input as $inputIdentifier)
-			{
-				$inputObjects[] = $this->getUnitTestDataObject($inputIdentifier);
-			}
+				//2. Foreach input - Get the object from kaltura DB and add it to the inputObjects array
+				foreach ($testCaseData->getInput() as $inputIdentifier)
+				{
+					$inputObjects[] = $this->getTestDataObject($inputIdentifier);
+				}
+	
+				//3. Foreach outputReference - Get the object from kaltura DB and add it to the outputReferenceObjects array
+				foreach ($testCaseData->getOutputReference() as $outputReferenceIdentifier)
+				{
+					$outputReferenceObjects[] = $this->getTestDataObject($outputReferenceIdentifier);
+				}
+					
+				//4. Create the new test data with the new objects 
+				$newTestCaseData->setInput($inputObjects);
+				$newTestCaseData->setOutputReference($outputReferenceObjects);
 									
-			//3. Foreach outputReference - Get the object from kaltura DB and add it to the outputReferenceObjects array
-			foreach ($unitTestData->outputReference as $outputReferenceIdentifier)
-			{
-				$outputReferenceObjects[] = $this->getUnitTestDataObject($outputReferenceIdentifier);
+				//5. Add the new unit test data to the Data file
+				$newTestProcedureData->addTestCaseInstance($newTestCaseData);
 			}
-				
-			//4. Create the new unit test data with the new objects 
-				
-			$unitTestDataObjects->input = $inputObjects;
-			$unitTestDataObjects->outputReference = $outputReferenceObjects;
-								
-			//5. Add the new unit test data to the Data file
-			$newTestDataFile->unitTestsData[] = $unitTestDataObjects;
-		}
 
-		chdir(dirname($this->generatorConfigFile->filePath));
+			$newTestDataFile->addTestProcedureData($newTestProcedureData);	
+	   	}
+	   	
+		chdir(dirname($this->dataSourceFile->getFilePath()));
 				
 		//3. Open the file at the file path 
-		$unitTestDatFileHandle = fopen($testDataFile->fileName, "w+");
+		$testDatFileHandle = fopen("{$testDataSourceFile->getTestCaseName()}.data", "w+");
 		
-		//4. Save the entire test data file to the test data file name path (in XML)
-		fwrite($unitTestDatFileHandle, $newTestDataFile->toDataXML());
+		//4. Convert the test data to xml dom
+		$newTestDataDom = KalturaTestCaseDataFile::toXml($newTestDataFile);
+		$newTestDataDom->formatOutput = true;
+
+		//5. Save the entire test data file to the test data file name path (in XML)		
+		fwrite($testDatFileHandle, $newTestDataDom->saveXML());
 	}
 
 	/**
@@ -172,7 +185,7 @@ class KalturaUnitTestDataGenerator
 	   		
 	   		if($objectInstance InstanceOf BaseObject)
 	   		{
-	   			$dataObject = KalturaUnitTestDataGenerator::getPropelObject($objectInstance, $objectId);
+	   			$dataObject = KalturaTestDataGenerator::getPropelObject($objectInstance, $objectId);
 	   		}
 	   		else if($objectInstance instanceof KalturaObject || $objectInstance instanceof KalturaObjectBase) // Object is Kaltura object (API)  
 	   		{
@@ -181,7 +194,7 @@ class KalturaUnitTestDataGenerator
 	   			$serviceUrl = $additionalData["serviceUrl"];
 	   			$service = $additionalData["service"];
 	   			
-	   			$dataObject = KalturaUnitTestDataGenerator::getAPIObject($objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service);
+	   			$dataObject = KalturaTestDataGenerator::getAPIObject($objectInstance, $objectId, $partnerId, $secret, $serviceUrl, $service);
 	   		}
 	   		else // normal objects types like string and int 
 	   		{
@@ -203,12 +216,12 @@ class KalturaUnitTestDataGenerator
 	 * Creates the Tests data files 
 	 * @retrun None, creates the tests data files (according to the config file data)
 	 */
-  	public function createTestFiles()
+  	public function createTestDataFiles()
   	{
 		//For each test found at the config fiel we need to create the test file
-		foreach ($this->generatorConfigFile->testFiles as $testFile)
+		foreach ($this->dataSourceFile->getTestFiles() as $testDataSourceFile)
 		{
-			$this->createTestFile($testFile);
+			$this->createTestDataFile($testDataSourceFile);
 		}
 	}
 }

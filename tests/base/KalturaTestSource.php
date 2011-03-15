@@ -1,6 +1,6 @@
 <?php
 
-class KalturaUnitTestSource
+class KalturaTestSource
 {
 	const INI = 'ini';
 	const XML = 'xml';

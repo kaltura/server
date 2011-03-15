@@ -3,6 +3,8 @@
 require_once (dirname ( __FILE__ ) . "/../../infra/bootstrap_base.php");
 require_once (KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 
+define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
+
 // Autoloader - override the autoloader defaults
 require_once (KALTURA_INFRA_PATH . DIRECTORY_SEPARATOR . "KAutoloader.php");
 

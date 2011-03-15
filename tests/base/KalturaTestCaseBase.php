@@ -2,8 +2,20 @@
 
 require_once (dirname(__FILE__). '/../bootstrap/bootstrapServer.php');
 
-class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
+/**
+ * Represents a base test case for a general test
+ * @author Roni
+ *
+ */
+class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 {
+	/**
+	 * 
+	 * Indicates wheter the test framework was initialized 
+	 * @var unknown_type
+	 */
+	private static $isFrameworkInit = false;
+	
 	/**
 	 * @var string
 	 */
@@ -15,12 +27,12 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	protected $testFolder;
 	
 	/**
-	 * @var KalturaUnitTestConfig
+	 * @var KalturaTestConfig
 	 */
 	protected $config;
 	
 	/**
-	 * @var KalturaUnitTestsSource
+	 * @var KalturaTestsSource
 	 */
 	protected $dataSource;
 
@@ -29,18 +41,60 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 * Indicates wheter the test has failures
 	 * @var bool
 	 */
-	public $hasFailures = false;
+	private $hasFailures = false;
 		
 	/**
 	 * 
 	 * Holds the current failure in the test
-	 * @var KalturaUnitTestCaseFailure
+	 * @var KalturaTestCaseFailure
 	 */
-	public $currentFailure = null;
+	private $currentFailure = null;
 	
 	/**
+	 * @return the $isFrameworkInit
+	 */
+	public static function getIsFrameworkInit() {
+		return KalturaTestCaseBase::$isFrameworkInit;
+	}
+
+	/**
+	 * @param unknown_type $isFrameworkInit
+	 */
+	public static function setIsFrameworkInit($isFrameworkInit) {
+		KalturaTestCaseBase::$isFrameworkInit = $isFrameworkInit;
+	}
+
+	/**
+	 * @return the $hasFailures
+	 */
+	public function getHasFailures() {
+		return $this->hasFailures;
+	}
+
+	/**
+	 * @return the $currentFailure
+	 */
+	public function getCurrentFailure() {
+		return $this->currentFailure;
+	}
+
+	/**
+	 * @param bool $hasFailures
+	 */
+	public function setHasFailures($hasFailures) {
+		$this->hasFailures = $hasFailures;
+	}
+
+	/**
+	 * @param KalturaTestCaseFailure $currentFailure
+	 */
+	public function setCurrentFailure($currentFailure) {
+		$this->currentFailure = $currentFailure;
+	}
+
+	/**
 	 * 
-	 * Creates a new Kaltura Unit Test Object
+	 * Creates a new Kaltura test Object
 	 * @param unknown_type $name
 	 * @param array $data
 	 * @param unknown_type $dataName
@@ -48,7 +102,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
 		parent::__construct($name, $data, $dataName);
-		
+				
 		$class = get_class($this);
 		if($name)
 		{
@@ -62,14 +116,14 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 		$testFilePath = KAutoloader::getClassFilePath($class);
 		$this->testFolder = dirname($testFilePath);
 			
-		print ($testFilePath);
+//		print ($testFilePath);
 		
-		$this->config = new KalturaUnitTestConfig("$testFilePath.ini");
+		$this->config = new KalturaTestConfig("$testFilePath.ini");
 		$testConfig = $this->config->get('config');
 		if(!$testConfig)
 		{
 			$testConfig = new Zend_Config(array(
-				'source' => KalturaUnitTestSource::INI,
+				'source' => KalturaTestSource::INI,
 			), true);
 			
 			$this->config->config = $testConfig;
@@ -97,7 +151,7 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	 * @param Zend_Config $testConfig
 	 * @param ReflectionParameter $arg
 	 * @throws Exception
-	 * @throws KalturaUnitTestException
+	 * @throws KalturaTestException
 	 * @return Ambigous
 	 */
 	protected function getArgConfig(Zend_Config $testConfig, ReflectionParameter $arg)
@@ -259,102 +313,95 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 	public function runTest()
 	{
 		print("In RunTest\n");
-		
-		//Do this section only once per test file and not for test... so we can initiate all the tests 
-		//TODO: HOW to do nice :) and also how to know if this is a new test class or a new test or just another input
+
 		$this->currentFailure = null;
 		
-		if(KalturaUnitTestListener::$failuresFile == null)
+		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
+		if(KalturaTestCaseBase::$isFrameworkInit == false)
 		{
 			$class = get_class($this);
-
 			$classPath = KAutoloader::getClassFilePath($class);
-			KalturaUnitTestListener::$failuresFile = fopen(dirname($classPath) . "/testsData/{$this->name}.failures", "w+");
-			$this->result->addListener(new KalturaUnitTestListener());
+			KalturaTestListener::setFailureFilePath(dirname($classPath) . "/testsData/{$class}.failures");
+
+			//add Listener from config with all params such as: when to report
+			$this->result->addListener(new KalturaTestListener());
+			
+			KalturaTestCaseBase::$isFrameworkInit = true;
+
+			//If the test case failures wasn't added
+			if(KalturaTestListener::getTestCaseFailures() == null)
+			{
+				KalturaTestListener::setCurrentTestCase($class);
+					
+				//Then add the test case failure
+				KalturaTestListener::setTestCaseFailures(new KalturaTestCaseFailures(KalturaTestListener::getCurrentTestCase()));
+				$testCaseFailures = KalturaTestListener::getTestCaseFailures();
+				$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($this->getName(false)));
+			}
 		}
 		
 		parent::runTest();
 	}
-	
+
 	/**
 	 * 
-	 * The unit test data provider (gets the data for the different unit tests)
+	 * The test data provider (gets the data for the different tests)
 	 * @param string $dataFilePath - the data file path (with the objects)
 	 * @return array<array>();
 	 */
-	public static function provider($dataFilePath)
+	public function provider($procedureName)
 	{
-		$simpleXML = kXml::openXmlFile($dataFilePath);
-				
-		$inputsForUnitTests = array();
+		//Gets from the given class the class data file
+		$class = get_class($this);
+		$classFilePath = KAutoloader::getClassFilePath($class);
+		$testClassDir = dirname($classFilePath);
+		$dataFilePath = $testClassDir . DIRECTORY_SEPARATOR . "testsData/{$this->name}.Data";
 		
-		foreach ($simpleXML->UnitTestsData->UnitTestData as $unitTestData)
+		if(file_exists($dataFilePath))
 		{
-			$inputs = array();
-			
-			foreach ($unitTestData->Inputs->Input as $input)
-			{
-				$object = KalturaUnitTestDataObject::fromXml($input);
-
-				//Go to the last and current input and add the variable
-				array_push($inputs, $object);
-			}
-			
-			foreach ($unitTestData->OutputReferences->OutputReference as $output)
-			{
-				$object = KalturaUnitTestDataObject::fromXml($output);
-
-				//Go to the last and current input and add the variable
-				array_push($inputs, $object);
-			}
-			
-			$inputsForUnitTests[] = $inputs;
+			$simpleXML = kXml::openXmlFile($dataFilePath);
 		}
-		
-		return $inputsForUnitTests; 
-	}
-
-	/**
-	 * 
-	 * Compares two propel objects and notifies the PHPUnit / Kaltura's listeners
-	 * @param BaseObject $outputReference
-	 * @param BaseObject $newResult
-	 * @return array<> $newErrors, if the objects are equal
-	 */
-	public function comparePropelObjectsByFields($outputReference, $newResult, $validErrorFields)
-	{
-		//Gets the data peer of the object (used to geting all the obejct feilds)
-		$dataPeer = $outputReference->getPeer(); 
-		
-		$outputReferenceId = $outputReference->getId();
-		$newResultId = $newResult->getId();
-		
-		//Gets all object feilds
-		$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
-		
-		$newErrors = array();
-		
-		//Create the xml elements by all fields and their values
-		foreach ($fields as $field)
+		else
 		{
-			PHPUnit_Util_Timer::start();
-			
-			//If the field is in the valid failure list then we skip him 
-			if(in_array($field, $validErrorFields))
+			//TODO: give notice or create the file don't throw an exception
+			throw new Exception("Data file not found");
+		}		
+		
+		$inputsForTests = array();
+		
+		foreach ($simpleXML->TestProcedureData as $xmlTestProcedureData)
+		{
+			if($xmlTestProcedureData["testProcedureName"] != $procedureName)
 			{
 				continue;
 			}
-			else 
+								
+			foreach($xmlTestProcedureData->TestCaseData as $xmlTestCaseData)
 			{
-				$expectedValue = $outputReference->getByName($field);
-				$actualValue = $newResult->getByName($field);
+				$testCaseInstanceInputs = array();
 				
-				//if this is an array we need to change it to a string
-				$this->compareOnField($field, $actualValue, $expectedValue, "assertEquals");
+				foreach ($xmlTestCaseData->Input as $input)
+				{
+					$object = KalturaTestDataObject::generatefromXml($input);
+
+					//Add the new input to the test case instance data
+					$testCaseInstanceInputs[]  = $object;
+				}
+				
+				foreach ($xmlTestCaseData->OutputReference as $output)
+				{
+					$object = KalturaTestDataObject::generatefromXml($output);
+	
+					//Add the new output reference to the test case instance data
+					$testCaseInstanceInputs[]  = $object;
+				}
+			
+				//Add the test case into the test procedure data
+				$inputsForTestProcedure[] = $testCaseInstanceInputs;	
 			}
 		}
-
-		return $newErrors;
+		
+		return $inputsForTestProcedure; 
 	}
 	
 	/**
@@ -382,5 +429,26 @@ class KalturaUnitTestCase extends PHPUnit_Framework_TestCase
 			$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
 		}
 	}
-}
 
+	/**
+	 * 
+	 * Adds a new failure for this test case
+	 * @param KalturaFailure $kalturaFailure
+	 */
+	public function addFailure(KalturaFailure $kalturaFailure)
+	{
+		$this->currentFailure = $kalturaFailure;
+		$this->hasFailures  = true;
+		$this->result->addFailure($this, $kalturaFailure, PHPUnit_Util_Timer::stop());
+	}
+	
+	/**
+	 * 
+	 * Adds a new error for this test case
+	 * @param Exception $e
+	 */
+	public function addError(Exception $e)
+	{
+		$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+	}
+}

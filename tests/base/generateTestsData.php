@@ -9,15 +9,16 @@
 
 	require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 	
+	//When used from command line
 	if(count($argv) > 1)
 	{
 		$configFileName = $argv[1];
 	}
-	else //TODO: clean the else segmant
+	else //Change values if you use from the Zend Studio
 	{
-		//R&P tests
-		$configFileName = "C:/opt/kaltura/app/tests/roles_and_permissions/testsData/testPermissionServiceTest.config";
+		//KDL tests
+		$configFileName = "C:/opt/kaltura/app/tests/unitTests/kdl/testsData/KDLTest.config";
 	}
 	
-	$testsDataGenerator = new KalturaUnitTestDataGenerator($configFileName);
-	$testsDataGenerator->createTestFiles();
+	$testsDataGenerator = new KalturaTestDataGenerator($configFileName);
+	$testsDataGenerator->createTestDataFiles();

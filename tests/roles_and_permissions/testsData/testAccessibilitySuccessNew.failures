@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Failures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="741"/>
+        <Input type="string" stringId="4442d0abb393f4df80fcdec0acabba8c"/>
+        <Input type="string" stringId="www.kaltura.co.cc"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="unitTests@mailinator.com"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>uiConf::getavailabletypes</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ACTION_DOES_NOT_EXISTS</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Action "getAvailableTypes" does not exists for service "uiconf"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::addfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updatedefinitionfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::updateviewsfromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::addfromuploadedfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>UPLOADED_FILE_NOT_FOUND_BY_TOKEN</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>The uploaded file was not found by the given token id, or was already used</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::addfromentry</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::addfromflavorasset</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>FLAVOR_ASSET_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Flavor asset id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::convert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>documents::upload</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>documents::convertppttoswf</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::listbypartner</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>PROPERTY_VALIDATION_NOT_UPDATABLE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>The property "KalturaStorageProfile::id" cannot be updated</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-1</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed creating formpost data</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getusage</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getadminsession</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_USER_ID</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid user id</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updateconfiguration</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getconfiguration</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getpackages</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>flavorParamsOutput::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>thumbParamsOutput::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>mediaInfo::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>entryAdmin::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>ENTRY_ID_NOT_FOUND</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Entry id "0" not found</Message>
+        </Failure>
+        <Failure>
+          <Field>entryAdmin::gettracks</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>NO_EXCEPTION_WAS_RAISED</ActualOutput>
+          <Assert>assertEquals</Assert>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+        <Failure>
+          <Field>virusScanProfile::scan</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>-2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>failed to unserialize server result
+</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+  </Failures>
+</UnitTests>

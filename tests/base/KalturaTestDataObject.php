@@ -4,12 +4,12 @@ require_once(dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
- * Represent all unit tests objects identifiers
+ * Represent all tests objects
  * Holds all the data from the data xml
  * @author Roni
  *
  */
-class KalturaUnitTestDataObject
+class KalturaTestDataObject extends KalturaTestDataBase
 {
 	/**
 	 * Creates a new Kaltura Object Identifier
@@ -33,22 +33,82 @@ class KalturaUnitTestDataObject
 	 * Additional data for the object identifier (such as key, partnerId, secret, value)
 	 * @var array<key => value>
 	 */
-	public $additionalData = array();
+	private $additionalData = array();
 	
 	/**
 	 * 
 	 * The data object to be retrieved like propel or kaltura object
 	 * @var unknown_type
 	 */
-	public $dataObject;
+	private $dataObject;
 	
 	/**
 	 * 
 	 * Holds all the objects comments
 	 * @var array<string> - key => value where key is the object field name and value is the value in the comment
 	 */
-	public $comments = array(); 
+	private $comments = array(); 
 	
+	/**
+	 * @return the $additionalData
+	 */
+	public function getAdditionalData() {
+		return $this->additionalData;
+	}
+
+	/**
+	 * @return the $dataObject
+	 */
+	public function getDataObject() {
+		return $this->dataObject;
+	}
+
+	/**
+	 * @param array<key $additionalData
+	 */
+	public function setAdditionalData($additionalData) {
+		$this->additionalData = $additionalData;
+	}
+
+	/**
+	 * @param unknown_type $dataObject
+	 */
+	public function setDataObject($dataObject) {
+		$this->dataObject = $dataObject;
+	}
+
+	/**
+	 * 
+	 * Adds a comment to the data object
+	 * @param string $commentName
+	 * @param string $commentValue
+	 */
+	public function addComment($commentName, $commentValue)
+	{
+		$this->comments[$commentName] = $commentValue;
+	}
+	
+	/**
+	 * @return the $comments
+	 */
+	public function getComments() {
+		return $this->comments;
+	}
+
+	/**
+	 * @param field_type $type
+	 */
+	public function setType($type) {
+		$this->type = $type;
+	}
+
+	/**
+	 * @param array<string> $comments
+	 */
+	public function setComments($comments) {
+		$this->comments = $comments;
+	}
+
 	/**
 	 * 
 	 * Returns the object id 
@@ -106,28 +166,30 @@ class KalturaUnitTestDataObject
 	 * The main function for converting to an Domdocument.
 	 * Pass in a BaseObject (from kaltura) and returns that object serialized as a DomDocument
 	 *
-	 * @param KalturaUnitTestDataObject $data
+	 * @param KalturaTestDataObject $data
 	 * @param string $rootNodeName - what you want the root node to be - defaultsto data.
 	 * @return DomDocument XML
 	 */
-	public static function toXml(KalturaUnitTestDataObject $data, $rootNodeName = 'data')
+	public static function toXml(KalturaTestDataBase $data, $rootNodeName = 'data')
 	{
-		$xml = new DOMDocument(1.0);
-		$rootNode = $xml->createElement($rootNodeName);
-		$xml->appendChild($rootNode);
+		$dom = new DOMDocument(1.0);
+		$rootNode = $dom->createElement($rootNodeName);
+		$dom->appendChild($rootNode);
 		
-		foreach ($data->additionalData as $key => $value)
+		foreach ($data->getAdditionalData() as $key => $value)
 		{
 			$rootNode->setAttribute($key, $value);
 		}
 		
+		$dataObject = $data->getDataObject();
+		
 		//we need to check if this is a propel object
-		if(is_object($data->dataObject))
+		if(is_object($dataObject ))
 		{
-			if($data->dataObject instanceof BaseObject)
+			if($dataObject instanceof BaseObject)
 			{
 				//Gets the data peer of the object (used to geting all the obejct feilds)
-				$dataPeer = $data->dataObject->getPeer(); 
+				$dataPeer = $dataObject->getPeer(); 
 				
 				//Gets all object fields
 				$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
@@ -135,28 +197,32 @@ class KalturaUnitTestDataObject
 				//Create the xml elements by all fields and their values
 				foreach ($fields as $field)
 				{
-					$value = $data->dataObject->getByName($field);
+					$value = $dataObject->getByName($field);
 				
 					$comment = null;
-					if(isset($data->comments[$field]))
+					$comments = $data->getComments();
+					
+					if(isset($comments[$field]))
 					{
-						$comment = $data->comments[$field];
+						$comment = $comments[$field];
 					}
 					
-					KalturaUnitTestDataObject::createFieldElement($xml, $rootNode, $value, $field, null, $comment);
+					KalturaTestDataObject::createFieldElement($dom, $rootNode, $value, $field, null, $comment);
 				}
 			}
 			else // object is Kaltura object base
 			{
-				$reflector = new ReflectionClass($data->dataObject);
+				$reflector = new ReflectionClass($data->getDataObject());
 				$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
 				foreach ($properties as $property)
 				{
-					$value = $property->getValue($data->dataObject);
+					$value = $property->getValue($data->getDataObject());
 					$propertyName = $property->getName();
 					$propertyValueType = gettype($value);
+					$comments = $data->getComments();
+					$comment = $comments[$propertyName];
 					
-					KalturaUnitTestDataObject::createFieldElement($xml, $rootNode, $value, $propertyName, $propertyValueType, $data->comments[$propertyName]);
+					KalturaTestDataObject::createFieldElement($dom, $rootNode, $value, $propertyName, $propertyValueType, $comment);
 				}
 			}
 		}
@@ -166,17 +232,18 @@ class KalturaUnitTestDataObject
 		}
 		 		
 		// pass back DomElement object
-		return $xml;
+		return $dom;
 	}
 
 	/**
 	 * 
-	 * Creates a new node in the gien xml under the root node with the values of the field (name and value)
+	 * Creates a new node in the given DomDocument xml under the root node with the values of the field (name and value)
 	 * @param DomDocumnet $xml
 	 * @param SimpleXmlElement $rootNode
 	 * @param unknown_type $value
 	 * @param string $fieldName
 	 * @param string $fieldType
+	 * @param string $fieldDbValue
 	 */
 	private static function createFieldElement(DOMDocument $xml, DomElement $rootNode, $value, $fieldName, $fieldType = null, $fieldDbValue = null)
 	{
@@ -231,21 +298,31 @@ class KalturaUnitTestDataObject
 	}
 	
 	/**
+	 * 
+	 * Creates a new Kaltura test data object 
+	 * @param SimpleXMLElement $inputXml
+	 */
+	public static function generatefromXml($inputXml)
+	{
+		$objectInstace = new KalturaTestDataObject();
+		$objectInstace->fromXml($inputXml);
+		return $objectInstace;	
+	}
+	
+	/**
 	 * Gets a xml based data and returns a new unit test data object with those values
 	 * @param SimpleXMLElement $xml
-	 * @return KalturaUnitTestDataObject the new unit test data object with the given data
+	 * @return KalturaTestDataObject the new unit test data object with the given data
 	 */
-	public static function fromXml($xml)
+	public function fromXml($xml)
 	{
-		$objectInstace = new KalturaUnitTestDataObject();
-		 
-		$objectInstace->type = (string)$xml['type'];
+		$this->type = (string)$xml['type'];
 			
-		$objectInstace->dataObject = KalturaUnitTestDataObject::getObjectInstance($objectInstace->type);	
+		$this->dataObject = KalturaTestDataObject::getObjectInstance($this->type);	
 	
-		$objectInstace->additionalData = kXml::getAttributesAsArray($xml);
+		$this->additionalData = kXml::getAttributesAsArray($xml);
 		
-		if(class_exists($objectInstace->type))
+		if(class_exists($this->type))
 		{
 			foreach ($xml->children() as $child)
 			{
@@ -254,7 +331,7 @@ class KalturaUnitTestDataObject
 				//if dbValue exists
 				if(isset($child["dbValue"]))
 				{
-					$objectInstace->comments[$childKey] = (string)$child["dbValue"];					
+					$this->comments[$childKey] = (string)$child["dbValue"];					
 				}
 												
 				if(strlen($child) != 0)
@@ -284,34 +361,33 @@ class KalturaUnitTestDataObject
 							//if dbValue exists
 							if(isset($singleElementValue["dbValue"]))
 							{
-								$objectInstace->comments[$singleElementKey][$key] = (string)$singleElementValue["dbValue"];
+								$this->comments[$singleElementKey][$key] = (string)$singleElementValue["dbValue"];
 							}
 						}
-											
-						KalturaUnitTestDataObject::setPropertyValue(&$objectInstace->dataObject, $arrayKey, $arrayValue, $childValueType);
+						
+						if(count($arrayValue) > 0)
+						{
+							KalturaTestDataObject::setPropertyValue(&$this->dataObject, $arrayKey, $arrayValue, $childValueType);
+						}
 					}
 	 				else 
 	 				{
-	 					KalturaUnitTestDataObject::setPropertyValue(&$objectInstace->dataObject, $childKey, $childValue, $childValueType);
+	 					KalturaTestDataObject::setPropertyValue(&$this->dataObject, $childKey, $childValue, $childValueType);
 	 				}
 				}	
 				catch (Exception $e)
 				{
-					throw new Exception("Error can't set by name" . $childValue . $e, $e->getCode());
+					throw new Exception("Error can't set by name: " . $childValue . $e, $e->getCode());
 				}
 			}
 		}
 		else
 		{
 			//Handle no classes objects like string and int
-			//TODO: add support for file... here or there...
 		}
-
-		// pass back propel object
-		return $objectInstace;
 	}
 
-		/**
+	/**
 	 * 
 	 * Returns an objetct instance from the given type 
 	 * @param unknown_type $objectInstace

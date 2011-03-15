@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . "/../bootstrap/bootstrapClient.php");
 
-class testPermissionServiceTest extends KalturaApiUnitTestCase
+class testPermissionServiceTest extends KalturaApiTestCase
 {
 	/**
 	 * 

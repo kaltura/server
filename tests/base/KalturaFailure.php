@@ -4,7 +4,7 @@ require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
 
 /**
  * 
- * Represents a unit test failure (single failure on a field)
+ * Represents a test failure (single failure on a field)
  * @author Roni
  *
  */
@@ -12,7 +12,7 @@ class KalturaFailure
 {
 	/**
 	 * 
-	 * Creates a new unit test failure
+	 * Creates a new test failure
 	 * @param string $field
 	 * @param unknown_type $actualValue
 	 * @param unknown_type $outputReferenceValue
@@ -28,39 +28,109 @@ class KalturaFailure
 	
 	/**
 	 * 
-	 * The unit test object field which has the error
+	 * The test object field which has the error
 	 * @var unknown_type
 	 */
-	public $field;
+	private $field;
 	
 	/**
 	 * 
-	 * The unit test assert that was performed
+	 * The test assert that was performed
 	 * @var unknown_type
 	 */
-	public $assert;
+	private $assert;
 	
 	/**
 	 * 
 	 * The field actual value
 	 * @var unknown_type
 	 */
-	public $actualValue;
+	private $actualValue;
 	
 	/**
 	 * 
 	 * The Error message
 	 * @var unknown_type
 	 */
-	public $message;
+	private $message;
 	
 	/**
 	 * 
 	 * The field output reference value
 	 * @var unknown_type
 	 */
-	public $outputReferenceValue;
+	private $outputReferenceValue;
 	
+	/**
+	 * @return the $field
+	 */
+	public function getField() {
+		return $this->field;
+	}
+
+	/**
+	 * @return the $assert
+	 */
+	public function getAssert() {
+		return $this->assert;
+	}
+
+	/**
+	 * @return the $actualValue
+	 */
+	public function getActualValue() {
+		return $this->actualValue;
+	}
+
+	/**
+	 * @return the $message
+	 */
+	public function getMessage() {
+		return $this->message;
+	}
+
+	/**
+	 * @return the $outputReferenceValue
+	 */
+	public function getOutputReferenceValue() {
+		return $this->outputReferenceValue;
+	}
+
+	/**
+	 * @param unknown_type $field
+	 */
+	public function setField($field) {
+		$this->field = $field;
+	}
+
+	/**
+	 * @param unknown_type $assert
+	 */
+	public function setAssert($assert) {
+		$this->assert = $assert;
+	}
+
+	/**
+	 * @param unknown_type $actualValue
+	 */
+	public function setActualValue($actualValue) {
+		$this->actualValue = $actualValue;
+	}
+
+	/**
+	 * @param unknown_type $message
+	 */
+	public function setMessage($message) {
+		$this->message = $message;
+	}
+
+	/**
+	 * @param unknown_type $outputReferenceValue
+	 */
+	public function setOutputReferenceValue($outputReferenceValue) {
+		$this->outputReferenceValue = $outputReferenceValue;
+	}
+
 	/**
 	 * 
 	 * Returns a well formatted string witht 
@@ -147,5 +217,99 @@ class KalturaFailure
 		}
 		
 		return $arrayValue;
+	}
+
+	/**
+	 * 
+	 * Returns a DomDocument containing the kaltura failure
+	 * @param KalturaFailure $kalturaFailure
+	 * @param unknown_type $rootNodeName
+	 * @return DomDocument
+	 */
+	public static function toXml(KalturaFailure $kalturaFailure, $rootNodeName='data')
+	{
+		$dom = new DOMDocument("1.0"); 
+		
+		$failureNode = $dom->createElement($rootNodeName);
+		$dom->appendChild($failureNode);	
+		
+//		if(!is_null($kalturaFailure->getField()))
+		{
+			$fieldNode = $dom->createElement("Field", $kalturaFailure->getField());
+			$failureNode->appendChild($fieldNode);	
+		}
+				
+//		if (!is_null($kalturaFailure->getOutputReferenceValue()))
+		{
+			$outputReferenceNode = $dom->createElement("OutputReference");
+			$failureNode->appendChild($outputReferenceNode);
+			KalturaFailure::setElementValue($dom, $outputReferenceNode, $kalturaFailure->getOutputReferenceValue(), $kalturaFailure->getField());
+		}
+		
+//		if (!is_null($kalturaFailure->getActualValue()))
+		{
+			$actualOutputNode = $dom->createElement("ActualOutput");
+			$failureNode->appendChild($actualOutputNode);
+			KalturaFailure::setElementValue($dom, $actualOutputNode, $kalturaFailure->getActualValue(), $kalturaFailure->getField());
+		}
+					
+//		if (!is_null($kalturaFailure->getAssert()))
+		{
+			$assertNode = $dom->createElement("Assert");
+			$failureNode->appendChild($assertNode);
+			KalturaFailure::setElementValue($dom, $assertNode, $kalturaFailure->getAssert());
+		}
+		
+		if (!is_null($kalturaFailure->getMessage()))
+		{
+			$messageNode = $dom->createElement("Message");
+			$failureNode->appendChild($messageNode );
+			KalturaFailure::setElementValue($dom, $messageNode , $kalturaFailure->getMessage());
+		}
+		
+		return $dom;
+	}
+	
+	/**
+	 * 
+	 * Sets the given node it's value (if is array and if not)
+	 * @param DomDocumnet $xml
+	 * @param SimpleXmlElement $rootNode
+	 * @param unknown_type $value
+	 * @param string $fieldName
+	 * @param string $fieldType
+	 */
+	private static function setElementValue(DOMDocument &$xml, DomElement &$rootNode, $value, $fieldName = null, $fieldType = null)
+	{
+		//If the value is not an array then we just create the element and sets it's value
+		if(!is_array($value ))
+		{
+			$rootNode->nodeValue = $value;
+			if($fieldType != null)
+			{
+				$rootNode->setAttribute("type", $fieldType);
+			}
+		}
+		else
+		{
+			//create the array node
+			$arrayNode = $xml->createElement("Array");
+			
+			foreach ($value as $key => $singleValue)
+			{
+				$node = $xml->createElement($fieldName, $singleValue);
+						
+				$node->setAttribute("key", $key );
+				
+				if($fieldType != null)
+				{
+					$$node->setAttribute("type", $fieldType);
+				}
+				
+				$arrayNode->appendChild($node);
+			}
+								
+			$rootNode->appendChild($arrayNode);
+		}
 	}
 }

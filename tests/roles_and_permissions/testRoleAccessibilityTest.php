@@ -1,16 +1,16 @@
 <?php
 
-require_once (dirname(__FILE__). '/../bootstrap/bootstrapClient.php');
+require_once (dirname(__FILE__). '/../bootstrap/bootstrapServer.php');
 
-class testRoleAccessibilityTest extends KalturaApiUnitTestCase
+class testRoleAccessibilityTest extends KalturaApiTestCase
 {
 	private static $adminClient;
 
-	const TEST_SERVER = 'www.kaltura.co.cc'; // //
+	const TEST_SERVER = 'www.kaltura.co.cc';
 //	const TEST_SERVER = 'local.trunk';  
 	const ADMIN_PARTNER = -2;
 	const ADMIN_USER = 0;
-	const ADMIN_SECRET = "35dc0d295d874788332a813066a77b88"; //
+	const ADMIN_SECRET = "35dc0d295d874788332a813066a77b88";
 //	const ADMIN_SECRET = "adminconsoleadminsecret";
 
 	private $enumTypes = array(
@@ -401,95 +401,6 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 
 	/**
 	 * 
-	 * Creates a new user role given the role name and permissions 
-	 * @param unknown_type $roleName
-	 * @param unknown_type $permissionsNames
-	 */
-	private function createUserRole($roleName, $roleDesc,$permissionsNames)
-	{
-		$userRole = new KalturaUserRole();
-		$userRole->name = $roleName;
-		$userRole->permissionNames = $permissionsNames;
-		$userRole->description = $roleDesc;
-		$userRole->status = KalturaUserRoleStatus::ACTIVE;
-		return $userRole;
-	}
-	
-	/**
-	 * 
-	 * Creates a new permission item given the name, desc and permissions items ids
-	 * @param unknown_type $name
-	 * @param unknown_type $desc
-	 * @param unknown_type $permissionsItemsIds
-	 */
-	private function createPermission($name, $desc, $permissionsItemsIds)
-	{
-		$permission = new KalturaPermission();
-		$permission->name = $name;
-		$permission->description = $desc;
-		$permission->permissionItemsIds = $permissionsItemsIds;
-		$permission->status = KalturaPermissionStatus::ACTIVE;
-		$permission->type = KalturaPermissionType::NORMAL;
-		
-		return $permission;
-	}
-
-	/**
-	 * 
-	 * Creates and adds a new role to the DB 
-	 * @param unknown_type $name
-	 * @param unknown_type $description
-	 * @param unknown_type $permissionsNames
-	 */
-	private function addRole($name, $description, $permissionsNames)
-	{
-		$newRole = $this->createUserRole($name, $description, $permissionsNames);
-		$addedRole = $this->addRoleWrap($newRole);
-		
-		return $addedRole;
-	}
-	
-	/**
-	 * 
-	 * Creates and adds a new permission to the DB
-	 * @param unknown_type $name
-	 * @param unknown_type $description
-	 * @param unknown_type $permissionsItemsIds
-	 */
-	private function addPermission($name, $description, $permissionsItemsIds)
-	{
-		$newPermission = $this->createPermission($name, $description, $permissionsItemsIds);
-		$newPermissionId = $this->addPermissionWrap($newPermission);
-		
-		return $newPermissionId;
-	}
-	
-	/**
-	 * 
-	 * Adds a role to the DB using .
-	 * @param KalturaUserRole $role
-	 */
-	private function addRoleWrap(KalturaUserRole $role)
-	{
-		$addedRole = $this->client->userRole->add($role);
-		$this->addedRoleIds[$role->name] = $addedRole->id;
-		return $addedRole;
-	}
-		
-	/**
-	 * 
-	 * Adds a permissions to the DB.
-	 * @param KalturaPermission $permission
-	 */
-	private function addPermissionWrap(KalturaPermission $permission)
-	{
-		$addedPermission = $this->client->permission->add($permission);
-		$this->addedPermissionsId[$permission->name] = $addedPermission->id;
-		return $addedPermission;
-	}
-
-	/**
-	 * 
 	 * Returns the given clients permission items
 	 * @param unknown_type $client
 	 * @return array<KalturaPermissionItem>
@@ -616,19 +527,17 @@ class testRoleAccessibilityTest extends KalturaApiUnitTestCase
 				
 		$partnerConfig = self::$adminClient->systemPartner->getConfiguration($partnerId);
 		
-		//TODO: change to explode and shit
-//		$permissionNames = explode(",", $partnerConfig->alwaysAllowedPermissionNames);
-		$permissionNames = $partnerConfig->alwaysAllowedPermissionNames;
+		$permissionNames = explode(",", $partnerConfig->alwaysAllowedPermissionNames);
 	
 		foreach ($permissionNames as $permissionName)
 		{
 			//Skip empty permissions names
 			if($permissionName == ''){continue;}
-			
+						
 			$permission = self::$adminClient->permission->get($permissionName);
-			
+
 			$permissionItemIds = explode(',', $permission->permissionItemsIds);
-					
+
 			foreach ($permissionItemIds as $permissionItemId)
 			{
 				$this->addPermissionItem(&$permissionItems, $permissionItemId); 

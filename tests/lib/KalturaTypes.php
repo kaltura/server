@@ -2739,10 +2739,9 @@ class KalturaSchedulerStatus extends KalturaObjectBase
 
 	/**
 	 * The type of the job worker.
-	 * Could be KalturaBatchJobType or extended type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $workerType = null;
 
@@ -3241,7 +3240,7 @@ class KalturaSchedulerWorker extends KalturaObjectBase
 	 * The worker type
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $type = null;
 
@@ -4077,10 +4076,9 @@ class KalturaWorkerQueueFilter extends KalturaObjectBase
 class KalturaBatchQueuesStatus extends KalturaObjectBase
 {
 	/**
-	 * The job type (KalturaBatchJobType or extended)
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 */
 	public $jobType = null;
 
@@ -4517,7 +4515,7 @@ class KalturaFreeJobResponse extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaBatchJobType
 	 * @readonly
 	 */
 	public $jobType = null;
@@ -6582,6 +6580,13 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	 * @var KalturaContainerFormat
 	 */
 	public $formatEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsEqual = null;
 
 
 }
@@ -8954,6 +8959,20 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var KalturaUiConfObjType
 	 */
 	public $objTypeEqual = null;
@@ -9047,6 +9066,63 @@ class KalturaUiConfListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
+class KalturaString extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+/**
+ * @package External
+ * @subpackage Kaltura
+ */
+class KalturaUiConfTypeInfo extends KalturaObjectBase
+{
+	/**
+	 * UiConf Type
+	 * 
+	 *
+	 * @var KalturaUiConfObjType
+	 */
+	public $type = null;
+
+	/**
+	 * Available versions
+	 * 
+	 *
+	 * @var array of KalturaString
+	 */
+	public $versions;
+
+	/**
+	 * The direcotry this type is saved at
+	 * 
+	 *
+	 * @var string
+	 */
+	public $directory = null;
+
+	/**
+	 * Filename for this UiConf type
+	 * 
+	 *
+	 * @var string
+	 */
+	public $filename = null;
 
 
 }

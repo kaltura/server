@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . "/../../infra/bootstrap_base.php");
 require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 
-define("KALTURA_TEST_PATH", KALTURA_ROOT_PATH . "/tests/base");
+define("KALTURA_TEST_BASE_PATH", KALTURA_ROOT_PATH . "/tests/base");
 
 // Autoloader - override the autoloader defaults
 require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
@@ -29,7 +29,7 @@ KAutoloader::register();
 date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
 
 // Logger
-$loggerConfigPath = KALTURA_TEST_PATH . "/config/logger.ini";
+$loggerConfigPath = KALTURA_TEST_BASE_PATH . "/config/logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {

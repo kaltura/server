@@ -1,6 +1,6 @@
 <?php
 
-class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogger
+class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 {
 	/**
 	 * @var KalturaClient
@@ -9,7 +9,7 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 	
 	/**
 	 * 
-	 * Creates a new Kaltura API Unit Test Case
+	 * Creates a new Kaltura API Test Case
 	 * @param unknown_type $name
 	 * @param array $data
 	 * @param unknown_type $dataName
@@ -41,9 +41,9 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 			$testConfig->curlTimeout = 90;
 			$needSave = true;
 		}	
-		if(!$testConfig->startSession)
+		if(!isset($testConfig->startSession))
 		{
-			$testConfig->startSession = true;
+			$testConfig->startSession = false;
 			$needSave = true;
 		}		
 		
@@ -143,7 +143,7 @@ class KalturaApiUnitTestCase extends KalturaUnitTestCase implements IKalturaLogg
 	
 		return $newErrors;
 	}
-
+	
 	/**
 	 * 
 	 * Gets the parameters for creating a new kaltura client and returns the new client

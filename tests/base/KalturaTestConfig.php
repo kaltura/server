@@ -1,6 +1,6 @@
 <?php
 
-class KalturaUnitTestConfig extends Zend_Config_Ini
+class KalturaTestConfig extends Zend_Config_Ini
 {
 	private $filePath;
 	
@@ -50,4 +50,5 @@ class KalturaUnitTestConfig extends Zend_Config_Ini
 		
 		return $str;
 	}
+
 }
