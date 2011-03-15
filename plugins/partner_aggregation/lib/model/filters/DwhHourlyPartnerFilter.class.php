@@ -155,5 +155,24 @@ class DwhHourlyPartnerFilter extends baseObjectFilter
 	{
 		return null;
 	}
+	
+	public function attachToCriteria(Criteria $c)
+	{
+		$fromHour = $c->getNewCriterion(DwhHourlyPartnerPeer::HOUR_ID, $this->get('_gte_hour_id') || 0);
+		$fromDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_gte_date_id') || 0);
+		$fromDate->addAnd($fromHour);
+		$c->addAnd($fromDate);
+		$this->unsetByName('_gte_hour_id');
+		$this->unsetByName('_gte_date_id');
+		
+		$toHour = $c->getNewCriterion(DwhHourlyPartnerPeer::HOUR_ID, $this->get('_lte_hour_id') || 0);
+		$toDate = $c->getNewCriterion(DwhHourlyPartnerPeer::DATE_ID, $this->get('_lte_date_id') || 0);
+		$toDate->addAnd($toHour);
+		$c->addAnd($toDate);
+		$this->unsetByName('_lte_hour_id');
+		$this->unsetByName('_lte_date_id');
+		
+		return parent::attachToCriteria($c);
+	}
 }
 
