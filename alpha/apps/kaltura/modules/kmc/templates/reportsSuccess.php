@@ -1,6 +1,7 @@
 <?php
 $service_url = requestUtils::getRequestHost();
-$host = str_replace ( "http://" , "" , $service_url );
+$protocol = requestUtils::getRequestProtocol();
+$host = str_replace ( "$protocol://" , "" , $service_url );
 $cdn_host = str_replace ( "http://" , "" , myPartnerUtils::getCdnHost($partner_id) );
 $kmc_content_version = 'v1.1.8';
 $kmc_account_version = 'v1.1.6';

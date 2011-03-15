@@ -209,9 +209,16 @@ class requestUtils
 //		return self::SECURE_COOKIE_PREFIX . md5("bigbag$name);
 	}
 	
+	public static function getRequestProtocol()
+	{
+		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		return $protocol;
+	}
+	
 	public static function getRequestHost()
 	{
-		return "http://".kConf::get("www_host");
+		$protocol = self::getRequestProtocol();
+		return "$protocol://".kConf::get("www_host");
 	}
 	
 	public static function getRequestHostId()
@@ -233,8 +240,9 @@ class requestUtils
 	public static function getStreamingServerUrl()
 	{
 		$domain = self::getRequestHost();
-		
-		$rtmp_host = str_replace ( "http:" , "rtmp:" , $domain );
+		$protocol = self::getRequestProtocol();
+				
+		$rtmp_host = str_replace ( $protocol.':' , "rtmp:" , $domain );
 		return "$rtmp_host/oflaDemo"; 
 	}
 	
