@@ -143,7 +143,15 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			
 		$str .= "			return arr;\n";	
 		$str .= "		}\n";
-
+		
+		////////////////////////////////////////////////
+		if($xml->attributes()->name == "KalturaBaseEntry")
+		{
+			$str .= 	"		// required for backwards compatibility with an old, un-optimized client\n";
+			$str .= 	"		public function getParamKeys():Array { trace('backward incompatible'); throw new Error('backward incompatible');}\n";
+		}
+		
+		
 		////////////////////////////////////////////////
 		
 		$str .= "	}\n";
