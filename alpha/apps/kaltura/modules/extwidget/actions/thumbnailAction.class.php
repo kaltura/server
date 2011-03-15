@@ -248,9 +248,8 @@ class thumbnailAction extends sfAction
 								KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
 								KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 							}
-							$remote_url = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync, $_SERVER['REQUEST_URI']);
-							KalturaLog::log( __METHOD__.": redirecting to [$remote_url]" );
-							$this->redirect($remote_url);
+							$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
+							kFile::dumpUrl($remoteUrl);
 						}
 					}
 				}
@@ -265,9 +264,8 @@ class thumbnailAction extends sfAction
 		
 		if ( !$local && !$tempThumbPath)
 		{
-			$remote_url = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
-			KalturaLog::log ( __METHOD__ . ": redirecting to [$remote_url]" );
-			$this->redirect($remote_url);
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
+			kFile::dumpUrl($remoteUrl);
 		}
 		
 		// if we didnt return a template for the player die and dont return the original deleted thumb
@@ -305,9 +303,8 @@ class thumbnailAction extends sfAction
 							KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
 							KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 						}
-						$remote_url = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync, $_SERVER['REQUEST_URI']);
-						KalturaLog::log( __METHOD__.": redirecting to [$remote_url]" );
-						$this->redirect($remote_url);
+						$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
+						kFile::dumpUrl($remoteUrl);
 					}
 				}
 			}
