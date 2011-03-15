@@ -474,8 +474,9 @@ class UserRoleServiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($addedRole->permissionNames, $getRole->permissionNames);
 		
 		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, array(self::TEST_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER), Criteria::EQUAL);
-		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::API_ACCESS, PermissionType::EXTERNAL), Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array(self::TEST_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
+		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		$allPartnerPermissions = PermissionPeer::doSelect($c);
 		$returnedPermissions = explode(',', trim($getRole->permissionNames,','));
 		$this->assertEquals(count($allPartnerPermissions), count($returnedPermissions));
