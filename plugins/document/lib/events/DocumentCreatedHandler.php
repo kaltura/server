@@ -114,6 +114,9 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 					$object->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
 					$object->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 					$object->save();
+					
+					$entry->setStatusReady();
+					$entry->save();
 				}
 			}
 		}
