@@ -172,7 +172,7 @@ class DwhHourlyPartnerFilter extends baseObjectFilter
 		$this->unsetByName('_lte_hour_id');
 		$this->unsetByName('_lte_date_id');
 		
-		return parent::attachToCriteria($c);
+		return parent::attachToFinalCriteria($c);
 	}
 }
 
