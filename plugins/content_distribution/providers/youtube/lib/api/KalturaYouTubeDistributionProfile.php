@@ -89,7 +89,12 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * @var string
 	 */
-	public $target;	
+	public $target;
+
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -110,7 +115,8 @@ class KalturaYouTubeDistributionProfile extends KalturaDistributionProfile
 		'allowResponses',
 		'commercialPolicy',
 		'ugcPolicy',
-		'target'
+		'target',
+		'metadataProfileId',
 	 );
 		 
 	public function getMapBetweenObjects()

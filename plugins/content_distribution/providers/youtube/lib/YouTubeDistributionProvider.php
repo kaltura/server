@@ -127,13 +127,10 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-//		e.g.
-//		maybe should be taken from local config or kConf
-//		return array(
-//			"/*[local-name()='metadata']/*[local-name()='ShortDescription']",
-//			"/*[local-name()='metadata']/*[local-name()='LongDescription']",
-//		);
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST."']",
+			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
+		);
 		
-		return array();
 	}
 }

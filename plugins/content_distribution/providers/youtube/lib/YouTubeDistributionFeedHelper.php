@@ -137,6 +137,19 @@ class YouTubeDistributionFeedHelper
 		}
 	}
 	
+	/**
+	 * @param string $xpath
+	 * @param string $value
+	 */
+	public function getNodeValue($xpath)
+	{
+		$node = $this->xpath->query($xpath)->item(0);
+		if (!is_null($node))
+			return $node->nodeValue;
+		else
+			return null;
+	}
+	
 	public function setAction($value)
 	{
 		$this->setNodeValue('/rss/channel/item/yt:action', $value);
@@ -145,6 +158,12 @@ class YouTubeDistributionFeedHelper
 	public function setTarget($value)
 	{
 		$this->setNodeValue('/rss/channel/item/yt:target', $value);
+	}
+	
+
+	public function getTarget()
+	{
+		return $this->getNodeValue('/rss/channel/item/yt:target');
 	}
 	
 	public function setNotificationEmail($value)
@@ -260,6 +279,34 @@ class YouTubeDistributionFeedHelper
 		$this->setDescription($entry->description);
 		$this->setKeywords($entry->tags);
 		$this->setWebCustomId($entry->id);
+	}
+	
+	/**
+	 * @param array<KalturaString> $playlists
+	 */
+	public function setPlaylists(array $playlists)
+	{
+		if (count($playlists) == 0)
+			return;
+		$playlistsNode = $this->doc->createElement('yt:playlists');
+		$playlistsArray = array();
+		foreach($playlists as $playlist)
+		{
+			$playlistNode = $this->doc->createElement('yt:playlist');
+			$actionNode = $this->doc->createElement('yt:action', 'Insert');
+			$nameNode = $this->doc->createElement('yt:name', $playlist->value);
+			$playlistNode->appendChild($actionNode);
+			$playlistNode->appendChild($nameNode);
+			$playlistsNode->appendChild($playlistNode);
+		}
+		
+		$itemNode = $this->xpath->query('/rss/channel/item')->item(0);
+		$itemNode->appendChild($playlistsNode);
+		
+		$target = $this->getTarget();
+		$targetArray = explode(',', $target);
+		$targetArray[] = 'playlist';
+		$this->setTarget(implode(',', $targetArray));
 	}
 	
 }

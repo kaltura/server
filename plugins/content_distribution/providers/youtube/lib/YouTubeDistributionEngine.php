@@ -171,7 +171,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$videoFilePath = $providerData->videoAssetFilePath;
 		if (!$videoFilePath)
 			throw new KalturaException('No video asset to distribute, the job will fail');
-			
+
 		if (!file_exists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 			
@@ -180,6 +180,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry($entry);
+		$feed->setPlaylists($providerData->playlists);
 		$feed->setContentUrl('file://' . pathinfo($videoFilePath, PATHINFO_BASENAME));
 		if (file_exists($thumbnailFilePath))
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
@@ -239,6 +240,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed->setAction('Update');
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry($entry);
+		$feed->setPlaylists($providerData->playlists);
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
