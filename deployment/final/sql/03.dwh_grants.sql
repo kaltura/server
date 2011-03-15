@@ -1,5 +1,5 @@
-GRANT ALL ON *.* TO 'etl'@'@DB1_HOST@' IDENTIFIED BY 'etl';
-GRANT ALL ON *.* TO 'etl'@'%' IDENTIFIED BY 'etl';
+GRANT ALL ON *.* TO '@DWH_USER@'@'@DB1_HOST@' IDENTIFIED BY '@DWH_PASS@';
+GRANT ALL ON *.* TO '@DWH_USER@'@'%' IDENTIFIED BY '@DWH_PASS@';
 GRANT SELECT ON *.* TO 'kaltura_read'@'@DB1_HOST@' IDENTIFIED BY 'kaltura_read';
 FLUSH privileges;
 COMMIT;
