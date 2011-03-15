@@ -511,8 +511,6 @@ class kFile
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
 			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
 			
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
-		
 		$post_params = array();
 		
 		// pass uploaded files by adding them as post data with curl @ prefix
@@ -541,6 +539,7 @@ class kFile
 		$ch = curl_init();
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $host . $url . '?' . $getQuery);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
