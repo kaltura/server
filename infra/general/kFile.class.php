@@ -578,15 +578,18 @@ class kFile
 		// set URL and other appropriate options
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+
+		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
+		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
+			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
+			
+		$sendHeaders = array("X-Kaltura-Proxy: dumpUrl");
 		
 		if($passHeaders)
 		{
 			$sentHeaders = self::getRequestHeaders();
-			$sendHeaders = array();
 			foreach($sentHeaders as $header => $value)
 				$sendHeaders[] = "$header: $value";
-			
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
 		}
 		elseif($allowRange && isset($_SERVER['HTTP_RANGE']) && $_SERVER['HTTP_RANGE'])
 		{
@@ -594,6 +597,8 @@ class kFile
 			list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
 			curl_setopt($ch, CURLOPT_RANGE, $range);
 		}
+		
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
 		
 		if($_SERVER['REQUEST_METHOD'] == 'HEAD')
 		{
@@ -678,10 +683,6 @@ class kFile
 		}
 		else
 			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
-		
-		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
-		// upon detecting this header it cancels its original request and starts sending byte range requests 
-		header("Accept-Ranges: bytes");
 		
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");
