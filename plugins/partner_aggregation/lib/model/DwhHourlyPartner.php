@@ -26,4 +26,14 @@ class DwhHourlyPartner extends BaseDwhHourlyPartner {
 		parent::__construct();
 	}
 
+	public function getAggregatedTime()
+	{
+		$dateId = $this->getDateId();
+		return mktime(
+			$this->getHourId(), 0, 0, 
+			substr($dateId, 4, 2), 
+			substr($dateId, 6, 2), 
+			substr($dateId, 0, 4));
+	}
+	
 } // DwhHourlyPartner
