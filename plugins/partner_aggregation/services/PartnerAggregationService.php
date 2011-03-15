@@ -28,14 +28,14 @@ class PartnerAggregationService extends KalturaBaseService
 		$filter->validatePropertyNotNull('aggregatedTimeLessThanOrEqual');
 		$filter->validatePropertyNotNull('aggregatedTimeGreaterThanOrEqual');
 
+		if (!$pager)
+			$pager = new KalturaFilterPager();
 		
 		$c = new Criteria();			
 		$dwhHourlyPartnerFilter = $filter->toObject();
 		$dwhHourlyPartnerFilter->attachToCriteria($c);
 		$count = DwhHourlyPartnerPeer::doCount($c);
-		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		$pager->attachToCriteria($c);
 		$list = DwhHourlyPartnerPeer::doSelect($c);
 		
 		$response = new KalturaDwhHourlyPartnerListResponse();
