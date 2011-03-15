@@ -23,6 +23,7 @@ class KExternalErrors
 	const MISSING_PARAMETER= 20;
 	const WIDGET_NOT_FOUND = 21;
 	const UI_CONF_NOT_FOUND = 22;
+	const PROXY_LOOPBACK = 23;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -47,6 +48,8 @@ class KExternalErrors
 			self::MISSING_PARAMETER => "Request parameter [%s] is missing",
 			self::WIDGET_NOT_FOUND => "requested widget not found",
 			self::UI_CONF_NOT_FOUND => "requested ui_conf not found",
+			self::PROXY_LOOPBACK => "proxied request is being looped back",
+			
 		);
 	
 	public static function dieError($errorCode)
@@ -65,4 +68,4 @@ class KExternalErrors
 		header("X-Kaltura-App: exiting on error $errorCode - $description");
 		die();
 	}
-}
+}	
