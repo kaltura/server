@@ -1201,7 +1201,8 @@ class myPartnerUtils
  			foreach($fpcpList as $fpcp)
  			{
  				$flavorParamsId = $fpcp->getFlavorParamsId();
- 				$flavorParams = flavorParamsPeer::retrieveByPK($flavorParamsId);
+ 				assetParamsPeer::resetInstanceCriteriaFilter();
+ 				$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
  				if ($flavorParams && $flavorParams->getPartnerId() === 0) // copy the relation only if the flavor params are from partner 0 
  				{
 	 				$newFpcp = $fpcp->copy();
