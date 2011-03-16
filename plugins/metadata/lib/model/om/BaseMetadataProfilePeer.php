@@ -26,7 +26,7 @@ abstract class BaseMetadataProfilePeer {
 	const TM_CLASS = 'MetadataProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 9;
+	const NUM_COLUMNS = 12;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -52,11 +52,20 @@ abstract class BaseMetadataProfilePeer {
 	/** the column name for the NAME field */
 	const NAME = 'metadata_profile.NAME';
 
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'metadata_profile.SYSTEM_NAME';
+
+	/** the column name for the DESCRIPTION field */
+	const DESCRIPTION = 'metadata_profile.DESCRIPTION';
+
 	/** the column name for the STATUS field */
 	const STATUS = 'metadata_profile.STATUS';
 
 	/** the column name for the OBJECT_TYPE field */
 	const OBJECT_TYPE = 'metadata_profile.OBJECT_TYPE';
+
+	/** the column name for the CREATE_MODE field */
+	const CREATE_MODE = 'metadata_profile.CREATE_MODE';
 
 	/**
 	 * An identiy map to hold any loaded instances of MetadataProfile objects.
@@ -74,11 +83,11 @@ abstract class BaseMetadataProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'Version', 'ViewsVersion', 'PartnerId', 'Name', 'Status', 'ObjectType', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'version', 'viewsVersion', 'partnerId', 'name', 'status', 'objectType', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::VERSION, self::VIEWS_VERSION, self::PARTNER_ID, self::NAME, self::STATUS, self::OBJECT_TYPE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'version', 'views_version', 'partner_id', 'name', 'status', 'object_type', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'Version', 'ViewsVersion', 'PartnerId', 'Name', 'SystemName', 'Description', 'Status', 'ObjectType', 'CreateMode', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'version', 'viewsVersion', 'partnerId', 'name', 'systemName', 'description', 'status', 'objectType', 'createMode', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::VERSION, self::VIEWS_VERSION, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::STATUS, self::OBJECT_TYPE, self::CREATE_MODE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'version', 'views_version', 'partner_id', 'name', 'system_name', 'description', 'status', 'object_type', 'create_mode', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -88,11 +97,11 @@ abstract class BaseMetadataProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'Version' => 3, 'ViewsVersion' => 4, 'PartnerId' => 5, 'Name' => 6, 'Status' => 7, 'ObjectType' => 8, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'version' => 3, 'viewsVersion' => 4, 'partnerId' => 5, 'name' => 6, 'status' => 7, 'objectType' => 8, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::VERSION => 3, self::VIEWS_VERSION => 4, self::PARTNER_ID => 5, self::NAME => 6, self::STATUS => 7, self::OBJECT_TYPE => 8, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'version' => 3, 'views_version' => 4, 'partner_id' => 5, 'name' => 6, 'status' => 7, 'object_type' => 8, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'Version' => 3, 'ViewsVersion' => 4, 'PartnerId' => 5, 'Name' => 6, 'SystemName' => 7, 'Description' => 8, 'Status' => 9, 'ObjectType' => 10, 'CreateMode' => 11, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'version' => 3, 'viewsVersion' => 4, 'partnerId' => 5, 'name' => 6, 'systemName' => 7, 'description' => 8, 'status' => 9, 'objectType' => 10, 'createMode' => 11, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::VERSION => 3, self::VIEWS_VERSION => 4, self::PARTNER_ID => 5, self::NAME => 6, self::SYSTEM_NAME => 7, self::DESCRIPTION => 8, self::STATUS => 9, self::OBJECT_TYPE => 10, self::CREATE_MODE => 11, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'version' => 3, 'views_version' => 4, 'partner_id' => 5, 'name' => 6, 'system_name' => 7, 'description' => 8, 'status' => 9, 'object_type' => 10, 'create_mode' => 11, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -169,8 +178,11 @@ abstract class BaseMetadataProfilePeer {
 		$criteria->addSelectColumn(MetadataProfilePeer::VIEWS_VERSION);
 		$criteria->addSelectColumn(MetadataProfilePeer::PARTNER_ID);
 		$criteria->addSelectColumn(MetadataProfilePeer::NAME);
+		$criteria->addSelectColumn(MetadataProfilePeer::SYSTEM_NAME);
+		$criteria->addSelectColumn(MetadataProfilePeer::DESCRIPTION);
 		$criteria->addSelectColumn(MetadataProfilePeer::STATUS);
 		$criteria->addSelectColumn(MetadataProfilePeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(MetadataProfilePeer::CREATE_MODE);
 	}
 
 	/**

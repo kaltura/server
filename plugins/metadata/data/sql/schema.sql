@@ -19,8 +19,11 @@ CREATE TABLE `metadata_profile`
 	`views_version` INTEGER,
 	`partner_id` INTEGER,
 	`name` VARCHAR(31),
+	`system_name` VARCHAR(127),
+	`description` VARCHAR(255),
 	`status` TINYINT,
 	`object_type` INTEGER,
+	`create_mode` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`)
 )Type=MyISAM;

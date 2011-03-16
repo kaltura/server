@@ -8,8 +8,11 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="views_version" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="31" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="127" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="description" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="create_mode" type="integer" />
 		<index name="partner_id">
 			<index-column name="partner_id" />
 		</index>

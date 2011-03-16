@@ -62,6 +62,18 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
+	 * The value for the description field.
+	 * @var        string
+	 */
+	protected $description;
+
+	/**
 	 * The value for the status field.
 	 * @var        int
 	 */
@@ -72,6 +84,12 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $object_type;
+
+	/**
+	 * The value for the create_mode field.
+	 * @var        int
+	 */
+	protected $create_mode;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -232,6 +250,26 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
+	}
+
+	/**
+	 * Get the [description] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getDescription()
+	{
+		return $this->description;
+	}
+
+	/**
 	 * Get the [status] column value.
 	 * 
 	 * @return     int
@@ -249,6 +287,16 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function getObjectType()
 	{
 		return $this->object_type;
+	}
+
+	/**
+	 * Get the [create_mode] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getCreateMode()
+	{
+		return $this->create_mode;
 	}
 
 	/**
@@ -465,6 +513,52 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	} // setName()
 
 	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     MetadataProfile The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[MetadataProfilePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = MetadataProfilePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
+
+	/**
+	 * Set the value of [description] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     MetadataProfile The current object (for fluent API support)
+	 */
+	public function setDescription($v)
+	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::DESCRIPTION]))
+			$this->oldColumnsValues[MetadataProfilePeer::DESCRIPTION] = $this->description;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->description !== $v) {
+			$this->description = $v;
+			$this->modifiedColumns[] = MetadataProfilePeer::DESCRIPTION;
+		}
+
+		return $this;
+	} // setDescription()
+
+	/**
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
@@ -511,6 +605,29 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	} // setObjectType()
 
 	/**
+	 * Set the value of [create_mode] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     MetadataProfile The current object (for fluent API support)
+	 */
+	public function setCreateMode($v)
+	{
+		if(!isset($this->oldColumnsValues[MetadataProfilePeer::CREATE_MODE]))
+			$this->oldColumnsValues[MetadataProfilePeer::CREATE_MODE] = $this->create_mode;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->create_mode !== $v) {
+			$this->create_mode = $v;
+			$this->modifiedColumns[] = MetadataProfilePeer::CREATE_MODE;
+		}
+
+		return $this;
+	} // setCreateMode()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -549,8 +666,11 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$this->views_version = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->name = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->object_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->system_name = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->description = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->object_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->create_mode = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -560,7 +680,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 9; // 9 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating MetadataProfile object", $e);
@@ -985,10 +1105,19 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				return $this->getName();
 				break;
 			case 7:
-				return $this->getStatus();
+				return $this->getSystemName();
 				break;
 			case 8:
+				return $this->getDescription();
+				break;
+			case 9:
+				return $this->getStatus();
+				break;
+			case 10:
 				return $this->getObjectType();
+				break;
+			case 11:
+				return $this->getCreateMode();
 				break;
 			default:
 				return null;
@@ -1018,8 +1147,11 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$keys[4] => $this->getViewsVersion(),
 			$keys[5] => $this->getPartnerId(),
 			$keys[6] => $this->getName(),
-			$keys[7] => $this->getStatus(),
-			$keys[8] => $this->getObjectType(),
+			$keys[7] => $this->getSystemName(),
+			$keys[8] => $this->getDescription(),
+			$keys[9] => $this->getStatus(),
+			$keys[10] => $this->getObjectType(),
+			$keys[11] => $this->getCreateMode(),
 		);
 		return $result;
 	}
@@ -1073,10 +1205,19 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 				$this->setName($value);
 				break;
 			case 7:
-				$this->setStatus($value);
+				$this->setSystemName($value);
 				break;
 			case 8:
+				$this->setDescription($value);
+				break;
+			case 9:
+				$this->setStatus($value);
+				break;
+			case 10:
 				$this->setObjectType($value);
+				break;
+			case 11:
+				$this->setCreateMode($value);
 				break;
 		} // switch()
 	}
@@ -1109,8 +1250,11 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setViewsVersion($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setName($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setObjectType($arr[$keys[8]]);
+		if (array_key_exists($keys[7], $arr)) $this->setSystemName($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setDescription($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setStatus($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setObjectType($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreateMode($arr[$keys[11]]);
 	}
 
 	/**
@@ -1129,8 +1273,11 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(MetadataProfilePeer::VIEWS_VERSION)) $criteria->add(MetadataProfilePeer::VIEWS_VERSION, $this->views_version);
 		if ($this->isColumnModified(MetadataProfilePeer::PARTNER_ID)) $criteria->add(MetadataProfilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(MetadataProfilePeer::NAME)) $criteria->add(MetadataProfilePeer::NAME, $this->name);
+		if ($this->isColumnModified(MetadataProfilePeer::SYSTEM_NAME)) $criteria->add(MetadataProfilePeer::SYSTEM_NAME, $this->system_name);
+		if ($this->isColumnModified(MetadataProfilePeer::DESCRIPTION)) $criteria->add(MetadataProfilePeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(MetadataProfilePeer::STATUS)) $criteria->add(MetadataProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(MetadataProfilePeer::OBJECT_TYPE)) $criteria->add(MetadataProfilePeer::OBJECT_TYPE, $this->object_type);
+		if ($this->isColumnModified(MetadataProfilePeer::CREATE_MODE)) $criteria->add(MetadataProfilePeer::CREATE_MODE, $this->create_mode);
 
 		return $criteria;
 	}
@@ -1197,9 +1344,15 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 		$copyObj->setName($this->name);
 
+		$copyObj->setSystemName($this->system_name);
+
+		$copyObj->setDescription($this->description);
+
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setObjectType($this->object_type);
+
+		$copyObj->setCreateMode($this->create_mode);
 
 
 		$copyObj->setNew(true);

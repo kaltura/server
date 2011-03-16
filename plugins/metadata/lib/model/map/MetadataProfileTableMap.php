@@ -44,8 +44,11 @@ class MetadataProfileTableMap extends TableMap {
 		$this->addColumn('VIEWS_VERSION', 'ViewsVersion', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 127, null);
+		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
+		$this->addColumn('CREATE_MODE', 'CreateMode', 'INTEGER', false, null, null);
 		// validators
 	} // initialize()
 

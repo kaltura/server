@@ -6,97 +6,86 @@
 class KalturaMetadataProfile extends KalturaObject implements IFilterable 
 {
 	/**
-	 * 
 	 * @var int
 	 * @filter eq
 	 * @readonly
 	 */
 	public $id;
-
 	
 	/**
-	 * 
 	 * @var int
 	 * @filter eq
 	 * @readonly
 	 */
 	public $partnerId;
-
-
 	
 	/**
-	 * 
 	 * @var KalturaMetadataObjectType
 	 * @filter eq
 	 */
 	public $metadataObjectType;
-
-
 	
 	/**
-	 * 
 	 * @var int
 	 * @filter eq
 	 * @readonly
 	 */
 	public $version;
-
-
 	
 	/**
-	 * 
 	 * @var string
 	 * @filter eq
 	 */
 	public $name;
-
-
 	
 	/**
-	 * 
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
+	
+	/**
+	 * @var string
+	 */
+	public $description;
+	
+	/**
 	 * @var int
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
 	public $createdAt;
-
-
 	
 	/**
-	 * 
 	 * @var int
 	 * @filter gte,lte,order
 	 * @readonly
 	 */
 	public $updatedAt;
-
-
 	
 	/**
-	 * 
 	 * @var KalturaMetadataProfileStatus
 	 * @filter eq,in
 	 * @readonly
 	 */
 	public $status;
-
-
 	
 	/**
-	 * 
 	 * @var string
 	 * @readonly
 	 */
 	public $xsd;
 
-
-	
 	/**
-	 * 
 	 * @var string
 	 * @readonly
 	 */
 	public $views;
+
+	/**
+	 * @var KalturaMetadataProfileCreateMode
+	 */
+	public $createMode;
 	
 	private static $map_between_objects = array
 	(
@@ -105,9 +94,12 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		"metadataObjectType" => "objectType",
 		"version",
 		"name",
+		"systemName",
+		"description",
 		"createdAt",
 		"updatedAt",
 		"status",
+		"createMode",
 	);
 	
 	public function getMapBetweenObjects()
