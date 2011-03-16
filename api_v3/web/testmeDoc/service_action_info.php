@@ -122,7 +122,7 @@ function example_hit( $service, $action , $actionParams )
 	{
 		if ($actionParam->isComplexType())
 		{
-			if ($actionParam->isEnum() || $actionParam->isFile())
+			if ($actionParam->isEnum())
 				$hit .= $actionParam->getName().'<br />';
 			else // assume object
 			{

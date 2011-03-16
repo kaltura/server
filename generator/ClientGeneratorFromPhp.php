@@ -251,7 +251,7 @@ abstract class ClientGeneratorFromPhp
 						
 					foreach ($actionParams as $actionParam)
 					{
-						if ($actionParam->isComplexType() && !$actionParam->isFile())
+						if ($actionParam->isComplexType())
 						{
 							$typeReflector = KalturaTypeReflectorCacher::get($actionParam->getType());
 							if(!$typeReflector)
