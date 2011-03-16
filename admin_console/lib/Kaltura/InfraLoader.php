@@ -3,9 +3,9 @@ class Kaltura_InfraLoader implements Zend_Loader_Autoloader_Interface
 {
 	public function Kaltura_InfraLoader()
 	{
-		$cacheDir = realpath('../cache/');
-		$infaDir = realpath('../../infra/');
-		$pluginsDir = realpath('../../plugins/');
+		$cacheDir = realpath(dirname(__FILE__) . '/../../../cache/');
+		$infaDir = realpath(dirname(__FILE__) . '/../../../infra/');
+		$pluginsDir = realpath(dirname(__FILE__) . '/../../../plugins/');
 		
 		require_once($infaDir . DIRECTORY_SEPARATOR . 'bootstrap_base.php');
 		require_once($infaDir . DIRECTORY_SEPARATOR . 'KAutoloader.php');
