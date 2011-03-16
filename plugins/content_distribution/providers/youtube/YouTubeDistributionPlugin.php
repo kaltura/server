@@ -2,12 +2,14 @@
 /**
  * @package plugins.youTubeDistribution
  */
-class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
+class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'youTubeDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
 	const CONTENT_DSTRIBUTION_VERSION_MINOR = 0;
 	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
+	
+	const YOUTUBE_EVENT_CONSUMER = 'kYouTubeDistributionEventConsumer';
 
 	public static function getPluginName()
 	{
@@ -209,6 +211,16 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
 		
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::YOUTUBE_EVENT_CONSUMER,
+		);
 	}
 	
 	/**

@@ -26,10 +26,14 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 	public $sftpMetadataFilename;
 	
 	/**
-	 * 
-	 * @var KalturaStringArray
+	 * @var string
 	 */
-	public $playlists;
+	public $newPlaylists;
+	
+	/**
+	 * @var string
+	 */
+	public $currentPlaylists;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -38,7 +42,7 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 			
 		if(!($distributionJobData->distributionProfile instanceof KalturaYouTubeDistributionProfile))
 			return;
-			
+		
 		$flavorAssets = flavorAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		if(count($flavorAssets)) // if we have specific flavor assets for this distribution, grab the first one
 			$flavorAsset = reset($flavorAssets);
@@ -59,6 +63,11 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 		}
 		
 		$this->loadPlaylistsFromMetadata($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile);
+		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
+		if ($entryDistributionDb)
+			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
+		else
+			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
 	}
 		
 	private static $map_between_objects = array
@@ -67,17 +76,18 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 		"thumbAssetFilePath",
 		"sftpDirectory",
 		"sftpMetadataFilename",
-		"playlists",
+		"newPlaylists",
+		"currentPlaylists",
 	);
 
-	public function getMapBetweenObjects ( )
+	public function getMapBetweenObjects()
 	{
-		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
 	protected function loadPlaylistsFromMetadata($entryId, KalturaYouTubeDistributionProfile $distributionProfile)
 	{
-		$this->playlists = new KalturaStringArray();
+		$playlists = array();
 		$metadataProfileId = $distributionProfile->metadataProfileId; 
 		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryId);
 		if ($metadata)
@@ -91,19 +101,17 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaDistributionJobPr
 			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST);
 			foreach($nodes as $node)
 			{
-				$string = new KalturaString();
-				$string->value = $node->textContent;
-				$this->playlists[] = $string;
+				$playlists[] = $node->textContent;
 			}
 			
 			// second metadata field
 			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS);
 			foreach($nodes as $node)
 			{
-				$string = new KalturaString();
-				$string->value = $node->textContent;
-				$this->playlists[] = $string;
+				$playlists[] = $node->textContent;
 			}
 		}
+		
+		$this->newPlaylists = implode(',', $playlists);
 	}
 }

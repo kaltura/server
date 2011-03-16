@@ -180,7 +180,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed = new YouTubeDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $data->entryDistribution);
 		$feed->setAction('Insert');
 		$feed->setMetadataFromEntry($entry);
-		$feed->setPlaylists($providerData->playlists);
+		$feed->setPlaylists($providerData->currentPlaylists, $providerData->newPlaylists);
 		$feed->setContentUrl('file://' . pathinfo($videoFilePath, PATHINFO_BASENAME));
 		if (file_exists($thumbnailFilePath))
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
@@ -204,6 +204,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
 		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+		$providerData->currentPlaylists = $providerData->newPlaylists;
 	}
 	
 	/**
@@ -240,15 +241,15 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed->setAction('Update');
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry($entry);
-		$feed->setPlaylists($providerData->playlists);
+		$feed->setPlaylists($providerData->currentPlaylists, $providerData->newPlaylists);
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		
 		$feed->sendFeed($sftpManager);
 		$feed->setDeliveryComplete($sftpManager);
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
 		$providerData->sftpMetadataFilename = $feed->getMetadataTempFileName();
+		$providerData->currentPlaylists = $providerData->newPlaylists;
 	}
 	
 	/**

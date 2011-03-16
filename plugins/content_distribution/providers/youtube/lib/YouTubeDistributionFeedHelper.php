@@ -282,27 +282,59 @@ class YouTubeDistributionFeedHelper
 	}
 	
 	/**
-	 * @param array<KalturaString> $playlists
+	 * @param array<KalturaString> $currentPlaylists
+	 * @param array<KalturaString> $newPlaylists
 	 */
-	public function setPlaylists(array $playlists)
+	public function setPlaylists($currentPlaylists, $newPlaylists)
 	{
-		if (count($playlists) == 0)
+		KalturaLog::debug('Current playlists: ' . $currentPlaylists);
+		KalturaLog::debug('New playlists: ' . $newPlaylists);
+		$currentPlaylistsArray = explode(',', $currentPlaylists);
+		$newPlaylistsArray = explode(',', $newPlaylists);
+		sort($currentPlaylistsArray);
+		sort($newPlaylistsArray);
+		
+		if (count($currentPlaylists) == 0 && count($newPlaylists) == 0)
 			return;
+			
+		if (var_export($currentPlaylistsArray, true) === var_export($newPlaylistsArray, true)) // nothing changed
+			return;
+			
 		$playlistsNode = $this->doc->createElement('yt:playlists');
 		$playlistsArray = array();
-		foreach($playlists as $playlist)
+		
+		// playlists we need to add
+		foreach($newPlaylistsArray as $playlist)
 		{
-			$playlistNode = $this->doc->createElement('yt:playlist');
-			$actionNode = $this->doc->createElement('yt:action', 'Insert');
-			$nameNode = $this->doc->createElement('yt:name', $playlist->value);
-			$playlistNode->appendChild($actionNode);
-			$playlistNode->appendChild($nameNode);
-			$playlistsNode->appendChild($playlistNode);
+			if ($playlist && !in_array($playlist, $currentPlaylistsArray))
+			{
+				$playlistNode = $this->doc->createElement('yt:playlist');
+				$actionNode = $this->doc->createElement('yt:action', 'Insert');
+				$nameNode = $this->doc->createElement('yt:name', $playlist);
+				$playlistNode->appendChild($actionNode);
+				$playlistNode->appendChild($nameNode);
+				$playlistsNode->appendChild($playlistNode);
+			}
+		}
+		
+		// playlists we need to remove
+		foreach($currentPlaylistsArray as $playlist)
+		{
+			if ($playlist && !in_array($playlist, $newPlaylistsArray))
+			{
+				$playlistNode = $this->doc->createElement('yt:playlist');
+				$actionNode = $this->doc->createElement('yt:action', 'Delete');
+				$nameNode = $this->doc->createElement('yt:name', $playlist);
+				$playlistNode->appendChild($actionNode);
+				$playlistNode->appendChild($nameNode);
+				$playlistsNode->appendChild($playlistNode);
+			}
 		}
 		
 		$itemNode = $this->xpath->query('/rss/channel/item')->item(0);
 		$itemNode->appendChild($playlistsNode);
 		
+		// finally add the playlist target
 		$target = $this->getTarget();
 		$targetArray = explode(',', $target);
 		$targetArray[] = 'playlist';
