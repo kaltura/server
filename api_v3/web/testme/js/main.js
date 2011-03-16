@@ -119,13 +119,16 @@ KTestMe.prototype = {
 					this.addEnumField(this.jqActionParams, param);
 				else if (param.isArray)
 					this.addArrayField(this.jqActionParams, param);
-				else if (param.isFile)
-					this.addFileField(this.jqActionParams, param);
-				else
+				else 
 					this.addObjectField(this.jqActionParams, param);
+			}
+			else if (param.isFile)
+			{
+				this.addFileField(this.jqActionParams, param);
 			}
 			else
 			{
+				
 				this.addSimpleField(this.jqActionParams, param);
 			}
 		}));
