@@ -36,4 +36,12 @@ class DwhHourlyPartner extends BaseDwhHourlyPartner {
 			substr($dateId, 0, 4));
 	}
 	
+	public function getAverageTimeViewed()
+	{
+		if(!$this->getCountTimeViewed() || !function_exists('gmp_div_q'))
+			return 0;
+			
+		return gmp_div_q($this->getSumTimeViewed(), $this->getCountTimeViewed());
+	}
+	
 } // DwhHourlyPartner

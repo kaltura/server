@@ -13,6 +13,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $partnerId;
 
 	/**
+	 * Events aggregation time as Unix timestamp (In seconds) represent one hour
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -20,6 +21,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $aggregatedTime;
 
 	/**
+	 * Summary of all entries play time (in seconds)
 	 * @var string
 	 * @filter lte,gte,order
 	 * @readonly
@@ -27,13 +29,15 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $sumTimeViewed;
 
 	/**
+	 * Average of all entries play time (in seconds)
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
 	 */
-	public $countTimeViewed;
+	public $averageTimeViewed;
 
 	/**
+	 * Number of all played entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -41,7 +45,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPlays;
 
 	/**
-	 * Media loaded (viewed)
+	 * Number of all loaded entry players
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -49,7 +53,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countLoads;
 
 	/**
-	 * Play reached 25%
+	 * Number of plays that reached 25%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -57,7 +61,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPlays25;
 
 	/**
-	 * Play reached 50%
+	 * Number of plays that reached 50%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -65,7 +69,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPlays50;
 
 	/**
-	 * Play reached 75%
+	 * Number of plays that reached 75%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -73,7 +77,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPlays75;
 
 	/**
-	 * Play reached 100%
+	 * Number of plays that reached 100%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -81,7 +85,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPlays100;
 
 	/**
-	 * Open Edit
+	 * Number of times that editor opened
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -89,6 +93,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countEdit;
 
 	/**
+	 * Number of times that share button clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -96,7 +101,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countShares;
 
 	/**
-	 * Open Download
+	 * Number of times that download button clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -104,6 +109,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countDownload;
 
 	/**
+	 * Number of times that report abuse button clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -111,6 +117,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countReportAbuse;
 
 	/**
+	 * Count of new created media entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -118,6 +125,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMediaEntries;
 
 	/**
+	 * Count of new created video entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -125,6 +133,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countVideoEntries;
 
 	/**
+	 * Count of new created image entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -132,6 +141,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countImageEntries;
 
 	/**
+	 * Count of new created audio entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -139,6 +149,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countAudioEntries;
 
 	/**
+	 * Count of new created mix entries
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -146,13 +157,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMixEntries;
 
 	/**
-	 * @var int
-	 * @filter lte,gte,order
-	 * @readonly
-	 */
-	public $countMixNonEmpty;
-
-	/**
+	 * Count of new created playlists
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -176,6 +181,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countStorage;
 
 	/**
+	 * Count of new created users
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -183,25 +189,12 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countUsers;
 
 	/**
+	 * Count of new created widgets
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
 	 */
 	public $countWidgets;
-
-	/**
-	 * @var int
-	 * @filter lte,gte,order
-	 * @readonly
-	 */
-	public $flagActiveSite;
-
-	/**
-	 * @var int
-	 * @filter lte,gte,order
-	 * @readonly
-	 */
-	public $flagActivePublisher;
 
 	/**
 	 * Is bigint - in MB, aggregated daily in the first hour of every day
@@ -220,6 +213,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $aggregatedBandwidth;
 
 	/**
+	 * Count of times that player entered buffering state
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -227,6 +221,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countBufferStart;
 
 	/**
+	 * Count of times that player left buffering state
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -234,6 +229,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countBufferEnd;
 
 	/**
+	 * Count of times that player fullscreen state opened
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -241,6 +237,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countOpenFullScreen;
 
 	/**
+	 * Count of times that player fullscreen state closed
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -248,6 +245,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countCloseFullScreen;
 
 	/**
+	 * Count of times that replay button clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -255,7 +253,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countReplay;
 
 	/**
-	 * Seek
+	 * Count of times that seek option used
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -263,6 +261,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countSeek;
 
 	/**
+	 * Count of times that upload dialog opened in the editor
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -270,6 +269,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countOpenUpload;
 
 	/**
+	 * Count of times that save and publish button clicked in the editor
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -277,6 +277,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countSavePublish;
 
 	/**
+	 * Count of times that the editor closed
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -284,6 +285,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countCloseEditor;
 
 	/**
+	 * Count of times that pre-bumper entry played
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -291,6 +293,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPreBumperPlayed;
 
 	/**
+	 * Count of times that post-bumper entry played
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -298,6 +301,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPostBumperPlayed;
 
 	/**
+	 * Count of times that bumper entry clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -305,6 +309,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countBumperClicked;
 
 	/**
+	 * Count of times that pre-roll ad started
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -312,6 +317,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPrerollStarted;
 
 	/**
+	 * Count of times that mid-roll ad started
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -319,6 +325,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMidrollStarted;
 
 	/**
+	 * Count of times that post-roll ad started
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -326,6 +333,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPostrollStarted;
 
 	/**
+	 * Count of times that overlay ad started
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -333,6 +341,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countOverlayStarted;
 
 	/**
+	 * Count of times that pre-roll ad clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -340,6 +349,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPrerollClicked;
 
 	/**
+	 * Count of times that mid-roll ad clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -347,6 +357,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMidrollClicked;
 
 	/**
+	 * Count of times that post-roll ad clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -354,6 +365,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPostrollClicked;
 
 	/**
+	 * Count of times that overlay ad clicked
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -361,6 +373,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countOverlayClicked;
 
 	/**
+	 * Count of pre-roll ad plays that reached 25%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -368,6 +381,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPreroll25;
 
 	/**
+	 * Count of pre-roll ad plays that reached 50%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -375,6 +389,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPreroll50;
 
 	/**
+	 * Count of pre-roll ad plays that reached 75%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -382,6 +397,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPreroll75;
 
 	/**
+	 * Count of mid-roll ad plays that reached 25%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -389,6 +405,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMidroll25;
 
 	/**
+	 * Count of mid-roll ad plays that reached 50%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -396,6 +413,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMidroll50;
 
 	/**
+	 * Count of mid-roll ad plays that reached 75%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -403,6 +421,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countMidroll75;
 
 	/**
+	 * Count of post-roll ad plays that reached 25%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -410,6 +429,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPostroll25;
 
 	/**
+	 * Count of post-roll ad plays that reached 50%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -417,6 +437,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 	public $countPostroll50;
 
 	/**
+	 * Count of post-roll ad plays that reached 75%
 	 * @var int
 	 * @filter lte,gte,order
 	 * @readonly
@@ -445,7 +466,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 		'partnerId',
 		'aggregatedTime',
 		'sumTimeViewed',
-		'countTimeViewed',
+		'averageTimeViewed',
 		'countPlays',
 		'countLoads',
 		'countPlays25',
@@ -461,14 +482,11 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 		'countImageEntries' => 'countImage',
 		'countAudioEntries' => 'countAudio',
 		'countMixEntries' => 'countMix',
-		'countMixNonEmpty',
 		'countPlaylists' => 'countPlaylist',
 		'countBandwidth',
 		'countStorage',
 		'countUsers',
 		'countWidgets',
-		'flagActiveSite',
-		'flagActivePublisher',
 		'aggregatedStorage' => 'aggrStorage',
 		'aggregatedBandwidth' => 'aggrBandwidth',
 		'countBufferStart' => 'countBufStart',
