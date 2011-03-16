@@ -113,7 +113,6 @@ class kAkamaiUrlManager extends kUrlManager
 		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
 			{
-				$url = parse_url($url, PHP_URL_PATH);
 				$url = "http://kalturavod-i.akamaihd.net/i".$url."/master.m3u8";				
 			}
 			else
