@@ -97,10 +97,17 @@ abstract class KalturaBaseService
 		$this->ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
 		
 		// operating partner = partner from the request or the ks partner
-		$partnerId = kCurrentContext::$partner_id;
-		if (is_null($partnerId) || !strlen($partnerId)) {
-			$partnerId = kCurrentContext::$ks_partner_id;
-		}
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+
+		
+//		For now the express uploader uses partner zero in every request
+//		Need to verify that the partner is allowed to impersonate to the partner in the request
+//		
+//		$partnerId = kCurrentContext::$partner_id;
+//		if (is_null($partnerId) || !strlen($partnerId)) {
+//			$partnerId = kCurrentContext::$ks_partner_id;
+//		}
+		
 		$this->partner = PartnerPeer::retrieveByPK( $partnerId );
 		if (!$this->partner) { $this->partner = null; }		
 
