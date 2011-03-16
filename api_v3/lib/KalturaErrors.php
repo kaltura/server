@@ -266,4 +266,8 @@ class KalturaErrors extends APIErrors
 	
 	const INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM = "INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM,Invalid xslt, missing apply-template tag for item's template with the following convention: xsl:apply-templates name=\"item\"";
 	
+	/*
+	 * file sync
+	 */
+	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST,File doesnt exist";
 }

@@ -263,4 +263,43 @@ abstract class KalturaBaseService
 		}
 
 	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param int $fileSubType
+	 * @param string $fileName
+	 * @param bool $forceProxy
+	 * @throws KalturaAPIException
+	 */
+	protected function serveFile(EntryDistribution $entryDistribution, $fileSubType, $fileName, $forceProxy = false)
+	{
+		$syncKey = $entryDistribution->getSyncKey($fileSubType);
+		if(!kFileSyncUtils::fileSync_exists($syncKey))
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+			$mimeType = kFile::mimeType($filePath);
+			kFile::dumpFile($filePath, $mimeType);
+		}
+		else
+		{
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KalturaLog::info("Redirecting to [$remoteUrl]");
+			if($forceProxy)
+			{
+				kFile::dumpUrl($remoteUrl);
+			}
+			else
+			{
+				// or redirect if no proxy
+				header("Location: $remoteUrl");
+			}
+		}	
+	}
 }
