@@ -419,5 +419,28 @@ class MetadataService extends KalturaBaseService
 		$metadata->fromObject($dbMetadata);
 		
 		return $metadata;
-	}	
+	}		
+
+	/**
+	 * Serves metadata XML file
+	 *  
+	 * @action serve
+	 * @param int $id
+	 * @return file
+	 *  
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
+	 */
+	public function serveAction($id)
+	{
+		$dbMetadata = MetadataPeer::retrieveByPK( $id );
+		
+		if(!$dbMetadata)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$fileName = $dbMetadata->getObjectId() . '.xml';
+		$fileSubType = Metadata::FILE_SYNC_METADATA_DATA;
+		
+		return $this->serveFile($dbMetadata, $fileSubType, $fileName);
+	}
 }

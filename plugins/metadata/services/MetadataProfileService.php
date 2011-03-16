@@ -445,4 +445,50 @@ class MetadataProfileService extends KalturaBaseService
 		
 		return $metadataProfile;
 	}	
+
+	/**
+	 * Serves metadata profile XSD file
+	 *  
+	 * @action serve
+	 * @param int $id
+	 * @return file
+	 *  
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
+	 */
+	public function serveAction($id)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK( $id );
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$fileName = $dbMetadataProfile->getSystemName() . '.xml';
+		$fileSubType = MetadataProfile::FILE_SYNC_METADATA_DEFINITION;
+		
+		return $this->serveFile($dbMetadataProfile, $fileSubType, $fileName);
+	}	
+
+	/**
+	 * Serves metadata profile view file
+	 *  
+	 * @action serveView
+	 * @param int $id
+	 * @return file
+	 *  
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
+	 */
+	public function serveViewAction($id)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK( $id );
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$fileName = $dbMetadataProfile->getSystemName() . '.xml';
+		$fileSubType = MetadataProfile::FILE_SYNC_METADATA_VIEWS;
+		
+		return $this->serveFile($dbMetadataProfile, $fileSubType, $fileName);
+	}
 }
