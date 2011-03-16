@@ -27,12 +27,12 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
-		if($fromObject instanceof flavorParams)
-			self::mapIds('flavorParams', $fromObject->getId(), $toObject->getId());
+		if($fromObject instanceof assetParams)
+			self::mapIds('assetParams', $fromObject->getId(), $toObject->getId());
 			
-		if($fromObject instanceof flavorParamsOutput)
+		if($fromObject instanceof assetParamsOutput)
 		{
-			$flavorParamsId = self::getMappedId('flavorParams', $fromObject->getFlavorParamsId());
+			$flavorParamsId = self::getMappedId('assetParams', $fromObject->getFlavorParamsId());
 			if($flavorParamsId)
 				$toObject->setFlavorParamsId($flavorParamsId);
 		}
