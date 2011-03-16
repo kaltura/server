@@ -518,8 +518,8 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 	this.addCode(this.codeSystemFunction("require_once", [this.codeString("lib/KalturaClient.php")]));
 
 	var jqConfigObject = this.codeVar("config");
-	
-	this.addCode(this.codeAssign(jqConfigObject.clone(), this.codeNewInstance("KalturaConfiguration")));
+
+	this.addCode(this.codeAssign(jqConfigObject.clone(), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")])));
 	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
 	this.addCode(this.codeAssign(this.jqClientObject.clone(), this.codeNewInstance("KalturaClient", [jqConfigObject.clone()])));
 };
