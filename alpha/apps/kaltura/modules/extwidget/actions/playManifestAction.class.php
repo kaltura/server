@@ -140,9 +140,31 @@ class playManifestAction extends kalturaAction
 				$tag = flavorParams::TAG_SLWEB;
 			elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
 				$tag = flavorParams::TAG_APPLEMBR;
-				
 			$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, $tag);
-			
+
+			// if format is APPLE HTTP and there aren't any segmented flavors use ipad and iphone with
+			// akamai hd on the fly segmenter
+			if(!count($flavorAssets) && $this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			{
+				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, "ipad");
+				$flavorAssets2 = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, "iphone");
+				foreach($flavorAssets2 as $flavorAsset2)
+				{
+					$found = false;
+					foreach($flavorAssets as $flavorAsset)
+					{
+						if ($flavorAsset->getId() == $flavorAsset2->getId())
+						{
+							$found = true;
+							break;
+						}
+					}
+					
+					if (!$found)
+						$flavorAssets[] = $flavorAsset2;
+				}
+			}
+				
 			if(!count($flavorAssets) && $tag == flavorParams::TAG_MBR)
 				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
 		}
@@ -161,7 +183,7 @@ class playManifestAction extends kalturaAction
 					$durationSet = true;
 				}
 			}
-
+			
 			$flavors[] = array(
 				'url' => $this->getFlavorHttpUrl($flavorAsset),
 				'bitrate' => $flavorAsset->getBitrate(),
@@ -271,8 +293,10 @@ class playManifestAction extends kalturaAction
 		$urlManager->setProtocol($this->format);
 
 	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
-		
-		$url = $this->cdnHost . $url;
+
+		if (strpos($url, "/") === 0)
+			$url = $this->cdnHost . $url;
+			
 		$url = preg_replace('/^https?:\/\//', '', $url);
 		return $this->protocol . '://' . $url;
 	}
@@ -584,10 +608,6 @@ class playManifestAction extends kalturaAction
 			$bitrate = (isset($flavor['bitrate']) ? $flavor['bitrate'] : 0) * 1000;
 			$content .= "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=".$bitrate."\n";
 			$content .= $flavor['url']."\n";
-			
-			#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=301000,CODECS="mp4a.40.2,avc1.66.30"
-			///content/entry/data/....../entryId_falvorId/playlist.m3u8
-			
 		}
 		
 		return $content;
