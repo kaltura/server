@@ -4,7 +4,7 @@
 		<column primaryKey="true"  required="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
 		<column primaryKey="true"  required="false" lazyLoad="false" name="date_id" type="integer" default="0" />
 		<column primaryKey="true"  required="false" lazyLoad="false" name="hour_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" lazyLoad="false" name="sum_time_viewed" type="decimal" size="20" scale="3" phpType="double" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="sum_time_viewed" type="decimal" size="20" scale="3" phpType="float" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="count_time_viewed" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="count_plays" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="count_loads" type="integer" />

@@ -22,7 +22,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * Summary of all entries play time (in seconds)
-	 * @var double
+	 * @var float
 	 * @filter lte,gte,order
 	 * @readonly
 	 */
@@ -30,7 +30,7 @@ class KalturaDwhHourlyPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * Average of all entries play time (in seconds)
-	 * @var double
+	 * @var float
 	 * @filter lte,gte,order
 	 * @readonly
 	 */
