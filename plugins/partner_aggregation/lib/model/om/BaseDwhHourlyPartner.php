@@ -42,7 +42,7 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 
 	/**
 	 * The value for the sum_time_viewed field.
-	 * @var        string
+	 * @var        double
 	 */
 	protected $sum_time_viewed;
 
@@ -480,7 +480,7 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 	/**
 	 * Get the [sum_time_viewed] column value.
 	 * 
-	 * @return     string
+	 * @return     double
 	 */
 	public function getSumTimeViewed()
 	{
@@ -1129,7 +1129,7 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 	/**
 	 * Set the value of [sum_time_viewed] column.
 	 * 
-	 * @param      string $v new value
+	 * @param      double $v new value
 	 * @return     DwhHourlyPartner The current object (for fluent API support)
 	 */
 	public function setSumTimeViewed($v)
@@ -1138,7 +1138,7 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 			$this->oldColumnsValues[DwhHourlyPartnerPeer::SUM_TIME_VIEWED] = $this->sum_time_viewed;
 
 		if ($v !== null) {
-			$v = (string) $v;
+			$v = (double) $v;
 		}
 
 		if ($this->sum_time_viewed !== $v) {
@@ -2523,7 +2523,7 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 			$this->partner_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->date_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->hour_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->sum_time_viewed = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->sum_time_viewed = ($row[$startcol + 3] !== null) ? (double) $row[$startcol + 3] : null;
 			$this->count_time_viewed = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->count_plays = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->count_loads = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
