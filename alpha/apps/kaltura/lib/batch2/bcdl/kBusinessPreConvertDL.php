@@ -791,9 +791,7 @@ class kBusinessPreConvertDL
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		
 		$sourceFlavor = null;
-		// gets the flavor params by the id
-		assetParamsPeer::resetInstanceCriteriaFilter();
-		$flavors = assetParamsPeer::retrieveByPKs($flavorsIds);
+		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
 
 		foreach($flavors as $index => $flavor)
 		{
