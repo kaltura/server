@@ -423,6 +423,7 @@ class EntryDistributionService extends KalturaBaseService
 	 *  
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
 	public function serveSentDataAction($id, $actionType)
 	{
@@ -460,6 +461,7 @@ class EntryDistributionService extends KalturaBaseService
 	 *  
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_NOT_FOUND
 	 * @throws ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG
+	 * @throws KalturaErrors::FILE_DOESNT_EXIST
 	 */
 	public function serveReturnedDataAction($id, $actionType)
 	{
@@ -485,44 +487,5 @@ class EntryDistributionService extends KalturaBaseService
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $id);
 		
 		return $this->serveFile($dbEntryDistribution, $fileSubType, $fileName);
-	}
-	
-	/**
-	 * @param EntryDistribution $entryDistribution
-	 * @param int $fileSubType
-	 * @param string $fileName
-	 * @param bool $forceProxy
-	 * @throws KalturaAPIException
-	 */
-	protected function serveFile(EntryDistribution $entryDistribution, $fileSubType, $fileName, $forceProxy = false)
-	{
-		$syncKey = $entryDistribution->getSyncKey($fileSubType);
-		if(!kFileSyncUtils::fileSync_exists($syncKey))
-			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_MISSING_LOG, $entryDistribution->getId(), $fileSubType);
-
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		
-		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		
-		if($local)
-		{
-			$filePath = $fileSync->getFullPath();
-			$mimeType = kFile::mimeType($filePath);
-			kFile::dumpFile($filePath, $mimeType);
-		}
-		else
-		{
-			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			KalturaLog::info("Redirecting to [$remoteUrl]");
-			if($forceProxy)
-			{
-				kFile::dumpUrl($remoteUrl);
-			}
-			else
-			{
-				// or redirect if no proxy
-				header("Location: $remoteUrl");
-			}
-		}	
 	}
 }
