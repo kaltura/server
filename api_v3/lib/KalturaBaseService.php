@@ -97,7 +97,10 @@ abstract class KalturaBaseService
 		$this->ks = kCurrentContext::$ks_object ? kCurrentContext::$ks_object : null;
 		
 		// operating partner = partner from the request or the ks partner
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::$partner_id;
+		if (is_null($partnerId) || !strlen($partnerId)) {
+			$partnerId = kCurrentContext::$ks_partner_id;
+		}
 		$this->partner = PartnerPeer::retrieveByPK( $partnerId );
 		if (!$this->partner) { $this->partner = null; }		
 
