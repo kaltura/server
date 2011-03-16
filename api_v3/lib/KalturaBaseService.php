@@ -265,15 +265,15 @@ abstract class KalturaBaseService
 	}
 	
 	/**
-	 * @param EntryDistribution $entryDistribution
+	 * @param ISyncableFile $syncable
 	 * @param int $fileSubType
 	 * @param string $fileName
 	 * @param bool $forceProxy
 	 * @throws KalturaAPIException
 	 */
-	protected function serveFile(EntryDistribution $entryDistribution, $fileSubType, $fileName, $forceProxy = false)
+	protected function serveFile(ISyncableFile $syncable, $fileSubType, $fileName, $forceProxy = false)
 	{
-		$syncKey = $entryDistribution->getSyncKey($fileSubType);
+		$syncKey = $syncable->getSyncKey($fileSubType);
 		if(!kFileSyncUtils::fileSync_exists($syncKey))
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 
