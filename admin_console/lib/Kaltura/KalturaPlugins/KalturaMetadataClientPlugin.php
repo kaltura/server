@@ -36,6 +36,16 @@ class KalturaMetadataOrderBy
  * @package Admin
  * @subpackage Client
  */
+class KalturaMetadataProfileCreateMode
+{
+	const API = 1;
+	const KMC = 2;
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaMetadataProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -467,6 +477,20 @@ class KalturaMetadataProfile extends KalturaObjectBase
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $systemName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 * @readonly
 	 */
@@ -503,6 +527,13 @@ class KalturaMetadataProfile extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $views = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMetadataProfileCreateMode
+	 */
+	public $createMode = null;
 
 
 }
@@ -758,6 +789,15 @@ class KalturaMetadataService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaMetadata");
 		return $resultObject;
 	}
+
+	function serve($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall('metadata_metadata', 'serve', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
 }
 
 /**
@@ -914,6 +954,24 @@ class KalturaMetadataProfileService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaMetadataProfile");
+		return $resultObject;
+	}
+
+	function serve($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall('metadata_metadataprofile', 'serve', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
+
+	function serveView($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall('metadata_metadataprofile', 'serveView', $kparams);
+		$resultObject = $this->client->getServeUrl();
 		return $resultObject;
 	}
 }

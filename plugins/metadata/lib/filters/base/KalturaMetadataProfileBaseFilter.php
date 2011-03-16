@@ -13,6 +13,8 @@ class KalturaMetadataProfileBaseFilter extends KalturaFilter
 		"metadataObjectTypeEqual" => "_eq_metadata_object_type",
 		"versionEqual" => "_eq_version",
 		"nameEqual" => "_eq_name",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -73,6 +75,20 @@ class KalturaMetadataProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $nameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
 
 	/**
 	 * 
