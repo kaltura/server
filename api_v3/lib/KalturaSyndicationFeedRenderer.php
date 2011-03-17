@@ -400,7 +400,7 @@ class KalturaSyndicationFeedRenderer
 					
 			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB);				
 		}
-		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $syndicationFeedDB);
+		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 	}
 	
 	private function renderYahooFeed()
