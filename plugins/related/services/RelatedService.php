@@ -14,28 +14,28 @@ class RelatedService extends KalturaBaseService
 	 * @action listRelatedMedieEntries
 	 * @param string $entryId
 	 * @param KalturaRelatedScope $scope
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaMediaListResponse
+	 * @param int $pageSize
+	 * @return KalturaRelatedResponse
 	 */
-	public function listRelatedMedieEntriesAction($entryId, KalturaRelatedScope $scope = null, KalturaFilterPager $pager = null)
+	public function listRelatedMedieEntriesAction($entryId, KalturaRelatedScope $scope = null, $pageSize = 30)
 	{
 		$mediaService = new MediaService();
 		$mediaService->initService('media', 'media', 'get');
 		$entry = $mediaService->getAction($entryId);
+		$pager = new KalturaFilterPager();
 
 		if (!$scope)
 			$scope = new KalturaRelatedScope();
 			
-		if (!$pager)
-			$pager = new KalturaFilterPager();
+		if ($pageSize > $pager->maxPageSize)
+			throw new KalturaAPIException(KalturaRelatedErrors::MAX_PAGE_SIZE_EXCEEDED);
 			
-		if ($pager->pageIndex != 1)
-			throw new KalturaAPIException(KalturaRelatedErrors::PAGING_NOT_SUPPORTED);
-			 
+		$pager->pageSize = $pageSize;
 		$originalKs = kCurrentContext::$ks;
 		$adminKs = $this->getAdminSessionForPartner($entry->partnerId);
 		$mediaEntryFilter = new KalturaMediaEntryFilter();
 		$mediaEntryFilter->idNotIn = $entryId;
+		$mediaEntryFilter->mediaTypeEqual = KalturaMediaType::VIDEO;
 		$mediaEntryFilter->startDateLessThanOrEqualOrNull = time();
 		$mediaEntryFilter->startDateGreaterThanOrEqualOrNull = time();
 		kCurrentContext::initKsPartnerUser($adminKs);
@@ -68,12 +68,29 @@ class RelatedService extends KalturaBaseService
 			{
 				$mediaResponse->objects[] = $entry;
 			}
-			$mediaResponse->totalCount = count($entries);
 		}
+		
+		$entryIds = array();
+		foreach($mediaResponse->objects as $entry)
+		{
+			$entryIds[] = $entry->id;
+		}
+		
+		$metadataService = new MetadataService();
+		$metadataFilter = new KalturaMetadataFilter();
+		$metadataFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+		$metadataFilter->objectIdIn = implode(',', $entryIds);
+		$metadataPager = new KalturaFilterPager();
+		$metadataPager->pageSize =  $pager->pageSize;
+		$metadataService->initService('metadata_metadata', 'metadata_metadata', 'list');
+		$metadataResponse = $metadataService->listAction($metadataFilter, $metadataPager);
 		
 		kCurrentContext::initKsPartnerUser($originalKs);
 		
-		return $mediaResponse;
+		$relatedResponse = new KalturaRelatedResponse();
+		$relatedResponse->entryObjects = $mediaResponse->objects;
+		$relatedResponse->metadataObjects = $metadataResponse->objects;
+		return $relatedResponse;
 	}
 	
 	protected function getAdminSessionForPartner($partnerId)
