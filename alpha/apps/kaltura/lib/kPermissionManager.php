@@ -616,7 +616,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	private static function isPartnerAccessAllowed($service, $action)
 	{		
-		if (!self::$operatingPartnerId || !self::$requestedPartnerId) {
+		if (is_null(self::$operatingPartnerId) || is_null(self::$requestedPartnerId)) {
 			return true;
 		}
 		

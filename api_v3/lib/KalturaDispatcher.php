@@ -25,9 +25,10 @@ class KalturaDispatcher
 		
 		$start = microtime( true );
 	
-		$p = isset ($params["p"]) ? $params["p"] : null;
+		// prevent impersonate to partner zero
+		$p = isset($params["p"]) && $params["p"] ? $params["p"] : null;
 		if (!$p) 
-			$p = isset($params["partnerId"]) ? $params["partnerId"] : null;
+			$p = isset($params["partnerId"]) && $params["partnerId"] ? $params["partnerId"] : null;
 			
 		$GLOBALS["partnerId"] = $p; // set for logger
 		
