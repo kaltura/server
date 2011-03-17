@@ -137,7 +137,6 @@ class kXml
 		return $modified;
 	}
 
-
 	/**
 	 * 
 	 * Sets the given object's given property value 
@@ -227,5 +226,29 @@ class kXml
 		}
 		
 		return $simpleXML;
+	}
+
+	/**
+	 * 
+	 * gets a dom to append and an element and another dom to append into them.
+	 * @param DomDocument $domToAppend
+	 * @param DOMElement $element
+	 * @param DomDocument $elementsDom
+	 * @throws Exception
+	 */
+	public static function appendDomToElement(DomDocument $domToAppend,DOMElement &$element, DomDocument $elementsDom)
+	{ 
+		if($domToAppend->documentElement != NULL)
+		{
+			$importedNode = $elementsDom->importNode($domToAppend->documentElement, true);
+	
+			//Add him to the output reference elements
+			$element->appendChild($importedNode);
+		}
+		else
+		{
+			//DO nothing because the Dom is empty 
+//			throw new Exception("The dom to append document element was null : " . $domToAppend);
+		}
 	}
 }
