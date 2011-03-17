@@ -21,7 +21,7 @@ FROM
     	partner_name,
     	created_at,
     	partner_package,
-    	dwh_dim_partners.partner_id partner_id,	
+    	dim_partner.partner_id partner_id,	
 	SUM(count_loads) count_loads,
 	SUM(count_plays) count_plays,
 	SUM(count_video) count_video,
@@ -30,24 +30,24 @@ FROM
 	SUM(count_image) count_image,
 	SUM(count_bandwidth) count_bandwidth,
 	SUM(count_storage) count_storage
-	FROM kalturadw.dwh_hourly_partner RIGHT JOIN kalturadw.dwh_dim_partners
-	ON (dwh_hourly_partner.partner_id = dwh_dim_partners.partner_id AND dwh_hourly_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
+	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner
+	ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
 	WHERE  {OBJ_ID_CLAUSE} AND
-	dwh_dim_partners.created_date_id <= {TO_DATE_ID}
-	GROUP BY dwh_dim_partners.partner_id
-	ORDER BY dwh_dim_partners.partner_id
-	LIMIT LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
+	dim_partner.created_date_id <= {TO_DATE_ID}
+	GROUP BY dim_partner.partner_id
+	ORDER BY dim_partner.partner_id
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) aggr_p,
 (
-	SELECT	partner_id, 
+	SELECT	aggr_partner.partner_id, 
 		SUM(count_video + count_audio + count_image) count_media_all_time,
 		SUM(count_bandwidth ) count_bandwidth_all_time,
 		SUM(count_storage ) count_storage_all_time
-	FROM kalturadw.dwh_aggr_partner 
+	FROM kalturadw.dwh_aggr_partner aggr_partner inner join kalturadw.dwh_dim_partners dim_partner on (aggr_partner.partner_id = dim_partner.partner_id)
 	WHERE {OBJ_ID_CLAUSE} AND
-	date_id <= {TO_DATE_ID}
-	GROUP BY partner_id
-	ORDER BY partner_id
-	LIMIT LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
+	aggr_partner.date_id <= {TO_DATE_ID}
+	GROUP BY aggr_partner.partner_id
+	ORDER BY aggr_partner.partner_id
+	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) all_time_aggr
 WHERE aggr_p.partner_id = all_time_aggr.partner_id
