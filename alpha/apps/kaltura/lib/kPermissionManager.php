@@ -615,12 +615,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	
 	private static function isPartnerAccessAllowed($service, $action)
-	{		
+	{
 		if (is_null(self::$operatingPartnerId) || is_null(self::$requestedPartnerId)) {
 			return true;
 		}
 		
-		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , self::getPartnerGroup($service, $action) , self::$requestedPartnerId );
+		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , self::getKsPartnerGroup($service, $action) , self::$requestedPartnerId );
 		return $accessAllowed;
 	}
 	
@@ -722,11 +722,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$service = strtolower($service); //TODO: save service with normal case ?
 		$action = strtolower($action); //TODO: save actions with normal case ?
 		
-		if (self::$requestedPartnerId && self::$requestedPartnerId != self::$operatingPartnerId)
-		{
-			return self::$requestedPartnerId;
-		}
-		
 		$partnerGroupSet   = isset(self::$map[self::PARTNER_GROUP_ARRAY_NAME][$service]) &&isset(self::$map[self::PARTNER_GROUP_ARRAY_NAME][$service][$action]);
 		
 		if (!$partnerGroupSet)
@@ -739,10 +734,16 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		if (in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $partnerGroup, true))
 		{
+			if (self::$requestedPartnerId && self::$requestedPartnerId != self::$operatingPartnerId)
+				return self::$requestedPartnerId;
+				
 			return myPartnerUtils::ALL_PARTNERS_WILD_CHAR;
 		}
 		
 		$partnerGroup = array_filter($partnerGroup);
+		if (self::$requestedPartnerId && self::$requestedPartnerId != self::$operatingPartnerId && in_array(self::$requestedPartnerId, $partnerGroup))
+			return self::$requestedPartnerId;
+		
 		$partnerGroup = implode(',', $partnerGroup);
 		return $partnerGroup;
 	}
