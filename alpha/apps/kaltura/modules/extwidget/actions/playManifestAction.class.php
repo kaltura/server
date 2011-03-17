@@ -628,7 +628,7 @@ class playManifestAction extends kalturaAction
 			$url = parse_url($url, PHP_URL_PATH);
 			
 			$url = htmlspecialchars($url);
-			$flavorsXml .= "<video src=\"$url\" system-bitrate=\"$bitrate\"/>"; 
+			$flavorsXml .= "<video src=\"$url\" system-bitrate=\"".($bitrate * 1000)."\"/>"; 
 		}
 			
 		return '<?xml version="1.0"?>
