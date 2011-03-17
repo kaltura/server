@@ -620,7 +620,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return true;
 		}
 		
-		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , self::getKsPartnerGroup($service, $action) , self::$requestedPartnerId );
+		$accessAllowed = myPartnerUtils::allowPartnerAccessPartner ( self::$operatingPartnerId , self::getPartnerGroup($service, $action) , self::$requestedPartnerId );
 		return $accessAllowed;
 	}
 	
