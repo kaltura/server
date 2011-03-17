@@ -48,6 +48,9 @@ class PartnerUsageController extends Zend_Controller_Action
 		$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
 		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
 		$client = Kaltura_ClientHelper::getClient();
+		if ($client->getKs() == null) {
+			$client->setKs(self::generateKs());
+		}
 		$form = new Form_PartnerUsageFilter();
 		$form->populate($request->getParams());
 		
@@ -160,5 +163,36 @@ class PartnerUsageController extends Zend_Controller_Action
 	private function getDefaultToDate()
 	{
 		return time();
+	}
+	
+	private static function generateKs() {
+		$settings = Zend_Registry::get('config')->settings;
+		$partnerId = $settings->partnerId;
+		$secret = $settings->secret;
+		$sessionExpiry = $settings->sessionExpiry;
+		return self::createKS($partnerId, $secret, KalturaSessionType::ADMIN, $sessionExpiry);
+	}
+	
+	private static function createKS($partnerId, $adminSecret, $sessionType = KalturaSessionType::ADMIN, $expiry = 7200)
+	{
+		$puserId = '';
+		$privileges = '';
+		
+		$rand = rand(0, 32000);
+		$rand = microtime(true);
+		$expiry = time() + $expiry;
+		$fields = array($partnerId, '', $expiry, $sessionType, $rand, $puserId, $privileges);
+		$str = implode(";", $fields);
+		
+		$salt = $adminSecret;
+		$hashed_str = self::hash($salt, $str) . "|" . $str;
+		$decoded_str = base64_encode($hashed_str);
+		
+		return $decoded_str;
+	}
+	
+	private static function hash($salt, $str)
+	{
+		return sha1($salt . $str);
 	}
 }
