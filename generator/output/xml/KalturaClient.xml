@@ -3412,7 +3412,9 @@
       <property name="parameter" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="action" type="string" enumType="KalturaApiParameterPermissionItemAction" readOnly="0" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaGenericSyndicationFeed" base="KalturaBaseSyndicationFeed"/>
+    <class name="KalturaGenericSyndicationFeed" base="KalturaBaseSyndicationFeed">
+      <property name="feedDescription" type="string" readOnly="0" insertOnly="0" description="feed description&#10;"/>
+    </class>
     <class name="KalturaGenericXsltSyndicationFeed" base="KalturaGenericSyndicationFeed">
       <property name="xslt" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
