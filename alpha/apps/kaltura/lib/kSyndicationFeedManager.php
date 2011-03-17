@@ -44,7 +44,7 @@ class kSyndicationFeedManager
 	{
 		if(self::$xsl)
 			return self::$xsl;
-		KalturaLog::debug("get xsl");
+		
 		self::$xsl = $syndicationFeed->getXslt();
 		return self::$xsl;
 	}
@@ -98,7 +98,6 @@ class kSyndicationFeedManager
 	 */
 	public static function getMrssHeader($title, $link = null, $description = null, syndicationFeed $syndicationFeed = null)
 	{
-		
 		$mrss = self::getKalturaMrssXml($title, $link, $description);
 		
 		if (!is_null($syndicationFeed) && ($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
@@ -109,6 +108,7 @@ class kSyndicationFeedManager
 		
 		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER);		
 		$mrss = substr($mrss,0,$divideHeaderFromFooter);
+		$mrss = self::removeXmlHeader($mrss);
 		
 		return $mrss;
 	}
@@ -131,9 +131,8 @@ class kSyndicationFeedManager
 		}
 		
 		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER) + strlen(ITEMS_PLACEHOLDER);
+		$mrss = substr($mrss,$divideHeaderFromFooter);
 		
-		
-		$mrss = substr($mrss,$divideHeaderFromFooter);	
 		return $mrss;
 	}
 	
