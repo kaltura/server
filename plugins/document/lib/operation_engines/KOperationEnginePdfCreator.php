@@ -80,7 +80,7 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 		}
 		
 		if (!file_exists(realpath($tmpFile))) {
-			throw new KOperationEngineException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.']');
+			throw new kTemporaryException('Temp PDF Creator file not found ['.$tmpFile.'] output file ['.$this->outFilePath.']');
 		}else{
 			KalturaLog::notice('document temp  found ['.$tmpFile.'] output file ['.$this->outFilePath.']'); 
 		}

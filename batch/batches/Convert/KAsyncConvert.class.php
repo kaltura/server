@@ -118,6 +118,10 @@ class KAsyncConvert extends KBatchBase
 			{
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
+			catch(kTemporaryException $ktex)
+			{
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
+			}
 			catch(KalturaClientException $kcex)
 			{
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
