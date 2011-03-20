@@ -1321,6 +1321,7 @@ CREATE TABLE `access_control`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`partner_id` INTEGER  NOT NULL,
 	`name` VARCHAR(128) default '' NOT NULL,
+	`system_name` VARCHAR(128) default '' NOT NULL,
 	`description` VARCHAR(1024) default '' NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
@@ -1333,6 +1334,7 @@ CREATE TABLE `access_control`
 	`prv_restrict_privilege` VARCHAR(20),
 	`prv_restrict_length` INTEGER,
 	`kdir_restrict_type` TINYINT,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
@@ -1400,6 +1402,7 @@ CREATE TABLE `flavor_params`
 	`version` INTEGER  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`name` VARCHAR(128) default '' NOT NULL,
+	`system_name` VARCHAR(128) default '' NOT NULL,
 	`tags` TEXT,
 	`description` VARCHAR(1024) default '' NOT NULL,
 	`ready_behavior` TINYINT  NOT NULL,
@@ -1555,6 +1558,10 @@ CREATE TABLE `conversion_profile_2`
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
 	`description` VARCHAR(1024) default '' NOT NULL,
+	`system_name` VARCHAR(128),
+	`tags` TEXT,
+	`status` INTEGER default 2,
+	`default_entry_id` VARCHAR(20),
 	`crop_left` INTEGER default -1 NOT NULL,
 	`crop_top` INTEGER default -1 NOT NULL,
 	`crop_width` INTEGER default -1 NOT NULL,
@@ -1563,7 +1570,9 @@ CREATE TABLE `conversion_profile_2`
 	`clip_duration` INTEGER default -1 NOT NULL,
 	`input_tags_map` VARCHAR(1023),
 	`creation_mode` SMALLINT default 1,
-	PRIMARY KEY (`id`)
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status`(`partner_id`, `status`)
 )Type=MyISAM;
 
 #-----------------------------------------------------------------------------
@@ -1578,6 +1587,8 @@ CREATE TABLE `flavor_params_conversion_profile`
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
 	`conversion_profile_id` INTEGER  NOT NULL,
 	`flavor_params_id` INTEGER  NOT NULL,
+	`system_name` VARCHAR(128)  NOT NULL,
+	`origin` TINYINT  NOT NULL,
 	`ready_behavior` TINYINT  NOT NULL,
 	`force_none_complied` TINYINT,
 	`created_at` DATETIME,
@@ -1729,6 +1740,7 @@ CREATE TABLE `storage_profile`
 	`updated_at` DATETIME,
 	`partner_id` INTEGER,
 	`name` VARCHAR(31),
+	`system_name` VARCHAR(128),
 	`desciption` VARCHAR(127),
 	`status` TINYINT,
 	`protocol` TINYINT,
