@@ -113,7 +113,7 @@ class kAkamaiUrlManager extends kUrlManager
 		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
 			{
-				$url = "http://kalturavod-i.akamaihd.net/i".$url."/master.m3u8";				
+				$url = "http://".@$this->params['hd_ios']."/i".$url."/master.m3u8";				
 			}
 			else
 				$url .= "/file/playlist.m3u8";
@@ -138,6 +138,9 @@ class kAkamaiUrlManager extends kUrlManager
 					$url .= '?aktimeoffset=' . floor($this->seekFromTime / 1000);
 			}
 		}
+		
+		if($this->protocol == "hdnetworksmil")
+			$url = "http://".$this->params["hd_flash"].$url;
 			
 		$url = str_replace('\\', '/', $url);
 
