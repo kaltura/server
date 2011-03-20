@@ -48,16 +48,43 @@ class UserRolePeer extends BaseUserRolePeer
 		return true;
 	}
 	
-	
-	public static function getByStrId($strId)
+		
+	public static function getIdByStrId($strId)
 	{
+		// try to get strId to id mapping form cache
+		$cacheKey = 'UserRolePeer_role_str_id_'.$strId;
+		if (kConf::get('enable_cache') && function_exists('apc_fetch') && function_exists('apc_store'))
+		{
+			$id = apc_fetch($cacheKey); // try to fetch from cache
+			if ($id) {
+				KalturaLog::debug("UserRole str_id [$strId] mapped to id [$id] - fetched from cache");
+				return $id;
+			}
+		}
+		
+		// not found in cache - get from database
 		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
+		$c->addSelectColumn(UserRolePeer::ID);
 		$c->addAnd(UserRolePeer::STR_ID, $strId, Criteria::EQUAL);
-		UserRolePeer::setUseCriteriaFilter(false);
-		$userRole = UserRolePeer::doSelectOne($c);
-		UserRolePeer::setUseCriteriaFilter(true);
-		return $userRole;
+		$c->setLimit(1);
+		$stmt = UserRolePeer::doSelectStmt($c);
+		$id = $stmt->fetch(PDO::FETCH_COLUMN);
+		
+		if ($id) {
+			// store the found id in cache for later use
+			if (kConf::get('enable_cache') && function_exists('apc_fetch') && function_exists('apc_store'))
+			{
+				$success = apc_store($cacheKey, $id, kConf::get('apc_cache_ttl'));
+				if ($success) {
+					KalturaLog::debug("UserRole str_id [$strId] mapped to id [$id] - stored in cache");
+				}
+			}
+		}
+		
+		if (!$id) {
+			KalturaLog::log("UserRole with str_id [$strId] not found in DB!");
+		}
+		return $id;		
 	}
 	
 	

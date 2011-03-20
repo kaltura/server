@@ -628,9 +628,7 @@ class Partner extends BasePartner
 	{
 		$id = $this->getFromCustomData('admin_session_role_id');
 		if (!$id) {
-			$role = UserRolePeer::getByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
-			if($role)
-				$id = $role->getId();
+			$id = UserRolePeer::getIdByStrId(UserRoleId::PARTNER_ADMIN_ROLE);
 		}
 		return $id;
 	}
@@ -657,8 +655,7 @@ class Partner extends BasePartner
 	{
 		$id = $this->getFromCustomData('user_session_role_id');
 		if (!$id) {
-			$role = UserRolePeer::getByStrId(UserRoleId::BASE_USER_SESSION_ROLE);
-			$id = $role->getId();
+			$id = UserRolePeer::getIdByStrId(UserRoleId::BASE_USER_SESSION_ROLE);
 		}
 		return $id;
 	}
