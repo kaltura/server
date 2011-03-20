@@ -40,6 +40,8 @@ class flavorParamsConversionProfileTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addForeignKey('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', 'conversion_profile_2', 'ID', true, null, null);
 		$this->addForeignKey('FLAVOR_PARAMS_ID', 'FlavorParamsId', 'INTEGER', 'flavor_params', 'ID', true, null, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', true, 128, null);
+		$this->addColumn('ORIGIN', 'Origin', 'TINYINT', true, null, null);
 		$this->addColumn('READY_BEHAVIOR', 'ReadyBehavior', 'TINYINT', true, null, null);
 		$this->addColumn('FORCE_NONE_COMPLIED', 'ForceNoneComplied', 'BOOLEAN', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

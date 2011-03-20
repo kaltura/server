@@ -1181,6 +1181,7 @@
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="name" type="varchar" required="true" default="" size="128" />
+		<column primaryKey="false" lazyLoad="false" name="system_name" type="varchar" required="true" default="" size="128" />
 		<column primaryKey="false" lazyLoad="false" name="description" type="varchar" required="true" default="" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
@@ -1193,6 +1194,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="prv_restrict_privilege" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="prv_restrict_length" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kdir_restrict_type" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 	</table>
 	<table skipSql="false" abstract="false" name="media_info" phpName="mediaInfo">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -1242,6 +1244,7 @@
 		<column primaryKey="false" lazyLoad="false" name="version" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="name" type="varchar" required="true" default="" size="128" />
+		<column primaryKey="false" lazyLoad="false" name="system_name" type="varchar" required="true" default="" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
 		<column primaryKey="false" lazyLoad="false" name="description" type="varchar" required="true" default="" size="1024" />
 		<column primaryKey="false" lazyLoad="false" name="ready_behavior" type="tinyint" required="true" />
@@ -1361,6 +1364,10 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
 		<column primaryKey="false" lazyLoad="false" name="description" type="varchar" required="true" default="" size="1024" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_entry_id" type="varchar" size="20" />
 		<column primaryKey="false" lazyLoad="false" name="crop_left" type="integer" required="true" default="-1" />
 		<column primaryKey="false" lazyLoad="false" name="crop_top" type="integer" required="true" default="-1" />
 		<column primaryKey="false" lazyLoad="false" name="crop_width" type="integer" required="true" default="-1" />
@@ -1369,11 +1376,18 @@
 		<column primaryKey="false" lazyLoad="false" name="clip_duration" type="integer" required="true" default="-1" />
 		<column primaryKey="false" lazyLoad="false" name="input_tags_map" type="varchar" required="false" default="null" size="1023" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creation_mode" type="smallint" default="1" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<index name="partner_id_status">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="flavor_params_conversion_profile" phpName="flavorParamsConversionProfile" raiseEvents="false">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="conversion_profile_id" type="integer" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="flavor_params_id" type="integer" required="true" />
+		<column primaryKey="false" lazyLoad="false" name="system_name" type="varchar" size="128" required="true" />
+		<column primaryKey="false" lazyLoad="false" name="origin" type="tinyint" required="true" />
 		<column primaryKey="false" lazyLoad="false" name="ready_behavior" type="tinyint" required="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="force_none_complied" type="boolean" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
@@ -1489,6 +1503,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="31" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="desciption" type="varchar" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="protocol" type="tinyint" />

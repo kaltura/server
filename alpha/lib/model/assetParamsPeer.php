@@ -156,7 +156,8 @@ class assetParamsPeer extends BaseassetParamsPeer
 	{
 		if($row)
 		{
-			$assetType = $row[$colnum + 33]; // type column
+			$typeField = self::translateFieldName(assetParamsPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$assetType = $row[$typeField];
 			if(isset(self::$class_types_cache[$assetType]))
 				return self::$class_types_cache[$assetType];
 				

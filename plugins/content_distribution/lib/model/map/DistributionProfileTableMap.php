@@ -43,6 +43,7 @@ class DistributionProfileTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('PROVIDER_TYPE', 'ProviderType', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('SUBMIT_ENABLED', 'SubmitEnabled', 'TINYINT', false, null, null);
 		$this->addColumn('UPDATE_ENABLED', 'UpdateEnabled', 'TINYINT', false, null, null);

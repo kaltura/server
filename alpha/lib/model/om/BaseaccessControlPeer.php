@@ -26,7 +26,7 @@ abstract class BaseaccessControlPeer {
 	const TM_CLASS = 'accessControlTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 15;
+	const NUM_COLUMNS = 17;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -39,6 +39,9 @@ abstract class BaseaccessControlPeer {
 
 	/** the column name for the NAME field */
 	const NAME = 'access_control.NAME';
+
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'access_control.SYSTEM_NAME';
 
 	/** the column name for the DESCRIPTION field */
 	const DESCRIPTION = 'access_control.DESCRIPTION';
@@ -76,6 +79,9 @@ abstract class BaseaccessControlPeer {
 	/** the column name for the KDIR_RESTRICT_TYPE field */
 	const KDIR_RESTRICT_TYPE = 'access_control.KDIR_RESTRICT_TYPE';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'access_control.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of accessControl objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -92,11 +98,11 @@ abstract class BaseaccessControlPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'Description', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'SiteRestrictType', 'SiteRestrictList', 'CountryRestrictType', 'CountryRestrictList', 'KsRestrictPrivilege', 'PrvRestrictPrivilege', 'PrvRestrictLength', 'KdirRestrictType', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'description', 'createdAt', 'updatedAt', 'deletedAt', 'siteRestrictType', 'siteRestrictList', 'countryRestrictType', 'countryRestrictList', 'ksRestrictPrivilege', 'prvRestrictPrivilege', 'prvRestrictLength', 'kdirRestrictType', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::SITE_RESTRICT_TYPE, self::SITE_RESTRICT_LIST, self::COUNTRY_RESTRICT_TYPE, self::COUNTRY_RESTRICT_LIST, self::KS_RESTRICT_PRIVILEGE, self::PRV_RESTRICT_PRIVILEGE, self::PRV_RESTRICT_LENGTH, self::KDIR_RESTRICT_TYPE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'description', 'created_at', 'updated_at', 'deleted_at', 'site_restrict_type', 'site_restrict_list', 'country_restrict_type', 'country_restrict_list', 'ks_restrict_privilege', 'prv_restrict_privilege', 'prv_restrict_length', 'kdir_restrict_type', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'SystemName', 'Description', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'SiteRestrictType', 'SiteRestrictList', 'CountryRestrictType', 'CountryRestrictList', 'KsRestrictPrivilege', 'PrvRestrictPrivilege', 'PrvRestrictLength', 'KdirRestrictType', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'systemName', 'description', 'createdAt', 'updatedAt', 'deletedAt', 'siteRestrictType', 'siteRestrictList', 'countryRestrictType', 'countryRestrictList', 'ksRestrictPrivilege', 'prvRestrictPrivilege', 'prvRestrictLength', 'kdirRestrictType', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::SITE_RESTRICT_TYPE, self::SITE_RESTRICT_LIST, self::COUNTRY_RESTRICT_TYPE, self::COUNTRY_RESTRICT_LIST, self::KS_RESTRICT_PRIVILEGE, self::PRV_RESTRICT_PRIVILEGE, self::PRV_RESTRICT_LENGTH, self::KDIR_RESTRICT_TYPE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'system_name', 'description', 'created_at', 'updated_at', 'deleted_at', 'site_restrict_type', 'site_restrict_list', 'country_restrict_type', 'country_restrict_list', 'ks_restrict_privilege', 'prv_restrict_privilege', 'prv_restrict_length', 'kdir_restrict_type', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
 	);
 
 	/**
@@ -106,11 +112,11 @@ abstract class BaseaccessControlPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'Description' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'DeletedAt' => 6, 'SiteRestrictType' => 7, 'SiteRestrictList' => 8, 'CountryRestrictType' => 9, 'CountryRestrictList' => 10, 'KsRestrictPrivilege' => 11, 'PrvRestrictPrivilege' => 12, 'PrvRestrictLength' => 13, 'KdirRestrictType' => 14, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'description' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'deletedAt' => 6, 'siteRestrictType' => 7, 'siteRestrictList' => 8, 'countryRestrictType' => 9, 'countryRestrictList' => 10, 'ksRestrictPrivilege' => 11, 'prvRestrictPrivilege' => 12, 'prvRestrictLength' => 13, 'kdirRestrictType' => 14, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::DELETED_AT => 6, self::SITE_RESTRICT_TYPE => 7, self::SITE_RESTRICT_LIST => 8, self::COUNTRY_RESTRICT_TYPE => 9, self::COUNTRY_RESTRICT_LIST => 10, self::KS_RESTRICT_PRIVILEGE => 11, self::PRV_RESTRICT_PRIVILEGE => 12, self::PRV_RESTRICT_LENGTH => 13, self::KDIR_RESTRICT_TYPE => 14, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'description' => 3, 'created_at' => 4, 'updated_at' => 5, 'deleted_at' => 6, 'site_restrict_type' => 7, 'site_restrict_list' => 8, 'country_restrict_type' => 9, 'country_restrict_list' => 10, 'ks_restrict_privilege' => 11, 'prv_restrict_privilege' => 12, 'prv_restrict_length' => 13, 'kdir_restrict_type' => 14, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'SystemName' => 3, 'Description' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'DeletedAt' => 7, 'SiteRestrictType' => 8, 'SiteRestrictList' => 9, 'CountryRestrictType' => 10, 'CountryRestrictList' => 11, 'KsRestrictPrivilege' => 12, 'PrvRestrictPrivilege' => 13, 'PrvRestrictLength' => 14, 'KdirRestrictType' => 15, 'CustomData' => 16, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'systemName' => 3, 'description' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'deletedAt' => 7, 'siteRestrictType' => 8, 'siteRestrictList' => 9, 'countryRestrictType' => 10, 'countryRestrictList' => 11, 'ksRestrictPrivilege' => 12, 'prvRestrictPrivilege' => 13, 'prvRestrictLength' => 14, 'kdirRestrictType' => 15, 'customData' => 16, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::SYSTEM_NAME => 3, self::DESCRIPTION => 4, self::CREATED_AT => 5, self::UPDATED_AT => 6, self::DELETED_AT => 7, self::SITE_RESTRICT_TYPE => 8, self::SITE_RESTRICT_LIST => 9, self::COUNTRY_RESTRICT_TYPE => 10, self::COUNTRY_RESTRICT_LIST => 11, self::KS_RESTRICT_PRIVILEGE => 12, self::PRV_RESTRICT_PRIVILEGE => 13, self::PRV_RESTRICT_LENGTH => 14, self::KDIR_RESTRICT_TYPE => 15, self::CUSTOM_DATA => 16, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'system_name' => 3, 'description' => 4, 'created_at' => 5, 'updated_at' => 6, 'deleted_at' => 7, 'site_restrict_type' => 8, 'site_restrict_list' => 9, 'country_restrict_type' => 10, 'country_restrict_list' => 11, 'ks_restrict_privilege' => 12, 'prv_restrict_privilege' => 13, 'prv_restrict_length' => 14, 'kdir_restrict_type' => 15, 'custom_data' => 16, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
 	);
 
 	/**
@@ -183,6 +189,7 @@ abstract class BaseaccessControlPeer {
 		$criteria->addSelectColumn(accessControlPeer::ID);
 		$criteria->addSelectColumn(accessControlPeer::PARTNER_ID);
 		$criteria->addSelectColumn(accessControlPeer::NAME);
+		$criteria->addSelectColumn(accessControlPeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(accessControlPeer::DESCRIPTION);
 		$criteria->addSelectColumn(accessControlPeer::CREATED_AT);
 		$criteria->addSelectColumn(accessControlPeer::UPDATED_AT);
@@ -195,6 +202,7 @@ abstract class BaseaccessControlPeer {
 		$criteria->addSelectColumn(accessControlPeer::PRV_RESTRICT_PRIVILEGE);
 		$criteria->addSelectColumn(accessControlPeer::PRV_RESTRICT_LENGTH);
 		$criteria->addSelectColumn(accessControlPeer::KDIR_RESTRICT_TYPE);
+		$criteria->addSelectColumn(accessControlPeer::CUSTOM_DATA);
 	}
 
 	/**

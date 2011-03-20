@@ -26,7 +26,7 @@ abstract class BaseDistributionProfilePeer {
 	const TM_CLASS = 'DistributionProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 19;
+	const NUM_COLUMNS = 20;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -48,6 +48,9 @@ abstract class BaseDistributionProfilePeer {
 
 	/** the column name for the NAME field */
 	const NAME = 'distribution_profile.NAME';
+
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'distribution_profile.SYSTEM_NAME';
 
 	/** the column name for the STATUS field */
 	const STATUS = 'distribution_profile.STATUS';
@@ -104,11 +107,11 @@ abstract class BaseDistributionProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'ProviderType', 'Name', 'Status', 'SubmitEnabled', 'UpdateEnabled', 'DeleteEnabled', 'ReportEnabled', 'AutoCreateFlavors', 'AutoCreateThumb', 'OptionalFlavorParamsIds', 'RequiredFlavorParamsIds', 'OptionalThumbDimensions', 'RequiredThumbDimensions', 'ReportInterval', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'providerType', 'name', 'status', 'submitEnabled', 'updateEnabled', 'deleteEnabled', 'reportEnabled', 'autoCreateFlavors', 'autoCreateThumb', 'optionalFlavorParamsIds', 'requiredFlavorParamsIds', 'optionalThumbDimensions', 'requiredThumbDimensions', 'reportInterval', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::PROVIDER_TYPE, self::NAME, self::STATUS, self::SUBMIT_ENABLED, self::UPDATE_ENABLED, self::DELETE_ENABLED, self::REPORT_ENABLED, self::AUTO_CREATE_FLAVORS, self::AUTO_CREATE_THUMB, self::OPTIONAL_FLAVOR_PARAMS_IDS, self::REQUIRED_FLAVOR_PARAMS_IDS, self::OPTIONAL_THUMB_DIMENSIONS, self::REQUIRED_THUMB_DIMENSIONS, self::REPORT_INTERVAL, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'provider_type', 'name', 'status', 'submit_enabled', 'update_enabled', 'delete_enabled', 'report_enabled', 'auto_create_flavors', 'auto_create_thumb', 'optional_flavor_params_ids', 'required_flavor_params_ids', 'optional_thumb_dimensions', 'required_thumb_dimensions', 'report_interval', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'ProviderType', 'Name', 'SystemName', 'Status', 'SubmitEnabled', 'UpdateEnabled', 'DeleteEnabled', 'ReportEnabled', 'AutoCreateFlavors', 'AutoCreateThumb', 'OptionalFlavorParamsIds', 'RequiredFlavorParamsIds', 'OptionalThumbDimensions', 'RequiredThumbDimensions', 'ReportInterval', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'providerType', 'name', 'systemName', 'status', 'submitEnabled', 'updateEnabled', 'deleteEnabled', 'reportEnabled', 'autoCreateFlavors', 'autoCreateThumb', 'optionalFlavorParamsIds', 'requiredFlavorParamsIds', 'optionalThumbDimensions', 'requiredThumbDimensions', 'reportInterval', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::PROVIDER_TYPE, self::NAME, self::SYSTEM_NAME, self::STATUS, self::SUBMIT_ENABLED, self::UPDATE_ENABLED, self::DELETE_ENABLED, self::REPORT_ENABLED, self::AUTO_CREATE_FLAVORS, self::AUTO_CREATE_THUMB, self::OPTIONAL_FLAVOR_PARAMS_IDS, self::REQUIRED_FLAVOR_PARAMS_IDS, self::OPTIONAL_THUMB_DIMENSIONS, self::REQUIRED_THUMB_DIMENSIONS, self::REPORT_INTERVAL, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'provider_type', 'name', 'system_name', 'status', 'submit_enabled', 'update_enabled', 'delete_enabled', 'report_enabled', 'auto_create_flavors', 'auto_create_thumb', 'optional_flavor_params_ids', 'required_flavor_params_ids', 'optional_thumb_dimensions', 'required_thumb_dimensions', 'report_interval', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
 	);
 
 	/**
@@ -118,11 +121,11 @@ abstract class BaseDistributionProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'ProviderType' => 4, 'Name' => 5, 'Status' => 6, 'SubmitEnabled' => 7, 'UpdateEnabled' => 8, 'DeleteEnabled' => 9, 'ReportEnabled' => 10, 'AutoCreateFlavors' => 11, 'AutoCreateThumb' => 12, 'OptionalFlavorParamsIds' => 13, 'RequiredFlavorParamsIds' => 14, 'OptionalThumbDimensions' => 15, 'RequiredThumbDimensions' => 16, 'ReportInterval' => 17, 'CustomData' => 18, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'providerType' => 4, 'name' => 5, 'status' => 6, 'submitEnabled' => 7, 'updateEnabled' => 8, 'deleteEnabled' => 9, 'reportEnabled' => 10, 'autoCreateFlavors' => 11, 'autoCreateThumb' => 12, 'optionalFlavorParamsIds' => 13, 'requiredFlavorParamsIds' => 14, 'optionalThumbDimensions' => 15, 'requiredThumbDimensions' => 16, 'reportInterval' => 17, 'customData' => 18, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::PROVIDER_TYPE => 4, self::NAME => 5, self::STATUS => 6, self::SUBMIT_ENABLED => 7, self::UPDATE_ENABLED => 8, self::DELETE_ENABLED => 9, self::REPORT_ENABLED => 10, self::AUTO_CREATE_FLAVORS => 11, self::AUTO_CREATE_THUMB => 12, self::OPTIONAL_FLAVOR_PARAMS_IDS => 13, self::REQUIRED_FLAVOR_PARAMS_IDS => 14, self::OPTIONAL_THUMB_DIMENSIONS => 15, self::REQUIRED_THUMB_DIMENSIONS => 16, self::REPORT_INTERVAL => 17, self::CUSTOM_DATA => 18, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'provider_type' => 4, 'name' => 5, 'status' => 6, 'submit_enabled' => 7, 'update_enabled' => 8, 'delete_enabled' => 9, 'report_enabled' => 10, 'auto_create_flavors' => 11, 'auto_create_thumb' => 12, 'optional_flavor_params_ids' => 13, 'required_flavor_params_ids' => 14, 'optional_thumb_dimensions' => 15, 'required_thumb_dimensions' => 16, 'report_interval' => 17, 'custom_data' => 18, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'ProviderType' => 4, 'Name' => 5, 'SystemName' => 6, 'Status' => 7, 'SubmitEnabled' => 8, 'UpdateEnabled' => 9, 'DeleteEnabled' => 10, 'ReportEnabled' => 11, 'AutoCreateFlavors' => 12, 'AutoCreateThumb' => 13, 'OptionalFlavorParamsIds' => 14, 'RequiredFlavorParamsIds' => 15, 'OptionalThumbDimensions' => 16, 'RequiredThumbDimensions' => 17, 'ReportInterval' => 18, 'CustomData' => 19, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'providerType' => 4, 'name' => 5, 'systemName' => 6, 'status' => 7, 'submitEnabled' => 8, 'updateEnabled' => 9, 'deleteEnabled' => 10, 'reportEnabled' => 11, 'autoCreateFlavors' => 12, 'autoCreateThumb' => 13, 'optionalFlavorParamsIds' => 14, 'requiredFlavorParamsIds' => 15, 'optionalThumbDimensions' => 16, 'requiredThumbDimensions' => 17, 'reportInterval' => 18, 'customData' => 19, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::PROVIDER_TYPE => 4, self::NAME => 5, self::SYSTEM_NAME => 6, self::STATUS => 7, self::SUBMIT_ENABLED => 8, self::UPDATE_ENABLED => 9, self::DELETE_ENABLED => 10, self::REPORT_ENABLED => 11, self::AUTO_CREATE_FLAVORS => 12, self::AUTO_CREATE_THUMB => 13, self::OPTIONAL_FLAVOR_PARAMS_IDS => 14, self::REQUIRED_FLAVOR_PARAMS_IDS => 15, self::OPTIONAL_THUMB_DIMENSIONS => 16, self::REQUIRED_THUMB_DIMENSIONS => 17, self::REPORT_INTERVAL => 18, self::CUSTOM_DATA => 19, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'provider_type' => 4, 'name' => 5, 'system_name' => 6, 'status' => 7, 'submit_enabled' => 8, 'update_enabled' => 9, 'delete_enabled' => 10, 'report_enabled' => 11, 'auto_create_flavors' => 12, 'auto_create_thumb' => 13, 'optional_flavor_params_ids' => 14, 'required_flavor_params_ids' => 15, 'optional_thumb_dimensions' => 16, 'required_thumb_dimensions' => 17, 'report_interval' => 18, 'custom_data' => 19, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
 	);
 
 	/**
@@ -198,6 +201,7 @@ abstract class BaseDistributionProfilePeer {
 		$criteria->addSelectColumn(DistributionProfilePeer::PARTNER_ID);
 		$criteria->addSelectColumn(DistributionProfilePeer::PROVIDER_TYPE);
 		$criteria->addSelectColumn(DistributionProfilePeer::NAME);
+		$criteria->addSelectColumn(DistributionProfilePeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(DistributionProfilePeer::STATUS);
 		$criteria->addSelectColumn(DistributionProfilePeer::SUBMIT_ENABLED);
 		$criteria->addSelectColumn(DistributionProfilePeer::UPDATE_ENABLED);

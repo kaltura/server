@@ -40,7 +40,7 @@ class BatchJobTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('JOB_TYPE', 'JobType', 'SMALLINT', false, null, null);
 		$this->addColumn('JOB_SUB_TYPE', 'JobSubType', 'SMALLINT', false, null, null);
-		$this->addColumn('DATA', 'Data', 'VARCHAR', false, 4096, null);
+		$this->addColumn('DATA', 'Data', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('FILE_SIZE', 'FileSize', 'INTEGER', false, null, null);
 		$this->addColumn('DUPLICATION_KEY', 'DuplicationKey', 'VARCHAR', false, 2047, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);

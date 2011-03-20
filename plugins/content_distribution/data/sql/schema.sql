@@ -18,6 +18,7 @@ CREATE TABLE `distribution_profile`
 	`partner_id` INTEGER,
 	`provider_type` INTEGER,
 	`name` VARCHAR(31),
+	`system_name` VARCHAR(128),
 	`status` TINYINT,
 	`submit_enabled` TINYINT,
 	`update_enabled` TINYINT,

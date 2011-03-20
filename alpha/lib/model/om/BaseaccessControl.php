@@ -39,6 +39,13 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * Note: this column has a database default value of: ''
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * The value for the description field.
 	 * Note: this column has a database default value of: ''
 	 * @var        string
@@ -112,6 +119,12 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	protected $kdir_restrict_type;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * @var        array entry[] Collection to store aggregation of entry objects.
 	 */
 	protected $collentrys;
@@ -158,6 +171,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->name = '';
+		$this->system_name = '';
 		$this->description = '';
 	}
 
@@ -199,6 +213,16 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -412,6 +436,16 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
+	}
+
+	/**
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
@@ -479,6 +513,29 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setName()
+
+	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     accessControl The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[accessControlPeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[accessControlPeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v || $this->isNew()) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = accessControlPeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
 
 	/**
 	 * Set the value of [description] column.
@@ -838,6 +895,26 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	} // setKdirRestrictType()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     accessControl The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = accessControlPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -848,6 +925,10 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	public function hasOnlyDefaultValues()
 	{
 			if ($this->name !== '') {
+				return false;
+			}
+
+			if ($this->system_name !== '') {
 				return false;
 			}
 
@@ -880,18 +961,20 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-			$this->description = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->deleted_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->site_restrict_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->site_restrict_list = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->country_restrict_type = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->country_restrict_list = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->ks_restrict_privilege = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->prv_restrict_privilege = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->prv_restrict_length = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->kdir_restrict_type = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->system_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->description = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->deleted_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->site_restrict_type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->site_restrict_list = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->country_restrict_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->country_restrict_list = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->ks_restrict_privilege = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->prv_restrict_privilege = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->prv_restrict_length = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->kdir_restrict_type = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -901,7 +984,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 15; // 15 = accessControlPeer::NUM_COLUMNS - accessControlPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 17; // 17 = accessControlPeer::NUM_COLUMNS - accessControlPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating accessControl object", $e);
@@ -1117,6 +1200,8 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1126,7 +1211,9 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1333,40 +1420,46 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 				return $this->getName();
 				break;
 			case 3:
-				return $this->getDescription();
+				return $this->getSystemName();
 				break;
 			case 4:
-				return $this->getCreatedAt();
+				return $this->getDescription();
 				break;
 			case 5:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 6:
-				return $this->getDeletedAt();
+				return $this->getUpdatedAt();
 				break;
 			case 7:
-				return $this->getSiteRestrictType();
+				return $this->getDeletedAt();
 				break;
 			case 8:
-				return $this->getSiteRestrictList();
+				return $this->getSiteRestrictType();
 				break;
 			case 9:
-				return $this->getCountryRestrictType();
+				return $this->getSiteRestrictList();
 				break;
 			case 10:
-				return $this->getCountryRestrictList();
+				return $this->getCountryRestrictType();
 				break;
 			case 11:
-				return $this->getKsRestrictPrivilege();
+				return $this->getCountryRestrictList();
 				break;
 			case 12:
-				return $this->getPrvRestrictPrivilege();
+				return $this->getKsRestrictPrivilege();
 				break;
 			case 13:
-				return $this->getPrvRestrictLength();
+				return $this->getPrvRestrictPrivilege();
 				break;
 			case 14:
+				return $this->getPrvRestrictLength();
+				break;
+			case 15:
 				return $this->getKdirRestrictType();
+				break;
+			case 16:
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1392,18 +1485,20 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getPartnerId(),
 			$keys[2] => $this->getName(),
-			$keys[3] => $this->getDescription(),
-			$keys[4] => $this->getCreatedAt(),
-			$keys[5] => $this->getUpdatedAt(),
-			$keys[6] => $this->getDeletedAt(),
-			$keys[7] => $this->getSiteRestrictType(),
-			$keys[8] => $this->getSiteRestrictList(),
-			$keys[9] => $this->getCountryRestrictType(),
-			$keys[10] => $this->getCountryRestrictList(),
-			$keys[11] => $this->getKsRestrictPrivilege(),
-			$keys[12] => $this->getPrvRestrictPrivilege(),
-			$keys[13] => $this->getPrvRestrictLength(),
-			$keys[14] => $this->getKdirRestrictType(),
+			$keys[3] => $this->getSystemName(),
+			$keys[4] => $this->getDescription(),
+			$keys[5] => $this->getCreatedAt(),
+			$keys[6] => $this->getUpdatedAt(),
+			$keys[7] => $this->getDeletedAt(),
+			$keys[8] => $this->getSiteRestrictType(),
+			$keys[9] => $this->getSiteRestrictList(),
+			$keys[10] => $this->getCountryRestrictType(),
+			$keys[11] => $this->getCountryRestrictList(),
+			$keys[12] => $this->getKsRestrictPrivilege(),
+			$keys[13] => $this->getPrvRestrictPrivilege(),
+			$keys[14] => $this->getPrvRestrictLength(),
+			$keys[15] => $this->getKdirRestrictType(),
+			$keys[16] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1445,40 +1540,46 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 				$this->setName($value);
 				break;
 			case 3:
-				$this->setDescription($value);
+				$this->setSystemName($value);
 				break;
 			case 4:
-				$this->setCreatedAt($value);
+				$this->setDescription($value);
 				break;
 			case 5:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 6:
-				$this->setDeletedAt($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 7:
-				$this->setSiteRestrictType($value);
+				$this->setDeletedAt($value);
 				break;
 			case 8:
-				$this->setSiteRestrictList($value);
+				$this->setSiteRestrictType($value);
 				break;
 			case 9:
-				$this->setCountryRestrictType($value);
+				$this->setSiteRestrictList($value);
 				break;
 			case 10:
-				$this->setCountryRestrictList($value);
+				$this->setCountryRestrictType($value);
 				break;
 			case 11:
-				$this->setKsRestrictPrivilege($value);
+				$this->setCountryRestrictList($value);
 				break;
 			case 12:
-				$this->setPrvRestrictPrivilege($value);
+				$this->setKsRestrictPrivilege($value);
 				break;
 			case 13:
-				$this->setPrvRestrictLength($value);
+				$this->setPrvRestrictPrivilege($value);
 				break;
 			case 14:
+				$this->setPrvRestrictLength($value);
+				break;
+			case 15:
 				$this->setKdirRestrictType($value);
+				break;
+			case 16:
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1507,18 +1608,20 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setDeletedAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setSiteRestrictType($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setSiteRestrictList($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCountryRestrictType($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCountryRestrictList($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setKsRestrictPrivilege($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setPrvRestrictPrivilege($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setPrvRestrictLength($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setKdirRestrictType($arr[$keys[14]]);
+		if (array_key_exists($keys[3], $arr)) $this->setSystemName($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setDeletedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setSiteRestrictType($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setSiteRestrictList($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setCountryRestrictType($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCountryRestrictList($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setKsRestrictPrivilege($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setPrvRestrictPrivilege($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setPrvRestrictLength($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setKdirRestrictType($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
 	}
 
 	/**
@@ -1533,6 +1636,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(accessControlPeer::ID)) $criteria->add(accessControlPeer::ID, $this->id);
 		if ($this->isColumnModified(accessControlPeer::PARTNER_ID)) $criteria->add(accessControlPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(accessControlPeer::NAME)) $criteria->add(accessControlPeer::NAME, $this->name);
+		if ($this->isColumnModified(accessControlPeer::SYSTEM_NAME)) $criteria->add(accessControlPeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(accessControlPeer::DESCRIPTION)) $criteria->add(accessControlPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(accessControlPeer::CREATED_AT)) $criteria->add(accessControlPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(accessControlPeer::UPDATED_AT)) $criteria->add(accessControlPeer::UPDATED_AT, $this->updated_at);
@@ -1545,6 +1649,7 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(accessControlPeer::PRV_RESTRICT_PRIVILEGE)) $criteria->add(accessControlPeer::PRV_RESTRICT_PRIVILEGE, $this->prv_restrict_privilege);
 		if ($this->isColumnModified(accessControlPeer::PRV_RESTRICT_LENGTH)) $criteria->add(accessControlPeer::PRV_RESTRICT_LENGTH, $this->prv_restrict_length);
 		if ($this->isColumnModified(accessControlPeer::KDIR_RESTRICT_TYPE)) $criteria->add(accessControlPeer::KDIR_RESTRICT_TYPE, $this->kdir_restrict_type);
+		if ($this->isColumnModified(accessControlPeer::CUSTOM_DATA)) $criteria->add(accessControlPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1603,6 +1708,8 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 
 		$copyObj->setName($this->name);
 
+		$copyObj->setSystemName($this->system_name);
+
 		$copyObj->setDescription($this->description);
 
 		$copyObj->setCreatedAt($this->created_at);
@@ -1626,6 +1733,8 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		$copyObj->setPrvRestrictLength($this->prv_restrict_length);
 
 		$copyObj->setKdirRestrictType($this->kdir_restrict_type);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		if ($deepCopy) {
@@ -2021,4 +2130,121 @@ abstract class BaseaccessControl extends BaseObject  implements Persistent {
 		$this->collentrys = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseaccessControl

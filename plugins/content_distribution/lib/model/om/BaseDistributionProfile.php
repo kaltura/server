@@ -56,6 +56,12 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * The value for the status field.
 	 * @var        int
 	 */
@@ -279,6 +285,16 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -600,6 +616,29 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 
 		return $this;
 	} // setName()
+
+	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     DistributionProfile The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[DistributionProfilePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[DistributionProfilePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = DistributionProfilePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
 
 	/**
 	 * Set the value of [status] column.
@@ -935,19 +974,20 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->provider_type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->name = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->submit_enabled = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->update_enabled = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->delete_enabled = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->report_enabled = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->auto_create_flavors = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->auto_create_thumb = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->optional_flavor_params_ids = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->required_flavor_params_ids = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->optional_thumb_dimensions = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->required_thumb_dimensions = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->report_interval = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->custom_data = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->system_name = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->submit_enabled = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->update_enabled = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->delete_enabled = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->report_enabled = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->auto_create_flavors = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->auto_create_thumb = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->optional_flavor_params_ids = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->required_flavor_params_ids = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->optional_thumb_dimensions = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->required_thumb_dimensions = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->report_interval = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->custom_data = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -957,7 +997,7 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 19; // 19 = DistributionProfilePeer::NUM_COLUMNS - DistributionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 20; // 20 = DistributionProfilePeer::NUM_COLUMNS - DistributionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DistributionProfile object", $e);
@@ -1383,42 +1423,45 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 				return $this->getName();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getSystemName();
 				break;
 			case 7:
-				return $this->getSubmitEnabled();
+				return $this->getStatus();
 				break;
 			case 8:
-				return $this->getUpdateEnabled();
+				return $this->getSubmitEnabled();
 				break;
 			case 9:
-				return $this->getDeleteEnabled();
+				return $this->getUpdateEnabled();
 				break;
 			case 10:
-				return $this->getReportEnabled();
+				return $this->getDeleteEnabled();
 				break;
 			case 11:
-				return $this->getAutoCreateFlavors();
+				return $this->getReportEnabled();
 				break;
 			case 12:
-				return $this->getAutoCreateThumb();
+				return $this->getAutoCreateFlavors();
 				break;
 			case 13:
-				return $this->getOptionalFlavorParamsIds();
+				return $this->getAutoCreateThumb();
 				break;
 			case 14:
-				return $this->getRequiredFlavorParamsIds();
+				return $this->getOptionalFlavorParamsIds();
 				break;
 			case 15:
-				return $this->getOptionalThumbDimensions();
+				return $this->getRequiredFlavorParamsIds();
 				break;
 			case 16:
-				return $this->getRequiredThumbDimensions();
+				return $this->getOptionalThumbDimensions();
 				break;
 			case 17:
-				return $this->getReportInterval();
+				return $this->getRequiredThumbDimensions();
 				break;
 			case 18:
+				return $this->getReportInterval();
+				break;
+			case 19:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1448,19 +1491,20 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 			$keys[3] => $this->getPartnerId(),
 			$keys[4] => $this->getProviderType(),
 			$keys[5] => $this->getName(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getSubmitEnabled(),
-			$keys[8] => $this->getUpdateEnabled(),
-			$keys[9] => $this->getDeleteEnabled(),
-			$keys[10] => $this->getReportEnabled(),
-			$keys[11] => $this->getAutoCreateFlavors(),
-			$keys[12] => $this->getAutoCreateThumb(),
-			$keys[13] => $this->getOptionalFlavorParamsIds(),
-			$keys[14] => $this->getRequiredFlavorParamsIds(),
-			$keys[15] => $this->getOptionalThumbDimensions(),
-			$keys[16] => $this->getRequiredThumbDimensions(),
-			$keys[17] => $this->getReportInterval(),
-			$keys[18] => $this->getCustomData(),
+			$keys[6] => $this->getSystemName(),
+			$keys[7] => $this->getStatus(),
+			$keys[8] => $this->getSubmitEnabled(),
+			$keys[9] => $this->getUpdateEnabled(),
+			$keys[10] => $this->getDeleteEnabled(),
+			$keys[11] => $this->getReportEnabled(),
+			$keys[12] => $this->getAutoCreateFlavors(),
+			$keys[13] => $this->getAutoCreateThumb(),
+			$keys[14] => $this->getOptionalFlavorParamsIds(),
+			$keys[15] => $this->getRequiredFlavorParamsIds(),
+			$keys[16] => $this->getOptionalThumbDimensions(),
+			$keys[17] => $this->getRequiredThumbDimensions(),
+			$keys[18] => $this->getReportInterval(),
+			$keys[19] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1511,42 +1555,45 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 				$this->setName($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setSystemName($value);
 				break;
 			case 7:
-				$this->setSubmitEnabled($value);
+				$this->setStatus($value);
 				break;
 			case 8:
-				$this->setUpdateEnabled($value);
+				$this->setSubmitEnabled($value);
 				break;
 			case 9:
-				$this->setDeleteEnabled($value);
+				$this->setUpdateEnabled($value);
 				break;
 			case 10:
-				$this->setReportEnabled($value);
+				$this->setDeleteEnabled($value);
 				break;
 			case 11:
-				$this->setAutoCreateFlavors($value);
+				$this->setReportEnabled($value);
 				break;
 			case 12:
-				$this->setAutoCreateThumb($value);
+				$this->setAutoCreateFlavors($value);
 				break;
 			case 13:
-				$this->setOptionalFlavorParamsIds($value);
+				$this->setAutoCreateThumb($value);
 				break;
 			case 14:
-				$this->setRequiredFlavorParamsIds($value);
+				$this->setOptionalFlavorParamsIds($value);
 				break;
 			case 15:
-				$this->setOptionalThumbDimensions($value);
+				$this->setRequiredFlavorParamsIds($value);
 				break;
 			case 16:
-				$this->setRequiredThumbDimensions($value);
+				$this->setOptionalThumbDimensions($value);
 				break;
 			case 17:
-				$this->setReportInterval($value);
+				$this->setRequiredThumbDimensions($value);
 				break;
 			case 18:
+				$this->setReportInterval($value);
+				break;
+			case 19:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1579,19 +1626,20 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setProviderType($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setName($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setSubmitEnabled($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdateEnabled($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDeleteEnabled($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setReportEnabled($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setAutoCreateFlavors($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setAutoCreateThumb($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setOptionalFlavorParamsIds($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setRequiredFlavorParamsIds($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setOptionalThumbDimensions($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setRequiredThumbDimensions($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setReportInterval($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setCustomData($arr[$keys[18]]);
+		if (array_key_exists($keys[6], $arr)) $this->setSystemName($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setSubmitEnabled($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdateEnabled($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDeleteEnabled($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setReportEnabled($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setAutoCreateFlavors($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setAutoCreateThumb($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setOptionalFlavorParamsIds($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setRequiredFlavorParamsIds($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setOptionalThumbDimensions($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setRequiredThumbDimensions($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setReportInterval($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCustomData($arr[$keys[19]]);
 	}
 
 	/**
@@ -1609,6 +1657,7 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		if ($this->isColumnModified(DistributionProfilePeer::PARTNER_ID)) $criteria->add(DistributionProfilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(DistributionProfilePeer::PROVIDER_TYPE)) $criteria->add(DistributionProfilePeer::PROVIDER_TYPE, $this->provider_type);
 		if ($this->isColumnModified(DistributionProfilePeer::NAME)) $criteria->add(DistributionProfilePeer::NAME, $this->name);
+		if ($this->isColumnModified(DistributionProfilePeer::SYSTEM_NAME)) $criteria->add(DistributionProfilePeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(DistributionProfilePeer::STATUS)) $criteria->add(DistributionProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DistributionProfilePeer::SUBMIT_ENABLED)) $criteria->add(DistributionProfilePeer::SUBMIT_ENABLED, $this->submit_enabled);
 		if ($this->isColumnModified(DistributionProfilePeer::UPDATE_ENABLED)) $criteria->add(DistributionProfilePeer::UPDATE_ENABLED, $this->update_enabled);
@@ -1685,6 +1734,8 @@ abstract class BaseDistributionProfile extends BaseObject  implements Persistent
 		$copyObj->setProviderType($this->provider_type);
 
 		$copyObj->setName($this->name);
+
+		$copyObj->setSystemName($this->system_name);
 
 		$copyObj->setStatus($this->status);
 

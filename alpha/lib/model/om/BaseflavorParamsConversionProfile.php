@@ -38,6 +38,18 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	protected $flavor_params_id;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
+	 * The value for the origin field.
+	 * @var        int
+	 */
+	protected $origin;
+
+	/**
 	 * The value for the ready_behavior field.
 	 * @var        int
 	 */
@@ -127,6 +139,26 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	public function getFlavorParamsId()
 	{
 		return $this->flavor_params_id;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
+	}
+
+	/**
+	 * Get the [origin] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getOrigin()
+	{
+		return $this->origin;
 	}
 
 	/**
@@ -307,6 +339,52 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	} // setFlavorParamsId()
 
 	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
+
+	/**
+	 * Set the value of [origin] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     flavorParamsConversionProfile The current object (for fluent API support)
+	 */
+	public function setOrigin($v)
+	{
+		if(!isset($this->oldColumnsValues[flavorParamsConversionProfilePeer::ORIGIN]))
+			$this->oldColumnsValues[flavorParamsConversionProfilePeer::ORIGIN] = $this->origin;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->origin !== $v) {
+			$this->origin = $v;
+			$this->modifiedColumns[] = flavorParamsConversionProfilePeer::ORIGIN;
+		}
+
+		return $this;
+	} // setOrigin()
+
+	/**
 	 * Set the value of [ready_behavior] column.
 	 * 
 	 * @param      int $v new value
@@ -485,10 +563,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
 			$this->conversion_profile_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->flavor_params_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-			$this->ready_behavior = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-			$this->force_none_complied = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
-			$this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->system_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->origin = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->ready_behavior = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->force_none_complied = ($row[$startcol + 6] !== null) ? (boolean) $row[$startcol + 6] : null;
+			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -498,7 +578,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 7; // 7 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = flavorParamsConversionProfilePeer::NUM_COLUMNS - flavorParamsConversionProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating flavorParamsConversionProfile object", $e);
@@ -881,15 +961,21 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 				return $this->getFlavorParamsId();
 				break;
 			case 3:
-				return $this->getReadyBehavior();
+				return $this->getSystemName();
 				break;
 			case 4:
-				return $this->getForceNoneComplied();
+				return $this->getOrigin();
 				break;
 			case 5:
-				return $this->getCreatedAt();
+				return $this->getReadyBehavior();
 				break;
 			case 6:
+				return $this->getForceNoneComplied();
+				break;
+			case 7:
+				return $this->getCreatedAt();
+				break;
+			case 8:
 				return $this->getUpdatedAt();
 				break;
 			default:
@@ -916,10 +1002,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 			$keys[0] => $this->getId(),
 			$keys[1] => $this->getConversionProfileId(),
 			$keys[2] => $this->getFlavorParamsId(),
-			$keys[3] => $this->getReadyBehavior(),
-			$keys[4] => $this->getForceNoneComplied(),
-			$keys[5] => $this->getCreatedAt(),
-			$keys[6] => $this->getUpdatedAt(),
+			$keys[3] => $this->getSystemName(),
+			$keys[4] => $this->getOrigin(),
+			$keys[5] => $this->getReadyBehavior(),
+			$keys[6] => $this->getForceNoneComplied(),
+			$keys[7] => $this->getCreatedAt(),
+			$keys[8] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -961,15 +1049,21 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 				$this->setFlavorParamsId($value);
 				break;
 			case 3:
-				$this->setReadyBehavior($value);
+				$this->setSystemName($value);
 				break;
 			case 4:
-				$this->setForceNoneComplied($value);
+				$this->setOrigin($value);
 				break;
 			case 5:
-				$this->setCreatedAt($value);
+				$this->setReadyBehavior($value);
 				break;
 			case 6:
+				$this->setForceNoneComplied($value);
+				break;
+			case 7:
+				$this->setCreatedAt($value);
+				break;
+			case 8:
 				$this->setUpdatedAt($value);
 				break;
 		} // switch()
@@ -999,10 +1093,12 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
 		if (array_key_exists($keys[1], $arr)) $this->setConversionProfileId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setFlavorParamsId($arr[$keys[2]]);
-		if (array_key_exists($keys[3], $arr)) $this->setReadyBehavior($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setForceNoneComplied($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[3], $arr)) $this->setSystemName($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setOrigin($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setReadyBehavior($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setForceNoneComplied($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
 	}
 
 	/**
@@ -1017,6 +1113,8 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::ID)) $criteria->add(flavorParamsConversionProfilePeer::ID, $this->id);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID)) $criteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $this->conversion_profile_id);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID)) $criteria->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $this->flavor_params_id);
+		if ($this->isColumnModified(flavorParamsConversionProfilePeer::SYSTEM_NAME)) $criteria->add(flavorParamsConversionProfilePeer::SYSTEM_NAME, $this->system_name);
+		if ($this->isColumnModified(flavorParamsConversionProfilePeer::ORIGIN)) $criteria->add(flavorParamsConversionProfilePeer::ORIGIN, $this->origin);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::READY_BEHAVIOR)) $criteria->add(flavorParamsConversionProfilePeer::READY_BEHAVIOR, $this->ready_behavior);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED)) $criteria->add(flavorParamsConversionProfilePeer::FORCE_NONE_COMPLIED, $this->force_none_complied);
 		if ($this->isColumnModified(flavorParamsConversionProfilePeer::CREATED_AT)) $criteria->add(flavorParamsConversionProfilePeer::CREATED_AT, $this->created_at);
@@ -1078,6 +1176,10 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		$copyObj->setConversionProfileId($this->conversion_profile_id);
 
 		$copyObj->setFlavorParamsId($this->flavor_params_id);
+
+		$copyObj->setSystemName($this->system_name);
+
+		$copyObj->setOrigin($this->origin);
 
 		$copyObj->setReadyBehavior($this->ready_behavior);
 

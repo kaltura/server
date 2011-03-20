@@ -40,6 +40,7 @@ class accessControlTableMap extends TableMap {
 		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 128, '');
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', true, 128, '');
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', true, 1024, '');
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -52,6 +53,7 @@ class accessControlTableMap extends TableMap {
 		$this->addColumn('PRV_RESTRICT_PRIVILEGE', 'PrvRestrictPrivilege', 'VARCHAR', false, 20, null);
 		$this->addColumn('PRV_RESTRICT_LENGTH', 'PrvRestrictLength', 'INTEGER', false, null, null);
 		$this->addColumn('KDIR_RESTRICT_TYPE', 'KdirRestrictType', 'TINYINT', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

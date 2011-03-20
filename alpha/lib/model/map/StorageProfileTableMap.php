@@ -42,6 +42,7 @@ class StorageProfileTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 31, null);
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
 		$this->addColumn('DESCIPTION', 'Desciption', 'VARCHAR', false, 127, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('PROTOCOL', 'Protocol', 'TINYINT', false, null, null);

@@ -50,6 +50,12 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * The value for the desciption field.
 	 * @var        string
 	 */
@@ -293,6 +299,16 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -641,6 +657,29 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setName()
+
+	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     StorageProfile The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[StorageProfilePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[StorageProfilePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = StorageProfilePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
 
 	/**
 	 * Set the value of [desciption] column.
@@ -1090,24 +1129,25 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$this->updated_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->desciption = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->status = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->protocol = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->storage_url = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->storage_base_dir = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->storage_username = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->storage_password = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->storage_ftp_passive_mode = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->delivery_http_base_url = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->delivery_rmp_base_url = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->delivery_iis_base_url = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-			$this->min_file_size = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->max_file_size = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->flavor_params_ids = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->max_concurrent_connections = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->custom_data = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->path_manager_class = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->url_manager_class = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->system_name = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->desciption = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->protocol = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->storage_url = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->storage_base_dir = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->storage_username = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->storage_password = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->storage_ftp_passive_mode = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->delivery_http_base_url = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->delivery_rmp_base_url = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->delivery_iis_base_url = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->min_file_size = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->max_file_size = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->flavor_params_ids = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->max_concurrent_connections = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->custom_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->path_manager_class = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->url_manager_class = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1117,7 +1157,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 23; // 23 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 24; // 24 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating StorageProfile object", $e);
@@ -1540,57 +1580,60 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 				return $this->getName();
 				break;
 			case 5:
-				return $this->getDesciption();
+				return $this->getSystemName();
 				break;
 			case 6:
-				return $this->getStatus();
+				return $this->getDesciption();
 				break;
 			case 7:
-				return $this->getProtocol();
+				return $this->getStatus();
 				break;
 			case 8:
-				return $this->getStorageUrl();
+				return $this->getProtocol();
 				break;
 			case 9:
-				return $this->getStorageBaseDir();
+				return $this->getStorageUrl();
 				break;
 			case 10:
-				return $this->getStorageUsername();
+				return $this->getStorageBaseDir();
 				break;
 			case 11:
-				return $this->getStoragePassword();
+				return $this->getStorageUsername();
 				break;
 			case 12:
-				return $this->getStorageFtpPassiveMode();
+				return $this->getStoragePassword();
 				break;
 			case 13:
-				return $this->getDeliveryHttpBaseUrl();
+				return $this->getStorageFtpPassiveMode();
 				break;
 			case 14:
-				return $this->getDeliveryRmpBaseUrl();
+				return $this->getDeliveryHttpBaseUrl();
 				break;
 			case 15:
-				return $this->getDeliveryIisBaseUrl();
+				return $this->getDeliveryRmpBaseUrl();
 				break;
 			case 16:
-				return $this->getMinFileSize();
+				return $this->getDeliveryIisBaseUrl();
 				break;
 			case 17:
-				return $this->getMaxFileSize();
+				return $this->getMinFileSize();
 				break;
 			case 18:
-				return $this->getFlavorParamsIds();
+				return $this->getMaxFileSize();
 				break;
 			case 19:
-				return $this->getMaxConcurrentConnections();
+				return $this->getFlavorParamsIds();
 				break;
 			case 20:
-				return $this->getCustomData();
+				return $this->getMaxConcurrentConnections();
 				break;
 			case 21:
-				return $this->getPathManagerClass();
+				return $this->getCustomData();
 				break;
 			case 22:
+				return $this->getPathManagerClass();
+				break;
+			case 23:
 				return $this->getUrlManagerClass();
 				break;
 			default:
@@ -1619,24 +1662,25 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$keys[2] => $this->getUpdatedAt(),
 			$keys[3] => $this->getPartnerId(),
 			$keys[4] => $this->getName(),
-			$keys[5] => $this->getDesciption(),
-			$keys[6] => $this->getStatus(),
-			$keys[7] => $this->getProtocol(),
-			$keys[8] => $this->getStorageUrl(),
-			$keys[9] => $this->getStorageBaseDir(),
-			$keys[10] => $this->getStorageUsername(),
-			$keys[11] => $this->getStoragePassword(),
-			$keys[12] => $this->getStorageFtpPassiveMode(),
-			$keys[13] => $this->getDeliveryHttpBaseUrl(),
-			$keys[14] => $this->getDeliveryRmpBaseUrl(),
-			$keys[15] => $this->getDeliveryIisBaseUrl(),
-			$keys[16] => $this->getMinFileSize(),
-			$keys[17] => $this->getMaxFileSize(),
-			$keys[18] => $this->getFlavorParamsIds(),
-			$keys[19] => $this->getMaxConcurrentConnections(),
-			$keys[20] => $this->getCustomData(),
-			$keys[21] => $this->getPathManagerClass(),
-			$keys[22] => $this->getUrlManagerClass(),
+			$keys[5] => $this->getSystemName(),
+			$keys[6] => $this->getDesciption(),
+			$keys[7] => $this->getStatus(),
+			$keys[8] => $this->getProtocol(),
+			$keys[9] => $this->getStorageUrl(),
+			$keys[10] => $this->getStorageBaseDir(),
+			$keys[11] => $this->getStorageUsername(),
+			$keys[12] => $this->getStoragePassword(),
+			$keys[13] => $this->getStorageFtpPassiveMode(),
+			$keys[14] => $this->getDeliveryHttpBaseUrl(),
+			$keys[15] => $this->getDeliveryRmpBaseUrl(),
+			$keys[16] => $this->getDeliveryIisBaseUrl(),
+			$keys[17] => $this->getMinFileSize(),
+			$keys[18] => $this->getMaxFileSize(),
+			$keys[19] => $this->getFlavorParamsIds(),
+			$keys[20] => $this->getMaxConcurrentConnections(),
+			$keys[21] => $this->getCustomData(),
+			$keys[22] => $this->getPathManagerClass(),
+			$keys[23] => $this->getUrlManagerClass(),
 		);
 		return $result;
 	}
@@ -1684,57 +1728,60 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 				$this->setName($value);
 				break;
 			case 5:
-				$this->setDesciption($value);
+				$this->setSystemName($value);
 				break;
 			case 6:
-				$this->setStatus($value);
+				$this->setDesciption($value);
 				break;
 			case 7:
-				$this->setProtocol($value);
+				$this->setStatus($value);
 				break;
 			case 8:
-				$this->setStorageUrl($value);
+				$this->setProtocol($value);
 				break;
 			case 9:
-				$this->setStorageBaseDir($value);
+				$this->setStorageUrl($value);
 				break;
 			case 10:
-				$this->setStorageUsername($value);
+				$this->setStorageBaseDir($value);
 				break;
 			case 11:
-				$this->setStoragePassword($value);
+				$this->setStorageUsername($value);
 				break;
 			case 12:
-				$this->setStorageFtpPassiveMode($value);
+				$this->setStoragePassword($value);
 				break;
 			case 13:
-				$this->setDeliveryHttpBaseUrl($value);
+				$this->setStorageFtpPassiveMode($value);
 				break;
 			case 14:
-				$this->setDeliveryRmpBaseUrl($value);
+				$this->setDeliveryHttpBaseUrl($value);
 				break;
 			case 15:
-				$this->setDeliveryIisBaseUrl($value);
+				$this->setDeliveryRmpBaseUrl($value);
 				break;
 			case 16:
-				$this->setMinFileSize($value);
+				$this->setDeliveryIisBaseUrl($value);
 				break;
 			case 17:
-				$this->setMaxFileSize($value);
+				$this->setMinFileSize($value);
 				break;
 			case 18:
-				$this->setFlavorParamsIds($value);
+				$this->setMaxFileSize($value);
 				break;
 			case 19:
-				$this->setMaxConcurrentConnections($value);
+				$this->setFlavorParamsIds($value);
 				break;
 			case 20:
-				$this->setCustomData($value);
+				$this->setMaxConcurrentConnections($value);
 				break;
 			case 21:
-				$this->setPathManagerClass($value);
+				$this->setCustomData($value);
 				break;
 			case 22:
+				$this->setPathManagerClass($value);
+				break;
+			case 23:
 				$this->setUrlManagerClass($value);
 				break;
 		} // switch()
@@ -1766,24 +1813,25 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setName($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDesciption($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setStatus($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setProtocol($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setStorageUrl($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setStorageBaseDir($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setStorageUsername($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setStoragePassword($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setStorageFtpPassiveMode($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setDeliveryHttpBaseUrl($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setDeliveryRmpBaseUrl($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setDeliveryIisBaseUrl($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setMinFileSize($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setMaxFileSize($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setFlavorParamsIds($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setMaxConcurrentConnections($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setCustomData($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setPathManagerClass($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setUrlManagerClass($arr[$keys[22]]);
+		if (array_key_exists($keys[5], $arr)) $this->setSystemName($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setDesciption($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setStatus($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setProtocol($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setStorageUrl($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setStorageBaseDir($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setStorageUsername($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setStoragePassword($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setStorageFtpPassiveMode($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setDeliveryHttpBaseUrl($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setDeliveryRmpBaseUrl($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setDeliveryIisBaseUrl($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setMinFileSize($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setMaxFileSize($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setFlavorParamsIds($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setMaxConcurrentConnections($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setCustomData($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setPathManagerClass($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setUrlManagerClass($arr[$keys[23]]);
 	}
 
 	/**
@@ -1800,6 +1848,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(StorageProfilePeer::UPDATED_AT)) $criteria->add(StorageProfilePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(StorageProfilePeer::PARTNER_ID)) $criteria->add(StorageProfilePeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(StorageProfilePeer::NAME)) $criteria->add(StorageProfilePeer::NAME, $this->name);
+		if ($this->isColumnModified(StorageProfilePeer::SYSTEM_NAME)) $criteria->add(StorageProfilePeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(StorageProfilePeer::DESCIPTION)) $criteria->add(StorageProfilePeer::DESCIPTION, $this->desciption);
 		if ($this->isColumnModified(StorageProfilePeer::STATUS)) $criteria->add(StorageProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(StorageProfilePeer::PROTOCOL)) $criteria->add(StorageProfilePeer::PROTOCOL, $this->protocol);
@@ -1879,6 +1928,8 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setName($this->name);
+
+		$copyObj->setSystemName($this->system_name);
 
 		$copyObj->setDesciption($this->desciption);
 

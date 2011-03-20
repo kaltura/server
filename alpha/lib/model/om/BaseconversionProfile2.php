@@ -64,6 +64,30 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	protected $description;
 
 	/**
+	 * The value for the system_name field.
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
+	 * The value for the tags field.
+	 * @var        string
+	 */
+	protected $tags;
+
+	/**
+	 * The value for the status field.
+	 * @var        int
+	 */
+	protected $status;
+
+	/**
+	 * The value for the default_entry_id field.
+	 * @var        string
+	 */
+	protected $default_entry_id;
+
+	/**
 	 * The value for the crop_left field.
 	 * Note: this column has a database default value of: -1
 	 * @var        int
@@ -117,6 +141,12 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 * @var        int
 	 */
 	protected $creation_mode;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
 
 	/**
 	 * @var        array entry[] Collection to store aggregation of entry objects.
@@ -356,6 +386,46 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	}
 
 	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
+	}
+
+	/**
+	 * Get the [tags] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getTags()
+	{
+		return $this->tags;
+	}
+
+	/**
+	 * Get the [status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
+
+	/**
+	 * Get the [default_entry_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getDefaultEntryId()
+	{
+		return $this->default_entry_id;
+	}
+
+	/**
 	 * Get the [crop_left] column value.
 	 * 
 	 * @return     int
@@ -433,6 +503,16 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	public function getCreationMode()
 	{
 		return $this->creation_mode;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -678,6 +758,98 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	} // setDescription()
 
 	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     conversionProfile2 The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[conversionProfile2Peer::SYSTEM_NAME]))
+			$this->oldColumnsValues[conversionProfile2Peer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = conversionProfile2Peer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
+
+	/**
+	 * Set the value of [tags] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     conversionProfile2 The current object (for fluent API support)
+	 */
+	public function setTags($v)
+	{
+		if(!isset($this->oldColumnsValues[conversionProfile2Peer::TAGS]))
+			$this->oldColumnsValues[conversionProfile2Peer::TAGS] = $this->tags;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->tags !== $v) {
+			$this->tags = $v;
+			$this->modifiedColumns[] = conversionProfile2Peer::TAGS;
+		}
+
+		return $this;
+	} // setTags()
+
+	/**
+	 * Set the value of [status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     conversionProfile2 The current object (for fluent API support)
+	 */
+	public function setStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[conversionProfile2Peer::STATUS]))
+			$this->oldColumnsValues[conversionProfile2Peer::STATUS] = $this->status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->status !== $v) {
+			$this->status = $v;
+			$this->modifiedColumns[] = conversionProfile2Peer::STATUS;
+		}
+
+		return $this;
+	} // setStatus()
+
+	/**
+	 * Set the value of [default_entry_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     conversionProfile2 The current object (for fluent API support)
+	 */
+	public function setDefaultEntryId($v)
+	{
+		if(!isset($this->oldColumnsValues[conversionProfile2Peer::DEFAULT_ENTRY_ID]))
+			$this->oldColumnsValues[conversionProfile2Peer::DEFAULT_ENTRY_ID] = $this->default_entry_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->default_entry_id !== $v) {
+			$this->default_entry_id = $v;
+			$this->modifiedColumns[] = conversionProfile2Peer::DEFAULT_ENTRY_ID;
+		}
+
+		return $this;
+	} // setDefaultEntryId()
+
+	/**
 	 * Set the value of [crop_left] column.
 	 * 
 	 * @param      int $v new value
@@ -862,6 +1034,26 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	} // setCreationMode()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     conversionProfile2 The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = conversionProfile2Peer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -936,14 +1128,19 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->deleted_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->description = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->crop_left = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->crop_top = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->crop_width = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->crop_height = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->clip_start = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-			$this->clip_duration = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-			$this->input_tags_map = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->creation_mode = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->system_name = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->tags = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->default_entry_id = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->crop_left = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->crop_top = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->crop_width = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+			$this->crop_height = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->clip_start = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+			$this->clip_duration = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->input_tags_map = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->creation_mode = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->custom_data = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -953,7 +1150,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 15; // 15 = conversionProfile2Peer::NUM_COLUMNS - conversionProfile2Peer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 20; // 20 = conversionProfile2Peer::NUM_COLUMNS - conversionProfile2Peer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating conversionProfile2 object", $e);
@@ -1180,6 +1377,8 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1189,7 +1388,9 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1416,28 +1617,43 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 				return $this->getDescription();
 				break;
 			case 7:
-				return $this->getCropLeft();
+				return $this->getSystemName();
 				break;
 			case 8:
-				return $this->getCropTop();
+				return $this->getTags();
 				break;
 			case 9:
-				return $this->getCropWidth();
+				return $this->getStatus();
 				break;
 			case 10:
-				return $this->getCropHeight();
+				return $this->getDefaultEntryId();
 				break;
 			case 11:
-				return $this->getClipStart();
+				return $this->getCropLeft();
 				break;
 			case 12:
-				return $this->getClipDuration();
+				return $this->getCropTop();
 				break;
 			case 13:
-				return $this->getInputTagsMap();
+				return $this->getCropWidth();
 				break;
 			case 14:
+				return $this->getCropHeight();
+				break;
+			case 15:
+				return $this->getClipStart();
+				break;
+			case 16:
+				return $this->getClipDuration();
+				break;
+			case 17:
+				return $this->getInputTagsMap();
+				break;
+			case 18:
 				return $this->getCreationMode();
+				break;
+			case 19:
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1467,14 +1683,19 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			$keys[4] => $this->getUpdatedAt(),
 			$keys[5] => $this->getDeletedAt(),
 			$keys[6] => $this->getDescription(),
-			$keys[7] => $this->getCropLeft(),
-			$keys[8] => $this->getCropTop(),
-			$keys[9] => $this->getCropWidth(),
-			$keys[10] => $this->getCropHeight(),
-			$keys[11] => $this->getClipStart(),
-			$keys[12] => $this->getClipDuration(),
-			$keys[13] => $this->getInputTagsMap(),
-			$keys[14] => $this->getCreationMode(),
+			$keys[7] => $this->getSystemName(),
+			$keys[8] => $this->getTags(),
+			$keys[9] => $this->getStatus(),
+			$keys[10] => $this->getDefaultEntryId(),
+			$keys[11] => $this->getCropLeft(),
+			$keys[12] => $this->getCropTop(),
+			$keys[13] => $this->getCropWidth(),
+			$keys[14] => $this->getCropHeight(),
+			$keys[15] => $this->getClipStart(),
+			$keys[16] => $this->getClipDuration(),
+			$keys[17] => $this->getInputTagsMap(),
+			$keys[18] => $this->getCreationMode(),
+			$keys[19] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1528,28 +1749,43 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 				$this->setDescription($value);
 				break;
 			case 7:
-				$this->setCropLeft($value);
+				$this->setSystemName($value);
 				break;
 			case 8:
-				$this->setCropTop($value);
+				$this->setTags($value);
 				break;
 			case 9:
-				$this->setCropWidth($value);
+				$this->setStatus($value);
 				break;
 			case 10:
-				$this->setCropHeight($value);
+				$this->setDefaultEntryId($value);
 				break;
 			case 11:
-				$this->setClipStart($value);
+				$this->setCropLeft($value);
 				break;
 			case 12:
-				$this->setClipDuration($value);
+				$this->setCropTop($value);
 				break;
 			case 13:
-				$this->setInputTagsMap($value);
+				$this->setCropWidth($value);
 				break;
 			case 14:
+				$this->setCropHeight($value);
+				break;
+			case 15:
+				$this->setClipStart($value);
+				break;
+			case 16:
+				$this->setClipDuration($value);
+				break;
+			case 17:
+				$this->setInputTagsMap($value);
+				break;
+			case 18:
 				$this->setCreationMode($value);
+				break;
+			case 19:
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1582,14 +1818,19 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setDeletedAt($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setDescription($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCropLeft($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setCropTop($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setCropWidth($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCropHeight($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setClipStart($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setClipDuration($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setInputTagsMap($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setCreationMode($arr[$keys[14]]);
+		if (array_key_exists($keys[7], $arr)) $this->setSystemName($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setTags($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setStatus($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDefaultEntryId($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCropLeft($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCropTop($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCropWidth($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setCropHeight($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setClipStart($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setClipDuration($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setInputTagsMap($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCreationMode($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCustomData($arr[$keys[19]]);
 	}
 
 	/**
@@ -1608,6 +1849,10 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		if ($this->isColumnModified(conversionProfile2Peer::UPDATED_AT)) $criteria->add(conversionProfile2Peer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(conversionProfile2Peer::DELETED_AT)) $criteria->add(conversionProfile2Peer::DELETED_AT, $this->deleted_at);
 		if ($this->isColumnModified(conversionProfile2Peer::DESCRIPTION)) $criteria->add(conversionProfile2Peer::DESCRIPTION, $this->description);
+		if ($this->isColumnModified(conversionProfile2Peer::SYSTEM_NAME)) $criteria->add(conversionProfile2Peer::SYSTEM_NAME, $this->system_name);
+		if ($this->isColumnModified(conversionProfile2Peer::TAGS)) $criteria->add(conversionProfile2Peer::TAGS, $this->tags);
+		if ($this->isColumnModified(conversionProfile2Peer::STATUS)) $criteria->add(conversionProfile2Peer::STATUS, $this->status);
+		if ($this->isColumnModified(conversionProfile2Peer::DEFAULT_ENTRY_ID)) $criteria->add(conversionProfile2Peer::DEFAULT_ENTRY_ID, $this->default_entry_id);
 		if ($this->isColumnModified(conversionProfile2Peer::CROP_LEFT)) $criteria->add(conversionProfile2Peer::CROP_LEFT, $this->crop_left);
 		if ($this->isColumnModified(conversionProfile2Peer::CROP_TOP)) $criteria->add(conversionProfile2Peer::CROP_TOP, $this->crop_top);
 		if ($this->isColumnModified(conversionProfile2Peer::CROP_WIDTH)) $criteria->add(conversionProfile2Peer::CROP_WIDTH, $this->crop_width);
@@ -1616,6 +1861,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		if ($this->isColumnModified(conversionProfile2Peer::CLIP_DURATION)) $criteria->add(conversionProfile2Peer::CLIP_DURATION, $this->clip_duration);
 		if ($this->isColumnModified(conversionProfile2Peer::INPUT_TAGS_MAP)) $criteria->add(conversionProfile2Peer::INPUT_TAGS_MAP, $this->input_tags_map);
 		if ($this->isColumnModified(conversionProfile2Peer::CREATION_MODE)) $criteria->add(conversionProfile2Peer::CREATION_MODE, $this->creation_mode);
+		if ($this->isColumnModified(conversionProfile2Peer::CUSTOM_DATA)) $criteria->add(conversionProfile2Peer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1682,6 +1928,14 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 
 		$copyObj->setDescription($this->description);
 
+		$copyObj->setSystemName($this->system_name);
+
+		$copyObj->setTags($this->tags);
+
+		$copyObj->setStatus($this->status);
+
+		$copyObj->setDefaultEntryId($this->default_entry_id);
+
 		$copyObj->setCropLeft($this->crop_left);
 
 		$copyObj->setCropTop($this->crop_top);
@@ -1697,6 +1951,8 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		$copyObj->setInputTagsMap($this->input_tags_map);
 
 		$copyObj->setCreationMode($this->creation_mode);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		if ($deepCopy) {
@@ -2305,4 +2561,121 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 		$this->collflavorParamsConversionProfiles = null;
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseconversionProfile2

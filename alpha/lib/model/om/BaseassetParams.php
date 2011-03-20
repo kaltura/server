@@ -45,6 +45,13 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 	protected $name;
 
 	/**
+	 * The value for the system_name field.
+	 * Note: this column has a database default value of: ''
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * The value for the tags field.
 	 * @var        string
 	 */
@@ -305,6 +312,7 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 	public function applyDefaultValues()
 	{
 		$this->name = '';
+		$this->system_name = '';
 		$this->description = '';
 		$this->is_default = 0;
 		$this->video_bitrate = 0;
@@ -369,6 +377,16 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -852,6 +870,29 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setName()
+
+	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     assetParams The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[assetParamsPeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[assetParamsPeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v || $this->isNew()) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = assetParamsPeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
 
 	/**
 	 * Set the value of [tags] column.
@@ -1635,6 +1676,10 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 				return false;
 			}
 
+			if ($this->system_name !== '') {
+				return false;
+			}
+
 			if ($this->description !== '') {
 				return false;
 			}
@@ -1717,36 +1762,37 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 			$this->version = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->tags = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-			$this->description = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->ready_behavior = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->deleted_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->is_default = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->format = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->video_codec = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->video_bitrate = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->audio_codec = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->audio_bitrate = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->audio_channels = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->audio_sample_rate = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-			$this->audio_resolution = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-			$this->width = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-			$this->height = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-			$this->frame_rate = ($row[$startcol + 21] !== null) ? (double) $row[$startcol + 21] : null;
-			$this->gop_size = ($row[$startcol + 22] !== null) ? (int) $row[$startcol + 22] : null;
-			$this->two_pass = ($row[$startcol + 23] !== null) ? (boolean) $row[$startcol + 23] : null;
-			$this->conversion_engines = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
-			$this->conversion_engines_extra_params = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
-			$this->custom_data = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
-			$this->view_order = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-			$this->creation_mode = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-			$this->deinterlice = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-			$this->rotate = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
-			$this->operators = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
-			$this->engine_version = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->type = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->system_name = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->tags = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->description = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->ready_behavior = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->deleted_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->is_default = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->format = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->video_codec = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->video_bitrate = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->audio_codec = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->audio_bitrate = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->audio_channels = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->audio_sample_rate = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->audio_resolution = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+			$this->width = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+			$this->height = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
+			$this->frame_rate = ($row[$startcol + 22] !== null) ? (double) $row[$startcol + 22] : null;
+			$this->gop_size = ($row[$startcol + 23] !== null) ? (int) $row[$startcol + 23] : null;
+			$this->two_pass = ($row[$startcol + 24] !== null) ? (boolean) $row[$startcol + 24] : null;
+			$this->conversion_engines = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
+			$this->conversion_engines_extra_params = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
+			$this->custom_data = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
+			$this->view_order = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+			$this->creation_mode = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+			$this->deinterlice = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+			$this->rotate = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->operators = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
+			$this->engine_version = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->type = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1756,7 +1802,7 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 34; // 34 = assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 35; // 35 = assetParamsPeer::NUM_COLUMNS - assetParamsPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating assetParams object", $e);
@@ -2233,93 +2279,96 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 				return $this->getName();
 				break;
 			case 4:
-				return $this->getTags();
+				return $this->getSystemName();
 				break;
 			case 5:
-				return $this->getDescription();
+				return $this->getTags();
 				break;
 			case 6:
-				return $this->getReadyBehavior();
+				return $this->getDescription();
 				break;
 			case 7:
-				return $this->getCreatedAt();
+				return $this->getReadyBehavior();
 				break;
 			case 8:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 9:
-				return $this->getDeletedAt();
+				return $this->getUpdatedAt();
 				break;
 			case 10:
-				return $this->getIsDefault();
+				return $this->getDeletedAt();
 				break;
 			case 11:
-				return $this->getFormat();
+				return $this->getIsDefault();
 				break;
 			case 12:
-				return $this->getVideoCodec();
+				return $this->getFormat();
 				break;
 			case 13:
-				return $this->getVideoBitrate();
+				return $this->getVideoCodec();
 				break;
 			case 14:
-				return $this->getAudioCodec();
+				return $this->getVideoBitrate();
 				break;
 			case 15:
-				return $this->getAudioBitrate();
+				return $this->getAudioCodec();
 				break;
 			case 16:
-				return $this->getAudioChannels();
+				return $this->getAudioBitrate();
 				break;
 			case 17:
-				return $this->getAudioSampleRate();
+				return $this->getAudioChannels();
 				break;
 			case 18:
-				return $this->getAudioResolution();
+				return $this->getAudioSampleRate();
 				break;
 			case 19:
-				return $this->getWidth();
+				return $this->getAudioResolution();
 				break;
 			case 20:
-				return $this->getHeight();
+				return $this->getWidth();
 				break;
 			case 21:
-				return $this->getFrameRate();
+				return $this->getHeight();
 				break;
 			case 22:
-				return $this->getGopSize();
+				return $this->getFrameRate();
 				break;
 			case 23:
-				return $this->getTwoPass();
+				return $this->getGopSize();
 				break;
 			case 24:
-				return $this->getConversionEngines();
+				return $this->getTwoPass();
 				break;
 			case 25:
-				return $this->getConversionEnginesExtraParams();
+				return $this->getConversionEngines();
 				break;
 			case 26:
-				return $this->getCustomData();
+				return $this->getConversionEnginesExtraParams();
 				break;
 			case 27:
-				return $this->getViewOrder();
+				return $this->getCustomData();
 				break;
 			case 28:
-				return $this->getCreationMode();
+				return $this->getViewOrder();
 				break;
 			case 29:
-				return $this->getDeinterlice();
+				return $this->getCreationMode();
 				break;
 			case 30:
-				return $this->getRotate();
+				return $this->getDeinterlice();
 				break;
 			case 31:
-				return $this->getOperators();
+				return $this->getRotate();
 				break;
 			case 32:
-				return $this->getEngineVersion();
+				return $this->getOperators();
 				break;
 			case 33:
+				return $this->getEngineVersion();
+				break;
+			case 34:
 				return $this->getType();
 				break;
 			default:
@@ -2347,36 +2396,37 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 			$keys[1] => $this->getVersion(),
 			$keys[2] => $this->getPartnerId(),
 			$keys[3] => $this->getName(),
-			$keys[4] => $this->getTags(),
-			$keys[5] => $this->getDescription(),
-			$keys[6] => $this->getReadyBehavior(),
-			$keys[7] => $this->getCreatedAt(),
-			$keys[8] => $this->getUpdatedAt(),
-			$keys[9] => $this->getDeletedAt(),
-			$keys[10] => $this->getIsDefault(),
-			$keys[11] => $this->getFormat(),
-			$keys[12] => $this->getVideoCodec(),
-			$keys[13] => $this->getVideoBitrate(),
-			$keys[14] => $this->getAudioCodec(),
-			$keys[15] => $this->getAudioBitrate(),
-			$keys[16] => $this->getAudioChannels(),
-			$keys[17] => $this->getAudioSampleRate(),
-			$keys[18] => $this->getAudioResolution(),
-			$keys[19] => $this->getWidth(),
-			$keys[20] => $this->getHeight(),
-			$keys[21] => $this->getFrameRate(),
-			$keys[22] => $this->getGopSize(),
-			$keys[23] => $this->getTwoPass(),
-			$keys[24] => $this->getConversionEngines(),
-			$keys[25] => $this->getConversionEnginesExtraParams(),
-			$keys[26] => $this->getCustomData(),
-			$keys[27] => $this->getViewOrder(),
-			$keys[28] => $this->getCreationMode(),
-			$keys[29] => $this->getDeinterlice(),
-			$keys[30] => $this->getRotate(),
-			$keys[31] => $this->getOperators(),
-			$keys[32] => $this->getEngineVersion(),
-			$keys[33] => $this->getType(),
+			$keys[4] => $this->getSystemName(),
+			$keys[5] => $this->getTags(),
+			$keys[6] => $this->getDescription(),
+			$keys[7] => $this->getReadyBehavior(),
+			$keys[8] => $this->getCreatedAt(),
+			$keys[9] => $this->getUpdatedAt(),
+			$keys[10] => $this->getDeletedAt(),
+			$keys[11] => $this->getIsDefault(),
+			$keys[12] => $this->getFormat(),
+			$keys[13] => $this->getVideoCodec(),
+			$keys[14] => $this->getVideoBitrate(),
+			$keys[15] => $this->getAudioCodec(),
+			$keys[16] => $this->getAudioBitrate(),
+			$keys[17] => $this->getAudioChannels(),
+			$keys[18] => $this->getAudioSampleRate(),
+			$keys[19] => $this->getAudioResolution(),
+			$keys[20] => $this->getWidth(),
+			$keys[21] => $this->getHeight(),
+			$keys[22] => $this->getFrameRate(),
+			$keys[23] => $this->getGopSize(),
+			$keys[24] => $this->getTwoPass(),
+			$keys[25] => $this->getConversionEngines(),
+			$keys[26] => $this->getConversionEnginesExtraParams(),
+			$keys[27] => $this->getCustomData(),
+			$keys[28] => $this->getViewOrder(),
+			$keys[29] => $this->getCreationMode(),
+			$keys[30] => $this->getDeinterlice(),
+			$keys[31] => $this->getRotate(),
+			$keys[32] => $this->getOperators(),
+			$keys[33] => $this->getEngineVersion(),
+			$keys[34] => $this->getType(),
 		);
 		return $result;
 	}
@@ -2421,93 +2471,96 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 				$this->setName($value);
 				break;
 			case 4:
-				$this->setTags($value);
+				$this->setSystemName($value);
 				break;
 			case 5:
-				$this->setDescription($value);
+				$this->setTags($value);
 				break;
 			case 6:
-				$this->setReadyBehavior($value);
+				$this->setDescription($value);
 				break;
 			case 7:
-				$this->setCreatedAt($value);
+				$this->setReadyBehavior($value);
 				break;
 			case 8:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 9:
-				$this->setDeletedAt($value);
+				$this->setUpdatedAt($value);
 				break;
 			case 10:
-				$this->setIsDefault($value);
+				$this->setDeletedAt($value);
 				break;
 			case 11:
-				$this->setFormat($value);
+				$this->setIsDefault($value);
 				break;
 			case 12:
-				$this->setVideoCodec($value);
+				$this->setFormat($value);
 				break;
 			case 13:
-				$this->setVideoBitrate($value);
+				$this->setVideoCodec($value);
 				break;
 			case 14:
-				$this->setAudioCodec($value);
+				$this->setVideoBitrate($value);
 				break;
 			case 15:
-				$this->setAudioBitrate($value);
+				$this->setAudioCodec($value);
 				break;
 			case 16:
-				$this->setAudioChannels($value);
+				$this->setAudioBitrate($value);
 				break;
 			case 17:
-				$this->setAudioSampleRate($value);
+				$this->setAudioChannels($value);
 				break;
 			case 18:
-				$this->setAudioResolution($value);
+				$this->setAudioSampleRate($value);
 				break;
 			case 19:
-				$this->setWidth($value);
+				$this->setAudioResolution($value);
 				break;
 			case 20:
-				$this->setHeight($value);
+				$this->setWidth($value);
 				break;
 			case 21:
-				$this->setFrameRate($value);
+				$this->setHeight($value);
 				break;
 			case 22:
-				$this->setGopSize($value);
+				$this->setFrameRate($value);
 				break;
 			case 23:
-				$this->setTwoPass($value);
+				$this->setGopSize($value);
 				break;
 			case 24:
-				$this->setConversionEngines($value);
+				$this->setTwoPass($value);
 				break;
 			case 25:
-				$this->setConversionEnginesExtraParams($value);
+				$this->setConversionEngines($value);
 				break;
 			case 26:
-				$this->setCustomData($value);
+				$this->setConversionEnginesExtraParams($value);
 				break;
 			case 27:
-				$this->setViewOrder($value);
+				$this->setCustomData($value);
 				break;
 			case 28:
-				$this->setCreationMode($value);
+				$this->setViewOrder($value);
 				break;
 			case 29:
-				$this->setDeinterlice($value);
+				$this->setCreationMode($value);
 				break;
 			case 30:
-				$this->setRotate($value);
+				$this->setDeinterlice($value);
 				break;
 			case 31:
-				$this->setOperators($value);
+				$this->setRotate($value);
 				break;
 			case 32:
-				$this->setEngineVersion($value);
+				$this->setOperators($value);
 				break;
 			case 33:
+				$this->setEngineVersion($value);
+				break;
+			case 34:
 				$this->setType($value);
 				break;
 		} // switch()
@@ -2538,36 +2591,37 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setVersion($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setTags($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDescription($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setReadyBehavior($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDeletedAt($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setIsDefault($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setFormat($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setVideoCodec($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setVideoBitrate($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setAudioCodec($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setAudioBitrate($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setAudioChannels($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setAudioSampleRate($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setAudioResolution($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setWidth($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setHeight($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setFrameRate($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setGopSize($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setTwoPass($arr[$keys[23]]);
-		if (array_key_exists($keys[24], $arr)) $this->setConversionEngines($arr[$keys[24]]);
-		if (array_key_exists($keys[25], $arr)) $this->setConversionEnginesExtraParams($arr[$keys[25]]);
-		if (array_key_exists($keys[26], $arr)) $this->setCustomData($arr[$keys[26]]);
-		if (array_key_exists($keys[27], $arr)) $this->setViewOrder($arr[$keys[27]]);
-		if (array_key_exists($keys[28], $arr)) $this->setCreationMode($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setDeinterlice($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setRotate($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setOperators($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setEngineVersion($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setType($arr[$keys[33]]);
+		if (array_key_exists($keys[4], $arr)) $this->setSystemName($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setTags($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setDescription($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setReadyBehavior($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setDeletedAt($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setIsDefault($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setFormat($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setVideoCodec($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setVideoBitrate($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setAudioCodec($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setAudioBitrate($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setAudioChannels($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setAudioSampleRate($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setAudioResolution($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setWidth($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setHeight($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setFrameRate($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setGopSize($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setTwoPass($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setConversionEngines($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setConversionEnginesExtraParams($arr[$keys[26]]);
+		if (array_key_exists($keys[27], $arr)) $this->setCustomData($arr[$keys[27]]);
+		if (array_key_exists($keys[28], $arr)) $this->setViewOrder($arr[$keys[28]]);
+		if (array_key_exists($keys[29], $arr)) $this->setCreationMode($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setDeinterlice($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setRotate($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setOperators($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setEngineVersion($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setType($arr[$keys[34]]);
 	}
 
 	/**
@@ -2583,6 +2637,7 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(assetParamsPeer::VERSION)) $criteria->add(assetParamsPeer::VERSION, $this->version);
 		if ($this->isColumnModified(assetParamsPeer::PARTNER_ID)) $criteria->add(assetParamsPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(assetParamsPeer::NAME)) $criteria->add(assetParamsPeer::NAME, $this->name);
+		if ($this->isColumnModified(assetParamsPeer::SYSTEM_NAME)) $criteria->add(assetParamsPeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(assetParamsPeer::TAGS)) $criteria->add(assetParamsPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(assetParamsPeer::DESCRIPTION)) $criteria->add(assetParamsPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(assetParamsPeer::READY_BEHAVIOR)) $criteria->add(assetParamsPeer::READY_BEHAVIOR, $this->ready_behavior);
@@ -2672,6 +2727,8 @@ abstract class BaseassetParams extends BaseObject  implements Persistent {
 		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setName($this->name);
+
+		$copyObj->setSystemName($this->system_name);
 
 		$copyObj->setTags($this->tags);
 

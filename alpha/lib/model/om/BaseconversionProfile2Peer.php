@@ -26,7 +26,7 @@ abstract class BaseconversionProfile2Peer {
 	const TM_CLASS = 'conversionProfile2TableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 15;
+	const NUM_COLUMNS = 20;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -52,6 +52,18 @@ abstract class BaseconversionProfile2Peer {
 	/** the column name for the DESCRIPTION field */
 	const DESCRIPTION = 'conversion_profile_2.DESCRIPTION';
 
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'conversion_profile_2.SYSTEM_NAME';
+
+	/** the column name for the TAGS field */
+	const TAGS = 'conversion_profile_2.TAGS';
+
+	/** the column name for the STATUS field */
+	const STATUS = 'conversion_profile_2.STATUS';
+
+	/** the column name for the DEFAULT_ENTRY_ID field */
+	const DEFAULT_ENTRY_ID = 'conversion_profile_2.DEFAULT_ENTRY_ID';
+
 	/** the column name for the CROP_LEFT field */
 	const CROP_LEFT = 'conversion_profile_2.CROP_LEFT';
 
@@ -76,6 +88,9 @@ abstract class BaseconversionProfile2Peer {
 	/** the column name for the CREATION_MODE field */
 	const CREATION_MODE = 'conversion_profile_2.CREATION_MODE';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'conversion_profile_2.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of conversionProfile2 objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -92,11 +107,11 @@ abstract class BaseconversionProfile2Peer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Description', 'CropLeft', 'CropTop', 'CropWidth', 'CropHeight', 'ClipStart', 'ClipDuration', 'InputTagsMap', 'CreationMode', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'createdAt', 'updatedAt', 'deletedAt', 'description', 'cropLeft', 'cropTop', 'cropWidth', 'cropHeight', 'clipStart', 'clipDuration', 'inputTagsMap', 'creationMode', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::DESCRIPTION, self::CROP_LEFT, self::CROP_TOP, self::CROP_WIDTH, self::CROP_HEIGHT, self::CLIP_START, self::CLIP_DURATION, self::INPUT_TAGS_MAP, self::CREATION_MODE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'created_at', 'updated_at', 'deleted_at', 'description', 'crop_left', 'crop_top', 'crop_width', 'crop_height', 'clip_start', 'clip_duration', 'input_tags_map', 'creation_mode', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'Description', 'SystemName', 'Tags', 'Status', 'DefaultEntryId', 'CropLeft', 'CropTop', 'CropWidth', 'CropHeight', 'ClipStart', 'ClipDuration', 'InputTagsMap', 'CreationMode', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'createdAt', 'updatedAt', 'deletedAt', 'description', 'systemName', 'tags', 'status', 'defaultEntryId', 'cropLeft', 'cropTop', 'cropWidth', 'cropHeight', 'clipStart', 'clipDuration', 'inputTagsMap', 'creationMode', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::DESCRIPTION, self::SYSTEM_NAME, self::TAGS, self::STATUS, self::DEFAULT_ENTRY_ID, self::CROP_LEFT, self::CROP_TOP, self::CROP_WIDTH, self::CROP_HEIGHT, self::CLIP_START, self::CLIP_DURATION, self::INPUT_TAGS_MAP, self::CREATION_MODE, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'created_at', 'updated_at', 'deleted_at', 'description', 'system_name', 'tags', 'status', 'default_entry_id', 'crop_left', 'crop_top', 'crop_width', 'crop_height', 'clip_start', 'clip_duration', 'input_tags_map', 'creation_mode', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
 	);
 
 	/**
@@ -106,11 +121,11 @@ abstract class BaseconversionProfile2Peer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'DeletedAt' => 5, 'Description' => 6, 'CropLeft' => 7, 'CropTop' => 8, 'CropWidth' => 9, 'CropHeight' => 10, 'ClipStart' => 11, 'ClipDuration' => 12, 'InputTagsMap' => 13, 'CreationMode' => 14, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'deletedAt' => 5, 'description' => 6, 'cropLeft' => 7, 'cropTop' => 8, 'cropWidth' => 9, 'cropHeight' => 10, 'clipStart' => 11, 'clipDuration' => 12, 'inputTagsMap' => 13, 'creationMode' => 14, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::DELETED_AT => 5, self::DESCRIPTION => 6, self::CROP_LEFT => 7, self::CROP_TOP => 8, self::CROP_WIDTH => 9, self::CROP_HEIGHT => 10, self::CLIP_START => 11, self::CLIP_DURATION => 12, self::INPUT_TAGS_MAP => 13, self::CREATION_MODE => 14, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'created_at' => 3, 'updated_at' => 4, 'deleted_at' => 5, 'description' => 6, 'crop_left' => 7, 'crop_top' => 8, 'crop_width' => 9, 'crop_height' => 10, 'clip_start' => 11, 'clip_duration' => 12, 'input_tags_map' => 13, 'creation_mode' => 14, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'DeletedAt' => 5, 'Description' => 6, 'SystemName' => 7, 'Tags' => 8, 'Status' => 9, 'DefaultEntryId' => 10, 'CropLeft' => 11, 'CropTop' => 12, 'CropWidth' => 13, 'CropHeight' => 14, 'ClipStart' => 15, 'ClipDuration' => 16, 'InputTagsMap' => 17, 'CreationMode' => 18, 'CustomData' => 19, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'deletedAt' => 5, 'description' => 6, 'systemName' => 7, 'tags' => 8, 'status' => 9, 'defaultEntryId' => 10, 'cropLeft' => 11, 'cropTop' => 12, 'cropWidth' => 13, 'cropHeight' => 14, 'clipStart' => 15, 'clipDuration' => 16, 'inputTagsMap' => 17, 'creationMode' => 18, 'customData' => 19, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::DELETED_AT => 5, self::DESCRIPTION => 6, self::SYSTEM_NAME => 7, self::TAGS => 8, self::STATUS => 9, self::DEFAULT_ENTRY_ID => 10, self::CROP_LEFT => 11, self::CROP_TOP => 12, self::CROP_WIDTH => 13, self::CROP_HEIGHT => 14, self::CLIP_START => 15, self::CLIP_DURATION => 16, self::INPUT_TAGS_MAP => 17, self::CREATION_MODE => 18, self::CUSTOM_DATA => 19, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'created_at' => 3, 'updated_at' => 4, 'deleted_at' => 5, 'description' => 6, 'system_name' => 7, 'tags' => 8, 'status' => 9, 'default_entry_id' => 10, 'crop_left' => 11, 'crop_top' => 12, 'crop_width' => 13, 'crop_height' => 14, 'clip_start' => 15, 'clip_duration' => 16, 'input_tags_map' => 17, 'creation_mode' => 18, 'custom_data' => 19, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, )
 	);
 
 	/**
@@ -187,6 +202,10 @@ abstract class BaseconversionProfile2Peer {
 		$criteria->addSelectColumn(conversionProfile2Peer::UPDATED_AT);
 		$criteria->addSelectColumn(conversionProfile2Peer::DELETED_AT);
 		$criteria->addSelectColumn(conversionProfile2Peer::DESCRIPTION);
+		$criteria->addSelectColumn(conversionProfile2Peer::SYSTEM_NAME);
+		$criteria->addSelectColumn(conversionProfile2Peer::TAGS);
+		$criteria->addSelectColumn(conversionProfile2Peer::STATUS);
+		$criteria->addSelectColumn(conversionProfile2Peer::DEFAULT_ENTRY_ID);
 		$criteria->addSelectColumn(conversionProfile2Peer::CROP_LEFT);
 		$criteria->addSelectColumn(conversionProfile2Peer::CROP_TOP);
 		$criteria->addSelectColumn(conversionProfile2Peer::CROP_WIDTH);
@@ -195,6 +214,7 @@ abstract class BaseconversionProfile2Peer {
 		$criteria->addSelectColumn(conversionProfile2Peer::CLIP_DURATION);
 		$criteria->addSelectColumn(conversionProfile2Peer::INPUT_TAGS_MAP);
 		$criteria->addSelectColumn(conversionProfile2Peer::CREATION_MODE);
+		$criteria->addSelectColumn(conversionProfile2Peer::CUSTOM_DATA);
 	}
 
 	/**

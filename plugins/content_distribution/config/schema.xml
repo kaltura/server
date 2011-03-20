@@ -7,6 +7,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="provider_type" type="integer" inheritance="single" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="name" type="varchar" size="31" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="submit_enabled" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="update_enabled" type="tinyint" />

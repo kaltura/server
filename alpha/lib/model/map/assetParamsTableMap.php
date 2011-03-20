@@ -41,6 +41,7 @@ class assetParamsTableMap extends TableMap {
 		$this->addColumn('VERSION', 'Version', 'INTEGER', true, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 128, '');
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', true, 128, '');
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', true, 1024, '');
 		$this->addColumn('READY_BEHAVIOR', 'ReadyBehavior', 'TINYINT', true, null, null);

@@ -44,6 +44,10 @@ class conversionProfile2TableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('DELETED_AT', 'DeletedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', true, 1024, '');
+		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 128, null);
+		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('DEFAULT_ENTRY_ID', 'DefaultEntryId', 'VARCHAR', false, 20, null);
 		$this->addColumn('CROP_LEFT', 'CropLeft', 'INTEGER', true, null, -1);
 		$this->addColumn('CROP_TOP', 'CropTop', 'INTEGER', true, null, -1);
 		$this->addColumn('CROP_WIDTH', 'CropWidth', 'INTEGER', true, null, -1);
@@ -52,6 +56,7 @@ class conversionProfile2TableMap extends TableMap {
 		$this->addColumn('CLIP_DURATION', 'ClipDuration', 'INTEGER', true, null, -1);
 		$this->addColumn('INPUT_TAGS_MAP', 'InputTagsMap', 'VARCHAR', false, 1023, null);
 		$this->addColumn('CREATION_MODE', 'CreationMode', 'SMALLINT', false, null, 1);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

@@ -26,7 +26,7 @@ abstract class BaseassetParamsPeer {
 	const TM_CLASS = 'assetParamsTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 34;
+	const NUM_COLUMNS = 35;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -42,6 +42,9 @@ abstract class BaseassetParamsPeer {
 
 	/** the column name for the NAME field */
 	const NAME = 'flavor_params.NAME';
+
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'flavor_params.SYSTEM_NAME';
 
 	/** the column name for the TAGS field */
 	const TAGS = 'flavor_params.TAGS';
@@ -149,11 +152,11 @@ abstract class BaseassetParamsPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Version', 'PartnerId', 'Name', 'Tags', 'Description', 'ReadyBehavior', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'IsDefault', 'Format', 'VideoCodec', 'VideoBitrate', 'AudioCodec', 'AudioBitrate', 'AudioChannels', 'AudioSampleRate', 'AudioResolution', 'Width', 'Height', 'FrameRate', 'GopSize', 'TwoPass', 'ConversionEngines', 'ConversionEnginesExtraParams', 'CustomData', 'ViewOrder', 'CreationMode', 'Deinterlice', 'Rotate', 'Operators', 'EngineVersion', 'Type', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'version', 'partnerId', 'name', 'tags', 'description', 'readyBehavior', 'createdAt', 'updatedAt', 'deletedAt', 'isDefault', 'format', 'videoCodec', 'videoBitrate', 'audioCodec', 'audioBitrate', 'audioChannels', 'audioSampleRate', 'audioResolution', 'width', 'height', 'frameRate', 'gopSize', 'twoPass', 'conversionEngines', 'conversionEnginesExtraParams', 'customData', 'viewOrder', 'creationMode', 'deinterlice', 'rotate', 'operators', 'engineVersion', 'type', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::VERSION, self::PARTNER_ID, self::NAME, self::TAGS, self::DESCRIPTION, self::READY_BEHAVIOR, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::IS_DEFAULT, self::FORMAT, self::VIDEO_CODEC, self::VIDEO_BITRATE, self::AUDIO_CODEC, self::AUDIO_BITRATE, self::AUDIO_CHANNELS, self::AUDIO_SAMPLE_RATE, self::AUDIO_RESOLUTION, self::WIDTH, self::HEIGHT, self::FRAME_RATE, self::GOP_SIZE, self::TWO_PASS, self::CONVERSION_ENGINES, self::CONVERSION_ENGINES_EXTRA_PARAMS, self::CUSTOM_DATA, self::VIEW_ORDER, self::CREATION_MODE, self::DEINTERLICE, self::ROTATE, self::OPERATORS, self::ENGINE_VERSION, self::TYPE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'version', 'partner_id', 'name', 'tags', 'description', 'ready_behavior', 'created_at', 'updated_at', 'deleted_at', 'is_default', 'format', 'video_codec', 'video_bitrate', 'audio_codec', 'audio_bitrate', 'audio_channels', 'audio_sample_rate', 'audio_resolution', 'width', 'height', 'frame_rate', 'gop_size', 'two_pass', 'conversion_engines', 'conversion_engines_extra_params', 'custom_data', 'view_order', 'creation_mode', 'deinterlice', 'rotate', 'operators', 'engine_version', 'type', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Version', 'PartnerId', 'Name', 'SystemName', 'Tags', 'Description', 'ReadyBehavior', 'CreatedAt', 'UpdatedAt', 'DeletedAt', 'IsDefault', 'Format', 'VideoCodec', 'VideoBitrate', 'AudioCodec', 'AudioBitrate', 'AudioChannels', 'AudioSampleRate', 'AudioResolution', 'Width', 'Height', 'FrameRate', 'GopSize', 'TwoPass', 'ConversionEngines', 'ConversionEnginesExtraParams', 'CustomData', 'ViewOrder', 'CreationMode', 'Deinterlice', 'Rotate', 'Operators', 'EngineVersion', 'Type', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'version', 'partnerId', 'name', 'systemName', 'tags', 'description', 'readyBehavior', 'createdAt', 'updatedAt', 'deletedAt', 'isDefault', 'format', 'videoCodec', 'videoBitrate', 'audioCodec', 'audioBitrate', 'audioChannels', 'audioSampleRate', 'audioResolution', 'width', 'height', 'frameRate', 'gopSize', 'twoPass', 'conversionEngines', 'conversionEnginesExtraParams', 'customData', 'viewOrder', 'creationMode', 'deinterlice', 'rotate', 'operators', 'engineVersion', 'type', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::VERSION, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::TAGS, self::DESCRIPTION, self::READY_BEHAVIOR, self::CREATED_AT, self::UPDATED_AT, self::DELETED_AT, self::IS_DEFAULT, self::FORMAT, self::VIDEO_CODEC, self::VIDEO_BITRATE, self::AUDIO_CODEC, self::AUDIO_BITRATE, self::AUDIO_CHANNELS, self::AUDIO_SAMPLE_RATE, self::AUDIO_RESOLUTION, self::WIDTH, self::HEIGHT, self::FRAME_RATE, self::GOP_SIZE, self::TWO_PASS, self::CONVERSION_ENGINES, self::CONVERSION_ENGINES_EXTRA_PARAMS, self::CUSTOM_DATA, self::VIEW_ORDER, self::CREATION_MODE, self::DEINTERLICE, self::ROTATE, self::OPERATORS, self::ENGINE_VERSION, self::TYPE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'version', 'partner_id', 'name', 'system_name', 'tags', 'description', 'ready_behavior', 'created_at', 'updated_at', 'deleted_at', 'is_default', 'format', 'video_codec', 'video_bitrate', 'audio_codec', 'audio_bitrate', 'audio_channels', 'audio_sample_rate', 'audio_resolution', 'width', 'height', 'frame_rate', 'gop_size', 'two_pass', 'conversion_engines', 'conversion_engines_extra_params', 'custom_data', 'view_order', 'creation_mode', 'deinterlice', 'rotate', 'operators', 'engine_version', 'type', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, )
 	);
 
 	/**
@@ -163,11 +166,11 @@ abstract class BaseassetParamsPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Version' => 1, 'PartnerId' => 2, 'Name' => 3, 'Tags' => 4, 'Description' => 5, 'ReadyBehavior' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'DeletedAt' => 9, 'IsDefault' => 10, 'Format' => 11, 'VideoCodec' => 12, 'VideoBitrate' => 13, 'AudioCodec' => 14, 'AudioBitrate' => 15, 'AudioChannels' => 16, 'AudioSampleRate' => 17, 'AudioResolution' => 18, 'Width' => 19, 'Height' => 20, 'FrameRate' => 21, 'GopSize' => 22, 'TwoPass' => 23, 'ConversionEngines' => 24, 'ConversionEnginesExtraParams' => 25, 'CustomData' => 26, 'ViewOrder' => 27, 'CreationMode' => 28, 'Deinterlice' => 29, 'Rotate' => 30, 'Operators' => 31, 'EngineVersion' => 32, 'Type' => 33, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'version' => 1, 'partnerId' => 2, 'name' => 3, 'tags' => 4, 'description' => 5, 'readyBehavior' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'deletedAt' => 9, 'isDefault' => 10, 'format' => 11, 'videoCodec' => 12, 'videoBitrate' => 13, 'audioCodec' => 14, 'audioBitrate' => 15, 'audioChannels' => 16, 'audioSampleRate' => 17, 'audioResolution' => 18, 'width' => 19, 'height' => 20, 'frameRate' => 21, 'gopSize' => 22, 'twoPass' => 23, 'conversionEngines' => 24, 'conversionEnginesExtraParams' => 25, 'customData' => 26, 'viewOrder' => 27, 'creationMode' => 28, 'deinterlice' => 29, 'rotate' => 30, 'operators' => 31, 'engineVersion' => 32, 'type' => 33, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::VERSION => 1, self::PARTNER_ID => 2, self::NAME => 3, self::TAGS => 4, self::DESCRIPTION => 5, self::READY_BEHAVIOR => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::DELETED_AT => 9, self::IS_DEFAULT => 10, self::FORMAT => 11, self::VIDEO_CODEC => 12, self::VIDEO_BITRATE => 13, self::AUDIO_CODEC => 14, self::AUDIO_BITRATE => 15, self::AUDIO_CHANNELS => 16, self::AUDIO_SAMPLE_RATE => 17, self::AUDIO_RESOLUTION => 18, self::WIDTH => 19, self::HEIGHT => 20, self::FRAME_RATE => 21, self::GOP_SIZE => 22, self::TWO_PASS => 23, self::CONVERSION_ENGINES => 24, self::CONVERSION_ENGINES_EXTRA_PARAMS => 25, self::CUSTOM_DATA => 26, self::VIEW_ORDER => 27, self::CREATION_MODE => 28, self::DEINTERLICE => 29, self::ROTATE => 30, self::OPERATORS => 31, self::ENGINE_VERSION => 32, self::TYPE => 33, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'version' => 1, 'partner_id' => 2, 'name' => 3, 'tags' => 4, 'description' => 5, 'ready_behavior' => 6, 'created_at' => 7, 'updated_at' => 8, 'deleted_at' => 9, 'is_default' => 10, 'format' => 11, 'video_codec' => 12, 'video_bitrate' => 13, 'audio_codec' => 14, 'audio_bitrate' => 15, 'audio_channels' => 16, 'audio_sample_rate' => 17, 'audio_resolution' => 18, 'width' => 19, 'height' => 20, 'frame_rate' => 21, 'gop_size' => 22, 'two_pass' => 23, 'conversion_engines' => 24, 'conversion_engines_extra_params' => 25, 'custom_data' => 26, 'view_order' => 27, 'creation_mode' => 28, 'deinterlice' => 29, 'rotate' => 30, 'operators' => 31, 'engine_version' => 32, 'type' => 33, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Version' => 1, 'PartnerId' => 2, 'Name' => 3, 'SystemName' => 4, 'Tags' => 5, 'Description' => 6, 'ReadyBehavior' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'DeletedAt' => 10, 'IsDefault' => 11, 'Format' => 12, 'VideoCodec' => 13, 'VideoBitrate' => 14, 'AudioCodec' => 15, 'AudioBitrate' => 16, 'AudioChannels' => 17, 'AudioSampleRate' => 18, 'AudioResolution' => 19, 'Width' => 20, 'Height' => 21, 'FrameRate' => 22, 'GopSize' => 23, 'TwoPass' => 24, 'ConversionEngines' => 25, 'ConversionEnginesExtraParams' => 26, 'CustomData' => 27, 'ViewOrder' => 28, 'CreationMode' => 29, 'Deinterlice' => 30, 'Rotate' => 31, 'Operators' => 32, 'EngineVersion' => 33, 'Type' => 34, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'version' => 1, 'partnerId' => 2, 'name' => 3, 'systemName' => 4, 'tags' => 5, 'description' => 6, 'readyBehavior' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'deletedAt' => 10, 'isDefault' => 11, 'format' => 12, 'videoCodec' => 13, 'videoBitrate' => 14, 'audioCodec' => 15, 'audioBitrate' => 16, 'audioChannels' => 17, 'audioSampleRate' => 18, 'audioResolution' => 19, 'width' => 20, 'height' => 21, 'frameRate' => 22, 'gopSize' => 23, 'twoPass' => 24, 'conversionEngines' => 25, 'conversionEnginesExtraParams' => 26, 'customData' => 27, 'viewOrder' => 28, 'creationMode' => 29, 'deinterlice' => 30, 'rotate' => 31, 'operators' => 32, 'engineVersion' => 33, 'type' => 34, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::VERSION => 1, self::PARTNER_ID => 2, self::NAME => 3, self::SYSTEM_NAME => 4, self::TAGS => 5, self::DESCRIPTION => 6, self::READY_BEHAVIOR => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::DELETED_AT => 10, self::IS_DEFAULT => 11, self::FORMAT => 12, self::VIDEO_CODEC => 13, self::VIDEO_BITRATE => 14, self::AUDIO_CODEC => 15, self::AUDIO_BITRATE => 16, self::AUDIO_CHANNELS => 17, self::AUDIO_SAMPLE_RATE => 18, self::AUDIO_RESOLUTION => 19, self::WIDTH => 20, self::HEIGHT => 21, self::FRAME_RATE => 22, self::GOP_SIZE => 23, self::TWO_PASS => 24, self::CONVERSION_ENGINES => 25, self::CONVERSION_ENGINES_EXTRA_PARAMS => 26, self::CUSTOM_DATA => 27, self::VIEW_ORDER => 28, self::CREATION_MODE => 29, self::DEINTERLICE => 30, self::ROTATE => 31, self::OPERATORS => 32, self::ENGINE_VERSION => 33, self::TYPE => 34, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'version' => 1, 'partner_id' => 2, 'name' => 3, 'system_name' => 4, 'tags' => 5, 'description' => 6, 'ready_behavior' => 7, 'created_at' => 8, 'updated_at' => 9, 'deleted_at' => 10, 'is_default' => 11, 'format' => 12, 'video_codec' => 13, 'video_bitrate' => 14, 'audio_codec' => 15, 'audio_bitrate' => 16, 'audio_channels' => 17, 'audio_sample_rate' => 18, 'audio_resolution' => 19, 'width' => 20, 'height' => 21, 'frame_rate' => 22, 'gop_size' => 23, 'two_pass' => 24, 'conversion_engines' => 25, 'conversion_engines_extra_params' => 26, 'custom_data' => 27, 'view_order' => 28, 'creation_mode' => 29, 'deinterlice' => 30, 'rotate' => 31, 'operators' => 32, 'engine_version' => 33, 'type' => 34, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, )
 	);
 
 	/**
@@ -241,6 +244,7 @@ abstract class BaseassetParamsPeer {
 		$criteria->addSelectColumn(assetParamsPeer::VERSION);
 		$criteria->addSelectColumn(assetParamsPeer::PARTNER_ID);
 		$criteria->addSelectColumn(assetParamsPeer::NAME);
+		$criteria->addSelectColumn(assetParamsPeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(assetParamsPeer::TAGS);
 		$criteria->addSelectColumn(assetParamsPeer::DESCRIPTION);
 		$criteria->addSelectColumn(assetParamsPeer::READY_BEHAVIOR);
@@ -714,7 +718,7 @@ abstract class BaseassetParamsPeer {
 	{
 		try {
 
-			$omClass = $row[$colnum + 33];
+			$omClass = $row[$colnum + 34];
 			$omClass = substr('.'.$omClass, strrpos('.'.$omClass, '.') + 1);
 
 		} catch (Exception $e) {
