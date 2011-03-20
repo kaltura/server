@@ -409,7 +409,8 @@ CREATE TABLE `conversion_profile` (
   `bypass_by_extension` varchar(32) DEFAULT NULL,
   `conversion_profile_2_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `partner_id_index` (`partner_id`)
+  KEY `partner_id_index` (`partner_id`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 
@@ -683,7 +684,8 @@ CREATE TABLE `file_sync` (
   UNIQUE KEY `unique_key` (`object_type`,`object_id`,`version`,`object_sub_type`,`dc`),
   KEY `object_id_object_type_version_subtype_index` (`object_id`,`object_type`,`version`,`object_sub_type`),
   KEY `partner_id_object_id_object_type_index` (`partner_id`,`object_id`,`object_type`),
-  KEY `dc_status_index` (`dc`,`status`)
+  KEY `dc_status_index` (`dc`,`status`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM;
 
 
@@ -734,7 +736,8 @@ CREATE TABLE `flavor_asset` (
   KEY `partner_id_entry_id` (`partner_id`,`entry_id`),
   KEY `flavor_asset_FI_1` (`entry_id`),
   KEY `flavor_asset_FI_2` (`flavor_params_id`),
-  KEY `id_indx` (`id`)
+  KEY `id_indx` (`id`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM;
 
 
@@ -776,7 +779,8 @@ CREATE TABLE `flavor_params` (
   `operators` text,
   `engine_version` smallint(6) DEFAULT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM;
 
 
@@ -841,7 +845,8 @@ CREATE TABLE `flavor_params_output` (
   PRIMARY KEY (`id`),
   KEY `flavor_params_output_FI_1` (`flavor_params_id`),
   KEY `flavor_params_output_FI_2` (`entry_id`),
-  KEY `flavor_params_output_FI_3` (`flavor_asset_id`)
+  KEY `flavor_params_output_FI_3` (`flavor_asset_id`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -1252,7 +1257,8 @@ CREATE TABLE `media_info` (
   `scan_type` int(11) NOT NULL,
   `multi_stream` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `flavor_asset_id_index` (`flavor_asset_id`)
+  KEY `flavor_asset_id_index` (`flavor_asset_id`),
+  KEY `updated_at_index` (`updated_at`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
