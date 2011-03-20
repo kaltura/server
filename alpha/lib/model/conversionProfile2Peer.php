@@ -30,6 +30,7 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 
 		$c = new Criteria();
 		$c->add ( self::DELETED_AT, null, Criteria::EQUAL );
+		$c->add ( self::STATUS, ConversionProfileStatus::DELETED, Criteria::NOT_EQUAL );
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 

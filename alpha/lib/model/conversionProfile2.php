@@ -21,6 +21,25 @@ class conversionProfile2 extends BaseconversionProfile2
 	protected $isDefault;
 	
 
+	/* (non-PHPdoc)
+	 * @see BaseconversionProfile2::setDeletedAt()
+	 */
+	public function setDeletedAt($v)
+	{
+		parent::setDeletedAt($v);
+		parent::setStatus(ConversionProfileStatus::DELETED);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseconversionProfile2::setStatus()
+	 */
+	public function setStatus($v)
+	{
+		parent::setStatus($v);
+		if($v == ConversionProfileStatus::DELETED)
+			parent::setDeletedAt(time());
+	}
+	
 	public function setIsDefault($v)
 	{
 		$this->isDefault = (bool)$v;
