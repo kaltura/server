@@ -1366,7 +1366,7 @@
 		<column primaryKey="false" lazyLoad="false" name="description" type="varchar" required="true" default="" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="system_name" type="varchar" size="128" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" default="2" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="default_entry_id" type="varchar" size="20" />
 		<column primaryKey="false" lazyLoad="false" name="crop_left" type="integer" required="true" default="-1" />
 		<column primaryKey="false" lazyLoad="false" name="crop_top" type="integer" required="true" default="-1" />

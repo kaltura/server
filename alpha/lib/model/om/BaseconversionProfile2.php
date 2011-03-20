@@ -77,6 +77,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 
 	/**
 	 * The value for the status field.
+	 * Note: this column has a database default value of: 2
 	 * @var        int
 	 */
 	protected $status;
@@ -206,6 +207,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	{
 		$this->name = '';
 		$this->description = '';
+		$this->status = 2;
 		$this->crop_left = -1;
 		$this->crop_top = -1;
 		$this->crop_width = -1;
@@ -818,7 +820,7 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			$v = (int) $v;
 		}
 
-		if ($this->status !== $v) {
+		if ($this->status !== $v || $this->isNew()) {
 			$this->status = $v;
 			$this->modifiedColumns[] = conversionProfile2Peer::STATUS;
 		}
@@ -1068,6 +1070,10 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 			}
 
 			if ($this->description !== '') {
+				return false;
+			}
+
+			if ($this->status !== 2) {
 				return false;
 			}
 

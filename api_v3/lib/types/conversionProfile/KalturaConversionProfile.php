@@ -21,6 +21,11 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public $partnerId;
 	
 	/**
+	 * @var KalturaConversionProfileStatus
+	 */
+	public $status;
+	
+	/**
 	 * The name of the Conversion Profile
 	 * 
 	 * @var string
@@ -83,6 +88,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	(
 		"id",
 		"partnerId",
+		"status",
 		"name",
 		"description",
 		"createdAt",
