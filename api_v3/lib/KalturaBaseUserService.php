@@ -41,7 +41,6 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::WRONG_OLD_PASSWORD
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
-	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
 	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName, $newLastName)

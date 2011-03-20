@@ -144,7 +144,7 @@ class PermissionItemService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaPermissionItemFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaPremissionItemListResponse
+	 * @return KalturaPermissionItemListResponse
 	 */
 	public function listAction(KalturaPermissionItemFilter  $filter = null, KalturaFilterPager $pager = null)
 	{

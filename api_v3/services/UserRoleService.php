@@ -36,7 +36,7 @@ class UserRoleService extends KalturaBaseService
 	 * Allows you to add a new KalturaUserRole object
 	 * 
 	 * @action add
-	 * @param KalturaUserRole $permissionItem
+	 * @param KalturaUserRole $userRole
 	 * @return KalturaUserRole
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
@@ -187,7 +187,7 @@ class UserRoleService extends KalturaBaseService
 	}
 	
 	/**
-	 * List permission items
+	 * List user roles
 	 * 
 	 * @action list
 	 * @param KalturaUserRoleFilter $filter

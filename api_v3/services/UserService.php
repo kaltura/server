@@ -314,7 +314,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_RETRIES_EXCEEDED
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
-	 * @throws KalturaErrors::INVALID_PARTNER_ID
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
 	public function loginAction($partnerId, $userId, $password, $expiry = 86400, $privileges = '*')
@@ -340,7 +339,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_RETRIES_EXCEEDED
 	 * @throws KalturaErrors::LOGIN_BLOCKED
 	 * @throws KalturaErrors::PASSWORD_EXPIRED
-	 * @throws KalturaErrors::INVALID_PARTNER_ID
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 */		
 	public function loginByLoginIdAction($loginId, $password, $partnerId = null, $expiry = 86400, $privileges = '*')
@@ -367,7 +365,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::WRONG_OLD_PASSWORD
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
-	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
 	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null)
@@ -428,7 +425,6 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
-	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 *
 	 */	
 	public function enableLoginAction($userId, $loginId, $password = null)
