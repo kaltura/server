@@ -620,11 +620,13 @@ class playManifestAction extends kalturaAction
 		
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
 		$flavorsXml = '';
+		$domain = '';
 		foreach($flavors as $flavor)
 		{
 			$url = $flavor['url'];
 			$bitrate = isset($flavor['bitrate'])	? $flavor['bitrate']	: 0;
-			
+
+			$domain = parse_url($url, PHP_URL_SCHEME)."://".parse_url($url, PHP_URL_HOST);
 			$url = parse_url($url, PHP_URL_PATH);
 			
 			$url = htmlspecialchars($url);
@@ -636,7 +638,7 @@ class playManifestAction extends kalturaAction
 <smil xmlns="http://www.w3.org/2001/SMIL20/Language">
 	<head>
 		<meta name="title" content="" />
-		<meta name="httpBase" content="http://kalturavod-f.akamaihd.net/" />
+		<meta name="httpBase" content="'.$domain.'" />
 		<meta name="rtmpAuthBase" content="" />
 	</head>
 	<body>
