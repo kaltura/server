@@ -13,8 +13,8 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"aggregatedTimeGreaterThanOrEqual" => "_gte_aggregated_time",
 		"sumTimeViewedLessThanOrEqual" => "_lte_sum_time_viewed",
 		"sumTimeViewedGreaterThanOrEqual" => "_gte_sum_time_viewed",
-		"countTimeViewedLessThanOrEqual" => "_lte_count_time_viewed",
-		"countTimeViewedGreaterThanOrEqual" => "_gte_count_time_viewed",
+		"averageTimeViewedLessThanOrEqual" => "_lte_average_time_viewed",
+		"averageTimeViewedGreaterThanOrEqual" => "_gte_average_time_viewed",
 		"countPlaysLessThanOrEqual" => "_lte_count_plays",
 		"countPlaysGreaterThanOrEqual" => "_gte_count_plays",
 		"countLoadsLessThanOrEqual" => "_lte_count_loads",
@@ -45,8 +45,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"countAudioEntriesGreaterThanOrEqual" => "_gte_count_audio_entries",
 		"countMixEntriesLessThanOrEqual" => "_lte_count_mix_entries",
 		"countMixEntriesGreaterThanOrEqual" => "_gte_count_mix_entries",
-		"countMixNonEmptyLessThanOrEqual" => "_lte_count_mix_non_empty",
-		"countMixNonEmptyGreaterThanOrEqual" => "_gte_count_mix_non_empty",
 		"countPlaylistsLessThanOrEqual" => "_lte_count_playlists",
 		"countPlaylistsGreaterThanOrEqual" => "_gte_count_playlists",
 		"countBandwidthLessThanOrEqual" => "_lte_count_bandwidth",
@@ -57,10 +55,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"countUsersGreaterThanOrEqual" => "_gte_count_users",
 		"countWidgetsLessThanOrEqual" => "_lte_count_widgets",
 		"countWidgetsGreaterThanOrEqual" => "_gte_count_widgets",
-		"flagActiveSiteLessThanOrEqual" => "_lte_flag_active_site",
-		"flagActiveSiteGreaterThanOrEqual" => "_gte_flag_active_site",
-		"flagActivePublisherLessThanOrEqual" => "_lte_flag_active_publisher",
-		"flagActivePublisherGreaterThanOrEqual" => "_gte_flag_active_publisher",
 		"aggregatedStorageLessThanOrEqual" => "_lte_aggregated_storage",
 		"aggregatedStorageGreaterThanOrEqual" => "_gte_aggregated_storage",
 		"aggregatedBandwidthLessThanOrEqual" => "_lte_aggregated_bandwidth",
@@ -135,8 +129,8 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"-aggregatedTime" => "-aggregated_time",
 		"+sumTimeViewed" => "+sum_time_viewed",
 		"-sumTimeViewed" => "-sum_time_viewed",
-		"+countTimeViewed" => "+count_time_viewed",
-		"-countTimeViewed" => "-count_time_viewed",
+		"+averageTimeViewed" => "+average_time_viewed",
+		"-averageTimeViewed" => "-average_time_viewed",
 		"+countPlays" => "+count_plays",
 		"-countPlays" => "-count_plays",
 		"+countLoads" => "+count_loads",
@@ -167,8 +161,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"-countAudioEntries" => "-count_audio_entries",
 		"+countMixEntries" => "+count_mix_entries",
 		"-countMixEntries" => "-count_mix_entries",
-		"+countMixNonEmpty" => "+count_mix_non_empty",
-		"-countMixNonEmpty" => "-count_mix_non_empty",
 		"+countPlaylists" => "+count_playlists",
 		"-countPlaylists" => "-count_playlists",
 		"+countBandwidth" => "+count_bandwidth",
@@ -179,10 +171,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 		"-countUsers" => "-count_users",
 		"+countWidgets" => "+count_widgets",
 		"-countWidgets" => "-count_widgets",
-		"+flagActiveSite" => "+flag_active_site",
-		"-flagActiveSite" => "-flag_active_site",
-		"+flagActivePublisher" => "+flag_active_publisher",
-		"-flagActivePublisher" => "-flag_active_publisher",
 		"+aggregatedStorage" => "+aggregated_storage",
 		"-aggregatedStorage" => "-aggregated_storage",
 		"+aggregatedBandwidth" => "+aggregated_bandwidth",
@@ -285,30 +273,30 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var string
+	 * @var float
 	 */
 	public $sumTimeViewedLessThanOrEqual;
 
 	/**
 	 * 
 	 * 
-	 * @var string
+	 * @var float
 	 */
 	public $sumTimeViewedGreaterThanOrEqual;
 
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var float
 	 */
-	public $countTimeViewedLessThanOrEqual;
+	public $averageTimeViewedLessThanOrEqual;
 
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var float
 	 */
-	public $countTimeViewedGreaterThanOrEqual;
+	public $averageTimeViewedGreaterThanOrEqual;
 
 	/**
 	 * 
@@ -525,20 +513,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 	 * 
 	 * @var int
 	 */
-	public $countMixNonEmptyLessThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $countMixNonEmptyGreaterThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
 	public $countPlaylistsLessThanOrEqual;
 
 	/**
@@ -603,34 +577,6 @@ class KalturaDwhHourlyPartnerBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $countWidgetsGreaterThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $flagActiveSiteLessThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $flagActiveSiteGreaterThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $flagActivePublisherLessThanOrEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var int
-	 */
-	public $flagActivePublisherGreaterThanOrEqual;
 
 	/**
 	 * 

@@ -9,8 +9,8 @@ class KalturaDwhHourlyPartnerOrderBy extends KalturaStringEnum
 	const AGGREGATED_TIME_DESC = "-aggregatedTime";
 	const SUM_TIME_VIEWED_ASC = "+sumTimeViewed";
 	const SUM_TIME_VIEWED_DESC = "-sumTimeViewed";
-	const COUNT_TIME_VIEWED_ASC = "+countTimeViewed";
-	const COUNT_TIME_VIEWED_DESC = "-countTimeViewed";
+	const AVERAGE_TIME_VIEWED_ASC = "+averageTimeViewed";
+	const AVERAGE_TIME_VIEWED_DESC = "-averageTimeViewed";
 	const COUNT_PLAYS_ASC = "+countPlays";
 	const COUNT_PLAYS_DESC = "-countPlays";
 	const COUNT_LOADS_ASC = "+countLoads";
@@ -41,8 +41,6 @@ class KalturaDwhHourlyPartnerOrderBy extends KalturaStringEnum
 	const COUNT_AUDIO_ENTRIES_DESC = "-countAudioEntries";
 	const COUNT_MIX_ENTRIES_ASC = "+countMixEntries";
 	const COUNT_MIX_ENTRIES_DESC = "-countMixEntries";
-	const COUNT_MIX_NON_EMPTY_ASC = "+countMixNonEmpty";
-	const COUNT_MIX_NON_EMPTY_DESC = "-countMixNonEmpty";
 	const COUNT_PLAYLISTS_ASC = "+countPlaylists";
 	const COUNT_PLAYLISTS_DESC = "-countPlaylists";
 	const COUNT_BANDWIDTH_ASC = "+countBandwidth";
@@ -53,10 +51,6 @@ class KalturaDwhHourlyPartnerOrderBy extends KalturaStringEnum
 	const COUNT_USERS_DESC = "-countUsers";
 	const COUNT_WIDGETS_ASC = "+countWidgets";
 	const COUNT_WIDGETS_DESC = "-countWidgets";
-	const FLAG_ACTIVE_SITE_ASC = "+flagActiveSite";
-	const FLAG_ACTIVE_SITE_DESC = "-flagActiveSite";
-	const FLAG_ACTIVE_PUBLISHER_ASC = "+flagActivePublisher";
-	const FLAG_ACTIVE_PUBLISHER_DESC = "-flagActivePublisher";
 	const AGGREGATED_STORAGE_ASC = "+aggregatedStorage";
 	const AGGREGATED_STORAGE_DESC = "-aggregatedStorage";
 	const AGGREGATED_BANDWIDTH_ASC = "+aggregatedBandwidth";
