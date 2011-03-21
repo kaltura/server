@@ -941,30 +941,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
-		$ignoreStatuses = array(
-			EntryDistributionStatus::PENDING,
-			EntryDistributionStatus::DELETED,
-			EntryDistributionStatus::DELETING,
-			EntryDistributionStatus::QUEUED,
-			EntryDistributionStatus::REMOVED,
-			EntryDistributionStatus::ERROR_SUBMITTING,
-		);
-		
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
 		foreach($entryDistributions as $entryDistribution)
 		{
-			if(in_array($entryDistribution->getStatus(), $ignoreStatuses))
-			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
-				continue;
-			}
-				
-			if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
-			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
-				continue;
-			}
-				
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
@@ -972,47 +951,80 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
 			}
-
-			$distributionProvider = $distributionProfile->getProvider();
-			if(!$distributionProvider)
+			
+			switch($entryDistribution->getStatus())
 			{
-				KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
-				continue;
-			}
+				case EntryDistributionStatus::DELETED:
+				case EntryDistributionStatus::DELETING:
+				case EntryDistributionStatus::REMOVED:
+					
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
+					continue;
 				
-			if(!$distributionProvider->isUpdateEnabled())
-			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
-				continue;
-			}
-			
-			$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields($distributionProfileId);
-			$updateRequired = false;
-			
-			foreach($updateRequiredEntryFields as $updateRequiredEntryField)
-			{
-				if(in_array($updateRequiredEntryField, $modifiedColumns))
-				{
-					$updateRequired = true;
+				case EntryDistributionStatus::PENDING:
+				case EntryDistributionStatus::QUEUED:
+				case EntryDistributionStatus::ERROR_SUBMITTING:
+					
+					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
+					$entryDistribution->setValidationErrorsArray($validationErrors);
+					$entryDistribution->save();
+
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
+					
+					if(!count($validationErrors))
+						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 					break;
-				}
+				
+				default:
+					
+					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
+						continue;
+					}
+						
+					$distributionProvider = $distributionProfile->getProvider();
+					if(!$distributionProvider)
+					{
+						KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
+						continue;
+					}
+						
+					if(!$distributionProvider->isUpdateEnabled())
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+						continue;
+					}
+					
+					$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields($distributionProfileId);
+					$updateRequired = false;
+					
+					foreach($updateRequiredEntryFields as $updateRequiredEntryField)
+					{
+						if(in_array($updateRequiredEntryField, $modifiedColumns))
+						{
+							$updateRequired = true;
+							break;
+						}
+					}
+					
+					if(!$updateRequired)
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
+						continue;	
+					}
+					
+					if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
+					{
+						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
+						$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
+						$entryDistribution->save();
+						continue;
+					}
+					
+					KalturaLog::log("Updating entry distribution [" . $entryDistribution->getId() . "]");
+					self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 			}
-			
-			if(!$updateRequired)
-			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
-				continue;	
-			}
-			
-			if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
-			{
-				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
-				$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
-				$entryDistribution->save();
-				continue;
-			}
-			
-			self::submitUpdateEntryDistribution($entryDistribution, $distributionProfile);
 		}
 		
 		return true;
