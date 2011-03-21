@@ -3,8 +3,6 @@
 require_once (dirname ( __FILE__ ) . "/../../infra/bootstrap_base.php");
 require_once (KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
 
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3");
-
 // Autoloader - override the autoloader defaults
 require_once (KALTURA_INFRA_PATH . DIRECTORY_SEPARATOR . "KAutoloader.php");
 
@@ -14,7 +12,8 @@ KAutoloader::setClassPath ( array( 	KAutoloader::buildPath ( KALTURA_ROOT_PATH, 
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "alpha", "apps", "kaltura", "lib", "*" ), // server 
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "plugins", "*" ),  // both 
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "base", "*" ), 
-					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "UnitTests", "*" ), 
+					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "unitTests", "*" ), 
+					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "common", "*" ),
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "tests", "roles_and_permissions", "*" ), 
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "api_v3", "lib", "*" ),  // server
 					KAutoloader::buildPath ( KALTURA_ROOT_PATH, "api_v3", "services", "*"), // server

@@ -1,0 +1,12 @@
+bug TanTan in script short link create  
+
+Connection	16-Mar-11 6:14:51 PM		Got 1 warning(s).	0	0
+Connection	16-Mar-11 6:14:51 PM		1287: The syntax 'TYPE=storage_engine' is deprecated and will be removed in MySQL 6.0. Please use 'ENGINE=storage_engine' instead	0	0
+Statement	16-Mar-11 6:14:51 PM	0:00:00.167	Executed Successfully	2	0
+.
+
+full name index
+Connection	16-Mar-11 6:48:56 PM		Got 2 warning(s).	0	0
+Connection	16-Mar-11 6:48:56 PM		1071: Specified key was too long; max key length is 1000 bytes	0	0
+Connection	16-Mar-11 6:48:56 PM		1071: Specified key was too long; max key length is 1000 bytes	0	0
+Statement	16-Mar-11 6:48:56 PM	0:00:00.220	10 rows affected	1	0

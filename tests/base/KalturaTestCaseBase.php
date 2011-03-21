@@ -367,7 +367,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			throw new Exception("Data file not found");
 		}		
 		
-		$inputsForTests = array();
+		$inputsForTestProcedure = array();
 		
 		foreach ($simpleXML->TestProcedureData as $xmlTestProcedureData)
 		{

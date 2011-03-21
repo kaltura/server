@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="puserKuserDeprecationTest">
+  <TestProcedureData testProcedureName="testAllPS2Services">
+	<TestCaseData testCaseInstanceName="testAllPS2Services with data set #0">
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="unitTests@mailinator.com"/>
+	</TestCaseData>
+  </TestProcedureData>
+ </TestCaseData>

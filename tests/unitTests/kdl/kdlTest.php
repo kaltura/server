@@ -13,11 +13,11 @@ class KDLTest extends KalturaServerTestCase
 	/**
 	 * 
 	 * Creates a new KDL Test case
-	 * @param unknown_type $name
-	 * @param unknown_type $data
-	 * @param unknown_type $dataName
+	 * @param string $name
+	 * @param array<unknown_type> $data
+	 * @param string $dataName
 	 */
-	public function __construct($name = "KDLTest", $data = array(), $dataName ="Default data")
+	public function __construct($name = "KDLTest", array $data = array(), $dataName ="Default data")
 	{
 		parent::__construct($name, $data, $dataName);
 	}

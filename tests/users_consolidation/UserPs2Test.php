@@ -12,10 +12,8 @@ class UserPs2Test extends PHPUnit_Framework_TestCase {
 	const TEST_ADMIN_SECRET = 'adminsecret116';
 	
 	private $ks = null;
-	
 	private $createdUserIds = null;
 	
-
 	/**
 	 * Prepares the environment before running a test.
 	 */
@@ -52,7 +50,6 @@ class UserPs2Test extends PHPUnit_Framework_TestCase {
 			}
 		}
 	}
-	
 	
 	public function testAddUser()
 	{
@@ -144,8 +141,6 @@ class UserPs2Test extends PHPUnit_Framework_TestCase {
 	{
 		
 	}
-	
-	
 	
 	// ----- PS2 "Client" for user related functions	
 	
