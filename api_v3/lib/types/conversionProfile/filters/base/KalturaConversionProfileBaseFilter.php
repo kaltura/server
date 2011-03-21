@@ -10,7 +10,15 @@ class KalturaConversionProfileBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 		"nameEqual" => "_eq_name",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
+		"defaultEntryIdEqual" => "_eq_default_entry_id",
+		"defaultEntryIdIn" => "_in_default_entry_id",
 	);
 
 	private $order_by_map = array
@@ -46,7 +54,64 @@ class KalturaConversionProfileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
+	 * @var KalturaConversionProfileStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * 
+	 * 
+	 * @dynamicType KalturaConversionProfileStatus
+	 * @var string
+	 */
+	public $statusIn;
+
+	/**
+	 * 
+	 * 
 	 * @var string
 	 */
 	public $nameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $defaultEntryIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $defaultEntryIdIn;
 }

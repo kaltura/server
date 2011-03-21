@@ -10,6 +10,8 @@ class KalturaAccessControlBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 	);
@@ -43,6 +45,20 @@ class KalturaAccessControlBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
 
 	/**
 	 * 

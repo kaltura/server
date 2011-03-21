@@ -8,6 +8,8 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 {
 	private $map_between_objects = array
 	(
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 		"isSystemDefaultEqual" => "_eq_is_system_default",
 		"tagsEqual" => "_eq_tags",
 		"formatEqual" => "_eq_format",
@@ -26,6 +28,20 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
 
 	/**
 	 * 
