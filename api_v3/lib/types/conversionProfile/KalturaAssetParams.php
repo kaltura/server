@@ -73,6 +73,14 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @filter eq
 	 */
 	public $format;
+
+	/**
+	 * The ingestion origin of the Flavor Params
+	 *  
+	 * @var KalturaAssetParamsOrigin
+	 * @filter eq,in
+	 */
+	public $origin;
 	
 	private static $map_between_objects = array
 	(
@@ -85,6 +93,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"isSystemDefault" => "isDefault",
 		"tags",
 		"format",
+		"origin",
 	);
 	
 	public function getMapBetweenObjects()
