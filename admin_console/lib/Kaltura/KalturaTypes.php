@@ -1316,6 +1316,14 @@ class KalturaAssetParams extends KalturaObjectBase
 	public $name = null;
 
 	/**
+	 * System name of the Flavor Params
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemName = null;
+
+	/**
 	 * The description of the Flavor Params
 	 * 
 	 *
@@ -4400,6 +4408,20 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $systemNameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemNameIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var KalturaNullableBoolean
 	 */
 	public $isSystemDefaultEqual = null;
@@ -5024,7 +5046,7 @@ class KalturaPermissionItemFilter extends KalturaPermissionItemBaseFilter
  * @package Admin
  * @subpackage Client
  */
-class KalturaPremissionItemListResponse extends KalturaObjectBase
+class KalturaPermissionItemListResponse extends KalturaObjectBase
 {
 	/**
 	 * 
@@ -7655,6 +7677,20 @@ abstract class KalturaAccessControlBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var string
+	 */
+	public $systemNameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemNameIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var int
 	 */
 	public $createdAtGreaterThanOrEqual = null;
@@ -7920,9 +7956,65 @@ abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var KalturaConversionProfileStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
 	 * @var string
 	 */
 	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemNameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemNameIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeOr = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $defaultEntryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $defaultEntryIdIn = null;
 
 
 }

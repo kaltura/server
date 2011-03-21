@@ -92,6 +92,13 @@ class KalturaStorageProfile extends KalturaObjectBase
 	 *
 	 * @var string
 	 */
+	public $systemName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $desciption = null;
 
 	/**

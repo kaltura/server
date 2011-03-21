@@ -465,6 +465,17 @@ class KalturaConversionProfileOrderBy
  * @package Admin
  * @subpackage Client
  */
+class KalturaConversionProfileStatus
+{
+	const DISABLED = "1";
+	const ENABLED = "2";
+	const DELETED = "3";
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaDataEntryOrderBy
 {
 	const NAME_ASC = "+name";

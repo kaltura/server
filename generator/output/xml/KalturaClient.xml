@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<xml apiVersion="3.1.1" generatedDate="1299689123">
-  <!-- Generated on date 09/03/11 16:45:23 -->
+<xml apiVersion="3.1.1" generatedDate="1300706165">
+  <!-- Generated on date 21/03/11 11:16:05 -->
   <enums>
     <enum name="KalturaAccessControlOrderBy" enumType="string">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -332,6 +332,11 @@
       <const name="CREATED_AT_ASC" value="+createdAt"/>
       <const name="CREATED_AT_DESC" value="-createdAt"/>
     </enum>
+    <enum name="KalturaConversionProfileStatus" enumType="string">
+      <const name="DISABLED" value="1"/>
+      <const name="ENABLED" value="2"/>
+      <const name="DELETED" value="3"/>
+    </enum>
     <enum name="KalturaCountryRestrictionType" enumType="int">
       <const name="RESTRICT_COUNTRY_LIST" value="0"/>
       <const name="ALLOW_COUNTRY_LIST" value="1"/>
@@ -396,6 +401,13 @@
       <const name="YOUTUBE" value="youTubeDistribution.YOUTUBE"/>
       <const name="VERIZON" value="verizonDistribution.VERIZON"/>
     </enum>
+    <enum name="KalturaDistributionValidationErrorType" enumType="int" plugin="contentDistribution">
+      <const name="CUSTOM_ERROR" value="0"/>
+      <const name="STRING_EMPTY" value="1"/>
+      <const name="STRING_TOO_LONG" value="2"/>
+      <const name="STRING_TOO_SHORT" value="3"/>
+      <const name="INVALID_FORMAT" value="4"/>
+    </enum>
     <enum name="KalturaDocumentEntryOrderBy" enumType="string" plugin="document">
       <const name="NAME_ASC" value="+name"/>
       <const name="NAME_DESC" value="-name"/>
@@ -418,6 +430,120 @@
       <const name="SHORT" value="short"/>
       <const name="MEDIUM" value="medium"/>
       <const name="LONG" value="long"/>
+    </enum>
+    <enum name="KalturaDwhHourlyPartnerOrderBy" enumType="string" plugin="partnerAggregation">
+      <const name="AGGREGATED_TIME_ASC" value="+aggregatedTime"/>
+      <const name="AGGREGATED_TIME_DESC" value="-aggregatedTime"/>
+      <const name="SUM_TIME_VIEWED_ASC" value="+sumTimeViewed"/>
+      <const name="SUM_TIME_VIEWED_DESC" value="-sumTimeViewed"/>
+      <const name="AVERAGE_TIME_VIEWED_ASC" value="+averageTimeViewed"/>
+      <const name="AVERAGE_TIME_VIEWED_DESC" value="-averageTimeViewed"/>
+      <const name="COUNT_PLAYS_ASC" value="+countPlays"/>
+      <const name="COUNT_PLAYS_DESC" value="-countPlays"/>
+      <const name="COUNT_LOADS_ASC" value="+countLoads"/>
+      <const name="COUNT_LOADS_DESC" value="-countLoads"/>
+      <const name="COUNT_PLAYS25_ASC" value="+countPlays25"/>
+      <const name="COUNT_PLAYS25_DESC" value="-countPlays25"/>
+      <const name="COUNT_PLAYS50_ASC" value="+countPlays50"/>
+      <const name="COUNT_PLAYS50_DESC" value="-countPlays50"/>
+      <const name="COUNT_PLAYS75_ASC" value="+countPlays75"/>
+      <const name="COUNT_PLAYS75_DESC" value="-countPlays75"/>
+      <const name="COUNT_PLAYS100_ASC" value="+countPlays100"/>
+      <const name="COUNT_PLAYS100_DESC" value="-countPlays100"/>
+      <const name="COUNT_EDIT_ASC" value="+countEdit"/>
+      <const name="COUNT_EDIT_DESC" value="-countEdit"/>
+      <const name="COUNT_SHARES_ASC" value="+countShares"/>
+      <const name="COUNT_SHARES_DESC" value="-countShares"/>
+      <const name="COUNT_DOWNLOAD_ASC" value="+countDownload"/>
+      <const name="COUNT_DOWNLOAD_DESC" value="-countDownload"/>
+      <const name="COUNT_REPORT_ABUSE_ASC" value="+countReportAbuse"/>
+      <const name="COUNT_REPORT_ABUSE_DESC" value="-countReportAbuse"/>
+      <const name="COUNT_MEDIA_ENTRIES_ASC" value="+countMediaEntries"/>
+      <const name="COUNT_MEDIA_ENTRIES_DESC" value="-countMediaEntries"/>
+      <const name="COUNT_VIDEO_ENTRIES_ASC" value="+countVideoEntries"/>
+      <const name="COUNT_VIDEO_ENTRIES_DESC" value="-countVideoEntries"/>
+      <const name="COUNT_IMAGE_ENTRIES_ASC" value="+countImageEntries"/>
+      <const name="COUNT_IMAGE_ENTRIES_DESC" value="-countImageEntries"/>
+      <const name="COUNT_AUDIO_ENTRIES_ASC" value="+countAudioEntries"/>
+      <const name="COUNT_AUDIO_ENTRIES_DESC" value="-countAudioEntries"/>
+      <const name="COUNT_MIX_ENTRIES_ASC" value="+countMixEntries"/>
+      <const name="COUNT_MIX_ENTRIES_DESC" value="-countMixEntries"/>
+      <const name="COUNT_PLAYLISTS_ASC" value="+countPlaylists"/>
+      <const name="COUNT_PLAYLISTS_DESC" value="-countPlaylists"/>
+      <const name="COUNT_BANDWIDTH_ASC" value="+countBandwidth"/>
+      <const name="COUNT_BANDWIDTH_DESC" value="-countBandwidth"/>
+      <const name="COUNT_STORAGE_ASC" value="+countStorage"/>
+      <const name="COUNT_STORAGE_DESC" value="-countStorage"/>
+      <const name="COUNT_USERS_ASC" value="+countUsers"/>
+      <const name="COUNT_USERS_DESC" value="-countUsers"/>
+      <const name="COUNT_WIDGETS_ASC" value="+countWidgets"/>
+      <const name="COUNT_WIDGETS_DESC" value="-countWidgets"/>
+      <const name="AGGREGATED_STORAGE_ASC" value="+aggregatedStorage"/>
+      <const name="AGGREGATED_STORAGE_DESC" value="-aggregatedStorage"/>
+      <const name="AGGREGATED_BANDWIDTH_ASC" value="+aggregatedBandwidth"/>
+      <const name="AGGREGATED_BANDWIDTH_DESC" value="-aggregatedBandwidth"/>
+      <const name="COUNT_BUFFER_START_ASC" value="+countBufferStart"/>
+      <const name="COUNT_BUFFER_START_DESC" value="-countBufferStart"/>
+      <const name="COUNT_BUFFER_END_ASC" value="+countBufferEnd"/>
+      <const name="COUNT_BUFFER_END_DESC" value="-countBufferEnd"/>
+      <const name="COUNT_OPEN_FULL_SCREEN_ASC" value="+countOpenFullScreen"/>
+      <const name="COUNT_OPEN_FULL_SCREEN_DESC" value="-countOpenFullScreen"/>
+      <const name="COUNT_CLOSE_FULL_SCREEN_ASC" value="+countCloseFullScreen"/>
+      <const name="COUNT_CLOSE_FULL_SCREEN_DESC" value="-countCloseFullScreen"/>
+      <const name="COUNT_REPLAY_ASC" value="+countReplay"/>
+      <const name="COUNT_REPLAY_DESC" value="-countReplay"/>
+      <const name="COUNT_SEEK_ASC" value="+countSeek"/>
+      <const name="COUNT_SEEK_DESC" value="-countSeek"/>
+      <const name="COUNT_OPEN_UPLOAD_ASC" value="+countOpenUpload"/>
+      <const name="COUNT_OPEN_UPLOAD_DESC" value="-countOpenUpload"/>
+      <const name="COUNT_SAVE_PUBLISH_ASC" value="+countSavePublish"/>
+      <const name="COUNT_SAVE_PUBLISH_DESC" value="-countSavePublish"/>
+      <const name="COUNT_CLOSE_EDITOR_ASC" value="+countCloseEditor"/>
+      <const name="COUNT_CLOSE_EDITOR_DESC" value="-countCloseEditor"/>
+      <const name="COUNT_PRE_BUMPER_PLAYED_ASC" value="+countPreBumperPlayed"/>
+      <const name="COUNT_PRE_BUMPER_PLAYED_DESC" value="-countPreBumperPlayed"/>
+      <const name="COUNT_POST_BUMPER_PLAYED_ASC" value="+countPostBumperPlayed"/>
+      <const name="COUNT_POST_BUMPER_PLAYED_DESC" value="-countPostBumperPlayed"/>
+      <const name="COUNT_BUMPER_CLICKED_ASC" value="+countBumperClicked"/>
+      <const name="COUNT_BUMPER_CLICKED_DESC" value="-countBumperClicked"/>
+      <const name="COUNT_PREROLL_STARTED_ASC" value="+countPrerollStarted"/>
+      <const name="COUNT_PREROLL_STARTED_DESC" value="-countPrerollStarted"/>
+      <const name="COUNT_MIDROLL_STARTED_ASC" value="+countMidrollStarted"/>
+      <const name="COUNT_MIDROLL_STARTED_DESC" value="-countMidrollStarted"/>
+      <const name="COUNT_POSTROLL_STARTED_ASC" value="+countPostrollStarted"/>
+      <const name="COUNT_POSTROLL_STARTED_DESC" value="-countPostrollStarted"/>
+      <const name="COUNT_OVERLAY_STARTED_ASC" value="+countOverlayStarted"/>
+      <const name="COUNT_OVERLAY_STARTED_DESC" value="-countOverlayStarted"/>
+      <const name="COUNT_PREROLL_CLICKED_ASC" value="+countPrerollClicked"/>
+      <const name="COUNT_PREROLL_CLICKED_DESC" value="-countPrerollClicked"/>
+      <const name="COUNT_MIDROLL_CLICKED_ASC" value="+countMidrollClicked"/>
+      <const name="COUNT_MIDROLL_CLICKED_DESC" value="-countMidrollClicked"/>
+      <const name="COUNT_POSTROLL_CLICKED_ASC" value="+countPostrollClicked"/>
+      <const name="COUNT_POSTROLL_CLICKED_DESC" value="-countPostrollClicked"/>
+      <const name="COUNT_OVERLAY_CLICKED_ASC" value="+countOverlayClicked"/>
+      <const name="COUNT_OVERLAY_CLICKED_DESC" value="-countOverlayClicked"/>
+      <const name="COUNT_PREROLL25_ASC" value="+countPreroll25"/>
+      <const name="COUNT_PREROLL25_DESC" value="-countPreroll25"/>
+      <const name="COUNT_PREROLL50_ASC" value="+countPreroll50"/>
+      <const name="COUNT_PREROLL50_DESC" value="-countPreroll50"/>
+      <const name="COUNT_PREROLL75_ASC" value="+countPreroll75"/>
+      <const name="COUNT_PREROLL75_DESC" value="-countPreroll75"/>
+      <const name="COUNT_MIDROLL25_ASC" value="+countMidroll25"/>
+      <const name="COUNT_MIDROLL25_DESC" value="-countMidroll25"/>
+      <const name="COUNT_MIDROLL50_ASC" value="+countMidroll50"/>
+      <const name="COUNT_MIDROLL50_DESC" value="-countMidroll50"/>
+      <const name="COUNT_MIDROLL75_ASC" value="+countMidroll75"/>
+      <const name="COUNT_MIDROLL75_DESC" value="-countMidroll75"/>
+      <const name="COUNT_POSTROLL25_ASC" value="+countPostroll25"/>
+      <const name="COUNT_POSTROLL25_DESC" value="-countPostroll25"/>
+      <const name="COUNT_POSTROLL50_ASC" value="+countPostroll50"/>
+      <const name="COUNT_POSTROLL50_DESC" value="-countPostroll50"/>
+      <const name="COUNT_POSTROLL75_ASC" value="+countPostroll75"/>
+      <const name="COUNT_POSTROLL75_DESC" value="-countPostroll75"/>
+      <const name="COUNT_LIVE_STREAMING_BANDWIDTH_ASC" value="+countLiveStreamingBandwidth"/>
+      <const name="COUNT_LIVE_STREAMING_BANDWIDTH_DESC" value="-countLiveStreamingBandwidth"/>
+      <const name="AGGREGATED_LIVE_STREAMING_BANDWIDTH_ASC" value="+aggregatedLiveStreamingBandwidth"/>
+      <const name="AGGREGATED_LIVE_STREAMING_BANDWIDTH_DESC" value="-aggregatedLiveStreamingBandwidth"/>
     </enum>
     <enum name="KalturaEditorType" enumType="int">
       <const name="SIMPLE" value="1"/>
@@ -789,6 +915,10 @@
       <const name="CREATED_AT_DESC" value="-createdAt"/>
       <const name="UPDATED_AT_ASC" value="+updatedAt"/>
       <const name="UPDATED_AT_DESC" value="-updatedAt"/>
+    </enum>
+    <enum name="KalturaMetadataProfileCreateMode" enumType="int" plugin="metadata">
+      <const name="API" value="1"/>
+      <const name="KMC" value="2"/>
     </enum>
     <enum name="KalturaMetadataProfileOrderBy" enumType="string" plugin="metadata">
       <const name="CREATED_AT_ASC" value="+createdAt"/>
@@ -1581,6 +1711,7 @@
       <property name="commercialPolicy" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="ugcPolicy" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="target" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="metadataProfileId" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaVerizonDistributionProfile" base="KalturaDistributionProfile" plugin="verizonDistribution">
       <property name="username" type="string" readOnly="0" insertOnly="0" description=""/>
@@ -1652,11 +1783,34 @@
     <class name="KalturaMsnDistributionProvider" base="KalturaDistributionProvider" plugin="msnDistribution"/>
     <class name="KalturaHuluDistributionProvider" base="KalturaDistributionProvider" plugin="huluDistribution"/>
     <class name="KalturaComcastDistributionProvider" base="KalturaDistributionProvider" plugin="comcastDistribution"/>
+    <class name="KalturaDistributionValidationError" abstract="1" plugin="contentDistribution">
+      <property name="action" type="int" enumType="KalturaDistributionAction" readOnly="0" insertOnly="0" description=""/>
+      <property name="errorType" type="int" enumType="KalturaDistributionErrorType" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDistributionValidationErrorMissingMetadata" base="KalturaDistributionValidationError" plugin="contentDistribution">
+      <property name="fieldName" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDistributionValidationErrorMissingThumbnail" base="KalturaDistributionValidationError" plugin="contentDistribution">
+      <property name="dimensions" type="KalturaDistributionThumbDimensions" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDistributionValidationErrorMissingFlavor" base="KalturaDistributionValidationError" plugin="contentDistribution">
+      <property name="flavorParamsId" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDistributionValidationErrorInvalidData" base="KalturaDistributionValidationError" plugin="contentDistribution">
+      <property name="fieldName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="validationErrorType" type="int" enumType="KalturaDistributionValidationErrorType" readOnly="0" insertOnly="0" description=""/>
+      <property name="validationErrorParam" type="string" readOnly="0" insertOnly="0" description="Parameter of the validation error&#10;For example, minimum value for KalturaDistributionValidationErrorType::STRING_TOO_SHORT validation error&#13;"/>
+    </class>
+    <class name="KalturaDistributionValidationErrorInvalidMetadata" base="KalturaDistributionValidationErrorInvalidData" plugin="contentDistribution">
+      <property name="metadataProfileId" type="int" readOnly="0" insertOnly="0" description=""/>
+    </class>
     <class name="KalturaBaseRestriction"/>
     <class name="KalturaAccessControl">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Access Control Profile&#10;"/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="The name of the Access Control Profile&#10;"/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description="System name of the Access Control Profile&#10;"/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description="The description of the Access Control Profile&#10;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds) &#10;"/>
       <property name="isDefault" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description="True if this Conversion Profile is the default&#10;"/>
@@ -1669,6 +1823,8 @@
     <class name="KalturaAccessControlBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
@@ -1912,8 +2068,12 @@
     <class name="KalturaConversionProfile">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Conversion Profile&#10;"/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="status" type="string" enumType="KalturaConversionProfileStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="The name of the Conversion Profile&#10;"/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description="System name of the Conversion Profile&#10;"/>
+      <property name="tags" type="string" readOnly="0" insertOnly="0" description="Comma separated tags&#10;"/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description="The description of the Conversion Profile&#10;"/>
+      <property name="defaultEntryId" type="string" readOnly="0" insertOnly="0" description="ID of the default entry to be used for template data&#10;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds) &#10;"/>
       <property name="flavorParamsIds" type="string" readOnly="0" insertOnly="0" description="List of included flavor ids (comma separated)&#10;"/>
       <property name="isDefault" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description="True if this Conversion Profile is the default&#10;"/>
@@ -1924,7 +2084,15 @@
     <class name="KalturaConversionProfileBaseFilter" abstract="1" base="KalturaFilter">
       <property name="idEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="idIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusEqual" type="string" enumType="KalturaConversionProfileStatus" readOnly="0" insertOnly="0" description=""/>
+      <property name="statusIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameIn" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeOr" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="tagsMultiLikeAnd" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="defaultEntryIdEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="defaultEntryIdIn" type="string" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaConversionProfileFilter" base="KalturaConversionProfileBaseFilter"/>
     <class name="KalturaConversionProfileListResponse">
@@ -2051,6 +2219,7 @@
       <property name="id" type="int" readOnly="1" insertOnly="0" description="The id of the Flavor Params&#10;"/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="The name of the Flavor Params&#10;"/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description="System name of the Flavor Params&#10;"/>
       <property name="description" type="string" readOnly="0" insertOnly="0" description="The description of the Flavor Params&#10;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds)&#10;"/>
       <property name="isSystemDefault" type="int" enumType="KalturaNullableBoolean" readOnly="1" insertOnly="0" description="True if those Flavor Params are part of system defaults&#10;"/>
@@ -2082,6 +2251,8 @@
       <property name="entryId" type="string" readOnly="0" insertOnly="0" description="The entry id&#10;"/>
     </class>
     <class name="KalturaAssetParamsBaseFilter" abstract="1" base="KalturaFilter">
+      <property name="systemNameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="isSystemDefaultEqual" type="int" enumType="KalturaNullableBoolean" readOnly="0" insertOnly="0" description=""/>
       <property name="tagsEqual" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="formatEqual" type="string" enumType="KalturaContainerFormat" readOnly="0" insertOnly="0" description=""/>
@@ -2242,7 +2413,7 @@
       <property name="updatedAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaPermissionItemFilter" base="KalturaPermissionItemBaseFilter"/>
-    <class name="KalturaPremissionItemListResponse">
+    <class name="KalturaPermissionItemListResponse">
       <property name="objects" type="array" arrayType="KalturaPermissionItem" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
@@ -2660,6 +2831,8 @@
       <property name="metadataObjectTypeEqual" type="int" enumType="KalturaMetadataObjectType" readOnly="0" insertOnly="0" description=""/>
       <property name="versionEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="nameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemNameIn" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAtLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
       <property name="updatedAtGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
@@ -2674,11 +2847,14 @@
       <property name="metadataObjectType" type="int" enumType="KalturaMetadataObjectType" readOnly="0" insertOnly="0" description=""/>
       <property name="version" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="status" type="int" enumType="KalturaMetadataProfileStatus" readOnly="1" insertOnly="0" description=""/>
       <property name="xsd" type="string" readOnly="1" insertOnly="0" description=""/>
       <property name="views" type="string" readOnly="1" insertOnly="0" description=""/>
+      <property name="createMode" type="int" enumType="KalturaMetadataProfileCreateMode" readOnly="0" insertOnly="0" description=""/>
     </class>
     <class name="KalturaMetadataProfileListResponse" plugin="metadata">
       <property name="objects" type="array" arrayType="KalturaMetadataProfile" readOnly="1" insertOnly="0" description=""/>
@@ -2712,6 +2888,7 @@
       <property name="updatedAt" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="systemName" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="desciption" type="string" readOnly="0" insertOnly="0" description=""/>
       <property name="status" type="int" enumType="KalturaStorageProfileStatus" readOnly="0" insertOnly="0" description=""/>
       <property name="protocol" type="int" enumType="KalturaStorageProfileProtocol" readOnly="0" insertOnly="0" description=""/>
@@ -3054,11 +3231,6 @@
       <property name="objects" type="array" arrayType="KalturaDistributionProfile" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
-    <class name="KalturaDistributionValidationError" abstract="1" plugin="contentDistribution">
-      <property name="action" type="int" enumType="KalturaDistributionAction" readOnly="0" insertOnly="0" description=""/>
-      <property name="errorType" type="int" enumType="KalturaDistributionErrorType" readOnly="0" insertOnly="0" description=""/>
-      <property name="description" type="string" readOnly="0" insertOnly="0" description=""/>
-    </class>
     <class name="KalturaEntryDistribution" plugin="contentDistribution">
       <property name="id" type="int" readOnly="1" insertOnly="0" description="Auto generated unique id&#10;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Entry distribution creation date as Unix timestamp (In seconds)&#10;"/>
@@ -3225,6 +3397,185 @@
     </class>
     <class name="KalturaShortLinkListResponse" plugin="shortLink">
       <property name="objects" type="array" arrayType="KalturaShortLink" readOnly="1" insertOnly="0" description=""/>
+      <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDwhHourlyPartnerBaseFilter" abstract="1" base="KalturaFilter" plugin="partnerAggregation">
+      <property name="partnerIdEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedTimeLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedTimeGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="sumTimeViewedLessThanOrEqual" type="float" readOnly="0" insertOnly="0" description=""/>
+      <property name="sumTimeViewedGreaterThanOrEqual" type="float" readOnly="0" insertOnly="0" description=""/>
+      <property name="averageTimeViewedLessThanOrEqual" type="float" readOnly="0" insertOnly="0" description=""/>
+      <property name="averageTimeViewedGreaterThanOrEqual" type="float" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlaysLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlaysGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countLoadsLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countLoadsGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays25LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays25GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays50LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays50GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays75LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays75GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays100LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlays100GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countEditLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countEditGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSharesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSharesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countDownloadLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countDownloadGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countReportAbuseLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countReportAbuseGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMediaEntriesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMediaEntriesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countVideoEntriesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countVideoEntriesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countImageEntriesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countImageEntriesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countAudioEntriesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countAudioEntriesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMixEntriesLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMixEntriesGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlaylistsLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPlaylistsGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBandwidthLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBandwidthGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countStorageLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countStorageGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countUsersLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countUsersGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countWidgetsLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countWidgetsGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedStorageLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedStorageGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedBandwidthLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedBandwidthGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBufferStartLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBufferStartGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBufferEndLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBufferEndGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOpenFullScreenLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOpenFullScreenGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countCloseFullScreenLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countCloseFullScreenGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countReplayLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countReplayGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSeekLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSeekGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOpenUploadLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOpenUploadGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSavePublishLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countSavePublishGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countCloseEditorLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countCloseEditorGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreBumperPlayedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreBumperPlayedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostBumperPlayedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostBumperPlayedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBumperClickedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countBumperClickedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPrerollStartedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPrerollStartedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidrollStartedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidrollStartedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostrollStartedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostrollStartedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOverlayStartedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOverlayStartedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPrerollClickedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPrerollClickedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidrollClickedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidrollClickedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostrollClickedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostrollClickedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOverlayClickedLessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countOverlayClickedGreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll25LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll25GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll50LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll50GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll75LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPreroll75GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll25LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll25GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll50LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll50GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll75LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countMidroll75GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll25LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll25GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll50LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll50GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll75LessThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countPostroll75GreaterThanOrEqual" type="int" readOnly="0" insertOnly="0" description=""/>
+      <property name="countLiveStreamingBandwidthLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="countLiveStreamingBandwidthGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedLiveStreamingBandwidthLessThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+      <property name="aggregatedLiveStreamingBandwidthGreaterThanOrEqual" type="string" readOnly="0" insertOnly="0" description=""/>
+    </class>
+    <class name="KalturaDwhHourlyPartnerFilter" base="KalturaDwhHourlyPartnerBaseFilter" plugin="partnerAggregation"/>
+    <class name="KalturaDwhHourlyPartner" plugin="partnerAggregation">
+      <property name="partnerId" type="int" readOnly="1" insertOnly="0" description=""/>
+      <property name="aggregatedTime" type="int" readOnly="1" insertOnly="0" description="Events aggregation time as Unix timestamp (In seconds) represent one hour&#13;"/>
+      <property name="sumTimeViewed" type="float" readOnly="1" insertOnly="0" description="Summary of all entries play time (in seconds)&#13;"/>
+      <property name="averageTimeViewed" type="float" readOnly="1" insertOnly="0" description="Average of all entries play time (in seconds)&#13;"/>
+      <property name="countPlays" type="int" readOnly="1" insertOnly="0" description="Number of all played entries&#13;"/>
+      <property name="countLoads" type="int" readOnly="1" insertOnly="0" description="Number of all loaded entry players&#13;"/>
+      <property name="countPlays25" type="int" readOnly="1" insertOnly="0" description="Number of plays that reached 25%&#13;"/>
+      <property name="countPlays50" type="int" readOnly="1" insertOnly="0" description="Number of plays that reached 50%&#13;"/>
+      <property name="countPlays75" type="int" readOnly="1" insertOnly="0" description="Number of plays that reached 75%&#13;"/>
+      <property name="countPlays100" type="int" readOnly="1" insertOnly="0" description="Number of plays that reached 100%&#13;"/>
+      <property name="countEdit" type="int" readOnly="1" insertOnly="0" description="Number of times that editor opened&#13;"/>
+      <property name="countShares" type="int" readOnly="1" insertOnly="0" description="Number of times that share button clicked&#13;"/>
+      <property name="countDownload" type="int" readOnly="1" insertOnly="0" description="Number of times that download button clicked&#13;"/>
+      <property name="countReportAbuse" type="int" readOnly="1" insertOnly="0" description="Number of times that report abuse button clicked&#13;"/>
+      <property name="countMediaEntries" type="int" readOnly="1" insertOnly="0" description="Count of new created media entries&#13;"/>
+      <property name="countVideoEntries" type="int" readOnly="1" insertOnly="0" description="Count of new created video entries&#13;"/>
+      <property name="countImageEntries" type="int" readOnly="1" insertOnly="0" description="Count of new created image entries&#13;"/>
+      <property name="countAudioEntries" type="int" readOnly="1" insertOnly="0" description="Count of new created audio entries&#13;"/>
+      <property name="countMixEntries" type="int" readOnly="1" insertOnly="0" description="Count of new created mix entries&#13;"/>
+      <property name="countPlaylists" type="int" readOnly="1" insertOnly="0" description="Count of new created playlists&#13;"/>
+      <property name="countBandwidth" type="string" readOnly="1" insertOnly="0" description="Is bigint - in KB, aggregated daily in the first hour of every day&#13;"/>
+      <property name="countStorage" type="string" readOnly="1" insertOnly="0" description="Is bigint - in MB, aggregated daily in the first hour of every day&#13;"/>
+      <property name="countUsers" type="int" readOnly="1" insertOnly="0" description="Count of new created users&#13;"/>
+      <property name="countWidgets" type="int" readOnly="1" insertOnly="0" description="Count of new created widgets&#13;"/>
+      <property name="aggregatedStorage" type="string" readOnly="1" insertOnly="0" description="Is bigint - in MB, aggregated daily in the first hour of every day&#13;"/>
+      <property name="aggregatedBandwidth" type="string" readOnly="1" insertOnly="0" description="Is bigint - in KB, aggregated daily in the first hour of every day&#13;"/>
+      <property name="countBufferStart" type="int" readOnly="1" insertOnly="0" description="Count of times that player entered buffering state&#13;"/>
+      <property name="countBufferEnd" type="int" readOnly="1" insertOnly="0" description="Count of times that player left buffering state&#13;"/>
+      <property name="countOpenFullScreen" type="int" readOnly="1" insertOnly="0" description="Count of times that player fullscreen state opened&#13;"/>
+      <property name="countCloseFullScreen" type="int" readOnly="1" insertOnly="0" description="Count of times that player fullscreen state closed&#13;"/>
+      <property name="countReplay" type="int" readOnly="1" insertOnly="0" description="Count of times that replay button clicked&#13;"/>
+      <property name="countSeek" type="int" readOnly="1" insertOnly="0" description="Count of times that seek option used&#13;"/>
+      <property name="countOpenUpload" type="int" readOnly="1" insertOnly="0" description="Count of times that upload dialog opened in the editor&#13;"/>
+      <property name="countSavePublish" type="int" readOnly="1" insertOnly="0" description="Count of times that save and publish button clicked in the editor&#13;"/>
+      <property name="countCloseEditor" type="int" readOnly="1" insertOnly="0" description="Count of times that the editor closed&#13;"/>
+      <property name="countPreBumperPlayed" type="int" readOnly="1" insertOnly="0" description="Count of times that pre-bumper entry played&#13;"/>
+      <property name="countPostBumperPlayed" type="int" readOnly="1" insertOnly="0" description="Count of times that post-bumper entry played&#13;"/>
+      <property name="countBumperClicked" type="int" readOnly="1" insertOnly="0" description="Count of times that bumper entry clicked&#13;"/>
+      <property name="countPrerollStarted" type="int" readOnly="1" insertOnly="0" description="Count of times that pre-roll ad started&#13;"/>
+      <property name="countMidrollStarted" type="int" readOnly="1" insertOnly="0" description="Count of times that mid-roll ad started&#13;"/>
+      <property name="countPostrollStarted" type="int" readOnly="1" insertOnly="0" description="Count of times that post-roll ad started&#13;"/>
+      <property name="countOverlayStarted" type="int" readOnly="1" insertOnly="0" description="Count of times that overlay ad started&#13;"/>
+      <property name="countPrerollClicked" type="int" readOnly="1" insertOnly="0" description="Count of times that pre-roll ad clicked&#13;"/>
+      <property name="countMidrollClicked" type="int" readOnly="1" insertOnly="0" description="Count of times that mid-roll ad clicked&#13;"/>
+      <property name="countPostrollClicked" type="int" readOnly="1" insertOnly="0" description="Count of times that post-roll ad clicked&#13;"/>
+      <property name="countOverlayClicked" type="int" readOnly="1" insertOnly="0" description="Count of times that overlay ad clicked&#13;"/>
+      <property name="countPreroll25" type="int" readOnly="1" insertOnly="0" description="Count of pre-roll ad plays that reached 25%&#13;"/>
+      <property name="countPreroll50" type="int" readOnly="1" insertOnly="0" description="Count of pre-roll ad plays that reached 50%&#13;"/>
+      <property name="countPreroll75" type="int" readOnly="1" insertOnly="0" description="Count of pre-roll ad plays that reached 75%&#13;"/>
+      <property name="countMidroll25" type="int" readOnly="1" insertOnly="0" description="Count of mid-roll ad plays that reached 25%&#13;"/>
+      <property name="countMidroll50" type="int" readOnly="1" insertOnly="0" description="Count of mid-roll ad plays that reached 50%&#13;"/>
+      <property name="countMidroll75" type="int" readOnly="1" insertOnly="0" description="Count of mid-roll ad plays that reached 75%&#13;"/>
+      <property name="countPostroll25" type="int" readOnly="1" insertOnly="0" description="Count of post-roll ad plays that reached 25%&#13;"/>
+      <property name="countPostroll50" type="int" readOnly="1" insertOnly="0" description="Count of post-roll ad plays that reached 50%&#13;"/>
+      <property name="countPostroll75" type="int" readOnly="1" insertOnly="0" description="Count of post-roll ad plays that reached 75%&#13;"/>
+      <property name="countLiveStreamingBandwidth" type="string" readOnly="1" insertOnly="0" description="Is bigint - in KB, aggregated daily in the first hour of every day&#13;"/>
+      <property name="aggregatedLiveStreamingBandwidth" type="string" readOnly="1" insertOnly="0" description="Is bigint - in MB, aggregated daily in the first hour of every day&#13;"/>
+    </class>
+    <class name="KalturaDwhHourlyPartnerListResponse" plugin="partnerAggregation">
+      <property name="objects" type="array" arrayType="KalturaDwhHourlyPartner" readOnly="1" insertOnly="0" description=""/>
       <property name="totalCount" type="int" readOnly="1" insertOnly="0" description=""/>
     </class>
     <class name="KalturaSearchCondition" base="KalturaSearchItem">
@@ -4001,7 +4352,7 @@
       <action name="list" description="List KalturaPermissionItem objects&#10;">
         <param name="filter" type="KalturaPermissionItemFilter" optional="1" default="null" description="&#13;"/>
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
-        <result type="KalturaPremissionItemListResponse"/>
+        <result type="KalturaPermissionItemListResponse"/>
       </action>
     </service>
     <service id="permission" name="permission" description="Permission service lets you create and manage user permissions&#13;">
@@ -4380,9 +4731,9 @@
         <result type="KalturaUploadTokenListResponse"/>
       </action>
     </service>
-    <service id="userrole" name="userRole" description="UserRole service lets you create and manage user permissions&#13;">
+    <service id="userrole" name="userRole" description="UserRole service lets you create and manage user roles&#13;">
       <action name="add" description="Allows you to add a new KalturaUserRole object&#10;">
-        <param name="userRole" type="KalturaUserRole" optional="0" description=""/>
+        <param name="userRole" type="KalturaUserRole" optional="0" description="&#13;"/>
         <result type="KalturaUserRole"/>
       </action>
       <action name="get" description="Retrieve a KalturaUserRole object by ID&#10;">
@@ -4398,7 +4749,7 @@
         <param name="userRoleId" type="int" optional="0" description="&#13;"/>
         <result type="KalturaUserRole"/>
       </action>
-      <action name="list" description="List permission items&#10;">
+      <action name="list" description="List user roles&#10;">
         <param name="filter" type="KalturaUserRoleFilter" optional="1" default="null" description="&#13;"/>
         <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
         <result type="KalturaUserRoleListResponse"/>
@@ -4572,6 +4923,10 @@
         <param name="xmlFile" type="file" optional="1" default="null" description="XML metadata&#13;"/>
         <result type="KalturaMetadata"/>
       </action>
+      <action name="serve" description="Serves metadata XML file&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="file"/>
+      </action>
     </service>
     <service id="metadata_metadataprofile" name="metadataProfile" description="Metadata Profile service&#13;" plugin="metadata">
       <action name="list" description="List metadata profile objects by filter and pager&#10;">
@@ -4624,6 +4979,14 @@
         <param name="id" type="int" optional="0" description="&#13;"/>
         <param name="viewsFile" type="file" optional="0" description="UI views file&#13;"/>
         <result type="KalturaMetadataProfile"/>
+      </action>
+      <action name="serve" description="Serves metadata profile XSD file&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="file"/>
+      </action>
+      <action name="serveView" description="Serves metadata profile view file&#10;">
+        <param name="id" type="int" optional="0" description="&#13;"/>
+        <result type="file"/>
       </action>
     </service>
     <service id="document_documents" name="documents" description="Document service lets you upload and manage document files&#13;" plugin="document">
@@ -4777,6 +5140,11 @@
     <service id="adminconsole_entryadmin" name="entryAdmin" description="Entry Admin service&#13;" plugin="adminConsole">
       <action name="get" description="Get base entry by ID with no filters.&#10;">
         <param name="entryId" type="string" optional="0" description="Entry id&#13;"/>
+        <param name="version" type="int" optional="1" default="-1" description="Desired version of the data&#13;"/>
+        <result type="KalturaBaseEntry"/>
+      </action>
+      <action name="getByFlavorId" description="Get base entry by flavor ID with no filters.&#10;">
+        <param name="flavorId" type="string" optional="0" description="&#13;"/>
         <param name="version" type="int" optional="1" default="-1" description="Desired version of the data&#13;"/>
         <result type="KalturaBaseEntry"/>
       </action>
@@ -5109,6 +5477,13 @@
         <result type="file"/>
       </action>
     </service>
+    <service id="partneraggregation_partneraggregation" name="partnerAggregation" description="Partner Aggregation service&#13;" plugin="partnerAggregation">
+      <action name="list" description="List aggregated partner data&#10;">
+        <param name="filter" type="KalturaDwhHourlyPartnerFilter" optional="0" description="&#13;"/>
+        <param name="pager" type="KalturaFilterPager" optional="1" default="null" description="&#13;"/>
+        <result type="KalturaDwhHourlyPartnerListResponse"/>
+      </action>
+    </service>
   </services>
   <plugins>
     <plugin name="metadata">
@@ -5155,6 +5530,9 @@
     </plugin>
     <plugin name="shortLink">
       <pluginService name="shortLink"/>
+    </plugin>
+    <plugin name="partnerAggregation">
+      <pluginService name="partnerAggregation"/>
     </plugin>
   </plugins>
 </xml>

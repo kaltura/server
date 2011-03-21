@@ -1359,7 +1359,7 @@ class KalturaPermissionItemService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaPremissionItemListResponse");
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItemListResponse");
 		return $resultObject;
 	}
 }
