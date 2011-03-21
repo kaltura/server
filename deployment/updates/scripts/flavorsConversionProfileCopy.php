@@ -8,7 +8,7 @@ $entryLimitEachLoop = 1000;
 
 require_once(dirname(__FILE__).'/../../bootstrap.php');
 
-$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 	
 $join = new Join();	
 $join->setJoinType(Criteria::INNER_JOIN);
@@ -46,7 +46,7 @@ while(count($links))
 		$updateCriteria = new Criteria();
 		$updateCriteria->add(flavorParamsConversionProfilePeer::READY_BEHAVIOR, $readyBehavior);
 		
-		$affectedRows = BasePeer::doUpdate($conditionCriteria, $updateCriteria);
+		$affectedRows = BasePeer::doUpdate($conditionCriteria, $updateCriteria, $con);
 		KalturaLog::log("Updated [$affectedRows] rows to [$readyBehavior] ready behavior");
 	}
 		
