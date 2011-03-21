@@ -24,7 +24,6 @@ class kuserFilter extends baseObjectFilter
 				"_gte_produced_kshows" ,
 				"_gte_entries" ,
 				"_eq_partner_id" , 
-				"_like_tags" ,
 				"_eq_puser_id",
 				"_in_puser_id",
 				"_eq_id",
