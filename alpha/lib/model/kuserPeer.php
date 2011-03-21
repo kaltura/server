@@ -9,9 +9,11 @@
  */ 
 class kuserPeer extends BasekuserPeer 
 {	
-	const  KALTURA_NEW_USER_EMAIL = 120;
+	const KALTURA_NEW_USER_EMAIL = 120;
 	const KALTURA_NEW_EXISTING_USER_EMAIL = 121;
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
+	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
+	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
 	
 	private static $s_default_count_limit = 301;
 
@@ -494,6 +496,7 @@ class kuserPeer extends BasekuserPeer
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmc';
+		$adminConsoleLink = trim(kConf::get('admin_console_url'));
 		$contactLink = kConf::get('contact_url');
 		$beginnersGuideLink = kConf::get('beginners_tutorial_url');
 		$quickStartGuideLink = kConf::get('quick_start_guide_url');
@@ -502,17 +505,32 @@ class kuserPeer extends BasekuserPeer
 		$mailType = null;
 		$bodyParams = array();
 		
-		if ($existingUser)
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // If new user is admin console user
 		{
-			$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			if ($existingUser)
+			{
+				$mailType = self::KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL;
+				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink);
+			}
+			else
+			{
+				$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL;
+				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink);
+			}
 		}
-		else
+		else // Not an admin console partner
 		{
-			$mailType = self::KALTURA_NEW_USER_EMAIL;
-			$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-		}		
-		
+			if ($existingUser)
+			{
+				$mailType = self::KALTURA_NEW_EXISTING_USER_EMAIL;
+				$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}
+			else
+			{
+				$mailType = self::KALTURA_NEW_USER_EMAIL;
+				$bodyParams = array($userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $publisherName, $publisherName, $roleName, $publisherName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			}		
+		}
 		// add mail job
 		kJobsManager::addMailJob(
 			null, 
