@@ -37,6 +37,11 @@ class KalturaStorageProfile extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $systemName;
+	
+	/**
+	 * @var string
+	 */
 	public $desciption;
 	
 	/**
@@ -134,6 +139,7 @@ class KalturaStorageProfile extends KalturaObject
 		"updatedAt",
 		"partnerId",
 		"name",
+		"systemName",
 		"desciption",
 		"status",
 		"protocol",
