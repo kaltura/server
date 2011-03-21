@@ -21,6 +21,9 @@ class accessControl extends BaseaccessControl
 	 * @var accessControlScope
 	 */
 	protected $scope;
+	
+	
+	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -128,7 +131,8 @@ class accessControl extends BaseaccessControl
 			$this->hasCountryRestriction() ||
 			$this->hasSessionRestriction() ||
 			$this->hasPreviewRestriction() ||
-			$this->hasDirectoryRestriction()
+			$this->hasDirectoryRestriction() ||
+			$this->hasIpAddressRestriction()
 		);
 	}
 	
@@ -155,6 +159,9 @@ class accessControl extends BaseaccessControl
 			
 		if ($this->hasDirectoryRestriction())
 			$restrictions[] = $this->getDirectoryRestriction();
+			
+		if ($this->hasIpAddressRestriction())
+			$restrictions[] = $this->getIpAddressRestriction();
 			
 		return $restrictions;
 	}
@@ -189,6 +196,7 @@ class accessControl extends BaseaccessControl
 		parent::setPrvRestrictPrivilege(null);
 		parent::setPrvRestrictLength(null);
 		parent::setKdirRestrictType(null);
+		$this->setIpAddressRestriction(null);
 	}
 	
 	/**
@@ -215,6 +223,9 @@ class accessControl extends BaseaccessControl
 				break;
 			case "directoryRestriction":
 				$this->setDirectoryRestriction($restriction);
+				break;
+			case "ipAddressRestriction":
+				$this->setIpAddressRestriction($restriction);
 				break;
 		}
 	}
@@ -358,6 +369,30 @@ class accessControl extends BaseaccessControl
 		parent::setKdirRestrictType($restrinction->getType());
 	}
 	
+	
+	public function getIpAddressRestriction()
+	{
+		if (!$this->hasIpAddressRestriction())
+			return null;
+					
+		$restriction = new ipAddressRestriction($this);
+		$restriction->populateFromString($this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME));
+		return $restriction;
+	}
+	
+	public function hasIpAddressRestriction()
+	{
+		return $this->getFromCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME) !== null;
+	}
+	
+	public function setIpAddressRestriction(ipAddressRestriction $restriction = null)
+	{
+		$restrictionString = is_null($restriction) ? null : $restriction->toString();
+		$this->putInCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME, $restrictionString);
+	}
+	
+	
+	
 	public function setIsDefault($v)
 	{
 		$this->isDefault = (bool)$v;
@@ -419,4 +454,5 @@ class accessControl extends BaseaccessControl
 	{
 		throw new Exception("Internal use only");		
 	}
+		
 }

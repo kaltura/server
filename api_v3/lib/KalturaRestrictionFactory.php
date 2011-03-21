@@ -21,6 +21,9 @@ class KalturaRestrictionFactory
 			case "directoryRestriction":
 				$obj = new KalturaDirectoryRestriction();
 				break;
+			case "ipAddressRestriction":
+				$obj = new KalturaIpAddressRestriction();
+				break;
 			default:
 				$obj = new KalturaBaseRestriction();
 				break;
@@ -49,6 +52,9 @@ class KalturaRestrictionFactory
 				break;
 			case "KalturaDirectoryRestriction":
 				$obj = new directoryRestriction();
+				break;
+			case "KalturaIpAddressRestriction":
+				$obj = new ipAddressRestriction();
 				break;
 		}
 		return $obj;
