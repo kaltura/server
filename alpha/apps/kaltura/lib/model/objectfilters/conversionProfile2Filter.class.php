@@ -14,7 +14,16 @@ class conversionProfile2Filter extends baseObjectFilter
 			"_in_id",
 			"_gte_created_at",
 			"_lte_created_at",
-			"_eq_name"
+			"_eq_name",
+			"_eq_system_name",
+			"_in_system_name",
+			"_eq_status",
+			"_in_status",
+			"_eq_default_entry_id",
+			"_in_default_entry_id",
+			"_like_tags" ,
+			"_mlikeor_tags",
+			"_mlikeand_tags" ,
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at")	;

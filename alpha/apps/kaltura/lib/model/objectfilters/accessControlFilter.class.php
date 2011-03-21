@@ -13,7 +13,9 @@ class accessControlFilter extends baseObjectFilter
 			"_eq_id",
 			"_in_id",
 			"_gte_created_at",
-			"_lte_created_at"
+			"_lte_created_at",
+			"_eq_system_name",
+			"_in_system_name"
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at")	;
