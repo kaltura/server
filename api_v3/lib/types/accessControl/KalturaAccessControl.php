@@ -28,6 +28,14 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	public $name;
 	
 	/**
+	 * System name of the Access Control Profile
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
+	
+	/**
 	 * The description of the Access Control Profile
 	 * 
 	 * @var string
@@ -61,6 +69,7 @@ class KalturaAccessControl extends KalturaObject implements IFilterable
 	(
 		"id",
 		"name",
+		"systemName",
 		"partnerId",
 		"description",
 		"createdAt",

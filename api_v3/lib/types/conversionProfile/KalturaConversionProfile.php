@@ -22,6 +22,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaConversionProfileStatus
+	 * @filter eq,in
 	 */
 	public $status;
 	
@@ -34,11 +35,35 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public $name;
 	
 	/**
+	 * System name of the Conversion Profile
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
+	
+	/**
+	 * Comma separated tags
+	 * 
+	 * @var string
+	 * @filter mlikeor,mlikeand
+	 */
+	public $tags;
+	
+	/**
 	 * The description of the Conversion Profile
 	 * 
 	 * @var string
 	 */
 	public $description;
+	
+	/**
+	 * ID of the default entry to be used for template data
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $defaultEntryId;
 	
 	/**
 	 * Creation date as Unix timestamp (In seconds) 
@@ -90,7 +115,10 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"partnerId",
 		"status",
 		"name",
+		"systemName",
+		"tags",
 		"description",
+		"defaultEntryId",
 		"createdAt",
 		"isDefault",
 		"clipStart",

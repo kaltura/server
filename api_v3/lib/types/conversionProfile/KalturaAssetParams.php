@@ -22,9 +22,17 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	/**
 	 * The name of the Flavor Params
 	 * 
-	 * @var string 
+	 * @var string
 	 */
 	public $name;
+	
+	/**
+	 * System name of the Flavor Params
+	 * 
+	 * @var string 
+	 * @filter eq,in
+	 */
+	public $systemName;
 	
 	/**
 	 * The description of the Flavor Params
@@ -71,6 +79,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"id",
 		"partnerId",
 		"name",
+		"systemName",
 		"description",
 		"createdAt",
 		"isSystemDefault" => "isDefault",
