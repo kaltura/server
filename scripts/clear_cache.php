@@ -7,13 +7,13 @@ require_once(dirname(__FILE__).'/../alpha/config/kConf.php');
 // clear kConf defined cache directories
 $path = realpath(kConf::get('cache_root_path'));
 
-askToDelete(realpath(kConf::get('general_cache_dir')));
-askToDelete(realpath(kConf::get('response_cache_dir')));
-askToDelete(realpath(kConf::get('cache_root_path')));
+askToDelete(fixPath(kConf::get('general_cache_dir')));
+askToDelete(fixPath(kConf::get('response_cache_dir')));
+askToDelete(fixPath(kConf::get('cache_root_path')));
 
 // clear symfony (alpha) cache
-system('php '.realpath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
-system('php '.realpath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
+system('php '.fixPath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
+system('php '.fixPath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
 
 // clear APC cache
 if (function_exists('apc_clear_cache'))
@@ -31,8 +31,15 @@ if (function_exists('apc_clear_cache'))
 	}
 }
 
-function askToDelete($path)
+function fixPath($path)
 {
+	$path = str_replace('\\', '/', $path);
+	return realpath($path);
+}
+
+
+function askToDelete($path)
+{	
 	$baseKalturaPath = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..');
 	if (strpos($path, $baseKalturaPath) === 0)
 	{
