@@ -322,7 +322,15 @@ KalturaLog::log(__METHOD__."==>\n");
 	 */
 	public function EvaluateFileExt()
 	{
-		return $this->_container->_id;
+		if($this->_container != null)
+		{
+			return $this->_container->_id;
+		}
+		else
+		{
+			return null;
+		}
+		
 		switch($this->_container->_id){
 			case "flv":
 			case "avi":
@@ -358,7 +366,7 @@ $sourceDur=0;
 			else if($source->_audio && $source->_audio->_duration>0) {
 				$sourceDur=$source->_audio->_duration;
 			}
-			else if($source->_container && $source->_conatiner->_duration>0) {
+			else if($source->_container && $source->_container->_duration>0) {
 				$sourceDur=$source->_container->_duration;
 			}
 		}
