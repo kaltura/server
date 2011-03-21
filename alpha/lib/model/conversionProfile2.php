@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class conversionProfile2 extends BaseconversionProfile2
+class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 {
 	const CONVERSION_PROFILE_NONE = -1;
 	
@@ -17,9 +17,117 @@ class conversionProfile2 extends BaseconversionProfile2
 	const CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC = 3;
 	const CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV = 4;
 	
+	const FILE_SYNC_MRSS_XSL = 1;
+	
+	private $xsl;
 	
 	protected $isDefault;
+		
+	/**
+	 * @var FileSync
+	 */
+	private $m_file_sync;
 	
+	/* (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getFileSync()
+	 */
+	public function getFileSync ( )
+	{
+		return $this->m_file_sync; 
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#setFileSync()
+	 */
+	public function setFileSync ( FileSync $file_sync )
+	{
+		 $this->m_file_sync = $file_sync;
+	}
+	
+	/**
+	 * @param int $sub_type
+	 * @throws FileSyncException
+	 */
+	private static function validateFileSyncSubType($sub_type)
+	{
+		$valid_sub_types = array(
+			self::FILE_SYNC_MRSS_XSL,
+		);
+		
+		if(! in_array($sub_type, $valid_sub_types))
+			throw new FileSyncException(FileSyncObjectType::CONVERSION_PROFILE, $sub_type, $valid_sub_types);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getSyncKey()
+	 */
+	public function getSyncKey($sub_type, $version = null)
+	{
+		self::validateFileSyncSubType($sub_type);
+		if(!$version)
+			$version = $this->getVersion();
+		
+		$key = new FileSyncKey();
+		$key->object_type = FileSyncObjectType::CONVERSION_PROFILE;
+		$key->object_sub_type = $sub_type;
+		$key->object_id = $this->getId();
+		$key->version = $version;
+		$key->partner_id = $this->getPartnerId();
+		return $key;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#generateFileName()
+	 */
+	public function generateFileName($sub_type, $version = null)
+	{
+		self::validateFileSyncSubType($sub_type);
+		
+		if(!$version)
+			$version = $this->getVersion();
+			
+		return $this->getId(). "_{$version}.xsl";
+	}
+	
+	public function getVersion()
+	{
+		return $this->getFromCustomData("xslVersion", null, 0);
+	}
+	
+	public function incrementXslVersion()
+	{
+		$this->incInCustomData("xslVersion");
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#generateFilePathArr()
+	 */
+	public function generateFilePathArr($sub_type, $version = null)
+	{
+		self::validateFileSyncSubType ( $sub_type );
+		
+		if(!$version)
+			$version = $this->getVersion();
+		
+		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		$path =  "/content/conversion/xsl/$dir/" . $this->generateFileName($sub_type, $version);
+
+		return array(myContentStorage::getFSContentRootPath(), $path); 
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getXsl()
+	{
+		if (!is_null($this->xsl))
+			return $this->xsl;
+
+		$key = $this->getSyncKey(self::FILE_SYNC_MRSS_XSL);
+		$this->xsl = kFileSyncUtils::file_get_contents($key, true, false);
+		return $this->xsl;
+	}
 
 	/* (non-PHPdoc)
 	 * @see BaseconversionProfile2::setDeletedAt()

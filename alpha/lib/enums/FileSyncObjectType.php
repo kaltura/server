@@ -12,4 +12,5 @@ interface FileSyncObjectType extends BaseEnum
 	const METADATA = 5;
 	const METADATA_PROFILE = 6;
 	const SYNDICATION_FEED = 7;
+	const CONVERSION_PROFILE = 8;
 }

@@ -109,6 +109,13 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 */
 	public $clipDuration;
 	
+	/**
+	 * XSL to transform ingestion MRSS XML
+	 * 
+	 * @var string
+	 */
+	public $xslTransformation;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -133,6 +140,8 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public function fromObject($sourceObject)
 	{
 		parent::fromObject($sourceObject);
+		
+		$this->xslTransformation = $sourceObject->getXsl();
 		
 		$this->cropDimensions = new KalturaCropDimensions();
 		$this->cropDimensions->fromObject($sourceObject);

@@ -23,6 +23,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		if($object instanceof syndicationFeed)
 			$this->syndicationFeedDeleted($object);
 			
+		if($object instanceof conversionProfile2)
+			$this->conversionProfileDeleted($object);
+			
 		return true;
 	}
 
@@ -102,7 +105,6 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		$this->syncableDeleted($asset->getId(), FileSyncObjectType::FLAVOR_ASSET);
 	}
 	
-	
 	/**
 	 * @param syndicationFeed $syndicationFeed
 	 */
@@ -110,5 +112,13 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 	{
 		if($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT)
 			$this->syncableDeleted($syndicationFeed->getId(), FileSyncObjectType::SYNDICATION_FEED);
+	}
+	
+	/**
+	 * @param conversionProfile2 $conversionProfile
+	 */
+	protected function conversionProfileDeleted(conversionProfile2 $conversionProfile)
+	{
+		$this->syncableDeleted($conversionProfile->getId(), FileSyncObjectType::CONVERSION_PROFILE);
 	}
 }

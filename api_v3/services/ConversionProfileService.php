@@ -43,9 +43,20 @@ class ConversionProfileService extends KalturaBaseService
 
 		$conversionProfileDb->setInputTagsMap(flavorParams::TAG_WEB . ',' . flavorParams::TAG_SLWEB);
 		$conversionProfileDb->setPartnerId($this->getPartnerId());
+		
+		if($conversionProfile->xslTransformation)
+			$conversionProfileDb->incrementXslVersion();
+			
 		$conversionProfileDb->save();
 		
 		$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
+		
+		if($conversionProfile->xslTransformation)
+		{
+			$xsl = html_entity_decode($conversionProfile->xslTransformation);
+			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MRSS_XSL);
+			kFileSyncUtils::file_put_contents($key, $xsl);
+		}
 		
 		$conversionProfile->fromObject($conversionProfileDb);
 		
@@ -97,12 +108,23 @@ class ConversionProfileService extends KalturaBaseService
 			
 		$conversionProfile->toUpdatableObject($conversionProfileDb);
 		$conversionProfileDb->setCreationMode(conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_KMC);
+		
+		if($conversionProfile->xslTransformation)
+			$conversionProfileDb->incrementXslVersion();
+			
 		$conversionProfileDb->save();
 		
 		if ($conversionProfile->flavorParamsIds !== null) 
 		{
 			$this->deleteFlavorParamsRelation($conversionProfileDb);
 			$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
+		}
+		
+		if($conversionProfile->xslTransformation)
+		{
+			$xsl = html_entity_decode($conversionProfile->xslTransformation);
+			$key = $conversionProfileDb->getSyncKey(conversionProfile2::FILE_SYNC_MRSS_XSL);
+			kFileSyncUtils::file_put_contents($key, $xsl);
 		}
 		
 		$conversionProfile->fromObject($conversionProfileDb);
