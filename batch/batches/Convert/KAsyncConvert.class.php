@@ -74,7 +74,7 @@ class KAsyncConvert extends KBatchBase
 	public function run($jobs = null)
 	{
 		KalturaLog::notice ( "Convert batch is running");
-		KalturaLog::notice ( "Supporting engines: " . $this->getSupportedEnginesDescription() );
+		KalturaLog::notice ( "Supporting engines: " . $this->getSupportedEngines() );
 		 
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
@@ -321,30 +321,6 @@ class KAsyncConvert extends KBatchBase
 		return $response->job;
 	}	
 
-	
-	/*
-	 * @return string
-	 */
-	protected function getSupportedEnginesDescription()
-	{
-		$supported_engines_arr = array();
-		if  ( $this->taskConfig->params->useOn2 ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::ON2 . "] On2";
-		if  ( $this->taskConfig->params->useFFMpeg ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::FFMPEG . "] ffmpeg";
-		if  ( $this->taskConfig->params->MEncoder ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::MENCODER . "] mencoder";
-		if  ( $this->taskConfig->params->EncodingCom ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::ENCODING_COM . "] encoding.com";
-		if  ( $this->taskConfig->params->KalturaCom ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::KALTURA_COM . "] kaltura";
-		if  ( $this->taskConfig->params->useFFMpegAux ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::FFMPEG_AUX . "] ffmpeg_aux";
-		if  ( $this->taskConfig->params->useFFMpegVp8 ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::FFMPEG_VP8 . "] ffmpeg_vp8";
-		if  ( $this->taskConfig->params->useExpressionEncoder ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::EXPRESSION_ENCODER . "] expression_encoder";
-		if  ( $this->taskConfig->params->useQtTools ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS . "] quicktimeplayer_tools";
-		if  ( $this->taskConfig->params->useAvidemux ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::AVIDEMUX . "] avidemux";
-		if  ( $this->taskConfig->params->usePdfCreator ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::PDF_CREATOR . "] pdf creator";
-		if  ( $this->taskConfig->params->usePdf2Swf ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::PDF2SWF . "] pdf2swf";
-		if  ( $this->taskConfig->params->useSegmenter ) $supported_engines_arr[] = "[" . KalturaConversionEngineType::SEGMENTER . "] segmenter";
-		
-		return implode ( ", " , $supported_engines_arr );
-	}
-	
 
 	/*
 	 * @return string
