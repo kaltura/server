@@ -533,6 +533,71 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaUiConfAdminService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function update($id, KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+}
 /**
  * @package Admin
  * @subpackage Client
@@ -564,6 +629,11 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 	 */
 	public $entryAdmin = null;
 
+	/**
+	 * @var KalturaUiConfAdminService
+	 */
+	public $uiConfAdmin = null;
+
 	protected function __construct(KalturaClient $client)
 	{
 		parent::__construct($client);
@@ -571,6 +641,7 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($client);
 		$this->mediaInfo = new KalturaMediaInfoService($client);
 		$this->entryAdmin = new KalturaEntryAdminService($client);
+		$this->uiConfAdmin = new KalturaUiConfAdminService($client);
 	}
 
 	/**
@@ -593,6 +664,7 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 			'thumbParamsOutput' => $this->thumbParamsOutput,
 			'mediaInfo' => $this->mediaInfo,
 			'entryAdmin' => $this->entryAdmin,
+			'uiConfAdmin' => $this->uiConfAdmin,
 		);
 		return $services;
 	}
