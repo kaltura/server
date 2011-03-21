@@ -200,11 +200,15 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	protected function addFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $flavorParamsIds)
 	{
-		foreach($flavorParamsIds as $flavorParamsId)
+		assetParamsPeer::resetInstanceCriteriaFilter();
+		$assetParamsObjects = assetParamsPeer::retrieveByPKs($flavorParamsIds);
+		foreach($assetParamsObjects as $assetParams)
 		{
 			$fpc = new flavorParamsConversionProfile();
 			$fpc->setConversionProfileId($conversionProfileDb->getId());
-			$fpc->setFlavorParamsId($flavorParamsId);
+			$fpc->setFlavorParamsId($assetParams->getId());
+			$fpc->setReadyBehavior($assetParams->getReadyBehavior());
+			$fpc->setSystemName($assetParams->getSystemName());
 			$fpc->save();
 		}
 	}

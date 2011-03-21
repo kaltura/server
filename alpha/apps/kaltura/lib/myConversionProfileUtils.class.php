@@ -296,7 +296,7 @@ class myConversionProfileUtils
 			$new_flavor_params->setHeight( $old_conversion_params->height );
 			
 			$new_flavor_params->setVersion( 1 );
-			$new_flavor_params->setReadyBehavior( false );
+			$new_flavor_params->setReadyBehavior( flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL );
 			$new_flavor_params->setVideoBitrate( $old_conversion_params->bitrate ? $old_conversion_params->bitrate : "" );
 			
 			
@@ -307,6 +307,7 @@ class myConversionProfileUtils
 			$flavor_params_conversion_profile = new flavorParamsConversionProfile();
 			$flavor_params_conversion_profile->setConversionProfileId( $new_profile->getId() );
 			$flavor_params_conversion_profile->setFlavorParamsId( $new_flavor_params->getId() );
+			$flavor_params_conversion_profile->setReadyBehavior( $new_flavor_params->getReadyBehavior() );
 			
 			$flavor_params_conversion_profile->save();
 		} 
