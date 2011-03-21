@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaPremissionItemListResponse extends KalturaObject
+class KalturaPermissionItemListResponse extends KalturaObject
 {
 	/**
 	 * @var KalturaPermissionItemArray
