@@ -66,9 +66,9 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	private static function getMrssEntryXml(entry $entry,  syndicationFeed $syndicationFeed = null)
+	private static function getMrssEntryXml(entry $entry,  syndicationFeed $syndicationFeed = null, $link = null)
 	{
-		$mrss = kMrssManager::getEntryMrssXml($entry);
+		$mrss = kMrssManager::getEntryMrssXml($entry, null, $link);
 		
 		if(!$mrss)
 		{
@@ -162,9 +162,9 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null)
+	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null, $link = null)
 	{
-		$entryMrss =  self::getMrssEntryXml($entry, $syndicationFeed);
+		$entryMrss =  self::getMrssEntryXml($entry, $syndicationFeed, $link);
 		
 		if(!$entryMrss)
 		{
