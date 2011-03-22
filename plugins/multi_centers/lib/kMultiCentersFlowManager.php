@@ -57,7 +57,7 @@ class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 		}
 		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$fileSync->setReadyAt( time() );
-		$fileSync->setFileSize(filesize(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync))));
+		$fileSync->setFileSizeFromPath(kFileSyncUtils::getLocalFilePathForKey(kFileSyncUtils::getKeyForFileSync($fileSync)));
 		$fileSync->save();
 		return $dbBatchJob;
 	}

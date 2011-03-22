@@ -42,9 +42,22 @@ class kFile
 		    closedir($handle);
 		}
 		return $fileList;
-	}	
+	}
 	
-	
+	/**
+	 * 
+	 * return the file size of the file in $filePath
+	 * @param unknown_type $filePath - path to file
+	 * @param unknown_type $specificClean - Clear the realpath cache for a specific filename
+	 */
+	static public function kFileSize($filePath, $specificClean = false)
+	{
+		if ($specificClean)
+			clearstatcache($specificClean, $filePath);
+		else
+			clearstatcache();
+		return filesize($filePath);	
+	}
 	
 	// TODO - implement recursion
 	static public function dirList($directory, $return_directory_as_prefix = true, $should_recurse = false)

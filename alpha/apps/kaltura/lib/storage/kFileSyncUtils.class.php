@@ -646,7 +646,7 @@ class kFileSyncUtils
 		$full_path = $current_dc_file_sync->getFullPath();
 		if ( file_exists( $full_path ) )
 		{
-			$current_dc_file_sync->setFileSize ( filesize( $full_path ) );
+			$current_dc_file_sync->setFileSizeFromPath ( $full_path );
 			$current_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
 			$current_dc_file_sync->setReadyAt ( time() );
 		}

@@ -76,7 +76,7 @@ class FileSyncService extends KalturaBaseService
 		{
 			$dbFileSync->setFileRoot($file_root);
 			$dbFileSync->setFilePath($real_path);
-			$dbFileSync->setFileSize(filesize($full_path));
+			$dbFileSync->setFileSizeFromPath($full_path);
 			$dbFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 			$dbFileSync->setReadyAt(time());
 		}

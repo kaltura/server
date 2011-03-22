@@ -47,7 +47,12 @@ class FileSync extends BaseFileSync
 		$file_sync->setVersion ( $key->version );
 		if ( $key->partner_id ) $file_sync->setPartnerId ( $key->partner_id );
 		return $file_sync;
-	}	
+	}
+
+	public function setFileSizeFromPath ($filePath)
+	{
+		return kFile::kFileSize($filePath);
+	}
 	
 	public function getFullPath ()
 	{
