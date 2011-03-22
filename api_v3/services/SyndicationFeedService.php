@@ -131,7 +131,7 @@ class SyndicationFeedService extends KalturaBaseService
 				
 		$syndicationFeed->type = null;
 		
-		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed)){// && ($syndicationFeed->xslt != null)){			
+		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){			
 			$key = $syndicationFeedDB->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 			kFileSyncUtils::file_put_contents($key, $syndicationFeed->xslt);
 		}
