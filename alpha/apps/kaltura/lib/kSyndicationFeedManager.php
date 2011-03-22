@@ -176,6 +176,7 @@ class kSyndicationFeedManager
 		{
 			$itemXslt = self::getKalturaItemXslt(self::getXslt($syndicationFeed));
 			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt);
+			$entryMrss = self::removeNamespaces($entryMrss);
 		}
 		$entryMrss = self::removeXmlHeader($entryMrss);
 		
@@ -232,6 +233,18 @@ class kSyndicationFeedManager
 		$items->item(0)->parentNode->replaceChild($itemPlaceHolderNode,$items->item(0));
 	
 		return $xsl->saveXML();
+	}
+	
+	/**
+	 * 
+	 * @param stinr $xmlStr
+	 * @return string
+	 */
+	private static function removeNamespaces($xmlStr)
+	{
+	//	return preg_replace("/<.*(xmlns *= *[\"'].[^\"']*[\"']).[^>]*>/i", "", $xmlStr);
+		//return preg_replace("/ xmlns:[a-zA-Z0-9_]{1,}=[\"'].[^\"']*[\"']/", "", $xmlStr);
+		return preg_replace("/ xmlns:[^= ]{1,}=[\"][^\"]*[\"]/i", "", $xmlStr);
 	}
 	
 	/**
